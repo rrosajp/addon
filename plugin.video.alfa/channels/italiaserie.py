@@ -136,7 +136,7 @@ def seasons(item):
 
 def episodios(item):
     support.log()
-    season = item.fulltitle
+    season = item.parentTitle
 
     patron = r'<div class="su-link-ep">\s+<a.*?href="([^"]+)".*?strong>(.*?)</'
     if item.args:
@@ -150,7 +150,7 @@ def episodios(item):
 
     for it in itemlist:
         if it.action == "findvideos":
-            season_n = season.lower().replace("stagione", "").strip()
+            season_n = scrapertools.find_single_match(season, r'Stagione\s+(\d+)')
             ep_n = scrapertools.find_single_match(it.title, r'Episodio\s+(\d+)')
             it.title = season_n + "x" + str(ep_n).zfill(2) + re.sub(r"Episodio\s+" + ep_n, "", it.title)
 
