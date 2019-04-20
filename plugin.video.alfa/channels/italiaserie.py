@@ -25,9 +25,7 @@ def mainlist(item):
     itemlist = []
 
     support.menu(itemlist, 'Ultime Uscite', 'peliculas', host + "/category/serie-tv/", "episode")
-    # page not working
-    # support.menu(itemlist, 'Ultimi Episodi', 'peliculas', host + "/ultimi-episodi/", "episode", 'latest')
-    support.menu(itemlist, 'Ultimi Episodi', 'peliculas', host, "episode", 'latest')
+    support.menu(itemlist, 'Ultimi Episodi', 'peliculas', host + "/ultimi-episodi/", "episode", 'latest')
     support.menu(itemlist, 'Categorie', 'menu', host, "episode", args="Serie-Tv per Genere")
     support.menu(itemlist, 'Cerca...', 'search', host, 'episode', args='serie')
 
@@ -71,17 +69,14 @@ def peliculas(item):
         patron += r'.*?aj-eps">(.*?)</span>'
         data = httptools.downloadpage(item.url).data
 
-        # remove when /ultimi-episodi page will work again
-        block = scrapertools.find_single_match(data, r'<ul class="recent-posts">(.*?)<\/ul>')
-
-        matches = re.compile(patron, re.S).findall(block)
+        matches = re.compile(patron, re.S).findall(data)
         itemlist = []
 
         for scrapedurl, scrapedtitle, scrapedthumbnail, scrapedep in matches:
             s, ep = scrapertools.find_single_match(scrapedep, r'(\d+)x(\d+)\s')
             itemlist.append(
                 Item(channel=item.channel,
-                     action="seasons",
+                     action="episodios",
                      contentType=item.contentType,
                      title="[B]" + scrapedtitle + "[/B] " + scrapedep,
                      fulltitle=scrapedtitle,
@@ -95,7 +90,12 @@ def peliculas(item):
         return itemlist
     else:
         patron_next = r'<a class="next page-numbers" href="(.*?)">'
-        return support.scrape(item, patron, list_groups, patronNext=patron_next, action="seasons")
+        itemlist = support.scrape(item, patron, list_groups, patronNext=patron_next, action="episodios")
+
+        if itemlist[-1].action != "peliculas":
+            itemlist.pop()
+
+        return itemlist
 
 
 def search(item, texto):
@@ -117,42 +117,44 @@ def menu(item):
     return support.scrape(item, patron, ["url", "title"], action="peliculas")
 
 
-def seasons(item):
+def episodios(item):
     support.log()
 
     patron = r'<div class="su-spoiler.*?</i>(.*?)</div>\s+<div class="su-spoiler-content"(.*?)="clearfix">'
-    itemlist = support.scrape(item, patron, ["title", "url"], action="episodios")
+    data = httptools.downloadpage(item.url).data
+    matches = re.compile(patron, re.S).findall(data)
 
     if item.args:
-        s = item.args["season"]
-        s = (int(s) - 1)
-        lastitem = itemlist[s]
-        lastitem.args = {"episode": item.args["episode"]}
+        s = (int(item.args["season"]))
+        try:
+            matches = [matches[s]]
+        except:
+            matches = [matches[(s - 1)]]
 
-        return episodios(lastitem)
+    itemlist = []
 
-    return itemlist[:-1]
+    for season, block in matches:
+        patron = r'<div class="su-link-ep">\s+<a.*?href="([^"]+)".*?strong>(.*?)</'
+        if item.args:
+            ep = int(item.args["episode"])
+            patron = r'<div class="su-link-ep">\s+<a.*?href="([^"]+)".*?strong>\s(Episodio ' + str(ep) + r') .*?</'
+        episodes = re.compile(patron, re.MULTILINE).findall(block)
+        for scrapedurl, scrapedtitle in episodes:
+            fixedtitle = scrapertools.get_season_and_episode(season + " " + scrapedtitle)
+            eptitle = re.sub(r"Episodio\s+\d+", "", scrapedtitle).strip()
+            itemlist.append(
+                Item(channel=item.channel,
+                     action="episodios",
+                     contentType=item.contentType,
+                     title="[B]" + fixedtitle + " " + eptitle + "[/B]",
+                     fulltitle=fixedtitle + " " + eptitle,
+                     show=fixedtitle + " " + eptitle,
+                     url=scrapedurl,
+                     extra=item.extra,
+                     ))
 
-
-def episodios(item):
-    support.log()
-    season = item.parentTitle
-
-    patron = r'<div class="su-link-ep">\s+<a.*?href="([^"]+)".*?strong>(.*?)</'
-    if item.args:
-        ep = int(item.args["episode"])
-        patron = r'<div class="su-link-ep">\s+<a.*?href="([^"]+)".*?strong>\s(Episodio ' + str(ep) + r') .*?</'
-
-    itemlist = support.scrape(item, patron, ["url", "title"], data=item.url)
-
-    if item.args:
-        itemlist = itemlist[:-1]
-
-    for it in itemlist:
-        if it.action == "findvideos":
-            season_n = scrapertools.find_single_match(season, r'Stagione\s+(\d+)')
-            ep_n = scrapertools.find_single_match(it.title, r'Episodio\s+(\d+)')
-            it.title = season_n + "x" + str(ep_n).zfill(2) + re.sub(r"Episodio\s+" + ep_n, "", it.title)
+    if not item.args:
+        support.videolibrary(itemlist, item)
 
     return itemlist
 
