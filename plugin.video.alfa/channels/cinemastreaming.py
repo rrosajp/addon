@@ -54,7 +54,7 @@ def peliculas(item):
         patron += r'\">([^<]+)'
         list_groups.append("quality")
 
-    action = "findvideos" if item.contentType == "movie" or item.args == "lateste" else "episodios"
+    action = "findvideos" if item.contentType == "movie" else "episodios"
 
     return support.scrape(item, patron, list_groups, patronNext=patron_next, action=action)
 
@@ -153,11 +153,21 @@ def newest(categoria):
 
 
 def findvideos(item):
+
+    if item.quality.lower() in ["ended", "canceled", "returning series"]:
+        return episodios(item)
+
     itemlist = []
     data = scrapertoolsV2.decodeHtmlentities(httptools.downloadpage(item.url).data)
     btns = re.compile(r'data-tplayernv="Opt.*?><span>([^<]+)</span><span>([^<]+)</span>', re.DOTALL).findall(data)
     matches = re.compile(r'<iframe.*?src="([^"]+trembed=[^"]+)', re.DOTALL).findall(data)
     for i, scrapedurl in enumerate(matches):
+
+        scrapedurl = scrapertoolsV2.decodeHtmlentities(scrapedurl)
+        patron = r'<iframe.*?src="([^"]+)"'
+        link_data = httptools.downloadpage(scrapedurl).data
+        url = scrapertoolsV2.find_single_match(link_data, patron)
+
         itemlist.append(
             Item(channel=item.channel,
                  action="play",
@@ -165,9 +175,11 @@ def findvideos(item):
                  title="[B]" + btns[i][0] + "[/B] - " + btns[i][1],
                  fulltitle=btns[i][0] + " " + btns[i][1],
                  show=btns[i][0] + " " + btns[i][1],
-                 url=scrapedurl,
+                 url=url,
                  extra=item.extra,
-                 infoLabels=item.infoLabels
+                 infoLabels=item.infoLabels,
+                 server=btns[i][0],
+                 contentQuality=btns[i][1].replace('Italiano - ', ''),
                  ))
 
     if item.contentType == "movie":
@@ -176,12 +188,3 @@ def findvideos(item):
 
     return itemlist
 
-
-def play(item):
-    patron = r'<iframe.*?src="([^>]+)"'
-    data = httptools.downloadpage(item.url).data
-    url = scrapertoolsV2.find_single_match(data, patron)
-
-    itemlist = support.server(item, url)
-
-    return itemlist
