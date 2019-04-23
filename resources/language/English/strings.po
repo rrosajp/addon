@@ -1402,7 +1402,7 @@ msgid "Download in"
 msgstr ""
 
 msgctxt "#60337"
-msgid "alfa-MCT: No support adf.ly"
+msgid "KOD-MCT: No support adf.ly"
 msgstr ""
 
 msgctxt "#60338"
@@ -1858,7 +1858,7 @@ msgid "KOD - FAQ - %s"
 msgstr ""
 
 msgctxt "#60462"
-msgid "You may not have written the library path correctly in 'Settings>Preferences'.\nIl The specified path must be exactly the same as the 'source' entered in 'Archive' of the Kodi library.\nAVANZATO: This path is also found in 'sources.xml'.\nThere can be problems using some Kodi forks and paths with 'special://'. SPMC, for example, has problems with this, and there doesn't seem to be a solution, as it is an external problem to Alfa that has existed for a long time.\nYou can try solving these problems in 'Settings>Library Settings' by changing the 'Search in' setting from 'The folder of each series' to 'All library'."
+msgid "You may not have written the library path correctly in 'Settings>Preferences'.\nIl The specified path must be exactly the same as the 'source' entered in 'Archive' of the Kodi library.\nAVANZATO: This path is also found in 'sources.xml'.\nThere can be problems using some Kodi forks and paths with 'special://'. SPMC, for example, has problems with this, and there doesn't seem to be a solution, as it is an external problem to KOD that has existed for a long time.\nYou can try solving these problems in 'Settings>Library Settings' by changing the 'Search in' setting from 'The folder of each series' to 'All library'."
 msgstr ""
 
 msgctxt "#60463"
@@ -1878,11 +1878,11 @@ msgid "Yes, the option to display merged or split results by channels can be fou
 msgstr ""
 
 msgctxt "#60467"
-msgid "To report a problem on'http://alfa-addon.com' you need to:|the version you're using of Alpha.|The version you're using of kodi, mediaserver, etc.|the version and name of the operating system you're using.|The name of the skin (in case you're using Kodi) and whether using the default skin has solved the problem.|Description of the problem and any test cases.To activate the log in detailed mode, go to:|Configuration.|Preferences.|In the General tab - Check the option: Generate detailed log. The detailed log file can be found in the following path: \n\n%s"
+msgid "To report a problem on'https://t.me/kodiondemand' you need to:|the version you're using of Alpha.|The version you're using of kodi, mediaserver, etc.|the version and name of the operating system you're using.|The name of the skin (in case you're using Kodi) and whether using the default skin has solved the problem.|Description of the problem and any test cases.To activate the log in detailed mode, go to:|Configuration.|Preferences.|In the General tab - Check the option: Generate detailed log. The detailed log file can be found in the following path: \n\n%s"
 msgstr ""
 
 msgctxt "#60468"
-msgid "You can find our Telegram channel at @alfa_addon\nIf you have doubts you can write to us in the Telegram group: https://t.me/alfa_addon"
+msgid "You can find our Telegram group at @kodiondemand"
 msgstr ""
 
 msgctxt "#60469"
@@ -2322,7 +2322,7 @@ msgid "Overwriting the video library...TV SERIES"
 msgstr ""
 
 msgctxt "#60585"
-msgid "alfa"
+msgid "kod"
 msgstr ""
 
 msgctxt "#60586"
@@ -2986,7 +2986,7 @@ msgid "In my Collection"
 msgstr ""
 
 msgctxt "#70069"
-msgid "Search %s in alfa: %s"
+msgid "Search %s in KOD: %s"
 msgstr ""
 
 msgctxt "#70070"
@@ -3122,7 +3122,7 @@ msgid "Congratulations, the Kodi video library has been configured correctly."
 msgstr ""
 
 msgctxt "#70105"
-msgid "Do you want Alfa to automatically configure the Kodi library?You will be asked to set up scrapers for movies and series."
+msgid "Do you want KOD to automatically configure the Kodi library?You will be asked to set up scrapers for movies and series."
 msgstr ""
 
 msgctxt "#70106"
@@ -3182,7 +3182,7 @@ msgid "Folder name for 'Movies'"
 msgstr ""
 
 msgctxt "#70120"
-msgid "Autoconfigure XBMC / Kodi library for Alfa content"
+msgid "Autoconfigure XBMC / Kodi library for KOD content"
 msgstr ""
 
 msgctxt "#70121"
@@ -3474,11 +3474,11 @@ msgid "Open torrent with..."
 msgstr ""
 
 msgctxt "#70194"
-msgid "alfa-torrent"
+msgid "kod-torrent"
 msgstr ""
 
 msgctxt "#70195"
-msgid "Alfa - Torrent"
+msgid "KOD - Torrent"
 msgstr ""
 
 msgctxt "#70196"
@@ -3734,7 +3734,7 @@ msgid "Settings -- Torrent"
 msgstr ""
 
 msgctxt "#70258"
-msgid "Alfa Started"
+msgid "KOD Started"
 msgstr ""
 
 msgctxt "#70259"
@@ -3754,11 +3754,11 @@ msgid "Stopping the Websocket server ..."
 msgstr ""
 
 msgctxt "#70263"
-msgid "Alfa stopped"
+msgid "KOD stopped"
 msgstr ""
 
 msgctxt "#70264"
-msgid "Enter the username and password to access Alfa"
+msgid "Enter the username and password to access KOD"
 msgstr ""
 
 msgctxt "#70265"
@@ -4088,7 +4088,7 @@ msgid "List sorted by %s. Change order?"
 msgstr ""
 
 msgctxt "#70350"
-msgid "Search in alfa: %s"
+msgid "Search in kod: %s"
 msgstr ""
 
 msgctxt "#70351"
@@ -5378,7 +5378,7 @@ msgid "Synchronization with Trakt started"
 msgstr ""
 
 msgctxt "#59971"
-msgid "Alfa Auto-configuration"
+msgid "KOD Auto-configuration"
 msgstr ""
 
 msgctxt "#59972"
@@ -5538,11 +5538,11 @@ msgid "No video to play"
 msgstr ""
 
 msgctxt "#60013"
-msgid "This website seems to be unavailable, try later, if the problem persists, check with a browser: %s. If the web page is working correctly, please report the error on : https://alfa-addon.com"
+msgid "This website seems to be unavailable, try later, if the problem persists, check with a browser: %s. If the web page is working correctly, please report the error on : https://t.me/kodiondemand"
 msgstr ""
 
 msgctxt "#60014"
-msgid "It may be due to a connection problem, the web page of the channel has changed its structure, or an internal error of alfa. To have more details, see the log file."
+msgid "It may be due to a connection problem, the web page of the channel has changed its structure, or an internal error of kod. To have more details, see the log file."
 msgstr ""
 
 msgctxt "#60015"
@@ -5638,7 +5638,7 @@ msgid "Tv series update ..."
 msgstr ""
 
 msgctxt "#60038"
-msgid "An error has occurred on alfa"
+msgid "An error has occurred on KOD"
 msgstr ""
 
 msgctxt "#60039"
@@ -5726,7 +5726,7 @@ msgid "Congratulations, Kodi's video library has been configured correctly."
 msgstr ""
 
 msgctxt "#60060"
-msgid "Alfa Auto-configuration"
+msgid "KOD Auto-configuration"
 msgstr ""
 
 msgctxt "#60062"
@@ -6102,7 +6102,7 @@ msgid "Problem in the connection process"
 msgstr ""
 
 msgctxt "#60261"
-msgid "Alfa"
+msgid "KOD"
 msgstr ""
 
 msgctxt "#60262"
@@ -6398,7 +6398,7 @@ msgid "Download in"
 msgstr ""
 
 msgctxt "#60337"
-msgid "alfa-MCT: No support adf.ly"
+msgid "KOD-MCT: No support adf.ly"
 msgstr ""
 
 msgctxt "#60338"
@@ -6422,7 +6422,7 @@ msgid "Continue with the session?"
 msgstr ""
 
 msgctxt "#60345"
-msgid "alfa-MCT: List of videos"
+msgid "KOD-MCT: List of videos"
 msgstr ""
 
 msgctxt "#60346"
@@ -6498,7 +6498,7 @@ msgid "The server on which it is hosted"
 msgstr ""
 
 msgctxt "#60364"
-msgid "is not yet supported in Alfa"
+msgid "is not yet supported in KOD"
 msgstr ""
 
 msgctxt "#60365"
@@ -6834,7 +6834,7 @@ msgid "    - Links of interest"
 msgstr ""
 
 msgctxt "#60457"
-msgid "Alfa"
+msgid "KOD"
 msgstr ""
 
 msgctxt "#60458"
@@ -6850,11 +6850,11 @@ msgid "This can be improved by limiting the maximum number of links or by displa
 msgstr ""
 
 msgctxt "#60461"
-msgid "Alfa - FAQ - %s"
+msgid "KOD - FAQ - %s"
 msgstr ""
 
 msgctxt "#60462"
-msgid "You may not have written the library path correctly in 'Settings>Preferences'.\nIl The specified path must be exactly the same as the 'source' entered in 'Archive' of the Kodi library.\nAVANZATO: This path is also found in 'sources.xml'.\nThere can be problems using some Kodi forks and paths with 'special://'. SPMC, for example, has problems with this, and there doesn't seem to be a solution, as it is an external problem to Alfa that has existed for a long time.\nYou can try solving these problems in 'Settings>Library Settings' by changing the 'Search in' setting from 'The folder of each series' to 'All library'."
+msgid "You may not have written the library path correctly in 'Settings>Preferences'.\nIl The specified path must be exactly the same as the 'source' entered in 'Archive' of the Kodi library.\nAVANZATO: This path is also found in 'sources.xml'.\nThere can be problems using some Kodi forks and paths with 'special://'. SPMC, for example, has problems with this, and there doesn't seem to be a solution, as it is an external problem to KOD that has existed for a long time.\nYou can try solving these problems in 'Settings>Library Settings' by changing the 'Search in' setting from 'The folder of each series' to 'All library'."
 msgstr ""
 
 msgctxt "#60463"
@@ -6862,7 +6862,7 @@ msgid "The channel site may not work. In case the site works you can report the 
 msgstr ""
 
 msgctxt "#60464"
-msgid "It is possible that you have updated Alfa recently and that the changes have not been fully applied Well, you can try 'Settings>Other Tools', checking the *_data.json files or reattaching everything to the library again"
+msgid "It is possible that you have updated KOD recently and that the changes have not been fully applied Well, you can try 'Settings>Other Tools', checking the *_data.json files or reattaching everything to the library again"
 msgstr ""
 
 msgctxt "#60465"
@@ -6874,11 +6874,11 @@ msgid "Yes, the option to display merged or split results by channels can be fou
 msgstr ""
 
 msgctxt "#60467"
-msgid "To report a problem on'http://alfa-addon.com' you need to:|the version you're using of Alpha.|The version you're using of kodi, mediaserver, etc.|the version and name of the operating system you're using.|The name of the skin (in case you're using Kodi) and whether using the default skin has solved the problem.|Description of the problem and any test cases.To activate the log in detailed mode, go to:|Configuration.|Preferences.|In the General tab - Check the option: Generate detailed log. The detailed log file can be found in the following path: \n\n%s"
+msgid "To report a problem on'https://t.me/kodiondemand' you need to:|the version you're using of Alpha.|The version you're using of kodi, mediaserver, etc.|the version and name of the operating system you're using.|The name of the skin (in case you're using Kodi) and whether using the default skin has solved the problem.|Description of the problem and any test cases.To activate the log in detailed mode, go to:|Configuration.|Preferences.|In the General tab - Check the option: Generate detailed log. The detailed log file can be found in the following path: \n\n%s"
 msgstr ""
 
 msgctxt "#60468"
-msgid "You can find our Telegram channel at @alfa_addon\nIf you have doubts you can write to us in the Telegram group: https://t.me/alfa_addon"
+msgid "You can find our Telegram group at @kodiondemand\nIf you have doubts you can write to us in the Telegram group: https://t.me/alfa_addon"
 msgstr ""
 
 msgctxt "#60469"
@@ -7318,7 +7318,7 @@ msgid "Overwriting the video library...TV SERIES"
 msgstr ""
 
 msgctxt "#60585"
-msgid "alfa"
+msgid "KOD"
 msgstr ""
 
 msgctxt "#60586"
@@ -7982,7 +7982,7 @@ msgid "In my Collection"
 msgstr ""
 
 msgctxt "#70069"
-msgid "Search %s in alfa: %s"
+msgid "Search %s in KOD: %s"
 msgstr ""
 
 msgctxt "#70070"
@@ -8118,7 +8118,7 @@ msgid "Congratulations, the Kodi video library has been configured correctly."
 msgstr ""
 
 msgctxt "#70105"
-msgid "Do you want Alfa to automatically configure the Kodi library?You will be asked to set up scrapers for movies and series."
+msgid "Do you want KOD to automatically configure the Kodi library?You will be asked to set up scrapers for movies and series."
 msgstr ""
 
 msgctxt "#70106"
@@ -8178,7 +8178,7 @@ msgid "Folder name for 'Movies'"
 msgstr ""
 
 msgctxt "#70120"
-msgid "Autoconfigure XBMC / Kodi library for Alfa content"
+msgid "Autoconfigure XBMC / Kodi library for KOD content"
 msgstr ""
 
 msgctxt "#70121"
@@ -8470,11 +8470,11 @@ msgid "Open torrent with..."
 msgstr ""
 
 msgctxt "#70194"
-msgid "alfa-torrent"
+msgid "KOD-torrent"
 msgstr ""
 
 msgctxt "#70195"
-msgid "Alfa - Torrent"
+msgid "KOD - Torrent"
 msgstr ""
 
 msgctxt "#70196"
@@ -8730,7 +8730,7 @@ msgid "Settings -- Torrent"
 msgstr ""
 
 msgctxt "#70258"
-msgid "Alfa Started"
+msgid "KOD Started"
 msgstr ""
 
 msgctxt "#70259"
@@ -8750,11 +8750,11 @@ msgid "Stopping the Websocket server ..."
 msgstr ""
 
 msgctxt "#70263"
-msgid "Alfa stopped"
+msgid "KOD stopped"
 msgstr ""
 
 msgctxt "#70264"
-msgid "Enter the username and password to access Alfa"
+msgid "Enter the username and password to access KOD"
 msgstr ""
 
 msgctxt "#70265"
@@ -9084,7 +9084,7 @@ msgid "List sorted by %s. Change order?"
 msgstr ""
 
 msgctxt "#70350"
-msgid "Search in alfa: %s"
+msgid "Search in KOD: %s"
 msgstr ""
 
 msgctxt "#70351"
@@ -9996,7 +9996,7 @@ msgid "To avoid waiting too long when a server does not respond:"
 msgstr ""
 
 msgctxt "#70579"
-msgid "Settings of urgent updates of Alfa modules (Quick Fixes):"
+msgid "Settings of urgent updates of KOD modules (Quick Fixes):"
 msgstr ""
 
 msgctxt "#70580"
@@ -10012,7 +10012,7 @@ msgid "Do you want to see messages about the updates?"
 msgstr ""
 
 msgctxt "#70583"
-msgid "Management of updates of other addons related to Alfa:"
+msgid "Management of updates of other addons related to KOD:"
 msgstr ""
 
 msgctxt "#70584"
@@ -10129,7 +10129,7 @@ msgid ""
 "[CR]- You can change an active list and moving from a list to another."
 "[CR]- It’s possible to share a list through tinyupload and send his code to your friends for downloading it ."
 "[CR]- You can download a list if you have a tinyupload code or an url with the code."
-"[CR]- If you want doing it manually, you can copy a list alfavorites-*.json that you added on the addon’s userdata folder; and you can upload these json on some server and send their url to your friends for sharing."
+"[CR]- If you want doing it manually, you can copy a list KODvorites-*.json that you added on the addon’s userdata folder; and you can upload these json on some server and send their url to your friends for sharing."
 "[CR]- The tinyupload.com service is used for sharing addon lists because it is free, private and quite fast. The files stay saved for 100 days they are not downloaded. They are private so you need a code for the access. The service has a limitation of 50MB but this is enough for the lists."
 msgstr ""
 
@@ -10382,7 +10382,7 @@ msgid "Alpha updated to"
 msgstr ""
 
 msgctxt "#70674"
-msgid "Alfa updates"
+msgid "KOD updates"
 msgstr ""
 
 msgctxt "#70675"
@@ -10406,8 +10406,8 @@ msgid "From URL"
 msgstr ""
 
 msgctxt "#70680"
-msgid "Alfa - (Community)"
-msgstr "Alfa - (Comunidad)"
+msgid "KOD - (Community)"
+msgstr "KOD - (Comunidad)"
 
 msgctxt "#70681"
 msgid "Enter the channel URL"
