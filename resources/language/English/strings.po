@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Kodi Media Center language file
 # strings 30000 thru 30999 reserved for plugins and plugin settings
 #
@@ -19,7 +18,7 @@ msgstr ""
 "Language: en_EN\n"
 
 msgctxt "#20000"
-msgid "Alfa"
+msgid "KOD"
 msgstr ""
 
 msgctxt "#30001"
@@ -387,7 +386,7 @@ msgid "Synchronization with Trakt started"
 msgstr ""
 
 msgctxt "#59971"
-msgid "Alfa Auto-configuration"
+msgid "KOD Auto-configuration"
 msgstr ""
 
 msgctxt "#59972"
@@ -547,11 +546,11 @@ msgid "No video to play"
 msgstr ""
 
 msgctxt "#60013"
-msgid "This website seems to be unavailable, try later, if the problem persists, check with a browser: %s. If the web page is working correctly, please report the error on : https://alfa-addon.com"
+msgid "This website seems to be unavailable, try later, if the problem persists, check with a browser: %s. If the web page is working correctly, please report the error on : https://t.me/kodiondemand"
 msgstr ""
 
 msgctxt "#60014"
-msgid "It may be due to a connection problem, the web page of the channel has changed its structure, or an internal error of alfa. To have more details, see the log file."
+msgid "It may be due to a connection problem, the web page of the channel has changed its structure, or an internal error of KOD. To have more details, see the log file."
 msgstr ""
 
 msgctxt "#60015"
@@ -647,7 +646,7 @@ msgid "Tv series update ..."
 msgstr ""
 
 msgctxt "#60038"
-msgid "An error has occurred on alfa"
+msgid "An error has occurred on KOD"
 msgstr ""
 
 msgctxt "#60039"
@@ -735,7 +734,7 @@ msgid "Congratulations, Kodi's video library has been configured correctly."
 msgstr ""
 
 msgctxt "#60060"
-msgid "Alfa Auto-configuration"
+msgid "KOD Auto-configuration"
 msgstr ""
 
 msgctxt "#60062"
@@ -1111,7 +1110,7 @@ msgid "Problem in the connection process"
 msgstr ""
 
 msgctxt "#60261"
-msgid "Alfa"
+msgid "KOD"
 msgstr ""
 
 msgctxt "#60262"
@@ -1427,7 +1426,7 @@ msgid "Continue with the session?"
 msgstr ""
 
 msgctxt "#60345"
-msgid "alfa-MCT: List of videos"
+msgid "KOD-MCT: List of videos"
 msgstr ""
 
 msgctxt "#60346"
@@ -1503,7 +1502,7 @@ msgid "The server on which it is hosted"
 msgstr ""
 
 msgctxt "#60364"
-msgid "is not yet supported in Alfa"
+msgid "is not yet supported in KOD"
 msgstr ""
 
 msgctxt "#60365"
@@ -1839,7 +1838,7 @@ msgid "    - Links of interest"
 msgstr ""
 
 msgctxt "#60457"
-msgid "Alfa"
+msgid "KOD"
 msgstr ""
 
 msgctxt "#60458"
@@ -1855,7 +1854,7 @@ msgid "This can be improved by limiting the maximum number of links or by displa
 msgstr ""
 
 msgctxt "#60461"
-msgid "Alfa - FAQ - %s"
+msgid "KOD - FAQ - %s"
 msgstr ""
 
 msgctxt "#60462"
@@ -1867,7 +1866,7 @@ msgid "The channel site may not work. In case the site works you can report the 
 msgstr ""
 
 msgctxt "#60464"
-msgid "It is possible that you have updated Alfa recently and that the changes have not been fully applied Well, you can try 'Settings>Other Tools', checking the *_data.json files or reattaching everything to the library again"
+msgid "It is possible that you have updated KOD recently and that the changes have not been fully applied Well, you can try 'Settings>Other Tools', checking the *_data.json files or reattaching everything to the library again"
 msgstr ""
 
 msgctxt "#60465"
@@ -5011,7 +5010,7 @@ msgstr ""
 "Language: en_EN\n"
 
 msgctxt "#20000"
-msgid "Alfa"
+msgid "KOD"
 msgstr ""
 
 msgctxt "#30001"
