@@ -1,0 +1,44 @@
+{
+	"id": "eurostreaming",
+	"name": "Eurostreaming",
+	"language": ["ita"],
+	"active": true,
+	"adult": false,
+	"thumbnail": "https://raw.githubusercontent.com/Zanzibar82/images/master/posters/eurostreaming.png",
+	"banner": "https://raw.githubusercontent.com/Zanzibar82/images/master/posters/eurostreaming.png",
+	"categories": ["tvshow","anime"],
+	"settings": [
+		{
+            "id": "include_in_global_search",
+            "type": "bool",
+            "label": "Includi ricerca globale",
+            "default": true,
+            "enabled": true,
+            "visible": true
+		},		
+		{
+			"id": "include_in_newest_series",
+			"type": "bool",
+			"label": "Includi in Novità - Serie TV",
+			"default": true,
+			"enabled": true,
+			"visible": true
+		},
+		{
+            "id": "include_in_newest_anime",
+            "type": "bool",
+            "label": "Includi in Novità - Anime",
+            "default": false,
+            "enabled": false,
+            "visible": false
+        },
+		{
+			"id": "include_in_newest_italiano",
+			"type": "bool",
+			"label": "Includi in Novità - Italiano",
+			"default": true,
+			"enabled": true,
+			"visible": true
+		}
+	]
+}

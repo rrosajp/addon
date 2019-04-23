@@ -1,0 +1,44 @@
+{
+  "id": "filmpertutti",
+  "name": "Filmpertutti",
+  "active": true,
+  "adult": false,
+  "language": ["ita"],
+  "thumbnail": "https://www.filmpertutti.club/wp-content/themes/blunge/assets/logo.png",
+  "banner": "https://www.filmpertutti.club/wp-content/themes/blunge/assets/logo.png",
+  "categories": ["tvshow","movie"],
+  "settings": [
+        {
+			"id": "include_in_global_search",
+			"type": "bool",
+			"label": "Includi in ricerca globale",
+			"default": true,
+			"enabled": true,
+			"visible": true
+		},
+		{
+			"id": "include_in_newest_peliculas",
+			"type": "bool",
+			"label": "Includi in Novità - Film",
+			"default": true,
+			"enabled": true,
+			"visible": true
+		},
+		{
+			"id": "include_in_newest_series",
+			"type": "bool",
+			"label": "Incluir en Novedades - Series",
+			"default": true,
+			"enabled": true,
+			"visible": true
+		},
+		{
+				"id": "include_in_newest_italiano",
+				"type": "bool",
+				"label": "Includi in Novità - Italiano",
+				"default": true,
+				"enabled": true,
+				"visible": true
+		}
+]
+}

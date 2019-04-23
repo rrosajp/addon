@@ -1,0 +1,37 @@
+{
+	"id": "mondolunatico",
+	"name": "Mondo Lunatico",
+	"language": ["ita"],
+	"active": true,
+	"adult": false,
+	"thumbnail": "http://mondolunatico.org/wp-content/uploads/2016/02/images-111.jpg",
+	"banner": "http://mondolunatico.org/wp-content/uploads/2016/02/images-111.jpg",
+	"categories": ["movie"],
+	"settings": [
+		{
+            "id": "include_in_global_search",
+            "type": "bool",
+            "label": "Includi in Ricerca Globale",
+            "default": true,
+            "enabled": true,
+            "visible": true
+		},
+        {
+            "id": "include_in_newest_peliculas",
+            "type": "bool",
+            "label": "Includi in Novità - Film",
+            "default": true,
+            "enabled": true,
+            "visible": true
+        },
+        {
+            "id": "include_in_newest_italiano",
+            "type": "bool",
+            "label": "Includi in Novità - Italiano",
+            "default": true,
+            "enabled": true,
+            "visible": true
+        }
+    ]
+}
+

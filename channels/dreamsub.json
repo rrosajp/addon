@@ -1,0 +1,36 @@
+{
+	"id": "dreamsub",
+	"name": "DreamSub",
+	"language": ["ita"],
+	"active": true,
+	"adult": false,
+	"thumbnail": "http://www.dreamsub.it/res/img/logo.png",
+	"banner": "http://www.dreamsub.it/res/img/logo.png",
+	"categories": ["anime","vosi"],
+	"settings": [
+		{
+            "id": "include_in_global_search",
+            "type": "bool",
+            "label": "Includi ricerca globale",
+            "default": true,
+            "enabled": true,
+            "visible": true
+        },
+        {
+            "id": "include_in_newest_anime",
+            "type": "bool",
+            "label": "Includi in Novità - Anime",
+            "default": true,
+            "enabled": true,
+            "visible": true
+        },
+        {
+			"id": "include_in_newest_italiano",
+			"type": "bool",
+			"label": "Includi in Novità - Italiano",
+			"default": true,
+			"enabled": true,
+			"visible": true
+		}
+	]
+}
