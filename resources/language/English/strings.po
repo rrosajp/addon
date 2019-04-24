@@ -4928,8 +4928,8 @@ msgid "Search Similar"
 msgstr ""
 
 msgctxt "#70562"
-msgid "Autoplay (Enable autoplay on all supported channels)"
-msgstr "Autoplay (Enable autoplay on all supported channels)"
+msgid "Enable autoplay on all supported channels"
+msgstr ""
 
 msgctxt "#70563"
 msgid "Italian"
@@ -5542,7 +5542,7 @@ msgid "This website seems to be unavailable, try later, if the problem persists,
 msgstr ""
 
 msgctxt "#60014"
-msgid "It may be due to a connection problem, the web page of the channel has changed its structure, or an internal error of kod. To have more details, see the log file."
+msgid "It may be due to a connection problem, the web page of the channel has changed its structure, or an internal error of KOD. To have more details, see the log file."
 msgstr ""
 
 msgctxt "#60015"
@@ -6878,7 +6878,7 @@ msgid "To report a problem on'https://t.me/kodiondemand' you need to:|the versio
 msgstr ""
 
 msgctxt "#60468"
-msgid "You can find our Telegram group at @kodiondemand\nIf you have doubts you can write to us in the Telegram group: https://t.me/alfa_addon"
+msgid "You can find our Telegram group at @kodiondemand"
 msgstr ""
 
 msgctxt "#60469"
@@ -9928,7 +9928,7 @@ msgid "Search Similar"
 msgstr ""
 
 msgctxt "#70562"
-msgid "autoplay"
+msgid "Autoplay"
 msgstr "Enable autoplay in all channels"
 
 msgctxt "#70563"

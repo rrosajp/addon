@@ -61,7 +61,7 @@ def set_key():
         import xbmc
         file_xml = "special://profile/keymaps/alfa.xml"
         data = '<keymap><global><keyboard><key id="%s">' % new_key + 'runplugin(plugin://' \
-                                                                     'plugin.video.alfa/?ew0KICAgICJhY3Rpb24iOiAia2V5bWFwIiwNCiAgICAib3BlbiI6IHRydWUNCn0=)</key></keyboard></global></keymap>'
+                                                                     'plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAia2V5bWFwIiwNCiAgICAib3BlbiI6IHRydWUNCn0=)</key></keyboard></global></keymap>'
         filetools.write(xbmc.translatePath(file_xml), data)
         platformtools.dialog_notification("Tecla guardada", "Reinicia Kodi para que se apliquen los cambios")
 
@@ -118,31 +118,31 @@ class Main(xbmcgui.WindowXMLDialog):
             if identifier == "news":
                 xbmc.executebuiltin('Dialog.Close(all,true)')
                 xbmc.executebuiltin(
-                    'ActivateWindow(10025, "plugin://plugin.video.alfa/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJuZXdzIg0KfQ==")')
+                    'ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJuZXdzIg0KfQ==")')
             elif identifier == "channels":
                 xbmc.executebuiltin('Dialog.Close(all,true)')
                 xbmc.executebuiltin(
-                    'ActivateWindow(10025, "plugin://plugin.video.alfa/?ew0KICAgICJhY3Rpb24iOiAiZ2V0Y2hhbm5lbHR5cGVzIiwgDQogICAgImNoYW5uZWwiOiAiY2hhbm5lbHNlbGVjdG9yIg0KfQ==")')
+                    'ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAiZ2V0Y2hhbm5lbHR5cGVzIiwgDQogICAgImNoYW5uZWwiOiAiY2hhbm5lbHNlbGVjdG9yIg0KfQ==")')
             elif identifier == "search":
                 xbmc.executebuiltin('Dialog.Close(all,true)')
                 xbmc.executebuiltin(
-                    'ActivateWindow(10025, "plugin://plugin.video.alfa/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJzZWFyY2giDQp9")')
+                    'ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJzZWFyY2giDQp9")')
             elif identifier == "favorites":
                 xbmc.executebuiltin('Dialog.Close(all,true)')
                 xbmc.executebuiltin(
-                    'ActivateWindow(10025, "plugin://plugin.video.alfa/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJmYXZvcml0ZXMiDQp9")')
+                    'ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJmYXZvcml0ZXMiDQp9")')
             elif identifier == "videolibrary":
                 xbmc.executebuiltin('Dialog.Close(all,true)')
                 xbmc.executebuiltin(
-                    'ActivateWindow(10025, "plugin://plugin.video.alfa/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJ2aWRlb2xpYnJhcnkiDQp9")')
+                    'ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJ2aWRlb2xpYnJhcnkiDQp9")')
             elif identifier == "downloads":
                 xbmc.executebuiltin('Dialog.Close(all,true)')
                 xbmc.executebuiltin(
-                    'ActivateWindow(10025, "plugin://plugin.video.alfa/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJkb3dubG9hZHMiDQp9")')
+                    'ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJkb3dubG9hZHMiDQp9")')
             elif identifier == "settings":
                 xbmc.executebuiltin('Dialog.Close(all,true)')
                 xbmc.executebuiltin(
-                    'ActivateWindow(10025, "plugin://plugin.video.alfa/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJzZXR0aW5nIg0KfQ==")')
+                    'ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJzZXR0aW5nIg0KfQ==")')
 
 
     def onAction(self, action):
