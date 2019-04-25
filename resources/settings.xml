@@ -5,7 +5,7 @@
         <setting id="default_action" type="enum" lvalues="30006|30007|30008" label="30005" default="0"/>
         <setting id="autoplay" type="bool" label="70562" default="false" visible="true"/>
         <setting id="thumbnail_type" type="enum" lvalues="30011|30012|30200" label="30010" default="2"/>
-        <setting id="channel_language" type="labelenum" values="auto|all|esp|cast|lat|ita" label="30019" default="auto"/>
+        <setting id="channel_language" type="labelenum" values="auto|all|ita" label="30019" default="auto"/>
         <setting id="trakt_sync" type="bool" label="70109" default="false"/>
         <setting id="forceview" type="bool" label="30043" default="false"/>
         <setting id="faster_item_serialization" type="bool" label="30300" default="false"/>
@@ -47,7 +47,7 @@
                  default="70137" visible="eq(-3,True)+eq(-1,True)+eq(-2,False)" enable="eq(-3,True)+eq(-1,True)+(-2,false)"/>
    </category>
     <category label="70126">
-        <setting id="icon_set" type="labelenum" label="70108" values="default|dark|angedam" default="default"/>
+        <setting id="icon_set" type="labelenum" label="70108" values="default|alfa" default="default"/>
         <setting id="enable_custom_theme" type="bool" label="70564" default="false"/>
         <setting id="custom_theme" type="folder" label="70565" default="" visible="eq(-1,true)"/>
         <setting id="infoplus_set" type="labelenum" label="70128" lvalues="70129|70130" default="70129"/>
@@ -190,7 +190,7 @@
                  default="70137" visible="eq(-3,True)+eq(-1,True)+eq(-2,False)" enable="eq(-3,True)+eq(-1,True)+(-2,false)"/>
    </category>
     <category label="70126">
-        <setting id="icon_set" type="labelenum" label="70108" values="default|dark|angedam" default="default"/>
+        <setting id="icon_set" type="labelenum" label="70108" values="default|alfa" default="default"/>
         <setting id="infoplus_set" type="labelenum" label="70128" lvalues="70129|70130" default="70129"/>
         <setting id="video_thumbnail_type" type="enum" label="70131" lvalues="70132|70133" default="0"/>
         <setting label="70167" type="lsep"/>

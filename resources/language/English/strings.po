@@ -3122,7 +3122,7 @@ msgid "Congratulations, the Kodi video library has been configured correctly."
 msgstr ""
 
 msgctxt "#70105"
-msgid "Do you want KOD to automatically configure the Kodi library?You will be asked to set up scrapers for movies and series."
+msgid "Do you want KOD to automatically configure the Kodi library? You will be asked to set up scrapers for movies and series."
 msgstr ""
 
 msgctxt "#70106"
@@ -8118,7 +8118,7 @@ msgid "Congratulations, the Kodi video library has been configured correctly."
 msgstr ""
 
 msgctxt "#70105"
-msgid "Do you want KOD to automatically configure the Kodi library?You will be asked to set up scrapers for movies and series."
+msgid "Do you want KOD to automatically configure the Kodi library? You will be asked to set up scrapers for movies and series."
 msgstr ""
 
 msgctxt "#70106"

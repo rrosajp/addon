@@ -3114,8 +3114,8 @@ msgid "Congratulations, the Kodi video library has been configured correctly."
 msgstr "Complimenti, la videoteca di Kodi è stata configurata correttamente."
 
 msgctxt "#70105"
-msgid "Do you want KOD to automatically configure the Kodi library?You will be asked to set up scrapers for movies and series."
-msgstr "Vuoi che KOD auto-configuri la videoteca di Kodi?Ti verrà chiesto di installare i providers info per film e serie tv."
+msgid "Do you want KOD to automatically configure the Kodi library? You will be asked to set up scrapers for movies and series."
+msgstr "Vuoi che KOD auto-configuri la videoteca di Kodi? Ti verrà chiesto di installare i providers info per film e serie tv."
 
 msgctxt "#70106"
 msgid "If you choose 'No' you can do it later from 'Configuration > Preferences > Paths'."

@@ -116,9 +116,9 @@ class Main(xbmcgui.WindowXMLDialog):
         selected = 'selected0.png'
         width = 260
         height = 30
-        textcolor = "0xffffd700"
-        conditional_textcolor = "0xffff3030"
-        shadow = "0xFF000000"
+        textcolor = "0xFFCCCCCC"
+        conditional_textcolor = "0xFF0081C2"
+        shadow = "0x00000000"
         offsetx = 30
         offsety = 5
         font = 'font25_title'
