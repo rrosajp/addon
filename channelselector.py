@@ -238,18 +238,14 @@ def get_thumb(thumb_name, view="thumb_", auto=False):
        
     else:
         icon_pack_name = config.get_setting('icon_set', default="default")
-
         resource_path = os.path.join(config.get_runtime_path(), "resources", "media", "themes")
         media_path = os.path.join(resource_path, icon_pack_name)
 
-        if config.get_setting('enable_custom_theme') and config.get_setting('custom_theme') and os.path.isfile(config.get_setting('custom_theme') + view + thumb_name):
-            media_path = config.get_setting('custom_theme')
+        if os.path.isdir(media_path) == False:
+            media_path = os.path.join("https://raw.githubusercontent.com/kodiondemand/media/master/themes/", icon_pack_name)
 
-        # elif os.path.isdir(media_path) == False:
-        #     media_path = os.path.join("https://raw.githubusercontent.com/alfa-addon/media/master/themes/", icon_pack_name)
-        
-        media_path = os.path.join(resource_path, icon_pack_name)
-        
+        elif config.get_setting('enable_custom_theme') and config.get_setting('custom_theme') and os.path.isfile(config.get_setting('custom_theme') + view + thumb_name):
+            media_path = config.get_setting('custom_theme')
 
         return os.path.join(media_path, view + thumb_name)
 
