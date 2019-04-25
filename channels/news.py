@@ -561,12 +561,12 @@ def menu_opciones(item):
                          title=config.get_localized_string(60529),
                          thumbnail=get_thumb("channels_anime.png"),
                          folder=False))
-    itemlist.append(
-        Item(channel=item.channel, action="setting_channel", extra="castellano", title=config.get_localized_string(70212),
-             thumbnail=get_thumb("channels_documentary.png"), folder=False))
+    # itemlist.append(
+    #     Item(channel=item.channel, action="setting_channel", extra="castellano", title=config.get_localized_string(70212),
+    #          thumbnail=get_thumb("channels_documentary.png"), folder=False))
 
-    itemlist.append(Item(channel=item.channel, action="setting_channel", extra="latino", title=config.get_localized_string(70213),
-                         thumbnail=get_thumb("channels_documentary.png"), folder=False))
+    # itemlist.append(Item(channel=item.channel, action="setting_channel", extra="latino", title=config.get_localized_string(70213),
+    #                      thumbnail=get_thumb("channels_documentary.png"), folder=False))
 
     itemlist.append(Item(channel=item.channel, action="setting_channel", extra="Torrent", title=config.get_localized_string(70214),
                          thumbnail=get_thumb("channels_documentary.png"), folder=False))

@@ -192,32 +192,32 @@ class Main(xbmcgui.WindowXMLDialog):
         self.buttons.append(self.button_docu)
         posy += space
 
-        label = config.get_localized_string(70013)
-        self.button_terror = xbmcgui.ControlButton(posx, posy, width, height, label, font=font,
-                                                   alignment=0x00000000, noFocusTexture='',
-                                                   focusTexture=media_path+selected, textColor=textcolor,
-                                                   shadowColor=shadow, textOffsetX=offsetx, textOffsetY=offsety)
-        self.addControl(self.button_terror)
-        self.buttons.append(self.button_terror)
+        # label = config.get_localized_string(70013)
+        # self.button_terror = xbmcgui.ControlButton(posx, posy, width, height, label, font=font,
+        #                                            alignment=0x00000000, noFocusTexture='',
+        #                                            focusTexture=media_path+selected, textColor=textcolor,
+        #                                            shadowColor=shadow, textOffsetX=offsetx, textOffsetY=offsety)
+        # self.addControl(self.button_terror)
+        # self.buttons.append(self.button_terror)
 
-        if channelselector.auto_filter() == 'esp':
-            posy += space
-            label = config.get_localized_string(59981)
-            self.button_lat = xbmcgui.ControlButton(posx, posy, width, height, label, font=font, alignment=0x00000000,
-                                                    noFocusTexture='', focusTexture=media_path+selected,
-                                                    textColor=textcolor, shadowColor=shadow, textOffsetX=offsetx,
-                                                    textOffsetY=offsety)
-            self.addControl(self.button_lat)
-            self.buttons.append(self.button_lat)
-            posy += space
-            label = config.get_localized_string(70014)
-            self.button_cast = xbmcgui.ControlButton(posx, posy, width, height, label, font=font, alignment=0x00000000,
-                                                     noFocusTexture='', focusTexture=media_path + selected,
-                                                     textColor=textcolor, shadowColor=shadow, textOffsetX=offsetx,
-                                                     textOffsetY=offsety)
-            self.addControl(self.button_cast)
-            self.buttons.append(self.button_cast)
-        posy += space
+        # if channelselector.auto_filter() == 'esp':
+        #     posy += space
+        #     label = config.get_localized_string(59981)
+        #     self.button_lat = xbmcgui.ControlButton(posx, posy, width, height, label, font=font, alignment=0x00000000,
+        #                                             noFocusTexture='', focusTexture=media_path+selected,
+        #                                             textColor=textcolor, shadowColor=shadow, textOffsetX=offsetx,
+        #                                             textOffsetY=offsety)
+        #     self.addControl(self.button_lat)
+        #     self.buttons.append(self.button_lat)
+        #     posy += space
+        #     label = config.get_localized_string(70014)
+        #     self.button_cast = xbmcgui.ControlButton(posx, posy, width, height, label, font=font, alignment=0x00000000,
+        #                                              noFocusTexture='', focusTexture=media_path + selected,
+        #                                              textColor=textcolor, shadowColor=shadow, textOffsetX=offsetx,
+        #                                              textOffsetY=offsety)
+        #     self.addControl(self.button_cast)
+        #     self.buttons.append(self.button_cast)
+        # posy += space
         label = config.get_localized_string(70015)
         self.button_torrent = xbmcgui.ControlButton(posx, posy, width, height, label, font=font,
                                                     alignment=0x00000000, noFocusTexture='',
