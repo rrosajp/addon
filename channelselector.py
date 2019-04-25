@@ -224,28 +224,6 @@ def filterchannels(category, view="thumb_"):
     return channelslist
 
 
-# def get_thumb(thumb_name, view="thumb_", auto=False):
-
-#     if auto:
-#         thumbnail = ''
-
-#         thumb_name = unify.set_genre(unify.simplify(thumb_name))
-
-
-#         if thumb_name in thumb_dict:
-#             thumbnail = thumb_dict[thumb_name]
-#         return thumbnail
-#     else:
-#         icon_pack_name = config.get_setting('icon_set', default="default")
-#         if icon_pack_name == "default":
-#             resource_path = os.path.join(config.get_runtime_path(), "resources", "media", "themes")
-#         else:
-#             resource_path = "https://raw.githubusercontent.com/alfa-addon/media/master/themes/"
-
-#         media_path = os.path.join(resource_path, icon_pack_name)
-
-#         return os.path.join(media_path, view + thumb_name)
-
 def get_thumb(thumb_name, view="thumb_", auto=False):
 
     if auto:
@@ -260,9 +238,6 @@ def get_thumb(thumb_name, view="thumb_", auto=False):
        
     else:
         icon_pack_name = config.get_setting('icon_set', default="default")
-        
-        if auto_filter(True) == 'ita' and icon_pack_name == "default":
-            icon_pack_name = 'default_ita'
 
         resource_path = os.path.join(config.get_runtime_path(), "resources", "media", "themes")
         media_path = os.path.join(resource_path, icon_pack_name)
@@ -270,10 +245,10 @@ def get_thumb(thumb_name, view="thumb_", auto=False):
         if config.get_setting('enable_custom_theme') and config.get_setting('custom_theme') and os.path.isfile(config.get_setting('custom_theme') + view + thumb_name):
             media_path = config.get_setting('custom_theme')
 
-        elif os.path.isdir(media_path) == False:
-            media_path = os.path.join("https://raw.githubusercontent.com/alfa-addon/media/master/themes/", icon_pack_name)
-        else:
-            media_path = os.path.join(resource_path, icon_pack_name)
+        # elif os.path.isdir(media_path) == False:
+        #     media_path = os.path.join("https://raw.githubusercontent.com/alfa-addon/media/master/themes/", icon_pack_name)
+        
+        media_path = os.path.join(resource_path, icon_pack_name)
         
 
         return os.path.join(media_path, view + thumb_name)
@@ -287,17 +262,12 @@ def set_channel_info(parameters):
     content = ''
     langs = parameters['language']
     lang_dict = {'ita':'Italiano',
-                 'lat':'Latino',
-                 'cast':'Castellano',
-                 'esp':'Latino, Castellano, VOSE, VO',
-                 '*':'Latino, Castellano, VOSE, VO'}
+                 '*':'Italiano, VOSI, VO'}
     for lang in langs:
         if 'vos' in parameters['categories']:
             lang = '*'
         if 'vosi' in parameters['categories']:
             lang = 'ita'
-        if 'vose' in parameters['categories']:
-            lang = 'esp'
 
         if lang in lang_dict:
             if language != '' and language != '*' and not parameters['adult']:
@@ -326,10 +296,7 @@ def auto_filter(auto_lang=False):
     def_lang = addon.getSetting('language')
     lang = 'all'
 
-    lang_dict = {'ita':'it',
-                 'esp':'es',
-                 'cast':'eu-ES',
-                 'lat':'es-MX'}
+    lang_dict = {'ita':'it'}
   
     if config.get_setting("channel_language") == 'auto' or auto_lang == True:
         for langs, variant in lang_dict.items():

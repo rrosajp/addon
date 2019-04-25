@@ -30,12 +30,12 @@ def mainlist(item):
     
     itemlist =[]
     
-    support.menu(itemlist, '[B] > Anime ITA[/B]', 'build_menu', host+'/filter?language[]=1')
-    support.menu(itemlist, '[B] > Anime SUB[/B]', 'build_menu', host+'/filter?language[]=0')
-    support.menu(itemlist, ' > Anime A-Z', 'alfabetico', host+'/az-list')
+    support.menu(itemlist, 'Anime ITA submenu bold', 'build_menu', host+'/filter?language[]=1')
+    support.menu(itemlist, 'Anime SUB submenu bold', 'build_menu', host+'/filter?language[]=0')
+    support.menu(itemlist, 'Anime A-Z sub', 'alfabetico', host+'/az-list')
     support.menu(itemlist, 'Anime - Ultimi Aggiunti', 'alfabetico', host+'/newest')
     support.menu(itemlist, 'Anime - Ultimi Episodi', 'alfabetico', host+'/newest')
-    support.menu(itemlist, '[COLOR blue]Cerca...[/COLOR]', 'search')
+    support.menu(itemlist, 'Cerca...', 'search')
 
     
     autoplay.init(item.channel, list_servers, list_quality)
@@ -52,9 +52,7 @@ def build_menu(item):
                     channel=item.channel,
                     action="video",
                     title="[B]Tutti[/B]",
-                    url=item.url,
-                    thumbnail=CategoriaThumbnail,
-                    fanart=CategoriaFanart))
+                    url=item.url))
 
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\t','',data)
@@ -73,7 +71,9 @@ def build_menu(item):
                  fulltitle=title,
                  show=title,
                  url=item.url,
-                 html=html))
+                 html=html,
+                 thumbnail=item.thumbnail,
+                 fanart=item.fanart))
 
     # Elimina FLingua dal Menu
     itemlist.pop(6)
@@ -413,13 +413,3 @@ def findvideos(item):
     return itemlist
 
 
-
-# riferimenti di servizio ====================================================
-AnimeThumbnail = "http://img15.deviantart.net/f81c/i/2011/173/7/6/cursed_candies_anime_poster_by_careko-d3jnzg9.jpg"
-AnimeFanart = "https://i.ytimg.com/vi/IAlbvyBdYdY/maxresdefault.jpg"
-CategoriaThumbnail = "http://static.europosters.cz/image/750/poster/street-fighter-anime-i4817.jpg"
-CategoriaFanart = "https://i.ytimg.com/vi/IAlbvyBdYdY/maxresdefault.jpg"
-CercaThumbnail = "http://dc467.4shared.com/img/fEbJqOum/s7/13feaf0c8c0/Search"
-CercaFanart = "https://i.ytimg.com/vi/IAlbvyBdYdY/maxresdefault.jpg"
-AvantiTxt = config.get_localized_string(30992)
-AvantiImg = "http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png"

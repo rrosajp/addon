@@ -1,8 +1,8 @@
 {
   "id": "url",
-  "name": "Tengo una URL",
+  "name": "URL",
   "active": false,
   "adult": false,
-  "thumbnail": "tengourl.png",
-  "banner": "tengourl.png"
+  "thumbnail": "url.png",
+  "banner": "url.png"
 }

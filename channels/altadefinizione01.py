@@ -114,7 +114,7 @@ def peliculas(item):
         fulltitle = scrapedtitle
         if subDiv:
             fulltitle += support.typo(subText + ' _ () color limegreen')
-        fulltitle += support.typo(scrapedquality.strip()+ ' _ [] color blue')
+        fulltitle += support.typo(scrapedquality.strip()+ ' _ [] color kod')
 
         itemlist.append(
             Item(channel=item.channel,
@@ -158,6 +158,6 @@ def findvideos(item):
     # Requerido para AutoPlay
     autoplay.start(itemlist, item)
 
-    support.videolibrary(itemlist, item, 'color blue')
+    support.videolibrary(itemlist, item, 'color kod')
 
     return itemlist

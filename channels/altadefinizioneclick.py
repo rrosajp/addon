@@ -104,6 +104,6 @@ def findvideos(item):
     itemlist = filtertools.get_links(itemlist, item, list_language)
 
     autoplay.start(itemlist, item)
-    support.videolibrary(itemlist, item ,'color blue bold')
+    support.videolibrary(itemlist, item ,'color kod bold')
 
     return itemlist

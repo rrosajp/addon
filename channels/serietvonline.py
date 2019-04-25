@@ -25,8 +25,8 @@ def mainlist(item):
     logger.info(item.channel + 'mainlist')
 
     itemlist = web_menu()
-    support.menu(itemlist, "Cerca Film... color blue", 'search', '', 'movie')
-    support.menu(itemlist, "Cerca Serie... color blue", 'search', '', 'episode')
+    support.menu(itemlist, "Cerca Film... color kod", 'search', '', 'movie')
+    support.menu(itemlist, "Cerca Serie... color kod", 'search', '', 'episode')
 
     autoplay.init(item.channel, list_servers, list_quality)
     autoplay.show_option(item.channel, itemlist)
@@ -149,7 +149,7 @@ def episodios(item):
                  title=title,
                  url=episode))
 
-    support.videolibrary(itemlist,item,'bold color blue')
+    support.videolibrary(itemlist,item,'bold color kod')
 
     return itemlist
 

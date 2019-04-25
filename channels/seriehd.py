@@ -122,7 +122,7 @@ def episodios(item):
                      show=item.show,
                      thumbnail=item.thumbnail))
 
-    support.videolibrary(itemlist, item, 'color blue bold')
+    support.videolibrary(itemlist, item, 'color kod bold')
 
     return itemlist
 

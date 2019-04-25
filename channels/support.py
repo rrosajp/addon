@@ -356,7 +356,9 @@ def menu(itemlist, title='', action='', url='', contentType='movie', args=[]):
     return itemlist
 
 
-def typo(string, typography=''):    
+def typo(string, typography=''):
+
+    kod_color = '0xFF0081C2'
 
     # Check if the typographic attributes are in the string or outside
     if typography:
@@ -373,7 +375,7 @@ def typo(string, typography=''):
 
     if not any(word in string for word in attribute):
         if any(word in string.lower() for word in search_word_list):
-            string = '[COLOR blue]' + string + '[/COLOR]'
+            string = '[COLOR '+ kod_color +']' + string + '[/COLOR]'
         elif any(word in string.lower() for word in categories_word_list):
             string = ' > ' + string
         elif any(word in string.lower() for word in movie_word_list):
@@ -391,6 +393,7 @@ def typo(string, typography=''):
             string = ' > ' + re.sub(r'\ssubmenu','',string)
         if 'color' in string:
             color = scrapertoolsV2.find_single_match(string,'color ([a-z]+)')
+            if color == 'kod' or '': color = kod_color
             string = '[COLOR '+ color +']' + re.sub(r'\scolor\s([a-z]+)','',string) + '[/COLOR]'
         if 'bold' in string:
             string = '[B]' + re.sub(r'\sbold','',string) + '[/B]'
@@ -456,7 +459,7 @@ def nextPage(itemlist, item, data, patron, function_level=1):
             Item(channel=item.channel,
                  action=inspect.stack()[function_level][3],
                  contentType=item.contentType,
-                 title=typo(config.get_localized_string(30992), 'color blue bold'),
+                 title=typo(config.get_localized_string(30992), 'color kod bold'),
                  url=next_page,
                  args=item.args,
                  thumbnail=thumb()))
@@ -472,7 +475,7 @@ def server(item, data='', headers=''):
     itemlist = servertools.find_video_items(data=data)
 
     for videoitem in itemlist:
-        videoitem.title = "".join([item.title, ' ', typo(videoitem.title, 'color blue []')])
+        videoitem.title = "".join([item.title, ' ', typo(videoitem.title, 'color kod []')])
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail

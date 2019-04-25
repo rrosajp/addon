@@ -110,6 +110,9 @@ def renumber(itemlist, item='', typography=''):
                 if data:
                     for episodes in data['data']:
                         if episodes['airedSeason'] >= S:
+                            if E == 0: 
+                                epList.append(str(episodes['airedSeason']) + 'x0')
+                                E = 1
                             if episodes['airedEpisodeNumber'] >= E:
                                 epList.append(str(episodes['airedSeason']) + 'x' + str(episodes['airedEpisodeNumber']))
                     page = page + 1
