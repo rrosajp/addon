@@ -174,14 +174,14 @@ class Main(xbmcgui.WindowXMLDialog):
                                                   textOffsetY=offsety)
         self.addControl(self.button_anime)
         self.buttons.append(self.button_anime)
-        posy += space
-        label = config.get_localized_string(70018)
-        self.button_infantil = xbmcgui.ControlButton(posx, posy, width, height, label, font=font,
-                                                     alignment=0x00000000, noFocusTexture='',
-                                                     focusTexture=media_path+selected, textColor=textcolor,
-                                                     shadowColor=shadow, textOffsetX=offsetx, textOffsetY=offsety)
-        self.addControl(self.button_infantil)
-        self.buttons.append(self.button_infantil)
+        # posy += space
+        # label = config.get_localized_string(70018)
+        # self.button_infantil = xbmcgui.ControlButton(posx, posy, width, height, label, font=font,
+        #                                              alignment=0x00000000, noFocusTexture='',
+        #                                              focusTexture=media_path+selected, textColor=textcolor,
+        #                                              shadowColor=shadow, textOffsetX=offsetx, textOffsetY=offsety)
+        # self.addControl(self.button_infantil)
+        # self.buttons.append(self.button_infantil)
         posy += space
         label = config.get_localized_string(70019)
         self.button_docu = xbmcgui.ControlButton(posx, posy, width, height, label, font=font,
@@ -218,13 +218,13 @@ class Main(xbmcgui.WindowXMLDialog):
         #     self.addControl(self.button_cast)
         #     self.buttons.append(self.button_cast)
         # posy += space
-        label = config.get_localized_string(70015)
-        self.button_torrent = xbmcgui.ControlButton(posx, posy, width, height, label, font=font,
-                                                    alignment=0x00000000, noFocusTexture='',
-                                                    focusTexture=media_path+selected, textColor=textcolor,
-                                                    shadowColor=shadow, textOffsetX=offsetx, textOffsetY=offsety)
-        self.addControl(self.button_torrent)
-        self.buttons.append(self.button_torrent)
+        # label = config.get_localized_string(70015)
+        # self.button_torrent = xbmcgui.ControlButton(posx, posy, width, height, label, font=font,
+        #                                             alignment=0x00000000, noFocusTexture='',
+        #                                             focusTexture=media_path+selected, textColor=textcolor,
+        #                                             shadowColor=shadow, textOffsetX=offsetx, textOffsetY=offsety)
+        # self.addControl(self.button_torrent)
+        # self.buttons.append(self.button_torrent)
 
         start_page_item = get_start_page()
         if config.get_setting('start_page') and start_page_item.channel == 'news':

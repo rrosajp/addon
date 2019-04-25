@@ -55,25 +55,25 @@ def mainlist(item):
     set_category_context(new_item)
     itemlist.append(new_item)
 
-    thumbnail = get_thumb("channels_movie_4k.png")
-    new_item = Item(channel=item.channel, action="novedades", extra="4k", title=config.get_localized_string(70208), thumbnail=thumbnail)
-
-    set_category_context(new_item)
-    itemlist.append(new_item)
+    # thumbnail = get_thumb("channels_movie_4k.png")
+    # new_item = Item(channel=item.channel, action="novedades", extra="4k", title=config.get_localized_string(70208), thumbnail=thumbnail)
+    #
+    # set_category_context(new_item)
+    # itemlist.append(new_item)
 
     #if list_canales['terror']:
-    thumbnail = get_thumb("channels_horror.png")
-    new_item = Item(channel=item.channel, action="novedades", extra="terror", title=config.get_localized_string(70209),
-                    thumbnail=thumbnail)
-    set_category_context(new_item)
-    itemlist.append(new_item)
+    # thumbnail = get_thumb("channels_horror.png")
+    # new_item = Item(channel=item.channel, action="novedades", extra="terror", title=config.get_localized_string(70209),
+    #                 thumbnail=thumbnail)
+    # set_category_context(new_item)
+    # itemlist.append(new_item)
 
     #if list_canales['infantiles']:
-    thumbnail = get_thumb("channels_children.png")
-    new_item = Item(channel=item.channel, action="novedades", extra="infantiles", title=config.get_localized_string(60510),
-                    thumbnail=thumbnail)
-    set_category_context(new_item)
-    itemlist.append(new_item)
+    # thumbnail = get_thumb("channels_children.png")
+    # new_item = Item(channel=item.channel, action="novedades", extra="infantiles", title=config.get_localized_string(60510),
+    #                 thumbnail=thumbnail)
+    # set_category_context(new_item)
+    # itemlist.append(new_item)
 
     #if list_canales['series']:
     thumbnail = get_thumb("channels_tvshow.png")
@@ -112,10 +112,10 @@ def mainlist(item):
         itemlist.append(new_item)
 
     # if list_canales['Torrent']:
-    thumbnail = get_thumb("channels_torrent.png")
-    new_item = Item(channel=item.channel, action="novedades", extra="torrent", title=config.get_localized_string(70171), thumbnail=thumbnail)
-    set_category_context(new_item)
-    itemlist.append(new_item)
+    # thumbnail = get_thumb("channels_torrent.png")
+    # new_item = Item(channel=item.channel, action="novedades", extra="torrent", title=config.get_localized_string(70171), thumbnail=thumbnail)
+    # set_category_context(new_item)
+    # itemlist.append(new_item)
 
     #if list_canales['documentales']:
     thumbnail = get_thumb("channels_documentary.png")
@@ -548,11 +548,11 @@ def menu_opciones(item):
     itemlist.append(Item(channel=item.channel, action="setting_channel", extra="peliculas", title=config.get_localized_string(60526),
                          thumbnail=get_thumb("channels_movie.png"),
                          folder=False))
-    itemlist.append(Item(channel=item.channel, action="setting_channel", extra="4K", title=config.get_localized_string(70207),
-                         thumbnail=get_thumb("channels_movie.png"), folder=False))
-    itemlist.append(Item(channel=item.channel, action="setting_channel", extra="infantiles", title=config.get_localized_string(60527),
-                         thumbnail=get_thumb("channels_children.png"),
-                         folder=False))
+    # itemlist.append(Item(channel=item.channel, action="setting_channel", extra="4K", title=config.get_localized_string(70207),
+    #                      thumbnail=get_thumb("channels_movie.png"), folder=False))
+    # itemlist.append(Item(channel=item.channel, action="setting_channel", extra="infantiles", title=config.get_localized_string(60527),
+    #                      thumbnail=get_thumb("channels_children.png"),
+    #                      folder=False))
     itemlist.append(Item(channel=item.channel, action="setting_channel", extra="series",
                          title=config.get_localized_string(60528),
                          thumbnail=get_thumb("channels_tvshow.png"),
