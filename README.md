@@ -1,13 +1,8 @@
-# Alfa addon
-### Es un proyecto sin ánimo de lucro y con fines educativos, basado en el código open source de pelisalacarta-ce, que permite utilizar Kodi u otra plataforma compatible como "navegador" para ver vídeos alojados en paginas web.
+# Kodi On Demand
+### Un fork italiano di [Alfa](https://github.com/alfa-addon)
+Ognuno è libero (anzi, invitato!) a collaborare, per farlo è possibile utilizzare i pull request.
 
-### Este addon es totalmente gratuito por lo tanto esta prohibida su venta en solitario o como parte de software integrado en cualquier dispositivo, es absolutamente para uso educativo y personal.
-
-## Colaborar
-Si deseas colaborar con el proyecto eres bienvenido a hacerlo, pero ten en cuenta por favor estas pautas
-
-- Para colaborar con sus Pull Request se pide seguir unas reglas de estilo basadas en las de python PEP8. Esto se puede
-  hacer desde diferentes IDEs que lo traen integrado como pydev, pycharm o ninjaIDE, o extensiones que se pueden
-  agregar a por ejemplo sublime, atom.
-
-- Utilizar nombre de clases, métodos y variables en inglés para favorecer la comprensión de personas no hispano parlantes.
+KOD come Alfa è sotto licenza GPL v3, pertanto, siete liberi di utilizzare parte del codice, a patto di rispettare i termini di suddetta licenza, che si possono riassumere in: 
+ 
+- Il tuo addon deve essere rilasciando secondo la stessa licenza, ovvero essere open source (il fatto che lo zip sia visibile da chiunque non ha importanza, è necessario avere un repository git come questo) 
+- Aggiungere i crediti a tutto ciò che copiate/modificate, ad esempio aggiungendo un commento nel file in questione o meglio facendo un cherry-pick (in modo da preservare lo storico)
