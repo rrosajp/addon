@@ -13,10 +13,9 @@
     <assets>
       <icon>logo.png</icon>
       <fanart>fanart.jpg</fanart>
-      <screenshot>resources/media/themes/ss/1.jpg</screenshot>
-      <screenshot>resources/media/themes/ss/2.jpg</screenshot>
-      <screenshot>resources/media/themes/ss/3.jpg</screenshot>
-      <screenshot>resources/media/themes/ss/4.jpg</screenshot>
+      <screenshot>resources/media/themes/ss/1.png</screenshot>
+      <screenshot>resources/media/themes/ss/2.png</screenshot>
+      <screenshot>resources/media/themes/ss/3.png</screenshot>
     </assets>
       <news>Benvenuto su KOD!</news>
     <description lang="it">Naviga velocemente sul web e guarda i contenuti presenti</description>
