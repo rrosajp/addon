@@ -2224,7 +2224,7 @@ def redirect_clone_newpct1(item, head_nfo=None, it=None, path=False, overwrite=F
     #     logger.error(item)
     #
     # return (item, it, overwrite)
-    return item, Item(), False
+    return item, item, False
     
 
 def verify_cached_torrents():

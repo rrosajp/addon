@@ -112,12 +112,6 @@ def list_movies(item, silent=False):
                 if not filetools.exists(filetools.join(new_item.path, filetools.basename(strm_path))):
                     # Si se ha eliminado el strm desde la bilbioteca de kodi, no mostrarlo
                     continue
-
-                ###### Redirección al canal NewPct1.py si es un clone, o a otro canal y url si ha intervención judicial
-                try:
-                    new_item, new_item, overwrite = generictools.redirect_clone_newpct1(new_item, head_nfo, new_item, raiz)
-                except:
-                    logger.error(traceback.format_exc())
                 
                 # Menu contextual: Marcar como visto/no visto
                 visto = new_item.library_playcounts.get(os.path.splitext(f)[0], 0)
@@ -466,11 +460,7 @@ def findvideos(item):
     if 'downloads' in list_canales:
         json_path = list_canales['downloads']
         item_json = Item().fromjson(filetools.read(json_path))
-        ###### Redirección al canal NewPct1.py si es un clone, o a otro canal y url si ha intervención judicial
-        try:
-            item_json, it, overwrite = generictools.redirect_clone_newpct1(item_json)
-        except:
-            logger.error(traceback.format_exc())
+
         item_json.contentChannel = "local"
         # Soporte para rutas relativas en descargas
         if filetools.is_relative(item_json.url):
@@ -511,11 +501,7 @@ def findvideos(item):
         
         item_canal = Item()
         item_canal.channel = nom_canal
-        ###### Redirección al canal NewPct1.py si es un clone, o a otro canal y url si ha intervención judicial
-        try:
-            item_canal, it, overwrite = generictools.redirect_clone_newpct1(item_canal)
-        except:
-            logger.error(traceback.format_exc())
+
         nom_canal = item_canal.channel
             
         # Importamos el canal de la parte seleccionada
@@ -525,11 +511,7 @@ def findvideos(item):
             exec "import channels." + nom_canal + " as channel"
 
         item_json = Item().fromjson(filetools.read(json_path))
-        ###### Redirección al canal NewPct1.py si es un clone, o a otro canal y url si ha intervención judicial
-        try:
-            item_json, it, overwrite = generictools.redirect_clone_newpct1(item_json)
-        except:
-            logger.error(traceback.format_exc())
+
         list_servers = []
 
         try:

@@ -45,7 +45,6 @@ def update(path, p_dialog, i, t, serie, overwrite):
             if it.emergency_urls:
                 serie.emergency_urls = it.emergency_urls
             serie.category = category
-            serie, it, overwrite = generictools.redirect_clone_newpct1(serie, head_nfo, it, path, overwrite)
         except:
             logger.error(traceback.format_exc())
 
@@ -135,16 +134,6 @@ def check_for_update(overwrite=True):
             for i, tvshow_file in enumerate(show_list):
                 head_nfo, serie = videolibrarytools.read_nfo(tvshow_file)
                 path = filetools.dirname(tvshow_file)
-                
-                ###### Redirección al canal NewPct1.py si es un clone, o a otro canal y url si ha intervención judicial
-                overwrite_forced = False
-                try:
-                    serie, serie, overwrite_forced = generictools.redirect_clone_newpct1(serie, head_nfo, serie, path, overwrite, lookup=True)
-                except:
-                    logger.error(traceback.format_exc())
-                if overwrite_forced == True:
-                    overwrite = True
-                    serie.update_next = ''
                     
                 logger.info("serie=" + serie.contentSerieName)
                 p_dialog.update(int(math.ceil((i + 1) * t)), heading, serie.contentSerieName)
