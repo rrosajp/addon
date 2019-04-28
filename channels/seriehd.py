@@ -6,12 +6,12 @@ import urlparse
 
 from channels import autoplay, filtertools, support
 from channels.support import menu, log
-from core import scrapertoolsV2, servertools, httptools
+from core import scrapertoolsV2, servertools, httptools, tmdb
 from core.item import Item
 from platformcode import logger, config
 from channelselector import thumb
 
-host = "https://www.seriehd.video"
+host = "https://seriehd.casa/"
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
@@ -31,7 +31,7 @@ def mainlist(item):
     menu(itemlist, 'Serie TV', 'peliculas', host + '/serie-tv-streaming/', 'tvshow')
     menu(itemlist, 'Per Genere submenu', 'genre', host, 'tvshow', 'TV')
     menu(itemlist, 'Per Nazione submenu', 'nation', host + '/serie-tv-streaming/', 'tvshow', 'TV')
-    menu(itemlist, 'Cerca...', 'peliculas', contentType='tvshow', args='TV')
+    menu(itemlist, 'Cerca...', 'search', contentType='episode', args='TV')
 
     autoplay.init(item.channel, list_servers, list_quality)
     autoplay.show_option(item.channel, itemlist)
@@ -92,8 +92,10 @@ def nation(item):
     menu(itemlist, 'Serie TV Italiane', 'peliculas', host + '/serie-tv-streaming/serie-tv-italiane/')
     return itemlist
 
+
 def peliculas(item):
-    return support.scrape(item,r'<h2>(.*?)</h2>\s*<img src="([^"]+)" alt="[^"]*" />\s*<A HREF="([^"]+)">',['title', 'thumb', 'url'], headers, patronNext=r"<span class='current'>\d+</span><a rel='nofollow' class='page larger' href='([^']+)'>\d+</a>", action='episodios')
+    item.contentType = 'episode'
+    return support.scrape(item,r'<h2>(.*?)</h2>\s*<img src="([^"]+)" alt="[^"]*" />\s*<A HREF="([^"]+)">.*?<span class="year">([0-9]{4}).*?<span class="calidad">([A-Z]+)',['title', 'thumb', 'url', 'year', 'quality'], headers, patronNext=r"<span class='current'>\d+</span><a rel='nofollow' class='page larger' href='([^']+)'>\d+</a>", action='episodios')
 
 
 def episodios(item):

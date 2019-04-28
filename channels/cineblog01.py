@@ -45,13 +45,13 @@ def mainlist(item):
     support.menu(itemlist, 'HD submenu', 'menu', host, args="Film HD Streaming")
     support.menu(itemlist, 'Per genere submenu', 'menu', host, args="Film per Genere")
     support.menu(itemlist, 'Per anno submenu', 'menu', host, args="Film per Anno")
-    support.menu(itemlist, 'Cerca... submenu', 'search', host, args='film')
+    support.menu(itemlist, 'Cerca film... submenu', 'search', host, args='film')
 
     support.menu(itemlist, 'Serie TV bold', 'peliculas', host + '/serietv/', contentType='episode')
     support.menu(itemlist, 'Per Lettera submenu', 'menu', host + '/serietv/', contentType='episode', args="Serie-Tv per Lettera")
     support.menu(itemlist, 'Per Genere submenu', 'menu', host + '/serietv/', contentType='episode', args="Serie-Tv per Genere")
     support.menu(itemlist, 'Per anno submenu', 'menu', host + '/serietv/', contentType='episode', args="Serie-Tv per Anno")
-    support.menu(itemlist, 'Cerca... submenu', 'search', host + '/serietv/', contentType='episode', args='serie')
+    support.menu(itemlist, 'Cerca serie... submenu', 'search', host + '/serietv/', contentType='episode', args='serie')
     
     autoplay.show_option(item.channel, itemlist)
 
