@@ -10,6 +10,9 @@
 # Fix desde la página: https://stackoverflow.com/questions/27835619/urllib-and-ssl-certificate-verify-failed-error
 #-----------------------------------------------------------------------
 import ssl
+
+from core import scrapertoolsV2
+
 try:
     _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError:
@@ -140,6 +143,22 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
     """
 
     response = {}
+
+    from lib.dns import resolver
+    my_resolver = resolver.Resolver()
+
+    # 8.8.8.8 is Google's public DNS server
+    my_resolver.nameservers = ['1.1.1.1']
+
+    protocol, domain = scrapertoolsV2.find_single_match(url, '(?:(https?)://)?(?:www\.)?([a-z.]+)/?')
+    headers = {'Host': domain}
+
+    answer = my_resolver.query(domain)
+    ip = scrapertoolsV2.find_single_match(str(answer.response),domain+'. [0-9]+ IN A (?!127\.0\.0\.1)([0-9.]+)')
+
+    url = "http://"+ip
+
+
 
     # Headers por defecto, si no se especifica nada
     request_headers = default_headers.copy()
