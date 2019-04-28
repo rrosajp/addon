@@ -139,7 +139,7 @@ def findvideos(item):
     def load_links(itemlist, re_txt, color, desc_txt, quality=""):
         streaming = scrapertoolsV2.find_single_match(data, re_txt).replace('"', '')
         support.log('STREAMING=',streaming)
-        patron = '<td><a.*?href=(.*?) target[^>]+>([^<]+)<'
+        patron = '<td><a.*?href=(.*?) (?:target|rel)[^>]+>([^<]+)<'
         matches = re.compile(patron, re.DOTALL).findall(streaming)
         for scrapedurl, scrapedtitle in matches:
             logger.debug("##### findvideos %s ## %s ## %s ##" % (desc_txt, scrapedurl, scrapedtitle))

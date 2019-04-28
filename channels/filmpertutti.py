@@ -25,6 +25,7 @@ def mainlist(item):
 
     support.menu(itemlist, '[B]Film[/B]', 'peliculas', host + '/category/film/', 'movie')
     support.menu(itemlist, '[B] > Film per Genere[/B]', 'genre', host, 'episode')
+    support.menu(itemlist, '[COLOR blue]Cerca Film...[/COLOR]', 'search', '')
     support.menu(itemlist, '[B]Serie TV[/B]', 'peliculas', host + '/category/serie-tv/', 'episode')
     support.menu(itemlist, '[B] > Serie TV in ordine alfabetico[/B]', 'az', host + '/category/serie-tv/', 'episode')
     support.menu(itemlist, '[COLOR blue]Cerca Serie TV...[/COLOR]', 'search', '', 'episode')
@@ -110,6 +111,7 @@ def az(item):
         )
     itemlist = thumb(itemlist)
     return itemlist
+
 
 def peliculas(item):
     logger.info(item.channel + 'peliculas')
