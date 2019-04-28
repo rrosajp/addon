@@ -12,7 +12,7 @@ from lib import unshortenit
 from platformcode import logger, config
 from channelselector import thumb
 
-host = "https://eurostreaming.one"
+host = "https://eurostreaming.cafe"
 list_servers = ['openload', 'speedvideo', 'wstream', 'streamango' 'flashx', 'nowvideo']
 list_quality = ['default']
 

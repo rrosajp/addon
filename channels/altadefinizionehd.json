@@ -1,7 +1,7 @@
 {
     "id": "altadefinizionehd",
     "name": "AltadefinizioneHD",
-    "active": true,
+    "active": false,
     "adult": false,
     "language": ["ita"],
     "thumbnail": "https://altadefinizione.doctor/wp-content/uploads/2019/02/logo.png",
