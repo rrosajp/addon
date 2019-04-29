@@ -5425,3 +5425,7 @@ msgstr "Inserisci il numero della stagione di partenza"
 msgctxt "#70687"
 msgid "Enter the number of the starting episode"
 msgstr "Inserisci il numero dell'episodio di partenza"
+
+msgctxt "#70688"
+msgid "Episode 0 is a special episode, enter the number of this episode"
+msgstr "L'episodio 0 è un episodio speciale, inserisci il numero di questo episodio"

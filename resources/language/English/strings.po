@@ -10436,3 +10436,7 @@ msgstr ""
 msgctxt "#70687"
 msgid "Enter the number of the starting episode"
 msgstr ""
+
+msgctxt "#70688"
+msgid "Episode 0 is a special episode, enter the number of this episode"
+msgstr ""

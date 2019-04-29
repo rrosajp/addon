@@ -59,7 +59,11 @@ def add_season(data=None):
     if season != "":
         heading = config.get_localized_string(70687)
         episode = platformtools.dialog_numeric(0, heading)
-        if episode != "":
+        if episode == "0":
+            heading = config.get_localized_string(70688)
+            special = platformtools.dialog_numeric(0, heading)
+            return [int(season), int(episode), int(special)]
+        elif episode != '':
             return [int(season), int(episode)]
 
 
@@ -90,14 +94,19 @@ def write_data(channel, show, data):
 
 def renumber(itemlist, item='', typography=''):    
     log()
+    # log(itemlist)
+    # key_list= item.title
+    # sorted_list = sorted(itemlist, key=key_list)
+    # log(sorted_list)
 
     if item:
         try:
             dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
-            SERIES = dict_series[item.show]['season_episode']
+            SERIES = dict_series[item.show.rstrip()]['season_episode']
             S = SERIES[0]
             E = SERIES[1]
-            ID = SERIES[2]
+            SP = SERIES[2]
+            ID = SERIES[3]
 
             page = 1
             epList = []
@@ -111,18 +120,23 @@ def renumber(itemlist, item='', typography=''):
                     for episodes in data['data']:
                         if episodes['airedSeason'] >= S:
                             if E == 0: 
-                                epList.append(str(episodes['airedSeason']) + 'x0')
+                                epList.append([0, SP])
                                 E = 1
                             if episodes['airedEpisodeNumber'] >= E:
-                                epList.append(str(episodes['airedSeason']) + 'x' + str(episodes['airedEpisodeNumber']))
+                                epList.append([episodes['airedSeason'], episodes['airedEpisodeNumber']])
                     page = page + 1
                 else:
                     exist = False
-            
+
+            epList.sort()
             ep = 0
+            
             for item in itemlist:
-                item.title = typo(epList[ep] + ' - ', typography) + item.title
+                s = str(epList[ep][0])
+                e = str(epList[ep][1])
+                item.title = typo(s + 'x'+ e + ' - ', typography) + item.title
                 ep = ep + 1
+
         except:
             return itemlist
     else:
