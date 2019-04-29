@@ -64,7 +64,7 @@ def add_season(data=None):
             special = platformtools.dialog_numeric(0, heading)
             return [int(season), int(episode), int(special)]
         elif episode != '':
-            return [int(season), int(episode)]
+            return [int(season), int(episode), '']
 
 
 def write_data(channel, show, data):
