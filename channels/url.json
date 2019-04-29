@@ -1,0 +1,8 @@
+{
+  "id": "url",
+  "name": "URL",
+  "active": false,
+  "adult": false,
+  "thumbnail": "url.png",
+  "banner": "url.png"
+}
