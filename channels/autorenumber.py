@@ -94,10 +94,6 @@ def write_data(channel, show, data):
 
 def renumber(itemlist, item='', typography=''):    
     log()
-    # log(itemlist)
-    # key_list= item.title
-    # sorted_list = sorted(itemlist, key=key_list)
-    # log(sorted_list)
 
     if item:
         try:
