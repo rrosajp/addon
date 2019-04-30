@@ -30,6 +30,14 @@
       "visible": true
     },
     {
+      "id": "include_in_newest_italiano",
+      "type": "bool",
+      "label": "Includi in Novità - Italiano",
+      "default": true,
+      "enabled": true,
+      "visible": true
+    },   
+    {
       "id": "include_in_global_search",
       "type": "bool",
       "label": "Includi ricerca globale",

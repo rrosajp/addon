@@ -47,10 +47,10 @@ headers = [['User-Agent', 'Mozilla/50.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/
            ['Referer', host]]#,['Accept-Language','it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3']]
 
 
-IDIOMAS = {'Italiano': 'ITA'}
+IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
-list_servers = []#'openload', 'streamcherry', 'youtube','rapidvideo', 'streamango']
-list_quality = []#'default']
+list_servers = ['openload', 'streamcherry','rapidvideo', 'streamango', 'supervideo']
+list_quality = ['default','HD']#'default']
 
 # =========== home menu ===================
 
