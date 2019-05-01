@@ -12,3 +12,6 @@ KOD come Alfa è sotto licenza GPL v3, pertanto, siete liberi di utilizzare part
 - Effettua tutte le modifiche e pusha nel tuo repository remoto.
 - Testa tutte le funzioni principali (videoteca, autoplay, scraper web) o eventuali aggiunte extra.
 - Apri una pull request.
+
+### Qualcosa non funziona
+Sentiti pure libero di segnalarlo al team [qui](https://github.com/kodiondemand/addon/issues)
