@@ -68,6 +68,8 @@ def mainlist(item):
     itemlist = []
     title = ''
     
+    autoplay.init(item.channel, list_servers, list_quality)
+    
     itemlist = [
         Item(channel=__channel__, title="Serie TV",
             contentTitle = __channel__, action="serietv",
@@ -101,7 +103,9 @@ def mainlist(item):
             thumbnail= get_thumb(title, auto = True)
             ),
     ]
-
+    
+    autoplay.show_option(item.channel, itemlist)
+    
     return itemlist
 
 # ======== def in ordine di menu ===========================
