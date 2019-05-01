@@ -4836,11 +4836,11 @@ msgid "Move down all"
 msgstr ""
 
 msgctxt "#70539"
-msgid "* Create different folders to store your favorite links within Icarus. [CR]"
+msgid "* Create different folders to store your favorite links within Kodi on Demand. [CR]"
 msgstr ""
 
 msgctxt "#70540"
-msgid "* To add links to folders, access the context menu from any point in Icarus.[CR]"
+msgid "* To add links to folders, access the context menu from any point in Kodi on Demand.[CR]"
 msgstr ""
 
 msgctxt "#70541"
@@ -9836,11 +9836,11 @@ msgid "Move down all"
 msgstr ""
 
 msgctxt "#70539"
-msgid "* Create different folders to store your favorite links within Icarus. [CR]"
+msgid "* Create different folders to store your favorite links within Kodi on Demand. [CR]"
 msgstr ""
 
 msgctxt "#70540"
-msgid "* To add links to folders, access the context menu from any point in Icarus.[CR]"
+msgid "* To add links to folders, access the context menu from any point in Kodi on Demand.[CR]"
 msgstr ""
 
 msgctxt "#70541"
