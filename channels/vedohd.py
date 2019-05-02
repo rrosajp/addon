@@ -31,7 +31,7 @@ def findhost():
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
-list_servers = ['openload', 'streamango', 'wstream']
+list_servers = ['verystream', 'openload', 'streamango', 'wstream']
 list_quality = ['HD', 'SD']
 
 #esclusione degli articoli 'di servizio'

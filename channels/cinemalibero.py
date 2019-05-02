@@ -18,7 +18,7 @@ from core import tmdb
 # Necessario per Autoplay
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
-list_servers = ['akstream', 'wstream', 'openload', 'streamango', 'verystream']
+list_servers = ['akstream', 'wstream', 'openload', 'streamango']
 list_quality = ['default']
 
 # Necessario per Verifica Link
