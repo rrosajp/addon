@@ -14,7 +14,7 @@ from channelselector import thumb
 
 host = "https://www.filmpertutti.club"
 headers = [['Referer', host]]
-list_servers = ['openload', 'streamango', 'wstream', 'akvideo']
+list_servers = ['openload', 'streamango', 'wstream', 'akvideo', 'verystream']
 list_quality = ['HD', 'SD']
 
 
