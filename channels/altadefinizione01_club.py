@@ -2,6 +2,7 @@
 # -*- Channel Altadefinizione01C Film -*-
 # -*- Created for IcarusbyGreko -*-
 # -*- By Greko -*-
+# -*- last change: 3/05/2019
 
 from channelselector import get_thumb
 from channels import autoplay
@@ -49,7 +50,7 @@ headers = [['User-Agent', 'Mozilla/50.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
-list_servers = ['openload','verystream','rapidvideo','streamango'] # per l'autoplay
+list_servers = ['verystream','openload','rapidvideo','streamango'] # per l'autoplay
 list_quality = ['default'] #'rapidvideo', 'streamango', 'openload', 'streamcherry'] # per l'autoplay
 
 
@@ -156,7 +157,7 @@ def peliculas(item):
                 ))
 
     # se il sito permette l'estrazione dell'anno del film aggiungere la riga seguente
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True, idioma_busqueda='it')
+    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
     # Paginazione
     next_page = scrapertools.find_single_match(data, "<link rel='next' href='(.*?)' />")
@@ -255,7 +256,7 @@ def orderalf(item):
             ))
 
     # se il sito permette l'estrazione dell'anno del film aggiungere la riga seguente
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True, idioma_busqueda='it')
+    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
     # Paginazione
     next_page = scrapertools.find_single_match(data, "<link rel='next' href='(.*?)' />")
@@ -287,11 +288,9 @@ def findvideos_film(item):
     # da qui fare le opportuni modifiche
     patron = '<a href="#" data-link="(.*?)">'
     matches = scrapertools.find_multiple_matches(data, patron)
-    #logger.info("altadefinizione01_clubMATCHES: %s " % matches)
+
     for scrapedurl in matches:
         logger.info("altadefinizione01_club scrapedurl log: %s" % scrapedurl)
-        #if 'vodexor' and 'megadrive' not in scrapedurl:
-            #data = httptools.downloadpage(scrapedurl, headers=headers).data
         try:
             itemlist = servertools.find_video_items(data=data)
 
@@ -303,7 +302,6 @@ def findvideos_film(item):
                 videoitem.contentType = item.contentType
                 videoitem.channel = item.channel
                 videoitem.text_color = color5
-                #videoitem.language = lang_orders[4]
                 videoitem.year = item.infoLabels['year']
                 videoitem.infoLabels['plot'] = item.infoLabels['plot']
         except AttributeError:
