@@ -713,7 +713,7 @@ def discover_list(item):
             title = unify.normalize(elem['name']).capitalize()
             tvshow = True
 
-        new_item = Item(channel='search', title=title, infoLabels=elem, action='search_tmdb', extra=title,
+        new_item = Item(channel='search', title=title, infoLabels=elem, action='do_search', extra=title,
                         category=config.get_localized_string(70695), context ='')
 
         if tvshow:
