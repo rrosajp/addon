@@ -67,7 +67,7 @@ def mainlist(item):
     logger.info("icarus.eurostreaming mainlist")
     itemlist = []
     title = ''
-    
+
     autoplay.init(item.channel, list_servers, list_quality)
     
     itemlist = [
