@@ -3,7 +3,7 @@
 # -*- Creato per Alfa-addon -*-
 # -*- e adattato for KOD -*-
 # -*- By Greko -*-
-# -*- change 30/04/2019
+# -*- last change: 3/05/2019
 
 from channelselector import get_thumb
 from channels import autoplay
@@ -18,9 +18,11 @@ from platformcode import config, logger
 
 __channel__ = "altadefinizione01_link"
 
-host = "https://altadefinizione01.link/" #riaggiornato al 29 aprile 2019
+#host = "https://altadefinizione01.link/" #riaggiornato al 29 aprile 2019
 #host = "http://altadefinizione01.art/" # aggiornato al 22 marzo 2019
 #host = "https://altadefinizione01.network/" #aggiornato al 22 marzo 2019
+#host = "http://altadefinizione01.date/" #aggiornato al 3 maggio 2019
+host = "https://altadefinizione01.voto/" #aggiornato al 3 maggio 2019
 
 # ======== def per utility INIZIO =============================
 try:
@@ -50,7 +52,7 @@ headers = [['User-Agent', 'Mozilla/50.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
 list_servers = ['openload', 'streamcherry','rapidvideo', 'streamango', 'supervideo']
-list_quality = ['default','HD']#'default']
+list_quality = ['default']
 
 # =========== home menu ===================
 
@@ -146,14 +148,14 @@ def peliculas(item):
             infoLabels={'year': scrapedyear},
             contenType="movie",
             thumbnail=scrapedimg,
-            title="%s [%s]" % (scrapedtitle, scrapedlang), #scrapedtitle + ' %s' % scrapedlang,
+            title="%s [%s]" % (scrapedtitle, scrapedlang),
             text_color=color5,
             language=scrapedlang,
             context="buscar_trailer"
         ))
 
     # poiché c'è l'anno negli item prendiamo le info direttamente da tmdb, anche se a volte può non esserci l'informazione
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True, idioma_busqueda='it')
+    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
     # Paginazione
     next_page = scrapertools.find_single_match(data, "<link rel='next' href='(.*?)' />")
@@ -233,8 +235,7 @@ def findvideos_film(item):
     matches = scrapertools.find_multiple_matches(data, patron)
     #logger.info("altadefinizione01_linkMATCHES: %s " % matches)
     for scrapedurl in matches:
-        #if 'vodexor' and 'megadrive' not in scrapedurl:
-            #data = httptools.downloadpage(scrapedurl, headers=headers).data
+
         try:
             itemlist = servertools.find_video_items(data=data)
 
@@ -246,7 +247,6 @@ def findvideos_film(item):
                 videoitem.contentType = item.contentType
                 videoitem.channel = item.channel
                 videoitem.text_color = color5
-                #videoitem.language = item.language
                 videoitem.year = item.infoLabels['year']
                 videoitem.infoLabels['plot'] = item.infoLabels['plot']
         except AttributeError:
@@ -302,7 +302,6 @@ def newest(categoria):
             item.url = host
             item.action = "peliculas"
             itemlist = peliculas(item)
-
 
             if itemlist[-1].action == "peliculas":
                 itemlist.pop()
