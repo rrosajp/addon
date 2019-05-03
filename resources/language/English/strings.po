@@ -10440,3 +10440,34 @@ msgstr ""
 msgctxt "#70688"
 msgid "Episode 0 is a special episode, enter the number of this episode"
 msgstr ""
+
+msgctxt "#70689"
+msgid "Enable Download"
+msgstr ""
+
+msgctxt "#70690"
+msgid "Disclaimer"
+msgstr "Disclaimer"
+
+msgctxt "#70691"
+msgid "Using the download function you declare that you have a physical copy and use this function as a backup of the same."
+msgstr ""
+msgctxt "#70692"
+msgid "The KOD team assumes no responsibility for the use that is made of this proposed function"
+msgstr ""
+
+msgctxt "#70693"
+msgid "Search"
+msgstr ""
+
+msgctxt "#70694"
+msgid "Similar to "
+msgstr ""
+
+msgctxt "#70695"
+msgid "Results"
+msgstr ""
+
+msgctxt "#70697"
+msgid " [Results of the %s channel] "
+msgstr ""
