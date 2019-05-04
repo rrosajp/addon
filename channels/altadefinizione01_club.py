@@ -6,16 +6,13 @@
 
 
 from channels import autoplay, support, filtertools
-
 from channelselector import get_thumb
-
 from core import httptools
 from core import channeltools
 from core import scrapertools
 from core import servertools
 from core import tmdb
 from core.item import Item
-
 from platformcode import config, logger
 
 __channel__ = "altadefinizione01_club"
@@ -23,6 +20,7 @@ __channel__ = "altadefinizione01_club"
 #host = "https://www.altadefinizione01.club/" # host da cambiare
 #host = "https://www.altadefinizione01.team/" #aggiornato al 22 marzo 2019
 host = "https://www.altadefinizione01.vision/" #aggiornato al 30-04-209
+
 # ======== Funzionalità =============================
 
 __comprueba_enlaces__ = config.get_setting('comprueba_enlaces', __channel__)
@@ -55,7 +53,7 @@ def mainlist(item):
     autoplay.init(item.channel, list_servers, list_quality)
 
     # Menu Principale
-    support.menu(itemlist, 'Film Ultimi Arrivi bold', 'peliculas', host+'', args='pellicola')
+    support.menu(itemlist, 'Film Ultimi Arrivi bold', 'peliculas', host, args='pellicola')
     support.menu(itemlist, 'Genere', 'categorie', host, args='genres')
     support.menu(itemlist, 'Per anno submenu', 'categorie', host, args=['Film per Anno','years'])
     support.menu(itemlist, 'Per lettera', 'categorie', host+'catalog/a/', args=['Film per Lettera','orderalf'])
@@ -81,7 +79,7 @@ def peliculas(item):
             bloque = scrapertools.find_single_match(data, '<div class="cover boxcaption">(.*?)<div id="right_bar">')
         elif item.args == "search":
             bloque = scrapertools.find_single_match(data, '<div class="cover boxcaption">(.*?)</a>')
-        else: #item.extra == 'cat':
+        else:
             bloque = scrapertools.find_single_match(data, '<div class="cover boxcaption">(.*?)<div class="page_nav">')
         patron = '<h2>.<a href="(.*?)".*?src="(.*?)".*?class="trdublaj">(.*?)<div class="ml-item-hiden".*?class="h4">(.*?)<.*?label">(.*?)</span'
         matches = scrapertools.find_multiple_matches(data, patron)
@@ -93,7 +91,7 @@ def peliculas(item):
                 scrapedlang = 'ITA'
             itemlist.append(Item(
                 channel=item.channel,
-                action="findvideos_film",
+                action="findvideos",
                 contentTitle=scrapedtitle,
                 fulltitle=scrapedtitle,
                 url=scrapedurl,
@@ -104,7 +102,8 @@ def peliculas(item):
                 language=scrapedlang
                 ))
 
-    # se il sito permette l'estrazione dell'anno del film aggiungere la riga seguente
+    # poichè  il sito ha l'anno del film con TMDB la ricerca titolo-anno è esatta quindi inutile fare lo scrap delle locandine 
+    # e della trama dal sito che a volte toppano
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
     # Paginazione
@@ -193,7 +192,7 @@ def orderalf(item):
 
 # =========== def pagina del film con i server per verderlo =============
 
-def findvideos_film(item):
+def findvideos(item):
     logger.info("%s mainlist findvideos_film log: %s" % (__channel__, item))
     itemlist = []
 
@@ -210,7 +209,7 @@ def findvideos_film(item):
 
             for videoitem in itemlist:
                 logger.info("Videoitemlist2: %s" % videoitem)
-                videoitem.title = "%s [%s]" % (item.contentTitle, videoitem.title)#"[%s] %s" % (videoitem.server, item.title) #"[%s]" % (videoitem.title)
+                videoitem.title = "%s [%s]" % (item.contentTitle, videoitem.title)
                 videoitem.show = item.show
                 videoitem.contentTitle = item.contentTitle
                 videoitem.contentType = item.contentType
@@ -225,13 +224,13 @@ def findvideos_film(item):
         itemlist = servertools.check_list_links(itemlist, __comprueba_enlaces_num__)
 
     # Requerido para FilterTools
-    #itemlist = filtertools.get_links(itemlist, item, list_language)
+    itemlist = filtertools.get_links(itemlist, item, list_language)
 
     # Requerido para AutoPlay
     autoplay.start(itemlist, item)
 
     # Aggiunge alla videoteca
-    if config.get_videolibrary_support() and len(itemlist) != 0 and item.extra != "library":
+    if  item.extra != 'findvideos' and item.extra != "library" and config.get_videolibrary_support() and len(itemlist) != 0 :
        support.videolibrary(itemlist, item)
     
     return itemlist
@@ -246,7 +245,7 @@ def search(item, text):
     #item.extra = "search"
     try:
         return peliculas(item)
-    # Se captura la excepciÛn, para no interrumpir al buscador global si un canal falla
+    # Cattura la eccezione così non interrompe la ricerca globle se il canale si rompe!
     except:
         import sys
         for line in sys.exc_info():

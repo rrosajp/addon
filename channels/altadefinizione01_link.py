@@ -7,16 +7,13 @@
 
 
 from channels import autoplay, support, filtertools
-
 from channelselector import get_thumb
-
 from core import httptools
 from core import channeltools
 from core import scrapertools
 from core import servertools
 from core import tmdb
 from core.item import Item
-
 from platformcode import config, logger
 
 __channel__ = "altadefinizione01_link"
@@ -50,7 +47,6 @@ def mainlist(item):
     """
     logger.info("%s mainlist log: %s" % (__channel__, item))
     itemlist = []
-    title = ''
 
     autoplay.init(item.channel, list_servers, list_quality)
     # Menu Principale
@@ -60,57 +56,9 @@ def mainlist(item):
     support.menu(itemlist, 'Per qualità submenu', 'categorie', host, args=['Film per qualità','quality']) 
     support.menu(itemlist, 'Al Cinema bold', 'peliculas', host+'film-del-cinema')    
     support.menu(itemlist, 'Popolari bold', 'categorie', host+'piu-visti.html', args=['popular',''])
-    support.menu(itemlist, 'Mi sento fortunato bold', 'categorie', host+'piu-visti.html',args=['fortunato','lucky'])    
+    support.menu(itemlist, 'Mi sento fortunato bold', 'categorie', host, args=['fortunato','lucky'])    
     support.menu(itemlist, 'Sub-ITA bold', 'peliculas', host+'film-sub-ita/')   
     support.menu(itemlist, 'Cerca film submenu', 'search', host)
-    
-##    itemlist = [
-##        # new upload
-##        Item(channel=__channel__, title="Ultimi Arrivi", action="peliculas",
-##             url="%s" % host, text_color=color4, extra="film", # color4 = red
-##             thumbnail=get_thumb(title, auto = True)
-##             ),
-##        # x to Cinema
-##        Item(channel=__channel__, title="Al Cinema", action="peliculas",
-##             url="%sfilm-del-cinema" % host, text_color=color4, extra="",
-##             thumbnail=get_thumb(title, auto = True)
-##             ),
-##        # Popolari
-##        Item(channel=__channel__, title="Popolari", action="peliculas",
-##             url="%spiu-visti.html" % host, text_color=color4, extra="",
-##             thumbnail=get_thumb(title, auto = True)
-##             ),
-##        # x Sub-ita
-##        Item(channel=__channel__, title="Sottotitolati", action="peliculas",
-##             url="%sfilm-sub-ita/" % host, text_color=color4, extra="",
-##             thumbnail=get_thumb(title, auto = True)
-##             ),
-##        # x mi sento fortunato - Prende solo film con player a pagamento
-##        Item(channel=__channel__, title="Mi Sento Fortunato", action="categorie",
-##             url="%s" % host, text_color=color4, extra="lucky",
-##             thumbnail=""),
-##        # x Category
-##        Item(channel=__channel__, title="Generi", action="categorie",
-##             url="%s" % host, text_color=color4, extra="genres",
-##             viewcontent='movies',
-##             thumbnail=get_thumb(title, auto = True)
-##             ),
-##        # x year
-##        Item(channel=__channel__, title="Anno", action="categorie",
-##             url="%s" % host, text_color=color4, extra="year",
-##             thumbnail=get_thumb(title, auto = True)
-##             ),
-##        # x quality
-##        Item(channel=__channel__, title="Qualità", action="categorie",
-##             url="%s" % host, text_color=color4, extra="quality",
-##             thumbnail=get_thumb(title, auto = True)
-##             ),
-##        # Search
-##        Item(channel=__channel__, title="Cerca Film...", action="search",
-##             text_color=color4, extra="",
-##             thumbnail=get_thumb(title, auto = True)
-##             ),
-##                ]
 
     autoplay.show_option(item.channel, itemlist)
     
@@ -136,7 +84,7 @@ def peliculas(item):
             scrapedlang = 'Sub-Ita'
         itemlist.append(Item(
             channel=item.channel,
-            action="findvideos_film",
+            action="findvideos",
             contentTitle=scrapedtitle,
             fulltitle=scrapedtitle,
             url=scrapedurl,
@@ -148,7 +96,8 @@ def peliculas(item):
             context="buscar_trailer"
         ))
 
-    # poiché c'è l'anno negli item prendiamo le info direttamente da tmdb, anche se a volte può non esserci l'informazione
+    # poichè il sito ha l'anno del film con TMDB la ricerca titolo-anno è esatta quindi inutile fare lo scrap delle locandine 
+    # e della trama dal sito che a volte toppano
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
     # Paginazione
@@ -203,7 +152,7 @@ def categorie(item):
 # =========== def pagina del film con i server per verderlo =============
 # da sistemare che ne da solo 1 come risultato
 
-def findvideos_film(item):
+def findvideos(item):
     logger.info("%s mainlist findvideos_film log: %s" % (__channel__, item))
     itemlist = []
     # scarico la pagina
@@ -235,13 +184,13 @@ def findvideos_film(item):
         itemlist = servertools.check_list_links(itemlist, __comprueba_enlaces_num__)
 
     # Requerido para FilterTools
-    #itemlist = filtertools.get_links(itemlist, item, list_language)
+    itemlist = filtertools.get_links(itemlist, item, list_language)
 
     # Requerido para AutoPlay
     autoplay.start(itemlist, item)
     
     # Aggiunge alla videoteca
-    if config.get_videolibrary_support() and len(itemlist) != 0 and item.extra != "library":
+    if  item.extra != 'findvideos' and item.extra != "library" and config.get_videolibrary_support() and len(itemlist) != 0 :
        support.videolibrary(itemlist, item)
 
     return itemlist
