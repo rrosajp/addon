@@ -185,7 +185,7 @@ def findvideos(item):
         data += str(scrapertools.find_multiple_matches(html, '</lable><a href="([^"]+)" target="_blank"'))
 
     itemlist = support.server(item, data=data)
-    itemlist = filtertools.get_links(itemlist, item, list_language)
+    # itemlist = filtertools.get_links(itemlist, item, list_language)
 
     autoplay.start(itemlist, item)
 

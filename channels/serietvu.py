@@ -149,7 +149,7 @@ def findvideos(item):
     support.log(item.channel + " findvideos")
 
     itemlist = support.server(item, data=item.url)
-    itemlist = filtertools.get_links(itemlist, item, list_language)
+    # itemlist = filtertools.get_links(itemlist, item, list_language)
 
     autoplay.start(itemlist, item)
 
@@ -174,7 +174,7 @@ def findepisodevideo(item):
     matches = re.compile(patron, re.DOTALL).findall(blocco)
 
     itemlist = support.server(item, data=matches[0][0])
-    itemlist = filtertools.get_links(itemlist, item, list_language)
+    # itemlist = filtertools.get_links(itemlist, item, list_language)
 
     autoplay.start(itemlist, item)
 
