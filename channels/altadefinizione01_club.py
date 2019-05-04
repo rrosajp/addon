@@ -121,7 +121,7 @@ def categorie(item):
     data = httptools.downloadpage(item.url, headers=headers).data
 
     # da qui fare le opportuni modifiche
-    if item.args[1] == 'genres':
+    if item.args == 'genres':
         bloque = scrapertools.find_single_match(data, '<ul class="kategori_list">(.*?)</ul>')
         patron = '<li><a href="/(.*?)">(.*?)</a>'
     elif item.args[1] == 'years':
