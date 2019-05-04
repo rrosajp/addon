@@ -5,7 +5,7 @@
 # -*- last change: 3/05/2019
 
 from channelselector import get_thumb
-from channels import autoplay
+from channels import autoplay, support
 from channels import filtertools
 from core import httptools
 from core import scrapertools
@@ -20,23 +20,7 @@ __channel__ = "altadefinizione01_club"
 #host = "https://www.altadefinizione01.club/" # host da cambiare
 #host = "https://www.altadefinizione01.team/" #aggiornato al 22 marzo 2019
 host = "https://www.altadefinizione01.vision/" #aggiornato al 30-04-209
-# ======== def per utility INIZIO =============================
-try:
-    __modo_grafico__ = config.get_setting('modo_grafico', __channel__)
-    __perfil__ = int(config.get_setting('perfil', __channel__))
-except:
-    __modo_grafico__ = True
-    __perfil__ = 0
-
-# Fijar perfil de color
-perfil = [['0xFFFFE6CC', '0xFFFFCE9C', '0xFF994D00', '0xFFFE2E2E', '0xFFFFD700'],
-          ['0xFFA5F6AF', '0xFF5FDA6D', '0xFF11811E', '0xFFFE2E2E', '0xFFFFD700'],
-          ['0xFF58D3F7', '0xFF2E9AFE', '0xFF2E64FE', '0xFFFE2E2E', '0xFFFFD700']]
-
-if __perfil__ < 3:
-    color1, color2, color3, color4, color5 = perfil[__perfil__]
-else:
-    color1 = color2 = color3 = color4 = color5 = ""
+# ======== Funzionalità =============================
 
 __comprueba_enlaces__ = config.get_setting('comprueba_enlaces', __channel__)
 __comprueba_enlaces_num__ = config.get_setting('comprueba_enlaces_num', __channel__)
@@ -44,9 +28,9 @@ __comprueba_enlaces_num__ = config.get_setting('comprueba_enlaces_num', __channe
 headers = [['User-Agent', 'Mozilla/50.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0'],
            ['Referer', host]]
 
-#parameters = channeltools.get_channel_parameters(__channel__)
-#fanart_host = parameters['fanart']
-#thumbnail_host = parameters['thumbnail']
+parameters = channeltools.get_channel_parameters(__channel__)
+fanart_host = parameters['fanart']
+thumbnail_host = parameters['thumbnail']
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
@@ -62,57 +46,19 @@ def mainlist(item):
     :param item:
     :return: itemlist []
     """
-    logger.info("%s mainlist log: %s" % (__channel__, item))
+    logger.info("%s mainlist log: %s" % (__channel__, item)) 
     itemlist = []
-    title = ''
 
     autoplay.init(item.channel, list_servers, list_quality)
-    
-    itemlist = [
-        # new upload
-        Item(channel=__channel__, title="Ultimi Arrivi", action="peliculas",
-             url="%s" % host, text_color=color4, extra="film",
-             infoLabels={'plot': item.category},
-             thumbnail=get_thumb(title, auto = True)
-             ),
-        # x to Cinema
-        Item(channel=__channel__, title="Al Cinema", action="peliculas",
-             url="%scinema/" % host, text_color=color4, extra="film",
-             infoLabels={'plot': item.category},
-             thumbnail = get_thumb(title, auto = True)
-             ),
-        # x Sub-ita
-        Item(channel=__channel__, title="Sottotitolati", action="peliculas",
-             url="%ssub-ita/" % host, text_color=color4, extra="film",
-             infoLabels={'plot': item.category},
-             thumbnail = get_thumb(title, auto = True)
-             ),
-        # x Category
-        Item(channel=__channel__, title="Generi", action="categorie",
-             url="%s" % host, text_color=color4, extra="genres",
-             viewcontent='movies',
-             infoLabels={'plot': item.category},
-             thumbnail = get_thumb(title, auto = True)
-             ),
-        # x year
-        Item(channel=__channel__, title="Anno", action="categorie",
-             url="%s" % host, text_color=color4, extra="year",
-             infoLabels={'plot': item.category},
-             thumbnail = get_thumb(title, auto = True)
-             ),
-       # x lettera
-       Item(channel=__channel__, title="Lettera", action="categorie",
-            url="%scatalog/a/" % host, text_color=color4, extra="orderalf",
-             infoLabels={'plot': item.category},
-             thumbnail = get_thumb(title, auto = True)
-            ),
-        # Search
-        Item(channel=__channel__, title="Cerca Film...", action="search",
-             text_color=color4, extra="",
-             infoLabels={'plot': item.category},
-             thumbnail = get_thumb(title, auto = True)
-             ),
-                ]
+
+    # Menu Principale
+    support.menu(itemlist, 'Novità bold', 'peliculas', host+'', args='pellicola')
+    support.menu(itemlist, 'Genere submenu', 'categorie', host, args='genres')
+    support.menu(itemlist, 'Anno', 'categorie', host)#, args='years')
+    support.menu(itemlist, 'Lettera', 'categorie', host+'catalog/a/', args='orderalf')  
+    support.menu(itemlist, 'Al Cinema bold', 'peliculas', host+'cinema/', args='pellicola')
+    support.menu(itemlist, 'Sub-ITA bold', 'peliculas', host+'sub-ita/', args='pellicola')   
+    support.menu(itemlist, 'Cerca film submenu', 'search', host)#, args='orderalf')
 
     autoplay.show_option(item.channel, itemlist)
     
@@ -127,10 +73,10 @@ def peliculas(item):
     # scarico la pagina
     data = httptools.downloadpage(item.url, headers=headers).data
     # da qui fare le opportuni modifiche
-    if item.extra != 'orderalf':
-        if item.extra == 'film' or item.extra == 'year':
+    if item.args != 'orderalf':
+        if item.args == 'pellicola' or item.extra == 'years':
             bloque = scrapertools.find_single_match(data, '<div class="cover boxcaption">(.*?)<div id="right_bar">')
-        elif item.extra == "search":
+        elif item.args == "search":
             bloque = scrapertools.find_single_match(data, '<div class="cover boxcaption">(.*?)</a>')
         else: #item.extra == 'cat':
             bloque = scrapertools.find_single_match(data, '<div class="cover boxcaption">(.*?)<div class="page_nav">')
@@ -152,7 +98,6 @@ def peliculas(item):
                 contenType="movie",
                 thumbnail=host+scrapedimg,
                 title= "%s [%s]" % (scrapedtitle, scrapedlang),
-                text_color=color5,
                 language=scrapedlang
                 ))
 
@@ -171,8 +116,6 @@ def peliculas(item):
                  title=config.get_localized_string(30992),
                  url=next_page,
                  extra=item.extra,
-                 text_color=color4,
-                 #thumbnail="http://icons.iconarchive.com/icons/ahmadhania/spherical/128/forward-icon.png"
                  thumbnail= get_thumb('nextpage', auto = True)
                  ))
 
@@ -187,13 +130,13 @@ def categorie(item):
     data = httptools.downloadpage(item.url, headers=headers).data
 
     # da qui fare le opportuni modifiche
-    if item.extra == 'genres':
+    if item.args == 'genres':
         bloque = scrapertools.find_single_match(data, '<ul class="kategori_list">(.*?)</ul>')
         patron = '<li><a href="/(.*?)">(.*?)</a>'
-    elif item.extra == 'year':
+    elif item.args == 'years':
         bloque = scrapertools.find_single_match(data, '<ul class="anno_list">(.*?)</ul>')
         patron = '<li><a href="/(.*?)">(.*?)</a>'
-    elif item.extra == 'orderalf':
+    elif item.args == 'orderalf':
         bloque = scrapertools.find_single_match(data, '<div class="movies-letter">(.*)<div class="clearfix">')
         patron = '<a title=.*?href="(.*?)"><span>(.*?)</span>'
 
@@ -206,19 +149,15 @@ def categorie(item):
         else:
           scrapurl = host+scrapurl
 
-        if item.extra != 'orderalf':
-            action = "peliculas"
-        else:
-            action = 'orderalf'
+        if item.args != 'orderalf': action = "peliculas"
+        else: action = 'orderalf'
         itemlist.append(Item(
             channel=item.channel,
             action= action,
             title = scraptitle,
             url= scrapurl,
-            text_color=color4,
             thumbnail = get_thumb(scraptitle, auto = True),
             extra = item.extra,
-            #Folder = True,
         ))
 
     return itemlist
@@ -248,9 +187,7 @@ def orderalf(item):
                 infoLabels={'year': scrapedyear},
                 contenType="movie",
                 thumbnail=host+scrapedimg,
-                #title=scrapedtitle + ' %s' % scrapedlang,
                 title = "%s [%s]" % (scrapedtitle, scrapedlang),
-                text_color=color5,
                 language=scrapedlang,
                 context="buscar_trailer"
             ))
@@ -270,7 +207,6 @@ def orderalf(item):
                  title=config.get_localized_string(30992),
                  url=next_page,
                  extra=item.extra,
-                 text_color=color4,
                  thumbnail= get_thumb('nextpage', auto = True)
                  ))
 
@@ -283,7 +219,6 @@ def findvideos_film(item):
     itemlist = []
 
     # scarico la pagina
-    #data = scrapertools.cache_page(item.url)
     data = httptools.downloadpage(item.url, headers=headers).data
     # da qui fare le opportuni modifiche
     patron = '<a href="#" data-link="(.*?)">'
@@ -301,7 +236,6 @@ def findvideos_film(item):
                 videoitem.contentTitle = item.contentTitle
                 videoitem.contentType = item.contentType
                 videoitem.channel = item.channel
-                videoitem.text_color = color5
                 videoitem.year = item.infoLabels['year']
                 videoitem.infoLabels['plot'] = item.infoLabels['plot']
         except AttributeError:
@@ -318,13 +252,10 @@ def findvideos_film(item):
     autoplay.start(itemlist, item)
     
     # Opción "Añadir esta película a la biblioteca de KODI"
-    if item.extra != "library":
+    # Comandi di servizio
+    if config.get_videolibrary_support() and len(itemlist) != 0 and item.extra != "library":
 
-        itemlist.append(Item(channel=__channel__, title="Aggiungi alla Videoteca", text_color="green",
-                             action="add_pelicula_to_library", url=item.url,
-                             thumbnail= get_thumb('videolibrary', auto = True),
-                             contentTitle=item.contentTitle, infoLabels = item.infoLabels
-                             ))
+       support.videolibrary(itemlist, item)
     
     return itemlist
 
@@ -351,7 +282,6 @@ def newest(categoria):
     logger.info("%s mainlist newest log: %s %s %s" % (__channel__, categoria))
     itemlist = []
     item = Item()
-    #item.extra = 'film'
     try:
         if categoria == "film":
             item.url = host
