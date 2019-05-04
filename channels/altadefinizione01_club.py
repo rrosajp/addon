@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
 # -*- Channel Altadefinizione01C Film -*-
-# -*- Created for IcarusbyGreko -*-
+# -*- Riscritto per KOD -*-
 # -*- By Greko -*-
-# -*- last change: 3/05/2019
+# -*- last change: 04/05/2019
+
+
+from channels import autoplay, support, filtertools
 
 from channelselector import get_thumb
-from channels import autoplay, support
-from channels import filtertools
+
 from core import httptools
+from core import channeltools
 from core import scrapertools
 from core import servertools
-from core.item import Item
-from core import channeltools
 from core import tmdb
+from core.item import Item
+
 from platformcode import config, logger
 
 __channel__ = "altadefinizione01_club"
@@ -52,13 +55,13 @@ def mainlist(item):
     autoplay.init(item.channel, list_servers, list_quality)
 
     # Menu Principale
-    support.menu(itemlist, 'Novità bold', 'peliculas', host+'', args='pellicola')
-    support.menu(itemlist, 'Genere submenu', 'categorie', host, args='genres')
-    support.menu(itemlist, 'Anno', 'categorie', host)#, args='years')
-    support.menu(itemlist, 'Lettera', 'categorie', host+'catalog/a/', args='orderalf')  
+    support.menu(itemlist, 'Film Ultimi Arrivi bold', 'peliculas', host+'', args='pellicola')
+    support.menu(itemlist, 'Genere', 'categorie', host, args='genres')
+    support.menu(itemlist, 'Per anno submenu', 'categorie', host, args=['Film per Anno','years'])
+    support.menu(itemlist, 'Per lettera', 'categorie', host+'catalog/a/', args=['Film per Lettera','orderalf'])
     support.menu(itemlist, 'Al Cinema bold', 'peliculas', host+'cinema/', args='pellicola')
     support.menu(itemlist, 'Sub-ITA bold', 'peliculas', host+'sub-ita/', args='pellicola')   
-    support.menu(itemlist, 'Cerca film submenu', 'search', host)#, args='orderalf')
+    support.menu(itemlist, 'Cerca film submenu', 'search', host)
 
     autoplay.show_option(item.channel, itemlist)
     
@@ -74,7 +77,7 @@ def peliculas(item):
     data = httptools.downloadpage(item.url, headers=headers).data
     # da qui fare le opportuni modifiche
     if item.args != 'orderalf':
-        if item.args == 'pellicola' or item.extra == 'years':
+        if item.args == 'pellicola' or item.args == 'years':
             bloque = scrapertools.find_single_match(data, '<div class="cover boxcaption">(.*?)<div id="right_bar">')
         elif item.args == "search":
             bloque = scrapertools.find_single_match(data, '<div class="cover boxcaption">(.*?)</a>')
@@ -105,20 +108,8 @@ def peliculas(item):
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
     # Paginazione
-    next_page = scrapertools.find_single_match(data, "<link rel='next' href='(.*?)' />")
-    if not next_page:
-        next_page = scrapertools.find_single_match(data, '<span>\d</span> <a href="([^"]+)">')
-
-    if next_page != "":
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="peliculas",
-                 title=config.get_localized_string(30992),
-                 url=next_page,
-                 extra=item.extra,
-                 thumbnail= get_thumb('nextpage', auto = True)
-                 ))
-
+    support.nextPage(itemlist,item,data,'<span>[^<]+</span>[^<]+<a href="(.*?)">')
+    
     return itemlist
 
 # =========== def pagina categorie ======================================
@@ -130,13 +121,13 @@ def categorie(item):
     data = httptools.downloadpage(item.url, headers=headers).data
 
     # da qui fare le opportuni modifiche
-    if item.args == 'genres':
+    if item.args[1] == 'genres':
         bloque = scrapertools.find_single_match(data, '<ul class="kategori_list">(.*?)</ul>')
         patron = '<li><a href="/(.*?)">(.*?)</a>'
-    elif item.args == 'years':
+    elif item.args[1] == 'years':
         bloque = scrapertools.find_single_match(data, '<ul class="anno_list">(.*?)</ul>')
         patron = '<li><a href="/(.*?)">(.*?)</a>'
-    elif item.args == 'orderalf':
+    elif item.args[1] == 'orderalf':
         bloque = scrapertools.find_single_match(data, '<div class="movies-letter">(.*)<div class="clearfix">')
         patron = '<a title=.*?href="(.*?)"><span>(.*?)</span>'
 
@@ -149,7 +140,7 @@ def categorie(item):
         else:
           scrapurl = host+scrapurl
 
-        if item.args != 'orderalf': action = "peliculas"
+        if item.args[1] != 'orderalf': action = "peliculas"
         else: action = 'orderalf'
         itemlist.append(Item(
             channel=item.channel,
@@ -196,19 +187,7 @@ def orderalf(item):
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
     # Paginazione
-    next_page = scrapertools.find_single_match(data, "<link rel='next' href='(.*?)' />")
-    if not next_page:
-        next_page = scrapertools.find_single_match(data, '<div class=\'wp-pagenavi\'>.*?href="(.*?)">')
-
-    if next_page != "":
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="orderalf",
-                 title=config.get_localized_string(30992),
-                 url=next_page,
-                 extra=item.extra,
-                 thumbnail= get_thumb('nextpage', auto = True)
-                 ))
+    support.nextPage(itemlist,item,data,'<span>[^<]+</span>[^<]+<a href="(.*?)">')
 
     return itemlist
 
@@ -250,11 +229,9 @@ def findvideos_film(item):
 
     # Requerido para AutoPlay
     autoplay.start(itemlist, item)
-    
-    # Opción "Añadir esta película a la biblioteca de KODI"
-    # Comandi di servizio
-    if config.get_videolibrary_support() and len(itemlist) != 0 and item.extra != "library":
 
+    # Aggiunge alla videoteca
+    if config.get_videolibrary_support() and len(itemlist) != 0 and item.extra != "library":
        support.videolibrary(itemlist, item)
     
     return itemlist
@@ -266,7 +243,7 @@ def search(item, text):
     itemlist = []
     text = text.replace(" ", "+")
     item.url = host+"index.php?do=search&story=%s&subaction=search" % (text)
-    item.extra = "search"
+    #item.extra = "search"
     try:
         return peliculas(item)
     # Se captura la excepciÛn, para no interrumpir al buscador global si un canal falla
