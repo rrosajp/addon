@@ -6,7 +6,7 @@
   "adult": false, 
   "thumbnail": "toonitalia.png", 
   "banner": "toonitalia.png", 
-  "categories": ["tvshow", "movie", "vosi"], 
+  "categories": ["tvshow", "movie", "vosi", "anime"],
   "settings": [
 		{
 		  "id": "include_in_global_search",
