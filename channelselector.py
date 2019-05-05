@@ -91,11 +91,6 @@ def getchanneltypes(view="thumb_"):
                              channel_type=channel_type, viewmode="thumbnails",
                              thumbnail=get_thumb("channels_%s.png" % channel_type, view)))
 
-    itemlist.append(Item(title='Oggi in TV', channel="filmontv", action="mainlist", view=view,
-                         category=title, channel_type="all", thumbnail=get_thumb("on_the_air.png", view),
-                         viewmode="thumbnails"))
-
-
     itemlist.append(Item(title=config.get_localized_string(70685), channel="community", action="mainlist", view=view,
                          category=title, channel_type="all", thumbnail=get_thumb("channels_community.png", view),
                          viewmode="thumbnails"))
@@ -337,10 +332,13 @@ def thumb(itemlist=[]):
                      'channels_grotesque':['grottesco'],
                      'channels_war':['guerra'],
                      'horror':['horror'],
+                     'lucky': ['fortunato'], # se potete inserire la icona anche per questa voce
                      'channels_musical':['musical'],
                      'channels_mistery':['mistero', 'giallo'],
                      'channels_noir':['noir'],
+                     'popular' : ['popolari','popolare', 'più visti'],
                      'channels_thriller':['thriller'],
+                     'top_rated' : ['fortunato'], #da tocgliere aggiunte la voce lucky o quello che volete
                      'channels_western':['western'],
                      'channels_vos':['sub','sub-ita'],
                      'channels_romance':['romantico','sentimentale'],
