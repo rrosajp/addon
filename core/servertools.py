@@ -725,12 +725,17 @@ def check_video_link(url, server, timeout=3):
     :param url, server: Link y servidor
     :return: str(2) '??':No se ha podido comprobar. 'Ok':Parece que el link funciona. 'NO':Parece que no funciona.
     """
+
+    NK = "[COLOR 0xFFF9B613][B]" + u'\u25cf' + "[/B][/COLOR]"
+    OK = "[COLOR 0xFF00C289][B]" + u'\u25cf' + "[/B][/COLOR]"
+    KO = "[COLOR 0xFFC20000][B]" + u'\u25cf' + "[/B][/COLOR]"
+
     try:
         server_module = __import__('servers.%s' % server, None, None, ["servers.%s" % server])
     except:
         server_module = None
         logger.info("[check_video_link] No se puede importar el servidor! %s" % server)
-        return "??"
+        return NK
         
     if hasattr(server_module, 'test_video_exists'):
         ant_timeout = httptools.HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT
@@ -740,17 +745,17 @@ def check_video_link(url, server, timeout=3):
             video_exists, message = server_module.test_video_exists(page_url=url)
             if not video_exists:
                 logger.info("[check_video_link] No existe! %s %s %s" % (message, server, url))
-                resultado = "[COLOR 0xffc20000][B]" + u'\u25cf' + "[/B][/COLOR]"
+                resultado = KO
             else:
                 logger.info("[check_video_link] comprobacion OK %s %s" % (server, url))
-                resultado = "[COLOR 0xff00c289][B]" + u'\u25cf' + "[/B][/COLOR]"
+                resultado = OK
         except:
             logger.info("[check_video_link] No se puede comprobar ahora! %s %s" % (server, url))
-            resultado = "??"
+            resultado = NK
 
         finally:
             httptools.HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT = ant_timeout  # Restaurar tiempo de descarga
             return resultado
 
     logger.info("[check_video_link] No hay test_video_exists para servidor: %s" % server)
-    return "??"
+    return NK
