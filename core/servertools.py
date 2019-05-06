@@ -714,7 +714,7 @@ def check_list_links(itemlist, numero='', timeout=3):
     for it in itemlist:
         if numero > 0 and it.server != '' and it.url != '':
             verificacion = check_video_link(it.url, it.server, timeout)
-            it.title = verificacion + ', ' + it.title.strip()
+            it.title = verificacion + ' ' + it.title.strip()
             it.alive = verificacion
             numero -= 1
     return itemlist
@@ -735,14 +735,15 @@ def check_video_link(url, server, timeout=3):
     if hasattr(server_module, 'test_video_exists'):
         ant_timeout = httptools.HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT
         httptools.HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT = timeout  # Limitar tiempo de descarga
+        
         try:
             video_exists, message = server_module.test_video_exists(page_url=url)
             if not video_exists:
                 logger.info("[check_video_link] No existe! %s %s %s" % (message, server, url))
-                resultado = "[COLOR red][B]NO[/B][/COLOR]"
+                resultado = "[COLOR 0xffc20000][B]" + u'\u25cf' + "[/B][/COLOR]"
             else:
                 logger.info("[check_video_link] comprobacion OK %s %s" % (server, url))
-                resultado = "[COLOR green][B]OK[/B][/COLOR]"
+                resultado = "[COLOR 0xff00c289][B]" + u'\u25cf' + "[/B][/COLOR]"
         except:
             logger.info("[check_video_link] No se puede comprobar ahora! %s %s" % (server, url))
             resultado = "??"
