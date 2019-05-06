@@ -86,7 +86,7 @@ def color(text, color):
 
 
 def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data="", patron_block="",
-           patronNext="", action="findvideos", url_host="", addVideolibrary = True):
+           patronNext="", action="findvideos", addVideolibrary = True):
     # patron: the patron to use for scraping page, all capturing group must match with listGroups
     # listGroups: a list containing the scraping info obtained by your patron, in order
     # accepted values are: url, title, thumb, quality, year, plot, duration, genre, rating
@@ -144,8 +144,8 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
             scraped = {}
             for kk in known_keys:
                 val = match[listGroups.index(kk)] if kk in listGroups else ''
-                if kk == "url":
-                    val = url_host + val
+                if val and (kk == "url" or kk == 'thumb') and 'http' not in val:
+                    val = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
                 scraped[kk] = val
 
             title = scrapertoolsV2.decodeHtmlentities(scraped["title"]).strip()
@@ -462,7 +462,9 @@ def nextPage(itemlist, item, data, patron, function_level=1):
     # If the call is direct, leave it blank
     
     next_page = scrapertoolsV2.find_single_match(data, patron)
-    log('NEXT= ',next_page)
+    if 'http' not in next_page:
+        next_page = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + next_page
+    log('NEXT= ', next_page)
 
     if next_page != "":
         itemlist.append(
