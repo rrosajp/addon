@@ -7,6 +7,7 @@ import urllib
 from lib import unshortenit
 from platformcode import logger, config
 from channelselector import thumb
+from channels import autoplay
 
 
 def hdpass_get_servers(item):
@@ -479,7 +480,10 @@ def nextPage(itemlist, item, data, patron, function_level=1):
     return itemlist
 
 
-def server(item, data='', headers=''):
+def server(item, data='', headers='', AutoPlay=True):
+
+    __comprueba_enlaces__ = config.get_setting('comprueba_enlaces', item.channel)
+    __comprueba_enlaces_num__ = config.get_setting('comprueba_enlaces_num', item.channel)
     
     if not data:
         data = httptools.downloadpage(item.url, headers=headers).data
@@ -494,7 +498,21 @@ def server(item, data='', headers=''):
         videoitem.channel = item.channel
         videoitem.contentType = item.contentType
 
+    if __comprueba_enlaces__:
+        itemlist = servertools.check_list_links(itemlist, __comprueba_enlaces_num__)
+    
+    if AutoPlay == True:
+        autoplay.start(itemlist, item)
+
     return itemlist
+
+
+def aplay(item, itemlist, list_servers='', list_quality=''):
+    if inspect.stack()[1][3] == 'mainlist':
+        autoplay.init(item.channel, list_servers, list_quality)
+        autoplay.show_option(item.channel, itemlist)
+    else:
+        autoplay.start(itemlist, item)
 
 
 def log(stringa1="", stringa2="", stringa3="", stringa4="", stringa5=""):
