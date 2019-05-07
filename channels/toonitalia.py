@@ -259,7 +259,8 @@ def episodios(item):
             scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle).replace("×", "x")
             scrapedtitle = scrapedtitle.replace("_", " ")
             scrapedtitle = scrapedtitle.replace(".mp4", "")
-            puntata = scrapertools.find_single_match(scrapedtitle, '[0-9]+x[0-9]+')
+            # puntata = scrapertools.find_single_match(scrapedtitle, '[0-9]+x[0-9]+')
+            puntata = scrapedtitle
             for i in itemlist:
                 if i.args == puntata: #è già stata aggiunta
                     i.url +=  " " + scrapedurl
