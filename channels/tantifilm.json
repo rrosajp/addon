@@ -6,9 +6,9 @@
 	"adult": false,
 	"thumbnail": "https://raw.githubusercontent.com/Zanzibar82/images/master/posters/tantifilm.png",
 	"banner": "https://raw.githubusercontent.com/Zanzibar82/images/master/posters/tantifilm.png",
-	"categories": ["tvshow", "movie"],
+	"categories": ["tvshow", "movie", "anime"],
     "settings": [
-			{
+        {
 			"id": "include_in_global_search",
 			"type": "bool",
 			"label": "Includi in ricerca globale",
@@ -25,14 +25,6 @@
 			"visible": true
 
 		},
-        {
-            "id": "include_in_newest_series",
-            "type": "bool",
-            "label": "Includi in Novità - Serie TV",
-            "default": true,
-            "enabled": true,
-            "visible": true
-        },
         {
             "id": "include_in_newest_italiano",
             "type": "bool",
