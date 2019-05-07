@@ -213,15 +213,17 @@ def update():
     unzipper = ziptools.ziptools()
     destpathname = xbmc.translatePath("special://home/addons/") 
     logger.info("kodiondemand.core.updater destpathname=%s" % destpathname)
-    unzipper.extract(localfilename,destpathname)
+    unzipper.extract(localfilename,destpathname, os.path.join(xbmc.translatePath("special://home/addons/"), "plugin.video.kod/"))
 
-    files = os.listdir(destpathname + "addon-master")
-    for f in files:
-        shutil.move(destpathname + "addon-master/" + f, xbmc.translatePath("special://home/addons/") + "plugin.video.kod/" + f)
+    temp_dir = os.path.join(destpathname,"addon-master")
+    files = os.listdir(temp_dir)
+    #for f in files:
+    #    shutil.move(os.path.join(temp_dir, f), os.path.join(xbmc.translatePath("special://home/addons/"), "plugin.video.kod/", f))
             
     # Borra el zip descargado
     logger.info("kodiondemand.core.updater borra fichero...")
     os.remove(localfilename)
+    #os.remove(temp_dir)
     logger.info("kodiondemand.core.updater ...fichero borrado")
 
     
