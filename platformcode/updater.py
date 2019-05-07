@@ -10,7 +10,7 @@ import traceback
 import urllib
 import json
 import xbmc
-
+import shutil
 
 from platformcode import config, logger, platformtools
 
@@ -199,22 +199,26 @@ def update():
     # Descarga el ZIP
     logger.info("kodiondemand.core.updater update")
     remotefilename = REMOTE_FILE
-    localfilename = xbmc.translatePath("special://home/addons/") + "plugin.video.kod/addon-master.zip"
+    localfilename = xbmc.translatePath("special://home/addons/") + "plugin.video.kod.update.zip"
     logger.info("kodiondemand.core.updater remotefilename=%s" % remotefilename)
     logger.info("kodiondemand.core.updater localfilename=%s" % localfilename)
     logger.info("kodiondemand.core.updater descarga fichero...")
     
-    #urllib.urlretrieve(remotefilename,localfilename)
-    from core import downloadtools
-    downloadtools.downloadfile(remotefilename, localfilename, continuar=False)
+    urllib.urlretrieve(remotefilename,localfilename)
+    #from core import downloadtools
+    #downloadtools.downloadfile(remotefilename, localfilename, continuar=False)
     
     # Lo descomprime
     logger.info("kodiondemand.core.updater descomprime fichero...")
     unzipper = ziptools.ziptools()
-    destpathname = xbmc.translatePath("special://home/addons/") + "plugin.video.kod"
+    destpathname = xbmc.translatePath("special://home/addons/") 
     logger.info("kodiondemand.core.updater destpathname=%s" % destpathname)
     unzipper.extract(localfilename,destpathname)
-    
+
+    files = os.listdir(destpathname + "addon-master")
+    for f in files:
+        shutil.move(destpathname + "addon-master/" + f, xbmc.translatePath("special://home/addons/") + "plugin.video.kod/" + f)
+            
     # Borra el zip descargado
     logger.info("kodiondemand.core.updater borra fichero...")
     os.remove(localfilename)
