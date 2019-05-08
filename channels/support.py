@@ -189,7 +189,8 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
                     quality=scraped["quality"],
                     url=scraped["url"],
                     infoLabels=infolabels,
-                    thumbnail=scraped["thumb"]
+                    thumbnail=scraped["thumb"],
+                    args=item.args
                 )
 
                 for lg in list(set(listGroups).difference(known_keys)):
@@ -417,6 +418,7 @@ def typo(string, typography=''):
 
 
 def match(item, patron='', patron_block='', headers='', url=''):
+    matches = []
     url = url if url else item.url
     data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
     data = re.sub('\n|\t', '', data)
@@ -480,10 +482,12 @@ def nextPage(itemlist, item, data, patron, function_level=1):
     return itemlist
 
 
-def server(item, data='', headers='', AutoPlay=True):
+def server(item, data='', headers='', AutoPlay=True, CheckLinks=True):
 
     __comprueba_enlaces__ = config.get_setting('comprueba_enlaces', item.channel)
+    log(__comprueba_enlaces__ )
     __comprueba_enlaces_num__ = config.get_setting('comprueba_enlaces_num', item.channel)
+    log(__comprueba_enlaces_num__ )
     
     if not data:
         data = httptools.downloadpage(item.url, headers=headers).data
@@ -498,7 +502,7 @@ def server(item, data='', headers='', AutoPlay=True):
         videoitem.channel = item.channel
         videoitem.contentType = item.contentType
 
-    if __comprueba_enlaces__:
+    if __comprueba_enlaces__ and CheckLinks:
         itemlist = servertools.check_list_links(itemlist, __comprueba_enlaces_num__)
     
     if AutoPlay == True:
