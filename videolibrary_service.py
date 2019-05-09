@@ -333,7 +333,7 @@ if __name__ == "__main__":
 
 
     # Verificar quick-fixes al abrirse Kodi, y dejarlo corriendo como Thread
-    if not os.path.isfile(config.get_runtime_path() + '/.dev'):
+    if not os.path.isdir(config.get_runtime_path() + '/.git'):
         logger.info("DEV MODE OFF")
         from platformcode import updater
         updater.check_addon_init()
