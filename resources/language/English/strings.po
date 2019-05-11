@@ -361,6 +361,10 @@ msgctxt "#30999"
 msgid "Add key to open Shortcut"
 msgstr ""
 
+msgctxt "#31000"
+msgid "[COLOR red]Remove key to open Shortcut[\COLOR]"
+msgstr ""
+
 msgctxt "#50000"
 msgid "Sagas"
 msgstr ""
@@ -1486,7 +1490,7 @@ msgid "Search Trailer"
 msgstr ""
 
 msgctxt "#60360"
-msgid "[COLOR 0xffccff00]<Quick Menu>[/COLOR]"
+msgid "[B]QUICK MENU[/B]"
 msgstr ""
 
 msgctxt "#60361"
@@ -5353,6 +5357,10 @@ msgctxt "#30999"
 msgid "Add key to open Shortcut"
 msgstr ""
 
+msgctxt "#31000"
+msgid "Remove key to open Shortcut"
+msgstr ""
+
 msgctxt "#50000"
 msgid "Sagas"
 msgstr ""
@@ -6482,7 +6490,7 @@ msgid "Search Trailer"
 msgstr ""
 
 msgctxt "#60360"
-msgid "[COLOR 0xffccff00]<Quick Menu>[/COLOR]"
+msgid "[COLOR 0xFF0081C2]Side Menu[/COLOR]"
 msgstr ""
 
 msgctxt "#60361"
@@ -10470,4 +10478,24 @@ msgstr ""
 
 msgctxt "#70697"
 msgid " [Results of the %s channel] "
+msgstr ""
+
+msgctxt "#70698"
+msgid "Press the key to be used to open the window"
+msgstr ""
+
+msgctxt "#70699"
+msgid "You have %s seconds"
+msgstr ""
+
+msgctxt "#70700"
+msgid "The key has been saved"
+msgstr ""
+
+msgctxt "#70701"
+msgid "The key has been deleted"
+msgstr ""
+
+msgctxt "#70702"
+msgid "Restart Kodi to apply the changes"
 msgstr ""

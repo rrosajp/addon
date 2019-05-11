@@ -25,11 +25,11 @@ class KeyListener(xbmcgui.WindowXMLDialog):
 
     def onInit(self):
         try:
-            self.getControl(401).addLabel("Presiona la tecla a usar para abrir la ventana")
-            self.getControl(402).addLabel("Tienes %s segundos" % self.TIMEOUT)
+            self.getControl(401).addLabel(config.get_localized_string(70698))
+            self.getControl(402).addLabel(config.get_localized_string(70699) % self.TIMEOUT)
         except AttributeError:
-            self.getControl(401).setLabel("Presiona la tecla a usar para abrir la ventana")
-            self.getControl(402).setLabel("Tienes %s segundos" % self.TIMEOUT)
+            self.getControl(401).setLabel(config.get_localized_string(70698))
+            self.getControl(402).setLabel(config.get_localized_string(70699) % self.TIMEOUT)
 
     def onAction(self, action):
         code = action.getButtonCode()
@@ -63,7 +63,7 @@ def set_key():
         data = '<keymap><global><keyboard><key id="%s">' % new_key + 'runplugin(plugin://' \
                                                                      'plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAia2V5bWFwIiwNCiAgICAib3BlbiI6IHRydWUNCn0=)</key></keyboard></global></keymap>'
         filetools.write(xbmc.translatePath(file_xml), data)
-        platformtools.dialog_notification("Tecla guardada", "Reinicia Kodi para que se apliquen los cambios")
+        platformtools.dialog_notification(config.get_localized_string(70700),config.get_localized_string(70702))
 
         config.set_setting("shortcut_key", new_key)
         # file_idioma = filetools.join(config.get_runtime_path(), 'resources', 'language', 'Spanish', 'strings.xml')
@@ -80,15 +80,26 @@ def set_key():
 
     return
 
+def delete_key():
+    from core import filetools
+    from platformcode import platformtools
+    import xbmc
+
+    file_xml = "special://profile/keymaps/kod.xml"
+    filetools.write(xbmc.translatePath(file_xml), '')
+    platformtools.dialog_notification(config.get_localized_string(70701),config.get_localized_string(70702))
+
+    config.set_setting("shortcut_key", '')
+
 
 MAIN_MENU = {
-    "news": {"label": "Novedades", "icon": get_thumb("news.png"), "order": 0},
-    "channels": {"label": "Canales", "icon": get_thumb("channels.png"), "order": 1},
-    "search": {"label": "Buscador", "icon": get_thumb("search.png"), "order": 2},
-    "favorites": {"label": "Favoritos", "icon": get_thumb("favorites.png"), "order": 3},
-    "videolibrary": {"label": "Videoteca", "icon": get_thumb("videolibrary.png"), "order": 4},
-    "downloads": {"label": "Descargas", "icon": get_thumb("downloads.png"), "order": 5},
-    "settings": {"label": "Configuración", "icon": get_thumb("setting_0.png"), "order": 6}
+    "news": {"label": config.get_localized_string(30130), "icon": get_thumb("news.png"), "order": 0},
+    "channels": {"label": config.get_localized_string(30118), "icon": get_thumb("channels.png"), "order": 1},
+    "search": {"label": config.get_localized_string(70082), "icon": get_thumb("search.png"), "order": 2},
+    "favorites": {"label": config.get_localized_string(30102), "icon": get_thumb("favorites.png"), "order": 3},
+    "videolibrary": {"label": config.get_localized_string(30131), "icon": get_thumb("videolibrary.png"), "order": 4},
+    "downloads": {"label": config.get_localized_string(60332), "icon": get_thumb("downloads.png"), "order": 5},
+    "settings": {"label": config.get_localized_string(60333), "icon": get_thumb("setting_0.png"), "order": 6}
 }
 
 

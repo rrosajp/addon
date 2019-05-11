@@ -112,6 +112,10 @@ def run(item=None):
             else:
                 return keymaptools.set_key()
 
+        elif item.action == "delete_key":
+            from platformcode import keymaptools
+            return keymaptools.delete_key()
+
         elif item.action == "script":
             from core import tmdb
             if tmdb.drop_bd():

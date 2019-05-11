@@ -361,6 +361,10 @@ msgctxt "#30999"
 msgid "Add key to open Shortcut"
 msgstr "Aggiungi tasto per aprire la scorciatoia"
 
+msgctxt "#31000"
+msgid "Remove key to open Shortcut"
+msgstr "Rimuovi tasto per aprire la scorciatoia"
+
 msgctxt "#50000"
 msgid "Sagas"
 msgstr "Saghe"
@@ -1478,8 +1482,8 @@ msgid "Search Trailer"
 msgstr "Cerca Trailer"
 
 msgctxt "#60360"
-msgid "[COLOR 0xffccff00]<Quick Menu>[/COLOR]"
-msgstr "[COLOR 0xffccff00]<Menu Rapido>[/COLOR]"
+msgid "[B]QUICK MENU[/B]"
+msgstr "[B]MENU RAPIDO[/B]"
 
 msgctxt "#60361"
 msgid "Super Favourites Menu"
@@ -5461,3 +5465,23 @@ msgstr "Risultati"
 msgctxt "#70697"
 msgid " [Results of the %s channel] "
 msgstr " [Risultati del canale %s] "
+
+msgctxt "#70698"
+msgid "Press the key to be used to open the window"
+msgstr "Premere il tasto da utilizzare per aprire la finestra"
+
+msgctxt "#70699"
+msgid "You have %s seconds"
+msgstr "Hai %s secondi"
+
+msgctxt "#70700"
+msgid "The key has been saved"
+msgstr "Il tasto è stato salvato"
+
+msgctxt "#70701"
+msgid "The key has been deleted"
+msgstr "Il tasto è stato cancellato"
+
+msgctxt "#70702"
+msgid "Restart Kodi to apply the changes"
+msgstr "Riavvia Kodi per applicare le modifiche"

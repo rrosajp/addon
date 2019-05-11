@@ -29,18 +29,18 @@
 			<height>70</height>
 			<texture colordiffuse="FF12B2E7" border="2">Shortcut/white70.png</texture>
 		</control>
-		<control type="label" id="30000">
+		<!-- <control type="label" id="30000">
 			<textoffsetx>70</textoffsetx>
 			<left>-30</left>
 			<top>0</top>
 			<width>969</width>
 			<height>70</height>
 			<font>font20_title</font>
-			<label>Alfa - $ADDON[plugin.video.kod 30998]</label>
+			<label>Kodi on Demand - $ADDON[plugin.video.kod 30998]</label>
 			<align>left</align>
 			<aligny>center</aligny>
 			<shadowcolor>black</shadowcolor>
-		</control>
+		</control> -->
 		<control type="button">
 			<left>-1920</left>
 			<top>-1080</top>
@@ -72,7 +72,7 @@
 			<label></label>
 			<animation effect="slide" end="-70,0" time="0" condition="true">Conditional</animation>
 			<textureradioofffocus colordiffuse="EEFFFFFF">Shortcut/close.png</textureradioofffocus>
-			<textureradiooffnofocus colordiffuse="EEFFFFFF">Shortcut/logo.png</textureradiooffnofocus>
+			<textureradiooffnofocus colordiffuse="EEFFFFFF">Shortcut/close.png</textureradiooffnofocus>
 			<textureradioonfocus colordiffuse="EEFFFFFF">Shortcut/close.png</textureradioonfocus>
 			<textureradioonnofocus colordiffuse="EEFFFFFF">Shortcut/logo.png</textureradioonnofocus>
 			<onclick>Action(close)</onclick>
