@@ -60,6 +60,9 @@ def mainlist(item):
 
     itemlist.append(Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70313), context=context,
                          search_type='list', list_type='tv/top_rated', thumbnail=get_thumb("top_rated.png")))
+    
+    itemlist.append(Item(channel="filmontv", action="mainlist", title=config.get_localized_string(50001),
+                         thumbnail=get_thumb("on_the_air.png"), viewmode="thumbnails")) 
 
 
 
