@@ -59,7 +59,7 @@ def set_key():
         from core import filetools
         from platformcode import platformtools
         import xbmc
-        file_xml = "special://profile/keymaps/alfa.xml"
+        file_xml = "special://profile/keymaps/kod.xml"
         data = '<keymap><global><keyboard><key id="%s">' % new_key + 'runplugin(plugin://' \
                                                                      'plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAia2V5bWFwIiwNCiAgICAib3BlbiI6IHRydWUNCn0=)</key></keyboard></global></keymap>'
         filetools.write(xbmc.translatePath(file_xml), data)

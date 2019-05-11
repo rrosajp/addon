@@ -362,7 +362,7 @@ msgid "Add key to open Shortcut"
 msgstr ""
 
 msgctxt "#31000"
-msgid "[COLOR red]Remove key to open Shortcut[\COLOR]"
+msgid "Remove key to open Shortcut"
 msgstr ""
 
 msgctxt "#50000"
