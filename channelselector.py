@@ -91,10 +91,9 @@ def getchanneltypes(view="thumb_"):
                              channel_type=channel_type, viewmode="thumbnails",
                              thumbnail=get_thumb("channels_%s.png" % channel_type, view)))
 
-
-        itemlist.append(Item(title='Oggi in TV', channel="filmontv", action="mainlist", view=view,
-                          category=title, channel_type="all", thumbnail=get_thumb("on_the_air.png", view),
-                          viewmode="thumbnails")) 
+    itemlist.append(Item(title='Oggi in TV', channel="filmontv", action="mainlist", view=view,
+                         category=title, channel_type="all", thumbnail=get_thumb("on_the_air.png", view),
+                         viewmode="thumbnails"))
 
 
 
