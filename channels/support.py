@@ -19,16 +19,16 @@ def hdpass_get_servers(item):
     if 'https' not in url:
         url = 'https:' + url
 
-    if 'hdpass' in url:
+    if 'hdpass' or 'hdplayer' in url:
         data = httptools.downloadpage(url).data
-
+       
         start = data.find('<div class="row mobileRes">')
         end = data.find('<div id="playerFront">', start)
         data = data[start:end]
 
         patron_res = '<div class="row mobileRes">(.*?)</div>'
         patron_mir = '<div class="row mobileMirrs">(.*?)</div>'
-        patron_media = r'<input type="hidden" name="urlEmbed" data-mirror="([^"]+)" id="urlEmbed" value="([^"]+)"\s*/>'
+        patron_media = r'<input type="hidden" name="urlEmbed" data-mirror="([^"]+)" id="urlEmbed"\s*value="([^"]+)"\s*/>'
 
         res = scrapertoolsV2.find_single_match(data, patron_res)
 
