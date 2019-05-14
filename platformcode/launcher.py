@@ -415,7 +415,7 @@ def play_from_library(item):
                                   path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
 
     # Por si acaso la imagen hiciera (en futuras versiones) le damos a stop para detener la reproduccion
-    sleep(0.5)              ### Si no se pone esto se bloquea Kodi
+    # sleep(0.5)              ### Si no se pone esto se bloquea Kodi
     xbmc.Player().stop()
 
     # modificamos el action (actualmente la videoteca necesita "findvideos" ya que es donde se buscan las fuentes
