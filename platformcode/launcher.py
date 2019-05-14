@@ -112,6 +112,10 @@ def run(item=None):
             else:
                 return keymaptools.set_key()
 
+        elif item.action == "delete_key":
+            from platformcode import keymaptools
+            return keymaptools.delete_key()
+
         elif item.action == "script":
             from core import tmdb
             if tmdb.drop_bd():
@@ -408,7 +412,7 @@ def play_from_library(item):
     # Intentamos reproducir una imagen (esto no hace nada y ademas no da error)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True,
                               xbmcgui.ListItem(
-                                  path=os.path.join(config.get_runtime_path(), "resources", "subtitle.mp4")))
+                                  path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
 
     # Por si acaso la imagen hiciera (en futuras versiones) le damos a stop para detener la reproduccion
     sleep(0.5)              ### Si no se pone esto se bloquea Kodi

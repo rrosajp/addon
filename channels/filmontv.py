@@ -20,30 +20,30 @@ TIMEOUT_TOTAL = 60
 def mainlist(item):
     logger.info(" mainlist")
     itemlist = [Item(channel=item.channel,
-                     title=support.typo("IN ONDA ADESSO bold color kod"),
+                     title=support.typo("IN ONDA ADESSO bold"),
                      action="tvoggi",
                      url="%s/filmtv/" % host,
-                     thumbnail=""),
+                     thumbnail=item.thumbnail),
                 Item(channel=item.channel,
                      title="Mattina",
                      action="tvoggi",
                      url="%s/filmtv/oggi/mattina/" % host,
-                     thumbnail=""),
+                     thumbnail=item.thumbnail),
                 Item(channel=item.channel,
                      title="Pomeriggio",
                      action="tvoggi",
                      url="%s/filmtv/oggi/pomeriggio/" % host,
-                     thumbnail=""),
+                     thumbnail=item.thumbnail),
                 Item(channel=item.channel,
                      title="Sera",
                      action="tvoggi",
                      url="%s/filmtv/oggi/sera/" % host,
-                     thumbnail=""),
+                     thumbnail=item.thumbnail),
                 Item(channel=item.channel,
                      title="Notte",
                      action="tvoggi",
                      url="%s/filmtv/oggi/notte/" % host,
-                     thumbnail="")]
+                     thumbnail=item.thumbnail)]
 
     return itemlist
 

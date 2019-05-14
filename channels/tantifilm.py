@@ -90,21 +90,27 @@ def search_peliculas(item):
 
     action = 'findvideos' if item.extra == 'movie' else 'episodios'
 
-    data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
-    patron = r'<a href="([^"]+)" title="Permalink to\s([^"]+) \([^<]+\).*?" rel="[^"]+">\s*<img[^s]+src="(.*?)"'
+    data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace('\t','').replace('\n','')
+    log(data)
+    patron = r'<a href="([^"]+)" title="Permalink to\s([^"]+) \(([^<]+)\).*?".*?<img[^s]+src="([^"]+)".*?<div class="calitate">\s*<p>([^<]+)<\/p>'
     matches = re.compile(patron, re.MULTILINE).findall(data)    
 
-    for url, title, thumb in matches:
+    for url, title, year, thumb, quality in matches:
+        infoLabels = {}
+        infoLabels['year'] = year
         title = scrapertoolsV2.decodeHtmlentities(title)
+        quality = scrapertoolsV2.decodeHtmlentities(quality)
+        longtitle = title + support.typo(quality,'_ [] color kod')
         itemlist.append(
             Item(channel=item.channel,
                  action=action,
                  contentType=item.contentType,
                  fulltitle=title,
                  show=title,
-                 title=title,
+                 title=longtitle,
                  url=url,
                  thumbnail=thumb,
+                 infoLabels=infoLabels,                 
                  args=item.args))
     
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
@@ -122,11 +128,11 @@ def peliculas(item):
     log()
     action = 'findvideos' if item.extra == 'movie' else 'episodios'
     if item.args == 'movie':
-        patron= r'<div class="mediaWrap mediaWrapAlt">[^<]+<a href="([^"]+)" title="Permalink to\s([^"]+) \([^<]+\).*?"[^>]+>[^<]+<img[^s]+src="([^"]+)"[^>]+>[^<]+<\/a>'  
-        itemlist = support.scrape(item, patron, ['url', 'title', 'thumb'], headers, action=action, patronNext='<a class="nextpostslink" rel="next" href="([^"]+)">')
+        patron= r'<div class="mediaWrap mediaWrapAlt">[^<]+<a href="([^"]+)" title="Permalink to\s([^"]+) \(([^<]+)\).*?"[^>]+>[^<]+<img[^s]+src="([^"]+)"[^>]+>[^<]+<\/a>.*?<p>\s*([a-zA-Z-0-9]+)\s*<\/p>'  
+        itemlist = support.scrape(item, patron, ['url', 'title', 'year', 'thumb', 'quality'], headers, action=action, patronNext='<a class="nextpostslink" rel="next" href="([^"]+)">')
     else:
-        patron = r'<div class="media3">[^>]+><a href="([^"]+)"><img[^s]+src="([^"]+)"[^>]+><\/a><[^>]+><a[^>]+><p>([^(:?\(|>]+)'
-        itemlist = support.scrape(item, patron, ['url', 'thumb', 'title'], headers, action=action, patronNext='<a class="nextpostslink" rel="next" href="([^"]+)">')
+        patron = r'<div class="media3">[^>]+><a href="([^"]+)"><img[^s]+src="([^"]+)"[^>]+><\/a><[^>]+><a[^<]+><p>([^<]+) \(([^\)]+)[^<]+<\/p>.*?<p>\s*([a-zA-Z-0-9]+)\s*<\/p>'
+        itemlist = support.scrape(item, patron, ['url', 'thumb', 'title', 'year', 'quality'], headers, action=action, patronNext='<a class="nextpostslink" rel="next" href="([^"]+)">')
     return autorenumber.renumber(itemlist) if item.args == 'anime' else itemlist
 
 
