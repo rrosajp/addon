@@ -10499,3 +10499,7 @@ msgstr ""
 msgctxt "#70702"
 msgid "Restart Kodi to apply the changes"
 msgstr ""
+
+msgctxt "#70703"
+msgid "Create directories with lowercase letters"
+msgstr ""
