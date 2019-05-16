@@ -11,7 +11,7 @@ from core.item import Item
 from platformcode import logger, config
 from channelselector import thumb
 
-host = "https://seriehd.casa/"
+host = "https://seriehd.casa"
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()

@@ -5485,3 +5485,7 @@ msgstr "Il tasto è stato cancellato"
 msgctxt "#70702"
 msgid "Restart Kodi to apply the changes"
 msgstr "Riavvia Kodi per applicare le modifiche"
+
+msgctxt "#70703"
+msgid "Create directories with lowercase letters"
+msgstr "Crea cartelle con le lettere minuscole"
