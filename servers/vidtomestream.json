@@ -4,22 +4,14 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "streamango.com/(?:embed|f)/([A-z0-9]+)",
-        "url": "http://streamango.com/embed/\\1"
-      },
-      {
-        "pattern": "https://fruitadblock.net/embed/([A-z0-9]+)",
-        "url": "http://streamango.com/embed/\\1"
-      },
-      {
-        "pattern": "https://streamangos.com/e/([A-z0-9]+)",
-        "url": "http://streamango.com/embed/\\1"
+        "pattern": "vidtome.stream/(?:embed-|)([A-z0-9]+)",
+        "url": "http://vidtome.stream/\\1.html"
       }
     ]
   },
   "free": true,
-  "id": "streamango",
-  "name": "streamango",
+  "id": "vidtomestream",
+  "name": "vidtomestream",
   "settings": [
     {
       "default": false,
@@ -45,6 +37,5 @@
       "type": "list",
       "visible": false
     }
-  ],
-  "thumbnail": "http://i.imgur.com/o8XR8fL.png"
+  ]
 }
