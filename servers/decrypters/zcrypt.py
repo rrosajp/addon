@@ -51,10 +51,9 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                     #fix by greko inizio
                     if not data:  
                         data = scrapertoolsV2.find_single_match(idata, 'action="(?:[^/]+.*?/[^/]+/([a-zA-Z0-9_]+))">')
-                    if '/olink/' in url or '/delta/' in url or '/mango/' in url or '/now/' in url:
-                        from lib import unshortenit
-                        data, status = unshortenit.unshorten(url)
-                        logger.info("Data - Status zcrypt linkup : [%s] [%s] " %(data, status))
+                    from lib import unshortenit
+                    data, status = unshortenit.unshorten(url)
+                    logger.info("Data - Status zcrypt linkup : [%s] [%s] " %(data, status))
                     # fix by greko fine
                 else:
                     data = ""
@@ -71,7 +70,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             else:
                 logger.info("  url duplicada=" + url)
 
-    patron = r"""(https?://(?:www\.)?(?:threadsphere\.bid|adf\.ly|q\.gs|j\.gs|u\.bb|ay\.gy|linkbucks\.com|any\.gs|cash4links\.co|cash4files\.co|dyo\.gs|filesonthe\.net|goneviral\.com|megaline\.co|miniurls\.co|qqc\.co|seriousdeals\.net|theseblogs\.com|theseforums\.com|tinylinks\.co|tubeviral\.com|ultrafiles\.net|urlbeat\.net|whackyvidz\.com|yyv\.co|adfoc\.us|lnx\.lu|sh\.st|href\.li|anonymz\.com|shrink-service\.it|rapidcrypt\.netz|ecleneue\.com)/[^"']+)"""
+    patron = r"""(https?://(?:www\.)?(?:threadsphere\.bid|adf\.ly|q\.gs|j\.gs|u\.bb|ay\.gy|linkbucks\.com|any\.gs|cash4links\.co|cash4files\.co|dyo\.gs|filesonthe\.net|goneviral\.com|megaline\.co|miniurls\.co|qqc\.co|seriousdeals\.net|theseblogs\.com|theseforums\.com|tinylinks\.co|tubeviral\.com|ultrafiles\.net|urlbeat\.net|whackyvidz\.com|yyv\.co|adfoc\.us|lnx\.lu|sh\.st|href\.li|anonymz\.com|shrink-service\.it|rapidcrypt\.net|ecleneue\.com)/[^"']+)"""
 
     logger.info(" find_videos #" + patron + "#")
     matches = re.compile(patron).findall(page_url)
@@ -90,5 +89,3 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     ret = page_url+" "+str(devuelve) if devuelve else page_url
     logger.info(" RET=" + str(ret))
     return ret
-
-
