@@ -152,7 +152,7 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
             title = scrapertoolsV2.decodeHtmlentities(scraped["title"]).strip()
             plot = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["plot"]))
 
-            if (scraped["quality"] and scraped["episode"]): # by greko aggiunto episode
+            if scraped["quality"] and scraped["episode"]: # by greko aggiunto episode
                 longtitle = '[B]' + title + '[/B] - [B]' + scraped["episode"] + '[/B][COLOR blue][' + scraped["quality"] + '][/COLOR]' # by greko aggiunto episode
             elif scraped["episode"]: # by greko aggiunto episode
                 longtitle = '[B]' + title + '[/B] - [B]' + scraped["episode"] + '[/B]' # by greko aggiunto episode
@@ -450,16 +450,17 @@ def videolibrary(itemlist, item, typography=''):
         contentType = 'tvshow'
 
     title = typo(config.get_localized_string(30161) + ' ' + typography)
-    if config.get_videolibrary_support() and len(itemlist) > 0:
-        itemlist.append(
-            Item(channel=item.channel,
-                 title=title,
-                 contentType=contentType,
-                 contentSerieName=item.fulltitle if contentType == 'tvshow' else '',
-                 url=item.url,
-                 action=action,
-                 extra=extra,
-                 contentTitle=item.fulltitle))
+    if inspect.stack()[1][3] == 'findvideos' and contentType == 'movie' or inspect.stack()[1][3] != 'findvideos' and contentType != 'movie':
+        if config.get_videolibrary_support() and len(itemlist) > 0:
+            itemlist.append(
+                Item(channel=item.channel,
+                     title=title,
+                     contentType=contentType,
+                     contentSerieName=item.fulltitle if contentType == 'tvshow' else '',
+                     url=item.url,
+                     action=action,
+                     extra=extra,
+                     contentTitle=item.fulltitle))
 
 
 def nextPage(itemlist, item, data, patron, function_level=1):
@@ -493,12 +494,7 @@ def server(item, data='', headers='', AutoPlay=True, CheckLinks=True):
     if not data:
         data = httptools.downloadpage(item.url, headers=headers).data
     ## fix by greko
-    # se inviamo un blocco di url dove cercare i video
-    if type(data) == list:
-        data = str(item.url)
-    else:
-        # se inviamo un singolo url dove cercare il video
-        data = item.url
+    data = str(item.url)
     ## FINE fix by greko
         
     itemlist = servertools.find_video_items(data=data)

@@ -96,7 +96,7 @@ def episodios(item):
         logger.info("blocks log: %s" % ( blocks ))
         for block in blocks:
             season_n, episode_n = scrapertoolsV2.find_single_match(block, r'(\d+)(?:&#215;|×)(\d+)') 
-            titolo = scrapertoolsV2.find_single_match(block, r'[&#;]\d+[ ](?:([a-zA-Z0-9;&#\s]+))[ ]?(?:[^<>])')
+            titolo = scrapertoolsV2.find_single_match(block, r'[&#;]\d+[ ]([a-zA-Z0-9;&#.\s]+)[ ]?[^<>]')
             logger.info("block log: %s" % ( block ))
                 
             titolo = re.sub(r'&#215;|×', "x", titolo).replace("&#8217;","'")
@@ -165,33 +165,5 @@ def findvideos(item):
     itemlist =[]
     
     itemlist = support.server(item, item.url)
-    
-
-    """
-        Questa parte funziona se non vanno bene le modifiche a support
-    """
-##    support.log()
-##    itemlist =[]
-##    data= ''
-##    logger.info("Url item.url: [%s] " % item.url)
-##    
-##    urls = scrapertoolsV2.find_multiple_matches(item.url, r'href="([^"]+)"')
-##    itemlist = servertools.find_video_items(data=str(urls))
-##
-##    for videoitem in itemlist:
-##        videoitem.title = item.title + ' - [COLOR limegreen][[/COLOR]'+ videoitem.title+ ' [COLOR limegreen]][/COLOR]'
-##        videoitem.fulltitle = item.fulltitle
-##        videoitem.thumbnail = item.thumbnail
-##        videoitem.show = item.show
-##        videoitem.plot = item.plot
-##        videoitem.channel = item.channel
-##        videoitem.contentType = item.contentType
-##                
-##    # Controlla se i link sono validi
-##    if __comprueba_enlaces__:
-##        itemlist = servertools.check_list_links(itemlist, __comprueba_enlaces_num__)
-##        
-##    # richiesto per AutoPlay
-##    autoplay.start(itemlist, item)
     
     return itemlist

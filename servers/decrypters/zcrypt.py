@@ -51,10 +51,9 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                     #fix by greko inizio
                     if not data:  
                         data = scrapertoolsV2.find_single_match(idata, 'action="(?:[^/]+.*?/[^/]+/([a-zA-Z0-9_]+))">')
-                    if '/olink/' in url or '/delta/' in url or '/mango/' in url or '/now/' in url:
-                        from lib import unshortenit
-                        data, status = unshortenit.unshorten(url)
-                        logger.info("Data - Status zcrypt linkup : [%s] [%s] " %(data, status))
+                    from lib import unshortenit
+                    data, status = unshortenit.unshorten(url)
+                    logger.info("Data - Status zcrypt linkup : [%s] [%s] " %(data, status))
                     # fix by greko fine
                 else:
                     data = ""
