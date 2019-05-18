@@ -115,10 +115,6 @@ def episodios(item):
                      thumbnail=item.thumbnail,
                      infoLabels=item.infoLabels
                      ))
-            
-##            itemlist = support.scrape(item, patron_block='', patron=patron, listGroups=listGroups,
-##                                  patronNext=patronNext,
-##                                  action='episodios')                
 
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
     
