@@ -2797,12 +2797,12 @@ msgctxt "#70020"
 msgid "[COLOR yellow]Search similar[/COLOR]"
 msgstr ""
 
-msgctxt "#70021"
-msgid "Search in TMDB"
+msgctxt "#70022"
+msgid " - Movies"
 msgstr ""
 
-msgctxt "#70022"
-msgid "        - Movies"
+msgctxt "#70023"
+msgid " - TV Shows"
 msgstr ""
 
 msgctxt "#70023"
@@ -10446,7 +10446,7 @@ msgid "Enter the number of the starting episode"
 msgstr ""
 
 msgctxt "#70688"
-msgid "Episode 0 is a special episode, enter the number of this episode"
+msgid "Episode 0 is a special episode, enter the number of this episode (0 to skip it)"
 msgstr ""
 
 msgctxt "#70689"
@@ -10502,4 +10502,8 @@ msgstr ""
 
 msgctxt "#70703"
 msgid "Create directories with lowercase letters"
+msgstr ""
+
+msgctxt "#70704"
+msgid "TMDB ID (0 to cancel)"
 msgstr ""
