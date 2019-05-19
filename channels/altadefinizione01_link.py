@@ -13,6 +13,18 @@ problemi noti:
  non ordina le categorie
  da sistemare ma in un altro file il titolo nella pagina server
 
+Questi sono "problemi" che secondo me vanno
+risolti in altri file
+
+ autoplay
+ videoteca nella pagina dei server
+
+In questo modo si ha può avere:
+
+    1. scheletro dei canali simile se non uguale per tutti, cambiano naturalmente gli host e le regex
+    2. con una modifica si cambiano tutti i canali
+    3. meno lavoro per me...
+    
 """
 
 from channels import autoplay, support
@@ -86,7 +98,7 @@ def peliculas(item):
     itemlist = support.scrape(item, patron=patron, listGroups=listGroups,
                           headers= headers, patronNext=patronNext,
                           action='findvideos')    
-                  
+    
     return itemlist
 
 # =========== def pagina categorie ======================================
@@ -122,7 +134,7 @@ def search(item, text):
     item.url = host+"/index.php?do=search&story=%s&subaction=search" % (text)
     #item.extra = "search"
     try:
-        return film(item)
+        return peliculas(item)
     # Se captura la excepciÛn, para no interrumpir al buscador global si un canal falla
     except:
         import sys
