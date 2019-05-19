@@ -59,6 +59,12 @@ def find_video_items(item=None, data=None):
         itemlist.append(
             item.clone(title=title, action="play", url=url, thumbnail=thumbnail, server=server, folder=False))
 
+    # fix by Greko inizio   
+    # Controlla se i link sono validi per tutti i canali
+    # non c'è + bisogno dei controlli nei file[.json, py]
+    itemlist = check_list_links(itemlist)
+    # fix by Greko fine
+    
     return itemlist
 
 
@@ -121,7 +127,7 @@ def get_servers_itemlist(itemlist, fnc=None, sort=False):
     # Ordenar segun favoriteslist si es necesario
     if sort:
         itemlist = sort_servers(itemlist)
-
+    
     return itemlist
 
 
@@ -184,6 +190,8 @@ def findvideosbyserver(data, serverid):
                     devuelve.append(value)
                 logger.info(msg)
 
+
+    
     return devuelve
 
 

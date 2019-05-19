@@ -107,7 +107,7 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
     #   patron = 'blablabla'
     #   headers = [['Referer', host]]
     #   blacklist = 'Request a TV serie!'
-    #   return support.scrape(item, itemlist, patron, ['thumb', 'quality', 'url', 'title', 'year', 'plot'],
+    #   return support.scrape(item, itemlist, patron, ['thumb', 'quality', 'url', 'title', 'year', 'plot','episode','lang'],
     #                           headers=headers, blacklist=blacklist)
 
     itemlist = []
@@ -128,15 +128,15 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
                 blocks = scrapertoolsV2.find_multiple_matches(block, regex)
                 block = ""
                 for b in blocks:
-                    block += "\n" + b
+                    block += "\n" + str(b) # by greko
                 log('BLOCK ', n, '=', block)
     else:
         block = data
     if patron and listGroups:
         matches = scrapertoolsV2.find_multiple_matches(block, patron)
         log('MATCHES =', matches)
-
-        known_keys = ['url', 'title', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating'] #by greko aggiunto episode
+        
+        known_keys = ['url', 'title', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'lang'] # by greko aggiunto episode + lang
         for match in matches:
             if len(listGroups) > len(match):  # to fix a bug
                 match = list(match)
@@ -152,12 +152,19 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
             title = scrapertoolsV2.decodeHtmlentities(scraped["title"]).strip()
             plot = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["plot"]))
 
-            if scraped["quality"] and scraped["episode"]: # by greko aggiunto episode
-                longtitle = '[B]' + title + '[/B] - [B]' + scraped["episode"] + '[/B][COLOR blue][' + scraped["quality"] + '][/COLOR]' # by greko aggiunto episode
-            elif scraped["episode"]: # by greko aggiunto episode
-                longtitle = '[B]' + title + '[/B] - [B]' + scraped["episode"] + '[/B]' # by greko aggiunto episode
-            else:
-                longtitle = '[B]' + title + '[/B]'
+            # modificato by Greko inizio
+            longtitle = '[B]' + title + '[/B] '         
+            if scraped["quality"]: # by greko aggiunto episode
+                longtitle += '[COLOR blue][' + scraped["quality"] + '][/COLOR]'#'[B]' + title + '[/B] - [B]' + scraped["episode"] + '[/B][COLOR blue][' + scraped["quality"] + '][/COLOR]' # by greko aggiunto episode
+            if scraped["episode"]: # by greko aggiunto episode
+                longtitle += '[B]' + scraped["episode"] + '[/B]'#'[B]' + title + '[/B] - [B]' + scraped["episode"] + '[/B]' # by greko aggiunto episode
+            if scraped["lang"]: 
+                if 'sub' in scraped["lang"].lower():
+                    lang = 'Sub-ITA'
+                else:
+                    lang = 'ITA'                  
+                longtitle += '[COLOR blue][ ' + lang + ' ][/COLOR]'
+            # modificato by Greko fine
 
             if item.infoLabels["title"] or item.fulltitle:  # if title is set, probably this is a list of episodes or video sources
                 infolabels = item.infoLabels
