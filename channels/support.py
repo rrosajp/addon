@@ -382,7 +382,7 @@ def typo(string, typography=''):
         string = string + ' >'
 
     # If there are no attributes, it applies the default ones
-    attribute = ['[]','()','{}','submenu','color','bold','italic','_','[B]','[I]','[COLOR]']
+    attribute = ['[]','()','{}','submenu','color','bold','italic','_','--','[B]','[I]','[COLOR]']
 
     movie_word_list = ['film', 'serie', 'tv', 'anime', 'cinema', 'sala']
     search_word_list = ['cerca']
