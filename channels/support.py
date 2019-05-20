@@ -372,7 +372,8 @@ def menu(itemlist, title='', action='', url='', contentType='movie', args=[]):
 
 def typo(string, typography=''):
 
-    kod_color = '0xFF0081C2'
+    kod_color = '0xFF65B3DA' #'0xFF0081C2'
+
 
     # Check if the typographic attributes are in the string or outside
     if typography:
