@@ -415,6 +415,8 @@ def typo(string, typography=''):
             string = '[I]' + re.sub(r'\sitalic','',string) + '[/I]' 
         if '_' in string:
             string = ' ' + re.sub(r'\s_','',string)
+        if '--' in string:
+            string = ' - ' + re.sub(r'\s--','',string)
 
     return string
 
@@ -448,7 +450,7 @@ def videolibrary(itemlist, item, typography=''):
         action = 'add_serie_to_library'
         extra = 'episodios'
         contentType = 'tvshow'
-
+    if not typography: typography = 'color kod bold'
     title = typo(config.get_localized_string(30161) + ' ' + typography)
     if inspect.stack()[1][3] == 'findvideos' and contentType == 'movie' or inspect.stack()[1][3] != 'findvideos' and contentType != 'movie':
         if config.get_videolibrary_support() and len(itemlist) > 0:
@@ -493,11 +495,8 @@ def server(item, data='', headers='', AutoPlay=True, CheckLinks=True):
 
     if not data:
         data = httptools.downloadpage(item.url, headers=headers).data
-    ## fix by greko
-    data = str(item.url)
-    ## FINE fix by greko
         
-    itemlist = servertools.find_video_items(data=data)
+    itemlist = servertools.find_video_items(data=str(data))
 
     for videoitem in itemlist:
         videoitem.title = "".join([item.title, ' ', typo(videoitem.title, 'color kod []')])
