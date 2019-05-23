@@ -17,8 +17,8 @@
 
 import re
 
-from specials import autoplay, filtertools
-from core import scrapertoolsV2, httptools, servertools, tmdb, support
+from channels import autoplay, filtertools, support
+from core import scrapertoolsV2, httptools, servertools, tmdb
 from core.item import Item
 from platformcode import logger, config
 
@@ -75,6 +75,7 @@ def episodios(item):
     
     # Carica la pagina
     data = httptools.downloadpage(item.url).data
+    
     #======== 
     if 'clicca qui per aprire' in data.lower():
         item.url = scrapertoolsV2.find_single_match(data, '"go_to":"(.*?)"')
@@ -87,6 +88,7 @@ def episodios(item):
         data = httptools.downloadpage(item.url).data
     #=========
 
+##    data = scrapertoolsV2.decodeHtmlentities(data)
     matches = scrapertoolsV2.find_multiple_matches(data,
                                                    r'<span class="su-spoiler-icon"><\/span>(.*?)</div></div>')    
     for match in matches:
@@ -96,12 +98,12 @@ def episodios(item):
         logger.info("blocks log: %s" % ( blocks ))
         for block in blocks:
             season_n, episode_n = scrapertoolsV2.find_single_match(block, r'(\d+)(?:&#215;|×)(\d+)') 
-            titolo = scrapertoolsV2.find_single_match(block, r'[&#;]\d+[ ]([a-zA-Z0-9;&#.\s]+)[ ]?[^<>]')
+            titolo = scrapertoolsV2.find_single_match(block, r'[&#;]\d+[ ]([a-zA-Z0-9,’;&#.\s]+)[ ]?[^<]')
             logger.info("block log: %s" % ( block ))
                 
             titolo = re.sub(r'&#215;|×', "x", titolo).replace("&#8217;","'")
-            item.infoLabels['season'] = season_n # permette di vedere il plot della stagione e...
-            item.infoLabels['episode'] = episode_n # permette di vedere il plot della puntata e...
+##            item.infoLabels['season'] = season_n # permette di vedere il plot della stagione e...
+##            item.infoLabels['episode'] = episode_n # permette di vedere il plot della puntata e...
            
             itemlist.append(
                 Item(channel=item.channel,
@@ -109,13 +111,21 @@ def episodios(item):
                      contentType=item.contentType,
                      title="[B]" + season_n + "x" + episode_n + " " + titolo + "[/B] " + season_lang,
                      fulltitle=item.title, # Titolo nel video
-                     show=titolo + ":" + season_n + "x" + episode_n, # sottotitoletto nel video
+                     show=titolo + " : " + season_n + "x" + episode_n, # sottotitoletto nel video
                      url=block,
                      extra=item.extra,
                      thumbnail=item.thumbnail,
-                     infoLabels=item.infoLabels
+                     infoLabels=item.infoLabels,
+                     language = season_lang,
+                     contentEpisodeTitle = titolo,
+                     contentSeason = season_n,  # permette di vedere il plot della stagione e...
+                     contentEpisodeNumber = episode_n # permette di vedere il plot della puntata e...
                      ))
             
+##            itemlist = support.scrape(item, patron_block='', patron=patron, listGroups=listGroups,
+##                                  patronNext=patronNext,
+##                                  action='episodios')                
+
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
     
     support.videolibrary(itemlist, item)
