@@ -76,7 +76,8 @@ def find_video_items(item=None, data=None):
     autoplay.start(itemlist, item)
     
     # Decommentare per la voce aggiungi alla videoteca di tutti i canali
-    if item.extra != "library":
+    # non funziona se il canale ha una def findvideos()
+    if item.extra != "library" and item.contentType != 'episode':
         itemlist.append(Item(channel=item.channel, title="Aggiungi alla Videoteca",
                              action="add_pelicula_to_library", url=item.url,
                              contentTitle=item.contentTitle, infoLabels = item.infoLabels

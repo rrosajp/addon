@@ -17,7 +17,8 @@
 
 import re
 
-from channels import autoplay, filtertools, support
+from specials import autoplay
+from core import support
 from core import scrapertoolsV2, httptools, servertools, tmdb
 from core.item import Item
 from platformcode import logger, config
@@ -26,8 +27,8 @@ from platformcode import logger, config
 host = "https://eurostreaming.cafe/"
 headers = ['Referer', host]
 
-IDIOMAS = {'Italiano': 'IT'}
-list_language = IDIOMAS.values()
+##IDIOMAS = {'Italiano': 'IT'}
+##list_language = IDIOMAS.values()
 list_servers = ['verystream', 'wstream', 'speedvideo', 'flashx', 'nowvideo', 'streamango', 'deltabit', 'openload']
 list_quality = ['default']
 
