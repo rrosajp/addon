@@ -85,6 +85,14 @@ msgctxt "#30019"
 msgid "Filter channels by language:"
 msgstr ""
 
+msgctxt "#30020"
+msgid "Check if the links exist"
+msgstr ""
+
+msgctxt "#30021"
+msgid "Number of links to check"
+msgstr ""
+
 msgctxt "#30043"
 msgid "Force view mode:"
 msgstr ""

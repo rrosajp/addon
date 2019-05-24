@@ -1,5 +1,5 @@
 # support functions that are needed by many channels, to no repeat the same code
-import base64, urlparse, re, os, inspect
+import base64, urlparse, re, os, inspect, xbmcaddon
 from core import httptools, scrapertoolsV2, servertools, tmdb
 from core.item import Item
 import urllib
@@ -55,6 +55,14 @@ def hdpass_get_servers(item):
                                          server=server,
                                          url=url_decode(media_url)))
                     log("video -> ", res_video)
+
+        __comprueba_enlaces__ = config.get_setting('comprueba_enlaces', item.channel)
+        __comprueba_enlaces_num__ = config.get_setting('comprueba_enlaces_num', item.channel)
+        
+        if __comprueba_enlaces__:
+            itemlist = servertools.check_list_links(itemlist, __comprueba_enlaces_num__)
+        if xbmcaddon.Addon('plugin.video.kod').getSetting('checklinks'):
+            itemlist = servertools.check_list_links(itemlist, xbmcaddon.Addon('plugin.video.kod').getSetting('checklinks_number'))
 
     return itemlist
 
@@ -509,7 +517,9 @@ def server(item, data='', headers='', AutoPlay=True, CheckLinks=True):
 
     if __comprueba_enlaces__ and CheckLinks:
         itemlist = servertools.check_list_links(itemlist, __comprueba_enlaces_num__)
-    
+    if xbmcaddon.Addon('plugin.video.kod').getSetting('checklinks'):
+        itemlist = servertools.check_list_links(itemlist, xbmcaddon.Addon('plugin.video.kod').getSetting('checklinks_number'))
+
     if AutoPlay == True:
         autoplay.start(itemlist, item)
 
