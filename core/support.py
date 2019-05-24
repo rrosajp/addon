@@ -1,12 +1,17 @@
 # support functions that are needed by many channels, to no repeat the same code
-import base64, urlparse, re, os, inspect, xbmcaddon
+import base64
+import inspect
+import os
+import re
+import urllib
+import urlparse
+import xbmcaddon
+
+from channelselector import thumb
 from core import httptools, scrapertoolsV2, servertools, tmdb
 from core.item import Item
-import urllib
-
 from lib import unshortenit
 from platformcode import logger, config
-from channelselector import thumb
 from specials import autoplay
 
 

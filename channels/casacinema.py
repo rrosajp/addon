@@ -3,14 +3,14 @@
 # Kodi on Demand - Kodi Addon
 # Canale per casacinema
 # ------------------------------------------------------------
-import re, urlparse
+import re
+import urlparse
 
-from core import scrapertools, scrapertoolsV2, httptools, servertools, tmdb, support
-from specials import autoplay, filtertools
+from channelselector import thumb, get_thumb
+from core import scrapertools, scrapertoolsV2, httptools, tmdb, support
 from core.item import Item
 from platformcode import logger, config
-from channelselector import thumb, get_thumb
-
+from specials import autoplay
 
 host = 'https://www.casacinema.site'
 
