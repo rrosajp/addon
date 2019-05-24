@@ -436,7 +436,7 @@ def show_result(item):
 
 def channel_search(search_results, channel_parameters, tecleado):
     try:
-        exec("from specials import " + channel_parameters["channel"] + " as module")
+        exec("from channels import " + channel_parameters["channel"] + " as module")
         mainlist = module.mainlist(Item(channel=channel_parameters["channel"]))
         search_items = [item for item in mainlist if item.action == "search"]
         if not search_items:
