@@ -131,6 +131,7 @@ def renumber(itemlist, item='', typography=''):
                 data = tvdb.otvdb_global.get_list_episodes(ID,page)
                 if data:
                     for episodes in data['data']:
+                        log(episodes.infoLabels)
                         if episodes['airedSeason'] >= S:
                             if E == 0: 
                                 epList.append([0, SP])
