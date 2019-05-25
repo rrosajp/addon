@@ -535,12 +535,17 @@ def set_content(content_type, silent=False):
     continuar = True
     msg_text = ""
     videolibrarypath = config.get_setting("videolibrarypath")
+    forced = config.get_setting('videolibrary_kodi_force')
 
     if content_type == 'movie':
         scraper = [config.get_localized_string(70093), config.get_localized_string(70096)]
-        seleccion = platformtools.dialog_select(config.get_localized_string(70094), scraper)
+        if forced:
+            seleccion = 0 # tmdb
+        else:
+            seleccion = platformtools.dialog_select(config.get_localized_string(70094), scraper)
 
-        # Instalar The Movie Database
+
+    # Instalar The Movie Database
         if seleccion == -1 or seleccion == 0:
             if not xbmc.getCondVisibility('System.HasAddon(metadata.themoviedb.org)'):
                 if not silent:
@@ -560,7 +565,7 @@ def set_content(content_type, silent=False):
                 continuar = (install and xbmc.getCondVisibility('System.HasAddon(metadata.themoviedb.org)'))
                 if not continuar:
                     msg_text = config.get_localized_string(60047)
-            if continuar:
+            if continuar and not forced:
                 xbmc.executebuiltin('xbmc.addon.opensettings(metadata.themoviedb.org)', True)
 
         # Instalar Universal Movie Scraper
@@ -584,12 +589,15 @@ def set_content(content_type, silent=False):
                 continuar = (install and continuar)
                 if not continuar:
                     msg_text = config.get_localized_string(70097)
-            if continuar:
+            if continuar and not forced:
                 xbmc.executebuiltin('xbmc.addon.opensettings(metadata.universal)', True)
 
     else:  # SERIES
         scraper = [config.get_localized_string(70098), config.get_localized_string(70093)]
-        seleccion = platformtools.dialog_select(config.get_localized_string(70107), scraper)
+        if forced:
+            seleccion = 0 # tvdb
+        else:
+            seleccion = platformtools.dialog_select(config.get_localized_string(70107), scraper)
 
         # Instalar The TVDB
         if seleccion == -1 or seleccion == 0:
@@ -611,7 +619,7 @@ def set_content(content_type, silent=False):
                 continuar = (install and xbmc.getCondVisibility('System.HasAddon(metadata.tvdb.com)'))
                 if not continuar:
                     msg_text = config.get_localized_string(70099)
-            if continuar:
+            if continuar and not forced:
                 xbmc.executebuiltin('xbmc.addon.opensettings(metadata.tvdb.com)', True)
 
         # Instalar The Movie Database
@@ -636,7 +644,7 @@ def set_content(content_type, silent=False):
                 continuar = (install and continuar)
                 if not continuar:
                     msg_text = config.get_localized_string(60047)
-            if continuar:
+            if continuar and not forced:
                 xbmc.executebuiltin('xbmc.addon.opensettings(metadata.tvshows.themoviedb.org)', True)
 
     idPath = 0

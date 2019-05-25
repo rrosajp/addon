@@ -40,6 +40,7 @@
         <setting id="folder_tvshows" type="text" label="70118" default="SERIES"/>
         <setting id="folder_movies" type="text" label="70119" default="CINE"/>
         <setting id="videolibrary_kodi_flag" type="number" label="" default="0" visible="false"/>
+        <setting id="videolibrary_kodi_force" type="bool" label="" default="false" visible="false"/>
         <setting id="videolibrary_kodi" type="bool" label="70120" enable="lt(-1,2)+eq(0,false)" default="false"/>
     </category>
      <category label="70121">
@@ -145,5 +146,4 @@
         <setting label="70583" type="lsep"/>
         <setting id="addon_quasar_update" type="bool" label="70584" default="false"/>
     </category>
-
 </settings>
