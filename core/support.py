@@ -61,7 +61,7 @@ def hdpass_get_servers(item):
                                          url=url_decode(media_url)))
                     log("video -> ", res_video)
 
-    return controls(itemlist, item, AutoPlay, CheckLinks)
+    return controls(itemlist, item, AutoPlay=True, CheckLinks=True)
 
 
 def url_decode(url_enc):
