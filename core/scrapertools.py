@@ -366,8 +366,8 @@ def get_season_and_episode(title):
     """
     filename = ""
     # 4l3x87 - fix for series example 9-1-1
-    original_title = title
-    title = title.replace('9-1-1','')
+    # original_title = title
+    # title = title.replace('9-1-1','')
 
     patrons = ["(\d+)\s*[x-]\s*(\d+)", "(\d+)\s*×\s*(\d+)", "(?:s|t)(\d+)e(\d+)",
                "(?:season|temp|stagione\w*)\s*(\d+)\s*(?:capitulo|epi|episode|episodio\w*)\s*(\d+)"]
