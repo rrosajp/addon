@@ -3,18 +3,15 @@
 # autorenumber - Rinomina Automaticamente gli Episodi
 # --------------------------------------------------------------------------------
 
-import os
-
 try:
     import xbmcgui
 except:
     xbmcgui = None
 
-from platformcode import config
 from core import jsontools, tvdb
-from core.item import Item
-from platformcode import platformtools
 from core.support import typo, log
+from platformcode import config
+from platformcode import platformtools
 
 TAG_TVSHOW_RENUMERATE = "TVSHOW_AUTORENUMBER"
 TAG_SEASON_EPISODE = "season_episode"

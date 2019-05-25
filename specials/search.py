@@ -6,14 +6,16 @@ import re
 import time
 from threading import Thread
 
+import xbmcaddon
+
 from channelselector import get_thumb, auto_filter
 from core import channeltools
 from core import scrapertools
+from core import tmdb
 from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
-from core import tmdb
-import xbmc, xbmcaddon
+
 addon = xbmcaddon.Addon('metadata.themoviedb.org')
 def_lang = addon.getSetting('language')
 
