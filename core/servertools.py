@@ -16,8 +16,6 @@ from platformcode import config, logger
 from platformcode import platformtools
 from servers.decrypters import zcrypt
 
-from specials import autoplay # by greko
-
 dict_servers_parameters = {}
 
 
@@ -35,7 +33,7 @@ def find_video_items(item=None, data=None):
     @return: devuelve el itemlist con los resultados
     @rtype: list
     """
-    logger.info("ITEM DATA : %s" % item)
+    logger.info()
     itemlist = []
 
     # Descarga la página
@@ -60,29 +58,6 @@ def find_video_items(item=None, data=None):
         itemlist.append(
             item.clone(title=title, action="play", url=url, thumbnail=thumbnail, server=server, folder=False))
 
-    """
-     fix by Greko inizio
-     Controllo su tutti i canali:
-     - se i link sono validi per tutti i canali
-     - autoplay
-     - aggiungi in videoteca
-     non c'è bisogno dei controlli nel file[.json, py] del canale
-    """
-    itemlist = check_list_links(itemlist)
-
-    ########## Da risolvere
-    # Per AutoPlay
-    autoplay.start(itemlist, item)
-    
-    # Decommentare per la voce aggiungi alla videoteca di tutti i canali
-    # non funziona se il canale ha una def findvideos()
-    if item.extra != "library" and item.contentType != 'episode':
-        itemlist.append(Item(channel=item.channel, title="Aggiungi alla Videoteca",
-                             action="add_pelicula_to_library", url=item.url,
-                             contentTitle=item.contentTitle, infoLabels = item.infoLabels
-                             ))
-    # fix by Greko fine
-    
     return itemlist
 
 
@@ -145,7 +120,7 @@ def get_servers_itemlist(itemlist, fnc=None, sort=False):
     # Ordenar segun favoriteslist si es necesario
     if sort:
         itemlist = sort_servers(itemlist)
-    
+
     return itemlist
 
 
@@ -181,7 +156,7 @@ def findvideos(data, skip=False):
     if config.get_setting("filter_servers") == False:  is_filter_servers = False
     if not devuelve and is_filter_servers:
         platformtools.dialog_ok(config.get_localized_string(60000), config.get_localized_string(60001))
-        
+
     return devuelve
 
 
@@ -208,8 +183,6 @@ def findvideosbyserver(data, serverid):
                     devuelve.append(value)
                 logger.info(msg)
 
-
-    
     return devuelve
 
 
