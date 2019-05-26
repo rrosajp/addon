@@ -154,7 +154,7 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
                     val = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
                 scraped[kk] = val
 
-            title = scrapertoolsV2.decodeHtmlentities(scraped["title"]).replace('"', "'").strip()
+            title = scrapertoolsV2.decodeHtmlentities(scraped["title"]).replace('"', "'").strip() # fix by greko da " a '
             plot = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["plot"]))
 
             longtitle = '[B]' + title + '[/B] '         
