@@ -25,7 +25,7 @@ def findhost():
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
 list_servers = ['verystream', 'openload', 'streamango', 'wstream']
-list_quality = ['HD', 'default']
+list_quality = ['HD', 'SD', 'default']
 
 checklinks = config.get_setting('checklinks', 'cineblog01')
 checklinks_number = config.get_setting('checklinks_number', 'cineblog01')
@@ -33,7 +33,7 @@ checklinks_number = config.get_setting('checklinks_number', 'cineblog01')
 # esclusione degli articoli 'di servizio'
 blacklist = ['BENVENUTI', 'Richieste Serie TV', 'CB01.UNO &#x25b6; TROVA L&#8217;INDIRIZZO UFFICIALE ',
              'Aggiornamento Quotidiano Serie TV', 'OSCAR 2019 ▶ CB01.UNO: Vota il tuo film preferito! 🎬',
-             'Openload: la situazione. Benvenuto Verystream']
+             'Openload: la situazione. Benvenuto Verystream', 'Openload: lo volete ancora?']
 
 
 def mainlist(item):
@@ -230,11 +230,10 @@ def findvideos(item):
         matches = re.compile(patron, re.DOTALL).findall(streaming)
         for scrapedurl, scrapedtitle in matches:
             logger.debug("##### findvideos %s ## %s ## %s ##" % (desc_txt, scrapedurl, scrapedtitle))
-            title = "[COLOR " + color + "]" + desc_txt + ":[/COLOR] " + item.fulltitle + " [COLOR grey]" + QualityStr + "[/COLOR] [COLOR blue][" + scrapedtitle + "][/COLOR]"
             itemlist.append(
                 Item(channel=item.channel,
                      action="play",
-                     title=title,
+                     title=scrapedtitle,
                      url=scrapedurl,
                      server=scrapedtitle,
                      fulltitle=item.fulltitle,
@@ -265,36 +264,17 @@ def findvideos(item):
     # Estrae i contenuti - Streaming HD
     load_links(itemlist, '<strong>Streaming HD[^<]+</strong>(.*?)<tableclass=cbtable height=30>', "yellow", "Streaming HD", "HD")
 
-    autoplay.start(itemlist, item)
-
     # Estrae i contenuti - Streaming 3D
     load_links(itemlist, '<strong>Streaming 3D[^<]+</strong>(.*?)<tableclass=cbtable height=30>', "pink", "Streaming 3D")
+
+    support.videolibrary(itemlist, item)
+    return support.server(item, itemlist=itemlist)
 
     # Estrae i contenuti - Download
     # load_links(itemlist, '<strong>Download:</strong>(.*?)<tableclass=cbtable height=30>', "aqua", "Download")
 
     # Estrae i contenuti - Download HD
     # load_links(itemlist, '<strong>Download HD[^<]+</strong>(.*?)<tableclass=cbtable width=100% height=20>', "azure", "Download HD")
-
-    if len(itemlist) == 0:
-        itemlist = servertools.find_video_items(item=item)
-
-    # Requerido para Filtrar enlaces
-
-    if checklinks:
-        itemlist = servertools.check_list_links(itemlist, checklinks_number)
-
-    # Requerido para FilterTools
-
-    # itemlist = filtertools.get_links(itemlist, item, list_language)
-
-    # Requerido para AutoPlay
-
-    autoplay.start(itemlist, item)
-
-    support.videolibrary(itemlist, item)
-
-    return itemlist
 
 
 def findvid_serie(item):
@@ -306,11 +286,11 @@ def findvid_serie(item):
         for match in matches:
             scrapedurl = match.group(1)
             scrapedtitle = match.group(2)
-            title = item.title + " [COLOR blue][" + scrapedtitle + "][/COLOR]"
+            # title = item.title + " [COLOR blue][" + scrapedtitle + "][/COLOR]"
             itemlist.append(
                 Item(channel=item.channel,
                      action="play",
-                     title=title,
+                     title=scrapedtitle,
                      url=scrapedurl,
                      server=scrapedtitle,
                      fulltitle=item.fulltitle,
@@ -354,9 +334,7 @@ def findvid_serie(item):
         else:
             load_vid_series(data[lnkblkp[i]:lnkblkp[i + 1]], item, itemlist, lnkblk[i])
 
-    autoplay.start(itemlist, item)
-
-    return itemlist
+    return support.server(item, itemlist=itemlist)
 
 
 def play(item):
@@ -390,4 +368,4 @@ def play(item):
     else:
         data = support.swzz_get_url(item)
 
-    return support.server(item, data, headers)
+    return servertools.find_video_items(data=data)

@@ -56,7 +56,7 @@ def serietv(item):
     if item.args:
         # il titolo degli episodi viene inglobato in episode ma non sono visibili in newest!!!
         patron = r'<span class="serieTitle" style="font-size:20px">(.*?).[^–]<a href="([^"]+)"\s+target="_blank">(.*?)<\/a>'
-        listGroups = ['title', 'url', 'episode']
+        listGroups = ['title', 'url', 'title2']
         patronNext = ''
     else:
         patron = r'<div class="post-thumb">.*?\s<img src="([^"]+)".*?><a href="([^"]+)".*?>(.*?(?:\((\d{4})\)|(\d{4}))?)<\/a><\/h2>'
