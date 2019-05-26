@@ -141,11 +141,8 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
         matches = scrapertoolsV2.find_multiple_matches(block, patron)
         log('MATCHES =', matches)
 
-<<<<<<< HEAD
-        known_keys = ['url', 'title', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'lang']
-=======
-        known_keys = ['url', 'title', 'title2', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type'] #by greko aggiunto episode
->>>>>>> 69c3700f279e8bc0c0741982c8c26b045549ffc6
+        known_keys = ['url', 'title', 'title2', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang'] #by greko aggiunto episode
+        
         for match in matches:
             if len(listGroups) > len(match):  # to fix a bug
                 match = list(match)
@@ -161,19 +158,6 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
             title = scrapertoolsV2.decodeHtmlentities(scraped["title"]).replace('"', "'").strip() # fix by greko da " a '
             plot = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["plot"]))
 
-<<<<<<< HEAD
-            longtitle = '[B]' + title + '[/B] '         
-            if scraped["quality"]: 
-                longtitle += '[COLOR blue][' + scraped["quality"] + '][/COLOR]'
-            if scraped["episode"]: 
-                longtitle += '[B]' + scraped["episode"] + '[/B]'
-            if scraped["lang"]: 
-                if 'sub' in scraped["lang"].lower():
-                    lang = 'Sub-ITA'
-                else:
-                    lang = 'ITA'                  
-                longtitle += '[COLOR blue][' + lang + '][/COLOR]'
-=======
             longtitle = typo(title, 'bold')
             if scraped['quality']: longtitle = longtitle + typo(scraped['quality'], '_ [] color kod')
             if scraped['episode']:
@@ -182,7 +166,12 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
             if scraped['title2']:
                 title2 = scrapertoolsV2.decodeHtmlentities(scraped["title2"]).strip()
                 longtitle = longtitle + typo(title2, 'bold _ -- _')
->>>>>>> 69c3700f279e8bc0c0741982c8c26b045549ffc6
+            if scraped["lang"]: 
+                if 'sub' in scraped["lang"].lower():
+                    lang = 'Sub-ITA'
+                else:
+                    lang = 'ITA'                  
+                longtitle += '[COLOR blue][' + lang + '][/COLOR]'
 
             if item.infoLabels["title"] or item.fulltitle:  # if title is set, probably this is a list of episodes or video sources
                 infolabels = item.infoLabels
