@@ -141,7 +141,7 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
         matches = scrapertoolsV2.find_multiple_matches(block, patron)
         log('MATCHES =', matches)
 
-        known_keys = ['url', 'title', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating'] #by greko aggiunto episode
+        known_keys = ['url', 'title', 'title2', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type'] #by greko aggiunto episode
         for match in matches:
             if len(listGroups) > len(match):  # to fix a bug
                 match = list(match)
@@ -157,12 +157,14 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
             title = scrapertoolsV2.decodeHtmlentities(scraped["title"]).strip()
             plot = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["plot"]))
 
-            if scraped["quality"] and scraped["episode"]: # by greko aggiunto episode
-                longtitle = '[B]' + title + '[/B] - [B]' + scraped["episode"] + '[/B][COLOR blue][' + scraped["quality"] + '][/COLOR]' # by greko aggiunto episode
-            elif scraped["episode"]: # by greko aggiunto episode
-                longtitle = '[B]' + title + '[/B] - [B]' + scraped["episode"] + '[/B]' # by greko aggiunto episode
-            else:
-                longtitle = '[B]' + title + '[/B]'
+            longtitle = typo(title, 'bold')
+            if scraped['quality']: longtitle = longtitle + typo(scraped['quality'], '_ [] color kod')
+            if scraped['episode']:
+                scraped['episode'] = re.sub(r'\s-\s|-|x|&#8211', 'x' , scraped['episode'])
+                longtitle = typo(scraped['episode'] + ' - ', 'bold') + longtitle
+            if scraped['title2']:
+                title2 = scrapertoolsV2.decodeHtmlentities(scraped["title2"]).strip()
+                longtitle = longtitle + typo(title2, 'bold _ -- _')
 
             if item.infoLabels["title"] or item.fulltitle:  # if title is set, probably this is a list of episodes or video sources
                 infolabels = item.infoLabels
@@ -492,6 +494,19 @@ def nextPage(itemlist, item, data, patron, function_level=1):
 
     return itemlist
 
+def pagination(itemlist, item, page, perpage, function_level=1):
+    if len(itemlist) >= page * perpage:
+        itemlist.append(
+            Item(channel=item.channel,
+                 action=inspect.stack()[function_level][3],
+                 contentType=item.contentType,
+                 title=typo(config.get_localized_string(30992), 'color kod bold'),
+                 url=item.url,
+                 args=item.args,
+                 page=page + 1,
+                 thumbnail=thumb()))
+    return itemlist
+
 def server(item, data='', itemlist='', headers='', AutoPlay=True, CheckLinks=True):
 
     if not data:
@@ -531,6 +546,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True):
 
     if AutoPlay == True:
         autoplay.start(itemlist, item)
+    videolibrary(itemlist, item)
     return itemlist
 
 
