@@ -492,15 +492,16 @@ def nextPage(itemlist, item, data, patron, function_level=1):
 
     return itemlist
 
-def server(item, data='', headers='', AutoPlay=True, CheckLinks=True):
+def server(item, data='', itemlist='', headers='', AutoPlay=True, CheckLinks=True):
 
     if not data:
         data = httptools.downloadpage(item.url, headers=headers).data
-        
-    itemlist = servertools.find_video_items(data=str(data))
+
+    if not itemlist:
+        itemlist = servertools.find_video_items(data=str(data))
 
     for videoitem in itemlist:
-        videoitem.title = "".join([item.title, ' ', typo(videoitem.title, 'color kod []')])
+        videoitem.title = "".join([item.title, ' ', typo(videoitem.title, 'color kod []'), typo(videoitem.quality, 'color kod []') if videoitem.quality else ""])
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail
