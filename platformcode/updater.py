@@ -23,51 +23,51 @@ def check_addon_init():
     logger.info()
     
     # Subtarea de monitor.  Se activa cada X horas para comprobar si hay FIXES al addon
-    def check_addon_monitor():
-        logger.info()
-        
-        # Obtiene el íntervalo entre actualizaciones y si se quieren mensajes
-        try:
-            timer = int(config.get_setting('addon_update_timer'))       # Intervalo entre actualizaciones, en Ajustes de Alfa
-            if timer <= 0:
-                return                                                  # 0.  No se quieren actualizaciones
-            verbose = config.get_setting('addon_update_message')
-        except:
-            timer = 12                                                  # Por defecto cada 12 horas
-            verbose = False                                             # Por defecto, sin mensajes
-        timer = timer * 3600                                            # Lo pasamos a segundos
-
-        if config.get_platform(True)['num_version'] >= 14:              # Si es Kodi, lanzamos el monitor
-            import xbmc
-            monitor = xbmc.Monitor()
-        else:                                                           # Lanzamos solo una actualización y salimos
-            check_addon_updates(verbose)                                # Lanza la actualización
-            return
-            
-        while not monitor.abortRequested():                             # Loop infinito hasta cancelar Kodi
-
-            check_addon_updates(verbose)                                # Lanza la actualización
-            
-            if monitor.waitForAbort(timer):                             # Espera el tiempo programado o hasta que cancele Kodi
-                break                                                   # Cancelación de Kodi, salimos
-                
-        return
-                
-    # Lanzamos en Servicio de actualización de FIXES
-    try:
-        threading.Thread(target=check_addon_monitor).start()            # Creamos un Thread independiente, hasta el fin de Kodi
-        time.sleep(5)                                                   # Dejamos terminar la primera verificación...
-    except:                                                             # Si hay problemas de threading, se llama una sola vez
-        try:
-            timer = int(config.get_setting('addon_update_timer'))       # Intervalo entre actualizaciones, en Ajustes de Alfa
-            if timer <= 0:
-                return                                                  # 0.  No se quieren actualizaciones
-            verbose = config.get_setting('addon_update_message')
-        except:
-            verbose = False                                             # Por defecto, sin mensajes
-            pass
-        check_addon_updates(verbose)                                    # Lanza la actualización, en Ajustes de Alfa
-        time.sleep(5)                                                   # Dejamos terminar la primera verificación...
+    # def check_addon_monitor():
+    #     logger.info()
+    #
+    #     # Obtiene el íntervalo entre actualizaciones y si se quieren mensajes
+    #     try:
+    #         timer = int(config.get_setting('addon_update_timer'))       # Intervalo entre actualizaciones, en Ajustes de Alfa
+    #         if timer <= 0:
+    #             return                                                  # 0.  No se quieren actualizaciones
+    #         verbose = config.get_setting('addon_update_message')
+    #     except:
+    #         timer = 12                                                  # Por defecto cada 12 horas
+    #         verbose = False                                             # Por defecto, sin mensajes
+    #     timer = timer * 3600                                            # Lo pasamos a segundos
+    #
+    #     if config.get_platform(True)['num_version'] >= 14:              # Si es Kodi, lanzamos el monitor
+    #         import xbmc
+    #         monitor = xbmc.Monitor()
+    #     else:                                                           # Lanzamos solo una actualización y salimos
+    #         check_addon_updates(verbose)                                # Lanza la actualización
+    #         return
+    #
+    #     while not monitor.abortRequested():                             # Loop infinito hasta cancelar Kodi
+    #
+    #         check_addon_updates(verbose)                                # Lanza la actualización
+    #
+    #         if monitor.waitForAbort(timer):                             # Espera el tiempo programado o hasta que cancele Kodi
+    #             break                                                   # Cancelación de Kodi, salimos
+    #
+    #     return
+    #
+    # # Lanzamos en Servicio de actualización de FIXES
+    # try:
+    #     threading.Thread(target=check_addon_monitor).start()            # Creamos un Thread independiente, hasta el fin de Kodi
+    #     time.sleep(5)                                                   # Dejamos terminar la primera verificación...
+    # except:                                                             # Si hay problemas de threading, se llama una sola vez
+    #     try:
+    #         timer = int(config.get_setting('addon_update_timer'))       # Intervalo entre actualizaciones, en Ajustes de Alfa
+    #         if timer <= 0:
+    #             return                                                  # 0.  No se quieren actualizaciones
+    #         verbose = config.get_setting('addon_update_message')
+    #     except:
+    #         verbose = False                                             # Por defecto, sin mensajes
+    #         pass
+    #     check_addon_updates(verbose)                                    # Lanza la actualización, en Ajustes de Alfa
+    #     time.sleep(5)                                                   # Dejamos terminar la primera verificación...
               
     return
 
