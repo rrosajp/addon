@@ -449,7 +449,11 @@ def match(item, patron='', patron_block='', headers='', url=''):
     return matches, data
 
 
-def videolibrary(itemlist, item, typography=''):
+def videolibrary(itemlist, item, typography='', function_level=1):
+    # Simply add this function to add video library support
+    # Function_level is useful if the function is called by another function.
+    # If the call is direct, leave it blank
+
     if item.contentType != 'episode':
         action = 'add_pelicula_to_library'
         extra = 'findvideos'
@@ -458,9 +462,12 @@ def videolibrary(itemlist, item, typography=''):
         action = 'add_serie_to_library'
         extra = 'episodios'
         contentType = 'tvshow'
+
     if not typography: typography = 'color kod bold'
+
     title = typo(config.get_localized_string(30161) + ' ' + typography)
-    if inspect.stack()[1][3] == 'findvideos' and contentType == 'movie' or inspect.stack()[1][3] != 'findvideos' and contentType != 'movie':
+
+    if inspect.stack()[function_level][3] == 'findvideos' and contentType == 'movie' or inspect.stack()[function_level][3] != 'findvideos' and contentType != 'movie':
         if config.get_videolibrary_support() and len(itemlist) > 0:
             itemlist.append(
                 Item(channel=item.channel,
@@ -472,6 +479,7 @@ def videolibrary(itemlist, item, typography=''):
                      extra=extra,
                      contentTitle=item.fulltitle))
 
+    return itemlist
 
 def nextPage(itemlist, item, data, patron, function_level=1):
     # Function_level is useful if the function is called by another function.
@@ -528,11 +536,13 @@ def server(item, data='', itemlist='', headers='', AutoPlay=True, CheckLinks=Tru
 def controls(itemlist, item, AutoPlay=True, CheckLinks=True):
     from core import jsontools
     from platformcode.config import get_setting
+
     CL = get_setting('checklinks') or get_setting('checklinks', item.channel)
     autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
     channel_node = autoplay_node.get(item.channel, {})
     settings_node = channel_node.get('settings', {})
     AP = get_setting('autoplay') or settings_node['active']
+
     if CL and not AP:
         if get_setting('checklinks', item.channel):
             checklinks = get_setting('checklinks', item.channel)
@@ -546,7 +556,8 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True):
 
     if AutoPlay == True:
         autoplay.start(itemlist, item)
-    videolibrary(itemlist, item)
+
+    videolibrary(itemlist, item, function_level=3)
     return itemlist
 
 
