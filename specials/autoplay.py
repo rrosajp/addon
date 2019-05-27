@@ -143,7 +143,7 @@ def start(itemlist, item):
         #       2: Solo servidores
         #       3: Solo calidades
         #       4: No ordenar
-        if (settings_node['custom_servers'] and settings_node['custom_quality']):
+        if (settings_node['custom_servers'] and settings_node['custom_quality']) or get_setting('autoplay'):
             priority = settings_node['priority']  # 0: Servidores y calidades o 1: Calidades y servidores
         elif settings_node['custom_servers']:
             priority = 2  # Solo servidores
