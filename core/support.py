@@ -92,7 +92,7 @@ def color(text, color):
 
 
 def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data="", patron_block="",
-           patronNext="", action="findvideos", addVideolibrary = True):
+           patronNext="", action="findvideos", addVideolibrary = True, type_content_dict={}, type_action_dict={}):
     # patron: the patron to use for scraping page, all capturing group must match with listGroups
     # listGroups: a list containing the scraping info obtained by your patron, in order
     # accepted values are: url, title, thumb, quality, year, plot, duration, genre, rating
@@ -114,6 +114,9 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
     #   blacklist = 'Request a TV serie!'
     #   return support.scrape(item, itemlist, patron, ['thumb', 'quality', 'url', 'title', 'year', 'plot'],
     #                           headers=headers, blacklist=blacklist)
+    # 'type' is a check for typologies of content e.g. Film or TV Series
+    # 'episode' is a key to grab episode numbers if it is separated from the title
+    # IMPORTANT 'type' is a special key, to work need type_content_dict={} and type_action_dict={}
 
     itemlist = []
 
@@ -186,6 +189,15 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
                     infolabels['genere'] = ", ".join(genres)
                 if scraped["rating"]:
                     infolabels['rating'] = scrapertoolsV2.decodeHtmlentities(scraped["rating"])
+
+            if type_content_dict:
+                for name, variants in type_content_dict.items():
+                    if scraped['type'] in variants:
+                        item.contentType = name
+            if type_action_dict:
+                for name, variants in type_action_dict.items():
+                    if scraped['type'] in variants:
+                        action = name
 
             if scraped["title"] not in blacklist:
                 it = Item(
