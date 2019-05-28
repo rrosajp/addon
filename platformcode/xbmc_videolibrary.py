@@ -565,7 +565,8 @@ def set_content(content_type, silent=False):
                 continuar = (install and xbmc.getCondVisibility('System.HasAddon(metadata.themoviedb.org)'))
                 if not continuar:
                     msg_text = config.get_localized_string(60047)
-            if continuar and not forced:
+
+            if continuar:
                 xbmc.executebuiltin('xbmc.addon.opensettings(metadata.themoviedb.org)', True)
 
         # Instalar Universal Movie Scraper
@@ -589,7 +590,7 @@ def set_content(content_type, silent=False):
                 continuar = (install and continuar)
                 if not continuar:
                     msg_text = config.get_localized_string(70097)
-            if continuar and not forced:
+            if continuar:
                 xbmc.executebuiltin('xbmc.addon.opensettings(metadata.universal)', True)
 
     else:  # SERIES
@@ -619,7 +620,7 @@ def set_content(content_type, silent=False):
                 continuar = (install and xbmc.getCondVisibility('System.HasAddon(metadata.tvdb.com)'))
                 if not continuar:
                     msg_text = config.get_localized_string(70099)
-            if continuar and not forced:
+            if continuar:
                 xbmc.executebuiltin('xbmc.addon.opensettings(metadata.tvdb.com)', True)
 
         # Instalar The Movie Database
@@ -644,7 +645,7 @@ def set_content(content_type, silent=False):
                 continuar = (install and continuar)
                 if not continuar:
                     msg_text = config.get_localized_string(60047)
-            if continuar and not forced:
+            if continuar:
                 xbmc.executebuiltin('xbmc.addon.opensettings(metadata.tvshows.themoviedb.org)', True)
 
     idPath = 0
