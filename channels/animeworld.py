@@ -31,8 +31,8 @@ def mainlist(item):
     itemlist =[]
     
     support.menu(itemlist, 'Anime bold', 'lista_anime', host+'/az-list')
-    support.menu(itemlist, 'ITA submenu', 'build_menu', host+'/filter?language[]=1', args=["anime"])
-    support.menu(itemlist, 'Sub-ITA submenu', 'build_menu', host+'/filter?language[]=0', args=["anime"])
+    support.menu(itemlist, 'ITA submenu', 'build_menu', host + '/filter?', args=["anime", 'language[]=1'])
+    support.menu(itemlist, 'Sub-ITA submenu', 'build_menu', host + '/filter?', args=["anime", 'language[]=0'])
     support.menu(itemlist, 'Archivio A-Z submenu', 'alfabetico', host+'/az-list', args=["tvshow","a-z"])
     support.menu(itemlist, 'In corso submenu', 'video', host+'/', args=["in sala"])
     support.menu(itemlist, 'Generi submenu', 'generi', host+'/')
@@ -67,11 +67,14 @@ def generi(item):
 def build_menu(item):
     log()
     itemlist = []
-    support.menu(itemlist, 'Tutti bold submenu', 'video', item.url)    
-    matches = support.match(item,r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> (.*?) <span.*?>(.*?)<\/ul>',r'<form class="filters.*?>(.*?)<\/form>')
-    for title, html in matches[0]:
+    support.menu(itemlist, 'Tutti bold submenu', 'video', item.url+item.args[1])
+    matches, data = support.match(item,r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> (.*?) <span.*?>(.*?)<\/ul>',r'<form class="filters.*?>(.*?)<\/form>')
+    log('ANIME DATA =' ,data)
+    for title, html in matches:
         if title not in 'Lingua Ordine':
-            support.menu(itemlist, title + ' submenu bold', 'build_sub_menu', item.url, args=html + ' anime')
+            support.menu(itemlist, title + ' submenu bold', 'build_sub_menu', html, args=item.args)
+            log('ARGS= ', item.args[0])
+            log('ARGS= ', html)
     return itemlist
 
 # Crea SottoMenu Filtro ======================================================
@@ -79,9 +82,9 @@ def build_menu(item):
 def build_sub_menu(item):
     log()
     itemlist = []
-    matches = re.compile(r'<input.*?value="([^"]+)"> <label for="([^"]+)">([^<]+)<\/label>', re.DOTALL).findall(item.args)
-    for value, name, title in matches:
-        support.menu(itemlist, support.typo(title, 'bold'), 'video', item.url + '&' + name + '=' + value)        
+    matches = re.compile(r'<input.*?name="([^"]+)" value="([^"]+)"\s*>[^>]+>([^<]+)<\/label>', re.DOTALL).findall(item.url)
+    for name, value, title in matches:
+        support.menu(itemlist, support.typo(title, 'bold'), 'video', host + '/filter?' + '&' + name + '=' + value + '&' + item.args[1])     
     return itemlist
 
 # Novità ======================================================
