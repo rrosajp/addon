@@ -452,7 +452,7 @@ def match(item, patron='', patron_block='', headers='', url=''):
     matches = []
     url = url if url else item.url
     data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
-    data = re.sub('\n|\t', '', data)
+    data = re.sub(r'\n|\t|\s\s', '', data)
     log('DATA= ', data)
 
     if patron_block:
