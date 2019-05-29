@@ -174,7 +174,7 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
                     lang = 'Sub-ITA'
                 else:
                     lang = 'ITA'                  
-                longtitle += '[COLOR blue][' + lang + '][/COLOR]'
+                longtitle += typo(lang, '_ [] color kod')
 
             if item.infoLabels["title"] or item.fulltitle:  # if title is set, probably this is a list of episodes or video sources
                 infolabels = item.infoLabels
