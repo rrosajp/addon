@@ -589,3 +589,16 @@ def log(stringa1="", stringa2="", stringa3="", stringa4="", stringa5=""):
     filename = frame[0].f_code.co_filename
     filename = os.path.basename(filename)    
     logger.info("[" + filename + "] - [" + inspect.stack()[1][3] + "] " + str(stringa1) + str(stringa2) + str(stringa3) + str(stringa4) + str(stringa5))
+
+
+def channel_config(item, itemlist):
+    from  channelselector import get_thumb
+    itemlist.append(
+        Item(channel='setting',
+             action="channel_config",
+             title=typo("Configurazione Canale color kod bold"),
+             config=item.channel,
+             folder=False,
+             thumbnail=get_thumb('setting_0.png'))
+    )
+
