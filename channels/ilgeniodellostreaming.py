@@ -40,10 +40,18 @@ def newest(categoria):
     log(categoria)
     itemlist = []
     item = Item()
+
     try:
-        if categoria == "movie": item.url = host + '/film/'
-        elif categoria == "tvshow":  item.url = host + '/serie/'
-        elif categoria == "anime":  item.url = host + '/anime/'
+        if categoria == 'peliculas':
+            item.contentType = 'movie'
+            item.url = host + '/film/'
+        elif categoria == "series":
+            item.contentType = 'episode'
+            item.url = host + '/serie/'
+        elif categoria == "anime":
+            item.contentType = 'episode'
+            item.url = host + '/anime/'
+
         item.action = "peliculas"
         itemlist = peliculas(item)
 
@@ -126,10 +134,11 @@ def episodios(item):
 
 def findvideos(item):
     log()
+    itemlist =[]
     matches, data = support.match(item, '<iframe class="metaframe rptss" src="([^"]+)"[^>]+>',headers=headers)
     for url in matches:
         html = httptools.downloadpage(url, headers=headers).data
         data += str(scrapertoolsV2.find_multiple_matches(html, '<meta name="og:url" content="([^"]+)">'))
-
-    return support.server(item, data)
+    itemlist = support.server(item, data)
+    return itemlist
 

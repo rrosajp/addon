@@ -606,14 +606,14 @@ def set_context_commands(item, parent_item):
 
             elif item.contentSerieName:
                 # Descargar serie
-                if item.contentType == "tvshow":
+                if item.contentType == "tvshow" or 'episode' and item.action in ["episodios"]:
                     context_commands.append((config.get_localized_string(60355), "XBMC.RunPlugin(%s?%s)" %
                                              (sys.argv[0], item.clone(channel="downloads", action="save_download",
                                                                       from_channel=item.channel,
                                                                       from_action=item.action).tourl())))
 
                 # Descargar episodio
-                elif item.contentType == "episode":
+                elif item.contentType == "tvshow" or 'episode' and item.action in ["findvideos"]:
                     context_commands.append((config.get_localized_string(60356), "XBMC.RunPlugin(%s?%s)" %
                                              (sys.argv[0], item.clone(channel="downloads", action="save_download",
                                                                       from_channel=item.channel,
