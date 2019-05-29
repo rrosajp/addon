@@ -383,7 +383,11 @@ def thumb(itemlist=[]):
                     item.thumbnail = get_thumb(thumb + '.png')
                 else:
                     thumb = item.thumbnails
-            # REmove args from title
+
+                if item.thumbnail != '':
+                    break
+
+            # Remove args from title
             if item.args: item.title = item.title.replace(' || ' + str(item.args), '')
         return itemlist
     else:
