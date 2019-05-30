@@ -10,7 +10,7 @@ from core.item import Item
 from platformcode import logger, config
 from specials import autoplay
 
-host = "https://altadefinizione.center"   ### <- cambio Host da .fm a .center
+host = "https://alta-definizione.live"   ### <- cambio Host da .fm a .center
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
