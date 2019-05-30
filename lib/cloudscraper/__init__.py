@@ -1,3 +1,6 @@
+# Cloudscraper by VeNoMouS
+# https://github.com/VeNoMouS/cloudscraper
+
 import logging
 import re
 import sys
