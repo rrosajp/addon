@@ -140,7 +140,7 @@ def pelicuals_tv(item):
                  contentLanguage='Sub-ITA',
                  infoLabels=infoLabels,
                  folder=True))
-
+    support.checkHost(item, itemlist)
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
     # Paginazione
@@ -237,6 +237,7 @@ def lista_serie(item):
                  folder=True))
         # ii += 1
 
+    support.checkHost(item, itemlist)
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
     if len(series) >= p * PERPAGE:
