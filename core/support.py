@@ -121,7 +121,7 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
     itemlist = []
 
     if not data:
-        data = httptools.downloadpage(item.url, headers=headers).data.replace("'", '"')
+        data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
         data = re.sub('\n|\t', ' ', data)
         # replace all ' with " and eliminate newline, so we don't need to worry about
         log('DATA =', data)
@@ -451,8 +451,8 @@ def typo(string, typography=''):
 def match(item, patron='', patron_block='', headers='', url=''):
     matches = []
     url = url if url else item.url
-    data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
-    data = re.sub('\n|\t', '', data)
+    data = httptools.downloadpage(url, headers=headers, ignore_response_code=True).data.replace("'", '"')
+    data = re.sub(r'\n|\t|\s\s', '', data)
     log('DATA= ', data)
 
     if patron_block:
@@ -537,7 +537,7 @@ def pagination(itemlist, item, page, perpage, function_level=1):
 def server(item, data='', itemlist='', headers='', AutoPlay=True, CheckLinks=True):
 
     if not data:
-        data = httptools.downloadpage(item.url, headers=headers).data
+        data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
 
     if not itemlist:
         itemlist = servertools.find_video_items(data=str(data))
@@ -596,3 +596,16 @@ def log(stringa1="", stringa2="", stringa3="", stringa4="", stringa5=""):
     filename = frame[0].f_code.co_filename
     filename = os.path.basename(filename)    
     logger.info("[" + filename + "] - [" + inspect.stack()[1][3] + "] " + str(stringa1) + str(stringa2) + str(stringa3) + str(stringa4) + str(stringa5))
+
+
+def channel_config(item, itemlist):
+    from  channelselector import get_thumb
+    itemlist.append(
+        Item(channel='setting',
+             action="channel_config",
+             title=typo("Configurazione Canale color kod bold"),
+             config=item.channel,
+             folder=False,
+             thumbnail=get_thumb('setting_0.png'))
+    )
+
