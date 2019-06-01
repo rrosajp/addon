@@ -28,7 +28,6 @@ def mainlist(item):
     
     itemlist =[]
     
-    support.menu(itemlist, 'Anime bold', 'lista_anime', host+'/az-list')
     support.menu(itemlist, 'ITA submenu', 'build_menu', host + '/filter?', args=["anime", 'language[]=1'])
     support.menu(itemlist, 'Sub-ITA submenu', 'build_menu', host + '/filter?', args=["anime", 'language[]=0'])
     support.menu(itemlist, 'Archivio A-Z submenu', 'alfabetico', host+'/az-list', args=["tvshow","a-z"])
@@ -172,7 +171,7 @@ def video(item):
     log()
     itemlist = []
 
-    matches, data = support.match(item, r'<a href="([^"]+)" class="poster.*?>\s<img src="([^"]+)"(.*?)data-jtitle="([^"]+)" .*?>(.*?)<\/a>', headers=headers)
+    matches, data = support.match(item, r'<a href="([^"]+)" class[^>]+><img src="([^"]+)"(.*?)data-jtitle="([^"]+)" .*?>(.*?)<\/a>', headers=headers)
 
     for scrapedurl, scrapedthumb ,scrapedinfo, scrapedoriginal, scrapedtitle in matches:
         # Cerca Info come anno o lingua nel Titolo
@@ -260,7 +259,6 @@ def episodios(item):
     itemlist = [] 
 
     data = httptools.downloadpage(item.url).data.replace('\n', '')
-    data = re.sub(r'>\s*<', '><', data)
     block1 = scrapertoolsV2.find_single_match(data, r'<div class="widget servers".*?>(.*?)<div id="download"')
     block = scrapertoolsV2.find_single_match(block1,r'<div class="server.*?>(.*?)<div class="server.*?>')
    
@@ -297,7 +295,7 @@ def findvideos(item):
     log()
 
     itemlist = []
-    episode = '1'
+    episode = ''
 
     if item.extra and item.extra['episode']:
         data = item.extra['data']

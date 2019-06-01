@@ -37,7 +37,7 @@ def show_channels(item):
     logger.info()
     itemlist = []
 
-    context = [{"title": "Eliminar este canal",
+    context = [{"title": config.get_localized_string(50005),
                  "action": "remove_channel",
                  "channel": "community"}]
 
