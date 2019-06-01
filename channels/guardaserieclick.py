@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per guardaserie.click
-# Thanks to Icarus crew & Alfa addon
+# Canale per Guardaserie.click
+# Thanks to Icarus crew & Alfa addon & 4l3x87
 # ------------------------------------------------------------
 
 import re
 
-import channelselector
-from core import httptools, scrapertools, servertools, support
+from core import httptools, scrapertools, support
 from core import tmdb
 from core.item import Item
 from core.support import log
 from platformcode import logger, config
-from specials import autoplay
 
 __channel__ = 'guardaserieclick'
 host = config.get_setting("channel_host", __channel__)
@@ -169,7 +167,7 @@ def episodios(item):
         scrapedepisodetitle = cleantitle(scrapedepisodetitle)
         title = str("%sx%s %s" % (scrapedseason, scrapedepisode, scrapedepisodetitle)).strip()
         if 'SUB-ITA' in scrapedtitle:
-            title += " Sub-ITA"
+            title += " "+support.typo("Sub-ITA", '_ [] color kod')
 
         infoLabels = {}
         infoLabels['season'] = scrapedseason
@@ -200,7 +198,7 @@ def episodios(item):
 # ----------------------------------------------------------------------------------------------------------------
 def findepvideos(item):
     log()
-    data = httptools.downloadpage(item.url, headers=headers).data
+    data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
     matches = scrapertools.find_multiple_matches(data, item.extra)
     data = "\r\n".join(matches[0])
     item.contentType = 'movie'
