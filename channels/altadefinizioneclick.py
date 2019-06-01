@@ -29,7 +29,7 @@ def mainlist(item):
     support.menu(itemlist, 'Film', 'peliculas', host + "/nuove-uscite/")
     support.menu(itemlist, 'Per Genere submenu', 'menu', host, args='Film')
     support.menu(itemlist, 'Per Anno submenu', 'menu', host, args='Anno')
-    support.menu(itemlist, 'Sub-IIA', 'peliculas', host + "/sub-ita/")
+    support.menu(itemlist, 'Sub-ITA', 'peliculas', host + "/sub-ita/")
     support.menu(itemlist, 'Cerca...', 'search', host, 'movie')    
     support.aplay(item, itemlist,list_servers, list_quality)
     support.channel_config(item, itemlist)
