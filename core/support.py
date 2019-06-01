@@ -167,7 +167,7 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
                 scraped['episode'] = re.sub(r'\s-\s|-|x|&#8211', 'x' , scraped['episode'])
                 longtitle = typo(scraped['episode'] + ' - ', 'bold') + longtitle
             if scraped['title2']:
-                title2 = scrapertoolsV2.decodeHtmlentities(scraped["title2"]).strip()
+                title2 = scrapertoolsV2.decodeHtmlentities(scraped["title2"]).replace('"', "'").strip()
                 longtitle = longtitle + typo(title2, 'bold _ -- _')
             if scraped["lang"]: 
                 if 'sub' in scraped["lang"].lower():
@@ -467,7 +467,8 @@ def match(item, patron='', patron_block='', headers='', url=''):
     matches = []
     url = url if url else item.url
     data = httptools.downloadpage(url, headers=headers, ignore_response_code=True).data.replace("'", '"')
-    data = re.sub(r'\n|\t|\s\s', ' ', data)
+    data = re.sub(r'\n|\t', ' ', data)
+    data = re.sub(r'>\s\s*<', '><', data)
     log('DATA= ', data)
 
     if patron_block:

@@ -103,35 +103,16 @@ def nuoveserie(item):
 
     patron_block = ''
     if 'inedite' in item.args:
-        patron_block = r'<div\sclass="container container-title-serie-ined container-scheda" meta-slug="ined">(.*?)</div></div><div'
+        patron_block = r'<div class="container container-title-serie-ined container-scheda" meta-slug="ined">(.*?)</div></div><div'
     elif 'da non perdere' in item.args:
-        patron_block = r'<div\sclass="container container-title-serie-danonperd container-scheda" meta-slug="danonperd">(.*?)</div></div><div'
+        patron_block = r'<div class="container container-title-serie-danonperd container-scheda" meta-slug="danonperd">(.*?)</div></div><div'
     elif 'classiche' in item.args:
-        patron_block = r'<div\sclass="container container-title-serie-classiche container-scheda" meta-slug="classiche">(.*?)</div></div><div'
+        patron_block = r'<div class="container container-title-serie-classiche container-scheda" meta-slug="classiche">(.*?)</div></div><div'
     else:
-        patron_block = r'<div\sclass="container container-title-serie-new container-scheda" meta-slug="new">(.*?)</div></div><div'
+        patron_block = r'<div class="container container-title-serie-new container-scheda" meta-slug="new">(.*?)</div></div><div'
 
-    patron = r'<a\shref="([^"]+)".*?>\s<img\s.*?src="([^"]+)" />[^>]+>[^>]+>[^>]+>[^>]+>'
-    patron += r'[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)</p>'
-
-    matches = support.match(item, patron, patron_block, headers)[0]
-
-    for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
-        scrapedtitle = cleantitle(scrapedtitle)
-
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="episodios",
-                 contentType="episode",
-                 title=scrapedtitle,
-                 fulltitle=scrapedtitle,
-                 url=scrapedurl,
-                 show=scrapedtitle,
-                 thumbnail=scrapedthumbnail,
-                 folder=True))
-
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-    return itemlist
+    patron = r'<a href="([^"]+)".*?>\s<img\s.*?src="([^"]+)" />[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)</p>'
+    return support.scrape(item, patron, ['url', 'thumb', 'title'], patron_block=patron_block, action='episodios')
 
 
 # ================================================================================================================
@@ -141,47 +122,10 @@ def serietvaggiornate(item):
     log()
     itemlist = []
 
-    patron_block = r'<div\sclass="container container-title-serie-lastep container-scheda" meta-slug="lastep">(.*?)</div></div><div'
-    patron = r'<a\srel="nofollow" href="([^"]+)"[^>]+> <img\s*.*?src="([^"]+)"[^>]+>[^>]+>'
-    patron += r'[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<[^>]+>'
+    patron_block = r'<div class="container\s*container-title-serie-lastep\s*container-scheda" meta-slug="lastep">(.*?)<\/div><\/div><div'
+    patron = r'<a rel="nofollow" href="([^"]+)"[^>]+> <img.*?src="([^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^(?:<|\()]+)(?:\(([^\)]+)\))?[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<[^>]+>'
 
-    matches = support.match(item, patron, patron_block, headers)[0]
-
-    for scrapedurl, scrapedthumbnail, scrapedep, scrapedtitle in matches:
-        episode = re.compile(r'^(\d+)x(\d+)', re.DOTALL).findall(scrapedep)  # Prendo stagione ed episodioso
-        scrapedtitle = cleantitle(scrapedtitle)
-
-        contentlanguage = ""
-        if 'sub-ita' in scrapedep.strip().lower():
-            contentlanguage = 'Sub-ITA'
-
-        extra = r'<span\s.*?meta-stag="%s" meta-ep="%s" meta-embed="([^"]+)"\s.*?embed2="([^"]+)?"\s.*?embed3="([^"]+)?"[^>]*>' % (
-            episode[0][0], episode[0][1].lstrip("0"))
-
-        infoLabels = {}
-        infoLabels['episode'] = episode[0][1].zfill(2)
-        infoLabels['season'] = episode[0][0]
-
-        title = str(
-            "%s - %sx%s %s" % (scrapedtitle, infoLabels['season'], infoLabels['episode'], contentlanguage)).strip()
-
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="findepvideos",
-                 contentType="episode",
-                 title=title,
-                 show=scrapedtitle,
-                 fulltitle=scrapedtitle,
-                 url=scrapedurl,
-                 extra=extra,
-                 thumbnail=scrapedthumbnail,
-                 contentLanguage=contentlanguage,
-                 infoLabels=infoLabels,
-                 folder=True))
-
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-
-    return itemlist
+    return support.scrape(item, patron, ['url', 'thumb', 'episode', 'lang', 'title'], patron_block=patron_block, action='findvideos')
 
 
 # ================================================================================================================
@@ -202,29 +146,7 @@ def lista_serie(item):
     patron_block = r'<div\sclass="col-xs-\d+ col-sm-\d+-\d+">(.*?)<div\sclass="container-fluid whitebg" style="">'
     patron = r'<a\shref="([^"]+)".*?>\s<img\s.*?src="([^"]+)" />[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)</p></div>'
 
-    matches, data = support.match(item, patron, patron_block, headers)
-
-    for scrapedurl, scrapedimg, scrapedtitle in matches:
-        scrapedtitle = cleantitle(scrapedtitle)
-
-        if scrapedtitle not in ['DMCA', 'Contatti', 'Lista di tutte le serie tv']:
-            itemlist.append(
-                Item(channel=item.channel,
-                     action="episodios",
-                     contentType="episode",
-                     title=scrapedtitle,
-                     fulltitle=scrapedtitle,
-                     url=scrapedurl,
-                     thumbnail=scrapedimg,
-                     extra=item.extra,
-                     show=scrapedtitle,
-                     folder=True))
-
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-
-    support.nextPage(itemlist, item, data, r"<link\s.*?rel='next'\shref='([^']*)'")
-
-    return itemlist
+    return support.scrape(item, patron, ['url', 'thumb', 'title'], patron_block=patron_block, patronNext=r"<link\s.*?rel='next'\shref='([^']*)'", action='episodios')
 
 
 # ================================================================================================================
@@ -235,7 +157,7 @@ def episodios(item):
     itemlist = []
 
     patron = r'<div\sclass="[^"]+">\s([^<]+)<\/div>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)?[^>]+>[^>]+>[^>]+>[^>]+>[^>]+><p[^>]+>([^<]+)<[^>]+>[^>]+>[^>]+>'
-    patron += r'[^<]+[^"]+".*?serie="([^"]+)".*?stag="([0-9]*)".*?ep="([0-9]*)"\s'
+    patron += r'[^"]+".*?serie="([^"]+)".*?stag="([0-9]*)".*?ep="([0-9]*)"\s'
     patron += r'.*?embed="([^"]+)"\s.*?embed2="([^"]+)?"\s.*?embed3="([^"]+)?"?[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>\s?'
     patron += r'(?:<img\sclass="[^"]+" meta-src="([^"]+)"[^>]+>|<img\sclass="[^"]+" src="" data-original="([^"]+)"[^>]+>)?'
 
@@ -255,7 +177,7 @@ def episodios(item):
         itemlist.append(
             Item(channel=item.channel,
                  action="findvideos",
-                 title=title,
+                 title=support.typo(title, 'bold'),
                  fulltitle=scrapedtitle,
                  url=scrapedurl + "\r\n" + scrapedurl2 + "\r\n" + scrapedurl3,
                  contentType="episode",
@@ -290,5 +212,11 @@ def findepvideos(item):
 # ----------------------------------------------------------------------------------------------------------------
 def findvideos(item):
     log()
-    logger.debug(item.url)
-    return support.server(item, data=item.url)
+    if item.contentType == 'tvshow':
+        data = httptools.downloadpage(item.url, headers=headers).data
+        matches = scrapertools.find_multiple_matches(data, item.extra)
+        data = "\r\n".join(matches[0])
+    else:
+        log(item.url)
+        data = item.url
+    return support.server(item, data)
