@@ -142,14 +142,14 @@ def lista_anime(item):
         title = scrapedtitle.replace(year,'').replace(lang,'').strip()
         original = scrapedoriginal.replace(year,'').replace(lang,'').strip()
         if lang: lang = support.typo(lang,'_ color kod')
-        title = '[B]' + title + '[/B]' + lang + original
+        longtitle = '[B]' + title + '[/B]' + lang + original
 
         itemlist.append(
                 Item(channel=item.channel,
                      extra=item.extra,
                      contentType="episode",
                      action="episodios",
-                     title=title,
+                     title=longtitle,
                      url=scrapedurl,
                      thumbnail=scrapedthumb,
                      fulltitle=title,
