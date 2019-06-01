@@ -267,7 +267,6 @@ def findvideos(item):
     # Estrae i contenuti - Streaming 3D
     load_links(itemlist, '<strong>Streaming 3D[^<]+</strong>(.*?)<tableclass=cbtable height=30>', "pink", "Streaming 3D")
 
-    support.videolibrary(itemlist, item)
     return support.server(item, itemlist=itemlist)
 
     # Estrae i contenuti - Download
