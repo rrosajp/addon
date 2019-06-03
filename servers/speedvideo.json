@@ -5,8 +5,8 @@
     "patterns": [
       {
         "pattern": "speedvideo.net/(?:embed-|)([A-Z0-9a-z]+)",
-        "url": "http://speedvideo.net/embed-\\1.html"
-      }
+        "url": "https:\/\/speedvideo.net\/embed-\\1.html"
+      }  
     ]
   },
   "free": true,
