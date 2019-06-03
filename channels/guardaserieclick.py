@@ -95,6 +95,7 @@ def cleantitle(scrapedtitle):
 
 # ================================================================================================================
 # ----------------------------------------------------------------------------------------------------------------
+
 def nuoveserie(item):
     log()
     itemlist = []
@@ -109,8 +110,26 @@ def nuoveserie(item):
     else:
         patron_block = r'<div class="container container-title-serie-new container-scheda" meta-slug="new">(.*?)</div></div><div'
 
-    patron = r'<a href="([^"]+)".*?>\s<img\s.*?src="([^"]+)" />[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)</p>'
-    return support.scrape(item, patron, ['url', 'thumb', 'title'], patron_block=patron_block, action='episodios')
+    patron = r'<a href="([^"]+)".*?><img\s.*?src="([^"]+)" \/>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<\/p>'
+
+    matches = support.match(item, patron, patron_block, headers)[0]
+
+    for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
+        scrapedtitle = cleantitle(scrapedtitle)
+
+        itemlist.append(
+            Item(channel=item.channel,
+                 action="episodios",
+                 contentType="episode",
+                 title=scrapedtitle,
+                 fulltitle=scrapedtitle,
+                 url=scrapedurl,
+                 show=scrapedtitle,
+                 thumbnail=scrapedthumbnail,
+                 folder=True))
+
+    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+    return itemlist
 
 
 # ================================================================================================================
@@ -121,9 +140,45 @@ def serietvaggiornate(item):
     itemlist = []
 
     patron_block = r'<div class="container\s*container-title-serie-lastep\s*container-scheda" meta-slug="lastep">(.*?)<\/div><\/div><div'
-    patron = r'<a rel="nofollow" href="([^"]+)"[^>]+> <img.*?src="([^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^(?:<|\()]+)(?:\(([^\)]+)\))?[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<[^>]+>'
+    patron = r'<a rel="nofollow"\s*href="([^"]+)"[^>]+><img.*?src="([^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<[^>]+>'
 
-    return support.scrape(item, patron, ['url', 'thumb', 'episode', 'lang', 'title'], patron_block=patron_block, action='findvideos')
+    matches = support.match(item, patron, patron_block, headers)[0]
+
+    for scrapedurl, scrapedthumbnail, scrapedep, scrapedtitle in matches:
+        episode = re.compile(r'^(\d+)x(\d+)', re.DOTALL).findall(scrapedep)  # Prendo stagione ed episodioso
+        scrapedtitle = cleantitle(scrapedtitle)
+
+        contentlanguage = ""
+        if 'sub-ita' in scrapedep.strip().lower():
+            contentlanguage = 'Sub-ITA'
+
+        extra = r'<span\s.*?meta-stag="%s" meta-ep="%s" meta-embed="([^"]+)"\s.*?embed2="([^"]+)?"\s.*?embed3="([^"]+)?"[^>]*>' % (
+            episode[0][0], episode[0][1].lstrip("0"))
+
+        infoLabels = {}
+        infoLabels['episode'] = episode[0][1].zfill(2)
+        infoLabels['season'] = episode[0][0]
+
+        title = str(
+            "%s - %sx%s %s" % (scrapedtitle, infoLabels['season'], infoLabels['episode'], contentlanguage)).strip()
+
+        itemlist.append(
+            Item(channel=item.channel,
+                 action="findepvideos",
+                 contentType="episode",
+                 title=title,
+                 show=scrapedtitle,
+                 fulltitle=scrapedtitle,
+                 url=scrapedurl,
+                 extra=extra,
+                 thumbnail=scrapedthumbnail,
+                 contentLanguage=contentlanguage,
+                 infoLabels=infoLabels,
+                 folder=True))
+
+    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+
+    return itemlist
 
 
 # ================================================================================================================

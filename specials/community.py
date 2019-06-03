@@ -3,16 +3,20 @@
 # -*- Created for Alfa-addon -*-
 # -*- By the Alfa Develop Group -*-
 
+import re
+import urllib
 import os
 
-from channelselector import get_thumb
 from core import httptools
-from core import jsontools
+from core import scrapertools
 from core import servertools
+from core import jsontools
+from channelselector import get_thumb
 from core import tmdb
 from core.item import Item
 from platformcode import logger, config, platformtools
 from specials import autoplay
+from specials import filtertools
 
 list_data = {}
 
@@ -36,7 +40,7 @@ def mainlist(item):
 def show_channels(item):
     logger.info()
     itemlist = []
-
+    
     context = [{"title": config.get_localized_string(50005),
                  "action": "remove_channel",
                  "channel": "community"}]
@@ -49,14 +53,18 @@ def show_channels(item):
     itemlist.append(Item(channel=item.channel, title=config.get_localized_string(70676), action='add_channel', thumbnail=get_thumb('add.png')))
 
     for key, channel in json['channels'].items():
-
-        if 'poster' in channel:
-            poster = channel['poster']
+        if 'thumbnail' in channel:
+            thumbnail = channel['thumbnail']
         else:
-            poster = ''
+            thumbnail = ''
+
+        if 'fanart' in channel:
+            fanart = channel['fanart']
+        else:
+            fanart = ''
 
         itemlist.append(Item(channel=item.channel, title=channel['channel_name'], url=channel['path'],
-                             thumbnail=poster, action='show_menu', channel_id = key, context=context))
+                             thumbnail=thumbnail, fanart=fanart, action='show_menu', channel_id = key, context=context))
     return itemlist
 
 def load_json(item):
@@ -80,7 +88,15 @@ def show_menu(item):
 
     if "menu" in json_data:
         for option in json_data['menu']:
-            itemlist.append(Item(channel=item.channel, title=option['title'], action='show_menu', url=option['link']))
+            if 'thumbnail' in json_data:
+                thumbnail = option['thumbnail']
+            else:
+                thumbnail = ''
+            if 'fanart' in option and option['fanart']:
+                fanart = option['fanart']
+            else:
+                fanart = item.fanart
+            itemlist.append(Item(channel=item.channel, title=option['title'], thumbnail=thumbnail, fanart=fanart, action='show_menu', url=option['link']))
         autoplay.show_option(item.channel, itemlist)
         return itemlist
 
@@ -94,9 +110,6 @@ def show_menu(item):
         item.media_type = 'episodes_list'
 
     return list_all(item)
-
-
-    return itemlist
 
 def list_all(item):
     logger.info()
@@ -161,7 +174,7 @@ def episodesxseason(item):
         infoLabels['season'] = season_number
         infoLabels['episode'] = episode_number
 
-        title = config.get_localized_string(70677) % (season_number, episode_number, episode_number)
+        title = config.get_localized_string(70677) + ' %s' % (episode_number)
 
         itemlist.append(Item(channel=item.channel, title=title, url=episode, action='findvideos',
                              contentEpisodeNumber=episode_number, infoLabels=infoLabels))
@@ -195,6 +208,7 @@ def findvideos(item):
 
 def add_channel(item):
     logger.info()
+    import xbmc
     import xbmcgui
     channel_to_add = {}
     json_file = ''
@@ -224,6 +238,8 @@ def add_channel(item):
         platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(70682))
         return
     channel_to_add['channel_name'] = json_file['channel_name']
+    channel_to_add['thumbnail'] = json_file['thumbnail']
+    channel_to_add['fanart'] = json_file['fanart']
     path = os.path.join(config.get_data_path(), 'community_channels.json')
 
     community_json = open(path, "r")
@@ -240,6 +256,8 @@ def add_channel(item):
 
 def remove_channel(item):
     logger.info()
+    import xbmc
+    import xbmcgui
     path = os.path.join(config.get_data_path(), 'community_channels.json')
 
     community_json = open(path, "r")
