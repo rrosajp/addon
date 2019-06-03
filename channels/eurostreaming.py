@@ -1,62 +1,76 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
 # Canale per Eurostreaming
-# adattamento di Cineblog01
 # by Greko
 # ------------------------------------------------------------
 """
     Riscritto per poter usufruire del modulo support.
     Problemi noti:
-    Alcun regex possono migliorare
+    Le regex non prendono tutto...
     server versystream : 'http://vcrypt.net/very/' # VeryS non decodifica il link :http://vcrypt.net/fastshield/
-    server nowvideo.club da implementare nella cartella servers, altri server nei meandri del sito?!
-    Alcune sezioni di anime-cartoni non vanno, alcune hanno solo la lista degli episodi, ma non hanno link
-    altre cambiano la struttura
-    La sezione novità non fa apparire il titolo degli episodi
+    alcuni server tra cui nowvideo.club non sono implementati nella cartella servers
+    Alcune sezioni di anime-cartoni non vanno:
+     - alcune hanno solo la lista degli episodi, ma non hanno link
+     - altre cambiano la struttura
+    La sezione novità di KOD non fa apparire il titolo degli episodi
+
+    In episodios è stata aggiunta la possibilità di configurare la videoteca
+
 """
 
-import re
-
-from core import scrapertoolsV2, httptools, tmdb, support
+import channelselector
+from specials import autoplay, filtertools
+from core import scrapertoolsV2, httptools, servertools, tmdb, support
 from core.item import Item
 from platformcode import logger, config
-from specials import autoplay
 
-host = "https://eurostreaming.cafe/"
+__channel__ = "eurostreaming"
+
+host = config.get_setting("channel_host", __channel__)
 headers = ['Referer', host]
 
-IDIOMAS = {'Italiano': 'IT'}
-list_language = IDIOMAS.values()
-list_servers = ['verystream', 'wstream', 'speedvideo', 'flashx', 'nowvideo', 'streamango', 'deltabit', 'openload']
+list_servers = ['verystream', 'wstream', 'speedvideo', 'flashx', 'nowvideo', 'streamango', 'deltabit', 'nowvideo', 'turbovid',  'openload']
 list_quality = ['default']
 
-checklinks = config.get_setting('checklinks', 'eurostreaming')
-checklinks_number = config.get_setting('checklinks_number', 'eurostreaming')
+IDIOMAS = {'Italiano': 'ITA', 'vosi':'Sub-ITA'}
+list_language = IDIOMAS.values()
 
 def mainlist(item):
+    #import web_pdb; web_pdb.set_trace()
     support.log()    
     itemlist = []
     
-    support.menu(itemlist, 'Serie TV', 'serietv', host, 'episode') # mettere sempre episode per serietv, anime!!
-    support.menu(itemlist, 'Serie TV Archivio submenu', 'serietv', host + "category/serie-tv-archive/", 'episode')
-    support.menu(itemlist, 'Ultimi Aggiornamenti submenu', 'serietv', host + 'aggiornamento-episodi/', 'episode', args='True')
-    support.menu(itemlist, 'Anime / Cartoni', 'serietv', host + 'category/anime-cartoni-animati/', 'episode')
-    support.menu(itemlist, 'Cerca...', 'search', host, 'episode')
+    support.menu(itemlist, 'Serie TV', 'serietv', host, contentType = 'episode') # mettere sempre episode per serietv, anime!!
+    support.menu(itemlist, 'Serie TV Archivio submenu', 'serietv', host + "category/serie-tv-archive/", contentType = 'episode')
+    support.menu(itemlist, 'Ultimi Aggiornamenti submenu', 'serietv', host + 'aggiornamento-episodi/', args='True', contentType = 'episode')
+    support.menu(itemlist, 'Anime / Cartoni', 'serietv', host + 'category/anime-cartoni-animati/', contentType = 'episode')
+    support.menu(itemlist, 'Cerca...', 'search', host, contentType = 'episode')
 
+##    itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality)
     # richiesto per autoplay
     autoplay.init(item.channel, list_servers, list_quality)
     autoplay.show_option(item.channel, itemlist)
 
+    itemlist.append(
+        Item(channel='setting',
+             action="channel_config",
+             title=support.typo("Configurazione Canale color lime"),
+             config=item.channel,
+             folder=False,
+             thumbnail=channelselector.get_thumb('setting_0.png'))
+    )
+    
     return itemlist
 
-
-def serietv(item):    
+def serietv(item):
+    #import web_pdb; web_pdb.set_trace()
+    # lista serie tv
     support.log()
     itemlist = []
     if item.args:
         # il titolo degli episodi viene inglobato in episode ma non sono visibili in newest!!!
         patron = r'<span class="serieTitle" style="font-size:20px">(.*?).[^–]<a href="([^"]+)"\s+target="_blank">(.*?)<\/a>'
-        listGroups = ['title', 'url', 'title2']
+        listGroups = ['title', 'url', 'episode']
         patronNext = ''
     else:
         patron = r'<div class="post-thumb">.*?\s<img src="([^"]+)".*?><a href="([^"]+)".*?>(.*?(?:\((\d{4})\)|(\d{4}))?)<\/a><\/h2>'
@@ -64,69 +78,67 @@ def serietv(item):
         patronNext='a class="next page-numbers" href="?([^>"]+)">Avanti &raquo;</a>'
 
     itemlist = support.scrape(item, patron_block='', patron=patron, listGroups=listGroups,
-                          patronNext=patronNext,
-                          action='episodios')
+                          patronNext=patronNext, action='episodios')
     return itemlist
 
+
 def episodios(item):
-    support.log()
+##    import web_pdb; web_pdb.set_trace()
+    support.log("episodios")
     itemlist = []
-    
+
     # Carica la pagina
     data = httptools.downloadpage(item.url).data
     #======== 
     if 'clicca qui per aprire' in data.lower():
-        item.url = scrapertoolsV2.find_single_match(data, '"go_to":"(.*?)"')
+        item.url = scrapertoolsV2.find_single_match(data, '"go_to":"([^"]+)"')
         item.url = item.url.replace("\\","")
         # Carica la pagina
         data = httptools.downloadpage(item.url).data
     elif 'clicca qui</span>' in data.lower():
-        item.url = scrapertoolsV2.find_single_match(data, '<h2 style="text-align: center;"><a href="(.*?)">')
+        item.url = scrapertoolsV2.find_single_match(data, '<h2 style="text-align: center;"><a href="([^"]+)">')
         # Carica la pagina        
         data = httptools.downloadpage(item.url).data
     #=========
+    patron = r'(?:<\/span>\w+ STAGIONE\s\d+ (?:\()?(ITA|SUB ITA)(?:\))?<\/div>'\
+             '<div class="su-spoiler-content su-clearfix" style="display:none">|'\
+             '(?:\s|\Wn)?(?:<strong>)?(\d&#.*?)(?:|–)?<a\s(.*?)<\/a><br\s\/>)'
+    listGroups = ['lang', 'title', 'url'] 
+    itemlist = support.scrape(item, data=data, patron=patron,
+                              listGroups=listGroups, action='findvideos')
 
-    matches = scrapertoolsV2.find_multiple_matches(data,
-                                                   r'<span class="su-spoiler-icon"><\/span>(.*?)</div></div>')    
-    for match in matches:
-        blocks = scrapertoolsV2.find_multiple_matches(match, r'(?:(\d&#215;[a-zA-Z0-9].*?))<br \/>')
-        season_lang = scrapertoolsV2.find_single_match(match, r'<\/span>.*?STAGIONE\s+\d+\s\(([^<>]+)\)').strip()
+    # Permette la configurazione della videoteca senza andare nel menu apposito
+    # così si possono Attivare/Disattivare le impostazioni direttamente dalla
+    # pagina delle puntate
+    itemlist.append(
+        Item(channel='setting',
+             action="channel_config",
+             title=support.typo("Configurazione Videoteca color lime"),
+             plot = 'Filtra per lingua utilizzando la configurazione della videoteca.\
+                     Escludi i video in sub attivando "Escludi streams... " e aggiungendo sub in Parole',
+             config='videolibrary',
+             folder=False,
+             thumbnail=channelselector.get_thumb('setting_0.png')
+             ))
 
-        logger.info("blocks log: %s" % ( blocks ))
-        for block in blocks:
-            season_n, episode_n = scrapertoolsV2.find_single_match(block, r'(\d+)(?:&#215;|×)(\d+)') 
-            titolo = scrapertoolsV2.find_single_match(block, r'[&#;]\d+[ ]([a-zA-Z0-9;&#.\s]+)[ ]?[^<>]')
-            logger.info("block log: %s" % ( block ))
-                
-            titolo = re.sub(r'&#215;|×', "x", titolo).replace("&#8217;","'")
-            item.infoLabels['season'] = season_n # permette di vedere il plot della stagione e...
-            item.infoLabels['episode'] = episode_n # permette di vedere il plot della puntata e...
-           
-            itemlist.append(
-                Item(channel=item.channel,
-                     action="findvideos",
-                     contentType=item.contentType,
-                     title="[B]" + season_n + "x" + episode_n + " " + titolo + "[/B] " + season_lang,
-                     fulltitle=item.title, # Titolo nel video
-                     show=titolo + ":" + season_n + "x" + episode_n, # sottotitoletto nel video
-                     url=block,
-                     extra=item.extra,
-                     thumbnail=item.thumbnail,
-                     infoLabels=item.infoLabels
-                     ))
-                
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+    itemlist = filtertools.get_links(itemlist, item, list_language)
     
-    support.videolibrary(itemlist, item)
-
     return itemlist
 
+# ===========  def findvideos  =============
+
+def findvideos(item):
+    support.log()
+    itemlist =[]
+
+    itemlist = support.server(item, item.url)
+   
+    return itemlist
 
 # ===========  def ricerca  =============
 def search(item, texto):
     support.log()
     item.url = "%s?s=%s" % (host, texto)
-
     try:
         return serietv(item)
     # Continua la ricerca in caso di errore
@@ -141,8 +153,9 @@ def newest(categoria):
     support.log()  
     itemlist = []
     item = Item()
-    try:
-        item.args= 'True'
+    item.contentType= 'episode'
+    item.args= 'True'
+    try:        
         item.url = "%saggiornamento-episodi/" % host
         item.action = "serietv"
         itemlist = serietv(item)
@@ -159,10 +172,5 @@ def newest(categoria):
 
     return itemlist
 
-def findvideos(item):
-    support.log()
-    itemlist =[]
-    
-    itemlist = support.server(item, item.url)
-    
-    return itemlist
+def paginator(item):
+    pass
