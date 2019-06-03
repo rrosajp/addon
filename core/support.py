@@ -489,7 +489,7 @@ def videolibrary(itemlist, item, typography='', function_level=1):
     # Function_level is useful if the function is called by another function.
     # If the call is direct, leave it blank
 
-    if item.contentType != 'episode':
+    if item.contentType == 'movie':
         action = 'add_pelicula_to_library'
         extra = 'findvideos'
         contentType = 'movie'
