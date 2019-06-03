@@ -114,8 +114,12 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
     #   patron = 'blablabla'
     #   headers = [['Referer', host]]
     #   blacklist = 'Request a TV serie!'
-    #   return support.scrape(item, itemlist, patron, ['thumb', 'quality', 'url', 'title', 'year', 'plot', 'episode', 'lang'],
+    #   return support.scrape(item, itemlist, patron, ['thumb', 'quality', 'url', 'title', 'title2', 'year', 'plot', 'episode', 'lang'],
     #                           headers=headers, blacklist=blacklist)
+    # listGroups
+    #    thumb = immagine, quality = qualità, url = link singolo o gruppo, title = titolo film o serie, title2 = titolo aggiuntivo
+    #    year = anno del film o della serie, plot = descrizione film o serie, episode = numero stagione - numero episodio in caso di serie,
+    #    lang = lingua del video
     # 'type' is a check for typologies of content e.g. Film or TV Series
     # 'episode' is a key to grab episode numbers if it is separated from the title
     # IMPORTANT 'type' is a special key, to work need type_content_dict={} and type_action_dict={}
@@ -167,12 +171,11 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
             longtitle = typo(title, 'bold')
             if scraped['quality']: longtitle = longtitle + typo(scraped['quality'], '_ [] color kod')
             if scraped['episode']:
-                scraped['episode'] = re.sub(r'\s-\s|-|x|&#8211', 'x' , scraped['episode']).replace('’', '\'').replace('"', "'")
+                scraped['episode'] = re.sub(r'\s-\s|-|x|&#8211', 'x' , scraped['episode'])
                 longtitle = typo(scraped['episode'] + ' - ', 'bold') + longtitle
             if scraped['title2']:
                 title2 = scrapertoolsV2.decodeHtmlentities(scraped["title2"]).replace('"', "'").strip()
                 longtitle = longtitle + typo(title2, 'bold _ -- _')
-
 
             ##    Aggiunto/modificato per gestire i siti che hanno i video
             ##    in ita e subita delle serie tv nella stessa pagina                             
