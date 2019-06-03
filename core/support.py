@@ -174,7 +174,7 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
                 scraped['episode'] = re.sub(r'\s-\s|-|x|&#8211', 'x' , scraped['episode'])
                 longtitle = typo(scraped['episode'] + ' - ', 'bold') + longtitle
             if scraped['title2']:
-                title2 = scrapertoolsV2.decodeHtmlentities(scraped["title2"]).replace('"', "'").strip()
+                title2 = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["title2"])).replace('"', "'").strip()
                 longtitle = longtitle + typo(title2, 'bold _ -- _')
 
             ##    Aggiunto/modificato per gestire i siti che hanno i video
