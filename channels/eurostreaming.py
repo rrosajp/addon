@@ -9,10 +9,9 @@
     Le regex non prendono tutto...
     server versystream : 'http://vcrypt.net/very/' # VeryS non decodifica il link :http://vcrypt.net/fastshield/
     alcuni server tra cui nowvideo.club non sono implementati nella cartella servers
-    Alcune sezioni di anime-cartoni non vanno:
-     - alcune hanno solo la lista degli episodi, ma non hanno link
-     - altre cambiano la struttura
-    La sezione novità di KOD non fa apparire il titolo degli episodi
+    Alcune sezioni di anime-cartoni non vanno, alcune hanno solo la lista degli episodi, ma non hanno link
+    altre cambiano la struttura
+    La sezione novità non fa apparire il titolo degli episodi
 
     In episodios è stata aggiunta la possibilità di configurare la videoteca
 
@@ -26,13 +25,17 @@ from platformcode import logger, config
 
 __channel__ = "eurostreaming"
 
+#host = "https://eurostreaming.cafe/"
 host = config.get_setting("channel_host", __channel__)
 headers = ['Referer', host]
 
-list_servers = ['verystream', 'wstream', 'speedvideo', 'flashx', 'nowvideo', 'streamango', 'deltabit', 'nowvideo', 'turbovid',  'openload']
+list_servers = ['verystream', 'wstream', 'speedvideo', 'flashx', 'nowvideo', 'streamango', 'deltabit', 'openload']
 list_quality = ['default']
 
-IDIOMAS = {'Italiano': 'ITA', 'vosi':'Sub-ITA'}
+__comprueba_enlaces__ = config.get_setting('comprueba_enlaces', 'eurostreaming')
+__comprueba_enlaces_num__ = config.get_setting('comprueba_enlaces_num', 'eurostreaming')
+
+IDIOMAS = {'Italiano': 'ITA', 'Sub-ITA':'vosi'}
 list_language = IDIOMAS.values()
 
 def mainlist(item):
@@ -70,7 +73,7 @@ def serietv(item):
     if item.args:
         # il titolo degli episodi viene inglobato in episode ma non sono visibili in newest!!!
         patron = r'<span class="serieTitle" style="font-size:20px">(.*?).[^–]<a href="([^"]+)"\s+target="_blank">(.*?)<\/a>'
-        listGroups = ['title', 'url', 'episode']
+        listGroups = ['title', 'url', 'title2']
         patronNext = ''
     else:
         patron = r'<div class="post-thumb">.*?\s<img src="([^"]+)".*?><a href="([^"]+)".*?>(.*?(?:\((\d{4})\)|(\d{4}))?)<\/a><\/h2>'
@@ -103,6 +106,12 @@ def episodios(item):
     patron = r'(?:<\/span>\w+ STAGIONE\s\d+ (?:\()?(ITA|SUB ITA)(?:\))?<\/div>'\
              '<div class="su-spoiler-content su-clearfix" style="display:none">|'\
              '(?:\s|\Wn)?(?:<strong>)?(\d&#.*?)(?:|–)?<a\s(.*?)<\/a><br\s\/>)'
+##    '(?:<\/span>\w+ STAGIONE\s\d+ (?:\()?(ITA|SUB ITA)(?:\))?'\
+##             '<\/div><div class="su-spoiler-content su-clearfix" style="display:none">|'\
+##             '(?:\s|\Wn)?(?:<strong>)?(\d[&#].*?)(?:–|\W)?<a\s(.*?)<\/a><br\s\/>)'
+##    '(?:<\/span>\w+ STAGIONE\s\d+ (?:\()?(ITA|SUB ITA)(?:\))?<\/div>'\
+##             '<div class="su-spoiler-content su-clearfix" style="display:none">|'\
+##             '\s(?:<strong>)?(\d[&#].*?)–<a\s(.*?)<\/a><br\s\/>)'
     listGroups = ['lang', 'title', 'url'] 
     itemlist = support.scrape(item, data=data, patron=patron,
                               listGroups=listGroups, action='findvideos')
@@ -116,13 +125,12 @@ def episodios(item):
              title=support.typo("Configurazione Videoteca color lime"),
              plot = 'Filtra per lingua utilizzando la configurazione della videoteca.\
                      Escludi i video in sub attivando "Escludi streams... " e aggiungendo sub in Parole',
-             config='videolibrary',
+             config='videolibrary', #item.channel,
              folder=False,
              thumbnail=channelselector.get_thumb('setting_0.png')
              ))
 
-    itemlist = filtertools.get_links(itemlist, item, list_language)
-    
+    itemlist = filtertools.get_links(itemlist, item, list_language)      
     return itemlist
 
 # ===========  def findvideos  =============
@@ -131,8 +139,12 @@ def findvideos(item):
     support.log()
     itemlist =[]
 
+    # Requerido para FilterTools
+##    itemlist = filtertools.get_links(itemlist, item, list_language)
+
     itemlist = support.server(item, item.url)
-   
+##    support.videolibrary(itemlist, item)
+    
     return itemlist
 
 # ===========  def ricerca  =============
