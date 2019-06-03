@@ -10,7 +10,9 @@ from core.item import Item
 from platformcode import logger, config
 from specials import autoplay
 
-host = config.get_setting("channel_host", 'altadefinizioneclick')
+#host = config.get_setting("channel_host", 'altadefinizioneclick')
+__channel__ = 'altadefinizioneclick'
+host = config.get_channel_url(__channel__)
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
