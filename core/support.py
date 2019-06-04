@@ -225,7 +225,7 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
                     title=longtitle,
                     fulltitle=title,
                     show=title,
-                    language = 'ITA' if lang =='' else lang,
+                    language = lang if lang != '' else '',
                     quality=scraped["quality"],
                     url=scraped["url"],
                     infoLabels=infolabels,
