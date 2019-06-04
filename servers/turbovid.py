@@ -15,7 +15,8 @@ def test_video_exists(page_url):
     return True, ""
 
 
-def get_video_url(page_url, premium=False, user="", password="", video_password=""):
+def get_video_url(page_url, premium=False, user="", password="", video_password="", server='turbovid'):
+    
     logger.info("(turbovid page_url='%s')" % page_url)
     video_urls = []
     data = httptools.downloadpage(page_url).data
