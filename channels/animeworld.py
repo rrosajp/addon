@@ -258,7 +258,7 @@ def episodios(item):
     log()
     itemlist = [] 
 
-    data = httptools.downloadpage(item.url).data.replace('\n', '')
+    data = httptools.downloadpage(item.url, headers=headers).data.replace('\n', '')
     block1 = scrapertoolsV2.find_single_match(data, r'<div class="widget servers".*?>(.*?)<div id="download"')
     block = scrapertoolsV2.find_single_match(block1,r'<div class="server.*?>(.*?)<div class="server.*?>')
    
@@ -301,18 +301,17 @@ def findvideos(item):
         data = item.extra['data']
         episode = item.extra['episode']
     else:
-        data = httptools.downloadpage(item.url,headers=headers).data
-
+        data = httptools.downloadpage(item.url, headers=headers).data
     block = scrapertoolsV2.find_single_match(data,r'data-target="\.widget\.servers.*?>(.*?)</div>')
     servers = scrapertoolsV2.find_multiple_matches(block,r'class="tab.*?data-name="([0-9]+)">([^<]+)</span')
 
     videolist = []
     videoData = ''
-
+    
     for serverid, servername in servers:
         #recupero l'id del video per questo server
-        block = scrapertoolsV2.find_single_match(data,r'<div class="server.*?data-id="'+serverid+'">(.*?)</ul>')
-        id = scrapertoolsV2.find_single_match(block,r'<a\sdata-id="([^"]+)"\sdata-base="'+episode+'"')
+        block = str(scrapertoolsV2.find_multiple_matches(data,r'<div class="server.*?data-id="'+serverid+'">(.*?)</ul>'))
+        id = scrapertoolsV2.find_single_match(data,r'<a\sdata-id="([^"]+)"\sdata-base="'+episode+'"')
 
         dataJson = httptools.downloadpage('%s/ajax/episode/info?id=%s&server=%s&ts=%s' % (host, id, serverid, int(time.time())), headers=[['x-requested-with', 'XMLHttpRequest']]).data
         json = jsontools.load(dataJson)
