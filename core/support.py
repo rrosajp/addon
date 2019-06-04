@@ -206,6 +206,8 @@ def scrape(item, patron = '', listGroups = [], headers="", blacklist="", data=""
                     if scraped['type'] in variants:
                         action = name
 
+            if inspect.stack()[1][3] == 'episodios':  item.contentType = 'episode' 
+            
             if scraped["title"] not in blacklist:
                 it = Item(
                     channel=item.channel,
@@ -575,12 +577,6 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True):
     CL = get_setting('checklinks') or get_setting('checklinks', item.channel)
     autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
     channel_node = autoplay_node.get(item.channel, {})
-    if not channel_node:  # non ha mai aperto il menu del canale quindi in autoplay_data.json non c'e la key
-        channelFile = __import__('channels.' + item.channel, fromlist=["channels.%s" % item.channel])
-        autoplay.init(item.channel, channelFile.list_servers, channelFile.list_quality)
-
-        autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
-        channel_node = autoplay_node.get(item.channel, {})
     settings_node = channel_node.get('settings', {})
     AP = get_setting('autoplay') or settings_node['active']
 
