@@ -229,7 +229,7 @@ def video(item):
 
         # Controlla se sono Episodi o Film
         if movie == '':
-            contentType = 'episode'
+            contentType = 'tvshow'
             action = 'episodios'
         else:
             contentType = 'movie'
