@@ -552,14 +552,15 @@ def pagination(itemlist, item, page, perpage, function_level=1):
                  thumbnail=thumb()))
     return itemlist
 
-def server(item, data='', itemlist='', headers='', AutoPlay=True, CheckLinks=True):
-
+def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True):
+    
     if not data:
         data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
 
-    if not itemlist:
-        itemlist = servertools.find_video_items(data=str(data))
-
+    
+    itemList = servertools.find_video_items(data=str(data))
+    itemlist += itemList
+    
     for videoitem in itemlist:
         videoitem.title = "".join([item.title, ' ', typo(videoitem.title, 'color kod []'), typo(videoitem.quality, 'color kod []') if videoitem.quality else ""])
         videoitem.fulltitle = item.fulltitle
