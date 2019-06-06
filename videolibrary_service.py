@@ -3,7 +3,7 @@
 # Service for updating new episodes on library series
 # ------------------------------------------------------------
 
-import datetime, imp, math, threading, traceback, sys
+import datetime, imp, math, threading, traceback, sys, glob
 
 
 
@@ -323,17 +323,15 @@ def get_channel_json():
         channels_path = os.path.join(ROOT_DIR, "channels", '*.json')
         channel_files = sorted(glob.glob(channels_path), key=lambda x: os.path.basename(x))
         for channel_file in channel_files:
-            if 1:
-                try:
-                    import json
-                except:
-                    import simplejson as json
+            if channel_file:
+                try: import json
+                except: import simplejson as json
                 with open(LOCAL_FILE) as f:
                     data = json.load(f)
-                    if data[channel_file] is not None:
-                        config.set_setting(name=data[channel_file], value="value", channel=channel_file)
-            else:
-                pass
+                    try:
+                        if data[channel_file]:
+                            config.set_setting(name=data[channel_file], value="value", channel=channel_file)
+                    except: pass #channel not in json
 
 if __name__ == "__main__":
     # Se ejecuta en cada inicio
