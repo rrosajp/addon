@@ -6,6 +6,10 @@
       {
         "pattern": "speedvideo.net/(?:embed-|)([A-Z0-9a-z]+)",
         "url": "http://speedvideo.net/embed-\\1.html"
+      },
+      {
+        "pattern": "speedvideo.net/(?:embed-|)([A-Z0-9a-z]+)",
+        "url": "https://speedvideo.net/embed-\\1.html"
       }
     ]
   },
