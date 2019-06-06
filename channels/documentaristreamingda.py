@@ -10,8 +10,8 @@ from core import httptools, scrapertools, servertools
 from core.item import Item
 from platformcode import logger, config
 
-host = "https://documentari-streaming-da.com"
-
+__channel__ = "documentaristreamingda"
+host = config.get_channel_url(__channel__)
 
 def mainlist(item):
     logger.info("kod.documentaristreamingda mainlist")

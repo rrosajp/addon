@@ -10,7 +10,8 @@ from core import scrapertoolsV2, httptools, tmdb, support
 from core.support import log, menu, aplay
 from core.item import Item
 
-host = "https://ilgeniodellostreaming.pw"
+__channel__ = 'ilgeniodellostreaming'
+host = config.get_channel_url(__channel__)
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()

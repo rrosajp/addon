@@ -12,8 +12,8 @@ from core import tmdb
 from core.item import Item
 from platformcode import logger
 
-host = "https://italiaserie.org"
-
+__channel__ = 'italiaserie'
+host = config.get_channel_url(__channel__)
 list_servers = ['speedvideo']
 
 IDIOMAS = {'Italiano': 'IT'}

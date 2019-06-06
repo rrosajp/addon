@@ -11,7 +11,8 @@ from core import scrapertools, httptools
 from core.item import Item
 from platformcode import logger
 
-host = "http://streamking.cc"
+__channel__ = "streamking"
+host = config.get_channel_url(__channel__)
 
 headers = [['Referer', host]]
 

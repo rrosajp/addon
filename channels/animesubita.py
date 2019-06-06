@@ -14,7 +14,7 @@ from core.item import Item
 from platformcode import logger, config
 
 __channel__ = "animesubita"
-host = config.get_addon_version(__channel__)
+host = config.get_channel_url(__channel__)
 PERPAGE = 20
 
 # ----------------------------------------------------------------------------------------------------------------

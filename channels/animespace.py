@@ -16,7 +16,7 @@ from specials import autoplay
 from specials import renumbertools
 
 __channel__ = "animespace"
-host = config.get_addon_version(__channel__)
+host = config.get_channel_url(__channel__)
 
 checklinks = config.get_setting('checklinks', 'animespace')
 checklinks_number = config.get_setting('checklinks_number', 'animespace')

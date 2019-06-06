@@ -9,7 +9,7 @@ from core.item import Item
 from specials import autoplay
 
 __channel__ = "cinemastreaming"
-host = config.get_addon_version(__channel__)
+host = config.get_channel_url(__channel__)
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
 list_servers = ['openload', 'streamango']

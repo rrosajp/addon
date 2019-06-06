@@ -12,7 +12,7 @@ from specials import autoplay
 #host = "https://altadefinizione01.to"
 
 __channel__ = "altadefinizione01"
-host = config.get_addon_version(__channel__)
+host = config.get_channel_url(__channel__)
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()

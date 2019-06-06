@@ -22,7 +22,8 @@ from core.item import Item
 from platformcode import logger, config
 from specials import autoplay
 
-host = "https://eurostreaming.cafe/"
+__channel__ = "eurostreaming"
+host = config.get_channel_url(__channel__)
 headers = ['Referer', host]
 
 IDIOMAS = {'Italiano': 'IT'}

@@ -11,7 +11,7 @@ from core.item import Item
 from platformcode import logger, config
 
 __channel__ = "animetubeita"
-host = config.get_addon_version(__channel__)
+host = config.get_channel_url(__channel__)
 hostlista = host + "/lista-anime/"
 hostgeneri = host + "/generi/"
 hostcorso = host + "/category/serie-in-corso/"

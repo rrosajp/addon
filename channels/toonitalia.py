@@ -11,8 +11,9 @@ from core.item import Item
 from platformcode import logger
 from specials import autoplay
 
-channel = "toonitalia"
-host = "https://toonitalia.org"
+__channel__ = "toonitalia"
+host = config.get_channel_url(__channel__)
+
 headers = [['Referer', host]]
 
 list_servers = ['wstream', 'openload', 'streamango']

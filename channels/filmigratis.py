@@ -9,10 +9,8 @@ from core.item import Item
 from platformcode import logger, config
 from specials import autoplay
 
-channel = 'filmigratis'
-
-host = 'https://filmigratis.net'
-
+__channel__ = 'filmigratis'
+host = config.get_channel_url(__channel__)
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
 list_servers = ['openload', 'streamango', 'vidoza', 'okru']

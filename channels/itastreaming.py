@@ -9,8 +9,8 @@ from core import scrapertools, httptools, tmdb, support
 from core.item import Item
 from platformcode import logger, config
 
-host = "https://itastreaming.film"
-
+__channel__ = 'itastreaming'
+host = config.get_channel_url(__channel__)
 headers = [['Referer', host]]
 
 

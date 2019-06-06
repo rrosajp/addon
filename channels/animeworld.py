@@ -14,7 +14,7 @@ from platformcode import logger, config
 from specials import autoplay, autorenumber
 
 __channel__ = "animeworld"
-host = config.get_addon_version(__channel__)
+host = config.get_channel_url(__channel__)
 headers = [['Referer', host]]
 
 IDIOMAS = {'Italiano': 'Italiano'}

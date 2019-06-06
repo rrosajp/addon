@@ -19,9 +19,7 @@ from platformcode import config
 from platformcode import logger
 
 __channel__ = "mondolunatico"
-
-host = "http://mondolunatico.org"
-
+host = config.get_channel_url(__channel__)
 captcha_url = '%s/pass/CaptchaSecurityImages.php?width=100&height=40&characters=5' % host
 
 PERPAGE = 25

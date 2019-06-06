@@ -13,7 +13,7 @@ from platformcode import logger, config
 from specials import autoplay, autorenumber
 
 __channel__ = "animeleggendari"
-host = config.get_addon_version(__channel__)
+host = config.get_channel_url(__channel__)
 
 # Richiesto per Autoplay
 IDIOMAS = {'Italiano': 'IT'}

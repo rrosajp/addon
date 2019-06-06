@@ -15,6 +15,7 @@ from specials import autoplay
 
 # Necessario per Autoplay
 __channel__ = 'filmsenzalimiticc'
+host = config.get_channel_url(__channel__)
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
@@ -24,8 +25,6 @@ list_quality = ['default']
 # Necessario per Verifica Link
 checklinks = config.get_setting('checklinks', 'filmsenzalimiticc')
 checklinks_number = config.get_setting('checklinks_number', 'filmsenzalimiticc')
-
-host = 'https://filmsenzalimiti.pw'
 
 headers = [['Referer', host]]
 

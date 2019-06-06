@@ -13,7 +13,7 @@ from core.support import log
 from platformcode import logger, config
 
 __channel__ = 'guardaserieclick'
-host = config.get_setting("channel_host", __channel__)
+host = config.get_channel_url(__channel__)
 headers = [['Referer', host]]
 
 IDIOMAS = {'Italiano': 'IT'}
