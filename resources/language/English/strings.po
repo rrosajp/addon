@@ -5515,3 +5515,7 @@ msgstr ""
 msgctxt "#70704"
 msgid "TMDB ID (0 to cancel)"
 msgstr ""
+
+msgctxt "#70705"
+msgid "Use your custom channel URLs"
+msgstr ""

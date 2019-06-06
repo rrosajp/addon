@@ -5515,3 +5515,7 @@ msgstr "Crea cartelle con le lettere minuscole"
 msgctxt "#70704"
 msgid "TMDB ID (0 to cancel)"
 msgstr "TMDB ID (0 per annullare)"
+
+msgctxt "#70705"
+msgid "Use your custom channel URLs"
+msgstr "Utilizza URL personalizzati per i canali"
