@@ -11,6 +11,7 @@ from lib import unshortenit
 from platformcode import config
 from platformcode import logger
 from specials import autoplay
+import channelselector
 
 # Necessario per Autoplay
 IDIOMAS = {'Italiano': 'IT'}
@@ -24,9 +25,8 @@ checklinks_number = config.get_setting('checklinks_number', 'cinemalibero')
 
 __channel__ = "cinemalibero"
 host = config.get_channel_url(__channel__)
+
 headers = [['Referer', host]]
-
-
 
 def mainlist(item):
     logger.info('[cinemalibero.py] mainlist')
@@ -44,6 +44,15 @@ def mainlist(item):
     support.menu(itemlist, 'Sport bold', 'video', host+'/category/sport/')
 
     autoplay.show_option(item.channel, itemlist) # Necessario per Autoplay (Menu Configurazione)
+
+    itemlist.append(
+        Item(channel='setting',
+             action="channel_config",
+             title=support.typo("Configurazione Canale color lime"),
+             config=item.channel,
+             folder=False,
+             thumbnail=channelselector.get_thumb('setting_0.png'))
+    )
     
     return itemlist
 
