@@ -54,7 +54,7 @@
                  default="70137" visible="eq(-3,True)+eq(-1,True)+eq(-2,False)" enable="eq(-3,True)+eq(-1,True)+(-2,false)"/>
    </category>
     <category label="70126">
-        <setting id="icon_set" type="labelenum" label="70108" values="default|light|dark|alfa" default="default"/>
+        <setting id="icon_set" type="labelenum" label="70108" values="default|light|dark|alfa|mike" default="default"/>
         <setting id="enable_custom_theme" type="bool" label="70564" default="false"/>
         <setting id="custom_theme" type="folder" label="70565" default="" visible="eq(-1,true)"/>
         <setting id="infoplus_set" type="labelenum" label="70128" lvalues="70129|70130" default="70129"/>
