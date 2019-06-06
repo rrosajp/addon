@@ -13,7 +13,8 @@ from core.item import Item
 from platformcode import logger, config
 from specials import autoplay, autorenumber
 
-host = config.get_setting("channel_host", 'animeworld')
+__channel__ = "animeworld"
+host = config.get_addon_version(__channel__)
 headers = [['Referer', host]]
 
 IDIOMAS = {'Italiano': 'Italiano'}

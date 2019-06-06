@@ -10,8 +10,8 @@ from core import httptools, scrapertools, servertools, tmdb
 from core.item import Item
 from platformcode import logger, config
 
-host = "https://www.cineblog01.pink"
-
+__channel__ = "cb01anime"
+host = config.get_addon_version(__channel__)
 #esclusione degli articoli 'di servizio'
 blacklist = ['AVVISO IMPORTANTE – CB01.ROCKS', 'Lista Alfabetica Completa Anime/Cartoon', 'CB01.UNO ▶ TROVA L’INDIRIZZO UFFICIALE']
 

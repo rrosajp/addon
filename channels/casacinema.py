@@ -12,8 +12,8 @@ from core.item import Item
 from platformcode import logger, config
 from specials import autoplay
 
-host = 'https://www.casacinema.site'
-
+__channel__ = "casacinema"
+host = config.get_addon_version(__channel__)
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
 list_servers = ['verystream', 'openload', 'wstream', 'speedvideo']

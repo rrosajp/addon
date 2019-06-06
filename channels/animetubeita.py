@@ -10,7 +10,8 @@ from core import httptools, scrapertools, tmdb
 from core.item import Item
 from platformcode import logger, config
 
-host = "http://www.animetubeita.com"
+__channel__ = "animetubeita"
+host = config.get_addon_version(__channel__)
 hostlista = host + "/lista-anime/"
 hostgeneri = host + "/generi/"
 hostcorso = host + "/category/serie-in-corso/"

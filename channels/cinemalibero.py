@@ -22,8 +22,8 @@ list_quality = ['default']
 checklinks = config.get_setting('checklinks', 'cinemalibero')
 checklinks_number = config.get_setting('checklinks_number', 'cinemalibero')
 
-host = 'https://www.cinemalibero.icu'
-
+__channel__ = "cinemalibero"
+host = config.get_addon_version(__channel__)
 headers = [['Referer', host]]
 
 

@@ -12,7 +12,8 @@ from lib.js2py.host import jsfunctions
 from platformcode import logger, config
 from specials import autoplay, autorenumber
 
-host = "https://animepertutti.com"
+__channel__ = "animeleggendari"
+host = config.get_addon_version(__channel__)
 
 # Richiesto per Autoplay
 IDIOMAS = {'Italiano': 'IT'}

@@ -8,8 +8,8 @@ from core import scrapertools, httptools, scrapertoolsV2, support
 from core.item import Item
 from specials import autoplay
 
-host = 'https://cinemastreaming.icu'
-
+__channel__ = "cinemastreaming"
+host = config.get_addon_version(__channel__)
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
 list_servers = ['openload', 'streamango']
