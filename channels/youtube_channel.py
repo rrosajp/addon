@@ -5,6 +5,7 @@ import urllib
 from core import jsontools
 from core.item import Item
 from platformcode import logger
+from platformcode import config
 
 CHANNELNAME = "youtube_channel"
 YOUTUBE_V3_API_KEY = "AIzaSyCjsmBT0JZy1RT-PLwB-Zkfba87sa2inyI"

@@ -10,6 +10,7 @@ from core import scrapertools, httptools, tmdb, support, servertools
 from core.item import Item
 from platformcode import logger
 from specials import autoplay
+from platformcode import config
 
 __channel__ = "toonitalia"
 host = config.get_channel_url(__channel__)

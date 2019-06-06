@@ -8,6 +8,7 @@ from core import scrapertools
 from core import servertools
 from core.item import Item
 from platformcode import logger
+from platformcode import config
 
 
 # BLOQUEO ESET INTERNET SECURITY

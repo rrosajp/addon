@@ -9,6 +9,7 @@ from platformcode import  logger
 from core import scrapertoolsV2, httptools, tmdb, support
 from core.support import log, menu, aplay
 from core.item import Item
+from platformcode import config
 
 __channel__ = 'ilgeniodellostreaming'
 host = config.get_channel_url(__channel__)

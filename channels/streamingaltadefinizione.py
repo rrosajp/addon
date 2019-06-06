@@ -6,6 +6,7 @@
 from core import support
 from core.item import Item
 from specials import autoplay
+from platformcode import config
 
 __channel__ = "streamingaltadefinizione"
 host = config.get_channel_url(__channel__)

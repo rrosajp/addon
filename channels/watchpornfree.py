@@ -7,6 +7,7 @@ from core import httptools
 from core import scrapertools
 from core.item import Item
 from platformcode import logger
+from platformcode import config
 
 # https://playpornfree.org/    https://mangoporn.net/   https://watchfreexxx.net/   https://losporn.org/  https://xxxstreams.me/  https://speedporn.net/
 

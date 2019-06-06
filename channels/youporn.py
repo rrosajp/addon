@@ -7,6 +7,7 @@ from core import httptools
 from core import scrapertools
 from core.item import Item
 from platformcode import logger
+from platformcode import config
 
 host = 'https://www.youporn.com'
 

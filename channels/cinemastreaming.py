@@ -7,6 +7,7 @@ import re
 from core import scrapertools, httptools, scrapertoolsV2, support
 from core.item import Item
 from specials import autoplay
+from platformcode import config
 
 __channel__ = "cinemastreaming"
 host = config.get_channel_url(__channel__)

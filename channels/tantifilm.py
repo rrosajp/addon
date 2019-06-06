@@ -12,6 +12,7 @@ from core.item import Item
 from core.support import menu, log, aplay
 from platformcode import logger
 from specials import autorenumber
+from platformcode import config
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
