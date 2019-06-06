@@ -310,14 +310,30 @@ def monitor_update():
             check_for_update(overwrite=False)
 
 def get_channel_json():
-    import urllib, os, xbmc, xbmcaddon
-    addon = xbmcaddon.Addon('plugin.video.kod')
-    ROOT_DIR = xbmc.translatePath(addon.getAddonInfo('Path'))
+    import urllib, os, xbmc
+    addon = config.get_addon_core()
+    ROOT_DIR = config.get_runtime_path()
     LOCAL_FILE = os.path.join(ROOT_DIR, "channels.json")
 
     if os.path.exists(LOCAL_FILE):
         os.remove(LOCAL_FILE)
     urllib.urlretrieve("https://raw.githubusercontent.com/kodiondemand/addon/master/channels.json", LOCAL_FILE)
+    
+    if addon.getSetting("use_custom_url") != "true":
+        channels_path = os.path.join(ROOT_DIR, "channels", '*.json')
+        channel_files = sorted(glob.glob(channels_path), key=lambda x: os.path.basename(x))
+        for channel_file in channel_files:
+            if 1:
+                try:
+                    import json
+                except:
+                    import simplejson as json
+                with open(LOCAL_FILE) as f:
+                    data = json.load(f)
+                    if data[channel_file] is not None:
+                        config.set_setting(name=data[channel_file], value="value", channel=channel_file)
+            else:
+                pass
 
 if __name__ == "__main__":
     # Se ejecuta en cada inicio
