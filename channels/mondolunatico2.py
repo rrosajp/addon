@@ -31,9 +31,9 @@ def mainlist(item):
     support.menu(itemlist, 'Ultime Richieste Inserite bold', 'carousel_request', host, contentType='movie', args='movies')
     support.menu(itemlist, 'Film Nelle Sale bold', 'carousel_cinema', host, contentType='movie', args='movies')
     support.menu(itemlist, 'Film Ultimi Inseriti submenu', 'carousel_last', host, contentType='movie', args='movies')
-    support.menu(itemlist, 'Film Top ImDb submenu', 'top_imdb', host + 'top-imdb/', contentType='movie', args='movies')
+    support.menu(itemlist, 'Film Top ImDb submenu', 'top_imdb', host + '/top-imdb/', contentType='movie', args='movies')
     support.menu(itemlist, 'Serie TV', 'carousel_episodes', host, contentType='episode', args='tvshows')
-    support.menu(itemlist, 'Serie TV Top ImDb submenu', 'top_serie', host + 'top-imdb/', contentType='episode', args='tvshows')
+    support.menu(itemlist, 'Serie TV Top ImDb submenu', 'top_serie', host + '/top-imdb/', contentType='episode', args='tvshows')
     support.menu(itemlist, '[COLOR blue]Cerca...[/COLOR] bold', 'search', host)
     autoplay.init(item.channel, list_servers, list_quality)
     autoplay.show_option(item.channel, itemlist)
@@ -146,7 +146,7 @@ def top_serie(item):
 
 def search(item, texto):
     logger.info("[mondolunatico2.py] " + item.url + " search " + texto)
-    item.url = host + "?s=" + texto
+    item.url = host + "/?s=" + texto
 
     try:
         return peliculas(item)

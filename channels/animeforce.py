@@ -478,7 +478,7 @@ def scrapedSingle(url="", single="", patron=""):
 def Crea_Url(pagina="1", azione="ricerca", categoria="", nome=""):
     # esempio
     # chiamate.php?azione=ricerca&cat=&nome=&pag=
-    Stringa = host + "chiamate.php?azione=" + azione + "&cat=" + categoria + "&nome=" + nome + "&pag=" + pagina
+    Stringa = host + "/chiamate.php?azione=" + azione + "&cat=" + categoria + "&nome=" + nome + "&pag=" + pagina
     log("crea_Url", Stringa)
     return Stringa
 

@@ -45,14 +45,7 @@ def mainlist(item):
 
     autoplay.show_option(item.channel, itemlist) # Necessario per Autoplay (Menu Configurazione)
 
-    itemlist.append(
-        Item(channel='setting',
-             action="channel_config",
-             title=support.typo("Configurazione Canale color lime"),
-             config=item.channel,
-             folder=False,
-             thumbnail=channelselector.get_thumb('setting_0.png'))
-    )
+    support.channel_config(item, itemlist)
     
     return itemlist
 

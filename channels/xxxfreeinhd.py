@@ -29,7 +29,7 @@ def mainlist(item):
 def search(item, texto):
     logger.info()
     texto = texto.replace(" ", "+")
-    item.url = host + "search.php?q=%s&language=en&search=Search" % texto
+    item.url = host + "/search.php?q=%s&language=en&search=Search" % texto
     try:
         return lista(item)
     except:

@@ -63,7 +63,7 @@ def mainlist(item):
 def search(item, texto):
     logger.info("[casacinemaInfo.py] " + item.url + " search " + texto)
 
-    item.url = host + "?s=" + texto
+    item.url = host + "/?s=" + texto
     data = httptools.downloadpage(item.url).data
 
     itemlist = []

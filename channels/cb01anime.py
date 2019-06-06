@@ -71,7 +71,7 @@ def listacompleta(item):
 
     return build_itemlist(item,
                           '<a href="#char_5a" title="Go to the letter Z">Z</a></span></div>(.*?)</ul></div><div style="clear:both;"></div></div>',
-                          '<li><a href="' + host + '([^"]+)"><span class="head">([^<]+)</span></a></li>', "episodios")
+                          '<li><a href="' + host + '/([^"]+)"><span class="head">([^<]+)</span></a></li>', "episodios")
 
 
 def build_itemlist(item, re_bloque, re_patron, iaction):

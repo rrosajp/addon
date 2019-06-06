@@ -83,7 +83,7 @@ def search(item, texto):
     logger.info()
     if texto != "":
         texto = texto.replace(" ", "+")
-    item.url = host + "search?q=" + texto
+    item.url = host + "/search?q=" + texto
     item.extra = "busqueda"
     try:
         return list_all(item)

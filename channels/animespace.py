@@ -42,42 +42,42 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, title="Ultimas",
                                action="list_all",
                                thumbnail=get_thumb('last', auto=True),
-                               url=host + 'emision'))
+                               url=host + '/emision'))
 
     itemlist.append(Item(channel=item.channel, title="Todas",
                                action="list_all",
                                thumbnail=get_thumb('all', auto=True),
-                               url=host + 'animes'))
+                               url=host + '/animes'))
 
     itemlist.append(Item(channel=item.channel, title="Anime",
                               action="list_all",
                               thumbnail=get_thumb('anime', auto=True),
-                              url=host + 'categoria/anime'))
+                              url=host + '/categoria/anime'))
 
     itemlist.append(Item(channel=item.channel, title="Películas",
                          action="list_all",
                          thumbnail=get_thumb('movies', auto=True),
-                         url=host + 'categoria/pelicula'))
+                         url=host + '/categoria/pelicula'))
 
     itemlist.append(Item(channel=item.channel, title="OVAs",
                               action="list_all",
                               thumbnail='',
-                              url=host + 'categoria/ova'))
+                              url=host + '/categoria/ova'))
 
     itemlist.append(Item(channel=item.channel, title="ONAs",
                               action="list_all",
                               thumbnail='',
-                              url=host + 'categoria/ona'))
+                              url=host + '/categoria/ona'))
 
 
     itemlist.append(Item(channel=item.channel, title="Especiales",
                               action="list_all",
                               thumbnail='',
-                              url=host + 'categoria/especial'))
+                              url=host + '/categoria/especial'))
 
     itemlist.append(Item(channel=item.channel, title="Buscar",
                                action="search",
-                               url=host + 'search?q=',
+                               url=host + '/search?q=',
                                thumbnail=get_thumb('search', auto=True),
                                fanart='https://s30.postimg.cc/pei7txpa9/buscar.png'
                                ))

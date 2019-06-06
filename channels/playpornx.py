@@ -22,7 +22,7 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, title="Escenas", action="lista",
                          url = urlparse.urljoin(host, "category/xxx-scenes/")))
 
-    itemlist.append(Item(channel=item.channel, title="Buscar", action="search", url=host+'?s=',
+    itemlist.append(Item(channel=item.channel, title="Buscar", action="search", url=host + '/?s=',
                          thumbnail='https://s30.postimg.cc/pei7txpa9/buscar.png',
                          fanart='https://s30.postimg.cc/pei7txpa9/buscar.png'))
 

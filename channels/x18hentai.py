@@ -22,11 +22,11 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, title="Todos", action="todas", url=host, thumbnail='', fanart=''))
 
     itemlist.append(
-        Item(channel=item.channel, title="Sin Censura", action="todas", url=host + 'tag/sin-censura/', thumbnail='',
+        Item(channel=item.channel, title="Sin Censura", action="todas", url=host + '/tag/sin-censura/', thumbnail='',
              fanart=''))
 
     itemlist.append(
-        Item(channel=item.channel, title="Estrenos", action="todas", url=host + 'category/estreno/', thumbnail='',
+        Item(channel=item.channel, title="Estrenos", action="todas", url=host + '/category/estreno/', thumbnail='',
              fanart=''))
 
     itemlist.append(

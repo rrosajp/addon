@@ -100,7 +100,7 @@ def newest(categoria):
 def search(item, texto):
     logger.info("[casacinema.py] " + item.url + " search " + texto)
 
-    item.url = host + "?s=" + texto
+    item.url = host + "/?s=" + texto
 
     try:
         if item.extra == "tvshow":

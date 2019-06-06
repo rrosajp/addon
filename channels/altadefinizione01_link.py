@@ -34,24 +34,17 @@ def mainlist(item):
     support.menu(itemlist, 'Film per Genere', 'genres', host, args='genres')
     support.menu(itemlist, 'Film per Anno submenu', 'genres', host, args='years')
     support.menu(itemlist, 'Film per Qualità submenu', 'genres', host, args='quality') 
-    support.menu(itemlist, 'Al Cinema bold', 'peliculas', host+'film-del-cinema')    
-    support.menu(itemlist, 'Popolari bold', 'peliculas', host+'piu-visti.html')
+    support.menu(itemlist, 'Al Cinema bold', 'peliculas', host + '/film-del-cinema')
+    support.menu(itemlist, 'Popolari bold', 'peliculas', host + '/piu-visti.html')
     support.menu(itemlist, 'Mi sento fortunato bold', 'genres', host, args='lucky')    
-    support.menu(itemlist, 'Sub-ITA bold', 'peliculas', host+'film-sub-ita/')   
+    support.menu(itemlist, 'Sub-ITA bold', 'peliculas', host + '/film-sub-ita/')
     support.menu(itemlist, 'Cerca film submenu', 'search', host)
 
     # per autoplay
     autoplay.init(item.channel, list_servers, list_quality)
     autoplay.show_option(item.channel, itemlist)
 
-    itemlist.append(
-        Item(channel='setting',
-             action="channel_config",
-             title=support.typo("Configurazione Canale color lime"),
-             config=item.channel,
-             folder=False,
-             thumbnail=channelselector.get_thumb('setting_0.png'))
-    )
+    support.channel_config(item, itemlist)
     
     return itemlist
 
