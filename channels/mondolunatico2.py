@@ -15,8 +15,8 @@ from core import scrapertools, httptools, tmdb, servertools, support, scrapertoo
 from core.item import Item
 from platformcode import logger, config, platformtools
 
-channel = "mondolunatico2"
-host = "https://mondolunatico.org/stream/"
+__channel__ = "mondolunatico2"
+host = config.get_channel_url(__channel__)
 headers = [['Referer', host]]
 
 list_servers = ['verystream', 'wstream', 'openload', 'streamango']

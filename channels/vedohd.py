@@ -7,6 +7,7 @@ from core import scrapertoolsV2, httptools, support
 from core.item import Item
 from platformcode import logger
 from specials import autoplay
+from platformcode import config
 
 headers = ""
 host = ""

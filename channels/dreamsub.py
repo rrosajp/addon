@@ -10,8 +10,8 @@ from core import scrapertools, httptools, servertools, tmdb
 from core.item import Item
 from platformcode import logger, config
 
-host = "https://www.dreamsub.co"
-
+__channel__ = "dreamsub"
+host = config.get_channel_url(__channel__)
 
 def mainlist(item):
     logger.info("kod.dreamsub mainlist")

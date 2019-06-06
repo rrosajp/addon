@@ -12,7 +12,8 @@ from core.item import Item
 from platformcode import config, logger
 from servers.decrypters import adfly
 
-host = "https://ww1.animeforce.org"
+__channel__ = "animeforge"
+host = config.get_channel_url(__channel__)
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()

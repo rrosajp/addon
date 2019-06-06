@@ -13,7 +13,6 @@ from platformcode import logger
 from specials import autoplay
 import channelselector
 
-__channel__ = 'cinemalibero'
 # Necessario per Autoplay
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
@@ -24,9 +23,9 @@ list_quality = ['default']
 checklinks = config.get_setting('checklinks', 'cinemalibero')
 checklinks_number = config.get_setting('checklinks_number', 'cinemalibero')
 
-#host = 'https://www.cinemalibero.fun/'
+__channel__ = "cinemalibero"
+host = config.get_channel_url(__channel__)
 
-host = config.get_setting("channel_host", __channel__)
 headers = [['Referer', host]]
 
 def mainlist(item):

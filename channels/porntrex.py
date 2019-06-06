@@ -9,6 +9,7 @@ from core import httptools
 from core import scrapertools
 from core.item import Item
 from platformcode import config, logger
+from platformcode import config
 
 host = "https://www.porntrex.com"
 perpage = 20

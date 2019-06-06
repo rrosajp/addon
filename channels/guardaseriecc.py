@@ -12,7 +12,8 @@ from core.item import Item
 from lib import unshortenit
 from platformcode import logger, config
 
-host = 'https://guardaserie.site'
+__channel__ = 'guardaseriecc'
+host = config.get_channel_url(__channel__)
 headers = [['Referer', host]]
 
 

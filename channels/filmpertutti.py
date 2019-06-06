@@ -10,7 +10,8 @@ from core.item import Item
 from platformcode import config, logger
 from specials import autoplay
 
-host = "https://www.filmpertutti.club"
+__channel__ = 'filmpertutti'
+host = config.get_channel_url(__channel__)
 headers = [['Referer', host]]
 list_servers = ['verystream', 'openload', 'streamango', 'wstream', 'akvideo']
 list_quality = ['HD', 'SD']

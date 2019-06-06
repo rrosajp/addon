@@ -11,8 +11,7 @@ from platformcode import logger
 from specials import autoplay
 
 __channel__ = 'filmsenzalimiti'
-
-host = 'https://filmsenzalimiti.space'
+host = config.get_channel_url(__channel__)
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()

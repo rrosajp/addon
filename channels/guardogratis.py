@@ -16,8 +16,7 @@ from core.item import Item
 from platformcode import logger, config
 
 __channel__ = "guardogratis"
-
-host = "https://guardogratis.it/"
+host = config.get_channel_url(__channel__)
 
 headers = [['Referer', host]]
 

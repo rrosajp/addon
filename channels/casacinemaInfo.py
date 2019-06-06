@@ -8,8 +8,8 @@ from core.item import Item
 from platformcode import logger, config
 from specials import autoplay
 
-host = 'https://casacinema.info'
-
+__channel__ = "casacinemainfo"
+host = config.get_channel_url(__channel__)
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
 list_servers = ['verystream', 'openload', 'wstream', 'speedvideo']

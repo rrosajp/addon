@@ -12,13 +12,15 @@ from core.item import Item
 from core.support import menu, log, aplay
 from platformcode import logger
 from specials import autorenumber
+from platformcode import config
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
 list_servers = ['verystream', 'openload', 'streamango', 'vidlox', 'youtube']
 list_quality = ['default']
 
-host = "https://www.tantifilm.cafe"
+__channel__ = "tantifilm"
+host = config.get_channel_url(__channel__)
 
 headers = [['Referer', host]]
 

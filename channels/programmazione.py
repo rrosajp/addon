@@ -10,6 +10,7 @@ import re
 from core import httptools, scrapertools
 from core.item import Item
 from platformcode import logger
+from platformcode import config
 
 site = "https://www.youtube.com"
 

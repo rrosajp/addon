@@ -24,9 +24,7 @@ from core.item import Item
 from platformcode import logger, config
 
 __channel__ = "eurostreaming"
-
-#host = "https://eurostreaming.cafe/"
-host = config.get_setting("channel_host", __channel__)
+host = config.get_channel_url(__channel__)
 headers = ['Referer', host]
 
 list_servers = ['verystream', 'wstream', 'speedvideo', 'flashx', 'nowvideo', 'streamango', 'deltabit', 'openload']

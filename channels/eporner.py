@@ -7,6 +7,7 @@ import urlparse
 from core import httptools
 from core import jsontools
 from platformcode import logger
+from platformcode import config
 
 
 def mainlist(item):

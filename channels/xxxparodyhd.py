@@ -8,6 +8,7 @@ from core import scrapertools
 from core import tmdb
 from core.item import Item
 from platformcode import logger
+from platformcode import config
 
 host = 'https://xxxparodyhd.net'
 

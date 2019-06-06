@@ -14,6 +14,8 @@ PLUGIN_NAME = "kod"
 __settings__ = xbmcaddon.Addon(id="plugin.video." + PLUGIN_NAME)
 __language__ = __settings__.getLocalizedString
 
+def get_addon_core():
+    return __settings__
 
 def get_addon_version(with_fix=True):
     '''
@@ -83,21 +85,24 @@ def get_videolibrary_support():
     return True
 
 def get_channel_url(name):
-    try:
-        try:
-            import json
-        except:
-            import simplejson as json
-        ROOT_DIR = xbmc.translatePath(__settings__.getAddonInfo('Path'))
-        LOCAL_FILE = os.path.join(ROOT_DIR, "channels.json")
-        with open(LOCAL_FILE) as f:
-            data = json.load(f)
-            if data[name] is not None:
-                return data[name]
-            else:
-                return get_setting("channel_host", name)
-    except:
+    if __settings__.getSetting("use_custom_url") == "true":
         return get_setting("channel_host", name)
+    else:
+        try:
+            try:
+                import json
+            except:
+                import simplejson as json
+            ROOT_DIR = xbmc.translatePath(__settings__.getAddonInfo('Path'))
+            LOCAL_FILE = os.path.join(ROOT_DIR, "channels.json")
+            with open(LOCAL_FILE) as f:
+                data = json.load(f)
+                if data[name] is not None:
+                    return data[name]
+                else:
+                    return get_setting("channel_host", name)
+        except:
+            return get_setting("channel_host", name)
 
 def get_system_platform():
     """ fonction: pour recuperer la platform que xbmc tourne """
