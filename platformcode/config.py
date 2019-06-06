@@ -83,7 +83,7 @@ def get_videolibrary_support():
     return True
 
 def get_channel_url(name):
-    if __settings__.getSetting("use_custom_url"):
+    if __settings__.getSetting("use_custom_url") == "true":
         return get_setting("channel_host", name)
     else:
         try:
