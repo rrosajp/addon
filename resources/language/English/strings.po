@@ -5519,3 +5519,23 @@ msgstr ""
 msgctxt "#70705"
 msgid "Use your custom channel URLs"
 msgstr ""
+
+msgctxt "#70706"
+msgid "autostart KOD at Kodi boot"
+msgstr ""
+
+msgctxt "#70707"
+msgid "Enable"
+msgstr ""
+
+msgctxt "#70708"
+msgid "Disable"
+msgstr ""
+
+msgctxt "#70710"
+msgid "Your new settings has just been saved"
+msgstr "Le nuove impostazioni sono state salvate"
+
+msgctxt "#70711"
+msgid "Ops! There's been a problem during saving your setting"
+msgstr "Ops! C'è stato un problema durante il salvataggio delle impostazioni"

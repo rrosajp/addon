@@ -5519,3 +5519,23 @@ msgstr "TMDB ID (0 per annullare)"
 msgctxt "#70705"
 msgid "Use your custom channel URLs"
 msgstr "Utilizza URL personalizzati per i canali"
+
+msgctxt "#70706"
+msgid "autostart KOD at Kodi boot"
+msgstr "avvio automatico di KOD al boot di Kodi"
+
+msgctxt "#70707"
+msgid "Enable"
+msgstr "Attivia"
+
+msgctxt "#70708"
+msgid "Disable"
+msgstr "Disattiva"
+
+msgctxt "#70709"
+msgid "Your new settings has just been saved"
+msgstr "Le nuove impostazioni sono state salvate"
+
+msgctxt "#70710"
+msgid "Ops! There's been a problem during saving your setting"
+msgstr "Ops! C'è stato un problema durante il salvataggio delle impostazioni"
