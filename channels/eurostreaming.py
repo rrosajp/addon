@@ -24,17 +24,7 @@ from core.item import Item
 from platformcode import logger, config
 
 __channel__ = "eurostreaming"
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-#host = "https://eurostreaming.cafe/"
-host = config.get_setting("channel_host", __channel__)
-=======
 host = config.get_channel_url(__channel__)
->>>>>>> kodiondemand-master
-=======
-host = config.get_channel_url(__channel__)
->>>>>>> e5c926a6784a44ffd5486b4d34bb7ae92408622e
 headers = ['Referer', host]
 
 list_servers = ['verystream', 'wstream', 'speedvideo', 'flashx', 'nowvideo', 'streamango', 'deltabit', 'openload']
@@ -51,35 +41,18 @@ def mainlist(item):
     support.log()    
     itemlist = []
     
-    support.menu(itemlist, 'Serie TV', 'serietv', host, contentType = 'episode') # mettere sempre episode per serietv, anime!!
-<<<<<<< HEAD
-    support.menu(itemlist, 'Serie TV Archivio submenu', 'serietv', host + "category/serie-tv-archive/", contentType = 'episode')
-    support.menu(itemlist, 'Ultimi Aggiornamenti submenu', 'serietv', host + 'aggiornamento-episodi/', args='True', contentType = 'episode')
-    support.menu(itemlist, 'Anime / Cartoni', 'serietv', host + 'category/anime-cartoni-animati/', contentType = 'episode')
-=======
-    support.menu(itemlist, 'Serie TV Archivio submenu', 'serietv', host + "/category/serie-tv-archive/", contentType = 'episode')
-    support.menu(itemlist, 'Ultimi Aggiornamenti submenu', 'serietv', host + '/aggiornamento-episodi/', args='True', contentType = 'episode')
-    support.menu(itemlist, 'Anime / Cartoni', 'serietv', host + '/category/anime-cartoni-animati/', contentType = 'episode')
->>>>>>> kodiondemand-master
-    support.menu(itemlist, 'Cerca...', 'search', host, contentType = 'episode')
+    support.menu(itemlist, 'Serie TV', 'serietv', host, contentType = 'tvshow') # mettere sempre episode per serietv, anime!!
+    support.menu(itemlist, 'Serie TV Archivio submenu', 'serietv', host + "/category/serie-tv-archive/", contentType = 'tvshow')
+    support.menu(itemlist, 'Ultimi Aggiornamenti submenu', 'serietv', host + '/aggiornamento-episodi/', args='True', contentType = 'tvshow')
+    support.menu(itemlist, 'Anime / Cartoni', 'serietv', host + '/category/anime-cartoni-animati/', contentType = 'tvshow')
+    support.menu(itemlist, 'Cerca...', 'search', host, contentType = 'tvshow')
 
 ##    itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality)
     # richiesto per autoplay
     autoplay.init(item.channel, list_servers, list_quality)
     autoplay.show_option(item.channel, itemlist)
 
-<<<<<<< HEAD
-    itemlist.append(
-        Item(channel='setting',
-             action="channel_config",
-             title=support.typo("Configurazione Canale color lime"),
-             config=item.channel,
-             folder=False,
-             thumbnail=channelselector.get_thumb('setting_0.png'))
-    )
-=======
     support.channel_config(item, itemlist)
->>>>>>> kodiondemand-master
     
     return itemlist
 
@@ -156,17 +129,10 @@ def episodios(item):
 def findvideos(item):
     support.log()
     itemlist =[]
-<<<<<<< HEAD
 
     # Requerido para FilterTools
 ##    itemlist = filtertools.get_links(itemlist, item, list_language)
 
-=======
-
-    # Requerido para FilterTools
-##    itemlist = filtertools.get_links(itemlist, item, list_language)
-
->>>>>>> kodiondemand-master
     itemlist = support.server(item, item.url)
 ##    support.videolibrary(itemlist, item)
     

@@ -23,20 +23,9 @@ list_quality = ['default']
 checklinks = config.get_setting('checklinks', 'cinemalibero')
 checklinks_number = config.get_setting('checklinks_number', 'cinemalibero')
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#host = 'https://www.cinemalibero.fun/'
-=======
-__channel__ = "cinemalibero"
-host = config.get_channel_url(__channel__)
->>>>>>> kodiondemand-master
-
-host = config.get_setting("channel_host", __channel__)
-=======
 __channel__ = "cinemalibero"
 host = config.get_channel_url(__channel__)
 
->>>>>>> e5c926a6784a44ffd5486b4d34bb7ae92408622e
 headers = [['Referer', host]]
 
 def mainlist(item):
@@ -56,18 +45,7 @@ def mainlist(item):
 
     autoplay.show_option(item.channel, itemlist) # Necessario per Autoplay (Menu Configurazione)
 
-<<<<<<< HEAD
-    itemlist.append(
-        Item(channel='setting',
-             action="channel_config",
-             title=support.typo("Configurazione Canale color lime"),
-             config=item.channel,
-             folder=False,
-             thumbnail=channelselector.get_thumb('setting_0.png'))
-    )
-=======
     support.channel_config(item, itemlist)
->>>>>>> kodiondemand-master
     
     return itemlist
 
