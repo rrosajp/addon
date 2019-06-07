@@ -41,11 +41,11 @@ def mainlist(item):
     support.log()    
     itemlist = []
     
-    support.menu(itemlist, 'Serie TV', 'serietv', host, contentType = 'episode') # mettere sempre episode per serietv, anime!!
-    support.menu(itemlist, 'Serie TV Archivio submenu', 'serietv', host + "/category/serie-tv-archive/", contentType = 'episode')
-    support.menu(itemlist, 'Ultimi Aggiornamenti submenu', 'serietv', host + '/aggiornamento-episodi/', args='True', contentType = 'episode')
-    support.menu(itemlist, 'Anime / Cartoni', 'serietv', host + '/category/anime-cartoni-animati/', contentType = 'episode')
-    support.menu(itemlist, 'Cerca...', 'search', host, contentType = 'episode')
+    support.menu(itemlist, 'Serie TV', 'serietv', host, contentType = 'tvshow') # mettere sempre episode per serietv, anime!!
+    support.menu(itemlist, 'Serie TV Archivio submenu', 'serietv', host + "/category/serie-tv-archive/", contentType = 'tvshow')
+    support.menu(itemlist, 'Ultimi Aggiornamenti submenu', 'serietv', host + '/aggiornamento-episodi/', args='True', contentType = 'tvshow')
+    support.menu(itemlist, 'Anime / Cartoni', 'serietv', host + '/category/anime-cartoni-animati/', contentType = 'tvshow')
+    support.menu(itemlist, 'Cerca...', 'search', host, contentType = 'tvshow')
 
 ##    itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality)
     # richiesto per autoplay
