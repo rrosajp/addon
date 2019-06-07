@@ -7,6 +7,7 @@ from core import scrapertools
 from core import servertools
 from core.item import Item
 from platformcode import logger
+from platformcode import config
 
 host = 'http://www.18hentaionline.net/'
 headers = [['User-Agent', 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0'],
@@ -21,11 +22,11 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, title="Todos", action="todas", url=host, thumbnail='', fanart=''))
 
     itemlist.append(
-        Item(channel=item.channel, title="Sin Censura", action="todas", url=host + 'tag/sin-censura/', thumbnail='',
+        Item(channel=item.channel, title="Sin Censura", action="todas", url=host + '/tag/sin-censura/', thumbnail='',
              fanart=''))
 
     itemlist.append(
-        Item(channel=item.channel, title="Estrenos", action="todas", url=host + 'category/estreno/', thumbnail='',
+        Item(channel=item.channel, title="Estrenos", action="todas", url=host + '/category/estreno/', thumbnail='',
              fanart=''))
 
     itemlist.append(

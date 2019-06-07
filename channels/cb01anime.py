@@ -10,8 +10,8 @@ from core import httptools, scrapertools, servertools, tmdb
 from core.item import Item
 from platformcode import logger, config
 
-host = "https://www.cineblog01.pink"
-
+__channel__ = "cb01anime"
+host = config.get_channel_url(__channel__)
 #esclusione degli articoli 'di servizio'
 blacklist = ['AVVISO IMPORTANTE – CB01.ROCKS', 'Lista Alfabetica Completa Anime/Cartoon', 'CB01.UNO ▶ TROVA L’INDIRIZZO UFFICIALE']
 
@@ -71,7 +71,7 @@ def listacompleta(item):
 
     return build_itemlist(item,
                           '<a href="#char_5a" title="Go to the letter Z">Z</a></span></div>(.*?)</ul></div><div style="clear:both;"></div></div>',
-                          '<li><a href="' + host + '([^"]+)"><span class="head">([^<]+)</span></a></li>', "episodios")
+                          '<li><a href="' + host + '/([^"]+)"><span class="head">([^<]+)</span></a></li>', "episodios")
 
 
 def build_itemlist(item, re_bloque, re_patron, iaction):

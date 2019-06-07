@@ -45,20 +45,20 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(Item(channel=__channel__, title="Últimas", url=host + '?filtre=date&cat=0',
+    itemlist.append(Item(channel=__channel__, title="Últimas", url=host + '/?filtre=date&cat=0',
                          action="peliculas", viewmode="movie_with_plot", viewcontent='movies',
                          thumbnail=thumbnail % '1'))
 
-    itemlist.append(Item(channel=__channel__, title="Más Vistas", url=host + '?display=extract&filtre=views',
+    itemlist.append(Item(channel=__channel__, title="Más Vistas", url=host + '/?display=extract&filtre=views',
                          action="peliculas", viewmode="movie_with_plot", viewcontent='movies',
                          thumbnail=thumbnail % '2'))
 
-    itemlist.append(Item(channel=__channel__, title="Mejor Valoradas", url=host + '?display=extract&filtre=rate',
+    itemlist.append(Item(channel=__channel__, title="Mejor Valoradas", url=host + '/?display=extract&filtre=rate',
                          action="peliculas", viewmode="movie_with_plot", viewcontent='movies',
                          thumbnail=thumbnail % '3'))
 
     itemlist.append(Item(channel=__channel__, title="Categorías", action="categorias",
-                         url=host + 'categories/', viewmode="movie_with_plot", viewcontent='movies',
+                         url=host + '/categories/', viewmode="movie_with_plot", viewcontent='movies',
                          thumbnail=thumbnail % '4'))
 
     itemlist.append(Item(channel=__channel__, title="WebCam", action="webcamenu",

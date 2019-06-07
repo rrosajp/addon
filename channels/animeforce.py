@@ -12,7 +12,8 @@ from core.item import Item
 from platformcode import config, logger
 from servers.decrypters import adfly
 
-host = "https://ww1.animeforce.org"
+__channel__ = "animeforge"
+host = config.get_channel_url(__channel__)
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
@@ -477,7 +478,7 @@ def scrapedSingle(url="", single="", patron=""):
 def Crea_Url(pagina="1", azione="ricerca", categoria="", nome=""):
     # esempio
     # chiamate.php?azione=ricerca&cat=&nome=&pag=
-    Stringa = host + "chiamate.php?azione=" + azione + "&cat=" + categoria + "&nome=" + nome + "&pag=" + pagina
+    Stringa = host + "/chiamate.php?azione=" + azione + "&cat=" + categoria + "&nome=" + nome + "&pag=" + pagina
     log("crea_Url", Stringa)
     return Stringa
 

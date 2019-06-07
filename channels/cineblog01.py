@@ -118,13 +118,19 @@ def last(item):
     itemlist = []
     infoLabels = {}
     quality = ''
+    PERPAGE = 20
+    page = 1
+    if item.page:
+        page = item.page
 
     if item.contentType == 'tvshow':
         matches = support.match(item, r'<a href="([^">]+)".*?>([^(:(|[)]+)([^<]+)<\/a>', '<article class="sequex-post-content.*?</article>', headers)[0]
     else:
         matches = support.match(item, r'<a href=([^>]+)>([^(:(|[)]+)([^<]+)<\/a>', r'<strong>Ultimi 100 film Aggiornati:<\/a><\/strong>(.*?)<td>', headers)[0]
 
-    for url, title, info in matches:
+    for i, (url, title, info) in enumerate(matches):
+        if (page - 1) * PERPAGE > i: continue
+        if i >= page * PERPAGE: break
         add = True
         title = title.rstrip()
         if item.contentType == 'tvshow':
@@ -143,16 +149,17 @@ def last(item):
         if add:
             itemlist.append(
                     Item(channel=item.channel,
-                         action='findvideos' if item.contentType == 'movie' else 'episodios',
-                         contentType=item.contentType,
-                         title=longtitle,
-                         fulltitle=title,
-                         show=title,
-                         quality=quality,
-                         url=url,
-                         infoLabels=infoLabels
-                         )
+                        action='findvideos' if item.contentType == 'movie' else 'episodios',
+                        contentType=item.contentType,
+                        title=longtitle,
+                        fulltitle=title,
+                        show=title,
+                        quality=quality,
+                        url=url,
+                        infoLabels=infoLabels
+                        )
                 )
+    support.pagination(itemlist, item, page, PERPAGE)
 
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 

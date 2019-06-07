@@ -13,7 +13,9 @@ from lib.unshortenit import unshorten
 from platformcode import logger, config
 from specials import autoplay
 
-host = "https://mondoserietv.com"
+__channel__ = "mondoserietv"
+host = config.get_channel_url(__channel__)
+
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
 list_servers = ['akstream']

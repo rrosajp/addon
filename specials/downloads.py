@@ -503,7 +503,7 @@ def download_from_server(item):
     unsupported_servers = ["torrent"]
 
     progreso = platformtools.dialog_progress(config.get_localized_string(30101), config.get_localized_string(70178) % item.server)
-    channel = __import__(item.contentChannel, None, None, [item.contentChannel])
+    channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
     if hasattr(channel, "play") and not item.play_menu:
 
         progreso.update(50, config.get_localized_string(70178) % item.server, config.get_localized_string(60003) % item.contentChannel)
@@ -570,7 +570,7 @@ def download_from_best_server(item):
     result = {"downloadStatus": STATUS_CODES.error}
 
     progreso = platformtools.dialog_progress(config.get_localized_string(30101), config.get_localized_string(70179))
-    channel = __import__(item.contentChannel, None, None, [item.contentChannel])
+    channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
 
     progreso.update(50, config.get_localized_string(70184), config.get_localized_string(70180) % item.contentChannel)
 
@@ -756,8 +756,8 @@ def save_download(item):
 
     # Menu contextual
     if item.from_action and item.from_channel:
-        item.channel = str(item.from_channel)
-        item.action = str(item.from_action)
+        item.channel = item.from_channel
+        item.action = item.from_action
         del item.from_action
         del item.from_channel
 
@@ -848,6 +848,7 @@ def save_download_tvshow(item):
                                 config.get_localized_string(30109))
     else:
         for i in episodes:
+            i.contentChannel = item.contentChannel
             res = start_download(i)
             if res == STATUS_CODES.canceled:
                 break

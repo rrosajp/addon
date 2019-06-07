@@ -20,8 +20,8 @@ list_quality = ['default']
 checklinks = config.get_setting('checklinks', 'italiafilmhd')
 checklinks_number = config.get_setting('checklinks_number', 'italiafilmhd')
 
-host = "https://italiafilm.network"
-
+__channel__ = 'italiafilmhd'
+host = config.get_channel_url(__channel__)
 headers = [['Referer', host]]
 
 

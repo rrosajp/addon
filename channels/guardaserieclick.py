@@ -13,7 +13,7 @@ from core.support import log
 from platformcode import logger, config
 
 __channel__ = 'guardaserieclick'
-host = config.get_setting("channel_host", __channel__)
+host = config.get_channel_url(__channel__)
 headers = [['Referer', host]]
 
 IDIOMAS = {'Italiano': 'IT'}
@@ -120,7 +120,7 @@ def nuoveserie(item):
         itemlist.append(
             Item(channel=item.channel,
                  action="episodios",
-                 contentType="episode",
+                 contentType="tvshow",
                  title=scrapedtitle,
                  fulltitle=scrapedtitle,
                  url=scrapedurl,
@@ -165,7 +165,7 @@ def serietvaggiornate(item):
         itemlist.append(
             Item(channel=item.channel,
                  action="findepvideos",
-                 contentType="episode",
+                 contentType="tvshow",
                  title=title,
                  show=scrapedtitle,
                  fulltitle=scrapedtitle,

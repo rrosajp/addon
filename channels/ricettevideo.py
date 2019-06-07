@@ -9,6 +9,7 @@ import urlparse
 from core import httptools, scrapertools
 from core.item import Item
 from platformcode import logger
+from platformcode import config
 
 host = "http://ricettevideo.net"
 

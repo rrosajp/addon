@@ -14,8 +14,8 @@ from core import tmdb
 from core.item import Item
 from platformcode import logger, config
 
-host = "https://www.italia-film.pro"
-
+__channel__ = 'italiafilm'
+host = config.get_channel_url(__channel__)
 headers = [['Referer', host]]
 
 

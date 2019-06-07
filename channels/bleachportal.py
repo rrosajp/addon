@@ -10,6 +10,7 @@ import re
 from core import scrapertools, httptools
 from core.item import Item
 from platformcode import logger
+from platformcode import config
 
 host = "http://www.bleachportal.it"
 

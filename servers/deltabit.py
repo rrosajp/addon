@@ -7,6 +7,7 @@ def test_video_exists(page_url):
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     return turbovid.get_video_url(page_url, premium, user, password, video_password, 'deltabit')
+<<<<<<< HEAD
 
 ##import time
 ##import urllib
@@ -42,3 +43,5 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 ##        ext = scrapertools.get_filename_from_url(media_url)[-4:]
 ##        video_urls.append(["%s [deltabit]" % (ext), media_url])    
 ##    return video_urls
+=======
+>>>>>>> kodiondemand-master

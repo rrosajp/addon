@@ -24,9 +24,13 @@ from core.item import Item
 from platformcode import logger, config
 
 __channel__ = "eurostreaming"
+<<<<<<< HEAD
 
 #host = "https://eurostreaming.cafe/"
 host = config.get_setting("channel_host", __channel__)
+=======
+host = config.get_channel_url(__channel__)
+>>>>>>> kodiondemand-master
 headers = ['Referer', host]
 
 list_servers = ['verystream', 'wstream', 'speedvideo', 'flashx', 'nowvideo', 'streamango', 'deltabit', 'openload']
@@ -44,9 +48,15 @@ def mainlist(item):
     itemlist = []
     
     support.menu(itemlist, 'Serie TV', 'serietv', host, contentType = 'episode') # mettere sempre episode per serietv, anime!!
+<<<<<<< HEAD
     support.menu(itemlist, 'Serie TV Archivio submenu', 'serietv', host + "category/serie-tv-archive/", contentType = 'episode')
     support.menu(itemlist, 'Ultimi Aggiornamenti submenu', 'serietv', host + 'aggiornamento-episodi/', args='True', contentType = 'episode')
     support.menu(itemlist, 'Anime / Cartoni', 'serietv', host + 'category/anime-cartoni-animati/', contentType = 'episode')
+=======
+    support.menu(itemlist, 'Serie TV Archivio submenu', 'serietv', host + "/category/serie-tv-archive/", contentType = 'episode')
+    support.menu(itemlist, 'Ultimi Aggiornamenti submenu', 'serietv', host + '/aggiornamento-episodi/', args='True', contentType = 'episode')
+    support.menu(itemlist, 'Anime / Cartoni', 'serietv', host + '/category/anime-cartoni-animati/', contentType = 'episode')
+>>>>>>> kodiondemand-master
     support.menu(itemlist, 'Cerca...', 'search', host, contentType = 'episode')
 
 ##    itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality)
@@ -54,6 +64,7 @@ def mainlist(item):
     autoplay.init(item.channel, list_servers, list_quality)
     autoplay.show_option(item.channel, itemlist)
 
+<<<<<<< HEAD
     itemlist.append(
         Item(channel='setting',
              action="channel_config",
@@ -62,6 +73,9 @@ def mainlist(item):
              folder=False,
              thumbnail=channelselector.get_thumb('setting_0.png'))
     )
+=======
+    support.channel_config(item, itemlist)
+>>>>>>> kodiondemand-master
     
     return itemlist
 
@@ -138,10 +152,17 @@ def episodios(item):
 def findvideos(item):
     support.log()
     itemlist =[]
+<<<<<<< HEAD
 
     # Requerido para FilterTools
 ##    itemlist = filtertools.get_links(itemlist, item, list_language)
 
+=======
+
+    # Requerido para FilterTools
+##    itemlist = filtertools.get_links(itemlist, item, list_language)
+
+>>>>>>> kodiondemand-master
     itemlist = support.server(item, item.url)
 ##    support.videolibrary(itemlist, item)
     

@@ -13,8 +13,8 @@ from core import httptools, scrapertools, tmdb, support
 from core.item import Item
 from platformcode import logger, config
 
-host = "http://www.animesubita.org"
-
+__channel__ = "animesubita"
+host = config.get_channel_url(__channel__)
 PERPAGE = 20
 
 # ----------------------------------------------------------------------------------------------------------------

@@ -15,6 +15,7 @@ from specials import autoplay
 
 # Necessario per Autoplay
 __channel__ = 'filmsenzalimiticc'
+host = config.get_channel_url(__channel__)
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
@@ -24,8 +25,6 @@ list_quality = ['default']
 # Necessario per Verifica Link
 checklinks = config.get_setting('checklinks', 'filmsenzalimiticc')
 checklinks_number = config.get_setting('checklinks_number', 'filmsenzalimiticc')
-
-host = 'https://filmsenzalimiti.pw'
 
 headers = [['Referer', host]]
 
@@ -53,7 +52,7 @@ def mainlist(item):
                      action='video',
                      title='Serie TV',
                      url=host+'/serie-tv/',
-                     contentType='episode',
+                     contentType='tvshow',
                      thumbnail=''),
                 Item(channel=item.channel,
                      action='sottomenu_serie',
@@ -119,19 +118,19 @@ def sottomenu_serie(item):
                      action='video',
                      title='Serie TV HD',
                      url=host+'/watch-genre/serie-altadefinizione/',
-                     contentType='episode',
+                     contentType='tvshow',
                      thumbnail=''),
                 Item(channel=item.channel,
                      action='video',
                      title='Miniserie',
                      url=host+'/watch-genre/miniserie/',
-                     contentType='episode',
+                     contentType='tvshow',
                      thumbnail=''),
                 Item(channel=item.channel,
                      action='video',
                      title='Programmi TV',
                      url=host+'/watch-genre/programmi-tv/',
-                     contentType='episode',
+                     contentType='tvshow',
                      thumbnail='')   
                 ]
                 
@@ -166,7 +165,7 @@ def video(item):
         if item.contentType == 'movie':
             azione = 'findvideos'
             tipologia = 'movie'
-        if item.contentType == 'episode':
+        if item.contentType == 'tvshow':
             azione='episodios'
             tipologia = 'tv'
         

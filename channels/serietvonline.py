@@ -11,7 +11,8 @@ from lib import unshortenit
 from platformcode import logger, config
 from specials import autoplay
 
-host = "https://serietvonline.live"
+__channel__ = "serietvonline"
+host = config.get_channel_url(__channel__)
 headers = [['Referer', host]]
 
 IDIOMAS = {'Italiano': 'IT'}

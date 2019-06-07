@@ -12,8 +12,8 @@ from core.item import Item
 from platformcode import logger, config
 from specials import autoplay
 
-host = 'https://www.casacinema.site'
-
+__channel__ = "casacinema"
+host = config.get_channel_url(__channel__)
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
 list_servers = ['verystream', 'openload', 'wstream', 'speedvideo']
@@ -100,7 +100,7 @@ def newest(categoria):
 def search(item, texto):
     logger.info("[casacinema.py] " + item.url + " search " + texto)
 
-    item.url = host + "?s=" + texto
+    item.url = host + "/?s=" + texto
 
     try:
         if item.extra == "tvshow":

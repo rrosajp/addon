@@ -7,6 +7,7 @@ from urlparse import urljoin
 from core import httptools
 from core import servertools
 from platformcode import logger
+from platformcode import config
 
 HOST="http://yespornplease.com"
 

@@ -11,9 +11,10 @@ from core import httptools, scrapertools
 from core import tmdb
 from core.item import Item
 from platformcode import logger
+from platformcode import config
 
-host = "https://italiaserie.org"
-
+__channel__ = 'italiaserie'
+host = config.get_channel_url(__channel__)
 list_servers = ['speedvideo']
 
 IDIOMAS = {'Italiano': 'IT'}

@@ -6,8 +6,10 @@
 from core import support
 from core.item import Item
 from specials import autoplay
+from platformcode import config
 
-host = 'https://www.streamingaltadefinizione.space'
+__channel__ = "streamingaltadefinizione"
+host = config.get_channel_url(__channel__)
 
 list_servers = ['verystream', 'openload', 'wstream']
 list_quality = ['1080p', 'HD', 'DVDRIP', 'SD', 'CAM']

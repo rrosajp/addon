@@ -8,6 +8,7 @@ from core import scrapertools
 from core import servertools
 from core.item import Item
 from platformcode import logger
+from platformcode import config
 
 host = 'https://watchxxxfreeinhd.com'
 
@@ -28,7 +29,7 @@ def mainlist(item):
 def search(item, texto):
     logger.info()
     texto = texto.replace(" ", "+")
-    item.url = host + "search.php?q=%s&language=en&search=Search" % texto
+    item.url = host + "/search.php?q=%s&language=en&search=Search" % texto
     try:
         return lista(item)
     except:

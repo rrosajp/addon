@@ -7,6 +7,7 @@ import urlparse
 from core import scrapertools, httptools
 from core.item import Item
 from platformcode import logger
+from platformcode import config
 
 HOST = "http://es.xhamster.com/"
 
