@@ -9,6 +9,7 @@ from core import servertools
 from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
+import xbmcgui
 
 CHANNELNAME = "setting"
 AUTOSTART = config.is_autorun_enabled()
@@ -90,7 +91,7 @@ def channel_config(item):
                                                                           item.config))
 
 
-def autostart():
+def autostart(item):  # item necessario launcher.py linea 265
     if config.enable_disable_autorun(AUTOSTART):
         xbmcgui.Dialog().ok(config.get_localized_string(20000), config.get_localized_string(70709))
     else:

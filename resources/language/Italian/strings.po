@@ -5526,7 +5526,7 @@ msgstr "avvio automatico di KOD al boot di Kodi"
 
 msgctxt "#70707"
 msgid "Enable"
-msgstr "Attivia"
+msgstr "Attiva"
 
 msgctxt "#70708"
 msgid "Disable"
