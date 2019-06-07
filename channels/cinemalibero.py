@@ -13,7 +13,6 @@ from platformcode import logger
 from specials import autoplay
 import channelselector
 
-__channel__ = 'cinemalibero'
 # Necessario per Autoplay
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
@@ -25,6 +24,7 @@ checklinks = config.get_setting('checklinks', 'cinemalibero')
 checklinks_number = config.get_setting('checklinks_number', 'cinemalibero')
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 #host = 'https://www.cinemalibero.fun/'
 =======
 __channel__ = "cinemalibero"
@@ -32,6 +32,11 @@ host = config.get_channel_url(__channel__)
 >>>>>>> kodiondemand-master
 
 host = config.get_setting("channel_host", __channel__)
+=======
+__channel__ = "cinemalibero"
+host = config.get_channel_url(__channel__)
+
+>>>>>>> e5c926a6784a44ffd5486b4d34bb7ae92408622e
 headers = [['Referer', host]]
 
 def mainlist(item):

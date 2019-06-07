@@ -6,16 +6,22 @@
       {
         "pattern": "speedvideo.net/(?:embed-|)([A-Z0-9a-z]+)",
 <<<<<<< HEAD
+<<<<<<< HEAD
         "url": "https:\/\/speedvideo.net\/embed-\\1.html"
       }  
 =======
+=======
+>>>>>>> e5c926a6784a44ffd5486b4d34bb7ae92408622e
         "url": "http://speedvideo.net/embed-\\1.html"
       },
       {
         "pattern": "speedvideo.net/(?:embed-|)([A-Z0-9a-z]+)",
         "url": "https://speedvideo.net/embed-\\1.html"
       }
+<<<<<<< HEAD
 >>>>>>> kodiondemand-master
+=======
+>>>>>>> e5c926a6784a44ffd5486b4d34bb7ae92408622e
     ]
   },
   "free": true,

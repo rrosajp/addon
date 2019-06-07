@@ -25,12 +25,16 @@ from platformcode import logger, config
 
 __channel__ = "eurostreaming"
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 #host = "https://eurostreaming.cafe/"
 host = config.get_setting("channel_host", __channel__)
 =======
 host = config.get_channel_url(__channel__)
 >>>>>>> kodiondemand-master
+=======
+host = config.get_channel_url(__channel__)
+>>>>>>> e5c926a6784a44ffd5486b4d34bb7ae92408622e
 headers = ['Referer', host]
 
 list_servers = ['verystream', 'wstream', 'speedvideo', 'flashx', 'nowvideo', 'streamango', 'deltabit', 'openload']
