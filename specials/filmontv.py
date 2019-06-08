@@ -63,15 +63,15 @@ def primafila(item):
 
     # Carica la pagina 
     data = httptools.downloadpage(item.url).data
-    patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ]*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?=]*)'
-    # patron = r'<div class="col-xs-5 box-immagine">[^<]+<img src="([^"]+)[^<]+<[^<]+<[^<]+<[^<]+<[^<]+<.*?titolo">(.*?)<[^<]+<[^<]+<[^<]+<[^>]+><br />(.*?)<[^<]+</div>'
+    #patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ]*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?=]*)'
+    patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ]*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*Year">([A-Z 0-9a-z]*)'
     matches = re.compile(patron, re.DOTALL).findall(data)
-    for scrapedtitle, scrapedgender, scrapedthumbnail in matches:
+    for scrapedtitle, scrapedgender, scrapedthumbnail, scrapedyear in matches:
     # for scrapedthumbnail, scrapedtitle, scrapedtv in matches:
         scrapedurl = ""
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle).strip()
         infoLabels = {}
-        #infoLabels["year"] = scrapedyear
+        infoLabels["year"] = scrapedyear
         itemlist.append(
             Item(channel=item.channel,
                  action="do_search",
