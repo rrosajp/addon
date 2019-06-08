@@ -159,7 +159,7 @@
         "SD"
       ],
       "default": 0,
-      "enabled": "eq(-2,'Reordenar')",
+      "enabled": "eq(-2,'@70245')",
       "visible": true
     },
     {
@@ -167,7 +167,7 @@
       "type": "bool",
       "label": "@70242",
       "default": true,
-      "enabled": "eq(-3,'Reordenar')",
+      "enabled": "eq(-3,'@70245')",
       "visible": true
     }
   ]
