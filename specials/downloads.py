@@ -584,8 +584,7 @@ def download_from_best_server(item):
     progreso.update(100, config.get_localized_string(70183), config.get_localized_string(70181) % len(play_items),
                     config.get_localized_string(70182))
 
-    if config.get_setting("server_reorder", "downloads") == 1:
-        play_items.sort(key=sort_method)
+    play_items.sort(key=sort_method)
 
     if progreso.iscanceled():
         return {"downloadStatus": STATUS_CODES.canceled}
