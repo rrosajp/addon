@@ -207,7 +207,7 @@ def menu(item):
         servidor = "Auto"
     # Opciones disponibles para el menu
     op = [config.get_localized_string(70225), config.get_localized_string(70226), config.get_localized_string(70227),
-          "Modificar servidor: %s" % (servidor.capitalize())]
+          config.get_localized_string(30165) % (servidor.capitalize())]
 
     opciones = []
 
