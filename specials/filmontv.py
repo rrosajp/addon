@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
 # Canale film in tv
-# Ringraziamo Icarus crew
 # ------------------------------------------------------------
 
 import re
@@ -11,43 +10,29 @@ from core import httptools, scrapertools, tmdb, support
 from core.item import Item
 from platformcode import logger, config
 
-host = "https://www.comingsoon.it"
+host = "https://www.superguidatv.it"
 
 TIMEOUT_TOTAL = 60
 
 
 def mainlist(item):
     logger.info(" mainlist")
-    itemlist = [Item(channel="search", action='discover_list', title=config.get_localized_string(70309),
-               search_type='list', list_type='movie/now_playing',
-                         thumbnail=get_thumb("now_playing.png")),
-               Item(channel="search", action='discover_list', title=config.get_localized_string(70312),
-                         search_type='list', list_type='tv/on_the_air', thumbnail=get_thumb("on_the_air.png")),
+    itemlist = [#Item(channel="search", action='discover_list', title=config.get_localized_string(70309),
+               #search_type='list', list_type='movie/now_playing',
+               #          thumbnail=get_thumb("now_playing.png")),
+               #Item(channel="search", action='discover_list', title=config.get_localized_string(70312),
+               #          search_type='list', list_type='tv/on_the_air', thumbnail=get_thumb("on_the_air.png")),
                Item(channel=item.channel,
-                     title="[Oggi in TV] [B]Adesso in onda[/B]",
-                     action="tvoggi",
-                     url="%s/filmtv/" % host,
-                     thumbnail=item.thumbnail),
-               Item(channel=item.channel,
-                     title="[Oggi in TV] [B]Primafila[/B]",
+                     title="[B]Oggi in TV[/B] - Tutti i Canali",
                      action="primafila",
-                     url="https://www.superguidatv.it/film-in-tv/oggi/sky-primafila/",
+                     url="%s/film-in-tv/",
                      thumbnail=item.thumbnail),
                Item(channel=item.channel,
-                     title="[Oggi in TV] Mattina",
-                     action="tvoggi",
-                     url="%s/filmtv/oggi/mattina/" % host,
+                     title="[B]Primafila[/B]",
+                     action="primafila",
+                     url="%s/film-in-tv/oggi/sky-primafila/",
                      thumbnail=item.thumbnail),
-               Item(channel=item.channel,
-                     title="[Oggi in TV] Pomeriggio",
-                     action="tvoggi",
-                     url="%s/filmtv/oggi/pomeriggio/" % host,
-                     thumbnail=item.thumbnail),
-               Item(channel=item.channel,
-                     title="[Oggi in TV] Sera",
-                     action="tvoggi",
-                     url="%s/filmtv/oggi/sera/" % host,
-                     thumbnail=item.thumbnail),
+               
                Item(channel=item.channel,
                      title="[Oggi in TV] Notte",
                      action="tvoggi",
@@ -56,6 +41,37 @@ def mainlist(item):
 
     return itemlist
 
+def now_on_tv(item):
+    logger.info("filmontv tvoggi")
+    itemlist = []
+
+    # Carica la pagina 
+    data = httptools.downloadpage(item.url).data
+    #patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ]*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?=]*)'
+    patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
+    matches = re.compile(patron, re.DOTALL).findall(data)
+    for scrapedtitle, scrapedgender, scrapedthumbnail, scrapedyear in matches:
+    # for scrapedthumbnail, scrapedtitle, scrapedtv in matches:
+        scrapedurl = ""
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle).strip()
+        infoLabels = {}
+        infoLabels["year"] = scrapedyear
+        itemlist.append(
+            Item(channel=item.channel,
+                 action="do_search",
+                 extra=urllib.quote_plus(scrapedtitle) + '{}' + 'movie',
+                 title=scrapedtitle,
+                 fulltitle=scrapedtitle,
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail.replace("?width=240", "?width=480"),
+                 contentTitle=scrapedtitle,
+                 contentType='movie',
+                 infoLabels=infoLabels,
+                 folder=True))
+
+    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+
+    return itemlist
 
 def primafila(item):
     logger.info("filmontv tvoggi")
@@ -64,7 +80,7 @@ def primafila(item):
     # Carica la pagina 
     data = httptools.downloadpage(item.url).data
     #patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ]*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?=]*)'
-    patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ]*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*Year">([A-Z 0-9a-z]*)'
+    patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
     matches = re.compile(patron, re.DOTALL).findall(data)
     for scrapedtitle, scrapedgender, scrapedthumbnail, scrapedyear in matches:
     # for scrapedthumbnail, scrapedtitle, scrapedtv in matches:
