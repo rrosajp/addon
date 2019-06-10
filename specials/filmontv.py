@@ -23,7 +23,7 @@ def mainlist(item):
                #Item(channel="search", action='discover_list', title=config.get_localized_string(70312),
                #          search_type='list', list_type='tv/on_the_air', thumbnail=get_thumb("on_the_air.png")),
                Item(channel=item.channel,
-                     title="Tutti i Canali",
+                     title="DT",
                      action="now_on_tv",
                      url="%s/film-in-tv/" % host,
                      thumbnail=item.thumbnail),
@@ -49,7 +49,7 @@ def mainlist(item):
                      thumbnail=item.thumbnail),
                Item(channel=item.channel,
                      title="Primafila",
-                     action="primafila",
+                     action="now_on_tv",
                      url="%s/film-in-tv/oggi/sky-primafila/" % host,
                      thumbnail=item.thumbnail)]
 
@@ -62,7 +62,7 @@ def now_on_tv(item):
     # Carica la pagina 
     data = httptools.downloadpage(item.url).data
     #patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
-    patron = r'view_logo" alt="([a-zA-Z 0-9]*)"[a-z \n<>\/="_\-:0-9;A-Z.?!\'\&]*spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
+    patron = r'view_logo" alt="([a-zA-Z 0-9]*)"[a-z \n<>\/="_\-:0-9;A-Z.?!\'\&]*spanTitleMovie">([A-Za-z ,0-9\.À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
     matches = re.compile(patron, re.DOTALL).findall(data)
     for scrapedchannel, scrapedtitle, scrapedgender, scrapedthumbnail, scrapedyear in matches:
     # for scrapedthumbnail, scrapedtitle, scrapedtv in matches:
