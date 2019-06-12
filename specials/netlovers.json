@@ -1,0 +1,12 @@
+{
+    "id": "netlovers",
+    "name": "Net Lovers",
+    "language": ["ita"],
+    "active": false,
+    "adult": false,
+    "thumbnail": null,
+    "banner": null,
+    "categories": [],
+    "settings": [],
+    "channel": false
+}
