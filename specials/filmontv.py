@@ -82,7 +82,7 @@ def now_on_misc(item):
     # Carica la pagina 
     data = httptools.downloadpage(item.url).data
     #patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
-    patron = r'table-cell[;" ]*alt="([a-zA-Z 0-9\+,\.]*)"[a-z \n<>\/="_\-:0-9;A-Z.?!\'\&, \(\)#]*backdrop" alt="([A-Za-z: ,0-9\.À-ÖØ-öø-ÿ\&\#\-\']*)"[ ]*src="([A-Za-z: ,0-9\.À-ÖØ-öø-ÿ\/?=\-\']*)'
+    patron = r'table-cell[;" ]*alt="([^"]+)"[a-z \n<>\/="_\-:0-9;A-Z.?!\'\&, \(\)#]*backdrop" alt="([^"]+)"[ ]*src="([^"]+)'
     matches = re.compile(patron, re.DOTALL).findall(data)
     for scrapedchannel, scrapedtitle, scrapedthumbnail in matches:
     # for scrapedthumbnail, scrapedtitle, scrapedtv in matches:
