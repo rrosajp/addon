@@ -64,8 +64,10 @@ def run(item=None):
             else:
                 item = Item(channel="channelselector", action="getmainlist", viewmode="movie")
         if not config.get_setting('show_once'):
-            from platformcode import updater
-            updater.calcCurrHash()
+            if not os.path.isdir(config.get_runtime_path() + '/.git'):
+                logger.info("DEV MODE OFF")
+                from platformcode import updater
+                updater.calcCurrHash()
             from platformcode import xbmc_videolibrary
             xbmc_videolibrary.ask_set_content(1, config.get_setting('videolibrary_kodi_force'))
             config.set_setting('show_once', True)
