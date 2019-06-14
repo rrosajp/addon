@@ -5019,7 +5019,7 @@ msgid "Timeout (maximum waiting time)"
 msgstr ""
 
 msgctxt "#70581"
-msgid "Interval between automatic updates (hours)"
+msgid "Check for updates when kodi starts"
 msgstr ""
 
 msgctxt "#70582"

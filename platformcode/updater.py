@@ -15,10 +15,8 @@ addon = xbmcaddon.Addon('plugin.video.kod')
 
 _hdr_pat = re.compile("^@@ -(\d+),?(\d+)? \+(\d+),?(\d+)? @@.*")
 
-# branch = 'stable'
-branch = 'updater'
-# user = 'kodiondemand'
-user = 'mac12m99'
+branch = 'master'
+user = 'kodiondemand'
 repo = 'addon'
 addonDir = xbmc.translatePath("special://home/addons/") + "plugin.video.kod/"
 maxPage = 5  # le api restituiscono 30 commit per volta, quindi se si è rimasti troppo indietro c'è bisogno di andare avanti con le pagine
@@ -33,8 +31,8 @@ def loadCommits(page=1):
 
 
 def check_addon_init():
-    # if not addon.getSetting('addon_update_enabled'):
-    #     return False
+    if not addon.getSetting('addon_update_enabled'):
+        return False
     logger.info('Cerco aggiornamenti..')
     commits = loadCommits()
 
@@ -118,8 +116,9 @@ def check_addon_init():
             if not alreadyApplied:  # non mando notifica se già applicata (es. scaricato zip da github)
                 changelog += commitJson['commit']['message'] + " | "
                 nCommitApplied += 1
-        time = nCommitApplied * 2000 if nCommitApplied < 10 else 20000
-        platformtools.dialog_notification('Kodi on Demand', changelog, time)
+        if addon.getSetting("addon_update_message"):
+            time = nCommitApplied * 2000 if nCommitApplied < 10 else 20000
+            platformtools.dialog_notification('Kodi on Demand', changelog, time)
 
         localCommitFile.seek(0)
         localCommitFile.truncate()
