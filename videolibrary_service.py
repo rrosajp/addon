@@ -338,8 +338,6 @@ if __name__ == "__main__":
     import xbmc
     import time
 
-    get_channel_json()
-
     # modo adulto:
     # sistema actual 0: Nunca, 1:Siempre, 2:Solo hasta que se reinicie Kodi
     # si es == 2 lo desactivamos.
@@ -361,6 +359,7 @@ if __name__ == "__main__":
         logger.info("DEV MODE OFF")
         from platformcode import updater
         updater.check_addon_init()
+        get_channel_json()
     else:
         logger.info("DEV MODE ON")
 
