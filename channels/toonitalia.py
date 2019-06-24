@@ -63,7 +63,7 @@ def insert(item):
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
 
         itemlist.append(
-            Item(channel=channel,
+            Item(channel=__channel__,
                  action="episodios",
                  contentType="episode",
                  title=scrapedtitle,
@@ -77,7 +77,7 @@ def insert(item):
     if len(matches) >= p * minpage:
         scrapedurl = item.url + '{}' + str(p + 1)
         itemlist.append(
-            Item(channel=channel,
+            Item(channel=__channel__,
                  args=item.args,
                  action="insert",
                  title="[COLOR blue][B]Successivo >[/B][/COLOR]",
@@ -109,7 +109,7 @@ def updates(item):
         scrapedplot = ""
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
         itemlist.append(
-            Item(channel=channel,
+            Item(channel=__channel__,
                  action="episodios",
                  contentType="episode",
                  title=scrapedtitle,
@@ -141,7 +141,7 @@ def most_view(item):
         scrapedplot = ""
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
         itemlist.append(
-            Item(channel=channel,
+            Item(channel=__channel__,
                  action="episodios",
                  contentType="episode",
                  title=scrapedtitle,
@@ -177,7 +177,7 @@ def list(item):
             scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
             scrapedplot = ""
             itemlist.append(
-                Item(channel=channel,
+                Item(channel=__channel__,
                      action = 'episodios' if not 'film' in item.args else 'findvideos',
                      contentType=item.contentType,
                      title=scrapedtitle,
@@ -190,7 +190,7 @@ def list(item):
     if len(matches) >= p * minpage:
         scrapedurl = item.url + '{}' + str(p + 1)
         itemlist.append(
-            Item(channel=channel,
+            Item(channel=__channel__,
                  args=item.args,
                  contentType=item.contentType,
                  action="list",
@@ -224,7 +224,7 @@ def peliculas(item):
         if i >= p * minpage: break
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
         itemlist.append(
-            Item(channel=channel,
+            Item(channel=__channel__,
                  action="episodios",
                  contentType="episode",
                  title=scrapedtitle,
@@ -236,7 +236,7 @@ def peliculas(item):
     if len(matches) >= p * minpage:
         scrapedurl = item.url + '{}' + str(p + 1)
         itemlist.append(
-            Item(channel=channel,
+            Item(channel=__channel__,
                  extra=item.extra,
                  action="peliculas",
                  title="[COLOR blue][B]Successivo >[/B][/COLOR]",
@@ -273,7 +273,7 @@ def episodios(item):
 
                 else:
                     itemlist.append(
-                        Item(channel=channel,
+                        Item(channel=__channel__,
                              action="findvideos",
                              contentType=item.contentType,
                              title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
@@ -298,7 +298,7 @@ def episodios(item):
 
                 else:
                     itemlist.append(
-                        Item(channel=channel,
+                        Item(channel=__channel__,
                             action="findvideos",
                             contentType=item.contentType,
                             title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
