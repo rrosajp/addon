@@ -20,8 +20,8 @@ from specials import filtertools
 
 list_data = {}
 
-list_language = ['LAT', 'CAST', 'VO', 'VOSE']
-list_servers = ['directo']
+list_language = ['ITA', 'SUB-ITA']
+list_servers = ['directo', 'akvideo', 'verystream', 'openload']
 list_quality = ['SD', '720', '1080', '4k']
 
 def mainlist(item):
@@ -52,7 +52,6 @@ def show_channels(item):
     itemlist.append(Item(channel=item.channel, title=config.get_localized_string(70676), action='add_channel', thumbnail=get_thumb('add.png')))
 
     for key, channel in json['channels'].items():
-
         file_path = channel ['path']
         file_url = httptools.downloadpage(file_path, follow_redirects=True).data
         json_url = jsontools.load(file_url)
@@ -67,7 +66,7 @@ def show_channels(item):
                              action='show_menu',
                              channel_id = key,
                              context=context))
-        return itemlist
+    return itemlist
 
 def load_json(item):
     logger.info()
