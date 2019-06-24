@@ -337,7 +337,7 @@ def findvideos(item):
         itemlist = servertools.find_video_items(data=data)
 
         for videoitem in itemlist:
-            videoitem.channel = channel
+            videoitem.channel = __channel__
             server = re.sub(r'[-\[\]\s]+', '', videoitem.title)
             videoitem.title = "".join(['[COLOR blue] ' + "[[B]" + server + "[/B]][/COLOR] " + item.title])
             videoitem.thumbnail = item.thumbnail
@@ -349,7 +349,7 @@ def findvideos(item):
         itemlist = servertools.find_video_items(data=item.url)
 
         for videoitem in itemlist:
-            videoitem.channel = channel
+            videoitem.channel = __channel__
             server = re.sub(r'[-\[\]\s]+', '', videoitem.title)
             videoitem.title = "".join(['[COLOR blue] ' + "[[B]" + server + "[/B]] " + item.title + '[/COLOR]'])
             videoitem.thumbnail = item.thumbnail
