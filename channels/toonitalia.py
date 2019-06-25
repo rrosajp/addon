@@ -12,8 +12,8 @@ from platformcode import logger
 from specials import autoplay
 from platformcode import config
 
-__channel__ = "toonitalia"
-host = config.get_channel_url(__channel__)
+channel = "toonitalia"
+host = config.get_channel_url(channel)
 
 headers = [['Referer', host]]
 
