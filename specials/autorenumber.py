@@ -275,15 +275,19 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
         ep = 0
         
     # rinumera gli episodi
-    
+    Break = False
     for item in itemlist:
         number = int(scrapertoolsV2.find_single_match(item.title, r'\d+'))
         episode = ep + number - 1
         if len(EpList) < episode: return error(itemlist)
         # Crea una lista di Episodi in base alla modalità di rinumerazione            
         if MODE == False and number != 0:
-            while EpList[episode][1] == 0 or len(EpList) < episode:
+            while Break:
+                log('Long= ',len(EpList))
+                log('NUMBER= ',EpList[episode][1])
+                log('Eisode= ',episode)
                 episode = episode + 1 
+                if EpList[episode][1] == 0 or len(EpList) <= episode: Break = True
                 ep = ep + 1
         elif number == 0:
             episode = previous(EpDateList, EpDict, ep + 1)
