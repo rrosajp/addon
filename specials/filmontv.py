@@ -6,9 +6,9 @@
 import re
 import urllib
 from channelselector import get_thumb
-from core import httptools, scrapertools, support, tmdb
+from core import httptools, scrapertools, support, tmdb, filetools
 from core.item import Item
-from platformcode import logger, config
+from platformcode import logger, config, platformtools
 
 host = "https://www.superguidatv.it"
 
@@ -23,52 +23,66 @@ def mainlist(item):
                #Item(channel="search", action='discover_list', title=config.get_localized_string(70312),
                #          search_type='list', list_type='tv/on_the_air', thumbnail=get_thumb("on_the_air.png")),
             Item(channel=item.channel,
-                     title="[Oggi in TV] Film #1",
+                     title=config.get_setting("film1", channel="filmontv"),
                      action="now_on_tv",
                      url="%s/film-in-tv/" % host,
                      thumbnail=item.thumbnail),
             Item(channel=item.channel,
-                     title="[Oggi in TV] Film #2",
+                     title=config.get_setting("film2", channel="filmontv"),
                      action="now_on_tv",
                      url="%s/film-in-tv/oggi/premium/" % host,
                      thumbnail=item.thumbnail),
             Item(channel=item.channel,
-                     title="[Oggi in TV] Film #3",
+                     title=config.get_setting("film3", channel="filmontv"),
                      action="now_on_tv",
                      url="%s/film-in-tv/oggi/sky-intrattenimento/" % host,
                      thumbnail=item.thumbnail),
             Item(channel=item.channel,
-                     title="[Oggi in TV] Film #4",
+                     title=config.get_setting("film4", channel="filmontv"),
                      action="now_on_tv",
                      url="%s/film-in-tv/oggi/sky-cinema/" % host,
                      thumbnail=item.thumbnail),
             Item(channel=item.channel,
-                     title="[Oggi in TV] Film #5",
+                     title=config.get_setting("film5", channel="filmontv"),
                      action="now_on_tv",
                      url="%s/film-in-tv/oggi/sky-primafila/" % host,
                      thumbnail=item.thumbnail),
             Item(channel=item.channel,
-                     title="[Oggi in TV] TV Show #1",
+                     title=config.get_setting("now1", channel="filmontv"),
+                     action="now_on_misc",
+                     url="%s/ora-in-onda/" % host,
+                     thumbnail=item.thumbnail),
+            Item(channel=item.channel,
+                     title=config.get_setting("now2", channel="filmontv"),
                      action="now_on_misc",
                      url="%s/ora-in-onda/premium/" % host,
                      thumbnail=item.thumbnail),
             Item(channel=item.channel,
-                     title="[Oggi in TV] TV Show #2",
+                     title=config.get_setting("now3", channel="filmontv"),
                      action="now_on_misc",
                      url="%s/ora-in-onda/sky-intrattenimento/" % host,
                      thumbnail=item.thumbnail),
             Item(channel=item.channel,
-                     title="[Oggi in TV] TV Show #3",
+                     title=config.get_setting("now4", channel="filmontv"),
                      action="now_on_misc",
                      url="%s/ora-in-onda/sky-doc-e-lifestyle/" % host,
                      thumbnail=item.thumbnail),
             Item(channel=item.channel,
-                     title="[Oggi in TV] TV Show #4",
+                     title=config.get_setting("now5", channel="filmontv"),
                      action="now_on_misc",
                      url="%s/ora-in-onda/sky-intrattenimento/" % host,
-                     thumbnail=item.thumbnail)]
+                     thumbnail=item.thumbnail),
+            Item(channel=item.channel, 
+                    title="Personalizza Oggi in TV",
+                    action="server_config", 
+                    config="filmontv", 
+                    folder=False, 
+                    thumbnail=item.thumbnail)]
 
     return itemlist
+
+def server_config(item):
+    return platformtools.show_channel_settings(channelpath=filetools.join(config.get_runtime_path(), "specials", item.config))
 
 def now_on_misc(item):
     logger.info("filmontv tvoggi")
@@ -77,7 +91,7 @@ def now_on_misc(item):
     # Carica la pagina 
     data = httptools.downloadpage(item.url).data
     #patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
-    patron = r'table-cell[;" ]*alt="([^"]+)"[a-z \n<>\/="_\-:0-9;A-Z.?!\'\&, \(\)#]*backdrop" alt="([^"]+)"[ ]*src="([^"]+)'
+    patron = r'table-cell[;" ]*alt="([^"]+)".*?backdrop" alt="([^"]+)"[ ]*src="([^"]+)'
     matches = re.compile(patron, re.DOTALL).findall(data)
     for scrapedchannel, scrapedtitle, scrapedthumbnail in matches:
     # for scrapedthumbnail, scrapedtitle, scrapedtv in matches:
@@ -110,7 +124,7 @@ def now_on_tv(item):
     # Carica la pagina 
     data = httptools.downloadpage(item.url).data
     #patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
-    patron = r'view_logo" alt="([a-zA-Z 0-9]*)"[a-z \n<>\/="_\-:0-9;A-Z.?!\'\&]*spanTitleMovie">([A-Za-z ,0-9\.À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
+    patron = r'view_logo" alt="([a-zA-Z 0-9]*)".*?spanTitleMovie">([A-Za-z ,0-9\.À-ÖØ-öø-ÿ\-\']*).*?GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*).*?src="([a-zA-Z:\/\.0-9?]*).*?Year">([A-Z 0-9a-z]*)'    
     matches = re.compile(patron, re.DOTALL).findall(data)
     for scrapedchannel, scrapedtitle, scrapedgender, scrapedthumbnail, scrapedyear in matches:
     # for scrapedthumbnail, scrapedtitle, scrapedtv in matches:
