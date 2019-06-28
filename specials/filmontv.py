@@ -69,8 +69,8 @@ def mainlist(item):
                      thumbnail=item.thumbnail),
             Item(channel=item.channel,
                      title=config.get_setting("now5", channel="filmontv"),
-                     action="now_on_misc",
-                     url="%s/ora-in-onda/sky-intrattenimento/" % host,
+                     action="now_on_misc_film",
+                     url="%s/ora-in-onda/sky-cinema/" % host,
                      thumbnail=item.thumbnail),
             Item(channel=item.channel, 
                     title="Personalizza Oggi in TV",
@@ -83,6 +83,39 @@ def mainlist(item):
 
 def server_config(item):
     return platformtools.show_channel_settings(channelpath=filetools.join(config.get_runtime_path(), "specials", item.config))
+
+def now_on_misc_film(item):
+    logger.info("filmontv tvoggi")
+    itemlist = []
+
+    # Carica la pagina 
+    data = httptools.downloadpage(item.url).data
+    #patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
+    patron = r'table-cell[;" ]*alt="([^"]+)".*?backdrop" alt="([^"]+)"[ ]*src="([^"]+)'
+    matches = re.compile(patron, re.DOTALL).findall(data)
+    for scrapedchannel, scrapedtitle, scrapedthumbnail in matches:
+    # for scrapedthumbnail, scrapedtitle, scrapedtv in matches:
+        scrapedurl = ""
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle).strip()
+        infoLabels = {}
+        #infoLabels["year"] = ""
+        infoLabels['title'] = "movie"
+        itemlist.append(
+            Item(channel=item.channel,
+                 action="do_search",
+                 extra=urllib.quote_plus(scrapedtitle) + '{}' + 'movie',
+                 title="[B]" + scrapedtitle + "[/B] - " + scrapedchannel,
+                 fulltitle=scrapedtitle,
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail.replace("?width=320", "?width=640"),
+                 contentTitle=scrapedtitle,
+                 contentType='movie',
+                 infoLabels=infoLabels,
+                 folder=True))
+
+    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+
+    return itemlist
 
 def now_on_misc(item):
     logger.info("filmontv tvoggi")
@@ -124,9 +157,9 @@ def now_on_tv(item):
     # Carica la pagina 
     data = httptools.downloadpage(item.url).data
     #patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
-    patron = r'view_logo" alt="([a-zA-Z 0-9]*)".*?spanTitleMovie">([A-Za-z ,0-9\.À-ÖØ-öø-ÿ\-\']*).*?GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*).*?src="([a-zA-Z:\/\.0-9?]*).*?Year">([A-Z 0-9a-z]*)'    
+    patron = r'view_logo" alt="([a-zA-Z 0-9]*)".*?spanMovieDuration">([^<]+).*?spanTitleMovie">([A-Za-z ,0-9\.À-ÖØ-öø-ÿ\-\']*).*?GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*).*?src="([a-zA-Z:\/\.0-9?]*).*?Year">([A-Z 0-9a-z]*)'    
     matches = re.compile(patron, re.DOTALL).findall(data)
-    for scrapedchannel, scrapedtitle, scrapedgender, scrapedthumbnail, scrapedyear in matches:
+    for scrapedchannel, scrapedduration, scrapedtitle, scrapedgender, scrapedthumbnail, scrapedyear in matches:
     # for scrapedthumbnail, scrapedtitle, scrapedtv in matches:
         scrapedurl = ""
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle).strip()
@@ -136,8 +169,8 @@ def now_on_tv(item):
             Item(channel=item.channel,
                  action="do_search",
                  extra=urllib.quote_plus(scrapedtitle) + '{}' + 'movie',
-                 title="[B]" + scrapedtitle + "[/B] - " + scrapedchannel,
-                 fulltitle="[B]" + scrapedtitle + "[/B] - " + scrapedchannel,
+                 title="[B]" + scrapedtitle + "[/B] - " + scrapedchannel + " - " + scrapedduration,
+                 fulltitle="[B]" + scrapedtitle + "[/B] - " + scrapedchannel+ " - " + scrapedduration,
                  url=scrapedurl,
                  thumbnail=scrapedthumbnail.replace("?width=240", "?width=480"),
                  contentTitle=scrapedtitle,
