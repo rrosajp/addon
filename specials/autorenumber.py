@@ -258,8 +258,9 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
                 except: ABS = ep
                 EpDict[str(ABS)] = [str(episodes['airedSeason']) + 'x' + str(episodes['airedEpisodeNumber']), episodes['firstAired']]
                 EpDateList.append(episodes['firstAired'])
-                EpList.append([int(ABS), episodes['airedSeason'], episodes['airedEpisodeNumber']])
-                ep = ep + 1        
+                if ABS != 0:
+                    EpList.append([ABS, episodes['airedSeason'], episodes['airedEpisodeNumber']])
+                    ep = ep + 1        
     EpDateList.sort()
     EpList.sort()
     log(EpDateList)
@@ -270,24 +271,24 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
     if int(SEASON) > 1:
         for name, episode in EpDict.items():
             if episode[0] == SEASON + 'x1':
-                ep = int(name)-1
+                ep = int(name) - 1
     else:
         ep = 0
+    
+    log('SEASON= ', SEASON)
+    log(ep)
         
     # rinumera gli episodi
-    Break = False
     for item in itemlist:
         number = int(scrapertoolsV2.find_single_match(item.title, r'\d+'))
         episode = ep + number - 1
+        
         if len(EpList) < episode: return error(itemlist)
-        # Crea una lista di Episodi in base alla modalità di rinumerazione            
+        # Crea una lista di Episodi in base alla modalità di rinumerazione 
         if MODE == False and number != 0:
-            while Break:
-                log('Long= ',len(EpList))
-                log('NUMBER= ',EpList[episode][1])
-                log('Eisode= ',episode)
+            # import web_pdb; web_pdb.set_trace() 
+            while EpList[episode][1] == 0 and len(EpList) > episode + 1:
                 episode = episode + 1 
-                if EpList[episode][1] == 0 or len(EpList) <= episode: Break = True
                 ep = ep + 1
         elif number == 0:
             episode = previous(EpDateList, EpDict, ep + 1)
