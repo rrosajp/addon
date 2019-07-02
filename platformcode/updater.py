@@ -157,10 +157,10 @@ def calcCurrHash():
             break
     else:
         logger.info('Non sono riuscito a trovare il commit attuale, scarico lo zip')
-        updateFromZip()
+        hash = updateFromZip()
         # se ha scaricato lo zip si trova di sicuro all'ultimo commit
         localCommitFile = open(addonDir + trackingFile, 'w')
-        localCommitFile.write(lastCommitSha)
+        localCommitFile.write(hash if hash else lastCommitSha)
         localCommitFile.close()
 
 
@@ -203,17 +203,20 @@ def updateFromZip():
 
     remotefilename = 'https://github.com/' + user + "/" + repo + "/archive/" + branch + ".zip"
     localfilename = xbmc.translatePath("special://home/addons/") + "plugin.video.kod.update.zip"
-    logger.info("kodiondemand.core.updater remotefilename=%s" % remotefilename)
-    logger.info("kodiondemand.core.updater localfilename=%s" % localfilename)
-    logger.info("kodiondemand.core.updater descarga fichero...")
+    logger.info("remotefilename=%s" % remotefilename)
+    logger.info("localfilename=%s" % localfilename)
 
     import urllib
     urllib.urlretrieve(remotefilename, localfilename)
 
     # Lo descomprime
-    logger.info("kodiondemand.core.updater descomprime fichero...")
+    logger.info("decompressione...")
     destpathname = xbmc.translatePath("special://home/addons/")
-    logger.info("kodiondemand.core.updater destpathname=%s" % destpathname)
+    logger.info("destpathname=%s" % destpathname)
+
+    # fix per android -> badZip file
+    hash = fixZipGetHash(localfilename)
+
     unzipper = ziptools()
     unzipper.extract(localfilename, destpathname)
 
@@ -227,6 +230,26 @@ def updateFromZip():
     os.remove(localfilename)
     # os.remove(temp_dir)
     platformtools.dialog_notification('Kodi on Demand', 'Aggiornamento completato!')
+
+    return hash
+
+
+# https://stackoverflow.com/questions/3083235/unzipping-file-results-in-badzipfile-file-is-not-a-zip-file
+def fixZipGetHash(zipFile):
+    f = open(zipFile, 'r+b')
+    data = f.read()
+    pos = data.find('\x50\x4b\x05\x06')  # End of central directory signature
+    hash = ''
+    if pos > 0:
+        f.seek(pos + 20)  # +20: see secion V.I in 'ZIP format' link above.
+        hash = f.read()[2:]
+        f.seek(pos + 20)
+        f.truncate()
+        f.write(
+            '\x00\x00')  # Zip file comment length: 0 byte length; tell zip applications to stop reading.
+        f.seek(0)
+
+    return hash
 
 
 class ziptools:
