@@ -222,11 +222,14 @@ def updateFromZip():
     destpathname = xbmc.translatePath("special://home/addons/")
     logger.info("destpathname=%s" % destpathname)
 
-    # fix per android -> badZip file
-    hash = fixZipGetHash(localfilename)
-
-    unzipper = ziptools()
-    unzipper.extract(localfilename, destpathname)
+    try:
+        hash = fixZipGetHash(localfilename)
+        unzipper = ziptools()
+        unzipper.extract(localfilename, destpathname)
+    except Exception as e:
+        logger.info('Non sono riuscito ad estrarre il file zip')
+        logger.info(e)
+        return False
 
     # puliamo tutto
     shutil.rmtree(addonDir)
