@@ -8,8 +8,8 @@ from core.item import Item
 from platformcode import logger, config
 from specials import autoplay
 
-#URL che reindirizza sempre al dominio corrente
-#host = "https://altadefinizione01.to"
+# URL che reindirizza sempre al dominio corrente
+# host = "https://altadefinizione01.to"
 
 __channel__ = "altadefinizione01"
 host = config.get_channel_url(__channel__)
@@ -29,15 +29,15 @@ blacklist_categorie = ['Altadefinizione01', 'Altadefinizione.to']
 def mainlist(item):
     support.log()
 
-    itemlist =[]
+    itemlist = []
 
-    support.menu(itemlist, 'Al Cinema','peliculas',host+'/cinema/')
-    support.menu(itemlist, 'Ultimi Film Inseriti','peliculas',host)
-    support.menu(itemlist, 'Film Sub-ITA','peliculas',host+'/sub-ita/')
-    support.menu(itemlist, 'Film Ordine Alfabetico ','AZlist',host+'/catalog/')
-    support.menu(itemlist, 'Categorie Film','categories',host)
-    support.menu(itemlist, 'Cerca...','search')
-    
+    support.menu(itemlist, 'Al Cinema', 'peliculas', host + '/cinema/')
+    support.menu(itemlist, 'Ultimi Film Inseriti', 'peliculas', host)
+    support.menu(itemlist, 'Film Sub-ITA', 'peliculas', host + '/sub-ita/')
+    support.menu(itemlist, 'Film Ordine Alfabetico ', 'AZlist', host + '/catalog/')
+    support.menu(itemlist, 'Categorie Film', 'categories', host)
+    support.menu(itemlist, 'Cerca...', 'search')
+
     autoplay.init(item.channel, list_servers, list_quality)
     autoplay.show_option(item.channel, itemlist)
 
@@ -46,12 +46,16 @@ def mainlist(item):
 
 def categories(item):
     support.log(item)
-    itemlist = support.scrape(item,'<li><a href="([^"]+)">(.*?)</a></li>',['url','title'],headers,'Altadefinizione01',patron_block='<ul class="kategori_list">(.*?)</ul>',action='peliculas')
+    itemlist = support.scrape(item, '<li><a href="([^"]+)">(.*?)</a></li>', ['url', 'title'], headers,
+                              'Altadefinizione01', patron_block='<ul class="kategori_list">(.*?)</ul>',
+                              action='peliculas')
     return support.thumb(itemlist)
+
 
 def AZlist(item):
     support.log()
-    return support.scrape(item,r'<a title="([^"]+)" href="([^"]+)"',['title','url'],headers,patron_block=r'<div class="movies-letter">(.*?)<\/div>',action='peliculas_list')
+    return support.scrape(item, r'<a title="([^"]+)" href="([^"]+)"', ['title', 'url'], headers,
+                          patron_block=r'<div class="movies-letter">(.*?)<\/div>', action='peliculas_list')
 
 
 def newest(categoria):
@@ -67,7 +71,7 @@ def newest(categoria):
 
             if itemlist[-1].action == "peliculas":
                 itemlist.pop()
-    # Continua la ricerca in caso di errore 
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
@@ -82,11 +86,8 @@ def search(item, texto):
     item.url = "%s/index.php?do=search&story=%s&subaction=search" % (
         host, texto)
     try:
-        if item.extra == "movie":
-            return subIta(item)
-        if item.extra == "tvshow":
-            return peliculas_tv(item)
-    # Continua la ricerca in caso di errore 
+        return peliculas(item)
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
@@ -101,9 +102,10 @@ def peliculas(item):
     data = httptools.downloadpage(item.url, headers=headers).data
     patron = r'<div class="cover_kapsul ml-mask".*?<a href="(.*?)">(.*?)<\/a>.*?<img .*?src="(.*?)".*?<div class="trdublaj">(.*?)<\/div>.(<div class="sub_ita">(.*?)<\/div>|())'
     matches = scrapertoolsV2.find_multiple_matches(data, patron)
-    
+
     for scrapedurl, scrapedtitle, scrapedthumbnail, scrapedquality, subDiv, subText, empty in matches:
-        info = scrapertoolsV2.find_multiple_matches(data, r'<span class="ml-label">([0-9]+)+<\/span>.*?<span class="ml-label">(.*?)<\/span>.*?<p class="ml-cat".*?<p>(.*?)<\/p>.*?<a href="(.*?)" class="ml-watch">')
+        info = scrapertoolsV2.find_multiple_matches(data,
+                                                    r'<span class="ml-label">([0-9]+)+<\/span>.*?<span class="ml-label">(.*?)<\/span>.*?<p class="ml-cat".*?<p>(.*?)<\/p>.*?<a href="(.*?)" class="ml-watch">')
         infoLabels = {}
         for infoLabels['year'], duration, scrapedplot, checkUrl in info:
             if checkUrl == scrapedurl:
@@ -115,7 +117,7 @@ def peliculas(item):
         fulltitle = scrapedtitle
         if subDiv:
             fulltitle += support.typo(subText + ' _ () color limegreen')
-        fulltitle += support.typo(scrapedquality.strip()+ ' _ [] color kod')
+        fulltitle += support.typo(scrapedquality.strip() + ' _ [] color kod')
 
         itemlist.append(
             Item(channel=item.channel,
@@ -132,22 +134,22 @@ def peliculas(item):
                  thumbnail=scrapedthumbnail))
 
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-    support.nextPage(itemlist,item,data,'<span>[^<]+</span>[^<]+<a href="(.*?)">')
+    support.nextPage(itemlist, item, data, '<span>[^<]+</span>[^<]+<a href="(.*?)">')
 
     return itemlist
+
 
 def peliculas_list(item):
     support.log()
     item.fulltitle = ''
     block = r'<tbody>(.*)<\/tbody>'
     patron = r'<a href="([^"]+)" title="([^"]+)".*?> <img.*?src="([^"]+)".*?<td class="mlnh-3">([0-9]{4}).*?mlnh-4">([A-Z]+)'
-    return support.scrape(item,patron, ['url', 'title', 'thumb', 'year', 'quality'], patron_block=block)
-
+    return support.scrape(item, patron, ['url', 'title', 'thumb', 'year', 'quality'], patron_block=block)
 
 
 def findvideos(item):
     support.log()
-    
+
     itemlist = support.server(item, headers=headers)
 
     return itemlist
