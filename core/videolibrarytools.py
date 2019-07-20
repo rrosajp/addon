@@ -203,6 +203,7 @@ def save_movie(item):
             item_nfo.library_urls[item.channel] = item.url
 
             if filetools.write(nfo_path, head_nfo + item_nfo.tojson()):
+                #logger.info("FOLDER_MOVIES : %s" % FOLDER_MOVIES)
                 # actualizamos la videoteca de Kodi con la pelicula
                 if config.is_xbmc():
                     from platformcode import xbmc_videolibrary
@@ -397,7 +398,8 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     channel_alt = generictools.verify_channel(serie.channel)            #Preparamos para añadir las urls de emergencia
     emergency_urls_stat = config.get_setting("emergency_urls", channel_alt)         #El canal quiere urls de emergencia?
     emergency_urls_succ = False
-    channel = __import__('channels.%s' % channel_alt, fromlist=["channels.%s" % channel_alt])
+    #channel = __import__('channels.%s' % channel_alt, fromlist=["channels.%s" % channel_alt])
+    channel = __import__('specials.%s' % channel_alt, fromlist=["specials.%s" % channel_alt])
     if serie.torrent_caching_fail:                              #Si el proceso de conversión ha fallado, no se cachean
         emergency_urls_stat = 0
         del serie.torrent_caching_fail
@@ -676,7 +678,8 @@ def add_tvshow(item, channel=None):
 
         if not channel:
             try:
-                channel = __import__('channels.%s' % item.channel, fromlist=["channels.%s" % item.channel])
+                #channel = __import__('channels.%s' % item.channel, fromlist=["channels.%s" % item.channel])
+                channel = __import__('specials.%s' % channel_alt, fromlist=["specials.%s" % channel_alt])
             except ImportError:
                 exec "import channels." + item.channel + " as channel"
 
@@ -740,7 +743,8 @@ def emergency_urls(item, channel=None, path=None):
     try:
         if channel == None:                             #Si el llamador no ha aportado la estructura de channel, se crea
             channel = generictools.verify_channel(item.channel)             #Se verifica si es un clon, que devuelva "newpct1"
-            channel = __import__('channels.%s' % channel, fromlist=["channels.%s" % channel])
+            #channel = __import__('channels.%s' % channel, fromlist=["channels.%s" % channel])
+            channel = __import__('specials.%s' % channel_alt, fromlist=["specials.%s" % channel_alt])
         if hasattr(channel, 'findvideos'):                                  #Si el canal tiene "findvideos"...
             item.videolibray_emergency_urls = True                          #... se marca como "lookup"
             channel_save = item.channel                 #... guarda el canal original por si hay fail-over en Newpct1
