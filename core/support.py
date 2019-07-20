@@ -464,34 +464,71 @@ def menu(func):
         list_quality = func.__globals__['list_quality']
         filename = func.__module__.split('.')[1]
 
-        listUrls = ['film', 'filmSub', 'tvshow', 'tvshowSub']
+        listUrls = ['film', 'filmSub', 'tvshow', 'tvshowSub', 'anime', 'animeSub', 'search']
+        listUrls_extra = []
         dictUrl = {}
+
         for name in listUrls:
+            dictUrl[name] = args[name] if name in args else None
+
+        for name, var in args.items():
+            if name not in listUrls and name != 'item':
+               listUrls_extra.append(name)
+        for name in listUrls_extra:
             dictUrl[name] = args[name] if name in args else None
         autoplay.init(item.channel, list_servers, list_quality)
 
         # Main options
         itemlist = []
+        
+        # if film menu
         if dictUrl['film'] is not None:
             menuItem(itemlist, filename, 'Film bold', 'peliculas', host + dictUrl['film'])
-            ### modificato by greko ########
-            for sub, var in dictUrl['filmSub']:
-                menuItem(itemlist, filename, sub + ' submenu', var[1],
-                         host + var[0],
-                         args=var[2] if len(var)>2 else '')
+            if dictUrl['filmSub']:
+                for sub, var in dictUrl['filmSub']:
+                    menuItem(itemlist, filename, sub + ' submenu', var[1],
+                            host + var[0],
+                            args=var[2] if len(var)>2 else '')
 
-            menuItem(itemlist, filename, 'Cerca submenu bold', 'search', host, args='film')
-
+            if dictUrl['search'] is None: menuItem(itemlist, filename, 'Cerca Film... submenu bold color kod', 'search', host, args='film')
+        
+        # if tvshow menu
         if dictUrl['tvshow'] is not None:
             menuItem(itemlist, filename, 'Serie TV bold', 'peliculas', host + dictUrl['tvshow'], contentType='tvshow')
+            if dictUrl['tvshowSub']:
+                for sub, var in dictUrl['tvshowSub']:
+                    menuItem(itemlist, filename, sub + ' submenu', var[1],
+                            host + var[0], contentType='tvshow',
+                            args=var[2] if len(var)>2 else '')
 
-            for sub, var in dictUrl['tvshowSub']:
-                menuItem(itemlist, filename, sub + ' submenu', var[1],
-                         host + var[0], contentType='tvshow',
-                         args=var[2] if len(var)>2 else '')
+            if dictUrl['search'] is None: menuItem(itemlist, filename, 'Cerca Serie TV... submenu bold color kod', 'search', host, args='serie')
+        
+        # if anime menu
+        if dictUrl['anime'] is not None:
+            menuItem(itemlist, filename, 'Anime bold', 'peliculas', host + dictUrl['anime'], contentType='tvshow', args='anime')
+            if dictUrl['animeSub']:
+                for sub, var in dictUrl['animeSub']:
+                    menuItem(itemlist, filename, sub + ' submenu', var[1],
+                            host + var[0], contentType='tvshow',
+                            args=var[2] if len(var)>2 else '')
 
-            menuItem(itemlist, filename, 'Cerca submenu bold', 'search', host, args='serie')
-            ### fine by greko ########
+            if dictUrl['search'] is None: menuItem(itemlist, filename, 'Cerca Anime... submenu bold color kod', 'search', host, args='serie')
+        # if menu item not in defaults
+        for name in listUrls_extra:
+            if len(name) > 2 and name[-3:] == 'Sub':
+                for sub, var in dictUrl[name]:                    
+                    menuItem(itemlist, filename, sub + ' submenu', var[1],
+                            host + var[0], var[3] if len(var)>3 else 'movie',
+                            args=var[2] if len(var)>2 else '')
+            else:
+                menuItem(itemlist, filename, dictUrl[name][0], dictUrl[name][1][1] if len(dictUrl[name][1]) > 0 else 'peliculas',
+                        host + dictUrl[name][1][0], contentType= dictUrl[name][1][3] if len(dictUrl[name][1]) > 2 else 'movie',
+                        args=dictUrl[name][1][2] if len(dictUrl[name]) > 1 else '')
+       
+        # if search menu
+        if dictUrl['search'] is not None:
+            menuItem(itemlist, filename, 'Cerca... bold color kod', 'search', host + dictUrl['search'])
+
         autoplay.show_option(item.channel, itemlist)
 
         return itemlist
