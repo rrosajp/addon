@@ -73,6 +73,9 @@ def check_addon_init():
         for c in reversed(commits[:pos]):
             commit = httptools.downloadpage(c['url']).data
             commitJson = json.loads(commit)
+            # evitiamo di applicare i merge commit
+            if 'Merge branch' in commitJson['commit']['message']:
+                continue
             logger.info('aggiornando a' + commitJson['sha'])
             alreadyApplied = True
 
