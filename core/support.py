@@ -530,7 +530,8 @@ def menu(func):
             menuItem(itemlist, filename, 'Cerca... bold color kod', 'search', host + dictUrl['search'])
 
         autoplay.show_option(item.channel, itemlist)
-
+        channel_config(item, itemlist) 
+        
         return itemlist
 
     return wrapper
