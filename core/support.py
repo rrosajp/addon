@@ -631,20 +631,19 @@ def videolibrary(itemlist, item, typography='', function_level=1):
     # Function_level is useful if the function is called by another function.
     # If the call is direct, leave it blank
 
-    if item.contentType != 'episode':
+    if item.contentType == 'movie':
         action = 'add_pelicula_to_library'
         extra = 'findvideos'
-        contentType = 'movie'
+        contentType = 'movie'               
     else:
         action = 'add_serie_to_library'
         extra = 'episodios'
-        contentType = 'tvshow'
+        contentType = 'tvshow' 
 
     if not typography: typography = 'color kod bold'
 
     title = typo(config.get_localized_string(30161) + ' ' + typography)
-
-    if inspect.stack()[function_level][3] == 'findvideos' and contentType == 'movie' or inspect.stack()[function_level][3] != 'findvideos' and contentType != 'movie':
+    if (inspect.stack()[function_level][3] == 'findvideos' and contentType == 'movie') or (inspect.stack()[function_level][3]  != 'findvideos' and contentType != 'movie'):
         if config.get_videolibrary_support() and len(itemlist) > 0:
             itemlist.append(
                 Item(channel=item.channel,
