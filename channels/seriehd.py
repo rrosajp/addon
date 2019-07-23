@@ -15,7 +15,7 @@ from specials import autoplay
 
 
 __channel__ = "seriehd"
-host = config.get_setting("channel_host", __channel__)
+host = config.get_channel_url(__channel__)
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
@@ -39,7 +39,8 @@ def mainlist(item):
 
     autoplay.init(item.channel, list_servers, list_quality)
     autoplay.show_option(item.channel, itemlist)
-
+    config.get_setting("channel_host", __channel__)
+    
     return itemlist
 
 
