@@ -79,19 +79,8 @@ def menu(item):
     return support.thumb(itemlist)
 
 
-def search(item, text):
-    support.log(item.url, "search" ,text)
 
-    try:
-        item.url = item.url + "/?s=" + text
-        return peliculas(item)
 
-    # Continua la ricerca in caso di errore 
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error("%s" % line)
-        return []
 
 
 def newest(categoria):

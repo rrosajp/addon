@@ -253,7 +253,11 @@ def run(item=None):
                         from specials import search
                         search.save_search(tecleado)
 
-                    itemlist = channel.search(item, tecleado)
+                    if 'search' in dir(channel):
+                        itemlist = channel.search(item, tecleado)
+                    else:
+                        from core import support
+                        itemlist = support.search(channel, item, tecleado)
                 else:
                     return
 

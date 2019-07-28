@@ -40,7 +40,7 @@ def mainlist(item):
     support.menu(itemlist, 'Da non perdere bold submenu', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args=['tv', 'da non perdere'])
     support.menu(itemlist, 'Classiche bold submenu', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args=['tv', 'classiche'])
     support.menu(itemlist, 'Disegni che si muovono sullo schermo per magia bold', 'tvserie', "%s/category/animazione/" % host, 'tvshow', args= ['anime'])
-    support.menu(itemlist, 'Cerca', 'search', host, 'tvshow', args=['cerca'])
+
 
     # autoplay
     support.aplay(item, itemlist, list_servers, list_quality)

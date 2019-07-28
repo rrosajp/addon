@@ -24,12 +24,12 @@ def mainlist(item):
 
     # Menu Principale
     itemlist = []
-    support.menu(itemlist, 'Film bold', 'peliculas', host + '/film/')
-    support.menu(itemlist, 'Per genere submenu', 'menu', host, args="Film per Genere")
+    film =  '/film/'
+    ('Per genere ', [, 'menu', ]), args="Film per Genere")
     support.menu(itemlist, 'Anime bold', 'peliculas', host + '/category/anime/')
-    support.menu(itemlist, 'Serie TV bold', 'peliculas', host + '/serie-tv/', contentType='episode')
-    support.menu(itemlist, 'Ultime Uscite submenu', 'peliculas', host + "/stagioni/", "episode", args='latests')
-    support.menu(itemlist, 'Ultimi Episodi submenu', 'peliculas_latest_ep', host + "/episodi/", "episode", args='lateste')
+    tvshow = '/serie-tv/'
+    ('Ultime Uscite ', ["/stagioni/", 'peliculas', ]), "episode", args='latests')
+    ('Ultimi Episodi ', ["/episodi/", 'peliculas_latest_ep', ]), "episode", args='lateste')
     support.menu(itemlist, '[COLOR blue]Cerca...[/COLOR]', 'search')
 
     autoplay.init(item.channel, list_servers, list_quality)

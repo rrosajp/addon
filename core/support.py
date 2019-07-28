@@ -16,7 +16,6 @@ from lib import unshortenit
 from platformcode import logger, config
 from specials import autoplay
 
-
 def hdpass_get_servers(item):
     # Carica la pagina
     data = httptools.downloadpage(item.url).data.replace('\n', '')
@@ -91,6 +90,58 @@ def url_decode(url_enc):
 
 def color(text, color):
     return "[COLOR " + color + "]" + text + "[/COLOR]"
+
+
+def search(channel, item, texto):
+    log(item.url + " search " + texto)
+    item.url = channel.host + "/?s=" + texto
+    try:
+        return channel.peliculas(item)
+    # Continua la ricerca in caso di errore
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("%s" % line)
+    return []
+
+
+def dbg():
+    import webbrowser
+    webbrowser.open('localhost:5555')
+    import web_pdb;
+    web_pdb.set_trace()
+
+
+def scrape2(item, patron = '', listGroups = [], headers="", blacklist="", data="", patronBlock="",
+           patronNext="", action="findvideos", addVideolibrary = True, typeContentDict={}, typeActionDict={}):
+    import json, urllib2, webbrowser
+    url = 'https://regex101.com'
+
+    html = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
+    html = re.sub('\n|\t', ' ', html)
+
+    m = re.search(r'\((?!\?)', patron)
+    n = 0
+    dbg()
+    while m:
+        patron = patron[:m.end()] + '?P<' + listGroups[n] + '>' + patron[m.end():]
+        m = re.search(r'\((?!\?)', patron)
+        n += 1
+
+    headers = {'content-type': 'application/json'}
+    data = {
+        'regex': patron,
+        'flags': 'gm',
+        'testString': html,
+        'delimiter': '"',
+        'flavor': 'python'
+    }
+    r = urllib2.Request(url + '/api/regex', json.dumps(data), headers=headers)
+    r = urllib2.urlopen(r).read()
+    permaLink = json.loads(r)['permalinkFragment']
+    webbrowser.open(url + "/r/" + permaLink)
+
+    return
 
 def scrape(func):
     # args is a dict containing the foolowing keys:
@@ -456,6 +507,7 @@ def menuItem(itemlist, filename, title='', action='', url='', contentType='movie
 
 def menu(func):
     def wrapper(*args):
+        log()
         args = func(*args)
 
         item = args['item']

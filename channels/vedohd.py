@@ -43,12 +43,12 @@ def mainlist(item):
 
     # Main options
     itemlist = []
-    support.menu(itemlist, 'Film', "peliculas", host+"film-hd")
+    film = "film-hd"
     support.menu(itemlist, 'I più votati', "peliculas", host+"ratings/?get=movies")
     support.menu(itemlist, 'I più popolari', "peliculas", host+"trending/?get=movies")
     support.menu(itemlist, 'Generi', "generos", host)
     support.menu(itemlist, 'Anno', "year", host)
-    support.menu(itemlist, 'Cerca', "search", host)
+
 
     autoplay.show_option(item.channel, itemlist)
 

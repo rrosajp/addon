@@ -28,10 +28,10 @@ def mainlist(item):
     support.menu(itemlist, 'Ultime novità bold', 'updates', host, contentType='episode')
     support.menu(itemlist, 'Episodi più visti bold', 'most_view', host, contentType='episode')
     support.menu(itemlist, 'Anime', 'list', host + '/lista-anime-2/', contentType='episode')
-    support.menu(itemlist, 'Sub-Ita submenu', 'list', host + '/lista-anime-sub-ita/', contentType='episode')
-    support.menu(itemlist, 'Serie TV bold', 'list', host + '/lista-serie-tv/', contentType='episode')
+    ('Sub-Ita ', ['/lista-anime-sub-ita/', 'list', ])
+    tvshow = '/lista-serie-tv/'
     support.menu(itemlist, 'Film Animazione bold', 'list', host + '/lista-film-animazione/', contentType="episode", args="film")
-    support.menu(itemlist, '[COLOR blue]Cerca anime e serie...[/COLOR] bold', 'search', host, contentType='episode')
+
 
     autoplay.init(item.channel, list_servers, list_quality)
     autoplay.show_option(item.channel, itemlist)

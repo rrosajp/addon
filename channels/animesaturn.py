@@ -30,7 +30,7 @@ def mainlist(item):
     support.menu(itemlist, 'Novità bold', 'ultimiep', "%s/fetch_pages.php?request=episodes" % host, 'tvshow')
     support.menu(itemlist, 'Anime bold', 'lista_anime', "%s/animelist?load_all=1" % host)
     support.menu(itemlist, 'Archivio A-Z submenu', 'list_az', '%s/animelist?load_all=1' % host, args=['tvshow', 'alfabetico'])
-    support.menu(itemlist, 'Cerca', 'search', host)
+
     support.aplay(item, itemlist, list_servers, list_quality)
     support.channel_config(item, itemlist)
 

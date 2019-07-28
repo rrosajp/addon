@@ -18,13 +18,13 @@ def mainlist(item):
     support.log()
     itemlist = []
 
-    support.menu(itemlist, 'Film', 'peliculas', host + "/film/")
+    film =  "/film/"
     support.menu(itemlist, 'Film Anime', 'peliculas', host + "/genere/anime/")
     support.menu(itemlist, 'Film per genere', 'generos', host)
-    support.menu(itemlist, 'Serie TV', 'peliculas', host + "/serietv/", contentType='tvshow')
+    tvshow = "/serietv/"
     support.menu(itemlist, 'Anime', 'peliculas', host + "/genere/anime/", contentType='tvshow')
-    support.menu(itemlist, 'Cerca film', 'search', host)
-    support.menu(itemlist, 'Cerca serie tv', 'search', host, contentType='tvshow')
+
+
 
     autoplay.init(item.channel, list_servers, list_quality)
     autoplay.show_option(item.channel, itemlist)
