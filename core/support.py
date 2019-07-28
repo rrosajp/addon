@@ -188,7 +188,9 @@ def scrape(func):
         patronBlock = args['patronBlock'] if 'patronBlock' in args else ''
         typeActionDict = args['type_action_dict'] if 'type_action_dict' in args else {}
         typeContentDict = args['type_content_dict'] if 'type_content_dict' in args else {}
-
+        if 'pagination' in args: pagination = args['pagination'] if args['pagination'] else 20
+        else: pagination = ''
+        log('PATRON= ', patron)
         if not data:
             data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
             data = re.sub('\n|\t', ' ', data)
@@ -217,7 +219,11 @@ def scrape(func):
                           'rating', 'type', 'lang']  # by greko aggiunto episode
             lang = '' # aggiunto per gestire i siti con pagine di serietv dove si hanno i video in ita e in subita
             
-            for match in matches:
+            pag  = item.page if item.page else 1  # pagination
+
+            for i, match in enumerate(matches):
+                if pagination and (pag - 1) * pagination > i: continue  # pagination
+                if pagination and i >= pag  * pagination: break  # pagination
                 listGroups = match.keys()
                 match = match.values()
 
@@ -232,8 +238,7 @@ def scrape(func):
                         val = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
                     scraped[kk] = val
 
-                title = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["title"])
-                                                 .replace('"',"'")).strip()  # fix by greko da " a '
+                title = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["title"]).replace('"',"'").replace('×', 'x').replace('–','-')).strip()  # fix by greko da " a '
                 plot = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["plot"]))
 
                 longtitle = typo(title, 'bold')
@@ -242,7 +247,7 @@ def scrape(func):
                     scraped['episode'] = re.sub(r'\s-\s|-|x|&#8211', 'x', scraped['episode'])
                     longtitle = typo(scraped['episode'] + ' - ', 'bold') + longtitle
                 if scraped['title2']:
-                    title2 = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["title2"]).replace('"', "'")).strip()
+                    title2 = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["title2"]).replace('"', "'").replace('×', 'x').replace('–','-')).strip()
                     longtitle = longtitle + typo(title2, 'bold _ -- _')
                     
                 ##    Aggiunto/modificato per gestire i siti che hanno i video
@@ -286,15 +291,15 @@ def scrape(func):
                     for name, variants in typeActionDict.items():
                         if scraped['type'] in variants:
                             action = name
-
+                
                 if scraped["title"] not in blacklist:
                     it = Item(
                         channel=item.channel,
                         action=action,
-                        contentType=item.contentType,
+                        contentType= 'episode' if item.action == 'episodios' else item.contentType,
                         title=longtitle,
                         fulltitle=title,
-                        show=title,
+                        show=item.show if item.action == 'episodios' else title,
                         quality=scraped["quality"],
                         url=scraped["url"],
                         infoLabels=infolabels,
@@ -309,8 +314,7 @@ def scrape(func):
                         it = args['itemHook'](it)
                     itemlist.append(it)
             checkHost(item, itemlist)
-##            if (item.contentType == "episode" and (action != "findvideos" and action != "play")) \
-##                    or (item.contentType == "movie" and action != "play"):
+           
             if (item.contentType == "tvshow" and (action != "findvideos" and action != "play")) \
                 or (item.contentType == "episode" and action != "play") \
                 or (item.contentType == "movie" and action != "play") :            
@@ -324,6 +328,18 @@ def scrape(func):
 
             if patronNext:
                 nextPage(itemlist, item, data, patronNext, 2)
+
+            # next page for pagination
+            if pagination and len(matches) >= pag * pagination:
+                itemlist.append(
+                    Item(channel=item.channel,
+                         action = item.action,
+                         contentType=item.contentType,
+                         title=typo(config.get_localized_string(30992), 'color kod bold'),
+                         url=item.url,
+                         args=item.args,
+                         page=pag + 1,
+                         thumbnail=thumb()))
 
             if anime:
                 from specials import autorenumber
@@ -582,7 +598,8 @@ def menu(func):
             menuItem(itemlist, filename, 'Cerca... bold color kod', 'search', host + dictUrl['search'])
 
         autoplay.show_option(item.channel, itemlist)
-
+        channel_config(item, itemlist) 
+        
         return itemlist
 
     return wrapper
@@ -666,20 +683,19 @@ def videolibrary(itemlist, item, typography='', function_level=1):
     # Function_level is useful if the function is called by another function.
     # If the call is direct, leave it blank
 
-    if item.contentType != 'episode':
+    if item.contentType == 'movie':
         action = 'add_pelicula_to_library'
         extra = 'findvideos'
-        contentType = 'movie'
+        contentType = 'movie'               
     else:
         action = 'add_serie_to_library'
         extra = 'episodios'
-        contentType = 'tvshow'
+        contentType = 'tvshow' 
 
     if not typography: typography = 'color kod bold'
 
     title = typo(config.get_localized_string(30161) + ' ' + typography)
-
-    if inspect.stack()[function_level][3] == 'findvideos' and contentType == 'movie' or inspect.stack()[function_level][3] != 'findvideos' and contentType != 'movie':
+    if (inspect.stack()[function_level][3] == 'findvideos' and contentType == 'movie') or (inspect.stack()[function_level][3]  != 'findvideos' and contentType != 'movie'):
         if config.get_videolibrary_support() and len(itemlist) > 0:
             itemlist.append(
                 Item(channel=item.channel,
