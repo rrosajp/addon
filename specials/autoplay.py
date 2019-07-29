@@ -16,6 +16,8 @@ PLAYED = False
 
 autoplay_node = {}
 
+colorKOD = '0xFF65B3DA'
+
 
 def context():
     '''
@@ -36,7 +38,7 @@ def context():
 context = context()
 
 
-def show_option(channel, itemlist, text_color='yellow', thumbnail=None, fanart=None):
+def show_option(channel, itemlist, text_color=colorKOD, thumbnail=None, fanart=None):
     '''
     Agrega la opcion Configurar AutoPlay en la lista recibida
 
@@ -63,10 +65,12 @@ def show_option(channel, itemlist, text_color='yellow', thumbnail=None, fanart=N
              title=config.get_localized_string(60071),
              action="autoplay_config",
              text_color=text_color,
+             text_bold=True,
              thumbnail=thumbnail,
              fanart=fanart,
              plot=plot_autoplay,
-             from_channel=channel
+             from_channel=channel,
+             folder=False
              ))
     return itemlist
 
