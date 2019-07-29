@@ -52,7 +52,7 @@ def hdpass_get_servers(item):
                 for media_label, media_url in scrapertoolsV2.find_multiple_matches(data, patron_media):
                     itemlist.append(Item(channel=item.channel,
                                          action="play",
-                                         title=item.title+" ["+color(server, 'orange')+"]"+" - "+color(res_video, 'limegreen'),
+                                         title=item.title + typo(server, '-- [] color kod') + typo(res_video, '-- [] color kod'),
                                          fulltitle=item.fulltitle,
                                          quality=res_video,
                                          show=item.show,
@@ -107,7 +107,7 @@ def search(channel, item, texto):
 
 def dbg():
     import webbrowser
-    webbrowser.open('localhost:5555')
+    webbrowser.open('http://localhost:5555')
     import web_pdb;
     web_pdb.set_trace()
 
@@ -315,7 +315,7 @@ def scrape(func):
                     itemlist.append(it)
             checkHost(item, itemlist)
            
-            if (item.contentType == "tvshow" and (action != "findvideos" and action != "play")) \
+            if ('thumb' not in args and item.contentType == "tvshow" and (action == "findvideos" and action != "play")) \
                 or (item.contentType == "episode" and action != "play") \
                 or (item.contentType == "movie" and action != "play") :            
                 tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
@@ -349,6 +349,9 @@ def scrape(func):
             if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
                 item.fulltitle = item.infoLabels["title"]
                 videolibrary(itemlist, item)
+
+            if 'thumb' in args:
+                itemlist = thumb(itemlist)
                 
             if 'fullItemlistHook' in args:
                 itemlist = args['fullItemlistHook'](itemlist)
@@ -512,8 +515,7 @@ def menuItem(itemlist, filename, title='', action='', url='', contentType='movie
         url = url,
         extra = extra,
         args = args,
-        contentType = contentType,
-        folder = False,
+        contentType = contentType
     ))
 
     # Apply auto Thumbnails at the menus
@@ -693,7 +695,7 @@ def match(item, patron='', patronBlock='', headers='', url=''):
         matches = scrapertoolsV2.find_multiple_matches(block, patron)
         log('MATCHES= ',matches)
 
-    return matches, data
+    return matches, block
 
 
 def videolibrary(itemlist, item, typography='', function_level=1):
