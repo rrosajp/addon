@@ -38,9 +38,9 @@ def check(item):
         ris = []
         logger.info("channel - host :%s - %s " % (chann, host))
         
-        lst_host = []
-        lst_host.append(host)
-
+        #lst_host = []
+        #lst_host.append(host)
+        lst_host = [host]
         rslt = test_conn(is_exit = True, check_dns = False, view_msg = True,
                          lst_urls = lst_host, lst_site_check_dns = [], in_addon = True)
 
