@@ -345,13 +345,13 @@ def thumb(itemlist=[]):
                      'now_playing':['cinema', 'in sala'],
                      'channels_anime':['anime'],
                      'genres':['genere', 'generi', 'categorie', 'categoria'],
-                     'channels_animation': ['animazione', 'cartoni'],
-                     'channels_adventure': ['avventura'],
+                     'channels_animation': ['animazione', 'cartoni', 'cartoon'],
                      'channels_action':['azione', 'arti marziali'],
+                     'channels_adventure': ['avventura'],                     
                      'channels_biographical':['biografico'],
                      'channels_comedy':['comico','commedia', 'demenziale'],
                      'channels_adult':['erotico', 'hentai'],
-                     'channels_drama':['drammatico'],
+                     'channels_drama':['drammatico', 'drama'],
                      'channels_syfy':['fantascienza'],
                      'channels_fantasy':['fantasy'],
                      'channels_crime':['gangster','poliziesco'],
@@ -385,7 +385,7 @@ def thumb(itemlist=[]):
         search_suffix ={'_movie':['film'],
                         '_tvshow':['serie','tv']}
         for item in itemlist:
-
+            
             # Check if item has args propriety
             if item.args: item.title = item.title + ' || ' + str(item.args)
 
@@ -401,7 +401,8 @@ def thumb(itemlist=[]):
                         for suffix, titles in suffix_dict.items():
                             if any( word in item.title.lower() for word in titles ):
                                 thumb = thumb + suffix
-                    item.thumbnail = get_thumb(thumb + '.png')
+                    else:
+                        item.thumbnail = get_thumb(thumb + '.png')
                 else:
                     thumb = item.thumbnails
 
