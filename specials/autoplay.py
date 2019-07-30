@@ -645,7 +645,7 @@ def get_languages(channel):
     :return: list
     '''
     logger.info()
-    list_language = ['No filtrar']
+    list_language = ['Non filtrare']
     list_controls, dict_settings = channeltools.get_channel_controls_settings(channel)
     for control in list_controls:
         try:

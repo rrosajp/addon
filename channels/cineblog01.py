@@ -9,9 +9,8 @@ from core import scrapertoolsV2, httptools, servertools, tmdb, support
 from core.item import Item
 from lib import unshortenit
 from platformcode import logger, config
-from specials import autoplay
 
-#impostati dinamicamente da getUrl()
+#impostati dinamicamente da findhost()
 host = ""
 headers = ""
 
@@ -56,31 +55,15 @@ def mainlist(item):
     return locals()
 
 
+@support.scrape
 def menu(item):
     findhost()
-    itemlist= []
-    data = httptools.downloadpage(item.url, headers=headers).data
-    data = re.sub('\n|\t', '', data)
-    block = scrapertoolsV2.find_single_match(data, item.args + r'<span.*?><\/span>.*?<ul.*?>(.*?)<\/ul>')
-    support.log('MENU BLOCK= ',block)
-    patron = r'href="?([^">]+)"?>(.*?)<\/a>'
-    matches = re.compile(patron, re.DOTALL).findall(block)
-    for scrapedurl, scrapedtitle in matches:
-        itemlist.append(
-            Item(
-                channel=item.channel,
-                title=scrapedtitle,
-                contentType=item.contentType,
-                action='peliculas',
-                url=host + scrapedurl
-            )
-        )
-    
-    return support.thumb(itemlist)
+    patronBlock = item.args + r'<span.*?><\/span>.*?<ul.*?>(.*?)<\/ul>'
+    patron = r'href="?(?P<url>[^">]+)"?>(?P<title>.*?)<\/a>'
+    thumb = ''
+    action = 'peliculas'
 
-
-
-
+    return locals()
 
 
 def newest(categoria):

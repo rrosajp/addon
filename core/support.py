@@ -112,21 +112,15 @@ def dbg():
     web_pdb.set_trace()
 
 
-def scrape2(item, patron = '', listGroups = [], headers="", blacklist="", data="", patronBlock="",
-           patronNext="", action="findvideos", addVideolibrary = True, typeContentDict={}, typeActionDict={}):
+def regexDbg(item, patron, headers, data=''):
     import json, urllib2, webbrowser
     url = 'https://regex101.com'
 
-    html = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
-    html = re.sub('\n|\t', ' ', html)
-
-    m = re.search(r'\((?!\?)', patron)
-    n = 0
-    dbg()
-    while m:
-        patron = patron[:m.end()] + '?P<' + listGroups[n] + '>' + patron[m.end():]
-        m = re.search(r'\((?!\?)', patron)
-        n += 1
+    if not data:
+        html = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
+        html = re.sub('\n|\t', ' ', html)
+    else:
+        html = data
 
     headers = {'content-type': 'application/json'}
     data = {
@@ -140,6 +134,17 @@ def scrape2(item, patron = '', listGroups = [], headers="", blacklist="", data="
     r = urllib2.urlopen(r).read()
     permaLink = json.loads(r)['permalinkFragment']
     webbrowser.open(url + "/r/" + permaLink)
+
+
+def scrape2(item, patron = '', listGroups = [], headers="", blacklist="", data="", patronBlock="",
+           patronNext="", action="findvideos", addVideolibrary = True, typeContentDict={}, typeActionDict={}):
+    m = re.search(r'\((?!\?)', patron)
+    n = 0
+    while m:
+        patron = patron[:m.end()] + '?P<' + listGroups[n] + '>' + patron[m.end():]
+        m = re.search(r'\((?!\?)', patron)
+        n += 1
+    regexDbg(item, patron, headers)
 
     return
 
@@ -182,7 +187,7 @@ def scrape(func):
         addVideolibrary = args['addVideolibrary'] if 'addVideolibrary' in args else True
         blacklist = args['blacklist'] if 'blacklist' in args else ''
         data = args['data'] if 'data' in args else ''
-        headers = args['headers'] if 'headers' in args else ''
+        headers = args['headers'] if 'headers' in args else func.__globals__['headers']
         patron = args['patron'] if 'patron' in args else ''
         patronNext = args['patronNext'] if 'patronNext' in args else ''
         patronBlock = args['patronBlock'] if 'patronBlock' in args else ''
@@ -190,6 +195,7 @@ def scrape(func):
         typeContentDict = args['type_content_dict'] if 'type_content_dict' in args else {}
         if 'pagination' in args: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
+
         log('PATRON= ', patron)
         if not data:
             data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
@@ -215,11 +221,14 @@ def scrape(func):
             matches = scrapertoolsV2.find_multiple_matches_groups(block, patron)
             log('MATCHES =', matches)
 
+            if 'debug' in args:
+                regexDbg(item, patron, headers, block)
+
             known_keys = ['url', 'title', 'title2', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere',
                           'rating', 'type', 'lang']  # by greko aggiunto episode
             lang = '' # aggiunto per gestire i siti con pagine di serietv dove si hanno i video in ita e in subita
             
-            pag  = item.page if item.page else 1  # pagination
+            pag = item.page if item.page else 1  # pagination
 
             for i, match in enumerate(matches):
                 if pagination and (pag - 1) * pagination > i: continue  # pagination
