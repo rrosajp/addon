@@ -191,7 +191,7 @@ class Kdicc():
                 # non vengono raggiunti per una qualsiasi causa
                 elif '[Errno 111]' in str(conn_errr) or 'Errno 10061' in str(conn_errr) \
                      or 'ConnectTimeoutError' in str(conn_errr) \
-                     or 'Errno 11002' in str(conn_errr) or 'ReadTimeout' in str(conn_errr)\
+                     or 'Errno 11002' in str(conn_errr) or 'ReadTimeout' in str(conn_errr) \
                      or 'Errno 11001' in str(conn_errr):
                     # nei casi in cui vogliamo raggiungere certi siti...
                     rslt['code'] = '111'
