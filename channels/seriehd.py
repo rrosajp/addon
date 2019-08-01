@@ -27,28 +27,17 @@ checklinks_number = config.get_setting('checklinks_number', 'seriehd')
 
 headers = [['Referer', host]]
 
-
-def mainlist(item):
-    log()
-    itemlist = []
-
-    menu(itemlist, 'Serie TV', 'peliculas', host + '/serie-tv-streaming', 'tvshow')
-    menu(itemlist, 'Per Genere submenu', 'genre', host, 'tvshow', 'TV')
-    menu(itemlist, 'Per Nazione submenu', 'nation', host + '/serie-tv-streaming/', 'tvshow', 'TV')
-    menu(itemlist, 'Cerca...', 'search', contentType='tvshow', args='TV')
-
-    autoplay.init(item.channel, list_servers, list_quality)
-    autoplay.show_option(item.channel, itemlist)
-    config.get_setting("channel_host", __channel__)
-    
-    return itemlist
+@support.menu
+def mainlist(item):    
+    tvshow = [('Genere', ['', 'genre', 'tv']),
+              ('Americane', ['/serie-tv-streaming/serie-tv-americane', 'peliculas', 'tv']),
+              ('Italiane', ['/serie-tv-streaming/serie-tv-italiane', 'peliculas', 'tv']),]
+    return locals()
 
 
 def search(item, texto):
     log(texto)
-
     item.url = host + "/?s=" + texto
-
     try:
         return peliculas(item)
 
@@ -65,14 +54,11 @@ def newest(categoria):
     itemlist = []
     item = Item()
     try:
-
-        ## cambiar los valores "peliculas, infantiles, series, anime, documentales por los que correspondan aqui en
-        # el py y en l json ###
         if categoria == "series":
             item.url = host
             itemlist = peliculas(item)
 
-            if 'Successivo>>' in itemlist[-1].title:
+            if config.get_localized_string(30992) in itemlist[-1].title:
                 itemlist.pop()
 
     # Continua la ricerca in caso di errore
@@ -85,31 +71,25 @@ def newest(categoria):
     return itemlist
 
 
+@support.scrape
 def genre(item):
-    itemlist = support.scrape(item, '<a href="([^"]+)">([^<]+)</a>', ['url', 'title'], headers,['Serie TV','Serie TV Americane','Serie TV Italiane','altadefinizione'], action='peliculas')
-    return thumb(itemlist)
+    patronMenu = '<a href="(?P<url>[^"]+)">(?P<title>[^<]+)</a>'
+    blacklist = ['Serie TV','Serie TV Americane','Serie TV Italiane','altadefinizione']
+    patronBlock = '<ul class="sub-menu">(.*?)</ul>'
+   
+    return locals()
 
-
-def nation(item):
-    log()
-    itemlist = []
-    menu(itemlist, 'Serie TV Americane', 'peliculas', host + '/serie-tv-streaming/serie-tv-americane/')
-    menu(itemlist, 'Serie TV Italiane', 'peliculas', host + '/serie-tv-streaming/serie-tv-italiane/')
-    return itemlist
-
-
+@support.scrape
 def peliculas(item):
-    item.contentType = 'tvshow'
-    return support.scrape(item,r'<h2>(.*?)</h2>\s*<img src="([^"]+)" alt="[^"]*" />\s*<A HREF="([^"]+)">.*?<span class="year">([0-9]{4}).*?<span class="calidad">([A-Z]+)',['title', 'thumb', 'url', 'year', 'quality'], headers, patronNext=r"<span class='current'>\d+</span><a rel='nofollow' class='page larger' href='([^']+)'>\d+</a>", action='episodios')
-
+    patron = r'<h2>(?P<title>.*?)</h2>\s*<img src="(?P<thumb>[^"]+)" alt="[^"]*" />\s*<A HREF="(?P<url>[^"]+)">.*?<span class="year">(?P<year>[0-9]{4}).*?<span class="calidad">(?P<quality>[A-Z]+)'
+    patronNext=r'<span class="current">\d+</span><a rel="nofollow" class="page larger" href="([^"]+)">\d+</a>'
+    action='episodios'
+    return locals()
 
 def episodios(item):
     log()
-    itemlist = []
-
-    data = httptools.downloadpage(item.url).data
-    patron = r'<iframe width=".+?" height=".+?" src="([^"]+)" allowfullscreen frameborder="0">'
-    url = scrapertoolsV2.find_single_match(data, patron).replace("?seriehd", "")
+    itemlist = []    
+    url = support.match(item, patronBlock=r'<iframe width=".+?" height=".+?" src="([^"]+)" allowfullscreen frameborder="0">')[1]
     seasons = support.match(item, r'<a href="([^"]+)">(\d+)<', r'<h3>STAGIONE</h3><ul>(.*?)</ul>', headers, url)[0]
     for season_url, season in seasons:
         season_url = urlparse.urljoin(url, season_url)
@@ -124,7 +104,7 @@ def episodios(item):
                      contentType="episode",
                      title=support.typo(title + ' - ' +item.show,'bold'),
                      url=episode_url,
-                     fulltitle=title + ' - ' + item.show,
+                     fulltitle=item.fulltitle,
                      show=item.show,
                      thumbnail=item.thumbnail))
 
@@ -135,16 +115,9 @@ def episodios(item):
 
 def findvideos(item):
     log()
-
     itemlist = []
-    itemlist = support.hdpass_get_servers(item)
-
-    if checklinks:
-        itemlist = servertools.check_list_links(itemlist, checklinks_number)
-
-    autoplay.start(itemlist, item)
-
-    return itemlist
+    itemlist = support.hdpass_get_servers(item)  
+    return support.controls(itemlist, item)
 
 
 

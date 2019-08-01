@@ -56,8 +56,8 @@ def show_option(channel, itemlist, text_color=colorKOD, thumbnail=None, fanart=N
 
     if thumbnail == None:
         thumbnail = get_thumb('autoplay.png')
-    if fanart == None:
-        fanart = get_thumb('autoplay.png')
+    # if fanart == None:
+    #     fanart = get_thumb('autoplay.png')
 
     plot_autoplay = config.get_localized_string(60399)
     itemlist.append(
@@ -67,7 +67,7 @@ def show_option(channel, itemlist, text_color=colorKOD, thumbnail=None, fanart=N
              text_color=text_color,
              text_bold=True,
              thumbnail=thumbnail,
-             fanart=fanart,
+            #  fanart=fanart,
              plot=plot_autoplay,
              from_channel=channel,
              folder=False

@@ -333,10 +333,10 @@ def auto_filter(auto_lang=False):
     return lang
 
 
-def thumb(itemlist=[]):
+def thumb(itemlist=[], genre=False):
     if itemlist:
         import re
-
+        
         icon_dict = {'channels_movie':['film'],
                      'channels_tvshow':['serie','tv','episodi','episodio'],
                      'channels_documentary':['documentari','documentario'],
@@ -344,9 +344,9 @@ def thumb(itemlist=[]):
                      'news':['novità', "novita'", 'aggiornamenti'],
                      'now_playing':['cinema', 'in sala'],
                      'channels_anime':['anime'],
-                     'genres':['genere', 'generi', 'categorie', 'categoria'],
-                     'channels_animation': ['animazione', 'cartoni', 'cartoon'],
+                     'genres':['genere', 'generi', 'categorie', 'categoria'],                     
                      'channels_action':['azione', 'arti marziali'],
+                     'channels_animation': ['animazione', 'cartoni', 'cartoon'],
                      'channels_adventure': ['avventura'],                     
                      'channels_biographical':['biografico'],
                      'channels_comedy':['comico','commedia', 'demenziale'],
@@ -377,40 +377,44 @@ def thumb(itemlist=[]):
         suffix_dict = {'_hd':['hd','altadefinizione','alta definizione'],
                        '_4k':['4K'],
                        '_az':['lettera','lista','alfabetico','a-z'],
-                       '_year':['anno'],
+                       '_year':['anno', 'anni'],
                        '_genre':['genere', 'generi', 'categorie', 'categoria']}
 
         search = ['cerca']
 
         search_suffix ={'_movie':['film'],
                         '_tvshow':['serie','tv']}
+
         for item in itemlist:
             
-            # Check if item has args propriety
-            if item.args: item.title = item.title + ' || ' + str(item.args)
+            if genre == False:
 
-            for thumb, titles in icon_dict.items():
-                if any( word in item.title.lower() for word in search):
-                    thumb = 'search'
-                    for suffix, titles in search_suffix.items():
-                        if any( word in item.title.lower() for word in titles ): 
-                            thumb = thumb + suffix
-                    item.thumbnail = get_thumb(thumb + '.png')
-                elif any( word in item.title.lower() for word in titles ):
-                    if thumb == 'channels_movie' or thumb == 'channels_tvshow':
-                        for suffix, titles in suffix_dict.items():
-                            if any( word in item.title.lower() for word in titles ):
+                for thumb, titles in icon_dict.items():
+                    if any( word in item.title.lower() for word in search):
+                        thumb = 'search'
+                        for suffix, titles in search_suffix.items():
+                            if any( word in item.title.lower() for word in titles ): 
                                 thumb = thumb + suffix
-                    else:
                         item.thumbnail = get_thumb(thumb + '.png')
-                else:
-                    thumb = item.thumbnails
+                    elif any( word in item.title.lower() for word in titles ):
+                        if thumb == 'channels_movie' or thumb == 'channels_tvshow':
+                            for suffix, titles in suffix_dict.items():
+                                if any( word in item.title.lower() for word in titles ):
+                                    thumb = thumb + suffix
+                            item.thumbnail = get_thumb(thumb + '.png')
+                        else: item.thumbnail = get_thumb(thumb + '.png')
+                    else:
+                        thumb = item.thumbnails
 
-                if item.thumbnail != '':
-                    break
+            else:
+                for thumb, titles in icon_dict.items():
+                    if any(word in item.title.lower() for word in titles ):
+                        item.thumbnail = get_thumb(thumb + '.png')
+                    else:
+                        thumb = item.thumbnails
 
-            # Remove args from title
-            if item.args: item.title = item.title.replace(' || ' + str(item.args), '')
+            
+            item.title = re.sub(r'\s*\{[^\}]+\}','',item.title)
         return itemlist
     else:
         return get_thumb('next.png')
