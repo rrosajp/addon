@@ -47,8 +47,8 @@ LST_SITE_CHCK_DNS = ['https://www.italia-film.pw', 'https://casacinema.space',
 
 class Kdicc():
     
-    def __init__(self, is_exit = True, check_dns = False, view_msg = True,
-                 lst_urls = [], lst_site_check_dns = [], in_addon = True):
+    def __init__(self, is_exit = True, check_dns = True, view_msg = True,
+                 lst_urls = [], lst_site_check_dns = [], in_addon = False):
 
         self.ip_addr = xbmc.getIPAddress()
         self.dns = [xbmc.getInfoLabel('Network.DNS1Address'),
@@ -236,8 +236,8 @@ class Kdicc():
 """
     def richiamato in launcher.py
 """
-def test_conn(is_exit, check_dns, view_msg, lst_urls,
-              lst_site_check_dns, in_addon):
+def test_conn(self, is_exit = True, check_dns = True, view_msg = True,
+                 lst_urls = [], lst_site_check_dns = [], in_addon = False):
     # debug
     # import web_pdb; web_pdb.set_trace()
     
