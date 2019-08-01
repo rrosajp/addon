@@ -6,7 +6,6 @@
     <import addon="metadata.themoviedb.org"/>
     <import addon="metadata.tvdb.com"/>
     <import addon="script.module.web-pdb" />
-    <import addon="script.module.kdicc" />
   </requires>
   <extension point="xbmc.python.pluginsource" library="default.py">
     <provides>video</provides>

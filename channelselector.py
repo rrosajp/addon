@@ -19,11 +19,11 @@ def getmainlist(view="thumb_"):
     ################################################################
     ################################################################
     # Questa voce è per TESTING e NON DOVRà MAI andare in stable
-    itemlist.append(Item(title="KDICC", channel="checkhost", action="check",
-                        thumbnail='',
-                        category=config.get_localized_string(30119), viewmode="thumbnails",
-                        context=[{"title": config.get_localized_string(70285), "channel": "checkhost", "action": "menu_opciones",
-                                "goto": True}]))
+##    itemlist.append(Item(title="KDICC", channel="checkhost", action="check",
+##                        thumbnail='',
+##                        category=config.get_localized_string(30119), viewmode="thumbnails",
+##                        context=[{"title": config.get_localized_string(70285), "channel": "checkhost", "action": "menu_opciones",
+##                                "goto": True}]))
     ################################################################
     ################################################################    
     # Añade los canales que forman el menú principal
