@@ -38,8 +38,7 @@ def start():
     test_conn(is_exit = True, check_dns = True, view_msg = True,
               lst_urls = [], lst_site_check_dns = [], in_addon = True)
 
-    except:
-        pass
+
 def run(item=None):
     logger.info()
     if not item:
