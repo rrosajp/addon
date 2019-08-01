@@ -191,8 +191,7 @@ class Kdicc():
                 # non vengono raggiunti per una qualsiasi causa
                 elif '[Errno 111]' in str(conn_errr) or 'Errno 10061' in str(conn_errr) \
                      or 'ConnectTimeoutError' in str(conn_errr) \
-                     or 'Errno 11002' in str(conn_errr) or 'ReadTimeout' in str(conn_errr) \
-                     or 'Errno 11001' in str(conn_errr):
+                     or 'Errno 11002' in str(conn_errr) or 'ReadTimeout' in str(conn_errr):
                     # nei casi in cui vogliamo raggiungere certi siti...
                     rslt['code'] = '111'
                     rslt['url'] = str(sito)
@@ -236,8 +235,8 @@ class Kdicc():
 """
     def richiamato in launcher.py
 """
-def test_conn(self, is_exit = True, check_dns = True, view_msg = True,
-                 lst_urls = [], lst_site_check_dns = [], in_addon = False):
+def test_conn(is_exit, check_dns, view_msg,
+              lst_urls, lst_site_check_dns, in_addon):
     # debug
     # import web_pdb; web_pdb.set_trace()
     
@@ -275,8 +274,8 @@ quanto meno che il modem/router sia acceso e/o il tuo dispositivo connesso.\n')
                 ktest.view_Advise('Gentile Utente, i tuoi DNS attuali non ti permettono di raggiungere tutti i siti \
  ergo, non tutti i Canali funzioneranno. Ti consigliamo per usufruire di un maggior numero \
  di canali di impostare i DNS. Cerca su google o contatta ALHAZIEL per una consulenza gratuita!\n')
-            if ktest.is_exit == True:
-                exit()
+##            if ktest.is_exit == True:
+##                exit()
 
 ##    else:
     # Lasciando solo else al posto dell'if sotto, l'else non viene considerato!
