@@ -24,9 +24,9 @@ def mainlist(item):
            ('Aggiornamenti', ['', 'peliculas', 'last', 'tvshow']),
            ('Popolari', ['', 'peliculas', 'most_view', 'tvshow'])]   
     tvshow = '/lista-serie-tv/'
-    anime =  '/lista-anime-2/'
-    animeSub =[('Sub-Ita',['/lista-anime-sub-ita/']),
-            ('Film Animati',['/lista-film-animazione/','peliculas', 'movie'])]    
+    anime =['/lista-anime-2/',
+               ('Sub-Ita',['/lista-anime-sub-ita/']),
+               ('Film Animati',['/lista-film-animazione/','peliculas', 'movie'])]    
     search = ''
 
     return locals()
