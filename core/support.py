@@ -306,17 +306,18 @@ def scrape(func):
                     it = Item(
                         channel=item.channel,
                         action=action,
-                        contentType= 'episode' if item.action == 'episodios' else item.contentType,
+                        contentType= 'episode' if (action == 'findvideos' and item.contentType == 'tvshow') else item.contentType,
                         title=longtitle,
-                        fulltitle=title,
-                        show=item.show if item.action == 'episodios' else title,
+                        fulltitle=item.fulltitle if (action == 'findvideos' and item.contentType != 'movie') else title,
+                        show=item.show if (action == 'findvideos' and item.contentType != 'movie') else title,
                         quality=scraped["quality"],
                         url=scraped["url"],
                         infoLabels=infolabels,
                         thumbnail=scraped["thumb"],
-                        args=item.args
+                        args=item.args,
+                        contentSerieName = title if (action == 'episodios' and item.contentType != 'movie') else ''
                     )
-
+                    
                     for lg in list(set(listGroups).difference(known_keys)):
                         it.__setattr__(lg, match[listGroups.index(lg)])
 
@@ -325,13 +326,13 @@ def scrape(func):
                     itemlist.append(it)
             checkHost(item, itemlist)
            
-            if ('patronMenu' not in args and item.contentType == "tvshow" and (action == "findvideos" and action != "play")) \
+            if (item.contentType == "tvshow" and (action != "findvideos" and action != "play")) \
                 or (item.contentType == "episode" and action != "play") \
                 or (item.contentType == "movie" and action != "play") :            
                 tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-            else:
-                for it in itemlist:
-                    it.infoLabels = item.infoLabels
+            # else:                                     # Si perde item show :(
+            #     for it in itemlist:
+            #         it.infoLabels = item.infoLabels
                 
             if 'itemlistHook' in args:
                 itemlist = args['itemlistHook'](itemlist)
@@ -361,7 +362,7 @@ def scrape(func):
                 videolibrary(itemlist, item)
 
             if 'patronMenu' in args:
-                itemlist = thumb(itemlist)
+                itemlist = thumb(itemlist, genre=True)
                 
             if 'fullItemlistHook' in args:
                 itemlist = args['fullItemlistHook'](itemlist)
@@ -531,7 +532,6 @@ def menuItem(itemlist, filename, title='', action='', url='', contentType='movie
     # Apply auto Thumbnails at the menus
     from channelselector import thumb
     thumb(itemlist)
-
     return itemlist
 
 
@@ -588,7 +588,7 @@ def menu(func):
                 if dictUrl[name] is not None and type(dictUrl[name]) is not str:
                     for sub, var in dictUrl[name]:
                         menuItem(itemlist, filename,
-                             title = sub + ' submenu',
+                             title = sub + ' submenu' + typo(title,'_ {}'),
                              url = host + var[0] if len(var) > 0 else '',
                              action = var[1] if len(var) > 1 else 'peliculas',
                              args=var[2] if len(dictUrl[name]) > 2 else '',
