@@ -340,7 +340,7 @@ def save_tvshow(item, episodelist):
     '''msg = "Insertados: %d | Sobreescritos: %d | Fallidos: %d | Tiempo: %2.2f segundos" % \
           (insertados, sobreescritos, fallidos, time.time() - start_time)
     logger.debug(msg)'''
-
+    
     return insertados, sobreescritos, fallidos, path
 
 
@@ -398,8 +398,8 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     channel_alt = generictools.verify_channel(serie.channel)            #Preparamos para añadir las urls de emergencia
     emergency_urls_stat = config.get_setting("emergency_urls", channel_alt)         #El canal quiere urls de emergencia?
     emergency_urls_succ = False
-    #channel = __import__('channels.%s' % channel_alt, fromlist=["channels.%s" % channel_alt])
-    channel = __import__('specials.%s' % channel_alt, fromlist=["specials.%s" % channel_alt])
+    try: channel = __import__('specials.%s' % channel_alt, fromlist=["specials.%s" % channel_alt])
+    except: channel = __import__('channels.%s' % channel_alt, fromlist=["channels.%s" % channel_alt])
     if serie.torrent_caching_fail:                              #Si el proceso de conversión ha fallado, no se cachean
         emergency_urls_stat = 0
         del serie.torrent_caching_fail

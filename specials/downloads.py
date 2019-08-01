@@ -263,9 +263,10 @@ def menu(item):
 
 def move_to_libray(item):
     download_path = filetools.join(config.get_setting("downloadpath"), item.downloadFilename)
-    library_path = filetools.join(config.get_videolibrary_path(), *filetools.split(item.downloadFilename))
+    library_path = filetools.join(config.get_videolibrary_path(), (config.get_setting("folder_movies") if item.contentType == 'movie' else config.get_setting("folder_tvshows")))
+    library_path = filetools.join(library_path, *filetools.split(item.downloadFilename))
     final_path = download_path
-
+    
     if config.get_setting("library_add", "downloads") == True and config.get_setting("library_move", "downloads") == True:
         if not filetools.isdir(filetools.dirname(library_path)):
             filetools.mkdir(filetools.dirname(library_path))
@@ -293,7 +294,7 @@ def move_to_libray(item):
                 tvshow = Item(channel="downloads", contentType="tvshow",
                               infoLabels={"tmdb_id": item.infoLabels["tmdb_id"]})
                 videolibrarytools.save_tvshow(tvshow, [library_item])
-
+            
 
 def update_json(path, params):
     item = Item().fromjson(filetools.read(path))
@@ -804,7 +805,7 @@ def save_download_movie(item):
 
     progreso.update(0, config.get_localized_string(60062))
 
-    item.downloadFilename = filetools.validate_path("%s [%s]" % (item.contentTitle.strip(), item.contentChannel))
+    item.downloadFilename = filetools.validate_path("%s [%s] [%s]" % (item.contentTitle.strip(), item.contentChannel, item.infoLabels['IMDBNumber']))
 
     write_json(item)
 
@@ -825,8 +826,8 @@ def save_download_tvshow(item):
 
     item.show = item.fulltitle
     scraper.find_and_set_infoLabels(item)
-
-    item.downloadFilename = filetools.validate_path("%s [%s]" % (item.contentSerieName, item.contentChannel))
+    logger.info('ID= ' + item.infoLabels['IMDBNumber'])
+    item.downloadFilename = filetools.validate_path("%s [%s]" % (item.contentSerieName, item.infoLabels['IMDBNumber']))
 
     progreso.update(0, config.get_localized_string(70186), config.get_localized_string(70187) % item.contentChannel)
 
