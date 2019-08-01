@@ -31,13 +31,15 @@ def start():
     config.verify_directories_created()
 
     # controlla se l'utente ha qualche problema di connessione
-    # se lo ha, non lo fa entrare nell'addon e visualizza un messaggio
-    # se tutto ok, entra nell'addon
+    # se lo ha: non lo fa entrare nell'addon
+    # se ha problemi di DNS avvia ma lascia entrare
+    # se tutto ok: entra nell'addon
     from specials.checkhost import test_conn
     test_conn(is_exit = True, check_dns = True, view_msg = True,
               lst_urls = [], lst_site_check_dns = [], in_addon = True)
 
-
+    except:
+        pass
 def run(item=None):
     logger.info()
     if not item:

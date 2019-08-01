@@ -94,6 +94,8 @@ def color(text, color):
 
 def search(channel, item, texto):
     log(item.url + " search " + texto)
+    if 'findhost' in dir(channel):
+        channel.findhost()
     item.url = channel.host + "/?s=" + texto
     try:
         return channel.peliculas(item)
@@ -106,28 +108,23 @@ def search(channel, item, texto):
 
 
 def dbg():
-    import webbrowser
-    webbrowser.open('http://localhost:5555')
     import web_pdb;
+    if not web_pdb.WebPdb.active_instance:
+        import webbrowser
+        webbrowser.open('http://localhost:5555')
     web_pdb.set_trace()
 
 
-def scrape2(item, patron = '', listGroups = [], headers="", blacklist="", data="", patronBlock="",
-           patronNext="", action="findvideos", addVideolibrary = True, typeContentDict={}, typeActionDict={}):
+
+def regexDbg(item, patron, headers, data=''):
     import json, urllib2, webbrowser
     url = 'https://regex101.com'
 
-    html = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
-    html = re.sub('\n|\t', ' ', html)
-
-    m = re.search(r'\((?!\?)', patron)
-    n = 0
-    dbg()
-    while m:
-        patron = patron[:m.end()] + '?P<' + listGroups[n] + '>' + patron[m.end():]
-        m = re.search(r'\((?!\?)', patron)
-        n += 1
-
+    if not data:
+        html = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
+        html = re.sub('\n|\t', ' ', html)
+    else:
+        html = data
     headers = {'content-type': 'application/json'}
     data = {
         'regex': patron,
@@ -141,7 +138,18 @@ def scrape2(item, patron = '', listGroups = [], headers="", blacklist="", data="
     permaLink = json.loads(r)['permalinkFragment']
     webbrowser.open(url + "/r/" + permaLink)
 
-    return
+
+def scrape2(item, patron = '', listGroups = [], headers="", blacklist="", data="", patronBlock="",
+           patronNext="", action="findvideos", addVideolibrary = True, typeContentDict={}, typeActionDict={}):
+    m = re.search(r'\((?!\?)', patron)
+    n = 0
+    while m:
+        patron = patron[:m.end()] + '?P<' + listGroups[n] + '>' + patron[m.end():]
+        m = re.search(r'\((?!\?)', patron)
+        n += 1
+    regexDbg(item, patron, headers)
+
+
 
 def scrape(func):
     # args is a dict containing the foolowing keys:
@@ -182,14 +190,16 @@ def scrape(func):
         addVideolibrary = args['addVideolibrary'] if 'addVideolibrary' in args else True
         blacklist = args['blacklist'] if 'blacklist' in args else ''
         data = args['data'] if 'data' in args else ''
-        headers = args['headers'] if 'headers' in args else ''
         patron = args['patron'] if 'patron' in args else args['patronMenu'] if 'patronMenu' in args else ''
+        headers = args['headers'] if 'headers' in args else func.__globals__['headers']
         patronNext = args['patronNext'] if 'patronNext' in args else ''
         patronBlock = args['patronBlock'] if 'patronBlock' in args else ''
         typeActionDict = args['type_action_dict'] if 'type_action_dict' in args else {}
         typeContentDict = args['type_content_dict'] if 'type_content_dict' in args else {}
+        debug = args['debug'] if 'debug' in args else False
         if 'pagination' in args: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
+
         log('PATRON= ', patron)
         if not data:
             data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
@@ -215,11 +225,14 @@ def scrape(func):
             matches = scrapertoolsV2.find_multiple_matches_groups(block, patron)
             log('MATCHES =', matches)
 
+            if debug:
+                regexDbg(item, patron, headers, block)
+
             known_keys = ['url', 'title', 'title2', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere',
                           'rating', 'type', 'lang']  # by greko aggiunto episode
             lang = '' # aggiunto per gestire i siti con pagine di serietv dove si hanno i video in ita e in subita
             
-            pag  = item.page if item.page else 1  # pagination
+            pag = item.page if item.page else 1  # pagination
 
             for i, match in enumerate(matches):
                 if pagination and (pag - 1) * pagination > i: continue  # pagination
@@ -541,7 +554,7 @@ def menu(func):
         listUrls_extra = []
         dictUrl = {}
 
-        
+
         # Main options
         itemlist = []
 
@@ -551,21 +564,21 @@ def menu(func):
             if name == 'film': title = 'Film'
             if name == 'tvshow': title = 'Serie TV'
             if name == 'anime': title = 'Anime'
-            
+
             if name == 'search' and dictUrl[name] is not None:
                 menuItem(itemlist, filename, 'Cerca… bold', 'search', host + dictUrl['search'])
-            
+
             # Make TOP MENU
             elif name == 'top' and dictUrl[name] is not None:
                 for sub, var in dictUrl['top']:
                     menuItem(itemlist, filename,
                              title = sub + ' italic bold',
                              url = host + var[0] if len(var) > 0 else '',
-                             action = var[1] if len(var) > 1 else 'peliculas',                         
-                             args=var[2] if len(dictUrl[name]) > 2 else '',
+                             action = var[1] if len(var) > 1 else 'peliculas',
+                             args=var[2] if len(var) > 2 else '',
                              contentType= var[3] if len(var) > 3 else 'movie',)
 
-            # Make MAIN MENU   
+            # Make MAIN MENU
             elif dictUrl[name] is not None:
                 if len(dictUrl[name]) == 0: url = ''
                 else: url = dictUrl[name][0] if type(dictUrl[name][0]) is not tuple and len(dictUrl[name][0]) > 0 else ''
@@ -580,26 +593,26 @@ def menu(func):
                         menuItem(itemlist, filename,
                              title = sub + ' submenu' + typo(title,'_ {}'),
                              url = host + var[0] if len(var) > 0 else '',
-                             action = var[1] if len(var) > 1 else 'peliculas',                         
-                             args=var[2] if len(dictUrl[name]) > 2 else '',
+                             action = var[1] if len(var) > 1 else 'peliculas',
+                             args=var[2] if len(var) > 2 else '',
                              contentType= var[3] if len(var) > 3 else 'movie',)
                 # add search menu for category
                 if 'search' not in args: menuItem(itemlist, filename, 'Cerca ' + title + '… submenu bold', 'search', host, args=name)
-        
+
         # Make EXTRA MENU (on bottom)
         for name, var in args.items():
             if name not in listUrls and name != 'item':
                listUrls_extra.append(name)
         for name in listUrls_extra:
-            dictUrl[name] = args[name] if name in args else None     
+            dictUrl[name] = args[name] if name in args else None
             for sub, var in dictUrl[name]:
                 menuItem(itemlist, filename,
                              title = sub + ' ',
                              url = host + var[0] if len(var) > 0 else '',
-                             action = var[1] if len(var) > 1 else 'peliculas',                         
-                             args=var[2] if len(dictUrl[name]) > 2 else '',
-                             contentType= var[3] if len(var) > 3 else 'movie',)   
-       
+                             action = var[1] if len(var) > 1 else 'peliculas',
+                             args=var[2] if len(var) > 2 else '',
+                             contentType= var[3] if len(var) > 3 else 'movie',)
+
 
         autoplay.init(item.channel, list_servers, list_quality)
         autoplay.show_option(item.channel, itemlist)
