@@ -33,11 +33,13 @@ def start():
     # controlla se l'utente ha qualche problema di connessione
     # se lo ha, non lo fa entrare nell'addon e visualizza un messaggio
     # se tutto ok, entra nell'addon
-    from kdicc import test_conn
-    test_conn(is_exit = True, check_dns = True, view_msg = True,
+    try:
+        from kdicc import test_conn
+        test_conn(is_exit = True, check_dns = True, view_msg = True,
               lst_urls = [], lst_site_check_dns = [], in_addon = True)
 
-
+    except:
+        pass
 def run(item=None):
     logger.info()
     if not item:
