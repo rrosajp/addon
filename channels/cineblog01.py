@@ -38,14 +38,12 @@ blacklist = ['BENVENUTI', 'Richieste Serie TV', 'CB01.UNO &#x25b6; TROVA L&#8217
 @support.menu
 def mainlist(item):
     findhost()
-    film = ''
-    filmSub = [
+    film = [
         ('HD', ['', 'menu', 'Film HD Streaming']),
         ('Generi', ['', 'menu', 'Film per Genere']),
         ('Anni', ['', 'menu', 'Film per Anno'])
     ]
-    tvshow = '/serietv/'
-    tvshowSub = [
+    tvshow = ['/serietv/',
         ('Aggiornamenti serie tv', ['/serietv/aggiornamento-quotidiano-serie-tv/', 'last']),
         ('Per Lettera', ['/serietv/', 'menu', 'Serie-Tv per Lettera']),
         ('Per Genere', ['/serietv/aggiornamento-quotidiano-serie-tv/', 'menu', 'Serie-Tv per Genere']),
@@ -59,8 +57,7 @@ def mainlist(item):
 def menu(item):
     findhost()
     patronBlock = item.args + r'<span.*?><\/span>.*?<ul.*?>(.*?)<\/ul>'
-    patron = r'href="?(?P<url>[^">]+)"?>(?P<title>.*?)<\/a>'
-    thumb = ''
+    patronMenu = r'href="?(?P<url>[^">]+)"?>(?P<title>.*?)<\/a>'
     action = 'peliculas'
 
     return locals()
@@ -133,13 +130,11 @@ def last(item):
 
 @support.scrape
 def peliculas(item):
-    support.log()
-    if item.contentType == 'movie' or '/serietv/' not in item.url:
+    if '/serietv/' not in item.url:
         patron = r'<div class="?card-image"?>.*?<img src="?(?P<thumb>[^" ]+)"? alt.*?<a href="?(?P<url>[^" >]+)(?:\/|")>(?P<title>[^<[(]+)(?:\[(?P<quality>[A-Za-z0-9/-]+)])? (?:\((?P<year>[0-9]{4})\))?.*?<strong>(?P<genre>[^<>&]+).*?DURATA (?P<duration>[0-9]+).*?<br(?: /)?>(?P<plot>[^<>]+)'
         action = 'findvideos'
     else:
         patron = r'div class="card-image">.*?<img src="(?P<thumb>[^ ]+)" alt.*?<a href="(?P<url>[^ >]+)">(?P<title>[^<[(]+)<\/a>.*?<strong><span style="[^"]+">(?P<genre>[^<>0-9(]+)\((?P<year>[0-9]{4}).*?</(?:p|div)>(?P<plot>.*?)</div'
-        listGroups = ['thumb', 'url', 'title', 'genre', 'year', 'plot']
         action = 'episodios'
 
     patronBlock=[r'<div class="?sequex-page-left"?>(.*?)<aside class="?sequex-page-right"?>',

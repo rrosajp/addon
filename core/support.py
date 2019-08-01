@@ -94,6 +94,8 @@ def color(text, color):
 
 def search(channel, item, texto):
     log(item.url + " search " + texto)
+    if 'findhost' in dir(channel):
+        channel.findhost()
     item.url = channel.host + "/?s=" + texto
     try:
         return channel.peliculas(item)
@@ -106,9 +108,10 @@ def search(channel, item, texto):
 
 
 def dbg():
-    import webbrowser
-    webbrowser.open('http://localhost:5555')
     import web_pdb;
+    if not web_pdb.WebPdb.active_instance:
+        import webbrowser
+        webbrowser.open('http://localhost:5555')
     web_pdb.set_trace()
 
 
@@ -122,18 +125,18 @@ def regexDbg(item, patron, headers, data=''):
         html = re.sub('\n|\t', ' ', html)
     else:
         html = data
-        headers = {'content-type': 'application/json'}
-        data = {
-            'regex': patron,
-            'flags': 'gm',
-            'testString': html,
-            'delimiter': '"',
-            'flavor': 'python'
-        }
-        r = urllib2.Request(url + '/api/regex', json.dumps(data), headers=headers)
-        r = urllib2.urlopen(r).read()
-        permaLink = json.loads(r)['permalinkFragment']
-        webbrowser.open(url + "/r/" + permaLink)
+    headers = {'content-type': 'application/json'}
+    data = {
+        'regex': patron,
+        'flags': 'gm',
+        'testString': html,
+        'delimiter': '"',
+        'flavor': 'python'
+    }
+    r = urllib2.Request(url + '/api/regex', json.dumps(data), headers=headers)
+    r = urllib2.urlopen(r).read()
+    permaLink = json.loads(r)['permalinkFragment']
+    webbrowser.open(url + "/r/" + permaLink)
 
 
 def scrape2(item, patron = '', listGroups = [], headers="", blacklist="", data="", patronBlock="",
@@ -189,11 +192,11 @@ def scrape(func):
         data = args['data'] if 'data' in args else ''
         patron = args['patron'] if 'patron' in args else args['patronMenu'] if 'patronMenu' in args else ''
         headers = args['headers'] if 'headers' in args else func.__globals__['headers']
-        patron = args['patron'] if 'patron' in args else ''
         patronNext = args['patronNext'] if 'patronNext' in args else ''
         patronBlock = args['patronBlock'] if 'patronBlock' in args else ''
         typeActionDict = args['type_action_dict'] if 'type_action_dict' in args else {}
         typeContentDict = args['type_content_dict'] if 'type_content_dict' in args else {}
+        debug = args['debug'] if 'debug' in args else False
         if 'pagination' in args: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
 
@@ -222,7 +225,7 @@ def scrape(func):
             matches = scrapertoolsV2.find_multiple_matches_groups(block, patron)
             log('MATCHES =', matches)
 
-            if 'debug' in args:
+            if debug:
                 regexDbg(item, patron, headers, block)
 
             known_keys = ['url', 'title', 'title2', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere',
@@ -572,7 +575,7 @@ def menu(func):
                              title = sub + ' italic bold',
                              url = host + var[0] if len(var) > 0 else '',
                              action = var[1] if len(var) > 1 else 'peliculas',
-                             args=var[2] if len(dictUrl[name]) > 2 else '',
+                             args=var[2] if len(var) > 2 else '',
                              contentType= var[3] if len(var) > 3 else 'movie',)
 
             # Make MAIN MENU
@@ -591,7 +594,7 @@ def menu(func):
                              title = sub + ' submenu' + typo(title,'_ {}'),
                              url = host + var[0] if len(var) > 0 else '',
                              action = var[1] if len(var) > 1 else 'peliculas',
-                             args=var[2] if len(dictUrl[name]) > 2 else '',
+                             args=var[2] if len(var) > 2 else '',
                              contentType= var[3] if len(var) > 3 else 'movie',)
                 # add search menu for category
                 if 'search' not in args: menuItem(itemlist, filename, 'Cerca ' + title + '… submenu bold', 'search', host, args=name)
@@ -607,7 +610,7 @@ def menu(func):
                              title = sub + ' ',
                              url = host + var[0] if len(var) > 0 else '',
                              action = var[1] if len(var) > 1 else 'peliculas',
-                             args=var[2] if len(dictUrl[name]) > 2 else '',
+                             args=var[2] if len(var) > 2 else '',
                              contentType= var[3] if len(var) > 3 else 'movie',)
 
 

@@ -31,18 +31,6 @@ def mainlist(item):
 
     return locals()
 
-def search(item, texto):
-    logger.info("[toonitalia.py] " + item.url + " search " + texto)
-    item.url = host + "/?s=" + texto
-    item.args = 'search'
-    try:
-        return peliculas(item)
-
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error("%s" % line)
-        return []
 
 @support.scrape
 def peliculas(item):
@@ -78,6 +66,7 @@ def check(item):
     itemlist = episodios(item)
     return itemlist
 
+
 @support.scrape
 def episodios(item):    
     anime = True
@@ -93,4 +82,3 @@ def episodios(item):
 
 def findvideos(item):
     return support.server(item, item.url if item.contentType != 'movie' else httptools.downloadpage(item.url, headers=headers).data )
-    
