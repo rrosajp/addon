@@ -92,7 +92,7 @@ class Kdicc():
         r = self.rqst(urls)
         http_errr = 0
         for rslt in r:
-##            xbmc.log("check_Adsl rslt: %s" % rslt['code'], level=xbmc.LOGNOTICE)
+            xbmc.log("check_Adsl rslt: %s" % rslt['code'], level=xbmc.LOGNOTICE)
             if rslt['code'] == '111':
                 http_errr +=1
 
@@ -112,10 +112,10 @@ class Kdicc():
             urls = self.lst_site_check_dns
 
         r = self.rqst(urls)
-##        xbmc.log("check_Dns risultato: %s" % r, level=xbmc.LOGNOTICE)
+        xbmc.log("check_Dns risultato: %s" % r, level=xbmc.LOGNOTICE)
         http_errr = 0
         for rslt in r:
-##            xbmc.log("check_Dns rslt: %s" % rslt['code'], level=xbmc.LOGNOTICE)
+            xbmc.log("check_Dns rslt: %s" % rslt['code'], level=xbmc.LOGNOTICE)
             if rslt['code'] == '111':
                 http_errr +=1
 
@@ -147,18 +147,17 @@ class Kdicc():
                     is_redirect = True
                 else:
                     is_redirect = False
-                #xbmc.log("rslt json : %s " %  (r.json()), level=xbmc.LOGNOTICE)
 
                 rslt['code'] = r.status_code
                 rslt['url'] = str(sito)
                 rslt['rdrcturl'] = str(r.url)
                 rslt['isRedirect'] = is_redirect
                 rslt['history'] = r.history
-##                xbmc.log("Risultato nel try: %s" %  (r,), level=xbmc.LOGNOTICE)
+                xbmc.log("Risultato nel try: %s" %  (r,), level=xbmc.LOGNOTICE)
             except requests.exceptions.HTTPError as http_err:
                 # 522 Server Error: Origin Connection Time-out for url: https://italiafilm.info/
                 # Errore : 404 Client Error: NOT FOUND for url: http://httpbin.org/status/404
-##                xbmc.log("http_err : %s " % http_err, level=xbmc.LOGNOTICE)
+                xbmc.log("http_err : %s " % http_err, level=xbmc.LOGNOTICE)
 
                 rslt['code'] = r.status_code    
                 rslt['url'] = str(sito)
@@ -170,10 +169,10 @@ class Kdicc():
                 # exceeded with url: /(Caused by NewConnectionError
                 # ('<urllib3.connection.VerifiedHTTPSConnection object at 0x7f96f7506d50>:
                 # Failed to establish a new connection: [Errno -2] Name or service not known',))
-##                xbmc.log("conn_errr : %s " % conn_errr, level=xbmc.LOGNOTICE)
+                xbmc.log("conn_errr : %s " % conn_errr, level=xbmc.LOGNOTICE)
                 
-                if '[Errno -2]' in str(conn_errr) or 'Errno 7' in str(conn_errr) \
-                    or 'Errno 11001' in str(conn_errr):
+                if '[Errno -2]' in str(conn_errr) or 'Errno 7' in str(conn_errr):
+##                    or 'Errno 11001' in str(conn_errr):
                     # il sito non esiste!!!
                     # Failed to establish a new connection: [Errno 7] errore android
                     rslt['code'] = '-2'
@@ -191,7 +190,8 @@ class Kdicc():
                 # non vengono raggiunti per una qualsiasi causa
                 elif '[Errno 111]' in str(conn_errr) or 'Errno 10061' in str(conn_errr) \
                      or 'ConnectTimeoutError' in str(conn_errr) \
-                     or 'Errno 11002' in str(conn_errr) or 'ReadTimeout' in str(conn_errr):
+                     or 'Errno 11002' in str(conn_errr) or 'ReadTimeout' in str(conn_errr) \
+                     or 'Errno 11001' in str(conn_errr): # questo errore è anche nel code: -2
                     # nei casi in cui vogliamo raggiungere certi siti...
                     rslt['code'] = '111'
                     rslt['url'] = str(sito)
@@ -203,7 +203,7 @@ class Kdicc():
 ##                    rslt['history'] = r.history
 
             except requests.exceptions.RequestException as other_err:
-##                xbmc.log("other_err: %s " % other_err, level=xbmc.LOGNOTICE)
+                xbmc.log("other_err: %s " % other_err, level=xbmc.LOGNOTICE)
                 rslt['code'] = other_err
                 rslt['url'] = str(sito)
 ##                rslt['history'] = r.history
@@ -225,7 +225,6 @@ class Kdicc():
             txt += '\nIP: %s\n' % self.ip_addr
             txt += '\nDNS: %s\n' % (self.dns)
         else:
-            # inserire codice lingua
             txt += '\nIP: %s' % self.ip_addr
 
 ##        if self.in_addon == False and self.view_msg == True:
@@ -252,6 +251,7 @@ def test_conn(is_exit, check_dns, view_msg,
         # I don't let you get into the addon
         # inserire codice lingua
         if view_msg == True:
+            # inserire codice lingua
             ktest.view_Advise('Gentile Utente,\nAttualmente non risulti connesso a nessun modem/router. \
 Non puoi accedere a KOD poichè i canali non saranno raggiungibili! \
 Ti consigliamo di controllare quanto meno che il modem/router \
@@ -261,6 +261,7 @@ sia acceso e/o il tuo dispositivo connesso.\n')
 
     elif not ktest.check_Adsl():
         if view_msg == True:
+            # inserire codice lingua
             ktest.view_Advise('Gentile Utente, sembra tu abbia problemi con l\'ADSL! \
 Non puoi accedere a KOD poichè i canali non saranno raggiungibili! \
 Ti consigliamo di chiamare il numero verde del tuo gestore o di controllare \
@@ -271,6 +272,7 @@ quanto meno che il modem/router sia acceso e/o il tuo dispositivo connesso.\n')
     elif ktest.check_dns:
         if not ktest.check_Dns():
             if view_msg == True:
+                # inserire codice lingua
                 ktest.view_Advise('Gentile Utente, i tuoi DNS attuali non ti permettono di raggiungere tutti i siti \
  ergo, non tutti i Canali funzioneranno. Ti consigliamo per usufruire di un maggior numero \
  di canali di impostare i DNS. Cerca su google o contatta ALHAZIEL per una consulenza gratuita!\n')
