@@ -2,7 +2,6 @@
 # -*- Channel Altadefinizione01L Film - Serie -*-
 # -*- By Greko -*-
 
-##import channelselector
 from specials import autoplay
 from core import servertools, support, jsontools
 from core.item import Item
@@ -11,27 +10,33 @@ from platformcode import config, logger
 __channel__ = "altadefinizione01_link"
 
 # ======== def per utility INIZIO ============================
-host = config.get_setting("channel_host", __channel__)
+host = config.get_channel_url(__channel__)
+headers = [['Referer', host]]
 
 list_servers = ['supervideo', 'streamcherry','rapidvideo', 'streamango', 'openload']
 list_quality = ['default']
 
-headers = [['Referer', host]]
 # =========== home menu ===================
 @support.menu
 def mainlist(item):
+##    support.dbg()
 
-    film = ''
-    filmSub = [
-        ('Al Cinema', ['/film-del-cinema', 'peliculas']),
-        ('Generi', ['', 'genres', 'genres']),
-        ('Anni', ['', 'genres', 'years']),
-        ('Mi sento fortunato', ['/piu-visti.html', 'genres', 'lucky']),
-        ('Popolari', ['/piu-visti.html', 'peliculas', '']),
-        ('Qualità', ['/piu-visti.html', 'genres', 'quality']),
-        ('Sub-ITA', ['/sub-ita/', 'peliculas'])
+    film = [
+        ('Al Cinema', ['/film-del-cinema', 'peliculas','']),
+
     ]
-
+    
+    film = [
+        ('Generi', ['', 'genres', 'genres', '']),
+        ('Anni', ['', 'genres', 'years', '']),
+        ('Qualità', ['/piu-visti.html', 'genres', 'quality', '']),
+        ('Mi sento fortunato', ['/piu-visti.html', 'genres', 'lucky', '']),
+        ('Popolari', ['/piu-visti.html', 'peliculas', '', '']),
+        ('Sub-ITA', ['/sub-ita/', 'peliculas', '', ''])
+    ]
+    
+    search = ''
+    
     return locals()
 
 # ======== def in ordine di action dal menu ===========================
