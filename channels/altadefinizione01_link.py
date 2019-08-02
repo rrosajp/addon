@@ -23,10 +23,6 @@ def mainlist(item):
 
     film = [
         ('Al Cinema', ['/film-del-cinema', 'peliculas','']),
-
-    ]
-    
-    film = [
         ('Generi', ['', 'genres', 'genres', '']),
         ('Anni', ['', 'genres', 'years', '']),
         ('Qualità', ['/piu-visti.html', 'genres', 'quality', '']),
