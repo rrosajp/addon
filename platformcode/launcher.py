@@ -72,8 +72,7 @@ def run(item=None):
             else:
                 item = Item(channel="channelselector", action="getmainlist", viewmode="movie")
         if not config.get_setting('show_once'):
-            if not os.path.isdir(config.get_runtime_path() + '/.git'):
-                logger.info("DEV MODE OFF")
+            if not config.dev_mode():
                 from platformcode import updater
                 updater.calcCurrHash()
             from platformcode import xbmc_videolibrary

@@ -89,8 +89,7 @@ def check_addon_init():
                             text = ""
                             try:
                                 localFile = open(addonDir + file["filename"], 'r+')
-                                for line in localFile:
-                                    text += line
+                                text = localFile.read()
                             except IOError: # nuovo file
                                 localFile = open(addonDir + file["filename"], 'w')
 
@@ -105,12 +104,13 @@ def check_addon_init():
                                 else:  # nel caso ci siano stati problemi
                                     logger.info('lo sha non corrisponde, scarico il file')
                                     downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'],
-                                                               silent=True, continuar=True)
+                                                               silent=True, continuar=True, resumir=False)
                         else:  # è un file NON testuale, lo devo scaricare
                             # se non è già applicato
                             if not (filetools.isfile(addonDir + file['filename']) and getSha(
                                     filetools.read(addonDir + file['filename']) == file['sha'])):
-                                downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'], silent=True, continuar=True)
+                                downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'], silent=True,
+                                                           continuar=True, resumir=False)
                                 alreadyApplied = False
                     elif file['status'] == 'removed':
                         try:
