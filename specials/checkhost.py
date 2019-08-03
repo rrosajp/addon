@@ -1,48 +1,21 @@
 # -*- coding: utf-8 -*-
-"""
-    sito con lista errori:
-    https://www.evemilano.com/status-code/
-
-    Tabella errori:
-    [Errno 11001] := sito non esistente
-    [Errno 11002] := sito non esistente o non raggiungibile in quel momento (DNS)
-
-    500 := Internal Server Error
-    503 := Service Unavailable
-
-    Cloudflare:
-    521 := Web Server Is Down
-    522 := Connection Timed Out
-    523 := Origin Is Unreachable
-
-    ReadTimeout(ReadTimeoutError("HTTPSConnectionPool(host='italiafilm.info', port=443): Read timed out. (read timeout=7)"
-    in browser diventa errore 522...Problema di cloudflare
-"""
-
 import xbmc, xbmcgui
 import xbmcaddon
 import json
-from platformcode import logger
+from platformcode import config, logger
 import requests
 from requests.exceptions import HTTPError
-import socket
 
 addon = xbmcaddon.Addon()
 addonname = addon.getAddonInfo('name')
 addonid = addon.getAddonInfo('id')
-#pluginname = 'script.module.kdicc'
 
-LIST_SITE = ['https://www.wikipedia.it', 'https://www.google.it',
-                'https://www.yahoo.it', 'https://www.debian.it']
+LIST_SITE = ['https://www.google.com', 'https://www.google.it',
+                'http://www.ansa.it/', 'https://www.debian.org/']
 
-# lista di siti che non verranno raggiunti se con i DNS del gestore
+# lista di siti che non verranno raggiunti con i DNS del gestore
 LST_SITE_CHCK_DNS = ['https://www.italia-film.pw', 'https://casacinema.space',
                      'https://filmsenzalimiti.best']
-
-"""
-        raggiungibilità dei siti in base al s.o. e gestore
-        https://github.com/greko17/kdicc/wiki/Raggiungibilit%C3%A0-siti-in-base-al-so-e-gestore
-"""
 
 
 class Kdicc():
@@ -130,7 +103,6 @@ class Kdicc():
             url deve iniziare con http(s):'
             return : (esito, sito, url, code, reurl)
         """
-##        xbmc.log("LST_URLS : %s" % lst_urls, level=xbmc.LOGNOTICE)
         rslt_final = []
         
         if lst_urls == []:
@@ -139,7 +111,6 @@ class Kdicc():
         for sito in lst_urls:
             rslt = {}
             try:
-##                r = requests.get(sito, allow_redirects=True)
                 r = requests.head(sito, allow_redirects = True, timeout=7)
                 if r.url.endswith('/'):
                     r.url = r.url[:-1]
@@ -154,41 +125,13 @@ class Kdicc():
                 rslt['isRedirect'] = is_redirect
                 rslt['history'] = r.history
                 xbmc.log("Risultato nel try: %s" %  (r,), level=xbmc.LOGNOTICE)
-            except requests.exceptions.HTTPError as http_err:
-                # 522 Server Error: Origin Connection Time-out for url: https://italiafilm.info/
-                # Errore : 404 Client Error: NOT FOUND for url: http://httpbin.org/status/404
-                xbmc.log("http_err : %s " % http_err, level=xbmc.LOGNOTICE)
-
-                rslt['code'] = r.status_code    
-                rslt['url'] = str(sito)
-                rslt['http_err'] = http_err
-                rslt['history'] = r.history
                 
             except requests.exceptions.ConnectionError as conn_errr:
-                # HTTPSConnectionPool(host='www.yahoo.minkia', port=443): Max retries
-                # exceeded with url: /(Caused by NewConnectionError
-                # ('<urllib3.connection.VerifiedHTTPSConnection object at 0x7f96f7506d50>:
-                # Failed to establish a new connection: [Errno -2] Name or service not known',))
-                xbmc.log("conn_errr : %s " % conn_errr, level=xbmc.LOGNOTICE)
-                
-                if '[Errno -2]' in str(conn_errr) or 'Errno 7' in str(conn_errr):
-##                    or 'Errno 11001' in str(conn_errr):
-                    # il sito non esiste!!!
-                    # Failed to establish a new connection: [Errno 7] errore android
-                    rslt['code'] = '-2'
-                    rslt['url'] = str(sito)
-                    rslt['http_err'] = 'unknown host'
-
-                elif '[Errno 110]' in str(conn_errr):
-                    rslt['code'] = '110'
-                    rslt['url'] = str(sito)
-                    rslt['http_err'] = 'Connection timed out'
-
                 # Errno 10061 per s.o. win
                 # gli Errno 10xxx e 11xxx saranno da compattare in qualche modo?
                 # gli errori vengono inglobati in code = '111' in quanto in quel momento
                 # non vengono raggiunti per una qualsiasi causa
-                elif '[Errno 111]' in str(conn_errr) or 'Errno 10061' in str(conn_errr) \
+                if '[Errno 111]' in str(conn_errr) or 'Errno 10061' in str(conn_errr) \
                      or 'ConnectTimeoutError' in str(conn_errr) \
                      or 'Errno 11002' in str(conn_errr) or 'ReadTimeout' in str(conn_errr) \
                      or 'Errno 11001' in str(conn_errr): # questo errore è anche nel code: -2
@@ -200,18 +143,8 @@ class Kdicc():
                     rslt['code'] = conn_errr
                     rslt['url'] = str(sito)
                     rslt['http_err'] = 'Connection refused'
-##                    rslt['history'] = r.history
-
-            except requests.exceptions.RequestException as other_err:
-                xbmc.log("other_err: %s " % other_err, level=xbmc.LOGNOTICE)
-                rslt['code'] = other_err
-                rslt['url'] = str(sito)
-##                rslt['history'] = r.history
-
             rslt_final.append(rslt)
-##        xbmc.log("rslt_final: %s " % rslt_final, level=xbmc.LOGNOTICE)
-##        if self.check_dns == True:
-##            return rslt_final
+
         return rslt_final
 
 
@@ -252,20 +185,14 @@ def test_conn(is_exit, check_dns, view_msg,
         # inserire codice lingua
         if view_msg == True:
             # inserire codice lingua
-            ktest.view_Advise('Gentile Utente,\nAttualmente non risulti connesso a nessun modem/router. \
-Non puoi accedere a KOD poichè i canali non saranno raggiungibili! \
-Ti consigliamo di controllare quanto meno che il modem/router \
-sia acceso e/o il tuo dispositivo connesso.\n')
+            ktest.view_Advise(config.get_localized_string(70720))
         if ktest.is_exit == True:
             exit()
 
     elif not ktest.check_Adsl():
         if view_msg == True:
             # inserire codice lingua
-            ktest.view_Advise('Gentile Utente, sembra tu abbia problemi con l\'ADSL! \
-Non puoi accedere a KOD poichè i canali non saranno raggiungibili! \
-Ti consigliamo di chiamare il numero verde del tuo gestore o di controllare \
-quanto meno che il modem/router sia acceso e/o il tuo dispositivo connesso.\n')
+            ktest.view_Advise(config.get_localized_string(70721))
         if ktest.is_exit == True:
             exit()
 
@@ -273,9 +200,7 @@ quanto meno che il modem/router sia acceso e/o il tuo dispositivo connesso.\n')
         if not ktest.check_Dns():
             if view_msg == True:
                 # inserire codice lingua
-                ktest.view_Advise('Gentile Utente, i tuoi DNS attuali non ti permettono di raggiungere tutti i siti \
- ergo, non tutti i Canali funzioneranno. Ti consigliamo per usufruire di un maggior numero \
- di canali di impostare i DNS. Cerca su google o contatta ALHAZIEL per una consulenza gratuita!\n')
+                ktest.view_Advise(config.get_localized_string(70722))
 ##            if ktest.is_exit == True:
 ##                exit()
 
