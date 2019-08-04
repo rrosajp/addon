@@ -34,7 +34,7 @@ def get_addon_version(with_fix=True):
 def get_addon_version_fix():
     if not dev_mode():
         sha = open(os.path.join(get_runtime_path(), 'last_commit.txt')).readline()
-        return sha[:8]
+        return sha[:7]
     else:
         return 'DEV'
 

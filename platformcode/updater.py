@@ -103,12 +103,20 @@ def check_addon_init():
                                     alreadyApplied = False
                                 else:  # nel caso ci siano stati problemi
                                     logger.info('lo sha non corrisponde, scarico il file')
+                                    try:
+                                        filetools.remove(addonDir + file["filename"])
+                                    except:
+                                        pass
                                     downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'],
                                                                silent=True, continuar=True, resumir=False)
                         else:  # è un file NON testuale, lo devo scaricare
                             # se non è già applicato
                             if not (filetools.isfile(addonDir + file['filename']) and getSha(
                                     filetools.read(addonDir + file['filename']) == file['sha'])):
+                                try:
+                                    filetools.remove(addonDir + file["filename"])
+                                except:
+                                    pass
                                 downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'], silent=True,
                                                            continuar=True, resumir=False)
                                 alreadyApplied = False
