@@ -5587,12 +5587,12 @@ msgstr "Non riesco a trovare automaticamente il numero dell'episodio speciale, p
 
 msgctxt "#70720"
 msgid "Dear User\n,You are currently not connected to any modem/router. You cannot access KOD because the channels will not be reachable! We advise you to check at least that the modem/router is switched on and/or your device is connected.\n"
-msgstr "Gentile Utente,\nAttualmente non risulti connesso a nessun modem/router.\nNON POTRAI ACCEDERE A KOD!\npoichè i canali non saranno raggiungibili, finchè non risolverai il problema. Ti consigliamo di controllare quanto meno che il modem/router sia acceso e/o il tuo dispositivo connesso.\n"
+msgstr "Gentile Utente,\nAttualmente non risulti connesso a nessun Modem/Router.\nNON POTRAI ACCEDERE A KOD!\npoichè i canali non saranno raggiungibili, finchè non risolverai il problema. Controlla quanto meno che il modem/router sia acceso e/o il tuo dispositivo connesso.\n"
 
 msgctxt "#70721"
 msgid "Dear user, you seem to have problems with ADSL! You cannot access KOD because the channels will not be accessible! We suggest you call your manager's toll-free number or check it out at least that the modem/router is on and/or your device is connected."
-msgstr "Gentile Utente, sembra tu abbia problemi con l'ADSL! Non puoi accedere a KOD poichè i canali non saranno raggiungibili! Ti consigliamo di chiamare il numero verde del tuo gestore o di controllare quanto meno che il modem/router sia acceso e/o il tuo dispositivo connesso."
+msgstr "Gentile Utente, sembra tu abbia problemi con l'ADSL! NON POTRAI ACCEDERE A KOD!\npoichè i canali non saranno raggiungibili, finchè non risolverai il problema.  Controlla quanto meno che il modem/router sia acceso e/o il tuo dispositivo connesso."
 
 msgctxt "#70722"
 msgid "Dear User, your current DNS do not allow you to reach all ergo sites, not all Channels will work. We recommend that you set up your DNS to take advantage of more channels. Search your favorite search engine how to set them up on your device."
-msgstr "Gentile Utente, i tuoi DNS attuali non ti permettono di raggiungere tutti i siti, ergo, non tutti i Canali funzioneranno. Ti consigliamo per usufruire di un maggior numero di canali, di impostare i DNS. Cerca sul tuo motore di ricerca preferito come impostarli sul tuo dispositivo."
+msgstr "Gentile Utente, i tuoi DNS attuali non ti permettono di raggiungere tutti i siti, ergo, non tutti i Canali funzioneranno. Ti consigliamo, per usufruire di un maggior numero di canali, di impostare i DNS. Cerca sul tuo motore di ricerca preferito come impostarli sul tuo dispositivo."

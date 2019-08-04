@@ -251,7 +251,12 @@ def scrape(func):
                         val = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
                     scraped[kk] = val
 
-                title = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["title"]).replace('"',"'").replace('×', 'x').replace('–','-')).strip()  # fix by greko da " a '
+                if scraped['title']:
+                    title = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped['title'])
+                                                     .replace('"',"'").replace('×', 'x').replace('–','-')).strip()  # fix by greko da " a '
+                else:
+                    title = ''
+                    
                 plot = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["plot"]))
 
                 longtitle = typo(title, 'bold')
@@ -260,7 +265,8 @@ def scrape(func):
                     scraped['episode'] = re.sub(r'\s-\s|-|x|&#8211', 'x', scraped['episode'])
                     longtitle = typo(scraped['episode'] + ' - ', 'bold') + longtitle
                 if scraped['title2']:
-                    title2 = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["title2"]).replace('"', "'").replace('×', 'x').replace('–','-')).strip()
+                    title2 = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped['title2'])
+                                                      .replace('"', "'").replace('×', 'x').replace('–','-')).strip()
                     longtitle = longtitle + typo(title2, 'bold _ -- _')
                     
                 ##    Aggiunto/modificato per gestire i siti che hanno i video
@@ -278,20 +284,20 @@ def scrape(func):
                     infolabels = item.infoLabels
                 else:
                     infolabels = {}
-                    if scraped["year"]:
-                        infolabels['year'] = scraped["year"]
+                    if scraped['year']:
+                        infolabels['year'] = scraped['year']
                     if scraped["plot"]:
                         infolabels['plot'] = plot
-                    if scraped["duration"]:
-                        matches = scrapertoolsV2.find_multiple_matches(scraped["duration"],
+                    if scraped['duration']:
+                        matches = scrapertoolsV2.find_multiple_matches(scraped['duration'],
                                                                        r'([0-9])\s*?(?:[hH]|:|\.|,|\\|\/|\||\s)\s*?([0-9]+)')
                         for h, m in matches:
-                            scraped["duration"] = int(h) * 60 + int(m)
+                            scraped['duration'] = int(h) * 60 + int(m)
                         if not matches:
-                            scraped["duration"] = scrapertoolsV2.find_single_match(scraped["duration"], r'(\d+)')
-                        infolabels['duration'] = int(scraped["duration"]) * 60
-                    if scraped["genere"]:
-                        genres = scrapertoolsV2.find_multiple_matches(scraped["genere"], '[A-Za-z]+')
+                            scraped['duration'] = scrapertoolsV2.find_single_match(scraped['duration'], r'(\d+)')
+                        infolabels['duration'] = int(scraped['duration']) * 60
+                    if scraped['genere']:
+                        genres = scrapertoolsV2.find_multiple_matches(scraped['genere'], '[A-Za-z]+')
                         infolabels['genere'] = ", ".join(genres)
                     if scraped["rating"]:
                         infolabels['rating'] = scrapertoolsV2.decodeHtmlentities(scraped["rating"])
@@ -304,29 +310,30 @@ def scrape(func):
                     for name, variants in typeActionDict.items():
                         if scraped['type'] in variants:
                             action = name
-                
-                if scraped["title"] not in blacklist:
-                    it = Item(
-                        channel=item.channel,
-                        action=action,
-                        contentType= 'episode' if (action == 'findvideos' and item.contentType == 'tvshow') else item.contentType,
-                        title=longtitle,
-                        fulltitle=item.fulltitle if (action == 'findvideos' and item.contentType != 'movie') else title,
-                        show=item.show if (action == 'findvideos' and item.contentType != 'movie') else title,
-                        quality=scraped["quality"],
-                        url=scraped["url"],
-                        infoLabels=infolabels,
-                        thumbnail=scraped["thumb"],
-                        args=item.args,
-                        contentSerieName = title if (action == 'episodios' and item.contentType != 'movie') else ''
-                    )
-                    
-                    for lg in list(set(listGroups).difference(known_keys)):
-                        it.__setattr__(lg, match[listGroups.index(lg)])
 
-                    if 'itemHook' in args:
-                        it = args['itemHook'](it)
-                    itemlist.append(it)
+                if scraped["title"]:
+                    if scraped["title"] not in blacklist:
+                        it = Item(
+                            channel=item.channel,
+                            action=action,
+                            contentType= 'episode' if (action == 'findvideos' and item.contentType == 'tvshow') else item.contentType,
+                            title=longtitle,
+                            fulltitle=item.fulltitle if (action == 'findvideos' and item.contentType != 'movie') else title,
+                            show=item.show if (action == 'findvideos' and item.contentType != 'movie') else title,
+                            quality=scraped["quality"],
+                            url=scraped["url"],
+                            infoLabels=infolabels,
+                            thumbnail=scraped["thumb"],
+                            args=item.args,
+                            contentSerieName = title if (action == 'episodios' and item.contentType != 'movie') else ''
+                        )
+                        
+                        for lg in list(set(listGroups).difference(known_keys)):
+                            it.__setattr__(lg, match[listGroups.index(lg)])
+
+                        if 'itemHook' in args:
+                            it = args['itemHook'](it)
+                        itemlist.append(it)
             checkHost(item, itemlist)
            
             if (item.contentType == "tvshow" and (action != "findvideos" and action != "play")) \
