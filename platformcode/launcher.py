@@ -38,11 +38,6 @@ def start():
     check_adsl = test_conn(is_exit = True, check_dns = True, view_msg = True,
               lst_urls = [], lst_site_check_dns = [], in_addon = True)
 
-   # Permette di scrivere il file channels.json
-   # controllando gli url del file solo se tutti i check
-   # della connessione sono andati a buon fine
-##    if check_adsl:
-##        check_channels()
     
 def run(item=None):
     logger.info()

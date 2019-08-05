@@ -5,7 +5,7 @@ import json
 from platformcode import config, logger
 import requests
 from requests.exceptions import HTTPError
-import httplib2
+from lib import httplib2
 import socket
 
 addon = xbmcaddon.Addon()
@@ -113,7 +113,7 @@ class Kdicc():
         for sito in lst_urls:
             rslt = {}
             try:
-                r = requests.head(sito, allow_redirects = True, timeout=7)
+                r = requests.head(sito, allow_redirects = True, timeout=7) # da errore dopo l'inserimento in lib di httplib2
                 if r.url.endswith('/'):
                     r.url = r.url[:-1]
                 if str(sito) != str(r.url):
