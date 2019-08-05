@@ -3,6 +3,12 @@
 # Canale per altadefinizione01
 # ------------------------------------------------------------
 
+
+"""
+        DA FINIRE - CONTROLLARE
+        
+"""
+
 from specials import autoplay
 from core import servertools, support, jsontools
 from core.item import Item
@@ -38,10 +44,10 @@ def peliculas(item):
     support.log('peliculas',item)
 
     action="findvideos"
-##    if item.args == "search":
-##        patronBlock = r'</script> <div class="boxgrid caption">(.*?)<div id="right_bar">'
-##    else:
-##        patronBlock = r'<div class="cover_kapsul ml-mask">(.*?)<div class="page_nav">'
+    if item.args == "search":
+        patronBlock = r'</script> <div class="boxgrid caption">(.*?)<div id="right_bar">'
+    else:
+        patronBlock = r'<div class="cover_kapsul ml-mask">(.*?)<div class="page_nav">'
     patron = r'<div class="cover boxcaption"> <h2>.<a href="(?P<url>[^"]+)">.*?<.*?src="(?P<thumb>[^"]+)"'\
          '.+?[^>]+>[^>]+<div class="trdublaj"> (?P<quality>[A-Z]+)<[^>]+>(?:.[^>]+>(?P<lang>.*?)<[^>]+>).*?'\
          '<p class="h4">(?P<title>.*?)</p>[^>]+> [^>]+> [^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> [^>]+> '\
@@ -60,7 +66,7 @@ def categorie(item):
 
     if item.args != 'orderalf': action = "peliculas"
     else: action = 'orderalf'
-    blacklist = 'Altadefinizione01'
+    blacklist = 'altadefinizione01'
 
     if item.args == 'genres':
         patronBlock = r'<ul class="kategori_list">(.*?)</ul>'
