@@ -8,17 +8,22 @@ import re
 import time
 import unicodedata
 
+
 from core import filetools, jsontools, scraper, scrapertools, servertools, videolibrarytools, support
 from core.downloader import Downloader
 from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
+from core.support import log
 
 STATUS_COLORS = {0: "orange", 1: "orange", 2: "green", 3: "red"}
 STATUS_CODES = type("StatusCode", (), {"stoped": 0, "canceled": 1, "completed": 2, "error": 3})
 DOWNLOAD_LIST_PATH = config.get_setting("downloadlistpath")
 DOWNLOAD_PATH = config.get_setting("downloadpath")
 STATS_FILE = os.path.join(config.get_data_path(), "servers.json")
+
+FOLDER_MOVIES = config.get_setting("folder_movies")
+FOLDER_TVSHOWS = config.get_setting("folder_tvshows")
 
 TITLE_FILE = "[COLOR %s][%i%%][/COLOR] %s"
 TITLE_TVSHOW = "[COLOR %s][%i%%][/COLOR] %s [%s]"
@@ -262,9 +267,20 @@ def menu(item):
 
 
 def move_to_libray(item):
+    logger.info('TITOLO= '+ item.title)
+    logger.info('TITOLO= '+ item.show)
+    if item.contentType == 'movie':
+        FOLDER = FOLDER_MOVIES
+        path_title = "%s [%s]" % (item.contentTitle.strip(), item.infoLabels['IMDBNumber'])
+        move_path = filetools.join(config.get_videolibrary_path(), FOLDER, path_title)
+        
+    else:
+        FOLDER = FOLDER_TVSHOWS
+        path_title = "%s [%s]" % (item.contentSerieName, item.infoLabels['IMDBNumber'])
+        move_path = filetools.join(config.get_videolibrary_path(), FOLDER)
+
     download_path = filetools.join(config.get_setting("downloadpath"), item.downloadFilename)
-    library_path = filetools.join(config.get_videolibrary_path(), (config.get_setting("folder_movies") if item.contentType == 'movie' else config.get_setting("folder_tvshows")))
-    library_path = filetools.join(library_path, *filetools.split(item.downloadFilename))
+    library_path = filetools.join(move_path, *filetools.split(item.downloadFilename))
     final_path = download_path
     
     if config.get_setting("library_add", "downloads") == True and config.get_setting("library_move", "downloads") == True:
@@ -280,8 +296,33 @@ def move_to_libray(item):
 
             if len(filetools.listdir(filetools.dirname(download_path))) == 0:
                 filetools.rmdir(filetools.dirname(download_path))
+        
+        
+        logger.info('ITEM = ' + str(item))
+        name = item.contentTitle if item.contentType == 'movie' else str(item.infoLabels['season']) + 'x' + str(item.infoLabels['episode']).zfill(2)
+        list_item = os.listdir(filetools.join(config.get_videolibrary_path(), FOLDER, path_title))       
+                
+        clean = False
+        for File in list_item:
+            filename = File.lower()
+            name = name.lower()
+            if File.startswith(name) and (File.endswith('.strm') or File.endswith('.json') or File.endswith('.nfo')):
+                clean = True
+                logger.info('Elimino il File: ' + str(os.path.join(config.get_videolibrary_path(), FOLDER, path_title, File)))
+                os.remove(os.path.join(config.get_videolibrary_path(), FOLDER, path_title, File))
+        from platformcode import xbmc_videolibrary
+        xbmc_videolibrary.update(FOLDER)
+        if clean == True:
+            import xbmc
+            xbmc.sleep(3000)
+            xbmc_videolibrary.clean()
+        
+        
+                    
+            
+        
 
-    if config.get_setting("library_add", "downloads") == True:
+    if config.get_setting("library_add", "downloads") == True and config.get_setting("library_move", "downloads") == False:
         if filetools.isfile(final_path):
             if item.contentType == "movie" and item.infoLabels["tmdb_id"]:
                 library_item = Item(title=config.get_localized_string(70228) % item.downloadFilename, channel="downloads",
@@ -640,6 +681,8 @@ def select_server(item):
             "downloadServer": {"url": play_items[seleccion - 1].url, "server": play_items[seleccion - 1].server}})
     elif seleccion == 0:
         update_json(item.path, {"downloadServer": {}})
+    if seleccion == 0:
+        update_json(item.path, {"downloadServer": {}})
 
     platformtools.itemlist_refresh()
 
@@ -828,7 +871,6 @@ def save_download_tvshow(item):
     scraper.find_and_set_infoLabels(item)
     logger.info('ID= ' + item.infoLabels['IMDBNumber'])
     item.downloadFilename = filetools.validate_path("%s [%s]" % (item.contentSerieName, item.infoLabels['IMDBNumber']))
-
     progreso.update(0, config.get_localized_string(70186), config.get_localized_string(70187) % item.contentChannel)
 
     episodes = get_episodes(item)
