@@ -22,9 +22,7 @@ list_quality = ['default']
 @support.menu
 def mainlist(item):
 
-    film = ''
-
-    filmSub = [
+    film = [
         ('Al Cinema', ['/cinema/', 'peliculas', 'pellicola']),
         ('Generi', ['', 'categorie', 'genres']),
         ('Lettera', ['/catalog/a/', 'categorie', 'orderalf']),

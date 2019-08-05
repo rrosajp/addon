@@ -34,11 +34,16 @@ def start():
     # se lo ha: non lo fa entrare nell'addon
     # se ha problemi di DNS avvia ma lascia entrare
     # se tutto ok: entra nell'addon
-    from specials.checkhost import test_conn
-    test_conn(is_exit = True, check_dns = True, view_msg = True,
+    from specials.checkhost import test_conn, check_channels
+    check_adsl = test_conn(is_exit = True, check_dns = True, view_msg = True,
               lst_urls = [], lst_site_check_dns = [], in_addon = True)
 
-
+   # Permette di scrivere il file channels.json
+   # controllando gli url del file solo se tutti i check
+   # della connessione sono andati a buon fine
+##    if check_adsl:
+##        check_channels()
+    
 def run(item=None):
     logger.info()
     if not item:

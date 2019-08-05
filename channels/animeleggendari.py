@@ -15,32 +15,31 @@ from specials import autoplay, autorenumber
 __channel__ = "animeleggendari"
 host = config.get_channel_url(__channel__)
 
-# Richiesto per Autoplay
-IDIOMAS = {'Italiano': 'IT'}
-list_language = IDIOMAS.values()
-list_servers = ['verystream', 'openload', 'streamango']
+headers = [['User-Agent', 'Mozilla/50.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0'],
+           ['Referer', host]]
+
+list_servers = ['verystream','openload','rapidvideo','streamango']
 list_quality = ['default']
 
 checklinks = config.get_setting('checklinks', 'animeleggendari')
 checklinks_number = config.get_setting('checklinks_number', 'animeleggendari')
 
+                                       
+@support.menu
 def mainlist(item):
-    log()
 
-    itemlist = []
-    menu(itemlist, 'Anime Leggendari', 'peliculas', host + '/category/anime-leggendari/')
-    menu(itemlist, 'Anime ITA', 'peliculas', host + '/category/anime-ita/')
-    menu(itemlist, 'Anime SUB-ITA', 'peliculas', host + '/category/anime-sub-ita/')
-    menu(itemlist, 'Anime Conclusi', 'peliculas', host + '/category/serie-anime-concluse/')
-    menu(itemlist, 'Anime in Corso', 'peliculas', host + '/category/anime-in-corso/')
-    menu(itemlist, 'Genere', 'genres', host)
-    menu(itemlist, 'Cerca...', 'search')
-                     
-    autoplay.init(item.channel, list_servers, list_quality)
-    autoplay.show_option(item.channel, itemlist)
-    support.channel_config(item, itemlist)
+    anime = ''
+    animeSub = [
+        ('Leggendari', ['/category/anime-leggendari/', 'peliculas']),
+        ('ITA', ['/category/anime-ita/', 'peliculas']),
+        ('SUB-ITA', ['/category/anime-sub-ita/', 'peliculas']),
+        ('Conclusi', ['/category/serie-anime-concluse/', 'peliculas']),
+        ('in Corso', ['/category/anime-in-corso/', 'peliculas']),
+        ('Genere', ['', 'genres'])
+    ]
 
-    return itemlist
+    return locals()
+
 
 def search(item, texto):
     log(texto)
@@ -48,17 +47,21 @@ def search(item, texto):
     item.url = host + "/?s=" + texto
     try:
         return peliculas(item)
-        
-    # Continua la ricerca in caso di errore 
+
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
             logger.error("%s" % line)
         return []
 
+@support.scrape
 def last_ep(item):
     log('ANIME PER TUTTI')
-    return support.scrape(item, '<a href="([^"]+)">([^<]+)<', ['url','title'],patron_block='<ul class="mh-tab-content-posts">(.*?)<\/ul>', action='findvideos')
+
+    action = 'findvideos'
+    patron = r'<a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
+    patron_block = r'<ul class="mh-tab-content-posts">(.*?)<\/ul>'
 
 def newest(categoria):
     log('ANIME PER TUTTI')
@@ -73,7 +76,7 @@ def newest(categoria):
 
             if itemlist[-1].action == "last_ep":
                 itemlist.pop()
-    # Continua la ricerca in caso di errore 
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
@@ -82,11 +85,17 @@ def newest(categoria):
 
     return itemlist
 
+@support.scrape
 def genres(item):
-    itemlist = support.scrape(item, '<a href="([^"]+)">([^<]+)<', ['url', 'title'], action='peliculas', patron_block=r'Generi.*?<ul.*?>(.*?)<\/ul>', blacklist=['Contattaci','Privacy Policy', 'DMCA'])
-    return support.thumb(itemlist)
+    log()
 
-def peliculas(item):    
+    action = 'peliculas'
+    blacklist = ['Contattaci','Privacy Policy', 'DMCA']
+    patron = r'<a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
+    patron_block = r'Generi.*?<ul.*?>(.*?)<\/ul>'
+    return locals()
+
+def peliculas(item):
     log()
     itemlist = []
 
@@ -94,11 +103,11 @@ def peliculas(item):
     matches, data = support.match(item, r'<a class="[^"]+" href="([^"]+)" title="([^"]+)"><img[^s]+src="([^"]+)"[^>]+')
 
     for url, title, thumb in matches:
-        title = scrapertoolsV2.decodeHtmlentities(title.strip()).replace("streaming", "")        
+        title = scrapertoolsV2.decodeHtmlentities(title.strip()).replace("streaming", "")
         lang = scrapertoolsV2.find_single_match(title, r"((?:SUB ITA|ITA))")
-        videoType = '' 
+        videoType = ''
         if 'movie' in title.lower():
-            videoType = ' - (MOVIE)' 
+            videoType = ' - (MOVIE)'
         if 'ova' in title.lower():
             videoType = ' - (OAV)'
 
@@ -117,13 +126,13 @@ def peliculas(item):
                     action=action,
                     contentType=contentType,
                     title=support.typo(cleantitle + videoType, 'bold') + support.typo(lang,'_ [] color kod'),
-                    fulltitle=cleantitle,                    
+                    fulltitle=cleantitle,
                     show=cleantitle,
                     url=url,
                     thumbnail=thumb))
 
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-    autorenumber.renumber(itemlist)    
+    autorenumber.renumber(itemlist)
     support.nextPage(itemlist, item, data, r'<a class="next page-numbers" href="([^"]+)">')
 
     return itemlist
@@ -155,7 +164,7 @@ def episodios(item):
                      fulltitle=item.title,
                      url=url,
                      thumbnail=item.thumbnail))
-    
+
     autorenumber.renumber(itemlist, item)
     support.videolibrary
     return itemlist
@@ -171,16 +180,16 @@ def findvideos(item):
             log('DATA',data)
             if 'animepertutti' in data:
                 log('ANIMEPERTUTTI!')
-          
+
     else:
         data = ''
 
     itemlist = support.server(item,data)
-        
+
     if checklinks:
         itemlist = servertools.check_list_links(itemlist, checklinks_number)
 
     # itemlist = filtertools.get_links(itemlist, item, list_language)
     autoplay.start(itemlist, item)
-    
+
     return itemlist

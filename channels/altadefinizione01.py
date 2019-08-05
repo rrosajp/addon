@@ -8,7 +8,7 @@ from core import servertools, support, jsontools
 from core.item import Item
 from platformcode import config, logger
 
-__channel__ = "altadefinizione01_club"
+__channel__ = "altadefinizione01"
 
 host = config.get_channel_url(__channel__)
 
@@ -22,9 +22,7 @@ list_quality = ['default']
 @support.menu
 def mainlist(item):
 
-    film = ''
-
-    filmSub = [
+    film = [
         ('Al Cinema', ['/cinema/', 'peliculas', 'pellicola']),
         ('Generi', ['', 'categorie', 'genres']),
         ('Lettera', ['/catalog/a/', 'categorie', 'orderalf']),
@@ -40,17 +38,19 @@ def peliculas(item):
     support.log('peliculas',item)
 
     action="findvideos"
-    if item.args == "search":
-        patronBlock = r'</script> <div class="boxgrid caption">(.*?)<div id="right_bar">'
-    else:
-        patronBlock = r'<div class="cover_kapsul ml-mask">(.*?)<div class="page_nav">'
+##    if item.args == "search":
+##        patronBlock = r'</script> <div class="boxgrid caption">(.*?)<div id="right_bar">'
+##    else:
+##        patronBlock = r'<div class="cover_kapsul ml-mask">(.*?)<div class="page_nav">'
     patron = r'<div class="cover boxcaption"> <h2>.<a href="(?P<url>[^"]+)">.*?<.*?src="(?P<thumb>[^"]+)"'\
          '.+?[^>]+>[^>]+<div class="trdublaj"> (?P<quality>[A-Z]+)<[^>]+>(?:.[^>]+>(?P<lang>.*?)<[^>]+>).*?'\
          '<p class="h4">(?P<title>.*?)</p>[^>]+> [^>]+> [^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> [^>]+> '\
          '[^>]+>[^>]+>(?P<year>\d{4})[^>]+>[^>]+> [^>]+>[^>]+>(?P<duration>\d+).+?>'
 
     patronNext =  '<span>\d</span> <a href="([^"]+)">'
-
+    
+##    support.regexDbg(item, patron, headers)
+                     
     return locals()
 
 @support.scrape
