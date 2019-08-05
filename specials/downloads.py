@@ -307,15 +307,14 @@ def move_to_libray(item):
             filename = File.lower()
             name = name.lower()
             if File.startswith(name) and (File.endswith('.strm') or File.endswith('.json') or File.endswith('.nfo')):
-                clean = True
                 logger.info('Elimino il File: ' + str(os.path.join(config.get_videolibrary_path(), FOLDER, path_title, File)))
                 os.remove(os.path.join(config.get_videolibrary_path(), FOLDER, path_title, File))
         from platformcode import xbmc_videolibrary
+        import xbmc
         xbmc_videolibrary.update(FOLDER)
-        if clean == True:
-            import xbmc
-            xbmc.sleep(3000)
-            xbmc_videolibrary.clean()
+        while xbmc.getCondVisibility('Library.IsScanningVideo()'):
+            xbmc.sleep(500)
+        xbmc_videolibrary.clean()
         
         
                     
