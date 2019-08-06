@@ -76,7 +76,7 @@ def check_addon_init():
             # evitiamo di applicare i merge commit
             if 'Merge' in commitJson['commit']['message']:
                 continue
-            logger.info('aggiornando a' + commitJson['sha'])
+            logger.info('aggiornando a ' + commitJson['sha'])
             alreadyApplied = True
 
             for file in commitJson['files']:
