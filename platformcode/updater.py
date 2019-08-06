@@ -91,6 +91,11 @@ def check_addon_init():
                                 localFile = open(addonDir + file["filename"], 'r+')
                                 text = localFile.read()
                             except IOError: # nuovo file
+                                # crea le cartelle se non esistono
+                                dirname = os.path.dirname(addonDir + file["filename"])
+                                if not os.path.exists(dirname):
+                                    os.makedirs(dirname)
+
                                 localFile = open(addonDir + file["filename"], 'w')
 
                             patched = apply_patch(text, (file['patch']+'\n').encode('utf-8'))
