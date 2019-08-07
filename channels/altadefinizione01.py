@@ -66,7 +66,7 @@ def categorie(item):
 
     if item.args != 'orderalf': action = "peliculas"
     else: action = 'orderalf'
-    blacklist = ['Altadefinizione01']
+    blacklist = 'altadefinizione01'
 
     if item.args == 'genres':
         patronBlock = r'<ul class="kategori_list">(?P<block>.*)</ul>'
@@ -130,4 +130,4 @@ def newest(categoria):
             logger.error("{0}".format(line))
         return []
 
-    return itemlist
+return itemlist
