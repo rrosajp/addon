@@ -9,8 +9,8 @@
         
 """
 
-from specials import autoplay
-from core import servertools, support, jsontools
+##from specials import autoplay
+from core import support #,servertools
 from core.item import Item
 from platformcode import config, logger
 
@@ -27,7 +27,7 @@ list_quality = ['default']
 
 @support.menu
 def mainlist(item):
-
+    
     film = [
         ('Al Cinema', ['/cinema/', 'peliculas', 'pellicola']),
         ('Generi', ['', 'categorie', 'genres']),
@@ -40,18 +40,17 @@ def mainlist(item):
 
 @support.scrape
 def peliculas(item):
-##    import web_pdb; web_pdb.set_trace()
     support.log('peliculas',item)
-
+##    support.dbg()
     action="findvideos"
     if item.args == "search":
         patronBlock = r'</script> <div class="boxgrid caption">(?P<block>.*)<div id="right_bar">'
     else:
         patronBlock = r'<div class="cover_kapsul ml-mask">(?P<block>.*)<div class="page_nav">'
     patron = r'<div class="cover boxcaption"> <h2>.<a href="(?P<url>[^"]+)">.*?<.*?src="(?P<thumb>[^"]+)"'\
-         '.+?[^>]+>[^>]+<div class="trdublaj"> (?P<quality>[A-Z]+)<[^>]+>(?:.[^>]+>(?P<lang>.*?)<[^>]+>).*?'\
+         '.+?[^>]+>[^>]+<div class="trdublaj"> (?P<quality>[A-Z/]+)<[^>]+>(?:.[^>]+>(?P<lang>.*?)<[^>]+>).*?'\
          '<p class="h4">(?P<title>.*?)</p>[^>]+> [^>]+> [^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> [^>]+> '\
-         '[^>]+>[^>]+>(?P<year>\d{4})[^>]+>[^>]+> [^>]+>[^>]+>(?P<duration>\d+).+?>'
+         '[^>]+>[^>]+>(?P<year>\d{4})[^>]+>[^>]+> [^>]+>[^>]+>(?P<duration>\d+).+?>.*?<p>(?P<plot>[^<]+)<'
 
     patronNext =  '<span>\d</span> <a href="([^"]+)">'
     
@@ -62,22 +61,24 @@ def peliculas(item):
 @support.scrape
 def categorie(item):
     support.log('categorie',item)
-##    import web_pdb; web_pdb.set_trace()
 
     if item.args != 'orderalf': action = "peliculas"
     else: action = 'orderalf'
-    blacklist = 'altadefinizione01'
+    
+    blacklist = ['Altadefinizione01']
 
     if item.args == 'genres':
-        patronBlock = r'<ul class="kategori_list">(?P<block>.*)</ul>'
+        patronBlock = r'<ul class="kategori_list">(?P<block>.*)<div class="tab-pane fade" id="wtab2">'
         patron = '<li><a href="(?P<url>[^"]+)">(?P<title>.*?)</a>'
     elif item.args == 'years':
-        patronBlock = r'<ul class="anno_list">(?P<block>.*)</ul>'
+        patronBlock = r'<ul class="anno_list">(?P<block>.*)</a></li> </ul> </div>'
         patron = '<li><a href="(?P<url>[^"]+)">(?P<title>.*?)</a>'
     elif item.args == 'orderalf':
         patronBlock = r'<div class="movies-letter">(?P<block>.*)<div class="clearfix">'
         patron = '<a title=.*?href="(?P<url>[^"]+)"><span>(?P<title>.*?)</span>'
-
+        
+    #support.regexDbg(item, patronBlock, headers)
+    
     return locals()
 
 @support.scrape
@@ -108,7 +109,7 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("%s Sono qua: %s" % (__channel__, line))
+            logger.error("search except %s: %s" % (__channel__, line))
         return []
 
 def newest(categoria):
@@ -130,4 +131,4 @@ def newest(categoria):
             logger.error("{0}".format(line))
         return []
 
-return itemlist
+    return itemlist

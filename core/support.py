@@ -193,7 +193,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             if val and (kk == "url" or kk == 'thumb') and 'http' not in val:
                 val = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
             scraped[kk] = val
-
+        
         if scraped['title']:
             title = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped['title'])
                                              .replace('"', "'").replace('×', 'x').replace('–',
@@ -213,7 +213,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                                               .replace('"', "'").replace('×', 'x').replace('–', '-')).strip()
             longtitle = longtitle + typo(title2, 'bold _ -- _')
 
-        lang, longitle = scrapeLang(scraped, lang, longtitle)
+        lang, longtitle = scrapeLang(scraped, lang, longtitle)
 
         # if title is set, probably this is a list of episodes or video sources
         if item.infoLabels["title"]:
@@ -247,7 +247,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 if scraped['type'] in variants:
                     action = name
 
-        if (scraped["title"] and scraped["title"] not in blacklist) or longtitle:
+        if (scraped["title"] not in blacklist) or longtitle:
             it = Item(
                 channel=item.channel,
                 action=action,
@@ -354,9 +354,10 @@ def scrape(func):
 
         checkHost(item, itemlist)
 
-        if (item.contentType == "tvshow" and (action != "findvideos" and action != "play")) \
-            or (item.contentType == "episode" and action != "play") \
-            or (item.contentType == "movie" and action != "play") :
+##        if (item.contentType == "tvshow" and (action != "findvideos" and action != "play")) \
+##            or (item.contentType == "episode" and action != "play") \
+##            or (item.contentType == "movie" and action != "play") :
+        if action != 'play':
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
         # else:                                     # Si perde item show :(
         #     for it in itemlist:
