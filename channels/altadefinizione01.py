@@ -130,4 +130,4 @@ def newest(categoria):
             logger.error("{0}".format(line))
         return []
 
-    return itemlist
+return itemlist
