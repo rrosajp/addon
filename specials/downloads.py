@@ -267,8 +267,6 @@ def menu(item):
 
 
 def move_to_libray(item):
-    logger.info('TITOLO= '+ item.title)
-    logger.info('TITOLO= '+ item.show)
     if item.contentType == 'movie':
         FOLDER = FOLDER_MOVIES
         path_title = "%s [%s]" % (item.contentTitle.strip(), item.infoLabels['IMDBNumber'])
@@ -300,21 +298,24 @@ def move_to_libray(item):
         
         logger.info('ITEM = ' + str(item))
         name = item.contentTitle if item.contentType == 'movie' else str(item.infoLabels['season']) + 'x' + str(item.infoLabels['episode']).zfill(2)
-        list_item = os.listdir(filetools.join(config.get_videolibrary_path(), FOLDER, path_title))       
+        list_item = os.listdir(filetools.join(config.get_videolibrary_path(), FOLDER, path_title))
                 
         clean = False
         for File in list_item:
             filename = File.lower()
             name = name.lower()
-            if File.startswith(name) and (File.endswith('.strm') or File.endswith('.json') or File.endswith('.nfo')):
-                logger.info('Elimino il File: ' + str(os.path.join(config.get_videolibrary_path(), FOLDER, path_title, File)))
+            if filename.startswith(name) and (filename.endswith('.strm') or filename.endswith('.json') or filename.endswith('.nfo')):
+                clean = True
+                logger.info('Delete File: ' + str(os.path.join(config.get_videolibrary_path(), FOLDER, path_title, File)))
                 os.remove(os.path.join(config.get_videolibrary_path(), FOLDER, path_title, File))
         from platformcode import xbmc_videolibrary
-        import xbmc
+        
         xbmc_videolibrary.update(FOLDER)
-        while xbmc.getCondVisibility('Library.IsScanningVideo()'):
-            xbmc.sleep(500)
-        xbmc_videolibrary.clean()
+        if clean == True:
+            import xbmc
+            while xbmc.getCondVisibility('Library.IsScanningVideo()'):
+                xbmc.sleep(500)
+            xbmc_videolibrary.clean()
         
         
                     
