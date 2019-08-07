@@ -3,7 +3,7 @@
 # -*- By Greko -*-
 
 from specials import autoplay
-from core import servertools, support, jsontools
+from core import servertools, support#, jsontools
 from core.item import Item
 from platformcode import config, logger
 
@@ -22,16 +22,16 @@ def mainlist(item):
 ##    support.dbg()
 
     film = [
-        ('Al Cinema', ['/film-del-cinema', 'peliculas','']),
-        ('Generi', ['', 'genres', 'genres', '']),
-        ('Anni', ['', 'genres', 'years', '']),
-        ('Qualità', ['/piu-visti.html', 'genres', 'quality', '']),
-        ('Mi sento fortunato', ['/piu-visti.html', 'genres', 'lucky', '']),
-        ('Popolari', ['/piu-visti.html', 'peliculas', '', '']),
-        ('Sub-ITA', ['/sub-ita/', 'peliculas', '', ''])
+        ('Al Cinema', ['/film-del-cinema', 'peliculas', '']),
+        ('Generi', ['', 'genres', 'genres']),
+        ('Anni', ['', 'genres', 'years']),
+        ('Qualità', ['/piu-visti.html', 'genres', 'quality']),
+        ('Mi sento fortunato', ['/piu-visti.html', 'genres', 'lucky']),
+        ('Popolari', ['/piu-visti.html', 'peliculas', '']),
+        ('Sub-ITA', ['/film-sub-ita/', 'peliculas', ''])
     ]
     
-    search = ''
+##    search = ''
     
     return locals()
 
@@ -39,26 +39,28 @@ def mainlist(item):
 
 @support.scrape
 def peliculas(item):
-    #import web_pdb; web_pdb.set_trace()
+##    support.dbg()
     support.log('peliculas',item)
-    itemlist = []
 
-    patron = r'class="innerImage">.*?href="(?P<url>[^"]+)".*?src="(?P<thumb>[^"]+)"'\
-             '.*?class="ml-item-title">(?P<title>[^<]+)</.*?class="ml-item-label"> '\
-             '(?P<year>\d{4}) <.*?class="ml-item-label"> (?P<duration>\d+) .*?'\
-             'class="ml-item-label ml-item-label-.+?"> (?P<quality>.+?) <.*?'\
-             'class="ml-item-label"> (?P<lang>.+?) </'
+##    patron = r'class="innerImage">.*?href="(?P<url>[^"]+)".*?src="(?P<thumb>[^"]+)"'\
+##             '.*?class="ml-item-title">(?P<title>[^<]+)</.*?class="ml-item-label"> '\
+##             '(?P<year>\d{4}) <.*?class="ml-item-label"> (?P<duration>\d+) .*?'\
+##             'class="ml-item-label ml-item-label-.+?"> (?P<quality>.+?) <.*?'\
+##             'class="ml-itelangm-label"> (?P<lang>.+?) </'
 
+    patron = r'class="innerImage">.*?href="(?P<url>[^"]+)".*?src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> (?P<year>\d{4})[^>]+>[^>]+> (?P<duration>\d+)[^>]+>[^>]+> (?P<quality>[a-zA-Z\\]+)[^>]+>[^>]+> (?P<lang>.*?) [^>]+>'
     patronNext =  '<span>\d</span> <a href="([^"]+)">'
+##    debug = True
 
     return locals()   
 
 # =========== def pagina categorie ======================================
 @support.scrape
 def genres(item):
-    support.log
+    support.log('genres',item)
 
     action = 'peliculas'
+##    item.contentType = 'movie'
     if item.args == 'genres':
         patronBlock = r'<ul class="listSubCat" id="Film">(?P<block>.*)</ul>'
     elif item.args == 'years':
@@ -68,9 +70,9 @@ def genres(item):
     elif item.args == 'lucky': # sono i titoli random nella pagina, cambiano 1 volta al dì
         patronBlock = r'FILM RANDOM.*?class="listSubCat">(?P<block>.*)</ul>'
         action = 'findvideos'
-
+##    item.args = ''
     patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
-
+        
     return locals()    
 
 # =========== def per cercare film/serietv =============
@@ -82,7 +84,7 @@ def search(item, text):
     item.url = host+"/index.php?do=search&story=%s&subaction=search" % (text)
     try:
         return peliculas(item)
-    # Se captura la excepciÛn, para no interrumpir al buscador global si un canal falla
+    # Se captura la excepcion, para no interrumpir al buscador global si un canal falla
     except:
         import sys
         for line in sys.exc_info():
@@ -111,7 +113,6 @@ def newest(categoria):
         return []
 
     return itemlist
-
 
 def findvideos(item):
     return support.server(item, headers=headers)

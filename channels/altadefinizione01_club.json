@@ -1,7 +1,7 @@
 {
   "id": "altadefinizione01_club",
   "name": "Altadefinizione01 C",
-  "active": false,
+  "active": "enable",
   "adult": false,
   "language": ["ita"],
   "fanart": "https://www.altadefinizione01.vision/templates/Darktemplate/images/logo.png",

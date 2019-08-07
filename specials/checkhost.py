@@ -113,7 +113,7 @@ class Kdicc():
         for sito in lst_urls:
             rslt = {}
             try:
-                r = requests.head(sito, allow_redirects = True, timeout=7) # da errore dopo l'inserimento in lib di httplib2
+                r = requests.head(sito, allow_redirects = True)#, timeout=7) # da errore dopo l'inserimento in lib di httplib2
                 if r.url.endswith('/'):
                     r.url = r.url[:-1]
                 if str(sito) != str(r.url):
@@ -289,3 +289,10 @@ def check_channels(inutile=''):
     with open(folderJson+'/'+fileJson_test, 'w') as f:
         data = json.dump(risultato, f, sort_keys=True, indent=4)
         logger.info(data)
+
+    # codice per l'invio del file su git!!!
+
+    # 1. Bottone OKNO richiesta se vuole inviare file
+    # 2. Maschera per le credenziali di Github
+    # 3. Invio file
+    # 4. Esci

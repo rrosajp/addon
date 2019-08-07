@@ -111,7 +111,7 @@ def dbg():
     import web_pdb;
     if not web_pdb.WebPdb.active_instance:
         import webbrowser
-        webbrowser.open('http://localhost:5555')
+        webbrowser.open('http://127.0.0.1:5555')
     web_pdb.set_trace()
 
 
