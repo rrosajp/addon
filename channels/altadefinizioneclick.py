@@ -37,7 +37,7 @@ def menu(item):
 
     action='peliculas'
     patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<]+)</a></li>'
-    patronBlock= r'<ul class="listSubCat" id="'+ str(item.args) + '">(.*?)</ul>'
+    patronBlock= r'<ul class="listSubCat" id="'+ str(item.args) + '">(?P<block>.*)</ul>'
 
     return locals()
 

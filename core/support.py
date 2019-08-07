@@ -130,7 +130,7 @@ def regexDbg(item, patron, headers, data=''):
         'regex': patron,
         'flags': 'gm',
         'testString': html,
-        'delimiter': '"',
+        'delimiter': '"""',
         'flavor': 'python'
     }
     r = urllib2.Request(url + '/api/regex', json.dumps(data), headers=headers)
@@ -141,14 +141,137 @@ def regexDbg(item, patron, headers, data=''):
 
 def scrape2(item, patron = '', listGroups = [], headers="", blacklist="", data="", patronBlock="",
            patronNext="", action="findvideos", addVideolibrary = True, typeContentDict={}, typeActionDict={}):
-    m = re.search(r'\((?!\?)', patron)
+    m = re.search(r'(?<!\\|\[)\((?!\?)', patron)
     n = 0
     while m:
         patron = patron[:m.end()] + '?P<' + listGroups[n] + '>' + patron[m.end():]
-        m = re.search(r'\((?!\?)', patron)
+        m = re.search(r'(?<!\\|\[)\((?!\?)', patron)
         n += 1
     regexDbg(item, patron, headers)
 
+
+def scrapeLang(scraped, lang, longtitle):
+    ##    Aggiunto/modificato per gestire i siti che hanno i video
+    ##    in ita e subita delle serie tv nella stessa pagina
+    if scraped['lang']:
+        if 'sub' in scraped['lang'].lower():
+            lang = 'Sub-ITA'
+        else:
+            lang = 'ITA'
+    if lang != '':
+        longtitle += typo(lang, '_ [] color kod')
+
+    return lang, longtitle
+
+
+def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, pag):
+    itemlist = []
+
+    matches = scrapertoolsV2.find_multiple_matches_groups(block, patron)
+    log('MATCHES =', matches)
+
+    if debug:
+        regexDbg(item, patron, headers, block)
+
+    known_keys = ['url', 'title', 'title2', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere',
+                  'rating', 'type', 'lang']  # by greko aggiunto episode
+    lang = ''  # aggiunto per gestire i siti con pagine di serietv dove si hanno i video in ita e in subita
+
+    for i, match in enumerate(matches):
+        if pagination and (pag - 1) * pagination > i: continue  # pagination
+        if pagination and i >= pag * pagination: break  # pagination
+        listGroups = match.keys()
+        match = match.values()
+
+        if len(listGroups) > len(match):  # to fix a bug
+            match = list(match)
+            match.extend([''] * (len(listGroups) - len(match)))
+
+        scraped = {}
+        for kk in known_keys:
+            val = match[listGroups.index(kk)] if kk in listGroups else ''
+            if val and (kk == "url" or kk == 'thumb') and 'http' not in val:
+                val = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
+            scraped[kk] = val
+
+        if scraped['title']:
+            title = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped['title'])
+                                             .replace('"', "'").replace('×', 'x').replace('–',
+                                                                                          '-')).strip()  # fix by greko da " a '
+        else:
+            title = ''
+
+        plot = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["plot"]))
+
+        longtitle = typo(title, 'bold')
+        if scraped['quality']: longtitle = longtitle + typo(scraped['quality'], '_ [] color kod')
+        if scraped['episode']:
+            scraped['episode'] = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode'])
+            longtitle = typo(scraped['episode'] + ' - ', 'bold') + longtitle
+        if scraped['title2']:
+            title2 = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped['title2'])
+                                              .replace('"', "'").replace('×', 'x').replace('–', '-')).strip()
+            longtitle = longtitle + typo(title2, 'bold _ -- _')
+
+        lang, longitle = scrapeLang(scraped, lang, longtitle)
+
+        # if title is set, probably this is a list of episodes or video sources
+        if item.infoLabels["title"]:
+            infolabels = item.infoLabels
+        else:
+            infolabels = {}
+            if scraped['year']:
+                infolabels['year'] = scraped['year']
+            if scraped["plot"]:
+                infolabels['plot'] = plot
+            if scraped['duration']:
+                matches = scrapertoolsV2.find_multiple_matches(scraped['duration'],
+                                                               r'([0-9])\s*?(?:[hH]|:|\.|,|\\|\/|\||\s)\s*?([0-9]+)')
+                for h, m in matches:
+                    scraped['duration'] = int(h) * 60 + int(m)
+                if not matches:
+                    scraped['duration'] = scrapertoolsV2.find_single_match(scraped['duration'], r'(\d+)')
+                infolabels['duration'] = int(scraped['duration']) * 60
+            if scraped['genere']:
+                genres = scrapertoolsV2.find_multiple_matches(scraped['genere'], '[A-Za-z]+')
+                infolabels['genere'] = ", ".join(genres)
+            if scraped["rating"]:
+                infolabels['rating'] = scrapertoolsV2.decodeHtmlentities(scraped["rating"])
+
+        if typeContentDict:
+            for name, variants in typeContentDict.items():
+                if scraped['type'] in variants:
+                    item.contentType = name
+        if typeActionDict:
+            for name, variants in typeActionDict.items():
+                if scraped['type'] in variants:
+                    action = name
+
+        if (scraped["title"] and scraped["title"] not in blacklist) or longtitle:
+            it = Item(
+                channel=item.channel,
+                action=action,
+                contentType='episode' if (
+                            action == 'findvideos' and item.contentType == 'tvshow') else item.contentType,
+                title=longtitle,
+                fulltitle=item.fulltitle if (action == 'findvideos' and item.contentType != 'movie') else title,
+                show=item.show if (action == 'findvideos' and item.contentType != 'movie') else title,
+                quality=scraped["quality"],
+                url=scraped["url"],
+                infoLabels=infolabels,
+                thumbnail=scraped["thumb"],
+                args=item.args,
+                contentSerieName=title if (action == 'episodios' and item.contentType != 'movie') else '',
+                contentLanguage=lang
+            )
+
+            for lg in list(set(listGroups).difference(known_keys)):
+                it.__setattr__(lg, match[listGroups.index(lg)])
+
+            if 'itemHook' in args:
+                it = args['itemHook'](it)
+            itemlist.append(it)
+    return itemlist, matches
 
 
 def scrape(func):
@@ -188,7 +311,7 @@ def scrape(func):
         action = args['action'] if 'action' in args else 'findvideos'
         anime = args['anime'] if 'anime' in args else ''
         addVideolibrary = args['addVideolibrary'] if 'addVideolibrary' in args else True
-        blacklist = args['blacklist'] if 'blacklist' in args else ''
+        blacklist = args['blacklist'] if 'blacklist' in args else []
         data = args['data'] if 'data' in args else ''
         patron = args['patron'] if 'patron' in args else args['patronMenu'] if 'patronMenu' in args else ''
         headers = args['headers'] if 'headers' in args else func.__globals__['headers']
@@ -200,6 +323,9 @@ def scrape(func):
         if 'pagination' in args: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
 
+        pag = item.page if item.page else 1  # pagination
+        matches = []
+
         log('PATRON= ', patron)
         if not data:
             data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
@@ -207,175 +333,67 @@ def scrape(func):
             # replace all ' with " and eliminate newline, so we don't need to worry about
             log('DATA =', data)
 
-            block = data
+        if patronBlock:
+            blocks = scrapertoolsV2.find_multiple_matches_groups(data, patronBlock)
+            block = ""
+            for bl in blocks:
+                blockItemlist, blockMatches = scrapeBlock(item, args, bl['block'], patron, headers, action, pagination, debug,
+                                            typeContentDict, typeActionDict, blacklist, pag)
+                for it in blockItemlist:
+                    if 'lang' in bl:
+                        it.contentLanguage, it.title = scrapeLang(bl, it.contentLanguage, it.title)
+                    if 'quality' in bl and bl['quality']:
+                        it.quality = bl['quality']
+                        it.title = it.title + typo(bl['quality'], '_ [] color kod')
+                log('BLOCK ', '=', block)
+                itemlist.extend(blockItemlist)
+                matches.extend(blockMatches)
+        elif patron:
+            itemlist, matches = scrapeBlock(item, args, data, patron, headers, action, pagination, debug, typeContentDict,
+                                   typeActionDict, blacklist, pag)
 
-            if patronBlock:
-                if type(patronBlock) == str:
-                    patronBlock = [patronBlock]
+        checkHost(item, itemlist)
 
-                for n, regex in enumerate(patronBlock):
-                    blocks = scrapertoolsV2.find_multiple_matches(block, regex)
-                    block = ""
-                    for b in blocks:
-                        block += "\n" + str(b)
-                    log('BLOCK ', n, '=', block)
-        else:
-            block = data
-        if patron:
-            matches = scrapertoolsV2.find_multiple_matches_groups(block, patron)
-            log('MATCHES =', matches)
+        if (item.contentType == "tvshow" and (action != "findvideos" and action != "play")) \
+            or (item.contentType == "episode" and action != "play") \
+            or (item.contentType == "movie" and action != "play") :
+            tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+        # else:                                     # Si perde item show :(
+        #     for it in itemlist:
+        #         it.infoLabels = item.infoLabels
 
-            if debug:
-                regexDbg(item, patron, headers, block)
+        if 'itemlistHook' in args:
+            itemlist = args['itemlistHook'](itemlist)
 
-            known_keys = ['url', 'title', 'title2', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere',
-                          'rating', 'type', 'lang']  # by greko aggiunto episode
-            lang = '' # aggiunto per gestire i siti con pagine di serietv dove si hanno i video in ita e in subita
-            
-            pag = item.page if item.page else 1  # pagination
+        if patronNext:
+            nextPage(itemlist, item, data, patronNext, 2)
 
-            for i, match in enumerate(matches):
-                if pagination and (pag - 1) * pagination > i: continue  # pagination
-                if pagination and i >= pag  * pagination: break  # pagination
-                listGroups = match.keys()
-                match = match.values()
+        # next page for pagination
+        if pagination and len(matches) >= pag * pagination:
+            itemlist.append(
+                Item(channel=item.channel,
+                     action = item.action,
+                     contentType=item.contentType,
+                     title=typo(config.get_localized_string(30992), 'color kod bold'),
+                     url=item.url,
+                     args=item.args,
+                     page=pag + 1,
+                     thumbnail=thumb()))
 
-                if len(listGroups) > len(match):  # to fix a bug
-                    match = list(match)
-                    match.extend([''] * (len(listGroups) - len(match)))
+        if anime:
+            from specials import autorenumber
+            if inspect.stack()[1][3] == 'episodios' or item.action == 'episodios': autorenumber.renumber(itemlist, item, 'bold')
+            else: autorenumber.renumber(itemlist)
 
-                scraped = {}
-                for kk in known_keys:
-                    val = match[listGroups.index(kk)] if kk in listGroups else ''
-                    if val and (kk == "url" or kk == 'thumb') and 'http' not in val:
-                        val = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
-                    scraped[kk] = val
+        if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
+            item.fulltitle = item.infoLabels["title"]
+            videolibrary(itemlist, item)
 
-                if scraped['title']:
-                    title = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped['title'])
-                                                     .replace('"',"'").replace('×', 'x').replace('–','-')).strip()  # fix by greko da " a '
-                else:
-                    title = ''
-                    
-                plot = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped["plot"]))
+        if 'patronMenu' in args:
+            itemlist = thumb(itemlist, genre=True)
 
-                longtitle = typo(title, 'bold')
-                if scraped['quality']: longtitle = longtitle + typo(scraped['quality'], '_ [] color kod')
-                if scraped['episode']:
-                    scraped['episode'] = re.sub(r'\s-\s|-|x|&#8211', 'x', scraped['episode'])
-                    longtitle = typo(scraped['episode'] + ' - ', 'bold') + longtitle
-                if scraped['title2']:
-                    title2 = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(scraped['title2'])
-                                                      .replace('"', "'").replace('×', 'x').replace('–','-')).strip()
-                    longtitle = longtitle + typo(title2, 'bold _ -- _')
-                    
-                ##    Aggiunto/modificato per gestire i siti che hanno i video
-                ##    in ita e subita delle serie tv nella stessa pagina                             
-                if scraped['lang']:              
-                    if 'sub' in scraped['lang'].lower():
-                        lang = 'Sub-ITA'
-                    else:
-                        lang = 'ITA'                      
-                if lang != '':
-                        longtitle += typo(lang, '_ [] color kod')
-
-                # if title is set, probably this is a list of episodes or video sources
-                if item.infoLabels["title"] or item.fulltitle:  
-                    infolabels = item.infoLabels
-                else:
-                    infolabels = {}
-                    if scraped['year']:
-                        infolabels['year'] = scraped['year']
-                    if scraped["plot"]:
-                        infolabels['plot'] = plot
-                    if scraped['duration']:
-                        matches = scrapertoolsV2.find_multiple_matches(scraped['duration'],
-                                                                       r'([0-9])\s*?(?:[hH]|:|\.|,|\\|\/|\||\s)\s*?([0-9]+)')
-                        for h, m in matches:
-                            scraped['duration'] = int(h) * 60 + int(m)
-                        if not matches:
-                            scraped['duration'] = scrapertoolsV2.find_single_match(scraped['duration'], r'(\d+)')
-                        infolabels['duration'] = int(scraped['duration']) * 60
-                    if scraped['genere']:
-                        genres = scrapertoolsV2.find_multiple_matches(scraped['genere'], '[A-Za-z]+')
-                        infolabels['genere'] = ", ".join(genres)
-                    if scraped["rating"]:
-                        infolabels['rating'] = scrapertoolsV2.decodeHtmlentities(scraped["rating"])
-
-                if typeContentDict:
-                    for name, variants in typeContentDict.items():
-                        if scraped['type'] in variants:
-                            item.contentType = name
-                if typeActionDict:
-                    for name, variants in typeActionDict.items():
-                        if scraped['type'] in variants:
-                            action = name
-
-                if scraped["title"]:
-                    if scraped["title"] not in blacklist:
-                        it = Item(
-                            channel=item.channel,
-                            action=action,
-                            contentType= 'episode' if (action == 'findvideos' and item.contentType == 'tvshow') else item.contentType,
-                            title=longtitle,
-                            fulltitle=item.fulltitle if (action == 'findvideos' and item.contentType != 'movie') else title,
-                            show=item.show if (action == 'findvideos' and item.contentType != 'movie') else title,
-                            quality=scraped["quality"],
-                            url=scraped["url"],
-                            infoLabels=infolabels,
-                            thumbnail=scraped["thumb"],
-                            args=item.args,
-                            contentSerieName = title if (action == 'episodios' and item.contentType != 'movie') else ''
-                        )
-                        
-                        for lg in list(set(listGroups).difference(known_keys)):
-                            it.__setattr__(lg, match[listGroups.index(lg)])
-
-                        if 'itemHook' in args:
-                            it = args['itemHook'](it)
-                        itemlist.append(it)
-            checkHost(item, itemlist)
-           
-            if (item.contentType == "tvshow" and (action != "findvideos" and action != "play")) \
-                or (item.contentType == "episode" and action != "play") \
-                or (item.contentType == "movie" and action != "play") :            
-                tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-            # else:                                     # Si perde item show :(
-            #     for it in itemlist:
-            #         it.infoLabels = item.infoLabels
-                
-            if 'itemlistHook' in args:
-                itemlist = args['itemlistHook'](itemlist)
-
-            if patronNext:
-                nextPage(itemlist, item, data, patronNext, 2)
-
-            # next page for pagination
-            if pagination and len(matches) >= pag * pagination:
-                itemlist.append(
-                    Item(channel=item.channel,
-                         action = item.action,
-                         contentType=item.contentType,
-                         title=typo(config.get_localized_string(30992), 'color kod bold'),
-                         url=item.url,
-                         args=item.args,
-                         page=pag + 1,
-                         thumbnail=thumb()))
-
-            if anime:
-                from specials import autorenumber
-                if inspect.stack()[1][3] == 'episodios' or item.action == 'episodios': autorenumber.renumber(itemlist, item, 'bold')
-                else: autorenumber.renumber(itemlist)
-                
-            if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
-                item.fulltitle = item.infoLabels["title"]
-                videolibrary(itemlist, item)
-
-            if 'patronMenu' in args:
-                itemlist = thumb(itemlist, genre=True)
-                
-            if 'fullItemlistHook' in args:
-                itemlist = args['fullItemlistHook'](itemlist)
+        if 'fullItemlistHook' in args:
+            itemlist = args['fullItemlistHook'](itemlist)
 
         return itemlist
 
@@ -604,7 +622,7 @@ def menu(func):
                              args=var[2] if len(var) > 2 else '',
                              contentType= var[3] if len(var) > 3 else 'movie',)
                 # add search menu for category
-                if 'search' not in args: menuItem(itemlist, filename, 'Cerca ' + title + '… submenu bold', 'search', host, args=name)
+                if 'search' not in args: menuItem(itemlist, filename, 'Cerca ' + title + '… submenu bold', 'search', host + url, args=name)
 
         # Make EXTRA MENU (on bottom)
         for name, var in args.items():

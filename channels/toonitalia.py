@@ -41,17 +41,17 @@ def peliculas(item):
     if item.args == 'search':
         patron = r'<h2 class="entry-title"><a href="(?P<url>[^"]+)" rel="bookmark">(?P<title>[^<]+)</a>'
     elif item.args == 'last':
-        patronBlock = 'Aggiornamenti</h2>(.*?)</ul>'
+        patronBlock = 'Aggiornamenti</h2>(?P<block>.*)</ul>'
         patron = '<a href="(?P<url>[^"]+)">(?P<title>[^<]+)</a>'
     elif item.args == 'most_view':
-        patronBlock = 'I piu visti</h2>(.*?)</ul>'
+        patronBlock = 'I piu visti</h2>(?P<block>.*)</ul>'
         patron = '<a href="(?P<url>[^"]+)" title="(?P<title>[^"]+)"'
     elif item.args == 'new':
-        patronBlock = '<main[^>]+>(.*?)</main>'
+        patronBlock = '<main[^>]+>(?P<block>.*)</main>'
         patron = '<a href="(?P<url>[^"]+)" rel="bookmark">(?P<title>[^<]+)</a>[^>]+>[^>]+>[^>]+><img.*?src="(?P<thumb>[^"]+)".*?<p>(?P<plot>[^<]+)</p>'
         patronNext = '<a class="next page-numbers" href="([^"]+)">'
     else:
-        patronBlock = '"lcp_catlist"[^>]+>(.*?)</ul>'
+        patronBlock = '"lcp_catlist"[^>]+>(?P<block>.*)</ul>'
         patron = r'<li ><a href="(?P<url>[^"]+)" title="[^>]+">(?P<title>[^<|\(]+)?(?:\([^\d]*(?P<year>\d+)\))?[^<]*</a>'
         
     action = 'findvideos' if item.contentType == 'movie' else 'check'

@@ -208,7 +208,7 @@ def findvideos(item):
     itemlist = []
 
     # data = httptools.downloadpage(item.url, headers=headers).data
-    patronBlock = '<div class="entry-content">(.*?)<footer class="entry-footer">'
+    patronBlock = '<div class="entry-content">(?P<block>.*)<footer class="entry-footer">'
     # bloque = scrapertools.find_single_match(data, patronBlock)
 
     patron = r'<a href="([^"]+)">'

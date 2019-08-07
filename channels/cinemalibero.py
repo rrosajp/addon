@@ -43,7 +43,7 @@ def mainlist(item):
     return locals()
 
 def genres(item):
-    return support.scrape2(item, patronBlock=r'<div id="bordobar" class="dropdown-menu(.*?)</li>', patron=r'<a class="dropdown-item" href="([^"]+)" title="([A-z]+)"', listGroups=['url', 'title'], action='video')
+    return support.scrape2(item, patronBlock=r'<div id="bordobar" class="dropdown-menu(?P<block>.*)</li>', patron=r'<a class="dropdown-item" href="([^"]+)" title="([A-z]+)"', listGroups=['url', 'title'], action='video')
 
 
 def peliculas(item):

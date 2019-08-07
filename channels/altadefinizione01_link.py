@@ -60,13 +60,13 @@ def genres(item):
 
     action = 'peliculas'
     if item.args == 'genres':
-        patronBlock = r'<ul class="listSubCat" id="Film">(.*?)</ul>'
+        patronBlock = r'<ul class="listSubCat" id="Film">(?P<block>.*)</ul>'
     elif item.args == 'years':
-        patronBlock = r'<ul class="listSubCat" id="Anno">(.*?)</ul>'
+        patronBlock = r'<ul class="listSubCat" id="Anno">(?P<block>.*)</ul>'
     elif item.args == 'quality':
-        patronBlock = r'<ul class="listSubCat" id="Qualita">(.*?)</ul>'
+        patronBlock = r'<ul class="listSubCat" id="Qualita">(?P<block>.*)</ul>'
     elif item.args == 'lucky': # sono i titoli random nella pagina, cambiano 1 volta al dì
-        patronBlock = r'FILM RANDOM.*?class="listSubCat">(.*?)</ul>'
+        patronBlock = r'FILM RANDOM.*?class="listSubCat">(?P<block>.*)</ul>'
         action = 'findvideos'
 
     patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'

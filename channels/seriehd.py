@@ -75,7 +75,7 @@ def newest(categoria):
 def genre(item):
     patronMenu = '<a href="(?P<url>[^"]+)">(?P<title>[^<]+)</a>'
     blacklist = ['Serie TV','Serie TV Americane','Serie TV Italiane','altadefinizione']
-    patronBlock = '<ul class="sub-menu">(.*?)</ul>'
+    patronBlock = '<ul class="sub-menu">(?P<block>.*)</ul>'
    
     return locals()
 

@@ -45,9 +45,9 @@ def peliculas(item):
 
     action="findvideos"
     if item.args == "search":
-        patronBlock = r'</script> <div class="boxgrid caption">(.*?)<div id="right_bar">'
+        patronBlock = r'</script> <div class="boxgrid caption">(?P<block>.*)<div id="right_bar">'
     else:
-        patronBlock = r'<div class="cover_kapsul ml-mask">(.*?)<div class="page_nav">'
+        patronBlock = r'<div class="cover_kapsul ml-mask">(?P<block>.*)<div class="page_nav">'
     patron = r'<div class="cover boxcaption"> <h2>.<a href="(?P<url>[^"]+)">.*?<.*?src="(?P<thumb>[^"]+)"'\
          '.+?[^>]+>[^>]+<div class="trdublaj"> (?P<quality>[A-Z]+)<[^>]+>(?:.[^>]+>(?P<lang>.*?)<[^>]+>).*?'\
          '<p class="h4">(?P<title>.*?)</p>[^>]+> [^>]+> [^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> [^>]+> '\
@@ -69,13 +69,13 @@ def categorie(item):
     blacklist = 'altadefinizione01'
 
     if item.args == 'genres':
-        patronBlock = r'<ul class="kategori_list">(.*?)</ul>'
+        patronBlock = r'<ul class="kategori_list">(?P<block>.*)</ul>'
         patron = '<li><a href="(?P<url>[^"]+)">(?P<title>.*?)</a>'
     elif item.args == 'years':
-        patronBlock = r'<ul class="anno_list">(.*?)</ul>'
+        patronBlock = r'<ul class="anno_list">(?P<block>.*)</ul>'
         patron = '<li><a href="(?P<url>[^"]+)">(?P<title>.*?)</a>'
     elif item.args == 'orderalf':
-        patronBlock = r'<div class="movies-letter">(.*)<div class="clearfix">'
+        patronBlock = r'<div class="movies-letter">(?P<block>.*)<div class="clearfix">'
         patron = '<a title=.*?href="(?P<url>[^"]+)"><span>(?P<title>.*?)</span>'
 
     return locals()
