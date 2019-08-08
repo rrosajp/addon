@@ -1,42 +1,38 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per seriehd
+# Canale per SerieHD
 # ------------------------------------------------------------
-import urlparse
-import re
 
-from channelselector import thumb
-from lib import cloudscraper
-from core import scrapertoolsV2, servertools, httptools, support
+
+from core import support
 from core.item import Item
-from core.support import menu, log
-from platformcode import logger, config
-from specials import autoplay
 
 
 __channel__ = "seriehd"
-host = config.get_channel_url(__channel__)
+host = support.config.get_channel_url(__channel__)
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
 list_servers = ['verystream', 'openload', 'streamango', 'thevideome']
 list_quality = ['1080p', '720p', '480p', '360']
 
-checklinks = config.get_setting('checklinks', 'seriehd')
-checklinks_number = config.get_setting('checklinks_number', 'seriehd')
+checklinks = support.config.get_setting('checklinks', __channel__)
+checklinks_number = support.config.get_setting('checklinks_number', __channel__)
 
 headers = [['Referer', host]]
 
 @support.menu
 def mainlist(item):    
-    tvshow = [('Genere', ['', 'genre', 'tv']),
-              ('Americane', ['/serie-tv-streaming/serie-tv-americane', 'peliculas', 'tv']),
-              ('Italiane', ['/serie-tv-streaming/serie-tv-italiane', 'peliculas', 'tv']),]
+    tvshow = [('Genere', ['', 'genre']),
+              ('Americane', ['/serie-tv-streaming/serie-tv-americane', 'peliculas']),
+              ('Italiane', ['/serie-tv-streaming/serie-tv-italiane', 'peliculas']),]
     return locals()
 
 
 def search(item, texto):
-    log(texto)
+    support.log(item)
+    support.log(texto)
+    # item.contentType = 'tvshow'
     item.url = host + "/?s=" + texto
     try:
         return peliculas(item)
@@ -45,14 +41,14 @@ def search(item, texto):
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("%s" % line)
+            support.logger.error("%s" % line)
         return []
 
 
 def newest(categoria):
-    log(categoria)
+    support.log(categoria)
     itemlist = []
-    item = Item()
+    item = support.Item()
     try:
         if categoria == "series":
             item.url = host
@@ -65,7 +61,7 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("{0}".format(line))
+            support.logger.error("{0}".format(line))
         return []
 
     return itemlist
@@ -87,26 +83,26 @@ def peliculas(item):
     return locals()
 
 def episodios(item):
-    log()
+    support.log()
     itemlist = []    
     url = support.match(item, patronBlock=r'<iframe width=".+?" height=".+?" src="([^"]+)" allowfullscreen frameborder="0">')[1]
     seasons = support.match(item, r'<a href="([^"]+)">(\d+)<', r'<h3>STAGIONE</h3><ul>(.*?)</ul>', headers, url)[0]
     for season_url, season in seasons:
-        season_url = urlparse.urljoin(url, season_url)
+        season_url = support.urlparse.urljoin(url, season_url)
         episodes = support.match(item, r'<a href="([^"]+)">(\d+)<', '<h3>EPISODIO</h3><ul>(.*?)</ul>', headers, season_url)[0]
         for episode_url, episode in episodes:
-            episode_url = urlparse.urljoin(url, episode_url)
+            episode_url = support.urlparse.urljoin(url, episode_url)
             title = season + "x" + episode.zfill(2)
 
             itemlist.append(
-                Item(channel=item.channel,
-                     action="findvideos",
-                     contentType="episode",
-                     title=support.typo(title + ' - ' +item.show,'bold'),
-                     url=episode_url,
-                     fulltitle=item.fulltitle,
-                     show=item.show,
-                     thumbnail=item.thumbnail))
+                support.Item(channel=item.channel,
+                             action="findvideos",
+                             contentType="episode",
+                             title=support.typo(title + ' - ' +item.show,'bold'),
+                             url=episode_url,
+                             fulltitle=item.fulltitle,
+                             show=item.show,
+                             thumbnail=item.thumbnail))
 
     support.videolibrary(itemlist, item, 'color kod bold')
 
@@ -114,7 +110,7 @@ def episodios(item):
 
 
 def findvideos(item):
-    log()
+    support.log()
     itemlist = []
     itemlist = support.hdpass_get_servers(item)  
     return support.controls(itemlist, item)

@@ -3,13 +3,10 @@
 # Canale per ToonItalia
 # ------------------------------------------------------------
 
-import re
-
-from core import httptools, support
-from platformcode import config, logger
+from core import support
 
 __channel__ = "toonitalia"
-host = config.get_channel_url(__channel__)
+host = support.config.get_channel_url(__channel__)
 
 headers = [['Referer', host]]
 
@@ -26,7 +23,7 @@ def mainlist(item):
     tvshow = '/lista-serie-tv/'
     anime =['/lista-anime-2/',
                ('Sub-Ita',['/lista-anime-sub-ita/']),
-               ('Film Animati',['/lista-film-animazione/','peliculas', 'movie'])]    
+               ('Film Animati',['/lista-film-animazione/','peliculas', '', 'movie'])]    
     search = ''
 
     return locals()
@@ -36,8 +33,8 @@ def mainlist(item):
 def peliculas(item):
     pagination = ''
     anime = True
-    blacklist = '-Film Animazione disponibili in attesa di recensione (Link Wstream)-">-Film Animazione disponibili in attesa di recensione (Link Wstream)-'
-    if item.args == 'movie': contentType = 'movie'
+    blacklist = ['-Film Animazione disponibili in attesa di recensione ']
+    
     if item.args == 'search':
         patron = r'<h2 class="entry-title"><a href="(?P<url>[^"]+)" rel="bookmark">(?P<title>[^<]+)</a>'
     elif item.args == 'last':
@@ -59,7 +56,7 @@ def peliculas(item):
     return locals()
 
 def check(item):
-    data = httptools.downloadpage(item.url, headers=headers).data
+    data = support.httptools.downloadpage(item.url, headers=headers).data
     item.action = 'episodios'
     if 'https://vcrypt.net' in data: item.patron = '(?:<br /> |<p>)(?P<title>[^<]+)<a href="(?P<url>[^"]+)"'
     else: item.patron = '<br /> <a href="(?P<url>[^"]+)" target="_blank" rel="noopener[^>]+>(?P<title>[^<]+)</a>'
@@ -68,17 +65,17 @@ def check(item):
 
 
 @support.scrape
-def episodios(item):    
+def episodios(item):
     anime = True
     patron = item.patron
 
     def itemHook(item):
         support.log(patron)
-        item.title = item.fulltitle.replace('_',' ').replace('–','-')
-        item.title = support.typo(re.sub(item.show + ' - ','',item.title, flags=re.I).strip(' - '), 'bold')        
+        item.title = item.title.replace('_',' ').replace('–','-')
+        item.title = support.re.sub(item.fulltitle + ' - ','',item.title)
         return item
 
     return locals()
 
 def findvideos(item):
-    return support.server(item, item.url if item.contentType != 'movie' else httptools.downloadpage(item.url, headers=headers).data )
+    return support.server(item, item.url if item.contentType != 'movie' else support.httptools.downloadpage(item.url, headers=headers).data )

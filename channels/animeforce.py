@@ -1,28 +1,21 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per animeforce.org
+# Canale per AnimeForce
 # ------------------------------------------------------------
-import re
-import urllib
-import urlparse
 
-from core import httptools, scrapertoolsV2, servertools, tmdb
-from core.item import Item
-from platformcode import config, logger
 from servers.decrypters import adfly
-from core.support import log
 from core import support
 
 __channel__ = "animeforce"
-host = config.get_channel_url(__channel__)
+host = support.config.get_channel_url(__channel__)
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
 list_servers = ['directo', 'openload']
 list_quality = ['default']
 
-checklinks = config.get_setting('checklinks', __channel__)
-checklinks_number = config.get_setting('checklinks_number', __channel__)
+checklinks = support.config.get_setting('checklinks', __channel__)
+checklinks_number = support.config.get_setting('checklinks_number', __channel__)
 
 headers = [['Referer', host]]
 
@@ -38,9 +31,9 @@ def mainlist(item):
 
     
 def newest(categoria):
-    log(categoria)
+    support.log(categoria)
     itemlist = []
-    item = Item()
+    item = support.Item()
     try:
         if categoria == "anime":
             item.url = host
@@ -53,7 +46,7 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("{0}".format(line))
+            support.logger.error("{0}".format(line))
         return []
 
     return itemlist
@@ -73,8 +66,8 @@ def peliculas(item):
     if item.args == 'update':
         patron = r'src="(?P<thumb>[^"]+)" class="attachment-grid-post[^"]+" alt="[^"]*" title="(?P<title>[^"]+").*?<h2><a href="(?P<url>[^"]+)"'
         def itemHook(item):
-            delete = scrapertoolsV2.find_single_match(item.fulltitle, r'( Episodio.*)')
-            number = scrapertoolsV2.find_single_match(item.title, r'Episodio (\d+)')
+            delete = support.scrapertoolsV2.find_single_match(item.fulltitle, r'( Episodio.*)')
+            number = support.scrapertoolsV2.find_single_match(item.title, r'Episodio (\d+)')
             item.title = support.typo(number + ' - ','bold') + item.title.replace(delete,'')
             item.fulltitle = item.show = item.fulltitle.replace(delete,'')    
             item.url = item.url.replace('-episodio-'+ number,'')
@@ -106,7 +99,7 @@ def episodios(item):
 
 
 def findvideos(item):
-    log(item)
+    support.log(item)
 
     itemlist = []
     
@@ -122,17 +115,17 @@ def findvideos(item):
     if 'adf.ly' in item.url:
         item.url = adfly.get_long_url(item.url)
     elif 'bit.ly' in item.url:
-        item.url = httptools.downloadpage(item.url, only_headers=True, follow_redirects=False).headers.get("location")
+        item.url = support.httptools.downloadpage(item.url, only_headers=True, follow_redirects=False).headers.get("location")
 
     matches = support.match(item, r'button"><a href="([^"]+)"')[0]
 
     for video in matches:
         itemlist.append(
-            Item(channel=item.channel,
-                action="play",
-                title='diretto',
-                url=video,
-                server='directo'))
+            support.Item(channel=item.channel,
+                         action="play",
+                         title='diretto',
+                         url=video,
+                         server='directo'))
 
     support.server(item, itemlist=itemlist)
 
