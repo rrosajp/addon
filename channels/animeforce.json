@@ -11,10 +11,10 @@
         {
             "id": "include_in_global_search",
             "type": "bool",
-            "label": "Incluir en busqueda global",
+            "label": "Includi in Ricerca Globale",
             "default": false,
             "enabled": false,
-            "visible": false
+            "visible": true
         },
         {
             "id": "include_in_newest_anime",
@@ -25,12 +25,37 @@
             "visible": true
         },
         {
-            "id": "include_in_newest_italiano",
+            "id": "checklinks",
             "type": "bool",
-            "label": "Includi in Novità - Italiano",
-            "default": true,
+            "label": "Verifica se i link esistono",
+            "default": false,
             "enabled": true,
             "visible": true
-            }
+        },
+        {
+            "id": "checklinks_number",
+            "type": "list",
+            "label": "Numero de link da verificare",
+            "default": 1,
+            "enabled": true,
+            "visible": "eq(-1,true)",
+            "lvalues": [ "1", "3", "5", "10" ]
+        },
+        {
+            "id": "autorenumber", 
+            "type": "bool", 
+            "label": "@70712", 
+            "default": false, 
+            "enabled": true, 
+            "visible": true
+        },
+        {
+            "id": "autorenumber_mode",
+            "type": "bool",
+            "label": "@70688",
+            "default": false,
+            "enabled": true,
+            "visible": "eq(-1,true)"
+        }
 	  ]
 }
