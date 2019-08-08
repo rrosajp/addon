@@ -166,7 +166,7 @@ def scrapeLang(scraped, lang, longtitle):
 
 def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function):
     itemlist = []
-
+    log("scrapeBlock qui", block, patron)
     matches = scrapertoolsV2.find_multiple_matches_groups(block, patron)
     log('MATCHES =', matches)
 
@@ -337,7 +337,7 @@ def scrape(func):
             log('DATA =', data)
 
         if patronBlock:
-            blocks = scrapertoolsV2.find_multiple_matches_groups(data, patronBlock)
+            blocks = scrapertoolsV2.find_multiple_matches_groups(data, patronBlock) 
             block = ""
             for bl in blocks:
                 blockItemlist, blockMatches = scrapeBlock(item, args, bl['block'], patron, headers, action, pagination, debug,

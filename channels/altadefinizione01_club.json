@@ -1,7 +1,7 @@
 {
   "id": "altadefinizione01_club",
   "name": "Altadefinizione01 C",
-  "active": "enable",
+  "active": false,
   "adult": false,
   "language": ["ita"],
   "fanart": "https://www.altadefinizione01.vision/templates/Darktemplate/images/logo.png",
@@ -11,14 +11,6 @@
     "movie"
   ],
   "settings": [
-    {
-    "id": "channel_host",
-    "type": "text",
-    "label": "Host del canale",
-    "default": "https://altadefinizione01.estate/",
-    "enabled": true,
-    "visible": true
-    },
     {
       "id": "modo_grafico",
       "type": "bool",
