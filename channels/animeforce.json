@@ -4,8 +4,8 @@
 	"language": ["ita"],
 	"active": true,
 	"adult": false,
-	"thumbnail": "http://www.animeforce.org/wp-content/uploads/2013/05/logo-animeforce.png",
-	"banner": "http://www.animeforce.org/wp-content/uploads/2013/05/logo-animeforce.png",
+	"thumbnail": "animeforce.png",
+	"banner": "animeforce.png",
 	"categories": ["anime"],
 	"settings": [
         {
