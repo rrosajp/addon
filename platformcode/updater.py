@@ -108,7 +108,7 @@ def check_addon_init():
                                 else:  # nel caso ci siano stati problemi
                                     logger.info('lo sha non corrisponde, scarico il file')
                                     try:
-                                        filetools.remove(addonDir + file["filename"])
+                                        os.remove(addonDir + file["filename"])
                                     except:
                                         pass
                                     downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'],
@@ -118,7 +118,7 @@ def check_addon_init():
                             if not (filetools.isfile(addonDir + file['filename']) and getSha(
                                     filetools.read(addonDir + file['filename']) == file['sha'])):
                                 try:
-                                    filetools.remove(addonDir + file["filename"])
+                                    os.remove(addonDir + file["filename"])
                                 except:
                                     pass
                                 downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'], silent=True,
@@ -126,7 +126,7 @@ def check_addon_init():
                                 alreadyApplied = False
                     elif file['status'] == 'removed':
                         try:
-                            filetools.remove(addonDir+file["filename"])
+                            os.remove(addonDir+file["filename"])
                             alreadyApplied = False
                         except:
                             pass
