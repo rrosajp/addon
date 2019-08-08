@@ -164,7 +164,7 @@ def scrapeLang(scraped, lang, longtitle):
     return lang, longtitle
 
 
-def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, pag):
+def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function):
     itemlist = []
 
     matches = scrapertoolsV2.find_multiple_matches_groups(block, patron)
@@ -246,31 +246,32 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             for name, variants in typeActionDict.items():
                 if scraped['type'] in variants:
                     action = name
-
-        if (scraped["title"] not in blacklist) or longtitle:
+        
+        if ((scraped["title"] not in blacklist) or longtitle) and search.lower() in longtitle.lower():
             it = Item(
                 channel=item.channel,
                 action=action,
-                contentType='episode' if (
-                            action == 'findvideos' and item.contentType == 'tvshow') else item.contentType,
+                contentType='episode' if function == 'episodios' else item.contentType,
                 title=longtitle,
-                fulltitle=item.fulltitle if (action == 'findvideos' and item.contentType != 'movie') else title,
-                show=item.show if (action == 'findvideos' and item.contentType != 'movie') else title,
+                fulltitle=item.fulltitle if function == 'episodios' else title,
+                show=item.show if function == 'episodios' else title,
                 quality=scraped["quality"],
                 url=scraped["url"],
                 infoLabels=infolabels,
-                thumbnail=scraped["thumb"],
+                thumbnail=item.thumbnail if function == 'episodios' else scraped["thumb"] ,
                 args=item.args,
-                contentSerieName=title if (action == 'episodios' and item.contentType != 'movie') else '',
+                contentSerieName=title if item.contentType != 'movie' else '',
+                contentTitle=title if item.contentType == 'movie' else '',
                 contentLanguage=lang
             )
-
+            
             for lg in list(set(listGroups).difference(known_keys)):
                 it.__setattr__(lg, match[listGroups.index(lg)])
 
             if 'itemHook' in args:
                 it = args['itemHook'](it)
             itemlist.append(it)
+            
     return itemlist, matches
 
 
@@ -302,6 +303,7 @@ def scrape(func):
     # IMPORTANT 'type' is a special key, to work need typeContentDict={} and typeActionDict={}
 
     def wrapper(*args):
+        function = func.__name__
         itemlist = []
 
         args = func(*args)
@@ -311,6 +313,7 @@ def scrape(func):
         action = args['action'] if 'action' in args else 'findvideos'
         anime = args['anime'] if 'anime' in args else ''
         addVideolibrary = args['addVideolibrary'] if 'addVideolibrary' in args else True
+        search = args['search'] if 'search' in args else ''
         blacklist = args['blacklist'] if 'blacklist' in args else []
         data = args['data'] if 'data' in args else ''
         patron = args['patron'] if 'patron' in args else args['patronMenu'] if 'patronMenu' in args else ''
@@ -338,7 +341,7 @@ def scrape(func):
             block = ""
             for bl in blocks:
                 blockItemlist, blockMatches = scrapeBlock(item, args, bl['block'], patron, headers, action, pagination, debug,
-                                            typeContentDict, typeActionDict, blacklist, pag)
+                                            typeContentDict, typeActionDict, blacklist, search, pag, function)
                 for it in blockItemlist:
                     if 'lang' in bl:
                         it.contentLanguage, it.title = scrapeLang(bl, it.contentLanguage, it.title)
@@ -350,14 +353,14 @@ def scrape(func):
                 matches.extend(blockMatches)
         elif patron:
             itemlist, matches = scrapeBlock(item, args, data, patron, headers, action, pagination, debug, typeContentDict,
-                                   typeActionDict, blacklist, pag)
+                                   typeActionDict, blacklist, search, pag, function)
 
         checkHost(item, itemlist)
 
-##        if (item.contentType == "tvshow" and (action != "findvideos" and action != "play")) \
-##            or (item.contentType == "episode" and action != "play") \
-##            or (item.contentType == "movie" and action != "play") :
-        if action != 'play':
+        if (item.contentType == "tvshow" and (action != "findvideos" and action != "play")) \
+           or (item.contentType == "episode" and action != "play") \
+           or (item.contentType == "movie" and action != "play") :
+        # if action != 'play' or (item.contentType == "tvshow" and action != "findvideos"):
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
         # else:                                     # Si perde item show :(
         #     for it in itemlist:
@@ -383,7 +386,7 @@ def scrape(func):
 
         if anime:
             from specials import autorenumber
-            if inspect.stack()[1][3] == 'episodios' or item.action == 'episodios': autorenumber.renumber(itemlist, item, 'bold')
+            if function == 'episodios' or item.action == 'episodios': autorenumber.renumber(itemlist, item, 'bold')
             else: autorenumber.renumber(itemlist)
 
         if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
@@ -621,7 +624,7 @@ def menu(func):
                              url = host + var[0] if len(var) > 0 else '',
                              action = var[1] if len(var) > 1 else 'peliculas',
                              args=var[2] if len(var) > 2 else '',
-                             contentType= var[3] if len(var) > 3 else 'movie',)
+                             contentType= var[3] if len(var) > 3 else 'movie' if name == 'film' else 'tvshow',)
                 # add search menu for category
                 if 'search' not in args: menuItem(itemlist, filename, 'Cerca ' + title + '… submenu bold', 'search', host + url, args=name)
 
