@@ -247,7 +247,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 if scraped['type'] in variants:
                     action = name
         
-        if ((scraped["title"] not in blacklist) or longtitle) and search.lower() in longtitle.lower():
+        if (scraped["title"] not in blacklist) and (search.lower() in longtitle.lower()):
             it = Item(
                 channel=item.channel,
                 action=action,
@@ -271,7 +271,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             if 'itemHook' in args:
                 it = args['itemHook'](it)
             itemlist.append(it)
-            
+
     return itemlist, matches
 
 
@@ -354,13 +354,13 @@ def scrape(func):
         elif patron:
             itemlist, matches = scrapeBlock(item, args, data, patron, headers, action, pagination, debug, typeContentDict,
                                    typeActionDict, blacklist, search, pag, function)
-
+        
         checkHost(item, itemlist)
 
-        if (item.contentType == "tvshow" and (action != "findvideos" and action != "play")) \
-           or (item.contentType == "episode" and action != "play") \
-           or (item.contentType == "movie" and action != "play") :
-        # if action != 'play' or (item.contentType == "tvshow" and action != "findvideos"):
+        # if (item.contentType == "tvshow" and (action != "findvideos" and action != "play")) \
+        #    or (item.contentType == "episode" and action != "play") \
+        #    or (item.contentType == "movie" and action != "play") :
+        if action != 'play':
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
         # else:                                     # Si perde item show :(
         #     for it in itemlist:
@@ -560,7 +560,7 @@ def menuItem(itemlist, filename, title='', action='', url='', contentType='movie
         args = args,
         contentType = contentType
     ))
-
+   
     # Apply auto Thumbnails at the menus
     from channelselector import thumb
     thumb(itemlist)
@@ -627,7 +627,7 @@ def menu(func):
                              contentType= var[3] if len(var) > 3 else 'movie' if name == 'film' else 'tvshow',)
                 # add search menu for category
                 if 'search' not in args: menuItem(itemlist, filename, 'Cerca ' + title + '… submenu bold', 'search', host + url, args=name)
-
+                
         # Make EXTRA MENU (on bottom)
         for name, var in args.items():
             if name not in listUrls and name != 'item':

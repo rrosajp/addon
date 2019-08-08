@@ -323,6 +323,10 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
         addiction = 0
         for item in itemlist:
             # Otiene Numerazione Episodi
+            if scrapertoolsV2.find_single_match(item.title, r'\d+'):
+                continue
+            else:
+                break
             episode = int(scrapertoolsV2.find_single_match(item.title, r'\d+'))
             number = episode + FirstOfSeason - addiction
             count = number + addiction
