@@ -624,7 +624,7 @@ def menu(func):
                              url = host + var[0] if len(var) > 0 else '',
                              action = var[1] if len(var) > 1 else 'peliculas',
                              args=var[2] if len(var) > 2 else '',
-                             contentType= var[3] if len(var) > 3 else 'movie',)
+                             contentType= var[3] if len(var) > 3 else 'movie' if name == 'film' else 'tvshow',)
                 # add search menu for category
                 if 'search' not in args: menuItem(itemlist, filename, 'Cerca ' + title + '… submenu bold', 'search', host + url, args=name)
 
