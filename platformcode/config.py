@@ -17,26 +17,35 @@ __language__ = __settings__.getLocalizedString
 def get_addon_core():
     return __settings__
 
+
 def get_addon_version(with_fix=True):
     '''
-    Devuelve el número de versión del addon, y opcionalmente número de fix si lo hay
+    Trova la versione dell'addon, senza usare le funzioni di kodi perchè non si aggiornano fino al riavvio
     '''
+    info = open(os.path.join(get_runtime_path(), 'addon.xml')).read()
+    ver = re.search('plugin.video.kod.*?version="([^"]+)"', info).group(1)
+
     if with_fix:
-        return __settings__.getAddonInfo('version') + get_addon_version_fix()
+        return ver + " " + get_addon_version_fix()
     else:
-        return __settings__.getAddonInfo('version')
+        return ver
+
 
 def get_addon_version_fix():
-    try:
-        last_fix_json = os.path.join(get_runtime_path(), 'last_fix.json')   # información de la versión fixeada del usuario
-        if os.path.exists(last_fix_json):
-            with open(last_fix_json, 'r') as f: data=f.read(); f.close()
-            fix = re.findall('"fix_version"\s*:\s*(\d+)', data)
-            if fix:
-                return '.fix%s' % fix[0]
-    except:
-        pass
-    return ''
+    if not dev_mode():
+        try:
+            sha = open(os.path.join(get_runtime_path(), 'last_commit.txt')).readline()
+            return sha[:7]
+        except:
+            return '??'
+    else:
+        return 'DEV'
+
+
+def dev_mode():
+    r = os.path.isdir(get_runtime_path() + '/.git')
+    return r
+
 
 def get_platform(full_version=False):
     """

@@ -342,12 +342,11 @@ def submenu_tools(item):
 def check_quickfixes(item):
     logger.info()    
     
-    if not os.path.isfile(config.get_runtime_path() + '/.dev'):
-        logger.info("DEV MODE OFF")
+    if not config.dev_mode():
         from platformcode import updater
-        return updater.check_addon_updates(verbose=True)
+        return updater.check_addon_init()
     else:
-        logger.info("DEV MODE ON")
+        return False
 
 
 def update_quasar(item):

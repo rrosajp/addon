@@ -3,7 +3,6 @@ import hashlib
 import io
 import os
 import shutil
-import zipfile
 
 from core import httptools, filetools, downloadtools
 from core.ziptools import ziptools
@@ -20,7 +19,7 @@ _hdr_pat = re.compile("^@@ -(\d+),?(\d+)? \+(\d+),?(\d+)? @@.*")
 branch = 'stable'
 user = 'kodiondemand'
 repo = 'addon'
-addonDir = xbmc.translatePath("special://home/addons/") + "plugin.video.kod/"
+addonDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'
 maxPage = 5  # le api restituiscono 30 commit per volta, quindi se si è rimasti troppo indietro c'è bisogno di andare avanti con le pagine
 trackingFile = "last_commit.txt"
 
@@ -73,7 +72,10 @@ def check_addon_init():
         for c in reversed(commits[:pos]):
             commit = httptools.downloadpage(c['url']).data
             commitJson = json.loads(commit)
-            logger.info('aggiornando a' + commitJson['sha'])
+            # evitiamo di applicare i merge commit
+            if 'Merge' in commitJson['commit']['message']:
+                continue
+            logger.info('aggiornando a ' + commitJson['sha'])
             alreadyApplied = True
 
             for file in commitJson['files']:
@@ -86,9 +88,13 @@ def check_addon_init():
                             text = ""
                             try:
                                 localFile = open(addonDir + file["filename"], 'r+')
-                                for line in localFile:
-                                    text += line
+                                text = localFile.read()
                             except IOError: # nuovo file
+                                # crea le cartelle se non esistono
+                                dirname = os.path.dirname(addonDir + file["filename"])
+                                if not os.path.exists(dirname):
+                                    os.makedirs(dirname)
+
                                 localFile = open(addonDir + file["filename"], 'w')
 
                             patched = apply_patch(text, (file['patch']+'\n').encode('utf-8'))
@@ -101,13 +107,22 @@ def check_addon_init():
                                     alreadyApplied = False
                                 else:  # nel caso ci siano stati problemi
                                     logger.info('lo sha non corrisponde, scarico il file')
+                                    try:
+                                        filetools.remove(addonDir + file["filename"])
+                                    except:
+                                        pass
                                     downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'],
-                                                               silent=True, continuar=True)
+                                                               silent=True, continuar=True, resumir=False)
                         else:  # è un file NON testuale, lo devo scaricare
                             # se non è già applicato
                             if not (filetools.isfile(addonDir + file['filename']) and getSha(
                                     filetools.read(addonDir + file['filename']) == file['sha'])):
-                                downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'], silent=True, continuar=True)
+                                try:
+                                    filetools.remove(addonDir + file["filename"])
+                                except:
+                                    pass
+                                downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'], silent=True,
+                                                           continuar=True, resumir=False)
                                 alreadyApplied = False
                     elif file['status'] == 'removed':
                         try:

@@ -355,13 +355,10 @@ if __name__ == "__main__":
 
 
     # Verificar quick-fixes al abrirse Kodi, y dejarlo corriendo como Thread
-    if not os.path.isdir(config.get_runtime_path() + '/.git'):
-        logger.info("DEV MODE OFF")
+    if not config.dev_mode():
         from platformcode import updater
         updater.check_addon_init()
         # get_channel_json()    -> disabilitato, lo si fa con l'updater
-    else:
-        logger.info("DEV MODE ON")
 
     # Copia Custom code a las carpetas de Alfa desde la zona de Userdata
     from platformcode import custom_code
