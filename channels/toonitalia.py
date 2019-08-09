@@ -51,26 +51,21 @@ def peliculas(item):
         patronBlock = '"lcp_catlist"[^>]+>(?P<block>.*)</ul>'
         patron = r'<li ><a href="(?P<url>[^"]+)" title="[^>]+">(?P<title>[^<|\(]+)?(?:\([^\d]*(?P<year>\d+)\))?[^<]*</a>'
         
-    action = 'findvideos' if item.contentType == 'movie' else 'check'
+    action = 'findvideos' if item.contentType == 'movie' else 'episodios'
 
     return locals()
-
-def check(item):
-    data = support.httptools.downloadpage(item.url, headers=headers).data
-    item.action = 'episodios'
-    if 'https://vcrypt.net' in data: item.patron = '(?:<br /> |<p>)(?P<title>[^<]+)<a href="(?P<url>[^"]+)"'
-    else: item.patron = '<br /> <a href="(?P<url>[^"]+)" target="_blank" rel="noopener[^>]+>(?P<title>[^<]+)</a>'
-    itemlist = episodios(item)
-    return itemlist
 
 
 @support.scrape
 def episodios(item):
     anime = True
-    patron = item.patron
+    data = support.httptools.downloadpage(item.url, headers=headers).data
+    if 'https://vcrypt.net' in data:
+        patron = '(?:<br /> |<p>)(?P<title>[^<]+)<a href="(?P<url>[^"]+)"'
+    else:
+        patron = '<br /> <a href="(?P<url>[^"]+)" target="_blank" rel="noopener[^>]+>(?P<title>[^<]+)</a>'
 
     def itemHook(item):
-        support.log(patron)
         item.title = item.title.replace('_',' ').replace('–','-')
         item.title = support.re.sub(item.fulltitle + ' - ','',item.title)
         return item
