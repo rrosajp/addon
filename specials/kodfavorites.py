@@ -202,7 +202,7 @@ def mainlist(item):
             context.append({'title': config.get_localized_string(70538), 'channel': item.channel, 'action': 'mover_perfil',
                             'i_perfil': i_perfil, 'direccion': 'bottom'})
 
-        plot = '%d enlaces en la carpeta' % len(perfil['items'])
+        plot = str(len(perfil['items'])) + " " + config.get_localized_string(70723)
         itemlist.append(Item(channel=item.channel, action='mostrar_perfil', title=perfil['title'], plot=plot, i_perfil=i_perfil, context=context))
 
     itemlist.append(item.clone(action='crear_perfil', title=config.get_localized_string(70542), folder=False))
@@ -230,10 +230,10 @@ def mostrar_perfil(item):
         it.context = [ {'title': '[COLOR blue]'+config.get_localized_string(70617)+'[/COLOR]', 'channel': item.channel, 'action': 'acciones_enlace',
                         'i_enlace': i_enlace, 'i_perfil': i_perfil} ]
 
-        it.plot += '[CR][CR][COLOR blue]Canal:[/COLOR] ' + it.channel + ' [COLOR blue]Action:[/COLOR] ' + it.action
+        it.plot += '[CR][CR][COLOR blue]' + config.get_localized_string(70724) + ':[/COLOR] ' + it.channel + ' [COLOR blue]' + config.get_localized_string(60266) + ':[/COLOR] ' + it.action
         if it.extra != '': it.plot += ' [COLOR blue]Extra:[/COLOR] ' + it.extra
         it.plot += '[CR][COLOR blue]Url:[/COLOR] ' + it.url if isinstance(it.url, str) else '...'
-        if it.date_added != '': it.plot += '[CR][COLOR blue]Added:[/COLOR] ' + it.date_added
+        if it.date_added != '': it.plot += '[CR][COLOR blue]' + config.get_localized_string(70469) + ':[/COLOR] ' + it.date_added
 
         # Si no es una url, ni tiene la ruta del sistema, convertir el path ya que se habrá copiado de otro dispositivo.
         # Sería más óptimo que la conversión se hiciera con un menú de importar, pero de momento se controla en run-time.
@@ -732,7 +732,7 @@ def informacion_lista(item):
     if 'tinyupload_date' in alfav.info_lista:
         txt += '[CR]' + config.get_localized_string(70638) + ' ' + alfav.info_lista['tinyupload_date'] + ' ' + config.get_localized_string(70639) + ' [COLOR blue]' + alfav.info_lista['tinyupload_code'] + '[/COLOR]'
     
-    txt += '[CR]' + config.get_localized_string(70640) + ' ' + len(alfav.user_favorites)
+    txt += '[CR]' + config.get_localized_string(70640) + ' ' + str(len(alfav.user_favorites))
     for perfil in alfav.user_favorites:
         txt += '[CR]- %s (%d %s)' % (perfil['title'], len(perfil['items']), config.get_localized_string(70641))
 
