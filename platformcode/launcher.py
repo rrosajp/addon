@@ -298,13 +298,13 @@ def run(item=None):
         if hasattr(e, 'reason'):
             logger.error("Razon del error, codigo: %s | Razon: %s" % (str(e.reason[0]), str(e.reason[1])))
             texto = config.get_localized_string(30050)  # "No se puede conectar con el sitio web"
-            platformtools.dialog_ok("alfa", texto)
+            platformtools.dialog_ok(config.get_localized_string(20000), texto)
 
         # Grab server response errors
         elif hasattr(e, 'code'):
             logger.error("Codigo de error HTTP : %d" % e.code)
             # "El sitio web no funciona correctamente (error http %d)"
-            platformtools.dialog_ok("alfa", config.get_localized_string(30051) % e.code)
+            platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(30051) % e.code)
     except WebErrorException, e:
         import traceback
         logger.error(traceback.format_exc())
