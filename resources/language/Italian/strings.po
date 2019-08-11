@@ -5604,3 +5604,11 @@ msgstr "Gentile Utente, sembra tu abbia problemi con l'ADSL! NON POTRAI ACCEDERE
 msgctxt "#70722"
 msgid "Dear User, your current DNS do not allow you to reach all ergo sites, not all Channels will work. We recommend that you set up your DNS to take advantage of more channels. Search your favorite search engine how to set them up on your device."
 msgstr "Gentile Utente, i tuoi DNS attuali non ti permettono di raggiungere tutti i siti, ergo, non tutti i Canali funzioneranno. Ti consigliamo, per usufruire di un maggior numero di canali, di impostare i DNS. Cerca sul tuo motore di ricerca preferito come impostarli sul tuo dispositivo."
+
+msgctxt "#70723"
+msgid "links in the folder"
+msgstr "collegamenti nella cartella"
+
+msgctxt "#70724"
+msgid "Channel"
+msgstr "Canale"
