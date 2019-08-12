@@ -4,12 +4,22 @@
 # ------------------------------------------------------------
 
 
-from core import support
+from core import scrapertoolsV2, httptools, support
 from core.item import Item
 
 
 __channel__ = "seriehd"
-host = support.config.get_channel_url(__channel__)
+# host = support.config.get_channel_url(__channel__)
+
+#impostati dinamicamente da findhost()
+host = ""
+headers = ""
+
+def findhost():
+    data= support.httptools.downloadpage('https://seriehd.nuovo.link/').data
+    global host, headers
+    host = support.scrapertoolsV2.find_single_match(data, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    headers = [['Referer', host]]
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
@@ -22,7 +32,8 @@ checklinks_number = support.config.get_setting('checklinks_number', __channel__)
 headers = [['Referer', host]]
 
 @support.menu
-def mainlist(item):    
+def mainlist(item):
+    findhost()
     tvshow = [('Genere', ['', 'genre']),
               ('Americane', ['/serie-tv-streaming/serie-tv-americane', 'peliculas']),
               ('Italiane', ['/serie-tv-streaming/serie-tv-italiane', 'peliculas']),]
