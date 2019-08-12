@@ -3231,7 +3231,7 @@ msgstr "Attivare Pagina iniziale"
 
 msgctxt "#70122"
 msgid "Custom (select from a channel)"
-msgstr "Personalizato (selezionare da un canale)"
+msgstr "Personalizzato (selezionare da un canale)"
 
 msgctxt "#70123"
 msgid "Show Recent"
