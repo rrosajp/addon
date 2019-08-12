@@ -360,7 +360,7 @@ def scrape(func):
         # if (item.contentType == "tvshow" and (action != "findvideos" and action != "play")) \
         #    or (item.contentType == "episode" and action != "play") \
         #    or (item.contentType == "movie" and action != "play") :
-        if action != 'play':
+        if action != 'play' and 'patronMenu' not in args:
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
         # else:                                     # Si perde item show :(
         #     for it in itemlist:

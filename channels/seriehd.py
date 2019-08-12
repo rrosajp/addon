@@ -8,18 +8,19 @@ from core import scrapertoolsV2, httptools, support
 from core.item import Item
 
 
-__channel__ = "seriehd"
+__channel__ = 'seriehd'
 # host = support.config.get_channel_url(__channel__)
 
 #impostati dinamicamente da findhost()
-host = ""
-headers = ""
+host = ''
+headers = ''
 
 def findhost():
-    data= support.httptools.downloadpage('https://seriehd.nuovo.link/').data
+    data= httptools.downloadpage('https://seriehd.nuovo.link/').data
     global host, headers
-    host = support.scrapertoolsV2.find_single_match(data, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    host = scrapertoolsV2.find_single_match(data, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
     headers = [['Referer', host]]
+    return host
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
@@ -35,16 +36,16 @@ headers = [['Referer', host]]
 def mainlist(item):
     findhost()
     tvshow = [('Genere', ['', 'genre']),
-              ('Americane', ['/serie-tv-streaming/serie-tv-americane', 'peliculas']),
-              ('Italiane', ['/serie-tv-streaming/serie-tv-italiane', 'peliculas']),]
+              ('Americane', ['serie-tv-streaming/serie-tv-americane', 'peliculas']),
+              ('Italiane', ['serie-tv-streaming/serie-tv-italiane', 'peliculas']),]
     return locals()
 
 
 def search(item, texto):
-    support.log(item)
     support.log(texto)
+    
     # item.contentType = 'tvshow'
-    item.url = host + "/?s=" + texto
+    item.url = findhost() + "/?s=" + texto
     try:
         return peliculas(item)
 
@@ -59,14 +60,11 @@ def search(item, texto):
 def newest(categoria):
     support.log(categoria)
     itemlist = []
-    item = support.Item()
+    item = support.Item()    
     try:
         if categoria == "series":
-            item.url = host
+            item.url = findhost()
             itemlist = peliculas(item)
-
-            if config.get_localized_string(30992) in itemlist[-1].title:
-                itemlist.pop()
 
     # Continua la ricerca in caso di errore
     except:
@@ -83,7 +81,7 @@ def genre(item):
     patronMenu = '<a href="(?P<url>[^"]+)">(?P<title>[^<]+)</a>'
     blacklist = ['Serie TV','Serie TV Americane','Serie TV Italiane','altadefinizione']
     patronBlock = '<ul class="sub-menu">(?P<block>.*)</ul>'
-   
+    action = 'peliculas'
     return locals()
 
 @support.scrape
