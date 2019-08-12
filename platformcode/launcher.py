@@ -58,7 +58,7 @@ def run(item=None):
                         config.get_localized_string(70018): 'infantiles',
                         config.get_localized_string(60513): 'documentales',
                         config.get_localized_string(70013): 'terror',
-                        config.get_localized_string(30124): 'castellano',
+                        config.get_localized_string(70014): 'castellano',
                         config.get_localized_string(59976): 'latino',
                         config.get_localized_string(70171): 'torrent',
                     }

@@ -62,7 +62,7 @@
         <setting id="news_start" type="bool" label="70123" default="false" visible="eq(-2,True)"
                  enable="eq(-1,False)+eq(-2,True"/>
          <setting id="category" type="labelenum" label="70124"
-                 lvalues="70137|30123|30124|70018|60513|70013|70014|59976|70171"
+                 lvalues="70137|30123|30124|60513"
                  default="70137" visible="eq(-3,True)+eq(-1,True)+eq(-2,False)" enable="eq(-3,True)+eq(-1,True)+(-2,false)"/>
    </category>
     <category label="70126">
