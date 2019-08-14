@@ -12,24 +12,24 @@ Se hai suggerimenti/consigli/dubbi sui test...Proponili e/o chiedi!
  
 ***
 
-Test #1: Lista Canali
+Test N°.1: Lista Canali
 
 Cosa serve: il file .json
 
 1. Verifica del canale nelle sezioni indicate nel file .json, voce "categories".
 
-- [Tutte]
-- [Alcune - Indicare le sezioni dove manca il canale] 
-- [Nessuna - Voce Canale mancante nella lista] In questo caso non puoi continuare il test.
+- [ ] Tutte
+- [ ] Alcune - Indicare le sezioni dove manca il canale
+- [ ] Nessuna - Voce Canale mancante nella lista. In questo caso non puoi continuare il test.
 
-2. Icone del canale []
+2. Icone del canale [ ]
 
-- [Presenti] 
-- [Non Presenti]
+- [ ] Presenti
+- [ ] Non Presenti
 
 ***
 
-Test #2: Configura Canale 
+Test N°.2: Configura Canale 
 
 1. Presenza della voce "Configura Canale"
 
@@ -75,7 +75,7 @@ g. Mostra link in lingua (Default: Non filtrare)
 
 ***
 
-Test #3: Voci menu nella pagina del Canale
+Test N°.3: Voci menu nella pagina del Canale
 
 1. Configurazione Autoplay
 
@@ -89,7 +89,7 @@ Test #3: Voci menu nella pagina del Canale
 
 ***
 
-Test #4: Confronto Sito - Pagina Canale
+Test N°.4: Confronto Sito - Pagina Canale
 
 Cosa serve: il file .py, consultare la def mainlist()
 
