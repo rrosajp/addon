@@ -506,7 +506,7 @@ def videolibrary(itemlist, item, typography='', function_level=1):
     # Function_level is useful if the function is called by another function.
     # If the call is direct, leave it blank
 
-    if item.contentType != 'episode':
+    if item.contentType == 'movie':
         action = 'add_pelicula_to_library'
         extra = 'findvideos'
         contentType = 'movie'
@@ -518,8 +518,9 @@ def videolibrary(itemlist, item, typography='', function_level=1):
     if not typography: typography = 'color kod bold'
 
     title = typo(config.get_localized_string(30161) + ' ' + typography)
-
-    if inspect.stack()[function_level][3] == 'findvideos' and contentType == 'movie' or inspect.stack()[function_level][3] != 'findvideos' and contentType != 'movie':
+    log('STACK= ',inspect.stack()[function_level][3])
+    if (inspect.stack()[function_level][3] == 'findvideos' and contentType == 'movie') \
+        or (inspect.stack()[function_level][3] == 'episodios' and contentType != 'movie'):
         if config.get_videolibrary_support() and len(itemlist) > 0:
             itemlist.append(
                 Item(channel=item.channel,
@@ -578,7 +579,8 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
     itemlist += itemList
     
     for videoitem in itemlist:
-        videoitem.title = "".join([item.title, ' ', typo(videoitem.title, 'color kod []'), typo(videoitem.quality, 'color kod []') if videoitem.quality else ""])
+        item.title = typo(item.contentTitle,'bold') if item.contentType == 'movie' else item.title
+        videoitem.title = "".join([item.title, typo(videoitem.title, '_ color kod []'), typo(videoitem.quality, '_ color kod []') if videoitem.quality else ""])
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail
@@ -617,7 +619,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True):
     if AutoPlay == True:
         autoplay.start(itemlist, item)
 
-    videolibrary(itemlist, item, function_level=3)
+    if item.contentChannel != 'videolibrary': videolibrary(itemlist, item, function_level=3)
     return itemlist
 
 
