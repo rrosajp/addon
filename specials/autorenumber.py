@@ -268,6 +268,7 @@ def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, 
         make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE)
 
 def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE):
+    from core import support
     log()
     page = 1
     EpList = []
@@ -323,11 +324,8 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
         addiction = 0
         for item in itemlist:
             # Otiene Numerazione Episodi
-            if scrapertoolsV2.find_single_match(item.title, r'\d+'):
-                continue
-            else:
-                break
             episode = int(scrapertoolsV2.find_single_match(item.title, r'\d+'))
+            log('EPISODE= ',episode)
             number = episode + FirstOfSeason - addiction
             count = number + addiction
             # find = episode + FirstOfSeason
