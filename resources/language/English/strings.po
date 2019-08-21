@@ -5594,11 +5594,11 @@ msgid "I can't automatically find the special episode number, please enter it ma
 msgstr ""
 
 msgctxt "#70720"
-msgid "Dear User\n,You are currently not connected to any modem/router. You cannot access KOD because the channels will not be reachable! We advise you to check at least that the modem/router is switched on and/or your device is connected.\n"
+msgid "Dear User\n,You are currently not connected to any modem/router. We advise you to check at least that the modem/router is switched on and/or your device is connected.\nKoD WONT FIND ANYTHING until the problem is resolved".
 msgstr ""
 
 msgctxt "#70721"
-msgid "Dear user, you seem to have problems with ADSL! You cannot access KOD because the channels will not be accessible! We suggest you call your manager's toll-free number or check it out at least that the modem/router is on and/or your device is connected."
+msgid "Dear user, you seem to have problems with ADSL! We suggest you call your manager's toll-free number or check it out at least that the modem/router is on and/or your device is connected.\nKoD WONT FIND ANYTHING until the problem is resolved"
 msgstr ""
 
 msgctxt "#70722"

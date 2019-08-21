@@ -34,9 +34,11 @@ def start():
     # se lo ha: non lo fa entrare nell'addon
     # se ha problemi di DNS avvia ma lascia entrare
     # se tutto ok: entra nell'addon
-    from specials.checkhost import test_conn, check_channels
-    check_adsl = test_conn(is_exit = True, check_dns = True, view_msg = True,
-              lst_urls = [], lst_site_check_dns = [], in_addon = True)
+    from specials.checkhost import test_conn
+    import threading
+    threading.Thread(target=test_conn, args=(True, True, True, [], [], True)).start()
+    # check_adsl = test_conn(is_exit = True, check_dns = True, view_msg = True,
+    #           lst_urls = [], lst_site_check_dns = [], in_addon = True)
 
     
 def run(item=None):
