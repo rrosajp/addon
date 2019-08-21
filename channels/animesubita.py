@@ -3,13 +3,7 @@
 # Canale per AnimeSubIta
 # ------------------------------------------------------------
 
-import re
-import urllib
-import urlparse
 
-from core import httptools, scrapertools, tmdb, support
-from core.item import Item
-from platformcode import logger, config
 from core import support
 
 __channel__ = "animesubita"
@@ -30,9 +24,9 @@ def mainlist(item):
 
 
 def newest(categoria):
-    logger.info()
+    support.log(categoria)
     itemlist = []
-    item = Item()
+    item = support.Item()
     try:
         if categoria == "anime":
             item.url = host
@@ -45,14 +39,14 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("{0}".format(line))
+            support.logger.error("{0}".format(line))
         return []
 
     return itemlist
 
 
 def search(item, texto):
-    logger.info()
+    support.log(texto)
     item.url = host + "/?s=" + texto
     item.args = 'alt'
     try:
@@ -61,7 +55,7 @@ def search(item, texto):
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("%s" % line)
+            support.logger.error("%s" % line)
         return []
 
 
@@ -71,27 +65,6 @@ def genres(item):
     patronMenu=r'<li><a title="[^"]+" href="(?P<url>[^"]+)">(?P<title>[^<]+)</a>'
     action = 'peliculas'
     return locals()
-
-def categorie(item):
-    logger.info()
-    itemlist = []
-
-    data = httptools.downloadpage(item.url).data
-    patron = r'<li><a title="[^"]+" href="([^"]+)">([^<]+)</a>'
-    matches = re.compile(patron, re.DOTALL).findall(data)
-
-    for scrapedurl, scrapedtitle in matches:
-        itemlist.append(
-                Item(channel=item.channel,
-                     action="lista_anime",
-                     title=scrapedtitle.replace('Anime', '').strip(),
-                     text_color="azure",
-                     url=scrapedurl,
-                     thumbnail=item.thumbnail,
-                     folder=True))
-
-    return itemlist
-
 
 
 @support.scrape
@@ -112,6 +85,7 @@ def peliculas(item):
         patron = r'<a href="(?P<url>[^"]+)"[^>]+>(?P<title>.*?)(?: [Oo][Aa][Vv])?(?:\s*(?P<lang>[Ss][Uu][Bb].[Ii][Tt][Aa])[^<]+)?</a>'
         action = 'episodios'    
     return locals()
+
 
 @support.scrape
 def episodios(item):
@@ -136,21 +110,21 @@ def findvideos(item):
         headers['Referer'] =  url
         data = support.match(item, headers=headers, url=url)[1]
         cookies = ""
-        matches = support.re.compile('(.%s.*?)\n' % host.replace("http://", "").replace("www.", ""), re.DOTALL).findall(config.get_cookie_data())
+        matches = support.re.compile('(.%s.*?)\n' % host.replace("http://", "").replace("www.", ""), support.re.DOTALL).findall(support.config.get_cookie_data())
         for cookie in matches:
             cookies += cookie.split('\t')[5] + "=" + cookie.split('\t')[6] + ";"
 
         headers['Cookie'] = cookies[:-1]
         
-        url = support.match(data, r'<source src="([^"]+)"[^>]+>')[0][0] + '|' + urllib.urlencode(headers)
+        url = support.match(data, r'<source src="([^"]+)"[^>]+>')[0][0] + '|' + support.urllib.urlencode(headers)
         itemlist.append(
-            Item(channel=item.channel,
-                 action="play",
-                 title='diretto',
-                 quality='',
-                 url=url,
-                 server='directo',
-                 fulltitle=item.fulltitle,
-                 show=item.show))
+            support.Item(channel=item.channel,
+                         action="play",
+                         title='diretto',
+                         quality='',
+                         url=url,
+                         server='directo',
+                         fulltitle=item.fulltitle,
+                         show=item.show))
 
     return support.server(item,url,itemlist)
