@@ -731,9 +731,9 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
     # Simply add this function to add video library support
     # Function_level is useful if the function is called by another function.
     # If the call is direct, leave it blank
-    log(item)
+    log()
 
-    if item.contentType != 'episode':
+    if item.contentType == 'movie':
         action = 'add_pelicula_to_library'
         extra = 'findvideos'
         contentType = 'movie'
@@ -742,8 +742,7 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
         extra = 'episodios'
         contentType = 'tvshow'
 
-    log('FUNCTION = ',function)
-   
+    function = function if function else inspect.stack()[function_level][3]
 
     if not typography: typography = 'color kod bold'
 
@@ -751,8 +750,8 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
     contentSerieName=item.contentSerieName if item.contentSerieName else ''
     contentTitle=item.contentTitle if item.contentTitle else ''
 
-    if (inspect.stack()[function_level][3] == 'findvideos' and contentType == 'movie' \
-        or inspect.stack()[function_level][3] != 'findvideos' and contentType != 'movie'):
+    if (function == 'findvideos' and contentType == 'movie') \
+        or (function == 'episodios' and contentType != 'movie'):
         if config.get_videolibrary_support() and len(itemlist) > 0:
             itemlist.append(
                 Item(channel=item.channel,
