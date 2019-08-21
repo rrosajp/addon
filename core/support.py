@@ -207,7 +207,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         # make formatted Title [longtitle]
         s = ' - '
         title = episode +  (s if episode and title else '') + title
-        longtitle = episode + (s if episode and title else '') + title + (s if title and title2 else '') + title2
+        longtitle = title + (s if title and title2 else '') + title2
         longtitle = typo(longtitle, 'bold')
         longtitle += (typo(Type,'_ () bold') if Type else '') +  (typo(quality, '_ [] color kod') if quality else '')
         lang, longtitle = scrapeLang(scraped, lang, longtitle)
@@ -703,12 +703,15 @@ def typo(string, typography=''):
     return string
 
 
-def match(item, patron='', patronBlock='', headers='', url=''):
+def match(item, patron='', patronBlock='', headers='', url='', post=''):
     matches = []
-    url = url if url else item.url
-    data = httptools.downloadpage(url, headers=headers, ignore_response_code=True).data.replace("'", '"')
+    if type(item) == str:
+        data = item
+    else:
+        url = url if url else item.url
+        data = httptools.downloadpage(url, headers=headers, ignore_response_code=True, post=post).data.replace("'", '"')
     data = re.sub(r'\n|\t', ' ', data)
-    data = re.sub(r'>\s\s*<', '><', data)
+    data = re.sub(r'>\s\s*<', '><', data)    
     log('DATA= ', data)
 
     if patronBlock:
