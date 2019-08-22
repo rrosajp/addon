@@ -192,6 +192,8 @@ def config_item(item, itemlist=[], typography='', active=False):
 
 def renumber(itemlist, item='', typography=''):
     log()
+    if 'fromchannel' in item:
+        item.channel = item.fromchannel if item.fromchannel else item.channel
     # Seleziona la funzione Adatta, Menu Contestuale o Rinumerazione
     if item:
         settings_node = jsontools.get_node_from_file(item.channel, 'settings')

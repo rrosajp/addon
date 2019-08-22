@@ -803,8 +803,8 @@ def save_download(item):
         del item.from_action
         del item.from_channel
 
-    item.contentChannel = item.channel
-    item.contentAction = item.action
+    item.contentChannel = item.fromchannel if item.fromchannel else item.channel
+    item.contentAction = item.fromaction if item.fromaction else item.action
 
     if item.contentType in ["tvshow", "episode", "season"]:
         save_download_tvshow(item)

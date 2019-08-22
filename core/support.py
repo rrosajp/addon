@@ -390,6 +390,8 @@ def scrape(func):
         if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
             # item.fulltitle = item.infoLabels["title"]
             videolibrary(itemlist, item, function=function)
+        if config.get_setting('downloadenabled') and (function == 'episodios' or function == 'finvideos'):
+            download(itemlist, item, function=function)
 
         if 'patronMenu' in args:
             itemlist = thumb(itemlist, genre=True)
@@ -728,6 +730,39 @@ def match(item, patron='', patronBlock='', headers='', url='', post=''):
     return matches, block
 
 
+def download(itemlist, item, typography='', function_level=1, function=''):
+    if item.contentType == 'movie':       
+        fromaction = 'findvideos'
+        title = config.get_localized_string(60354)
+    else:        
+        fromaction = 'episodios'
+        title = config.get_localized_string(60355)
+
+    function = function if function else inspect.stack()[function_level][3]
+
+    if not typography: typography = 'color kod bold'
+
+    title = typo(title, typography)
+    contentSerieName=item.contentSerieName if item.contentSerieName else ''
+    contentTitle=item.contentTitle if item.contentTitle else ''
+    if item.contentType != 'episode':
+        itemlist.append(
+            Item(channel='downloads',
+                 fromchannel=item.channel,
+                 title=title,
+                 fulltitle=item.fulltitle,
+                 show=item.fulltitle,
+                 contentType=item.contentType,
+                 contentSerieName=contentSerieName,
+                 url=item.url,
+                 action='save_download',
+                 fromaction=fromaction,
+                 contentTitle=contentTitle
+                 ))
+
+    return itemlist
+
+
 def videolibrary(itemlist, item, typography='', function_level=1, function=''):
     # Simply add this function to add video library support
     # Function_level is useful if the function is called by another function.
@@ -856,6 +891,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True):
         autoplay.start(itemlist, item)
 
     if item.contentChannel != 'videolibrary': videolibrary(itemlist, item, function_level=3)
+    if get_setting('downloadenabled'): download(itemlist, item, function_level=3)
     return itemlist
 
 
