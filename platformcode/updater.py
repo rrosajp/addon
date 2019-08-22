@@ -11,6 +11,7 @@ import json
 import xbmc
 import re
 import xbmcaddon
+from lib import githash
 
 addon = xbmcaddon.Addon('plugin.video.kod')
 
@@ -72,9 +73,6 @@ def check_addon_init():
         for c in reversed(commits[:pos]):
             commit = httptools.downloadpage(c['url']).data
             commitJson = json.loads(commit)
-            # evitiamo di applicare i merge commit
-            if 'Merge' in commitJson['commit']['message']:
-                continue
             logger.info('aggiornando a ' + commitJson['sha'])
             alreadyApplied = True
 
@@ -140,7 +138,7 @@ def check_addon_init():
                                     filetools.mkdir(addonDir + d)
                             filetools.move(addonDir + file['previous_filename'], addonDir + file['filename'])
                             alreadyApplied = False
-            if not alreadyApplied:  # non mando notifica se già applicata (es. scaricato zip da github)
+            if not alreadyApplied and 'Merge' not in commitJson['commit']['message']: # non mando notifica se già applicata (es. scaricato zip da github) o se è un merge
                 changelog += commitJson['commit']['message'] + " | "
                 nCommitApplied += 1
         if addon.getSetting("addon_update_message"):
@@ -159,7 +157,6 @@ def check_addon_init():
 
 
 def calcCurrHash():
-    from lib import githash
     treeHash = githash.tree_hash(addonDir).hexdigest()
     logger.info('tree hash: ' + treeHash)
     commits = loadCommits()
@@ -220,7 +217,7 @@ def apply_patch(s,patch,revert=False):
 
 
 def getSha(fileText):
-    return hashlib.sha1("blob " + str(len(fileText)) + "\0" + fileText).hexdigest()
+    return githash.blob_hash(open(fileText, 'r'), githash.classify(fileText)[2]).hexdigest()
 
 
 def updateFromZip():
