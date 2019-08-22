@@ -2,20 +2,12 @@
 # ------------------------------------------------------------
 # Canale per animeleggendari
 # ------------------------------------------------------------
-"""
-        DA COMPLETARE - CONTROLLARE
-"""
-import re
 
-from core import servertools, httptools, scrapertoolsV2, tmdb, support
-from core.item import Item
-from core.support import log, menu
+from core importsupport
 from lib.js2py.host import jsfunctions
-from platformcode import logger, config
-from specials import autoplay, autorenumber
 
 __channel__ = "animeleggendari"
-host = config.get_channel_url(__channel__)
+host = support.config.get_channel_url(__channel__)
 
 headers = [['User-Agent', 'Mozilla/50.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0'],
            ['Referer', host]]
@@ -23,20 +15,16 @@ headers = [['User-Agent', 'Mozilla/50.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/
 list_servers = ['verystream','openload','rapidvideo','streamango']
 list_quality = ['default']
 
-checklinks = config.get_setting('checklinks', 'animeleggendari')
-checklinks_number = config.get_setting('checklinks_number', 'animeleggendari')
-
                                        
 @support.menu
 def mainlist(item):
 
-    anime = ''
-    animeSub = [
+    anime = [
         ('Leggendari', ['/category/anime-leggendari/', 'peliculas']),
         ('ITA', ['/category/anime-ita/', 'peliculas']),
         ('SUB-ITA', ['/category/anime-sub-ita/', 'peliculas']),
         ('Conclusi', ['/category/serie-anime-concluse/', 'peliculas']),
-        ('in Corso', ['/category/anime-in-corso/', 'peliculas']),
+        ('in Corso', ['/category/serie-anime-in-corso/', 'last_ep']),
         ('Genere', ['', 'genres'])
     ]
 
@@ -44,7 +32,7 @@ def mainlist(item):
 
 
 def search(item, texto):
-    log(texto)
+    support.log(texto)
     
     item.url = host + "/?s=" + texto
     try:
@@ -54,144 +42,60 @@ def search(item, texto):
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("%s" % line)
+            support.logger.error("%s" % line)
         return []
 
-@support.scrape
-def last_ep(item):
-    log('ANIME PER TUTTI')
-
-    action = 'findvideos'
-    patron = r'<a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
-    patron_block = r'<ul class="mh-tab-content-posts">(.*?)<\/ul>'
-
-def newest(categoria):
-    log('ANIME PER TUTTI')
-    log(categoria)
-    itemlist = []
-    item = Item()
-    try:
-        if categoria == "anime":
-            item.url = host
-            item.action = "last_ep"
-            itemlist = last_ep(item)
-
-            if itemlist[-1].action == "last_ep":
-                itemlist.pop()
-    # Continua la ricerca in caso di errore
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error("{0}".format(line))
-        return []
-
-    return itemlist
 
 @support.scrape
 def genres(item):
-    log()
-
-    action = 'peliculas'
     blacklist = ['Contattaci','Privacy Policy', 'DMCA']
-    patron = r'<a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
-    patron_block = r'Generi.*?<ul.*?>(.*?)<\/ul>'
+    patronMenu = r'<a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
+    patronBlock = r'Generi</a>\s*<ul[^>]+>(?P<block>.*?)<\/ul>'
+    action = 'peliculas'
     return locals()
 
+
+@support.scrape
 def peliculas(item):
-    log()
-    itemlist = []
-
+    anime = True
     blacklist = ['top 10 anime da vedere']
-    matches, data = support.match(item, r'<a class="[^"]+" href="([^"]+)" title="([^"]+)"><img[^s]+src="([^"]+)"[^>]+')
+    if item.url != host: patronBlock = r'<div id="main-content(?P<block>.*?)<aside'
+    patron = r'<figure class="(?:mh-carousel-thumb|mh-posts-grid-thumb)"> <a class="[^"]+" href="(?P<url>[^"]+)" title="(?P<title>.*?)(?: \((?P<year>\d+)\))? (?:(?P<lang>SUB ITA|ITA))(?: (?P<title2>[Mm][Oo][Vv][Ii][Ee]))?[^"]*"><img[^s]+src="(?P<thumb>[^"]+)"[^>]+'
+    def itemHook(item):
+        if 'movie' in item.title.lower():
+            item.title = support.re.sub(' - [Mm][Oo][Vv][Ii][Ee]|[Mm][Oo][Vv][Ii][Ee]','',item.title)
+            item.title += support.typo('Movie','_ () bold')
+            item.contentType = 'movie'
+            item.action = 'findvideos'
+        return item
+    patronNext = r'<a class="next page-numbers" href="([^"]+)">'
+    action = 'episodios'
+    return locals()
 
-    for url, title, thumb in matches:
-        title = scrapertoolsV2.decodeHtmlentities(title.strip()).replace("streaming", "")
-        lang = scrapertoolsV2.find_single_match(title, r"((?:SUB ITA|ITA))")
-        videoType = ''
-        if 'movie' in title.lower():
-            videoType = ' - (MOVIE)'
-        if 'ova' in title.lower():
-            videoType = ' - (OAV)'
 
-        cleantitle = title.replace(lang, "").replace('(Streaming & Download)', '').replace('( Streaming & Download )', '').replace('OAV', '').replace('OVA', '').replace('MOVIE', '').strip()
-
-        if not videoType :
-            contentType="tvshow"
-            action="episodios"
-        else:
-            contentType="movie"
-            action="findvideos"
-
-        if not title.lower() in blacklist:
-            itemlist.append(
-                Item(channel=item.channel,
-                    action=action,
-                    contentType=contentType,
-                    title=support.typo(cleantitle + videoType, 'bold') + support.typo(lang,'_ [] color kod'),
-                    fulltitle=cleantitle,
-                    show=cleantitle,
-                    url=url,
-                    thumbnail=thumb))
-
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-    autorenumber.renumber(itemlist)
-    support.nextPage(itemlist, item, data, r'<a class="next page-numbers" href="([^"]+)">')
-
-    return itemlist
-
+@support.scrape
 def episodios(item):
-    log()
-    itemlist = []
+    url = item.url
+    anime = True
+    patronBlock = r'(?:<p style="text-align: left;">|<div class="pagination clearfix">\s*)(?P<block>.*?)</span></a></div>'
+    patron = r'(?:<a href="(?P<url>[^"]+)"[^>]+>)?<span class="pagelink">(?P<episode>\d+)</span>'
+    def itemHook(item):
+        if not item.url:
+            item.url = url
+        item.title = support.typo('Episodio ', 'bold') + item.title
+        return item
+    return locals()
 
-    data = httptools.downloadpage(item.url).data
-    block = scrapertoolsV2.find_single_match(data, r'(?:<p style="text-align: left;">|<div class="pagination clearfix">\s*)(.*?)</span></a></div>')
-
-    itemlist.append(
-        Item(channel=item.channel,
-             action='findvideos',
-             contentType='episode',
-             title=support.typo('Episodio 1 bold'),
-             fulltitle=item.title,
-             url=item.url,
-             thumbnail=item.thumbnail))
-
-    if block:
-        matches = re.compile(r'<a href="([^"]+)".*?><span class="pagelink">(\d+)</span></a>', re.DOTALL).findall(data)
-        for url, number in matches:
-            itemlist.append(
-                Item(channel=item.channel,
-                     action='findvideos',
-                     contentType='episode',
-                     title=support.typo('Episodio ' + number,'bold'),
-                     fulltitle=item.title,
-                     url=url,
-                     thumbnail=item.thumbnail))
-
-    autorenumber.renumber(itemlist, item)
-    support.videolibrary
-    return itemlist
 
 def findvideos(item):
-    log()
+    support.log()
     data = ''
     matches = support.match(item, 'str="([^"]+)"')[0]
     if matches:
         for match in matches:
-            data += str(jsfunctions.unescape(re.sub('@|g','%', match)))
+            data += str(jsfunctions.unescape(support.re.sub('@|g','%', match)))
             data += str(match)
-            log('DATA',data)
-            if 'animepertutti' in data:
-                log('ANIMEPERTUTTI!')
-
     else:
         data = ''
 
-    itemlist = support.server(item,data)
-
-    if checklinks:
-        itemlist = servertools.check_list_links(itemlist, checklinks_number)
-
-    # itemlist = filtertools.get_links(itemlist, item, list_language)
-    autoplay.start(itemlist, item)
-
-    return itemlist
+    return support.server(item,data)

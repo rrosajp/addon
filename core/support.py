@@ -334,6 +334,7 @@ def scrape(func):
         if not data:
             data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
             data = re.sub('\n|\t', ' ', data)
+            data = re.sub('>\s+<', '> <', data)
             # replace all ' with " and eliminate newline, so we don't need to worry about
             log('DATA =', data)
 
