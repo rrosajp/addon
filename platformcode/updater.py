@@ -217,7 +217,7 @@ def apply_patch(s,patch,revert=False):
 
 
 def getSha(fileText):
-    return githash.blob_hash(open(fileText, 'r'), githash.classify(fileText)[2]).hexdigest()
+    return hashlib.sha1("blob " + str(len(fileText)) + "\0" + fileText).hexdigest()
 
 
 def updateFromZip():
