@@ -3,7 +3,7 @@
 # Canale per animeleggendari
 # ------------------------------------------------------------
 
-from core importsupport
+from core import support
 from lib.js2py.host import jsfunctions
 
 __channel__ = "animeleggendari"
