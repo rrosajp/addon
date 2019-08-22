@@ -9,6 +9,14 @@
     "categories": ["anime"],
     "settings": [
         {
+            "id": "modo_grafico",
+            "type": "bool",
+            "label": "Cerca informazioni extra",
+            "default": true,
+            "enabled": true,
+            "visible": true
+        },
+        {
             "id": "channel_host",
             "type": "text",
             "label": "Host del canale",

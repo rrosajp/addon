@@ -10,7 +10,7 @@ __channel__ = "animesaturn"
 host = support.config.get_setting("channel_host", __channel__)
 headers={'X-Requested-With': 'XMLHttpRequest'}
 
-IDIOMAS = {'Italiano': 'IT'}
+IDIOMAS = {'Italiano': 'ITA'}
 list_language = IDIOMAS.values()
 list_servers = ['openload', 'fembed', 'animeworld']
 list_quality = ['default', '480p', '720p', '1080p']
@@ -63,7 +63,6 @@ def menu(item):
 @support.scrape
 def peliculas(item):
     anime = True
-    # debug = True
     if item.args == 'updated':
         post = "page=" + str(item.page if item.page else 1) if item.page > 1 else None
         page, data = support.match(item, r'data-page="(\d+)" title="Next">', post=post, headers=headers)
@@ -71,9 +70,8 @@ def peliculas(item):
         if page: nextpage = page
         action = 'findvideos'
     elif item.args == 'top':
-        # debug = True
         data = item.url
-        patron = r'a href="(?P<url>[^"]+)">[^>]+>(?P<title>[^<\(]+)(?:\((?P<year>[^\)]+)\))?</div></a><div class="numero">(?P<title2>[^<]+)</div>.*?<img alt="[^"]+" src="(?P<thumb>[^"]+)"' 
+        patron = r'<a href="(?P<url>[^"]+)">[^>]+>(?P<title>[^<\(]+)(?:\((?P<year>[^\)]+)\))?</div></a><div class="numero">(?P<title2>[^<]+)</div>.*?src="(?P<thumb>[^"]+)"' 
         action = 'check'
     else:
         pagination = ''
@@ -84,9 +82,10 @@ def peliculas(item):
 
 
 def check(item):
-    movie, data = support.match(item, r' Episodi:</b> (\d*) Movie')
+    movie, data = support.match(item, r'Episodi:</b> (\d*) Movie')
     anime_id = support.match(data, r'anime_id=(\d+)')[0][0]    
     item.url = host + "/loading_anime?anime_id=" + anime_id
+    support.log('MOVIE= ', movie)
     if movie:
         item.contentType = 'movie'
         episodes = episodios(item)
@@ -103,11 +102,12 @@ def episodios(item):
     return locals()
 
 
-def findvideos(item):    
+def findvideos(item):
+    support.log(item)
     itemlist = []
-    item.url = support.match(item, r'<a href="([^"]+)"><div class="downloadestreaming">',headers=headers)[0][0]
-    itemlist = support.server(item)
-    return itemlist
+    url = support.match(item, r'<a href="([^"]+)"><div class="downloadestreaming">',headers=headers)[0]
+    if url: item.url = url[0]
+    return support.server(item)
 
 
 
