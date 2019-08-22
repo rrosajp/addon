@@ -145,7 +145,7 @@ def check_addon_init():
                 nCommitApplied += 1
         if addon.getSetting("addon_update_message"):
             time = nCommitApplied * 2000 if nCommitApplied < 10 else 20000
-            platformtools.dialog_notification('Kodi on Demand', changelog, time)
+            platformtools.dialog_notification('Kodi on Demand', 'Aggiornamenti applicati:\n' + changelog[:-3], time)
 
         localCommitFile.seek(0)
         localCommitFile.truncate()
