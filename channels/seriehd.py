@@ -11,7 +11,7 @@ from core.item import Item
 __channel__ = 'seriehd'
 # host = support.config.get_channel_url(__channel__)
 
-#impostati dinamicamente da findhost()
+# impostati dinamicamente da findhost()
 host = ''
 headers = ''
 
@@ -22,8 +22,6 @@ def findhost():
     headers = [['Referer', host]]
     return host
 
-IDIOMAS = {'Italiano': 'IT'}
-list_language = IDIOMAS.values()
 list_servers = ['verystream', 'openload', 'streamango', 'thevideome']
 list_quality = ['1080p', '720p', '480p', '360']
 
@@ -84,6 +82,7 @@ def genre(item):
     action = 'peliculas'
     return locals()
 
+
 @support.scrape
 def peliculas(item):
     patron = r'<h2>(?P<title>.*?)</h2>\s*<img src="(?P<thumb>[^"]+)" alt="[^"]*" />\s*<A HREF="(?P<url>[^"]+)">.*?<span class="year">(?P<year>[0-9]{4}).*?<span class="calidad">(?P<quality>[A-Z]+)'
@@ -91,31 +90,23 @@ def peliculas(item):
     action='episodios'
     return locals()
 
+
+@support.scrape
 def episodios(item):
-    support.log()
-    itemlist = []    
+    data =''
     url = support.match(item, patronBlock=r'<iframe width=".+?" height=".+?" src="([^"]+)" allowfullscreen frameborder="0">')[1]
-    seasons = support.match(item, r'<a href="([^"]+)">(\d+)<', r'<h3>STAGIONE</h3><ul>(.*?)</ul>', headers, url)[0]
+    seasons = support.match(item, r'<a href="([^"]+)">(\d+)<', r'<h3>STAGIONE</h3><ul>(.*?)</ul>', headers, url)[0]    
     for season_url, season in seasons:
         season_url = support.urlparse.urljoin(url, season_url)
         episodes = support.match(item, r'<a href="([^"]+)">(\d+)<', '<h3>EPISODIO</h3><ul>(.*?)</ul>', headers, season_url)[0]
         for episode_url, episode in episodes:
             episode_url = support.urlparse.urljoin(url, episode_url)
             title = season + "x" + episode.zfill(2)
-
-            itemlist.append(
-                support.Item(channel=item.channel,
-                             action="findvideos",
-                             contentType="episode",
-                             title=support.typo(title + ' - ' +item.show,'bold'),
-                             url=episode_url,
-                             fulltitle=item.fulltitle,
-                             show=item.show,
-                             thumbnail=item.thumbnail))
-
-    support.videolibrary(itemlist, item, 'color kod bold')
-
-    return itemlist
+            data += title + '|' + episode_url + '\n'
+    support.log('DaTa= ',data)
+    patron = r'(?P<title>[^\|]+)\|(?P<url>[^\n]+)\n'
+    action = 'findvideos'
+    return locals()
 
 
 def findvideos(item):
