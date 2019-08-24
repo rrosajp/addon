@@ -612,6 +612,11 @@ def set_context_commands(item, parent_item):
                                             (sys.argv[0], item.clone(channel="downloads", action="save_download",
                                                                     from_channel=item.channel,
                                                                     from_action=item.action).tourl())))
+                context_commands.append((config.get_localized_string(60357), "XBMC.RunPlugin(%s?%s)" %
+                                            (sys.argv[0], item.clone(channel="downloads", action="save_download",
+                                                                    from_channel=item.channel,
+                                                                    from_action=item.action,
+                                                                    download='season').tourl())))
 
             # Descargar episodio
             elif item.contentType == 'episode' and item.action in ["findvideos"]:
@@ -622,11 +627,12 @@ def set_context_commands(item, parent_item):
                                                                     from_action=item.action).tourl())))
 
             # Descargar temporada
-            elif item.contentType == "season":
-                context_commands.append((config.get_localized_string(60357), "XBMC.RunPlugin(%s?%s)" %
-                                            (sys.argv[0], item.clone(channel="downloads", action="save_download",
-                                                                    from_channel=item.channel,
-                                                                    from_action=item.action).tourl())))
+            # elif item.contentType == "season":
+            #     context_commands.append((config.get_localized_string(60357), "XBMC.RunPlugin(%s?%s)" %
+            #                                 (sys.argv[0], item.clone(channel="downloads", action="save_download",
+            #                                                         from_channel=item.channel,
+            #                                                         from_action=item.action,
+            #                                                         download='season').tourl())))
 
         # Abrir configuración
         if parent_item.channel not in ["setting", "news", "search"]:

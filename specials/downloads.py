@@ -712,6 +712,11 @@ def start_download(item):
 def get_episodes(item):
     logger.info("contentAction: %s | contentChannel: %s | contentType: %s" % (
         item.contentAction, item.contentChannel, item.contentType))
+    if 'dlseason' in item:
+        season = True
+        season_number = item.dlseason
+    else: 
+        season = False
         
             # El item que pretendemos descargar YA es un episodio
     if item.contentType == "episode":
@@ -758,11 +763,18 @@ def get_episodes(item):
 
             # Episodio, Temporada y Titulo
             if not episode.contentTitle:
-                episode.contentTitle = re.sub("\[[^\]]+\]|\([^\)]+\)|\d*x\d*\s*-", "", episode.title).strip()
+                episode.contentTitle = re.sub(r"\[[^\]]+\]|\([^\)]+\)|\d*x\d*\s*-", "", episode.title).strip()
 
             episode.downloadFilename = filetools.validate_path(os.path.join(item.downloadFilename, "%dx%0.2d - %s" % (
                 episode.contentSeason, episode.contentEpisodeNumber, episode.contentTitle.strip())))
-            itemlist.append(episode)
+            if season:
+                log('SEASON= ',season)
+                log(int(scrapertools.find_single_match(episode.title, r'(\d+)x')))
+                log(season_number,' ',type(season_number))
+                if scrapertools.find_single_match(episode.title, r'(\d+)x') == season_number:
+                    itemlist.append(episode)
+            else:
+                itemlist.append(episode)
         # Cualquier otro resultado no nos vale, lo ignoramos
         else:
             logger.info("Omitting invalid item: %s" % episode.tostring())
@@ -807,6 +819,9 @@ def save_download(item):
     item.contentAction = item.fromaction if item.fromaction else item.action
 
     if item.contentType in ["tvshow", "episode", "season"]:
+        if 'download' in item:
+            heading = config.get_localized_string(70686) # <- Enter the number of the starting season (for season > 1)
+            item.dlseason = platformtools.dialog_numeric(0, heading, '')
         save_download_tvshow(item)
 
     elif item.contentType == "movie":
@@ -885,7 +900,7 @@ def save_download_tvshow(item):
 
     if not platformtools.dialog_yesno(config.get_localized_string(30101), config.get_localized_string(70189)):
         platformtools.dialog_ok(config.get_localized_string(30101),
-                                str(len(episodes)) + " capitulos de: " + item.contentSerieName,
+                                str(len(episodes)) + config.get_localized_string(30110) + item.contentSerieName,
                                 config.get_localized_string(30109))
     else:
         for i in episodes:

@@ -171,7 +171,11 @@ msgstr "aggiunto ai preferiti"
 
 msgctxt "#30109"
 msgid "added to download list"
-msgstr "aggiunto alla lista download"
+msgstr "aggiunto/i alla lista download"
+
+msgctxt "#30110"
+msgid " Episodes of: "
+msgstr " Episodi di: "
 
 msgctxt "#30112"
 msgid "Enter title to search"

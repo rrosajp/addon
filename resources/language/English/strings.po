@@ -173,6 +173,10 @@ msgctxt "#30109"
 msgid "added to download list"
 msgstr ""
 
+msgctxt "#30110"
+msgid " Episodes of: "
+msgstr " Episodi di: "
+
 msgctxt "#30112"
 msgid "Enter title to search"
 msgstr ""

@@ -731,25 +731,42 @@ def match(item, patron='', patronBlock='', headers='', url='', post=''):
 
 
 def download(itemlist, item, typography='', function_level=1, function=''):
-    if item.contentType == 'movie':       
-        fromaction = 'findvideos'
-        title = config.get_localized_string(60354)
-    else:        
-        fromaction = 'episodios'
-        title = config.get_localized_string(60355)
-
-    function = function if function else inspect.stack()[function_level][3]
-
     if not typography: typography = 'color kod bold'
 
-    title = typo(title, typography)
+    if item.contentType == 'movie':       
+        fromaction = 'findvideos'
+        title = typo(config.get_localized_string(60354), typography)
+    elif item.contentType == 'episode':       
+        fromaction = 'findvideos'
+        title = typo(config.get_localized_string(60356), typography) + ' - ' + item.title
+    else:        
+        fromaction = 'episodios'
+        title = typo(config.get_localized_string(60355), typography)
+
+    function = function if function else inspect.stack()[function_level][3]
+    
     contentSerieName=item.contentSerieName if item.contentSerieName else ''
     contentTitle=item.contentTitle if item.contentTitle else ''
-    if item.contentType != 'episode':
+    # if item.contentType != 'episode':
+    log(item)
+    itemlist.append(
+        Item(channel='downloads',
+             fromchannel=item.channel,
+             title=title,
+             fulltitle=item.fulltitle,
+             show=item.fulltitle,
+             contentType=item.contentType,
+             contentSerieName=contentSerieName,
+             url=item.url,
+             action='save_download',
+             fromaction=fromaction,
+             contentTitle=contentTitle
+        ))
+    if fromaction == 'episodios':
         itemlist.append(
             Item(channel='downloads',
                  fromchannel=item.channel,
-                 title=title,
+                 title=typo(config.get_localized_string(60357),typography),
                  fulltitle=item.fulltitle,
                  show=item.fulltitle,
                  contentType=item.contentType,
@@ -757,8 +774,10 @@ def download(itemlist, item, typography='', function_level=1, function=''):
                  url=item.url,
                  action='save_download',
                  fromaction=fromaction,
-                 contentTitle=contentTitle
-                 ))
+                 contentTitle=contentTitle,
+                 download='season'
+            ))
+        
 
     return itemlist
 
