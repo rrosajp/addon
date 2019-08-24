@@ -820,9 +820,12 @@ def save_download(item):
 
     if item.contentType in ["tvshow", "episode", "season"]:
         if 'download' in item:
-            heading = config.get_localized_string(70686) # <- Enter the number of the starting season (for season > 1)
+            heading = config.get_localized_string(70594) # <- Enter the season number
             item.dlseason = platformtools.dialog_numeric(0, heading, '')
-        save_download_tvshow(item)
+            if item.dlseason:
+                save_download_tvshow(item)
+        else:
+            save_download_tvshow(item)
 
     elif item.contentType == "movie":
         save_download_movie(item)
