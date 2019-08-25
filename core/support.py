@@ -747,37 +747,35 @@ def download(itemlist, item, typography='', function_level=1, function=''):
     
     contentSerieName=item.contentSerieName if item.contentSerieName else ''
     contentTitle=item.contentTitle if item.contentTitle else ''
-    # if item.contentType != 'episode':
-    log(item)
-    itemlist.append(
-        Item(channel='downloads',
-             fromchannel=item.channel,
-             title=title,
-             fulltitle=item.fulltitle,
-             show=item.fulltitle,
-             contentType=item.contentType,
-             contentSerieName=contentSerieName,
-             url=item.url,
-             action='save_download',
-             fromaction=fromaction,
-             contentTitle=contentTitle
-        ))
-    if fromaction == 'episodios':
+    if item.contentChannel != 'videolibrary':
         itemlist.append(
             Item(channel='downloads',
-                 fromchannel=item.channel,
-                 title=typo(config.get_localized_string(60357),typography),
-                 fulltitle=item.fulltitle,
-                 show=item.fulltitle,
-                 contentType=item.contentType,
-                 contentSerieName=contentSerieName,
-                 url=item.url,
-                 action='save_download',
-                 fromaction=fromaction,
-                 contentTitle=contentTitle,
-                 download='season'
+                fromchannel=item.channel,
+                title=title,
+                fulltitle=item.fulltitle,
+                show=item.fulltitle,
+                contentType=item.contentType,
+                contentSerieName=contentSerieName,
+                url=item.url,
+                action='save_download',
+                fromaction=fromaction,
+                contentTitle=contentTitle
             ))
-        
+        if fromaction == 'episodios':
+            itemlist.append(
+                Item(channel='downloads',
+                    fromchannel=item.channel,
+                    title=typo(config.get_localized_string(60357),typography),
+                    fulltitle=item.fulltitle,
+                    show=item.fulltitle,
+                    contentType=item.contentType,
+                    contentSerieName=contentSerieName,
+                    url=item.url,
+                    action='save_download',
+                    fromaction=fromaction,
+                    contentTitle=contentTitle,
+                    download='season'
+                ))
 
     return itemlist
 
