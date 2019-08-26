@@ -658,6 +658,10 @@ def set_context_commands(item, parent_item):
                                                                                      action="open_menu",
                                                                                      parent=parent_item.tourl()).tourl(
                                 ))))
+    if config.dev_mode():
+        context_commands.insert(1, ("item info",
+                                    "XBMC.Container.Update (%s?%s)" % (sys.argv[0], Item(action="itemInfo",
+                                                                                parent=parent_item.tojson()).tourl())))
     return context_commands
 
 

@@ -131,7 +131,9 @@ def run(item=None):
             from core import tmdb
             if tmdb.drop_bd():
                 platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60011), time=2000, sound=False)
-
+        elif item.action == "itemInfo":
+            import base64
+            platformtools.dialog_textviewer('Item info', item.parent)
         # Action in certain channel specified in "action" and "channel" parameters
         else:
             # Entry point for a channel is the "mainlist" action, so here we check parental control
