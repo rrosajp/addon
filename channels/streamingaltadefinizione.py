@@ -14,22 +14,16 @@ host = config.get_channel_url(__channel__)
 list_servers = ['verystream', 'openload', 'wstream']
 list_quality = ['1080p', 'HD', 'DVDRIP', 'SD', 'CAM']
 
+@support.menu
 def mainlist(item):
-    support.log()
-    itemlist = []
+    film = ["/film/"]
+    anime = ["/genere/anime/",
+        ('Film Anime', ["/genere/anime/", 'peliculas']),
+        ('Film Anime per genere', ["/genere/anime/", 'generos'])
+    ]
+    tvshow = ["/serietv/"]
 
-    film =  "/film/"
-    support.menu(itemlist, 'Film Anime', 'peliculas', host + "/genere/anime/")
-    support.menu(itemlist, 'Film per genere', 'generos', host)
-    tvshow = "/serietv/"
-    support.menu(itemlist, 'Anime', 'peliculas', host + "/genere/anime/", contentType='tvshow')
-
-
-
-    autoplay.init(item.channel, list_servers, list_quality)
-    autoplay.show_option(item.channel, itemlist)
-
-    return itemlist
+    return locals()
 
 
 def search(item, text):
@@ -39,14 +33,16 @@ def search(item, text):
     return support.dooplay_search(item)
 
 
+@support.scrape
 def generos(item):
-    patron = '<a href="([^"#]+)">([a-zA-Z]+)'
-    return support.scrape(item, patron, ['url', 'title'], patron_block='<a href="#">Genere</a><ul class="sub-menu">.*?</ul>', action='peliculas')
+    patron = '<a href="(?P<url>[^"#]+)">(?P<title>[a-zA-Z]+)'
+    patronBlock='<a href="#">Genere</a><ul class="sub-menu">(?P<block>.*?)</ul>'
+    action='peliculas'
+
+    return locals()
 
 
 def peliculas(item):
-    support.log("[streamingaltadefinizione.py] video")
-
     return support.dooplay_films(item)
 
 

@@ -318,7 +318,12 @@ def scrape(func):
         blacklist = args['blacklist'] if 'blacklist' in args else []
         data = args['data'] if 'data' in args else ''
         patron = args['patron'] if 'patron' in args else args['patronMenu'] if 'patronMenu' in args else ''
-        headers = args['headers'] if 'headers' in args else func.__globals__['headers']
+        if 'headers' in args:
+            headers = args['headers']
+        elif 'headers' in func.__globals__:
+            headers = func.__globals__['headers']
+        else:
+            headers = ''
         patronNext = args['patronNext'] if 'patronNext' in args else ''
         patronBlock = args['patronBlock'] if 'patronBlock' in args else ''
         typeActionDict = args['type_action_dict'] if 'type_action_dict' in args else {}
@@ -447,61 +452,51 @@ def dooplay_get_links(item, host):
     return ret
 
 
+@scrape
 def dooplay_get_episodes(item):
-    itemlist = []
     item.contentType = "episode"
-    data = httptools.downloadpage(item.url).data.replace("'", '"')
-    patron = '<li class="mark-[0-9]">.*?<img.*?data-lazy-src="([^"]+).*?([0-9] - [0-9]).*?<a href="([^"]+)">([^<>]+).*?([0-9]{4})'
-
-    for scrapedthumb, scrapedep, scrapedurl, scrapedtitle, scrapedyear in scrapertoolsV2.find_multiple_matches(data, patron):
-        scrapedep = scrapedep.replace(' - ', 'x')
-        infoLabels = {}
-        infoLabels['year'] = scrapedyear
-
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="findvideos",
-                 contentType="episode",
-                 title=scrapedep + " " + scrapedtitle,
-                 fulltitle=scrapedtitle,
-                 show=item.fulltitle,
-                 url=scrapedurl,
-                 thumbnail=scrapedthumb,
-                 infoLabels=infoLabels
-                 )
-        )
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-    videolibrary(itemlist, item)
-    return itemlist
+    patron = '<li class="mark-[0-9]+">.*?<img.*?(?:data-lazy-)?src="(?P<thumb>[^"]+).*?(?P<episode>[0-9]+ - [0-9]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+).*?(?P<year>[0-9]{4})'
+    # debug = True
+    return locals()
 
 
+@scrape
 def dooplay_films(item, blacklist=""):
-    if item.contentType == 'movie':
-        action = 'findvideos'
-        patron = '<article id="post-[0-9]+" class="item movies">.*?<img src="(?!data)([^"]+)".*?<span class="quality">([^<>]+).*?<a href="([^"]+)">([^<>]+)</a></h3>.*?(?:<span>([0-9]{4})</span>|</article>).*?(?:<span>([0-9]+) min</span>|</article>).*?(?:<div class="texto">([^<>]+)|</article>).*?(?:genres">(.*?)</div>|</article>)'
+    if item.args == 'searchPage':
+        return dooplay_search_vars(item, blacklist)
     else:
-        action = 'episodios'
-        patron = '<article id="post-[0-9]+" class="item tvshows">.*?<img src="(?!data)([^"]+)".*?(?:<span class="quality">([^<>]+))?.*?<a href="([^"]+)">([^<>]+)</a></h3>.*?(?:<span>([0-9]{4})</span>|</article>).*?(?:<span>([0-9]+) min</span>|</article>).*?(?:<div class="texto">([^<>]+)|</article>).*?(?:genres">(.*?)</div>|</article>)'
-    # patronNext = '<a class="arrow_pag" href="([^"]+)"><i id="nextpagination"'
-    patronNext = '<div class="pagination">.*?class="current".*?<a href="([^"]+)".*?<div class="resppages">'
-    itemlist = scrape(item, patron, ['thumb', 'quality', 'url', 'title', 'year', 'duration', 'plot', 'genre'], blacklist=blacklist, patronNext=patronNext, action=action, addVideolibrary=False)
-    if itemlist and 'Successivo' in itemlist[-1].title:
-        itemlist[-1].action = 'peliculas'
+        if item.contentType == 'movie':
+            action = 'findvideos'
+            patron = '<article id="post-[0-9]+" class="item movies">.*?<img src="(?!data)(?P<thumb>[^"]+)".*?<span class="quality">(?P<quality>[^<>]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></h3>.*?(?:<span>[^<>]*(?P<year>[0-9]{4})</span>|</article>).*?(?:<span>(?P<duration>[0-9]+) min</span>|</article>).*?(?:<div class="texto">(?P<plot>[^<>]+)|</article>).*?(?:genres">(?P<genre>.*?)</div>|</article>)'
+        else:
+            action = 'episodios'
+            patron = '<article id="post-[0-9]+" class="item tvshows">.*?<img src="(?!data)(?P<thumb>[^"]+)".*?(?:<span class="quality">(?P<quality>[^<>]+))?.*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></h3>.*?(?:<span>(?P<year>[0-9]{4})</span>|</article>).*?(?:<div class="texto">(?P<plot>[^<>]+)|</article>).*?(?:genres">(?P<genre>.*?)</div>|</article>)'
+        patronNext = '<div class="pagination">.*?class="current".*?<a href="([^"]+)".*?<div class="resppages">'
+        addVideolibrary = False
 
-    return itemlist
+        return locals()
 
-    
+
+@scrape
 def dooplay_search(item, blacklist=""):
+    return dooplay_search_vars(item, blacklist)
+
+def dooplay_search_vars(item, blacklist):
     if item.contentType == 'movie':
         type = 'movies'
         action = 'findvideos'
     else:
         type = 'tvshows'
         action = 'episodios'
-    patron = '<div class="result-item">.*?<img src="([^"]+)".*?<span class="' + type + '">([^<>]+).*?<a href="([^"]+)">([^<>]+)</a>.*?<span class="year">([0-9]{4}).*?<div class="contenido"><p>([^<>]+)'
+    patron = '<div class="result-item">.*?<img src="(?P<thumb>[^"]+)".*?<span class="' + type + '">(?P<quality>[^<>]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a>.*?<span class="year">(?P<year>[0-9]{4}).*?<div class="contenido"><p>(?P<plot>[^<>]+)'
     patronNext = '<a class="arrow_pag" href="([^"]+)"><i id="nextpagination"'
-    return scrape(item, patron, ['thumb', 'quality', 'url', 'title', 'year', 'plot'], blacklist=blacklist, patronNext=patronNext, action=action)
-
+    def fullItemlistHook(itemlist):
+        # se è una next page
+        if itemlist[-1].title == typo(config.get_localized_string(30992), 'color kod bold'):
+            itemlist[-1].action = 'peliculas'
+            itemlist[-1].args = 'searchPage'
+        return itemlist
+    return locals()
 
 def swzz_get_url(item):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:59.0) Gecko/20100101 Firefox/59.0'}
