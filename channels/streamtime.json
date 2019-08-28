@@ -1,11 +1,11 @@
 {
 	"id": "streamtime",
-	"name": "streamtime",
+	"name": "StreamTime",
 	"language": ["ita"],
 	"active": true,
 	"adult": false,
 	"thumbnail": "",
-	"banner": "",
+	"banner": "streamtime.png",
 	"categories": ["tvshow", "movie"],
 	"settings": [
 		{

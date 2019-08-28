@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import re
-import urlparse
-
-from core import httptools
+import urlparse,urllib2,urllib,re
+import os, sys
 from core import scrapertools
 from core import servertools
 from core.item import Item
-from platformcode import logger
-from platformcode import config
+from platformcode import config, logger
+from core import httptools
 
 host = 'http://www.eroticage.net'
 
