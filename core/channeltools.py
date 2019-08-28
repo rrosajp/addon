@@ -79,7 +79,7 @@ def get_channel_parameters(channel_name):
                     #             break
                     #     if found:
                     #         break
-
+                    channel_parameters['settings'] = get_default_settings(channel_name)                    
                     for s in channel_parameters['settings']:
                         if 'id' in s:
                             if s['id'] == "include_in_global_search":
@@ -155,7 +155,8 @@ def get_channel_controls_settings(channel_name):
     # logger.info("channel_name=" + channel_name)
     dict_settings = {}
     # import web_pdb; web_pdb.set_trace()
-    list_controls = get_channel_json(channel_name).get('settings', list())
+    # list_controls = get_channel_json(channel_name).get('settings', list())
+    list_controls = get_default_settings(channel_name)
 
     for c in list_controls:
         if 'id' not in c or 'type' not in c or 'default' not in c:
@@ -166,6 +167,24 @@ def get_channel_controls_settings(channel_name):
         dict_settings[c['id']] = c['default']
 
     return list_controls, dict_settings
+
+def get_default_settings(channel_name):
+    import filetools
+    channel_controls = get_channel_json(channel_name).get('settings', list())
+    default_path = filetools.join(config.get_runtime_path(), 'default_channel_settings' + '.json')
+    default_controls = jsontools.load(filetools.read(default_path)).get('settings', list())
+    categories = get_channel_json(channel_name).get('categories', list())
+    for control in default_controls:
+        if control['id'] not in str(channel_controls):
+            if control['id'] == 'include_in_newest_peliculas' and 'movie' not in categories:
+                pass
+            elif control['id'] == 'include_in_newest_series' and 'tvshow' not in categories:
+                pass
+            elif control['id'] == 'include_in_newest_anime' and 'anime' not in categories:
+                pass
+            else:
+                channel_controls.append(control)
+    return channel_controls
 
 
 def get_channel_setting(name, channel, default=None):
