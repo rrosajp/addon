@@ -331,6 +331,7 @@ def scrape(func):
         debug = args['debug'] if 'debug' in args else False
         if 'pagination' in args: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
+        list_language = func.__globals__['list_language'] if 'list_language' in func.__globals__ else {}
 
         pag = item.page if item.page else 1  # pagination
         matches = []
@@ -403,8 +404,19 @@ def scrape(func):
 
         if 'fullItemlistHook' in args:
             itemlist = args['fullItemlistHook'](itemlist)
-
-        return itemlist
+        
+        filterLang = False
+        for item in itemlist:
+            if item.contentLanguage:
+                filterLang = True
+                break
+            
+        if list_language and filterLang:
+            log('Lista Lingue = ', list_language)
+            from specials import filtertools
+            return filtertools.get_links(itemlist, item, list_language)
+        else:
+            return itemlist
 
     return wrapper
 
