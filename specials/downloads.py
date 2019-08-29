@@ -887,8 +887,11 @@ def save_download_tvshow(item):
 
     item.show = item.fulltitle
     scraper.find_and_set_infoLabels(item)
-    logger.info('ID= ' + item.infoLabels['IMDBNumber'])
+    item.contentSerieName = item.fulltitle
+    
     item.downloadFilename = filetools.validate_path("%s [%s]" % (item.contentSerieName, item.infoLabels['IMDBNumber']))
+    if config.get_setting("lowerize_title", "videolibrary") == 0:
+        item.downloadFilename = item.downloadFilename.lower()
     progreso.update(0, config.get_localized_string(70186), config.get_localized_string(70187) % item.contentChannel)
 
     episodes = get_episodes(item)
