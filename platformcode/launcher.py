@@ -30,6 +30,14 @@ def start():
     # Test if all the required directories are created
     config.verify_directories_created()
 
+    # controlla se l'utente ha qualche problema di connessione
+    # se lo ha: non lo fa entrare nell'addon
+    # se ha problemi di DNS avvia ma lascia entrare
+    # se tutto ok: entra nell'addon
+    from specials.checkhost import test_conn
+    import threading
+    threading.Thread(target=test_conn, args=(True, True, True, [], [], True)).start()
+
 
 def run(item=None):
     logger.info()
