@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import re
-import urlparse
-
-from core import httptools
+import urlparse,urllib2,urllib,re
+import os, sys
+from platformcode import config, logger
 from core import scrapertools
 from core.item import Item
-from platformcode import logger
-from platformcode import config
+from core import servertools
+from core import httptools
 
 host = 'https://www.pornrewind.com'
+
+# hacer funcionar conector Kt player
 
 def mainlist(item):
     logger.info()

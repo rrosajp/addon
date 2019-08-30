@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import re
-import urlparse
-
-from core import httptools
+import urlparse,urllib2,urllib,re
+import os, sys
+from platformcode import config, logger
 from core import scrapertools
 from core.item import Item
-from platformcode import logger
-from platformcode import config
+from core import servertools
+from core import httptools
 
 host = 'http://www.absoluporn.es'
 
@@ -90,7 +89,7 @@ def play(item):
     matches = scrapertools.find_multiple_matches(data, patron)
     for servervideo,path,filee  in matches:
         scrapedurl = servervideo + path + "56ea912c4df934c216c352fa8d623af3" + filee
-        itemlist.append(Item(channel=item.channel, action="play", title=item.title, fulltitle=item.fulltitle, url=scrapedurl,
+        itemlist.append(Item(channel=item.channel, action="play", title=item.title, url=scrapedurl,
                             thumbnail=item.thumbnail, plot=item.plot, show=item.title, server="directo", folder=False))
     return itemlist
 

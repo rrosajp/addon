@@ -171,7 +171,11 @@ msgstr "aggiunto ai preferiti"
 
 msgctxt "#30109"
 msgid "added to download list"
-msgstr "aggiunto alla lista download"
+msgstr "aggiunto/i alla lista download"
+
+msgctxt "#30110"
+msgid " Episodes of: "
+msgstr " Episodi di: "
 
 msgctxt "#30112"
 msgid "Enter title to search"
@@ -216,6 +220,14 @@ msgstr "Novità"
 msgctxt "#30131"
 msgid "Videolibrary"
 msgstr "Videoteca"
+
+msgctxt "#30132"
+msgid "It seems that the Channel %s no longer exists."
+msgstr "Sembra che il canale %s non esista più."
+
+msgctxt "#30133"
+msgid "Do you want to remove links from this channel?"
+msgstr "Vuoi rimuovere i collegamenti da questo canale?"
 
 msgctxt "#30135"
 msgid "added to the videolibrary"
@@ -3223,7 +3235,7 @@ msgstr "Attivare Pagina iniziale"
 
 msgctxt "#70122"
 msgid "Custom (select from a channel)"
-msgstr "Personalizato (selezionare da un canale)"
+msgstr "Personalizzato (selezionare da un canale)"
 
 msgctxt "#70123"
 msgid "Show Recent"
@@ -5604,3 +5616,19 @@ msgstr "collegamenti nella cartella"
 msgctxt "#70724"
 msgid "Channel"
 msgstr "Canale"
+
+msgctxt "#70725"
+msgid "Select the language"
+msgstr "Seleziona la lingua"
+
+msgctxt "#70726"
+msgid "Seleziona la qualità"
+msgstr "Select the quality"
+
+msgctxt "#70727"
+msgid "Include in News"
+msgstr "Includi in Novità"
+
+msgctxt "#70728"
+msgid "Include in Global Search"
+msgstr "Includi in Ricerca Globale"

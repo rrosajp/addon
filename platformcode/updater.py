@@ -11,6 +11,7 @@ import json
 import xbmc
 import re
 import xbmcaddon
+from lib import githash
 
 addon = xbmcaddon.Addon('plugin.video.kod')
 
@@ -72,9 +73,6 @@ def check_addon_init():
         for c in reversed(commits[:pos]):
             commit = httptools.downloadpage(c['url']).data
             commitJson = json.loads(commit)
-            # evitiamo di applicare i merge commit
-            if 'Merge' in commitJson['commit']['message']:
-                continue
             logger.info('aggiornando a ' + commitJson['sha'])
             alreadyApplied = True
 
@@ -140,12 +138,12 @@ def check_addon_init():
                                     filetools.mkdir(addonDir + d)
                             filetools.move(addonDir + file['previous_filename'], addonDir + file['filename'])
                             alreadyApplied = False
-            if not alreadyApplied:  # non mando notifica se già applicata (es. scaricato zip da github)
+            if not alreadyApplied and 'Merge' not in commitJson['commit']['message']: # non mando notifica se già applicata (es. scaricato zip da github) o se è un merge
                 changelog += commitJson['commit']['message'] + " | "
                 nCommitApplied += 1
         if addon.getSetting("addon_update_message"):
             time = nCommitApplied * 2000 if nCommitApplied < 10 else 20000
-            platformtools.dialog_notification('Kodi on Demand', changelog, time)
+            platformtools.dialog_notification('Kodi on Demand', 'Aggiornamenti applicati:\n' + changelog[:-3], time)
 
         localCommitFile.seek(0)
         localCommitFile.truncate()
@@ -159,7 +157,6 @@ def check_addon_init():
 
 
 def calcCurrHash():
-    from lib import githash
     treeHash = githash.tree_hash(addonDir).hexdigest()
     logger.info('tree hash: ' + treeHash)
     commits = loadCommits()

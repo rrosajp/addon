@@ -31,8 +31,8 @@ def mainlist(item):
     support.menu(itemlist, 'Film alta definizione bold', 'peliculas', host, contentType='movie', args='film')
     support.menu(itemlist, 'Categorie Film bold', 'categorias_film', host , contentType='movie', args='film')
     support.menu(itemlist, 'Categorie Serie bold', 'categorias_serie', host, contentType='tvshow', args='serie')
-    support.menu(itemlist, '[COLOR blue]Cerca Film...[/COLOR] bold', 'search', host, contentType='movie', args='film')
-    support.menu(itemlist, '[COLOR blue]Cerca Serie...[/COLOR] bold', 'search', host, contentType='tvshow', args='serie')
+
+
 
     autoplay.init(item.channel, list_servers, list_quality)
     autoplay.show_option(item.channel, itemlist)

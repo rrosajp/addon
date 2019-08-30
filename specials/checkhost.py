@@ -67,7 +67,7 @@ class Kdicc():
         http_errr = 0
         for rslt in r:
             xbmc.log("check_Adsl rslt: %s" % rslt['code'], level=xbmc.LOGNOTICE)
-            if rslt['code'] == '111':
+            if rslt['code'] == '111' or '[Errno -3]' in str(rslt['code']):
                 http_errr +=1
 
         if len(LIST_SITE) == http_errr:
@@ -197,7 +197,6 @@ def test_conn(is_exit, check_dns, view_msg,
     # import web_pdb; web_pdb.set_trace()
     
     ktest = Kdicc(is_exit, check_dns, view_msg, lst_urls, lst_site_check_dns, in_addon)
-
     # se non ha l'ip lo comunico all'utente
     if not ktest.check_Ip():
         # non permetto di entrare nell'addon

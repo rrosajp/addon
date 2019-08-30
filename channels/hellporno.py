@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import re
-import urlparse
-
-from core import httptools
+import urlparse,urllib2,urllib,re
+import os, sys
+from platformcode import config, logger
 from core import scrapertools
 from core.item import Item
-from platformcode import logger
-from platformcode import config
+from core import servertools
+from core import httptools
 
 host = 'http://hellporno.com'
 
@@ -61,7 +60,7 @@ def lista(item):
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>", "", data)
     patron = '<div class="video-thumb"><a href="([^"]+)" class="title".*?>([^"]+)</a>.*?'
     patron += '<span class="time">([^<]+)</span>.*?'
-    patron += '<video poster="([^"]+)"'
+    patron += '<video muted poster="([^"]+)"'
     matches = re.compile(patron,re.DOTALL).findall(data)
     for scrapedurl,scrapedtitle,duracion,scrapedthumbnail  in matches:
         url = scrapedurl
@@ -85,6 +84,6 @@ def play(item):
     scrapedurl = scrapertools.find_single_match(data,'<source data-fluid-hd src="([^"]+)/?br=\d+"')
     if scrapedurl=="":
         scrapedurl = scrapertools.find_single_match(data,'<source src="([^"]+)/?br=\d+"')
-    itemlist.append(item.clone(action="play", title=scrapedurl, fulltitle = item.title, url=scrapedurl))
+    itemlist.append(item.clone(action="play", title=scrapedurl, url=scrapedurl))
     return itemlist
 

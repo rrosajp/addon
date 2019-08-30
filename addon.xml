@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.kod" name="Kodi on Demand" version="0.4.1" provider-name="KOD Team">
+<addon id="plugin.video.kod" name="Kodi on Demand" provider-name="KOD Team" version="0.5">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.libtorrent" optional="true"/>
     <import addon="metadata.themoviedb.org"/>
     <import addon="metadata.tvdb.com"/>
+    
   </requires>
-  <extension point="xbmc.python.pluginsource" library="default.py">
+  <extension library="default.py" point="xbmc.python.pluginsource">
     <provides>video</provides>
   </extension>
   <extension point="xbmc.addon.metadata">
@@ -19,7 +19,9 @@
       <screenshot>resources/media/themes/ss/2.png</screenshot>
       <screenshot>resources/media/themes/ss/3.png</screenshot>
     </assets>
-      <news>Benvenuto su KOD!</news>
+      <news>KoD 0.5
+          -riscritti molti canali per cambiamenti nella struttura stessa di kod
+          -altre robe carine</news>
     <description lang="it">Naviga velocemente sul web e guarda i contenuti presenti</description>
     <disclaimer>[COLOR red]The owners and submitters to this addon do not host or distribute any of the content displayed by these addons nor do they have any affiliation with the content providers.[/COLOR]
     [COLOR yellow]Kodi © is a registered trademark of the XBMC Foundation. We are not connected to or in any other way affiliated with Kodi, Team Kodi, or the XBMC Foundation. Furthermore, any software, addons, or products offered by us will receive no support in official Kodi channels, including the Kodi forums and various social networks.[/COLOR]</disclaimer>
@@ -29,6 +31,6 @@
     <forum>https://t.me/kodiondemand</forum>
     <source>https://github.com/kodiondemand/addon</source>
   </extension>
-  <extension point="xbmc.service" library="videolibrary_service.py" start="login|startup">
+  <extension library="videolibrary_service.py" point="xbmc.service" start="login|startup">
   </extension>
 </addon>

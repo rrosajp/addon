@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import re
-import urlparse
-
-from core import httptools
+import urlparse,urllib2,urllib,re
+import os, sys
+from platformcode import config, logger
 from core import scrapertools
 from core.item import Item
-from platformcode import logger
-from platformcode import config
+from core import servertools
+from core import httptools
+
 
 host = 'https://www.cliphunter.com'
 
@@ -84,9 +84,8 @@ def lista(item):
         title = "[COLOR yellow]" + scrapedtime + "[/COLOR] " + scrapedtitle
         thumbnail = scrapedthumbnail
         plot = ""
-        year = ""
         itemlist.append( Item(channel=item.channel, action="play", title=title, url=url, thumbnail=thumbnail, plot=plot,
-                              fanart=thumbnail, contentTitle = title, infoLabels={'year':year} ))
+                              fanart=thumbnail, contentTitle = title ))
     next_page = scrapertools.find_single_match(data,'<li class="arrow"><a rel="next" href="([^"]+)">&raquo;</a>')
     if next_page!="":
         next_page = urlparse.urljoin(item.url,next_page)
@@ -103,7 +102,7 @@ def play(item):
     for scrapedurl  in matches:
         scrapedurl = scrapedurl.replace("\/", "/")
         title = scrapedurl
-    itemlist.append(Item(channel=item.channel, action="play", title=item.title, fulltitle=item.fulltitle, url=scrapedurl,
+    itemlist.append(Item(channel=item.channel, action="play", title=item.title, url=scrapedurl,
                          thumbnail=item.thumbnail, plot=item.plot, show=item.title, server="directo"))
     return itemlist
 

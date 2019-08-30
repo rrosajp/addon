@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import re
-
 import urlparse
-
 from core import httptools
 from core import scrapertools
 from core import servertools
 from core.item import Item
 from platformcode import logger
-from platformcode import config
 
 host = 'http://sexgalaxy.net'
-
 
 def mainlist(item):
     logger.info()
@@ -42,7 +38,7 @@ def canales(item):
     logger.info()
     itemlist = []
     data = httptools.downloadpage(host).data
-    data = scrapertools.find_single_match(data, 'Top Networks</a>(.*?)</ul>')
+    data = scrapertools.find_single_match(data, '>TopSites</a>(.*?)</ul>')
     patron = '<li id=.*?<a href="(.*?)">(.*?)</a></li>'
     matches = re.compile(patron, re.DOTALL).findall(data)
     for scrapedurl, scrapedtitle in matches:
@@ -59,8 +55,8 @@ def categorias(item):
     logger.info()
     itemlist = []
     data = httptools.downloadpage(item.url).data
-    data = scrapertools.find_single_match(data, 'More Categories</a>(.*?)</ul>')
-    patron = '<li id=.*?<a href="(.*?)">(.*?)</a></li>'
+    data = scrapertools.find_single_match(data, '>Popular Categories<(.*?)</p>')
+    patron = '<a href="(.*?)">(.*?)</a>'
     matches = re.compile(patron, re.DOTALL).findall(data)
     for scrapedurl, scrapedtitle in matches:
         scrapedplot = ""
@@ -83,21 +79,11 @@ def lista(item):
         calidad = scrapertools.find_single_match(scrapedtitle, '\(.*?/(\w+)\)')
         if calidad:
             scrapedtitle = "[COLOR red]" + calidad + "[/COLOR] " + scrapedtitle
-        itemlist.append(Item(channel=item.channel, action="play", title=scrapedtitle, url=scrapedurl,
-                             fanart=scrapedthumbnail, thumbnail=scrapedthumbnail, fulltitle=scrapedtitle, plot=scrapedplot))
+        itemlist.append(Item(channel=item.channel, action="findvideos", title=scrapedtitle, url=scrapedurl,
+                             fanart=scrapedthumbnail, thumbnail=scrapedthumbnail, plot=scrapedplot))
     next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="([^"]+)"')
     if next_page != "":
         itemlist.append(item.clone(action="lista", title="Página Siguiente >>", text_color="blue", url=next_page))
     return itemlist
 
 
-def play(item):
-    logger.info()
-    data = httptools.downloadpage(item.url).data
-    itemlist = servertools.find_video_items(data=data)
-    for videoitem in itemlist:
-        videoitem.title = item.title
-        videoitem.fulltitle = item.fulltitle
-        videoitem.thumbnail = item.thumbnail
-        videoitem.channel = item.channel
-    return itemlist

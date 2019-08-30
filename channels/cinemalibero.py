@@ -28,46 +28,25 @@ host = config.get_channel_url(__channel__)
 
 headers = [['Referer', host]]
 
+@support.menu
 def mainlist(item):
-    logger.info('[cinemalibero.py] mainlist')
-    
-    autoplay.init(item.channel, list_servers, list_quality) # Necessario per Autoplay
+    film = '/category/film/'
+    filmSub = [
+        ('Generi', ['', 'genres']),
+        ('Sport', ['/category/sport/', 'peliculas']),
+    ]
+    tvshow = '/category/serie-tv/'
+    tvshowSub = [
+        ('Anime ', ['/category/anime-giapponesi/', 'video'])
+    ]
 
-    # Menu Principale
-    itemlist = []
-    support.menu(itemlist, 'Film bold', 'video', host+'/category/film/')
-    support.menu(itemlist, 'Generi submenu', 'genres', host)
-    support.menu(itemlist, 'Cerca film submenu', 'search', host)
-    support.menu(itemlist, 'Serie TV bold', 'video', host+'/category/serie-tv/', contentType='episode')
-    support.menu(itemlist, 'Anime submenu', 'video', host+'/category/anime-giapponesi/', contentType='episode')
-    support.menu(itemlist, 'Cerca serie submenu', 'search', host, contentType='episode')
-    support.menu(itemlist, 'Sport bold', 'video', host+'/category/sport/')
-
-    autoplay.show_option(item.channel, itemlist) # Necessario per Autoplay (Menu Configurazione)
-
-    support.channel_config(item, itemlist)
-    
-    return itemlist
-
-
-def search(item, texto):
-    logger.info("[cinemalibero.py] " + item.url + " search " + texto)
-    item.url = host + "/?s=" + texto
-    try:
-        return video(item)
-    # Continua la ricerca in caso di errore 
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error("%s" % line)
-    return []
-
+    return locals()
 
 def genres(item):
-    return support.scrape(item, patron_block=r'<div id="bordobar" class="dropdown-menu(.*?)</li>', patron=r'<a class="dropdown-item" href="([^"]+)" title="([A-z]+)"', listGroups=['url', 'title'], action='video')
+    return support.scrape2(item, patronBlock=r'<div id="bordobar" class="dropdown-menu(?P<block>.*)</li>', patron=r'<a class="dropdown-item" href="([^"]+)" title="([A-z]+)"', listGroups=['url', 'title'], action='video')
 
 
-def video(item):
+def peliculas(item):
     logger.info('[cinemalibero.py] video')
     itemlist = []
 

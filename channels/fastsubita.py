@@ -38,8 +38,8 @@ def mainlist(item):
 
     support.menu(itemlist, 'Novità bold', 'pelicuals_tv', host, 'tvshow')
     support.menu(itemlist, 'Serie TV bold', 'lista_serie', host, 'tvshow')
-    support.menu(itemlist, 'Archivio A-Z submenu', 'list_az', host, 'tvshow', args=['serie'])
-    support.menu(itemlist, 'Cerca', 'search', host, 'tvshow')
+    ('Archivio A-Z ', [, 'list_az', ]), 'tvshow', args=['serie'])
+
     support.aplay(item, itemlist, list_servers, list_quality)
     support.channel_config(item, itemlist)
 
@@ -208,13 +208,13 @@ def findvideos(item):
     itemlist = []
 
     # data = httptools.downloadpage(item.url, headers=headers).data
-    patron_block = '<div class="entry-content">(.*?)<footer class="entry-footer">'
-    # bloque = scrapertools.find_single_match(data, patron_block)
+    patronBlock = '<div class="entry-content">(?P<block>.*)<footer class="entry-footer">'
+    # bloque = scrapertools.find_single_match(data, patronBlock)
 
     patron = r'<a href="([^"]+)">'
     # matches = re.compile(patron, re.DOTALL).findall(bloque)
 
-    matches, data = support.match(item, patron, patron_block, headers)
+    matches, data = support.match(item, patron, patronBlock, headers)
 
     for scrapedurl in matches:
         if 'is.gd' in scrapedurl:

@@ -23,57 +23,42 @@ list_servers = ['animeworld', 'verystream', 'streamango', 'openload', 'directo']
 list_quality = ['default', '480p', '720p', '1080p']
 
 
-
+@support.menu
 def mainlist(item):
-    log()
-    
-    itemlist =[]
-    
-    support.menu(itemlist, 'ITA submenu bold', 'build_menu', host + '/filter?', args=["anime", 'language[]=1'])
-    support.menu(itemlist, 'Sub-ITA submenu bold', 'build_menu', host + '/filter?', args=["anime", 'language[]=0'])
-    support.menu(itemlist, 'Archivio A-Z submenu', 'alfabetico', host+'/az-list', args=["tvshow","a-z"])
-    support.menu(itemlist, 'In corso submenu', 'video', host+'/', args=["in sala"])
-    support.menu(itemlist, 'Generi submenu', 'generi', host+'/')
-    support.menu(itemlist, 'Ultimi Aggiunti bold', 'video', host+'/newest', args=["anime"])
-    support.menu(itemlist, 'Ultimi Episodi bold', 'video', host+'/updated', args=["novita'"])
-    support.menu(itemlist, 'Cerca...', 'search')
-    support.aplay(item, itemlist, list_servers, list_quality)
-    support.channel_config(item, itemlist)
-    return itemlist
+    anime=['/filter',
+           ('ITA',['/filter?language%5B%5D=1&sort=2', 'build_menu', 'language[]=1']),
+           ('SUB-ITA',['/filter?language%5B%5D=1&sort=2', 'build_menu', 'language[]=0']),
+           ('In Corso', ['/ongoing', 'peliculas']),
+           ('Ultimi Episodi', ['/updated', 'peliculas', 'updated']),
+           ('Nuove Aggiunte',['/newest', 'peliculas' ]),
+           ('Generi',['','genres', '</i> Generi</a>'])]
+    return locals()
 
-# Crea menu dei generi =================================================
+# Crea menu  ===================================================
 
-def generi(item):
-    log()
-    patron_block = r'</i>\sGeneri</a>\s*<ul class="sub">(.*?)</ul>'
-    patron = r'<a href="([^"]+)"\stitle="([^"]+)">'
-
-    return support.scrape(item, patron, ['url','title'], patron_block=patron_block, action='video')
-
-
-# Crea Menu Filtro ======================================================
+@support.scrape
+def genres(item):
+    patronBlock = r'</i> Generi</a>(?P<block>.*?)</ul>'
+    patronMenu = r'<a href="(?P<url>[^"]+)"\stitle="(?P<title>[^"]+)">'
+    action = 'peliculas'
+    return locals()
 
 def build_menu(item):
     log()
     itemlist = []
-    support.menu(itemlist, 'Tutti bold submenu', 'video', item.url+item.args[1])
-    matches, data = support.match(item,r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> (.*?) <span.*?>(.*?)<\/ul>',r'<form class="filters.*?>(.*?)<\/form>')
-    log('ANIME DATA =' ,data)
+    support.menuItem(itemlist, __channel__, 'Tutti bold', 'peliculas', item.url, 'tvshow' , args=item.args)
+    matches = support.match(item,r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> (.*?) <span.[^>]+>(.*?)</ul>',r'<form class="filters.*?>(.*?)</form>')[0]
     for title, html in matches:
         if title not in 'Lingua Ordine':
-            support.menu(itemlist, title + ' submenu bold', 'build_sub_menu', html, args=item.args)
-            log('ARGS= ', item.args[0])
-            log('ARGS= ', html)
+            support.menuItem(itemlist, __channel__, title + ' submenu bold', 'build_sub_menu', html, 'tvshow', args=item.args)
     return itemlist
-
-# Crea SottoMenu Filtro ======================================================
 
 def build_sub_menu(item):
     log()
     itemlist = []
-    matches = re.compile(r'<input.*?name="([^"]+)" value="([^"]+)"\s*>[^>]+>([^<]+)<\/label>', re.DOTALL).findall(item.url)
+    matches = support.re.compile(r'<input.*?name="([^"]+)" value="([^"]+)"\s*>[^>]+>([^<]+)<\/label>', re.DOTALL).findall(item.url)
     for name, value, title in matches:
-        support.menu(itemlist, support.typo(title, 'bold'), 'video', host + '/filter?' + '&' + name + '=' + value + '&' + item.args[1])     
+        support.menuItem(itemlist, __channel__, support.typo(title, 'bold'), 'peliculas', host + '/filter?&' + name + '=' + value + '&' + item.args + '&sort=2', 'tvshow', args='sub')
     return itemlist
 
 # Novità ======================================================
@@ -84,12 +69,9 @@ def newest(categoria):
     item = Item()
     try:
         if categoria == "anime":
-            item.url = host + '/newest'
-            item.action = "video"
-            itemlist = video(item)
-
-            if itemlist[-1].action == "video":
-                itemlist.pop()
+            item.url = host + '/updated'
+            item.args = "updated"
+            return peliculas(item)
     # Continua la ricerca in caso di errore 
     except:
         import sys
@@ -106,7 +88,7 @@ def search(item, texto):
     log(texto)
     item.url = host + '/search?keyword=' + texto
     try:
-        return video(item)
+        return peliculas(item)
     # Continua la ricerca in caso di errore
     except:
         import sys
@@ -114,188 +96,50 @@ def search(item, texto):
             logger.error("%s" % line)
         return []
 
+# Scrapers ========================================================
 
-# Lista A-Z ====================================================
-
-def alfabetico(item):
-    return support.scrape(item, '<a href="([^"]+)" title="([^"]+)">', ['url', 'title'], patron_block=r'<span>.*?A alla Z.<\/span>.*?<ul>(.*?)<\/ul>', action='lista_anime')
+@support.scrape
+def peliculas(item):
+    anime=True
+    if item.args == 'updated':
+        patron=r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?[^>]+>[^>]+>\s*<div class="ep">[^\d]+(?P<episode>\d+)[^<]*</div>'
+        action='findvideos'
+    else:
+        patron= r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>[^>]+>[^>]+>\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?'
+        action='episodios'
     
-
-def lista_anime(item):
-    log()
-    itemlist = []
-    matches ,data = support.match(item, r'<div class="item"><a href="([^"]+)".*?src="([^"]+)".*?data-jtitle="([^"]+)".*?>([^<]+)<\/a><p>(.*?)<\/p>')
-    for scrapedurl, scrapedthumb, scrapedoriginal, scrapedtitle, scrapedplot in matches:
-        
-        if scrapedoriginal == scrapedtitle:
-            scrapedoriginal=''
-        else:
-            scrapedoriginal = support.typo(scrapedoriginal,' -- []')
-
-        year = ''
-        lang = ''
-        infoLabels = {}
-        if '(' in scrapedtitle:
-            year = scrapertoolsV2.find_single_match(scrapedtitle, r'(\([0-9]+\))')
-            lang = scrapertoolsV2.find_single_match(scrapedtitle, r'(\([a-zA-Z]+\))')
-
-        infoLabels['year'] = year
-        title = scrapedtitle.replace(year,'').replace(lang,'').strip()
-        original = scrapedoriginal.replace(year,'').replace(lang,'').strip()
-        if lang: lang = support.typo(lang,'_ color kod')
-        longtitle = '[B]' + title + '[/B]' + lang + original
-
-        itemlist.append(
-                Item(channel=item.channel,
-                     extra=item.extra,
-                     contentType="episode",
-                     action="episodios",
-                     title=longtitle,
-                     url=scrapedurl,
-                     thumbnail=scrapedthumb,
-                     fulltitle=title,
-                     show=title,
-                     infoLabels=infoLabels,
-                     plot=scrapedplot,
-                     folder=True))
-
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)    
-    autorenumber.renumber(itemlist)
-
-    # Next page
-    support.nextPage(itemlist, item, data, r'<a class="page-link" href="([^"]+)" rel="next"')
-
-    return itemlist
+    patronNext=r'href="([^"]+)" rel="next"'
+    type_content_dict={'movie':['movie']}
+    type_action_dict={'findvideos':['movie']}    
+    return locals()
 
 
-def video(item):
-    log()
-    itemlist = []
-
-    matches, data = support.match(item, r'<a href="([^"]+)" class[^>]+><img src="([^"]+)"(.*?)data-jtitle="([^"]+)" .*?>(.*?)<\/a>', '<div class="widget-body">(.*?)<div id="sidebar"', headers=headers)
-
-    for scrapedurl, scrapedthumb ,scrapedinfo, scrapedoriginal, scrapedtitle in matches:
-        # Cerca Info come anno o lingua nel Titolo
-        year = ''
-        lang = ''
-        if '(' in scrapedtitle:
-            year = scrapertoolsV2.find_single_match(scrapedtitle, r'( \([0-9]+\))')
-            lang = scrapertoolsV2.find_single_match(scrapedtitle, r'( \([a-zA-Z]+\))')
-        
-        # Rimuove Anno e Lingua nel Titolo
-        title = scrapedtitle.replace(year,'').replace(lang,'').strip()
-        original = scrapedoriginal.replace(year,'').replace(lang,'').strip()
-        
-        # Compara Il Titolo con quello originale
-        if original == title:
-            original=''
-        else:
-            original = support.typo(scrapedoriginal,'-- []')
-
-        # cerca info supplementari
-        ep = ''
-        ep = scrapertoolsV2.find_single_match(scrapedinfo, '<div class="ep">(.*?)<')
-        if  ep != '':
-            ep = ' - ' + ep
-
-        ova = ''
-        ova = scrapertoolsV2.find_single_match(scrapedinfo, '<div class="ova">(.*?)<')
-        if  ova != '':
-            ova = ' - (' + ova + ')'
-        
-        ona = ''
-        ona = scrapertoolsV2.find_single_match(scrapedinfo, '<div class="ona">(.*?)<')
-        if  ona != '':
-            ona = ' - (' + ona + ')'
-
-        movie = ''
-        movie = scrapertoolsV2.find_single_match(scrapedinfo, '<div class="movie">(.*?)<')
-        if  movie != '':
-            movie = ' - (' + movie + ')'
-
-        special = ''
-        special = scrapertoolsV2.find_single_match(scrapedinfo, '<div class="special">(.*?)<')
-        if  special != '':
-            special = ' - (' + special + ')'
-
-
-        # Concatena le informazioni
-
-        lang = support.typo('Sub-ITA', '_ [] color kod') if '(ita)' not in lang.lower() else ''
-
-        info = ep + lang + year + ova + ona + movie + special
-
-        # Crea il title da visualizzare
-        long_title = '[B]' + title + '[/B]' + info + original
-
-        # Controlla se sono Episodi o Film
-        if movie == '':
-            contentType = 'tvshow'
-            action = 'episodios'
-        else:
-            contentType = 'movie'
-            action = 'findvideos'
-        
-        itemlist.append(
-                Item(channel=item.channel,
-                     contentType=contentType,
-                     action=action,
-                     title=long_title,
-                     url=scrapedurl,
-                     fulltitle=title,
-                     show=title,
-                     thumbnail=scrapedthumb,
-                     context = autoplay.context,
-                     number= '1'))
-    
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-    autorenumber.renumber(itemlist)
-
-    # Next page
-    support.nextPage(itemlist, item, data, r'href="([^"]+)" rel="next"', resub=['&amp;','&'])
-    return itemlist
-
-
+@support.scrape
 def episodios(item):
-    log()
-    itemlist = []
-    patron_block = r'server  active(.*?)server  hidden '
-    patron = r'<li><a [^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+" href="([^"]+)"[^>]+>([^<]+)<'
-    matches = support.match(item, patron, patron_block)[0]
-
-    for scrapedurl, scrapedtitle in matches:
-        itemlist.append(
-            Item(
-                channel=item.channel,
-                action="findvideos",
-                contentType="episode",
-                title='[B] Episodio ' + scrapedtitle + '[/B]',
-                url=urlparse.urljoin(host, scrapedurl),
-                fulltitle=scrapedtitle,
-                show=scrapedtitle,
-                plot=item.plot,
-                fanart=item.thumbnail,
-                thumbnail=item.thumbnail,
-                number=scrapedtitle))
-    
-    autorenumber.renumber(itemlist, item, 'bold')
-    support.videolibrary(itemlist, item)
-    return itemlist
+    anime=True
+    patronBlock= r'server  active(?P<block>.*?)server  hidden ' 
+    patron = r'<li><a [^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+" href="(?P<url>[^"]+)"[^>]+>(?P<episode>[^<]+)<'
+    def itemHook(item):
+        log('FULLTITLE= ',item)
+        item.title += support.typo(item.fulltitle,'-- bold')
+        return item
+    action='findvideos'
+    return locals()
 
 
 def findvideos(item):
-    log()
-    itemlist = []
-    
-    matches, data = support.match(item, r'class="tab.*?data-name="([0-9]+)">([^<]+)</span', headers=headers)
+    log(item)
+    itemlist = []    
+    matches, data = support.match(item, r'class="tab.*?data-name="([0-9]+)">', headers=headers)
     videoData = ''
     
-    for serverid, servername in matches:
-        block = scrapertoolsV2.find_multiple_matches(data,'data-id="'+serverid+'">(.*?)<div class="server')
-        log('ITEM= ',item)
-        id = scrapertoolsV2.find_single_match(str(block),r'<a data-id="([^"]+)" data-base="'+item.number+'"')
+    for serverid in matches:
+        number = scrapertoolsV2.find_single_match(item.title,r'(\d+) -')
+        block = scrapertoolsV2.find_multiple_matches(data,'data-id="' + serverid + '">(.*?)<div class="server')
+        ID = scrapertoolsV2.find_single_match(str(block),r'<a data-id="([^"]+)" data-base="' + (number if number else '1') + '"')
+        log('ID= ',ID)
         if id:
-            dataJson = httptools.downloadpage('%s/ajax/episode/info?id=%s&server=%s&ts=%s' % (host, id, serverid, int(time.time())), headers=[['x-requested-with', 'XMLHttpRequest']]).data
+            dataJson = httptools.downloadpage('%s/ajax/episode/info?id=%s&server=%s&ts=%s' % (host, ID, serverid, int(time.time())), headers=[['x-requested-with', 'XMLHttpRequest']]).data
             json = jsontools.load(dataJson)
             videoData +='\n'+json['grabber']
 
@@ -308,6 +152,7 @@ def findvideos(item):
                         quality='',
                         url=json['grabber'],
                         server='directo',
+                        fulltitle=item.fulltitle,
                         show=item.show,
                         contentType=item.contentType,
                         folder=False))
