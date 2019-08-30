@@ -778,6 +778,28 @@ def get_episodes(item):
         # Cualquier otro resultado no nos vale, lo ignoramos
         else:
             logger.info("Omitting invalid item: %s" % episode.tostring())
+    
+    # if Multiple Languages or Qualities
+    list_lang = []
+    list_quality = []
+    for item in itemlist:
+        if not item.language: item.language = item.contentLanguage
+        if item.language not in list_lang: list_lang.append(item.language)
+        if item.infoLabels['quality'] not in list_quality: list_quality.append(item.infoLabels['quality'])
+    if len(list_lang) > 1:        
+        selection = platformtools.dialog_select(config.get_localized_string(70725),list_lang)
+        it = []
+        for item in itemlist:
+            if not item.language: item.language = item.contentLanguage
+            if item.language == list_lang[selection]:
+                it.append(item)            
+        itemlist = it
+    if len(list_quality) > 1:
+        selection = platformtools.dialog_select(config.get_localized_string(70726),list_quality)
+        it = []
+        for item in itemlist:
+            if item.infoLabels['quality'] == list_quality[selection]: it.append(item)
+        itemlist = it
 
     return itemlist
 
@@ -887,8 +909,11 @@ def save_download_tvshow(item):
 
     item.show = item.fulltitle
     scraper.find_and_set_infoLabels(item)
-    logger.info('ID= ' + item.infoLabels['IMDBNumber'])
+    item.contentSerieName = item.fulltitle
+    
     item.downloadFilename = filetools.validate_path("%s [%s]" % (item.contentSerieName, item.infoLabels['IMDBNumber']))
+    if config.get_setting("lowerize_title", "videolibrary") == 0:
+        item.downloadFilename = item.downloadFilename.lower()
     progreso.update(0, config.get_localized_string(70186), config.get_localized_string(70187) % item.contentChannel)
 
     episodes = get_episodes(item)

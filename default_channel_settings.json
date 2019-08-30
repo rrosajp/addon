@@ -3,7 +3,7 @@
 		{
 		  "id": "include_in_global_search",
 		  "type": "bool",
-		  "label": "Includi in Ricerca Globale",
+		  "label": "@70728",
 		  "default": true,
 		  "enabled": true,
 		  "visible": true
@@ -11,7 +11,7 @@
 		{
       "id": "include_in_newest_peliculas",
       "type": "bool",
-      "label": "Includi in Novità - Film",
+      "label": "@70727",
       "default": true,
       "enabled": true,
       "visible": true
@@ -19,7 +19,7 @@
 		{
 				"id": "include_in_newest_series",
 				"type": "bool",
-				"label": "Includi in Novità - Serie TV",
+				"label": "@70727",
 				"default": true,
 				"enabled": true,
 				"visible": true
@@ -27,7 +27,7 @@
 		{
 				"id": "include_in_newest_anime",
 				"type": "bool",
-				"label": "Includi in Novità - Anime",
+				"label": "@70727",
 				"default": true,
 				"enabled": true,
 				"visible": true
@@ -35,7 +35,7 @@
     {
       "id": "include_in_newest_italiano",
       "type": "bool",
-      "label": "Includi in Novità - Italiano",
+      "label": "@70727",
       "default": true,
       "enabled": true,
       "visible": true
@@ -52,10 +52,38 @@
       "id": "checklinks_number",
       "type": "list",
       "label": "Numero di link da verificare",
-      "default": 1,
+      "default": 2,
       "enabled": true,
       "visible": "eq(-1,true)",
-      "lvalues": [ "5", "10", "15", "20" ]
+      "lvalues": [ "3", "5", "10", "15", "20" ]
+    },
+    {
+      "id": "filter_languages",
+      "type": "list",
+      "label": "@30019",
+      "default": 0,
+      "enabled": true,
+      "visible": true,
+      "lvalues": ["Non Filtrare"]
     }
-	]
+  ],
+  
+  "anime": [
+    {
+      "id": "autorenumber", 
+      "type": "bool", 
+      "label": "@70712", 
+      "default": false, 
+      "enabled": true, 
+      "visible": true
+    },
+    {
+      "id": "autorenumber_mode",
+      "type": "bool",
+      "label": "@70688",
+      "default": false,
+      "enabled": true,
+      "visible": "eq(-1,true)"
+    }
+  ]
 }

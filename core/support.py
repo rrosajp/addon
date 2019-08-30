@@ -260,8 +260,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 infoLabels=infolabels,
                 thumbnail=item.thumbnail if function == 'episodios' else scraped["thumb"] ,
                 args=item.args,
-                contentSerieName=item.fulltitle if item.contentType != 'movie' else '',
-                contentTitle=title if item.contentType == 'movie' else '',
+                contentSerieName= title if item.contentType != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
+                contentTitle= title if item.contentType == 'movie' else '',
                 contentLanguage=lang,
                 ep=episode if episode else ''
             )
@@ -331,6 +331,7 @@ def scrape(func):
         debug = args['debug'] if 'debug' in args else False
         if 'pagination' in args: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
+        list_language = func.__globals__['list_language'] if 'list_language' in func.__globals__ else {}
 
         pag = item.page if item.page else 1  # pagination
         matches = []
@@ -403,8 +404,19 @@ def scrape(func):
 
         if 'fullItemlistHook' in args:
             itemlist = args['fullItemlistHook'](itemlist)
-
-        return itemlist
+        
+        filterLang = False
+        for item in itemlist:
+            if item.contentLanguage:
+                filterLang = True
+                break
+            
+        if list_language and filterLang:
+            log('Lista Lingue = ', list_language)
+            from specials import filtertools
+            return filtertools.get_links(itemlist, item, list_language)
+        else:
+            return itemlist
 
     return wrapper
 
@@ -936,3 +948,8 @@ def channel_config(item, itemlist):
              thumbnail=get_thumb('setting_0.png'))
     )
 
+
+def extract_wrapped(decorated):
+    from types import FunctionType
+    closure = (c.cell_contents for c in decorated.__closure__)
+    return next((c for c in closure if isinstance(c, FunctionType)), None)
