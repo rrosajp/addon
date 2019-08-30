@@ -948,3 +948,8 @@ def channel_config(item, itemlist):
              thumbnail=get_thumb('setting_0.png'))
     )
 
+
+def extract_wrapped(decorated):
+    from types import FunctionType
+    closure = (c.cell_contents for c in decorated.__closure__)
+    return next((c for c in closure if isinstance(c, FunctionType)), None)
