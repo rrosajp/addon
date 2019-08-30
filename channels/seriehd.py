@@ -111,9 +111,7 @@ def episodios(item):
 
 def findvideos(item):
     support.log()
-    itemlist = []
-    itemlist = support.hdpass_get_servers(item)  
-    return support.controls(itemlist, item)
+    return support.hdpass_get_servers(item) 
 
 
 
