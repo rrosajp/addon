@@ -67,7 +67,7 @@ class Kdicc():
         http_errr = 0
         for rslt in r:
             xbmc.log("check_Adsl rslt: %s" % rslt['code'], level=xbmc.LOGNOTICE)
-            if rslt['code'] == '111':
+            if rslt['code'] == '111' or '[Errno -3]' in str(rslt['code']):
                 http_errr +=1
 
         if len(LIST_SITE) == http_errr:
