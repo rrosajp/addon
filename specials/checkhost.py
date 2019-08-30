@@ -133,12 +133,13 @@ class Kdicc():
                 # gli errori vengono inglobati in code = '111' in quanto in quel momento
                 # non vengono raggiunti per una qualsiasi causa
                 if '[Errno 111]' in str(conn_errr) or 'Errno 10061' in str(conn_errr) \
+                     or '[Errno 110]' in str(conn_errr) \
                      or 'ConnectTimeoutError' in str(conn_errr) \
                      or 'Errno 11002' in str(conn_errr) or 'ReadTimeout' in str(conn_errr) \
                      or 'Errno 11001' in str(conn_errr): # questo errore è anche nel code: -2
                     rslt['code'] = '111'
                     rslt['url'] = str(sito)
-                    rslt['http_err'] = 'Connection refused'
+                    rslt['http_err'] = 'Connection error'
                 else:
                     rslt['code'] = conn_errr
                     rslt['url'] = str(sito)
