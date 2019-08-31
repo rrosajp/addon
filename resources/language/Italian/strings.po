@@ -1782,8 +1782,8 @@ msgid " and quality %s"
 msgstr " e qualità %s"
 
 msgctxt "#60432"
-msgid "[COLOR %s]No results in this language '%s'%s, click to show without filter[/COLOR]"
-msgstr "[COLOR %s]Nessun risultato in questa lingua '%s'%s, clicca per mostrare senza filtro[/COLOR]"
+msgid "[B]No results in this language '%s'%s, click to show without filter[/B]"
+msgstr "[B]Nessun risultato in questa lingua '%s'%s, clicca per mostrare senza filtro[/B]"
 
 msgctxt "#60433"
 msgid " (disabled)"

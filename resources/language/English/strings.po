@@ -1783,7 +1783,7 @@ msgid " and quality %s"
 msgstr ""
 
 msgctxt "#60432"
-msgid "[COLOR %s]No results in this language '%s'%s, click to show without filter[/COLOR]"
+msgid "[B]No results in this language '%s'%s, click to show without filter[/B]"
 msgstr ""
 
 msgctxt "#60433"

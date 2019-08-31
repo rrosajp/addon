@@ -302,7 +302,7 @@ def get_links(list_item, item, list_language, list_quality=None, global_filter_l
             for i in list_item:
                 list_item_all.append(i.tourl())
 
-            _context = [{"title": "FILTRO: Borrar '%s'" % _filter.language, "action": "delete_from_context",
+            _context = [{"title": config.get_localized_string(60430) % _filter.language, "action": "delete_from_context",
                          "channel": "filtertools", "to_channel": "seriesdanko"}]
 
             if _filter.quality_allowed:
@@ -312,9 +312,7 @@ def get_links(list_item, item, list_language, list_quality=None, global_filter_l
 
             new_itemlist.append(Item(channel=__channel__, action="no_filter", list_item_all=list_item_all,
                                      show=item.show,
-                                     title="[COLOR %s]No hay elementos con idioma '%s'%s, pulsa para mostrar "
-                                           "sin filtro[/COLOR]"
-                                           % (COLOR.get("error", "auto"), _filter.language, msg_quality_allowed),
+                                     title=config.get_localized_string(60432) % (_filter.language, msg_quality_allowed),
                                      context=_context))
 
     else:

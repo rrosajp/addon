@@ -170,46 +170,64 @@ def get_channel_controls_settings(channel_name):
 
 def get_default_settings(channel_name):
     import filetools, inspect
-    from core import support, scrapertoolsV2
-    channel = __import__('channels.%s' % channel_name, fromlist=["channels.%s" % channel_name])
-    if hasattr(channel, 'list_language'):
-        list_language = channel.list_language
-        list_language.insert(0, config.get_localized_string(70522))
-    else:
-        list_language = []
-    if 'episodios' in dir(channel):
-        episodios = getattr(__import__('channels.%s' % channel_name, fromlist=['episodios']), 'episodios')
-        anime = scrapertoolsV2.find_single_match(inspect.getsource(support.extract_wrapped(episodios)), r'(anime\s*=\s*True)')
 
+    # Check if it is a real channel
+    try:
+        channel = __import__('channels.%s' % channel_name, fromlist=["channels.%s" % channel_name])
+    except:
+        return get_channel_json(channel_name).get('settings', list())
+
+    list_language = [config.get_localized_string(70522)]
+    sub = False
+    langs = []
+    language = get_channel_json(channel_name).get('language', list())
+    for lang in language:
+        if 'vos' not in lang:
+            langs.append(lang.upper())
+        else:
+            sub = True
+    if sub == True:
+        for lang in langs:
+            list_language.append(lang)
+            list_language.append('Sub-' + lang)
+    
+    # Check if the automatic renumbering function exists
+    if 'episodios' in dir(channel):
+        from core import scrapertoolsV2
+        if scrapertoolsV2.find_single_match(inspect.getsource(channel), r'(anime\s*=\s*True)') \
+            or scrapertoolsV2.find_single_match(inspect.getsource(channel), r'(autorenumber\()'):
+            renumber = True
+        else: renumber = False        
+    
+    #  Collects configurations
     channel_controls = get_channel_json(channel_name).get('settings', list())
     default_path = filetools.join(config.get_runtime_path(), 'default_channel_settings' + '.json')
     default_controls = jsontools.load(filetools.read(default_path)).get('settings', list())
-    default_controls_anime = jsontools.load(filetools.read(default_path)).get('anime', list())
+    default_controls_renumber = jsontools.load(filetools.read(default_path)).get('renumber', list())
     categories = get_channel_json(channel_name).get('categories', list())
+
+    # Apply default configurations if they do not exist
     for control in default_controls:
         if control['id'] not in str(channel_controls):
             if 'include_in_newest' in control['id']:
                 label = control['id'].split('_')
                 label = label[-1]
                 if label == 'peliculas':
-                    if 'movie' not in categories:
-                        pass
-                    else:
+                    if 'movie' in categories:
                         control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30122)
                         channel_controls.append(control)
-                        logger.info(control)
+                    else: pass
                 elif label == 'series':
-                    if 'tvshow' not in categories:
-                        pass
-                    else:
+                    if 'tvshow' in categories:
                         control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30123)
                         channel_controls.append(control)
+                    else: pass
                 elif label == 'anime':
-                    if 'anime' not in categories:
-                        pass
-                    else:
+                    if 'anime' in categories:
                         control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30124)   
                         channel_controls.append(control) 
+                    else: pass
+                        
                 else:
                     control['label'] = config.get_localized_string(70727) + ' - ' + label.capitalize()
                     channel_controls.append(control)
@@ -218,12 +236,13 @@ def get_default_settings(channel_name):
                 if len(list_language) > 1:
                     control['lvalues'] = list_language
                     channel_controls.append(control)
-                else:
-                    pass         
+                else: pass
+
             else:
                 channel_controls.append(control)
-    if anime:
-        for control in default_controls_anime:
+
+    if renumber:
+        for control in default_controls_renumber:
             if control['id'] not in str(channel_controls):
                 channel_controls.append(control)
             else: pass

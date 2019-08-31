@@ -68,7 +68,7 @@
     }
   ],
   
-  "anime": [
+  "renumber": [
     {
       "id": "autorenumber", 
       "type": "bool", 
