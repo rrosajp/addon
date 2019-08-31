@@ -85,7 +85,7 @@ def genre(item):
 
 @support.scrape
 def peliculas(item):
-    patron = r'<h2>(?P<title>.*?)</h2>\s*<img src="(?P<thumb>[^"]+)" alt="[^"]*" />\s*<A HREF="(?P<url>[^"]+)">.*?<span class="year">(?P<year>[0-9]{4}).*?<span class="calidad">(?P<quality>[A-Z]+)'
+    patron = r'<h2>(?P<title>.*?)</h2>\s*<img src="(?P<thumb>[^"]+)" alt="[^"]*" />\s*<A HREF="(?P<url>[^"]+)">.*?<span class="year">(?:(?P<year>[0-9]{4}))?.*?<span class="calidad">(?:(?P<quality>[A-Z]+))?.*?</span>'
     patronNext=r'<span class="current">\d+</span><a rel="nofollow" class="page larger" href="([^"]+)">\d+</a>'
     action='episodios'
     return locals()
