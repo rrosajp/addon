@@ -1,36 +1,11 @@
 {
 	"id": "cb01anime",
 	"name": "Cb01anime",
-	"language": ["ita"],
+	"language": ["ita", "vos", "vosi"],
 	"active": true,
 	"adult": false,
-	"thumbnail": "http://i.imgur.com/bHoUMo2.png",
-	"banner": "http://i.imgur.com/bHoUMo2.png",
+	"thumbnail": "cb01anime.png",
+	"banner": "cb01anime.png",
 	"categories": ["anime"],
-	"settings": [
-		{
-            "id": "include_in_global_search",
-            "type": "bool",
-            "label": "Includi in Ricerca Globale",
-            "default": false,
-            "enabled": false,
-            "visible": false
-		},
-		{
-            "id": "include_in_newest_anime",
-            "type": "bool",
-            "label": "Includi in Novità - Anime",
-            "default": false,
-            "enabled": false,
-            "visible": false
-		},
-		{
-			"id": "include_in_newest_italiano",
-			"type": "bool",
-			"label": "Includi in Novità - Italiano",
-			"default": true,
-			"enabled": true,
-			"visible": true
-		}
-	  ]
+	"settings": []
 }
