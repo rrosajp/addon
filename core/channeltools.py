@@ -192,12 +192,12 @@ def get_default_settings(channel_name):
             list_language.append('Sub-' + lang)
     
     # Check if the automatic renumbering function exists
+    renumber = False  
     if 'episodios' in dir(channel):
         from core import scrapertoolsV2
         if scrapertoolsV2.find_single_match(inspect.getsource(channel), r'(anime\s*=\s*True)') \
             or scrapertoolsV2.find_single_match(inspect.getsource(channel), r'(autorenumber\()'):
             renumber = True
-        else: renumber = False        
     
     #  Collects configurations
     channel_controls = get_channel_json(channel_name).get('settings', list())
