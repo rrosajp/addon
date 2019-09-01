@@ -41,8 +41,8 @@ def mainlist(item):
 
 def search(item, texto):
     support.log(texto)
-    
-    # item.contentType = 'tvshow'
+        
+    item.contentType = 'tvshow'
     item.url = findhost() + "/?s=" + texto
     try:
         return peliculas(item)
