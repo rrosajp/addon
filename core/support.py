@@ -156,7 +156,7 @@ def scrapeLang(scraped, lang, longtitle):
     if scraped['lang']:
         if 'sub' in scraped['lang'].lower():
             lang = 'Sub-ITA'
-        else:
+        elif 'ita' in scraped['lang'].lower():
             lang = 'ITA'
     if lang != '':
         longtitle += typo(lang, '_ [] color kod')
@@ -330,8 +330,7 @@ def scrape(func):
         typeContentDict = args['type_content_dict'] if 'type_content_dict' in args else {}
         debug = args['debug'] if 'debug' in args else False
         if 'pagination' in args: pagination = args['pagination'] if args['pagination'] else 20
-        else: pagination = ''
-        list_language = func.__globals__['list_language'] if 'list_language' in func.__globals__ else {}
+        else: pagination = ''        
 
         pag = item.page if item.page else 1  # pagination
         matches = []
@@ -340,7 +339,7 @@ def scrape(func):
         if not data:
             data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
             data = re.sub('\n|\t', ' ', data)
-            data = re.sub('>\s+<', '> <', data)
+            data = re.sub(r'>\s+<', '> <', data)
             # replace all ' with " and eliminate newline, so we don't need to worry about
             log('DATA =', data)
 
@@ -410,13 +409,16 @@ def scrape(func):
             if item.contentLanguage:
                 filterLang = True
                 break
-            
-        if list_language and filterLang:
+        if item.channel:
+            import channeltools
+            list_language = channeltools.get_channel_json(item.channel).get('language', list())
             log('Lista Lingue = ', list_language)
-            from specials import filtertools
-            return filtertools.get_links(itemlist, item, list_language)
-        else:
-            return itemlist
+            if len(list_language) > 1 and filterLang:
+                log('Lista Lingue = ', list_language)
+                from specials import filtertools
+                itemlist = filtertools.get_links(itemlist, item, list_language)
+           
+        return itemlist
 
     return wrapper
 
@@ -719,7 +721,10 @@ def match(item, patron='', patronBlock='', headers='', url='', post=''):
         data = item
     else:
         url = url if url else item.url
-        data = httptools.downloadpage(url, headers=headers, ignore_response_code=True, post=post).data.replace("'", '"')
+        if post:
+            data = httptools.downloadpage(url, headers=headers, ignore_response_code=True, post=post).data.replace("'", '"')
+        else:
+            data = httptools.downloadpage(url, headers=headers, ignore_response_code=True).data.replace("'", '"')
     data = re.sub(r'\n|\t', ' ', data)
     data = re.sub(r'>\s\s*<', '><', data)    
     log('DATA= ', data)
@@ -754,7 +759,8 @@ def download(itemlist, item, typography='', function_level=1, function=''):
     
     contentSerieName=item.contentSerieName if item.contentSerieName else ''
     contentTitle=item.contentTitle if item.contentTitle else ''
-    if item.contentChannel != 'videolibrary':
+    
+    if itemlist and item.contentChannel != 'videolibrary':
         itemlist.append(
             Item(channel='downloads',
                 fromchannel=item.channel,
