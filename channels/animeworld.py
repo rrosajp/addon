@@ -24,11 +24,11 @@ def order():
 @support.menu
 def mainlist(item):
     anime=['/filter?sort=',
-           ('ITA',['/filter?language[]=1&sort=', 'build_menu', 'order']),
-           ('SUB-ITA',['/filter?language[]=0&sort=', 'build_menu', 'order']),
-           ('In Corso', ['/ongoing', 'peliculas']),
+           ('ITA',['/filter?language[]=1&sort=', 'build_menu', '1']),
+           ('SUB-ITA',['/filter?language[]=0&sort=', 'build_menu', '0']),
+           ('In Corso', ['/ongoing', 'peliculas','noorder']),
            ('Ultimi Episodi', ['/updated', 'peliculas', 'updated']),
-           ('Nuove Aggiunte',['/newest', 'peliculas' ]),
+           ('Nuove Aggiunte',['/newest', 'peliculas','noorder' ]),
            ('Generi',['','genres',])]
     return locals()
 
@@ -58,7 +58,7 @@ def build_sub_menu(item):
     itemlist = []
     matches = support.re.compile(r'<input.*?name="([^"]+)" value="([^"]+)"\s*>[^>]+>([^<]+)<\/label>', support.re.DOTALL).findall(item.url)
     for name, value, title in matches:
-        support.menuItem(itemlist, __channel__, support.typo(title, 'bold'), 'peliculas', host + '/filter?' + name + '=' + value + '&sort=' + order(), 'tvshow', args='sub')
+        support.menuItem(itemlist, __channel__, support.typo(title, 'bold'), 'peliculas', host + '/filter?' + name + '=' + value + '&language[]=' + item.args + '&sort=', 'tvshow', args='sub')
     return itemlist
 
 
@@ -93,13 +93,17 @@ def search(item, texto):
 
 @support.scrape
 def peliculas(item):
+    debug=True
     anime=True
     if item.args == 'updated':
         patron=r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?[^>]+>[^>]+>\s*<div class="ep">[^\d]+(?P<episode>\d+)[^<]*</div>'
         action='findvideos'
     else:
-        if item.args == 'order': item.url += order()
-        patron= r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>[^>]+>[^>]+>\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?'
+        if item.args != 'noorder' and not item.url[-1].isdigit():
+            item.url += order()
+            support.log('ORDINE= ', order())
+            
+        patron= r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<year>\d+)\) )?(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>[^>]+>[^>]+>\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?'
         action='episodios'
     def itemHook(item):
         support.log('Lingua= ',item.contentLanguage)
