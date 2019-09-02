@@ -2,8 +2,7 @@
 # -*- Channel Altadefinizione01L Film - Serie -*-
 # -*- By Greko -*-
 
-from specials import autoplay
-from core import servertools, support#, jsontools
+from core import support
 from core.item import Item
 from platformcode import config, logger
 
@@ -30,9 +29,6 @@ def mainlist(item):
         ('Popolari', ['/piu-visti.html', 'peliculas', '']),
         ('Sub-ITA', ['/film-sub-ita/', 'peliculas', ''])
     ]
-    
-##    search = ''
-    
     return locals()
 
 # ======== def in ordine di action dal menu ===========================
@@ -41,17 +37,9 @@ def mainlist(item):
 def peliculas(item):
 ##    support.dbg()
     support.log('peliculas',item)
-
-##    patron = r'class="innerImage">.*?href="(?P<url>[^"]+)".*?src="(?P<thumb>[^"]+)"'\
-##             '.*?class="ml-item-title">(?P<title>[^<]+)</.*?class="ml-item-label"> '\
-##             '(?P<year>\d{4}) <.*?class="ml-item-label"> (?P<duration>\d+) .*?'\
-##             'class="ml-item-label ml-item-label-.+?"> (?P<quality>.+?) <.*?'\
-##             'class="ml-itelangm-label"> (?P<lang>.+?) </'
-
     patron = r'class="innerImage">.*?href="(?P<url>[^"]+)".*?src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> (?P<year>\d{4})[^>]+>[^>]+> (?P<duration>\d+)[^>]+>[^>]+> (?P<quality>[a-zA-Z\\]+)[^>]+>[^>]+> (?P<lang>.*?) [^>]+>'
     patronNext =  '<span>\d</span> <a href="([^"]+)">'
 ##    debug = True
-
     return locals()   
 
 # =========== def pagina categorie ======================================
@@ -60,7 +48,6 @@ def genres(item):
     support.log('genres',item)
 
     action = 'peliculas'
-##    item.contentType = 'movie'
     if item.args == 'genres':
         patronBlock = r'<ul class="listSubCat" id="Film">(?P<block>.*)</ul>'
     elif item.args == 'years':
@@ -70,7 +57,6 @@ def genres(item):
     elif item.args == 'lucky': # sono i titoli random nella pagina, cambiano 1 volta al dì
         patronBlock = r'FILM RANDOM.*?class="listSubCat">(?P<block>.*)</ul>'
         action = 'findvideos'
-##    item.args = ''
     patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
         
     return locals()    

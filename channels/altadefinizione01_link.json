@@ -4,9 +4,8 @@
   "active": true,
   "adult": false,
   "language": ["ita"],
-  "bannermenu": "altadefinizione01link.png",
-  "banner": "altadefinizione01link.png",
-  "fanart": "altadefinizione01link.png",
+  "thumbnail": "altadefinizione01_L.png",
+  "banner": "altadefinizione01_L.png",
   "categories": ["movie","vosi"],
   "settings": [
     {

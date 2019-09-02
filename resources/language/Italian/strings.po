@@ -5607,7 +5607,10 @@ msgstr "Gentile Utente, sembra tu abbia problemi con l'ADSL!  Controlla quanto m
 
 msgctxt "#70722"
 msgid "Dear User, your current DNS do not allow you to reach all ergo sites, not all Channels will work. We recommend that you set up your DNS to take advantage of more channels. Search your favorite search engine how to set them up on your device."
-msgstr "Gentile Utente, i tuoi DNS attuali non ti permettono di raggiungere tutti i siti, ergo, non tutti i Canali funzioneranno. Ti consigliamo, per usufruire di un maggior numero di canali, di impostare i DNS. Cerca sul tuo motore di ricerca preferito come impostarli sul tuo dispositivo."
+msgstr "Gentile Utente, i tuoi DNS attuali non ti permettono di raggiungere tutti i siti, ergo, non tutti i Canali funzioneranno. Ti consigliamo, per usufruire di un maggior numero di canali, di impostare i DNS.
+Cercate sul tuo motore di ricerca preferito guide su come farlo e scegliete un DNS libero.
+Noi vi consigliamo quello di cloudflare: 1.1.1.1 e 1.0.0.1 (o in alternativa i DNS di Google 8.8.8.8-8.8.4.4).
+!!!'Se avete una VODAFONE station, entrate nel pannello del modem e disattivate la voce \"DNS sicuro\" prima di procedere'.Cerca sul tuo motore di ricerca preferito come impostarli sul tuo dispositivo.!!!"
 
 msgctxt "#70723"
 msgid "links in the folder"
