@@ -2,19 +2,13 @@
 # ------------------------------------------------------------
 # Canale per animeworld
 # ----------------------------------------------------------
-import re
-import time
-import urllib
-import urlparse
 
-from core import httptools, scrapertoolsV2, servertools, tmdb, support, jsontools
-from core.support import log
-from core.item import Item
-from platformcode import logger, config
-from specials import autoplay, autorenumber
+
+
+from core import  support, jsontools
 
 __channel__ = "animeworld"
-host = config.get_channel_url(__channel__)
+host = support.config.get_channel_url(__channel__)
 headers = [['Referer', host]]
 
 IDIOMAS = {'Italiano': 'Italiano'}
@@ -23,50 +17,54 @@ list_servers = ['animeworld', 'verystream', 'streamango', 'openload', 'directo']
 list_quality = ['default', '480p', '720p', '1080p']
 
 
+def order():
+    return str(support.config.get_setting("order", __channel__))
+
+
 @support.menu
 def mainlist(item):
-    anime=['/filter',
-           ('ITA',['/filter?language%5B%5D=1&sort=2', 'build_menu', 'language[]=1']),
-           ('SUB-ITA',['/filter?language%5B%5D=1&sort=2', 'build_menu', 'language[]=0']),
+    anime=['/filter?sort=',
+           ('ITA',['/filter?language[]=1&sort=', 'build_menu', 'order']),
+           ('SUB-ITA',['/filter?language[]=0&sort=', 'build_menu', 'order']),
            ('In Corso', ['/ongoing', 'peliculas']),
            ('Ultimi Episodi', ['/updated', 'peliculas', 'updated']),
            ('Nuove Aggiunte',['/newest', 'peliculas' ]),
-           ('Generi',['','genres', '</i> Generi</a>'])]
+           ('Generi',['','genres',])]
     return locals()
 
-# Crea menu  ===================================================
 
-@support.scrape
 def genres(item):
-    patronBlock = r'</i> Generi</a>(?P<block>.*?)</ul>'
-    patronMenu = r'<a href="(?P<url>[^"]+)"\stitle="(?P<title>[^"]+)">'
-    action = 'peliculas'
-    return locals()
+    support.log()
+    itemlist = []
+    matches = support.match(item, r'<input.*?name="([^"]+)" value="([^"]+)"\s*>[^>]+>([^<]+)<\/label>' , r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> Generi <span.[^>]+>(.*?)</ul>', headers=headers)[0]
+    for name, value, title in matches:
+        support.menuItem(itemlist, __channel__, support.typo(title, 'bold'), 'peliculas', host + '/filter?' + name + '=' + value + '&sort=' + order(), 'tvshow', args='sub')
+    return itemlist
+
 
 def build_menu(item):
-    log()
+    support.log()
     itemlist = []
-    support.menuItem(itemlist, __channel__, 'Tutti bold', 'peliculas', item.url, 'tvshow' , args=item.args)
-    matches = support.match(item,r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> (.*?) <span.[^>]+>(.*?)</ul>',r'<form class="filters.*?>(.*?)</form>')[0]
+    support.menuItem(itemlist, __channel__, 'Tutti bold', 'peliculas', item.url , 'tvshow' , args=item.args)
+    matches = support.match(item,r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> (.*?) <span.[^>]+>(.*?)</ul>',r'<form class="filters.*?>(.*?)</form>', headers=headers)[0]
     for title, html in matches:
         if title not in 'Lingua Ordine':
             support.menuItem(itemlist, __channel__, title + ' submenu bold', 'build_sub_menu', html, 'tvshow', args=item.args)
     return itemlist
 
+
 def build_sub_menu(item):
-    log()
+    support.log()
     itemlist = []
-    matches = support.re.compile(r'<input.*?name="([^"]+)" value="([^"]+)"\s*>[^>]+>([^<]+)<\/label>', re.DOTALL).findall(item.url)
+    matches = support.re.compile(r'<input.*?name="([^"]+)" value="([^"]+)"\s*>[^>]+>([^<]+)<\/label>', support.re.DOTALL).findall(item.url)
     for name, value, title in matches:
-        support.menuItem(itemlist, __channel__, support.typo(title, 'bold'), 'peliculas', host + '/filter?&' + name + '=' + value + '&' + item.args + '&sort=2', 'tvshow', args='sub')
+        support.menuItem(itemlist, __channel__, support.typo(title, 'bold'), 'peliculas', host + '/filter?' + name + '=' + value + '&sort=' + order(), 'tvshow', args='sub')
     return itemlist
 
-# Novità ======================================================
 
 def newest(categoria):
-    log()
-    itemlist = []
-    item = Item()
+    support.log(categoria)
+    item = support.Item()
     try:
         if categoria == "anime":
             item.url = host + '/updated'
@@ -76,16 +74,12 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("{0}".format(line))
+            support.logger.error("{0}".format(line))
         return []
 
-    return itemlist
-
-
-# Cerca ===========================================================
 
 def search(item, texto):
-    log(texto)
+    support.log(texto)
     item.url = host + '/search?keyword=' + texto
     try:
         return peliculas(item)
@@ -93,10 +87,9 @@ def search(item, texto):
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("%s" % line)
+            support.logger.error("%s" % line)
         return []
 
-# Scrapers ========================================================
 
 @support.scrape
 def peliculas(item):
@@ -105,9 +98,15 @@ def peliculas(item):
         patron=r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?[^>]+>[^>]+>\s*<div class="ep">[^\d]+(?P<episode>\d+)[^<]*</div>'
         action='findvideos'
     else:
+        if item.args == 'order': item.url += order()
         patron= r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>[^>]+>[^>]+>\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?'
         action='episodios'
-    
+    def itemHook(item):
+        support.log('Lingua= ',item.contentLanguage)
+        if item.contentLanguage == '':
+            item.contentLanguage = 'Sub-ITA'
+            item.title += support.typo(item.contentLanguage,'_ [] color kod')
+        return item
     patronNext=r'href="([^"]+)" rel="next"'
     type_content_dict={'movie':['movie']}
     type_action_dict={'findvideos':['movie']}    
@@ -120,7 +119,6 @@ def episodios(item):
     patronBlock= r'server  active(?P<block>.*?)server  hidden ' 
     patron = r'<li><a [^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+" href="(?P<url>[^"]+)"[^>]+>(?P<episode>[^<]+)<'
     def itemHook(item):
-        log('FULLTITLE= ',item)
         item.title += support.typo(item.fulltitle,'-- bold')
         return item
     action='findvideos'
@@ -128,24 +126,24 @@ def episodios(item):
 
 
 def findvideos(item):
-    log(item)
+    import time
+    support.log(item)
     itemlist = []    
     matches, data = support.match(item, r'class="tab.*?data-name="([0-9]+)">', headers=headers)
     videoData = ''
-    
+
     for serverid in matches:
-        number = scrapertoolsV2.find_single_match(item.title,r'(\d+) -')
-        block = scrapertoolsV2.find_multiple_matches(data,'data-id="' + serverid + '">(.*?)<div class="server')
-        ID = scrapertoolsV2.find_single_match(str(block),r'<a data-id="([^"]+)" data-base="' + (number if number else '1') + '"')
-        log('ID= ',ID)
+        number = support.scrapertoolsV2.find_single_match(item.title,r'(\d+) -')
+        block = support.scrapertoolsV2.find_multiple_matches(data,'data-id="' + serverid + '">(.*?)<div class="server')
+        ID = support.scrapertoolsV2.find_single_match(str(block),r'<a data-id="([^"]+)" data-base="' + (number if number else '1') + '"')
         if id:
-            dataJson = httptools.downloadpage('%s/ajax/episode/info?id=%s&server=%s&ts=%s' % (host, ID, serverid, int(time.time())), headers=[['x-requested-with', 'XMLHttpRequest']]).data
+            dataJson = support.httptools.downloadpage('%s/ajax/episode/info?id=%s&server=%s&ts=%s' % (host, ID, serverid, int(time.time())), headers=[['x-requested-with', 'XMLHttpRequest']]).data
             json = jsontools.load(dataJson)
             videoData +='\n'+json['grabber']
 
             if serverid == '28':
                 itemlist.append(
-                    Item(
+                    support.Item(
                         channel=item.channel,
                         action="play",
                         title='diretto',
