@@ -67,7 +67,7 @@ class Kdicc():
         http_errr = 0
         for rslt in r:
             xbmc.log("check_Adsl rslt: %s" % rslt['code'], level=xbmc.LOGNOTICE)
-            if rslt['code'] == '111':
+            if rslt['code'] == '111' or '[Errno -3]' in str(rslt['code']):
                 http_errr +=1
 
         if len(LIST_SITE) == http_errr:
@@ -133,12 +133,13 @@ class Kdicc():
                 # gli errori vengono inglobati in code = '111' in quanto in quel momento
                 # non vengono raggiunti per una qualsiasi causa
                 if '[Errno 111]' in str(conn_errr) or 'Errno 10061' in str(conn_errr) \
+                     or '[Errno 110]' in str(conn_errr) \
                      or 'ConnectTimeoutError' in str(conn_errr) \
                      or 'Errno 11002' in str(conn_errr) or 'ReadTimeout' in str(conn_errr) \
                      or 'Errno 11001' in str(conn_errr): # questo errore è anche nel code: -2
                     rslt['code'] = '111'
                     rslt['url'] = str(sito)
-                    rslt['http_err'] = 'Connection refused'
+                    rslt['http_err'] = 'Connection error'
                 else:
                     rslt['code'] = conn_errr
                     rslt['url'] = str(sito)
@@ -197,7 +198,6 @@ def test_conn(is_exit, check_dns, view_msg,
     # import web_pdb; web_pdb.set_trace()
     
     ktest = Kdicc(is_exit, check_dns, view_msg, lst_urls, lst_site_check_dns, in_addon)
-
     # se non ha l'ip lo comunico all'utente
     if not ktest.check_Ip():
         # non permetto di entrare nell'addon

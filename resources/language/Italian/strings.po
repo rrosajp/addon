@@ -171,7 +171,11 @@ msgstr "aggiunto ai preferiti"
 
 msgctxt "#30109"
 msgid "added to download list"
-msgstr "aggiunto alla lista download"
+msgstr "aggiunto/i alla lista download"
+
+msgctxt "#30110"
+msgid " Episodes of: "
+msgstr " Episodi di: "
 
 msgctxt "#30112"
 msgid "Enter title to search"
@@ -216,6 +220,14 @@ msgstr "Novità"
 msgctxt "#30131"
 msgid "Videolibrary"
 msgstr "Videoteca"
+
+msgctxt "#30132"
+msgid "It seems that the Channel %s no longer exists."
+msgstr "Sembra che il canale %s non esista più."
+
+msgctxt "#30133"
+msgid "Do you want to remove links from this channel?"
+msgstr "Vuoi rimuovere i collegamenti da questo canale?"
 
 msgctxt "#30135"
 msgid "added to the videolibrary"
@@ -1770,8 +1782,8 @@ msgid " and quality %s"
 msgstr " e qualità %s"
 
 msgctxt "#60432"
-msgid "[COLOR %s]No results in this language '%s'%s, click to show without filter[/COLOR]"
-msgstr "[COLOR %s]Nessun risultato in questa lingua '%s'%s, clicca per mostrare senza filtro[/COLOR]"
+msgid "[B]No results in this language '%s'%s, click to show without filter[/B]"
+msgstr "[B]Nessun risultato in questa lingua '%s'%s, clicca per mostrare senza filtro[/B]"
 
 msgctxt "#60433"
 msgid " (disabled)"
@@ -3223,7 +3235,7 @@ msgstr "Attivare Pagina iniziale"
 
 msgctxt "#70122"
 msgid "Custom (select from a channel)"
-msgstr "Personalizato (selezionare da un canale)"
+msgstr "Personalizzato (selezionare da un canale)"
 
 msgctxt "#70123"
 msgid "Show Recent"
@@ -5594,8 +5606,8 @@ msgid "Dear user, you seem to have problems with ADSL! We suggest you call your 
 msgstr "Gentile Utente, sembra tu abbia problemi con l'ADSL!  Controlla quanto meno che il modem/router sia acceso e/o il tuo dispositivo connesso.\nKoD NON TROVERA NIENTE finchè non risolverai il problema."
 
 msgctxt "#70722"
-msgid "Dear User, your current DNS do not allow you to reach all ergo sites, not all Channels will work. We recommend that you set up your DNS to take advantage of more channels. Search your favorite search engine how to set them up on your device."
-msgstr "Gentile Utente, i tuoi DNS attuali non ti permettono di raggiungere tutti i siti, ergo, non tutti i Canali funzioneranno. Ti consigliamo, per usufruire di un maggior numero di canali, di impostare i DNS. Cerca sul tuo motore di ricerca preferito come impostarli sul tuo dispositivo."
+msgid "Dear User, your current DNS do not allow you to reach all sites, ergo, not all Channels will work, we recommend you, to take advantage of more, to set up the DNS.\nSearch your favorite search engine for\n 1. guides on how to choose a free DNS.\n 2. set it up on your device.\nWe recommend the cloudflare DNS 1.1.1.1 and 1.0.0.1\nAlternatively the Google DNS 8.8.8.8 and 8.8.4.4.\nIf you have a VODAFONE station, enter the modem panel and disable 'Secure DNS' before proceeding.\n"
+msgstr "Gentile Utente, i tuoi DNS attuali non ti permettono di raggiungere tutti i siti, ergo, non tutti i Canali funzioneranno, ti consigliamo, per usufruirne di un maggior numero, di impostare i DNS.\nCerca sul tuo motore di ricerca preferito guide su come\n1. scegliere un DNS libero.\n2. impostarlo sul tuo dispositivo.\nNoi ti consigliamo i DNS di cloudflare 1.1.1.1 e 1.0.0.1\nIn alternativa i DNS di Google 8.8.8.8 e 8.8.4.4.\nSe hai una VODAFONE station, entra nel pannello del modem e disattiva la voce 'DNS sicuro' prima di procedere. E Ricordati 'Applica' in fondo alla pagina per salvare le impostazioni...\n"
 
 msgctxt "#70723"
 msgid "links in the folder"
@@ -5604,3 +5616,19 @@ msgstr "collegamenti nella cartella"
 msgctxt "#70724"
 msgid "Channel"
 msgstr "Canale"
+
+msgctxt "#70725"
+msgid "Select the language"
+msgstr "Seleziona la lingua"
+
+msgctxt "#70726"
+msgid "Seleziona la qualità"
+msgstr "Select the quality"
+
+msgctxt "#70727"
+msgid "Include in News"
+msgstr "Includi in Novità"
+
+msgctxt "#70728"
+msgid "Include in Global Search"
+msgstr "Includi in Ricerca Globale"

@@ -173,6 +173,10 @@ msgctxt "#30109"
 msgid "added to download list"
 msgstr ""
 
+msgctxt "#30110"
+msgid " Episodes of: "
+msgstr " Episodi di: "
+
 msgctxt "#30112"
 msgid "Enter title to search"
 msgstr ""
@@ -215,6 +219,14 @@ msgstr ""
 
 msgctxt "#30131"
 msgid "Videolibrary"
+msgstr ""
+
+msgctxt "#30132"
+msgid "It seems that the Channel %s no longer exists."
+msgstr ""
+
+msgctxt "#30133"
+msgid "Do you want to remove links from this channel?"
 msgstr ""
 
 msgctxt "#30135"
@@ -1771,7 +1783,7 @@ msgid " and quality %s"
 msgstr ""
 
 msgctxt "#60432"
-msgid "[COLOR %s]No results in this language '%s'%s, click to show without filter[/COLOR]"
+msgid "[B]No results in this language '%s'%s, click to show without filter[/B]"
 msgstr ""
 
 msgctxt "#60433"
@@ -5594,7 +5606,7 @@ msgid "Dear user, you seem to have problems with ADSL! We suggest you call your 
 msgstr ""
 
 msgctxt "#70722"
-msgid "Dear User, your current DNS do not allow you to reach all ergo sites, not all Channels will work. We recommend that you set up your DNS to take advantage of more channels. Search your favorite search engine how to set them up on your device."
+msgid "Dear User, your current DNS do not allow you to reach all sites, ergo, not all Channels will work, we recommend you, to take advantage of more, to set up the DNS.\nSearch your favorite search engine for\n 1. guides on how to choose a free DNS.\n 2. set it up on your device.\nWe recommend the cloudflare DNS 1.1.1.1 and 1.0.0.1\nAlternatively the Google DNS 8.8.8.8 and 8.8.4.4.\nIf you have a VODAFONE station, enter the modem panel and disable 'Secure DNS' before proceeding.\n"
 msgstr ""
 
 msgctxt "#70723"
@@ -5603,4 +5615,20 @@ msgstr ""
 
 msgctxt "#70724"
 msgid "Channel"
+msgstr ""
+
+msgctxt "#70725"
+msgid "Select the language"
+msgstr ""
+
+msgctxt "#70726"
+msgid "Seleziona la qualità"
+msgstr ""
+
+msgctxt "#70727"
+msgid "Include in News"
+msgstr ""
+
+msgctxt "#70728"
+msgid "Include in Global Search"
 msgstr ""
