@@ -80,6 +80,7 @@ def newest(categoria):
 
 def search(item, texto):
     support.log(texto)
+    item.args = 'noorder'
     item.url = host + '/search?keyword=' + texto
     try:
         return peliculas(item)
@@ -139,6 +140,7 @@ def findvideos(item):
         number = support.scrapertoolsV2.find_single_match(item.title,r'(\d+) -')
         block = support.scrapertoolsV2.find_multiple_matches(data,'data-id="' + serverid + '">(.*?)<div class="server')
         ID = support.scrapertoolsV2.find_single_match(str(block),r'<a data-id="([^"]+)" data-base="' + (number if number else '1') + '"')
+        support.log('ID= ',serverid)
         if id:
             dataJson = support.httptools.downloadpage('%s/ajax/episode/info?id=%s&server=%s&ts=%s' % (host, ID, serverid, int(time.time())), headers=[['x-requested-with', 'XMLHttpRequest']]).data
             json = jsontools.load(dataJson)

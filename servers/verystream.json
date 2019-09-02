@@ -4,7 +4,7 @@
       "ignore_urls": [],
       "patterns": [
         {
-          "pattern": "(?:verystream|woof.tube|keepsetsu.online).*?/(?:e|stream)/([0-9a-zA-Z-_]+)",
+          "pattern": "(?:verystream|woof.tube).*?/(?:e|stream)/([0-9a-zA-Z-_]+)",
           "url": "https://verystream.com/e/\\1/"
         }
       ]
