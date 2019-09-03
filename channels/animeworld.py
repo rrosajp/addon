@@ -3,8 +3,6 @@
 # Canale per animeworld
 # ----------------------------------------------------------
 
-
-
 from core import  support, jsontools
 
 __channel__ = "animeworld"
@@ -18,6 +16,7 @@ list_quality = ['default', '480p', '720p', '1080p']
 
 
 def order():
+    # Seleziona l'ordinamento dei risultati
     return str(support.config.get_setting("order", __channel__))
 
 
@@ -70,7 +69,7 @@ def newest(categoria):
             item.url = host + '/updated'
             item.args = "updated"
             return peliculas(item)
-    # Continua la ricerca in caso di errore 
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
@@ -95,32 +94,37 @@ def search(item, texto):
 @support.scrape
 def peliculas(item):
     anime=True
+
     if item.args == 'updated':
         patron=r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?[^>]+>[^>]+>\s*<div class="ep">[^\d]+(?P<episode>\d+)[^<]*</div>'
         action='findvideos'
     else:
-        if item.args != 'noorder' and not item.url[-1].isdigit():
-            item.url += order()
-            support.log('ORDINE= ', order())
-            
+        if item.args != 'noorder' and not item.url[-1].isdigit(): item.url += order() # usa l'ordinamento di configura canale
         patron= r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<year>\d+)\) )?(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>[^>]+>[^>]+>\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?'
         action='episodios'
+
+    # Controlla la lingua se assente
+    check_lang = item.url
     def itemHook(item):
-        support.log('Lingua= ',item.contentLanguage)
-        if item.contentLanguage == '':
-            item.contentLanguage = 'Sub-ITA'
-            item.title += support.typo(item.contentLanguage,'_ [] color kod')
+        if not item.contentLanguage:
+            if 'language[]=1' in check_lang:
+                item.contentLanguage = 'ITA'
+                item.title += support.typo(item.contentLanguage,'_ [] color kod')
+            else:
+                item.contentLanguage = 'Sub-ITA'
+                item.title += support.typo(item.contentLanguage,'_ [] color kod')
         return item
+
     patronNext=r'href="([^"]+)" rel="next"'
     type_content_dict={'movie':['movie']}
-    type_action_dict={'findvideos':['movie']}    
+    type_action_dict={'findvideos':['movie']}
     return locals()
 
 
 @support.scrape
 def episodios(item):
     anime=True
-    patronBlock= r'server  active(?P<block>.*?)server  hidden ' 
+    patronBlock= r'server  active(?P<block>.*?)server  hidden '
     patron = r'<li><a [^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+" href="(?P<url>[^"]+)"[^>]+>(?P<episode>[^<]+)<'
     def itemHook(item):
         item.title += support.typo(item.fulltitle,'-- bold')
@@ -132,7 +136,7 @@ def episodios(item):
 def findvideos(item):
     import time
     support.log(item)
-    itemlist = []    
+    itemlist = []
     matches, data = support.match(item, r'class="tab.*?data-name="([0-9]+)">', headers=headers)
     videoData = ''
 
