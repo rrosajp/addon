@@ -23,7 +23,7 @@ def_lang = addon.getSetting('language')
 
 __perfil__ = config.get_setting('perfil', "tvmoviedb")
 
-# Fijar perfil de color            
+# Fijar perfil de color
 perfil = [['0xFFFFE6CC', '0xFFFFCE9C', '0xFF994D00', '0xFFFE2E2E', '0xFF088A08', '0xFFFFD700'],
           ['0xFFA5F6AF', '0xFF5FDA6D', '0xFF11811E', '0xFFFE2E2E', '0xFF088A08', '0xFFFFD700'],
           ['0xFF58D3F7', '0xFF2E9AFE', '0xFF2E64FE', '0xFFFE2E2E', '0xFF088A08', '0xFFFFD700']]
@@ -247,12 +247,12 @@ def filmaf(item):
     itemlist.append(item.clone(title=config.get_localized_string(70045), action="indices_fa",
                                url='http://m.filmaffinity.com/%s/topics.php' % langf, ))
     if config.get_platform() != "plex":
-        itemlist.append(item.clone(title=config.get_localized_string(70046), action="search_", 
+        itemlist.append(item.clone(title=config.get_localized_string(70046), action="search_",
                                    url="http://m.filmaffinity.com/%s/search.php?stype=title&stext=" % langf))
 
-        itemlist.append(item.clone(title=config.get_localized_string(70036), action="search_", 
+        itemlist.append(item.clone(title=config.get_localized_string(70036), action="search_",
                                    url="http://m.filmaffinity.com/%s/search.php?stype=cast&stext=" % langf))
-        itemlist.append(item.clone(title=config.get_localized_string(70047), action="search_", 
+        itemlist.append(item.clone(title=config.get_localized_string(70047), action="search_",
                                    url="http://m.filmaffinity.com/%s/search.php?stype=director&stext=" % langf))
 
     itemlist.append(item.clone(title=config.get_localized_string(70038), action="filtro_fa", extra="top"))
@@ -462,7 +462,7 @@ def listado_tmdb(item):
                         from random import randint
                         random = randint(0, len(known_for) - 1)
                         new_item.title = typo(new_item.contentTitle, 'bold') + typo(known_for[random].get("title", known_for[random].get("name")), '_ () color kod')
-                       
+
                         if known_for[random]["backdrop_path"]:
                             new_item.fanart = 'http://image.tmdb.org/t/p/original' + known_for[random]["backdrop_path"]
                     else:
@@ -551,11 +551,11 @@ def detalles(item):
 
             # En caso de serie, opción de info por temporadas
     if item.contentType == "tvshow" and item.infoLabels['tmdb_id']:
-        itemlist.append(item.clone(action="info_seasons", 
+        itemlist.append(item.clone(action="info_seasons",
                                    title=config.get_localized_string(70067) % item.infoLabels["number_of_seasons"]))
     # Opción de ver el reparto y navegar por sus películas/series
     if item.infoLabels['tmdb_id']:
-        itemlist.append(item.clone(action="reparto", title=config.get_localized_string(70071), 
+        itemlist.append(item.clone(action="reparto", title=config.get_localized_string(70071),
                                    infoLabels={'tmdb_id': item.infoLabels['tmdb_id'],
                                                'mediatype': item.contentType}))
 
@@ -986,10 +986,11 @@ def listado_imdb(item):
 
     next_page = scrapertools.find_single_match(data, '<a href="([^"]+)"[^>]*>Next')
     if next_page:
-        if not "title_type" in item.url:
-            next_page = 'http://www.imdb.com' + next_page
-        else:
-            next_page = 'http://www.imdb.com/search/title' + next_page
+        next_page = 'http://www.imdb.com' + next_page
+        # if not "title_type" in item.url:
+        #     next_page = 'http://www.imdb.com' + next_page
+        # else:
+        #     next_page = 'http://www.imdb.com/search/title' + next_page
         itemlist.append(item.clone(title=config.get_localized_string(70065), url=next_page, ))
 
     return itemlist
@@ -1497,10 +1498,10 @@ def detalles_fa(item):
                                        contentTitle=tmdb_lang))
 
     if item.contentType == "tvshow" and ob_tmdb.result:
-        itemlist.append(item.clone(action="info_seasons", 
+        itemlist.append(item.clone(action="info_seasons",
                                    title=config.get_localized_string(70067) % item.infoLabels["number_of_seasons"]))
     if ob_tmdb.result:
-        itemlist.append(item.clone(action="reparto", title=config.get_localized_string(70071), 
+        itemlist.append(item.clone(action="reparto", title=config.get_localized_string(70071),
                                    infoLabels={'tmdb_id': item.infoLabels['tmdb_id'],
                                                'mediatype': item.contentType}))
 
@@ -2443,15 +2444,15 @@ def detalles_mal(item):
                                    title=config.get_localized_string(70352) % eng_title))
 
     if item_tmdb.extra == "tv" and ob_tmdb.result:
-        itemlist.append(item.clone(action="info_seasons", 
+        itemlist.append(item.clone(action="info_seasons",
                                    title=config.get_localized_string(70067) % item.infoLabels["number_of_seasons"]))
 
-    itemlist.append(item.clone(action="videos_mal", title=config.get_localized_string(70353), 
+    itemlist.append(item.clone(action="videos_mal", title=config.get_localized_string(70353),
                                url=item.url + "/video"))
 
     # Opción para ver la info de personajes y dobladores/equipo de rodaje
     if not "No characters or voice actors" in data and not "No staff for this anime" in data:
-        itemlist.append(item.clone(action="staff_mal", title=config.get_localized_string(70354), 
+        itemlist.append(item.clone(action="staff_mal", title=config.get_localized_string(70354),
                                    url=item.url + "/characters"))
     if config.is_xbmc():
         item.contextual = True
@@ -2471,7 +2472,7 @@ def detalles_mal(item):
         data_music = httptools.downloadpage("http://www.freeanimemusic.org/song_search.php", post).data
         if not "NO MATCHES IN YOUR SEARCH" in data_music:
             itemlist.append(
-                item.clone(action="musica_anime", title=config.get_localized_string(70317), 
+                item.clone(action="musica_anime", title=config.get_localized_string(70317),
                            post=post))
     except:
         pass
@@ -2716,7 +2717,7 @@ def season_mal(item):
                 thumb = thumb.replace("r/167x242/", "") + "l.jpg"
                 itemlist.append(Item(channel=item.channel, action="detalles_mal", url=url, title=title,
                                      thumbnail=thumb, infoLabels=infoLabels, extra=extra, tipo=tipo,
-                                     contentTitle=scrapedtitle, contentType=contentType, 
+                                     contentTitle=scrapedtitle, contentType=contentType,
                                      fanart=default_fan))
     else:
         patron = '<a href="([^"]+)" class="link-title">(.*?)</a>.*?<span>(\? ep|\d+ ep).*?' \
@@ -2751,11 +2752,11 @@ def season_mal(item):
             thumb = thumb.replace("r/167x242/", "") + "l.jpg"
             itemlist.append(Item(channel=item.channel, action="detalles_mal", url=url, title=title,
                                  thumbnail=thumb, infoLabels=infoLabels, extra=extra, tipo=tipo,
-                                 contentTitle=scrapedtitle, contentType=contentType, 
+                                 contentTitle=scrapedtitle, contentType=contentType,
                                  fanart=default_fan))
         next_page = scrapertools.find_single_match(data, '<a class="link current" href.*?href="([^"]+)"')
         if next_page:
-            itemlist.append(Item(channel=item.channel, action="season_mal", url=next_page, 
+            itemlist.append(Item(channel=item.channel, action="season_mal", url=next_page,
                                  title=config.get_localized_string(70065), thumbnail=item.thumbnail))
 
     return itemlist
@@ -2777,7 +2778,7 @@ def staff_mal(item):
             rol = rol.replace("Main", "Principal").replace("Supporting", "Secundario")
             nombre = "   %s   [%s]" % (nombre, rol)
             thumb = thumb.replace("r/46x64/", "")
-            itemlist.append(Item(channel=item.channel, action="detail_staff", url=url, 
+            itemlist.append(Item(channel=item.channel, action="detail_staff", url=url,
                                  thumbnail=thumb, fanart=default_fan, title=nombre, extra="character"))
             patron_voces = '<a href="(/people[^"]+)">([^<]+)<.*?<small>([^<]+)</small>.*?data-src="([^"]+)"'
             voces_match = scrapertools.find_multiple_matches(voces, patron_voces)
@@ -2785,7 +2786,7 @@ def staff_mal(item):
                 vurl = "https://myanimelist.net%s" % vurl
                 vnombre = "        %s   [%s]" % (vnombre, vidioma)
                 vthumb = vthumb.replace("r/46x64/", "")
-                itemlist.append(Item(channel=item.channel, action="detail_staff", url=vurl, 
+                itemlist.append(Item(channel=item.channel, action="detail_staff", url=vurl,
                                      thumbnail=vthumb, fanart=default_fan, title=vnombre))
     bloque = scrapertools.find_single_match(data, '<a name="staff">(.*?)</table>')
     patron = '<a href="(/people[^"]+)".*?data-src="([^"]+)".*?href=.*?>([^<]+)<.*?<small>([^<]+)</small>'
@@ -2796,7 +2797,7 @@ def staff_mal(item):
             url = "https://myanimelist.net%s" % url
             nombre = "   %s   [%s]" % (nombre, rol)
             thumb = thumb.replace("r/46x64/", "")
-            itemlist.append(Item(channel=item.channel, action="detail_staff", url=url, 
+            itemlist.append(Item(channel=item.channel, action="detail_staff", url=url,
                                  thumbnail=thumb, fanart=default_fan, title=nombre))
 
     return itemlist
@@ -2820,7 +2821,7 @@ def detail_staff(item):
                 title = "Imagen %s" % (i + 1)
                 infoLabels = {'plot': bio}
                 itemlist.append(
-                    Item(channel=item.channel, action="", title=title, infoLabels=infoLabels, 
+                    Item(channel=item.channel, action="", title=title, infoLabels=infoLabels,
                          thumbnail=thumb))
 
         matches = scrapertools.find_multiple_matches(data,
@@ -2830,7 +2831,7 @@ def detail_staff(item):
             for url, thumb, title in matches:
                 url = "https://myanimelist.net%s" % url
                 thumb = thumb.replace("r/23x32/", "")
-                itemlist.append(Item(channel=item.channel, action="detalles_mal", url=url, 
+                itemlist.append(Item(channel=item.channel, action="detalles_mal", url=url,
                                      thumbnail=thumb, fanart=default_fan, title=title, contentTitle=title))
     else:
         patron_bio = '<div class="js-sns-icon-container icon-block ">.*?<div class="spaceit_pad">(.*?)</td>'
@@ -2838,7 +2839,7 @@ def detail_staff(item):
         bio = scrapertools.htmlclean(bio.replace("</div>", "\n"))
         infoLabels = {'plot': bio}
         if not "No voice acting roles" in data:
-            itemlist.append(Item(channel=item.channel, title="Da voz a/en:", action="", 
+            itemlist.append(Item(channel=item.channel, title="Da voz a/en:", action="",
                                  thumbnail=item.thumbnail, infoLabels=infoLabels))
             bloque = scrapertools.find_single_match(data, 'Voice Acting Roles</div>(.*?)</table>')
             patron = '<a href="(/anime[^"]+)"><img data-src="([^"]+)".*?href.*?>(.*?)</a>.*?href="(/character[^"]+)".*?' \
@@ -2849,14 +2850,14 @@ def detail_staff(item):
                 url_p = "https://myanimelist.net%s" % url_p
                 thumb = thumb.replace("r/46x64/", "")
                 thumb_p = thumb_p.replace("r/46x64/", "")
-                itemlist.append(Item(channel=item.channel, action="detalles_mal", url=url, 
+                itemlist.append(Item(channel=item.channel, action="detalles_mal", url=url,
                                      thumbnail=thumb, fanart=default_fan, title=title, contentTitle=title))
-                itemlist.append(Item(channel=item.channel, action="detail_staff", url=url_p, 
+                itemlist.append(Item(channel=item.channel, action="detail_staff", url=url_p,
                                      thumbnail=thumb_p, fanart=default_fan, title="   %s" % personaje,
                                      extra="character"))
 
         if not "No staff positions" in data:
-            itemlist.append(Item(channel=item.channel, title="Staff en animes:", action="", 
+            itemlist.append(Item(channel=item.channel, title="Staff en animes:", action="",
                                  thumbnail=item.thumbnail, infoLabels=infoLabels))
             bloque = scrapertools.find_single_match(data, 'Anime Staff Positions</div>(.*?)</table>')
             patron = '<a href="(/anime[^"]+)"><img data-src="([^"]+)".*?href.*?>(.*?)</a>.*?<small>(.*?)</div>'
@@ -2866,7 +2867,7 @@ def detail_staff(item):
                 thumb = thumb.replace("r/46x64/", "")
                 rol = scrapertools.htmlclean(rol)
                 titulo = "%s   [COLOR %s][%s][/COLOR]" % (title, color6, rol)
-                itemlist.append(Item(channel=item.channel, action="detalles_mal", url=url, 
+                itemlist.append(Item(channel=item.channel, action="detalles_mal", url=url,
                                      thumbnail=thumb, fanart=default_fan, title=titulo, contentTitle=title))
 
     return itemlist
@@ -2925,7 +2926,7 @@ def busqueda_mal(item):
             infolabels["rating"] = float(rating)
             title += "  [COLOR %s]%s[/COLOR]" % (color6, rating)
         itemlist.append(Item(channel=item.channel, title=title, action="detalles_mal", url=url, show=show,
-                             thumbnail=thumb, infoLabels=infolabels, contentTitle=contentitle, 
+                             thumbnail=thumb, infoLabels=infolabels, contentTitle=contentitle,
                              contentType=contentType, tipo=tipo.lower(), extra=extra))
 
     if not "&show=" in item.url:
@@ -3207,7 +3208,7 @@ def items_mal(item):
             tipo = "movie"
             extra = "movie"
         itemlist.append(Item(channel=item.channel, action="detalles_mal", url=url, title=title, thumbnail=thumbnail,
-                             
+
                              contentTitle=contentTitle, contentType=tipo, extra=extra, login=True))
 
     if itemlist:
