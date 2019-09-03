@@ -27,7 +27,7 @@ def hdpass_get_servers(item):
 
     if 'hdpass' or 'hdplayer' in url:
         data = httptools.downloadpage(url).data
-       
+
         start = data.find('<div class="row mobileRes">')
         end = data.find('<div id="playerFront">', start)
         data = data[start:end]
@@ -195,15 +195,15 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             if val and (kk == "url" or kk == 'thumb') and 'http' not in val:
                 val = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
             scraped[kk] = val
-        
-        
+
+
         episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
         title = cleantitle(scraped['title']) if scraped['title'] else ''
         title2 = cleantitle(scraped['title2']) if scraped['title2'] else ''
         quality = scraped['quality'] if scraped['quality'] else ''
         Type = scraped['type'] if scraped['type'] else ''
         plot = cleantitle(scraped["plot"]) if scraped["plot"] else ''
-       
+
         # make formatted Title [longtitle]
         s = ' - '
         title = episode +  (s if episode and title else '') + title
@@ -246,7 +246,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 if str(scraped['type']).lower() in variants:
                     AC = name
                 else: AC = action
-        
+
         if (scraped["title"] not in blacklist) and (search.lower() in longtitle.lower()):
             it = Item(
                 channel=item.channel,
@@ -265,7 +265,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 contentLanguage=lang,
                 ep=episode if episode else ''
             )
-            
+
             for lg in list(set(listGroups).difference(known_keys)):
                 it.__setattr__(lg, match[listGroups.index(lg)])
 
@@ -330,7 +330,7 @@ def scrape(func):
         typeContentDict = args['type_content_dict'] if 'type_content_dict' in args else {}
         debug = args['debug'] if 'debug' in args else False
         if 'pagination' in args: pagination = args['pagination'] if args['pagination'] else 20
-        else: pagination = ''        
+        else: pagination = ''
 
         pag = item.page if item.page else 1  # pagination
         matches = []
@@ -344,7 +344,7 @@ def scrape(func):
             log('DATA =', data)
 
         if patronBlock:
-            blocks = scrapertoolsV2.find_multiple_matches_groups(data, patronBlock) 
+            blocks = scrapertoolsV2.find_multiple_matches_groups(data, patronBlock)
             block = ""
             for bl in blocks:
                 blockItemlist, blockMatches = scrapeBlock(item, args, bl['block'], patron, headers, action, pagination, debug,
@@ -361,10 +361,8 @@ def scrape(func):
         elif patron:
             itemlist, matches = scrapeBlock(item, args, data, patron, headers, action, pagination, debug, typeContentDict,
                                    typeActionDict, blacklist, search, pag, function)
-        
-        checkHost(item, itemlist)
 
-        
+        checkHost(item, itemlist)
 
         if 'itemlistHook' in args:
             itemlist = args['itemlistHook'](itemlist)
@@ -403,7 +401,7 @@ def scrape(func):
 
         if 'fullItemlistHook' in args:
             itemlist = args['fullItemlistHook'](itemlist)
-        
+
         filterLang = False
         for item in itemlist:
             if item.contentLanguage:
@@ -417,7 +415,7 @@ def scrape(func):
                 log('Lista Lingue = ', list_language)
                 from specials import filtertools
                 itemlist = filtertools.get_links(itemlist, item, list_language)
-           
+
         return itemlist
 
     return wrapper
@@ -569,7 +567,7 @@ def menuItem(itemlist, filename, title='', action='', url='', contentType='movie
         args = args,
         contentType = contentType
     ))
-   
+
     # Apply auto Thumbnails at the menus
     from channelselector import thumb
     thumb(itemlist)
@@ -636,7 +634,7 @@ def menu(func):
                              contentType= var[3] if len(var) > 3 else 'movie' if name == 'film' else 'tvshow',)
                 # add search menu for category
                 if 'search' not in args: menuItem(itemlist, filename, 'Cerca ' + title + '… submenu bold', 'search', host + url, contentType='movie' if name == 'film' else 'tvshow')
-                
+
         # Make EXTRA MENU (on bottom)
         for name, var in args.items():
             if name not in listUrls and name != 'item':
@@ -654,8 +652,8 @@ def menu(func):
 
         autoplay.init(item.channel, list_servers, list_quality)
         autoplay.show_option(item.channel, itemlist)
-        channel_config(item, itemlist) 
-        
+        channel_config(item, itemlist)
+
         return itemlist
 
     return wrapper
@@ -688,7 +686,7 @@ def typo(string, typography=''):
             string = '[B]' + string + '[/B]'
 
     # Otherwise it uses the typographical attributes of the string
-    else:        
+    else:
         if '[]' in string:
             string = '[' + re.sub(r'\s\[\]','',string) + ']'
         if '()' in string:
@@ -704,7 +702,7 @@ def typo(string, typography=''):
         if 'bold' in string:
             string = '[B]' + re.sub(r'\sbold','',string) + '[/B]'
         if 'italic' in string:
-            string = '[I]' + re.sub(r'\sitalic','',string) + '[/I]' 
+            string = '[I]' + re.sub(r'\sitalic','',string) + '[/I]'
         if '_' in string:
             string = ' ' + re.sub(r'\s_','',string)
         if '--' in string:
@@ -726,7 +724,7 @@ def match(item, patron='', patronBlock='', headers='', url='', post=''):
         else:
             data = httptools.downloadpage(url, headers=headers, ignore_response_code=True).data.replace("'", '"')
     data = re.sub(r'\n|\t', ' ', data)
-    data = re.sub(r'>\s\s*<', '><', data)    
+    data = re.sub(r'>\s\s*<', '><', data)
     log('DATA= ', data)
 
     if patronBlock:
@@ -734,7 +732,7 @@ def match(item, patron='', patronBlock='', headers='', url='', post=''):
         log('BLOCK= ',block)
     else:
         block = data
-        
+
     if patron:
         matches = scrapertoolsV2.find_multiple_matches(block, patron)
         log('MATCHES= ',matches)
@@ -745,21 +743,21 @@ def match(item, patron='', patronBlock='', headers='', url='', post=''):
 def download(itemlist, item, typography='', function_level=1, function=''):
     if not typography: typography = 'color kod bold'
 
-    if item.contentType == 'movie':       
+    if item.contentType == 'movie':
         fromaction = 'findvideos'
         title = typo(config.get_localized_string(60354), typography)
-    elif item.contentType == 'episode':       
+    elif item.contentType == 'episode':
         fromaction = 'findvideos'
         title = typo(config.get_localized_string(60356), typography) + ' - ' + item.title
-    else:        
+    else:
         fromaction = 'episodios'
         title = typo(config.get_localized_string(60355), typography)
 
     function = function if function else inspect.stack()[function_level][3]
-    
+
     contentSerieName=item.contentSerieName if item.contentSerieName else ''
     contentTitle=item.contentTitle if item.contentTitle else ''
-    
+
     if itemlist and item.contentChannel != 'videolibrary':
         itemlist.append(
             Item(channel='downloads',
@@ -871,14 +869,14 @@ def pagination(itemlist, item, page, perpage, function_level=1):
     return itemlist
 
 def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True):
-    
+
     if not data:
         data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
 
-    
+
     itemList = servertools.find_video_items(data=str(data))
     itemlist += itemList
-    
+
     for videoitem in itemlist:
         item.title = item.contentTitle if config.get_localized_string(30161) in item.title else item.title
         videoitem.title = "".join([item.title, ' ', typo(videoitem.title, 'color kod []'), typo(videoitem.quality, 'color kod []') if videoitem.quality else ""])
@@ -900,7 +898,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True):
     if not channel_node:  # non ha mai aperto il menu del canale quindi in autoplay_data.json non c'e la key
         channelFile = __import__('channels.' + item.channel, fromlist=["channels.%s" % item.channel])
         autoplay.init(item.channel, channelFile.list_servers, channelFile.list_quality)
-        
+
     autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
     channel_node = autoplay_node.get(item.channel, {})
     settings_node = channel_node.get('settings', {})
@@ -910,7 +908,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True):
         if get_setting('checklinks', item.channel):
             checklinks = get_setting('checklinks', item.channel)
         else:
-            checklinks = get_setting('checklinks')            
+            checklinks = get_setting('checklinks')
         if get_setting('checklinks_number', item.channel):
             checklinks_number = get_setting('checklinks_number', item.channel)
         else:
@@ -936,10 +934,10 @@ def aplay(item, itemlist, list_servers='', list_quality=''):
 def log(stringa1="", stringa2="", stringa3="", stringa4="", stringa5=""):
     # Function to simplify the log
     # Automatically returns File Name and Function Name
-    
+
     frame = inspect.stack()[1]
     filename = frame[0].f_code.co_filename
-    filename = os.path.basename(filename)    
+    filename = os.path.basename(filename)
     logger.info("[" + filename + "] - [" + inspect.stack()[1][3] + "] " + str(stringa1) + str(stringa2) + str(stringa3) + str(stringa4) + str(stringa5))
 
 

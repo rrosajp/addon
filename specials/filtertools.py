@@ -163,7 +163,7 @@ def load(item):
 
 
 def check_conditions(_filter, list_item, item, list_language, list_quality, quality_count=0, language_count=0):
-    if not item.language: item.language = item.contentLanguage 
+    if item.contentLanguage: item.language = item.contentLanguage
     
     is_language_valid = True
     if _filter.language:
@@ -201,7 +201,8 @@ def check_conditions(_filter, list_item, item, list_language, list_quality, qual
             list_item.append(item)
             # logger.debug("{0} | context: {1}".format(item.title, item.context))
             # logger.debug(" -Enlace añadido")
-
+        elif not item.language:
+            list_item.append(item)
         logger.debug(" idioma valido?: %s, item.language: %s, filter.language: %s" %
                      (is_language_valid, item.language, _filter.language))
         logger.debug(" calidad valida?: %s, item.quality: %s, filter.quality_allowed: %s"
