@@ -79,7 +79,7 @@ def get_channel_parameters(channel_name):
                     #             break
                     #     if found:
                     #         break
-                    channel_parameters['settings'] = get_default_settings(channel_name)                    
+                    channel_parameters['settings'] = get_default_settings(channel_name)
                     for s in channel_parameters['settings']:
                         if 'id' in s:
                             if s['id'] == "include_in_global_search":
@@ -178,28 +178,38 @@ def get_default_settings(channel_name):
         return get_channel_json(channel_name).get('settings', list())
 
     list_language = [config.get_localized_string(70522)]
-    sub = False
-    langs = []
-    language = get_channel_json(channel_name).get('language', list())
-    for lang in language:
-        if 'vos' not in lang:
-            langs.append(lang.upper())
+    if hasattr(channel, 'list_language'):
+        for language in channel.list_language:
+            list_language.append(language)
+        logger.info(list_language)
+    else:
+        sub = False
+        langs = []
+        language = get_channel_json(channel_name).get('language', list())
+        for lang in language:
+            if 'vos' not in lang:
+                langs.append(lang.upper())
+            else:
+                sub = True
+        if sub == True:
+            for lang in langs:
+                list_language.append(lang)
+                list_language.append('Sub-' + lang)
         else:
-            sub = True
-    if sub == True:
-        for lang in langs:
-            list_language.append(lang)
-            list_language.append('Sub-' + lang)
-    
+            for lang in langs:
+                list_language.append(lang)
+
+
     # Check if the automatic renumbering function exists
-    renumber = False  
+    renumber = False
     if 'episodios' in dir(channel):
         from core import scrapertoolsV2
         if scrapertoolsV2.find_single_match(inspect.getsource(channel), r'(anime\s*=\s*True)') \
             or scrapertoolsV2.find_single_match(inspect.getsource(channel), r'(autorenumber\()'):
             renumber = True
-    
+
     #  Collects configurations
+    channel_language = categories = get_channel_json(channel_name).get('language', list())
     channel_controls = get_channel_json(channel_name).get('settings', list())
     default_path = filetools.join(config.get_runtime_path(), 'default_channel_settings' + '.json')
     default_controls = jsontools.load(filetools.read(default_path)).get('settings', list())
@@ -224,16 +234,16 @@ def get_default_settings(channel_name):
                     else: pass
                 elif label == 'anime':
                     if 'anime' in categories:
-                        control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30124)   
-                        channel_controls.append(control) 
+                        control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30124)
+                        channel_controls.append(control)
                     else: pass
-                        
+
                 else:
                     control['label'] = config.get_localized_string(70727) + ' - ' + label.capitalize()
                     channel_controls.append(control)
 
             elif control['id'] == 'filter_languages':
-                if len(list_language) > 1:
+                if len(channel_language) > 1:
                     control['lvalues'] = list_language
                     channel_controls.append(control)
                 else: pass
