@@ -41,7 +41,8 @@ def mainlist(item):
     film = [
         ('HD', ['', 'menu', 'Film HD Streaming']),
         ('Generi', ['', 'menu', 'Film per Genere']),
-        ('Anni', ['', 'menu', 'Film per Anno'])
+        ('Anni', ['', 'menu', 'Film per Anno']),
+        ('Ultimi aggiornati', ['/lista-film-ultimi-100-film-aggiornati/', 'newest', 'aggiornati'])
     ]
     tvshow = ['/serietv/',
         ('Per Lettera', ['/serietv/', 'menu', 'Serie-Tv per Lettera']),
@@ -65,12 +66,16 @@ def menu(item):
 @support.scrape
 def newest(categoria):
     findhost()
-    debug = True
-    item = Item()
-    item.contentType = 'movie'
-    item.url = host + '/lista-film-ultimi-100-film-aggiunti/'
-    patron = "<a href=(?P<url>[^>]+)>(?P<title>[^<([]+)(?:\[(?P<quality>[A-Z]+)\])?\s\((?P<year>[0-9]{4})\)<\/a>"
-    patronBlock = r'Ultimi 100 film aggiunti:.*?<\/td>'
+    if type(categoria) != Item:
+        item = Item()
+        item.contentType = 'movie'
+        item.url = host + '/lista-film-ultimi-100-film-aggiunti/'
+        patronBlock = r'Ultimi 100 film aggiunti:(?P<block>.*?)<\/td>'
+    else:
+        patronBlock = r'Ultimi 100 film Aggiornati:(?P<block>.*?)<\/td>'
+        item = categoria
+    patron = "<a href=(?P<url>[^>]+)>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N)\])?\s?(?:\[(?P<quality>HD|SD|HD/3D)\])?\s?\((?P<year>[0-9]{4})\)<\/a>"
+    pagination = 20
 
     return locals()
 
@@ -93,11 +98,12 @@ def search(item, text):
 @support.scrape
 def peliculas(item):
     if '/serietv/' not in item.url:
-        patron = r'<div class="?card-image"?>.*?<img src="?(?P<thumb>[^" ]+)"? alt.*?<a href="?(?P<url>[^" >]+)(?:\/|")>(?P<title>[^<[(]+)(?:\[(?P<quality>[A-Za-z0-9/-]+)])? (?:\((?P<year>[0-9]{4})\))?.*?<strong>(?P<genre>[^<>&]+).*?DURATA (?P<duration>[0-9]+).*?<br(?: /)?>(?P<plot>[^<>]+)'
+        patron = r'<div class="?card-image"?>.*?<img src="?(?P<thumb>[^" ]+)"? alt.*?<a href="?(?P<url>[^" >]+)(?:\/|")>(?P<title>[^<[(]+)(?:\[(?P<quality>[A-Za-z0-9/-]+)])? (?:\((?P<year>[0-9]{4})\))?.*?<strong>(?P<genre>[^<>&–]+).*?DURATA (?P<duration>[0-9]+).*?<br(?: /)?>(?P<plot>[^<>]+)'
         action = 'findvideos'
     else:
         patron = r'div class="card-image">.*?<img src="(?P<thumb>[^ ]+)" alt.*?<a href="(?P<url>[^ >]+)">(?P<title>[^<[(]+)<\/a>.*?<strong><span style="[^"]+">(?P<genre>[^<>0-9(]+)\((?P<year>[0-9]{4}).*?</(?:p|div)>(?P<plot>.*?)</div'
         action = 'episodios'
+        item.contentType = 'tvshow'
 
     # patronBlock=[r'<div class="?sequex-page-left"?>(?P<block>.*?)<aside class="?sequex-page-right"?>',
     #                                           '<div class="?card-image"?>.*?(?=<div class="?card-image"?>|<div class="?rating"?>)']

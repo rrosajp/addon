@@ -133,7 +133,7 @@ def regexDbg(item, patron, headers, data=''):
         'delimiter': '"""',
         'flavor': 'python'
     }
-    r = urllib2.Request(url + '/api/regex', json.dumps(data), headers=headers)
+    r = urllib2.Request(url + '/api/regex', json.dumps(data, encoding='latin1'), headers=headers)
     r = urllib2.urlopen(r).read()
     permaLink = json.loads(r)['permalinkFragment']
     webbrowser.open(url + "/r/" + permaLink)
