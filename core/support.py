@@ -402,19 +402,7 @@ def scrape(func):
         if 'fullItemlistHook' in args:
             itemlist = args['fullItemlistHook'](itemlist)
 
-        filterLang = False
-        for item in itemlist:
-            if item.contentLanguage:
-                filterLang = True
-                break
-        if item.channel:
-            import channeltools
-            list_language = channeltools.get_channel_json(item.channel).get('language', list())
-            log('Lista Lingue = ', list_language)
-            if len(list_language) > 1 and filterLang:
-                log('Lista Lingue = ', list_language)
-                from specials import filtertools
-                itemlist = filtertools.get_links(itemlist, item, list_language)
+        itemlist = filterLang(item, itemlist)
 
         return itemlist
 
@@ -920,8 +908,15 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True):
 
     if item.contentChannel != 'videolibrary': videolibrary(itemlist, item, function_level=3)
     if get_setting('downloadenabled'): download(itemlist, item, function_level=3)
+    filterLang(item, itemlist)
     return itemlist
 
+def filterLang(item, itemlist):
+    import channeltools
+    list_language = channeltools.get_channel_json(item.channel).get('language', list())
+    from specials import filtertools
+    itemlist = filtertools.get_links(itemlist, item, list_language)
+    return itemlist
 
 def aplay(item, itemlist, list_servers='', list_quality=''):
     if inspect.stack()[1][3] == 'mainlist':
