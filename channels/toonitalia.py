@@ -252,12 +252,13 @@ def episodios(item):
     itemlist = []
 
     data = httptools.downloadpage(item.url, headers=headers).data
+    support.log('DATA= ', data)
 
-    patron = r'<br /> <a href="([^"]+)"\s*target="_blank"\s*rel[^>]+>([^<]+)</a>'
+    patron = r'<br />\s*<a href="([^"]+)"\s*target="_blank"\s*rel[^>]+>([^<]+)</a>'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     if "https://vcrypt.net" in data:
-        patron = r'(?:<p>|<br /> )([^<]+) &#8211; <a href="([^"]+)'
+        patron = r'(?:<p>|<br />)\s*([^<]+) &#8211; <a href="([^"]+)'
         matches = re.compile(patron, re.DOTALL).findall(data)
 
         for scrapedtitle, scrapedurl in matches:
