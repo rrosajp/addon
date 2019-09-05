@@ -21,8 +21,6 @@ def findhost():
     host = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
     headers = [['Referer', host]]
 
-IDIOMAS = {'Italiano': 'IT'}
-list_language = IDIOMAS.values()
 list_servers = ['verystream', 'openload', 'streamango', 'wstream']
 list_quality = ['HD', 'SD', 'default']
 
