@@ -908,14 +908,14 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True):
 
     if item.contentChannel != 'videolibrary': videolibrary(itemlist, item, function_level=3)
     if get_setting('downloadenabled'): download(itemlist, item, function_level=3)
-    filterLang(item, itemlist)
     return itemlist
 
 def filterLang(item, itemlist):
     import channeltools
-    list_language = channeltools.get_channel_json(item.channel).get('language', list())
-    from specials import filtertools
-    itemlist = filtertools.get_links(itemlist, item, list_language)
+    list_language = channeltools.get_lang(item.channel)
+    if len(list_language) > 1:
+        from specials import filtertools
+        itemlist = filtertools.get_links(itemlist, item, list_language)
     return itemlist
 
 def aplay(item, itemlist, list_servers='', list_quality=''):

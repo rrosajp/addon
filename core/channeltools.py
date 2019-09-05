@@ -168,6 +168,31 @@ def get_channel_controls_settings(channel_name):
 
     return list_controls, dict_settings
 
+def get_lang(channel_name):
+    channel = __import__('channels.%s' % channel_name, fromlist=["channels.%s" % channel_name])
+    list_language = [config.get_localized_string(70522)]
+    if hasattr(channel, 'list_language'):
+        for language in channel.list_language:
+            list_language.append(language)
+        logger.info(list_language)
+    else:
+    sub = False
+    langs = []
+    language = get_channel_json(channel_name).get('language', list())
+    for lang in language:
+        if 'vos' not in lang:
+            langs.append(lang.upper())
+        else:
+            sub = True
+    if sub == True:
+        for lang in langs:
+            list_language.append(lang)
+            list_language.append('Sub-' + lang)
+    else:
+        for lang in langs:
+            list_language.append(lang)
+    return list_language
+
 def get_default_settings(channel_name):
     import filetools, inspect
 
@@ -177,28 +202,7 @@ def get_default_settings(channel_name):
     except:
         return get_channel_json(channel_name).get('settings', list())
 
-    list_language = [config.get_localized_string(70522)]
-    if hasattr(channel, 'list_language'):
-        for language in channel.list_language:
-            list_language.append(language)
-        logger.info(list_language)
-    else:
-        sub = False
-        langs = []
-        language = get_channel_json(channel_name).get('language', list())
-        for lang in language:
-            if 'vos' not in lang:
-                langs.append(lang.upper())
-            else:
-                sub = True
-        if sub == True:
-            for lang in langs:
-                list_language.append(lang)
-                list_language.append('Sub-' + lang)
-        else:
-            for lang in langs:
-                list_language.append(lang)
-
+    list_language = get_lang(channel_name)
 
     # Check if the automatic renumbering function exists
     renumber = False

@@ -1806,12 +1806,12 @@ msgid "Delete"
 msgstr "Eliminare"
 
 msgctxt "#60438"
-msgid "¿Enable / disable filter?"
+msgid "Enable / Disable filter?"
 msgstr "Attiva / Disattiva filtro?"
 
 msgctxt "#60439"
 msgid "Language"
-msgstr "Linguaggio"
+msgstr "Lingua"
 
 msgctxt "#60440"
 msgid "Permitted quality"
@@ -1819,7 +1819,7 @@ msgstr "Qualità consentita"
 
 msgctxt "#60441"
 msgid "Filter links for: [COLOR %s]%s[/COLOR]"
-msgstr "Link di filtro per: [COLOR %s]%s[/COLOR]"
+msgstr "Filtro link per: [COLOR %s]%s[/COLOR]"
 
 msgctxt "#60442"
 msgid "Are you sure you want to delete the filter?"
