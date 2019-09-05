@@ -431,7 +431,7 @@ def config_item(item):
         if item.show.lower().strip() in dict_series:
             allow_option = True
             active = dict_series.get(item.show.lower().strip(), {}).get(TAG_ACTIVE, False)
-            custom_button = {'label': 'Borrar', 'function': 'delete', 'visible': True, 'close': True}
+            custom_button = {'label': config.get_localized_string(60437), 'function': 'delete', 'visible': True, 'close': True}
 
         list_controls = []
 
@@ -439,7 +439,7 @@ def config_item(item):
             active_control = {
                 "id": "active",
                 "type": "bool",
-                "label": "¿Activar/Desactivar filtro?",
+                "label": config.get_localized_string(60438),
                 "color": "",
                 "default": active,
                 "enabled": allow_option,
@@ -450,8 +450,8 @@ def config_item(item):
         language_option = {
             "id": "language",
             "type": "list",
-            "label": "Idioma",
-            "color": "0xFFee66CC",
+            "label": config.get_localized_string(60439),
+            # "color": "0xFFee66CC",
             "default": item.list_language.index(lang_selected),
             "enabled": True,
             "visible": True,
@@ -483,7 +483,7 @@ def config_item(item):
             # concatenamos list_controls con list_controls_calidad
             list_controls.extend(list_controls_calidad)
 
-        title = "Filtrado de enlaces para: [COLOR %s]%s[/COLOR]" % (COLOR.get("selected", "auto"), item.show)
+        title = config.get_localized_string(60441) % (COLOR.get("selected", "auto"), item.show)
 
         platformtools.show_channel_settings(list_controls=list_controls, callback='save', item=item,
                                             caption=title, custom_button=custom_button)
@@ -496,9 +496,8 @@ def delete(item, dict_values):
         dict_series = jsontools.get_node_from_file(item.from_channel, TAG_TVSHOW_FILTER)
         tvshow = item.show.strip().lower()
 
-        heading = "¿Está seguro que desea eliminar el filtro?"
-        line1 = "Pulse 'Si' para eliminar el filtro de [COLOR %s]%s[/COLOR], pulse 'No' o cierre la ventana para " \
-                "no hacer nada." % (COLOR.get("selected", "auto"), item.show.strip())
+        heading = config.get_localized_string(60442)
+        line1 = config.get_localized_string(60443) % (COLOR.get("selected", "auto"), item.show.strip())
 
         if platformtools.dialog_yesno(heading, line1) == 1:
             lang_selected = dict_series.get(tvshow, {}).get(TAG_LANGUAGE, "")
@@ -508,9 +507,9 @@ def delete(item, dict_values):
 
             sound = False
             if result:
-                message = "FILTRO ELIMINADO"
+                message = config.get_localized_string(60444)
             else:
-                message = "Error al guardar en disco"
+                message = config.get_localized_string(60445)
                 sound = True
 
             heading = "%s [%s]" % (item.show.strip(), lang_selected)
@@ -555,9 +554,9 @@ def save(item, dict_data_saved):
 
         sound = False
         if result:
-            message = "FILTRO GUARDADO"
+            message = config.get_localized_string(60446)
         else:
-            message = "Error al guardar en disco"
+            message = config.get_localized_string(70593)
             sound = True
 
         heading = "%s [%s]" % (item.show.strip(), lang_selected)

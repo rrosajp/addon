@@ -1807,7 +1807,7 @@ msgid "Delete"
 msgstr ""
 
 msgctxt "#60438"
-msgid "¿Enable / disable filter?"
+msgid "Enable / Disable filter?"
 msgstr ""
 
 msgctxt "#60439"

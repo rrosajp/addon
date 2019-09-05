@@ -200,7 +200,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
         title = cleantitle(scraped['title']) if scraped['title'] else ''
         title2 = cleantitle(scraped['title2']) if scraped['title2'] else ''
-        quality = scraped['quality'] if scraped['quality'] else ''
+        quality = scraped['quality'].strip() if scraped['quality'] else ''
         Type = scraped['type'] if scraped['type'] else ''
         plot = cleantitle(scraped["plot"]) if scraped["plot"] else ''
 
@@ -353,8 +353,8 @@ def scrape(func):
                     if 'lang' in bl:
                         it.contentLanguage, it.title = scrapeLang(bl, it.contentLanguage, it.title)
                     if 'quality' in bl and bl['quality']:
-                        it.quality = bl['quality']
-                        it.title = it.title + typo(bl['quality'], '_ [] color kod')
+                        it.quality = bl['quality'].strip()
+                        it.title = it.title + typo(bl['quality'].strip(), '_ [] color kod')
                 log('BLOCK ', '=', block)
                 itemlist.extend(blockItemlist)
                 matches.extend(blockMatches)
@@ -908,14 +908,14 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True):
 
     if item.contentChannel != 'videolibrary': videolibrary(itemlist, item, function_level=3)
     if get_setting('downloadenabled'): download(itemlist, item, function_level=3)
-    filterLang(item, itemlist)
     return itemlist
 
 def filterLang(item, itemlist):
     import channeltools
-    list_language = channeltools.get_channel_json(item.channel).get('language', list())
-    from specials import filtertools
-    itemlist = filtertools.get_links(itemlist, item, list_language)
+    list_language = channeltools.get_lang(item.channel)
+    if len(list_language) > 1:
+        from specials import filtertools
+        itemlist = filtertools.get_links(itemlist, item, list_language)
     return itemlist
 
 def aplay(item, itemlist, list_servers='', list_quality=''):
