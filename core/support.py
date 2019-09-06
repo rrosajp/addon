@@ -155,13 +155,12 @@ def scrapeLang(scraped, lang, longtitle):
     ##    in ita e subita delle serie tv nella stessa pagina
     # altrimenti dopo un sub-ita mette tutti quelli a seguire in sub-ita
     # e credo sia utile per filtertools
-    lang = 'ITA' 
+    lang = 'ITA'
     if scraped['lang']:
         if 'sub' in scraped['lang'].lower():
             lang = 'Sub-ITA'
-        elif 'ita' in scraped['lang'].lower():
-            lang = 'ITA'
-
+##        elif 'ita' in scraped['lang'].lower():
+##            lang = 'ITA'
     longtitle += typo(lang, '_ [] color kod')
 
     return lang, longtitle
@@ -181,7 +180,6 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
     known_keys = ['url', 'title', 'title2', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
     lang = ''  # aggiunto per gestire i siti con pagine di serietv dove si hanno i video in ita e in subita
-
     for i, match in enumerate(matches):
         if pagination and (pag - 1) * pagination > i: continue  # pagination
         if pagination and i >= pag * pagination: break          # pagination
