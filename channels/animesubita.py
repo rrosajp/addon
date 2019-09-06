@@ -71,7 +71,8 @@ def genres(item):
 def peliculas(item):    
     anime = True
     if item.args == 'updated':
-        patron = r'<div class="post-thumbnail">\s*<a href="(?P<url>[^"]+)" title="(?P<title>.*?)\s*(?P<episode>Episodio \d+)[^"]+"[^>]*>\s*<img[^src]+src="(?P<thumb>[^"]+)"'
+        #patron = r'<div class="post-thumbnail">\s*<a href="(?P<url>[^"]+)" title="(?P<title>.*?)\s*(?P<episode>Episodio \d+)[^"]+"[^>]*>\s*<img[^src]+src="(?P<thumb>[^"]+)"'
+        patron = r'<div class="post-thumbnail">\s*<a href="(?P<url>[^"]+)" title="(?P<title>.*?)\s*Episodio (?P<episode>\d+) (?P<lang>[a-zA-Z-\s]+)[^"]*"> <img[^src]+src="(?P<thumb>[^"]+)"'
         patronNext = r'<link rel="next" href="([^"]+)"\s*/>'
         action = 'findvideos'
     elif item.args == 'alt':
@@ -83,7 +84,8 @@ def peliculas(item):
         pagination = ''
         patronBlock = r'<ul class="lcp_catlist"[^>]+>(?P<block>.*?)</ul>'
         patron = r'<a href="(?P<url>[^"]+)"[^>]+>(?P<title>.*?)(?: [Oo][Aa][Vv])?(?:\s*(?P<lang>[Ss][Uu][Bb].[Ii][Tt][Aa])[^<]+)?</a>'
-        action = 'episodios'    
+        action = 'episodios'
+    debug = True
     return locals()
 
 
