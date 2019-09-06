@@ -32,7 +32,7 @@ def mainlist(item):
     support.menu(itemlist, 'ITA submenu bold', 'build_menu', host + '/filter?', args=["anime", 'language[]=1'])
     support.menu(itemlist, 'Sub-ITA submenu bold', 'build_menu', host + '/filter?', args=["anime", 'language[]=0'])
     support.menu(itemlist, 'Archivio A-Z submenu', 'alfabetico', host+'/az-list', args=["tvshow","a-z"])
-    support.menu(itemlist, 'In corso submenu', 'video', host+'/', args=["in sala"])
+    support.menu(itemlist, 'In corso submenu', 'video', host+'/ongoing', args=["in sala"])
     support.menu(itemlist, 'Generi submenu', 'generi', host+'/')
     support.menu(itemlist, 'Ultimi Aggiunti bold', 'video', host+'/newest', args=["anime"])
     support.menu(itemlist, 'Ultimi Episodi bold', 'video', host+'/updated', args=["novita'"])
@@ -196,8 +196,8 @@ def video(item):
         ep = ''
         ep = scrapertoolsV2.find_single_match(scrapedinfo, '<div class="ep">(.*?)<')
         if  ep != '':
-            ep = ' - ' + ep
-
+            ep = ' - ' + ep.strip()
+        number = scrapertoolsV2.find_single_match(ep, '(\d+)') if ep else ''
         ova = ''
         ova = scrapertoolsV2.find_single_match(scrapedinfo, '<div class="ova">(.*?)<')
         if  ova != '':
@@ -246,7 +246,7 @@ def video(item):
                      show=title,
                      thumbnail=scrapedthumb,
                      context = autoplay.context,
-                     number= '1'))
+                     number= number))
     
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
     autorenumber.renumber(itemlist)
@@ -264,19 +264,24 @@ def episodios(item):
     matches = support.match(item, patron, patron_block)[0]
 
     for scrapedurl, scrapedtitle in matches:
-        itemlist.append(
-            Item(
-                channel=item.channel,
-                action="findvideos",
-                contentType="episode",
-                title='[B] Episodio ' + scrapedtitle + '[/B]',
-                url=urlparse.urljoin(host, scrapedurl),
-                fulltitle=scrapedtitle,
-                show=scrapedtitle,
-                plot=item.plot,
-                fanart=item.thumbnail,
-                thumbnail=item.thumbnail,
-                number=scrapedtitle))
+        if scrapedtitle == item.number:
+            log('OK')
+            item.url = urlparse.urljoin(host, scrapedurl)
+            return findvideos(item)
+        else:
+            itemlist.append(
+                Item(
+                    channel=item.channel,
+                    action="findvideos",
+                    contentType="episode",
+                    title='[B] Episodio ' + scrapedtitle + '[/B]',
+                    url=urlparse.urljoin(host, scrapedurl),
+                    fulltitle=scrapedtitle,
+                    show=scrapedtitle,
+                    plot=item.plot,
+                    fanart=item.thumbnail,
+                    thumbnail=item.thumbnail,
+                    number=scrapedtitle))
     
     autorenumber.renumber(itemlist, item, 'bold')
     support.videolibrary(itemlist, item)
