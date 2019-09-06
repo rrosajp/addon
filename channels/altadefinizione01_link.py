@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# -*- Channel Altadefinizione01L Film - Serie -*-
+# -*- Channel Altadefinizione01L Film -*-
 # -*- By Greko -*-
 
 from core import support
@@ -38,9 +38,9 @@ def peliculas(item):
 ##    support.dbg()
     support.log('peliculas',item)
     patron = r'class="innerImage">.*?href="(?P<url>[^"]+)".*?src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> (?P<year>\d{4})[^>]+>[^>]+> (?P<duration>\d+)[^>]+>[^>]+> (?P<quality>[a-zA-Z\\]+)[^>]+>[^>]+> (?P<lang>.*?) [^>]+>'
-    patronNext =  '<span>\d</span> <a href="([^"]+)">'
+    patronNext =  r'<span>\d</span> <a href="([^"]+)">'
 ##    debug = True
-    return locals()   
+    return locals()
 
 # =========== def pagina categorie ======================================
 @support.scrape
@@ -58,13 +58,13 @@ def genres(item):
         patronBlock = r'FILM RANDOM.*?class="listSubCat">(?P<block>.*)</ul>'
         action = 'findvideos'
     patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
-        
-    return locals()    
+
+    return locals()
 
 # =========== def per cercare film/serietv =============
 #host+/index.php?do=search&story=avatar&subaction=search
 def search(item, text):
-    support.log()
+    support.log('search', item)
     itemlist = []
     text = text.replace(" ", "+")
     item.url = host+"/index.php?do=search&story=%s&subaction=search" % (text)
@@ -80,7 +80,7 @@ def search(item, text):
 # =========== def per le novità nel menu principale =============
 
 def newest(categoria):
-    support.log(categoria)
+    support.log('newest', categoria)
     itemlist = []
     item = Item()
     try:

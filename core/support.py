@@ -153,13 +153,16 @@ def scrape2(item, patron = '', listGroups = [], headers="", blacklist="", data="
 def scrapeLang(scraped, lang, longtitle):
     ##    Aggiunto/modificato per gestire i siti che hanno i video
     ##    in ita e subita delle serie tv nella stessa pagina
+    # altrimenti dopo un sub-ita mette tutti quelli a seguire in sub-ita
+    # e credo sia utile per filtertools
+    lang = 'ITA' 
     if scraped['lang']:
         if 'sub' in scraped['lang'].lower():
             lang = 'Sub-ITA'
         elif 'ita' in scraped['lang'].lower():
             lang = 'ITA'
-    if lang != '':
-        longtitle += typo(lang, '_ [] color kod')
+
+    longtitle += typo(lang, '_ [] color kod')
 
     return lang, longtitle
 
