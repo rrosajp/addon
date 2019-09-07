@@ -219,7 +219,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             lang = ''
 
         # if title is set, probably this is a list of episodes or video sources
-        # necessaria l'aggiunta di == scraped["title"] altrimenti non prende lo scraped dopo le categorie
+        # necessaria l'aggiunta di == scraped["title"] altrimenti non prende i gruppi dopo le categorie
         if item.infoLabels["title"] == scraped["title"]:
             infolabels = item.infoLabels
         else:
