@@ -211,7 +211,13 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         longtitle = title + (s if title and title2 else '') + title2
         longtitle = typo(longtitle, 'bold')
         longtitle += (typo(Type,'_ () bold') if Type else '') +  (typo(quality, '_ [] color kod') if quality else '')
-        lang, longtitle = scrapeLang(scraped, lang, longtitle)
+        
+        # per togliere la voce [ITA] da liste che non siano titoli (es.: genere)
+        if action != 'peliculas':
+            lang, longtitle = scrapeLang(scraped, lang, longtitle)
+        else:
+            longtitle = longtitle.replace('[ITA]','')
+            lang = ''
 
         # if title is set, probably this is a list of episodes or video sources
         if item.infoLabels["title"]:
@@ -247,7 +253,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 if str(scraped['type']).lower() in variants:
                     AC = name
                 else: AC = action
-
+                
+        
         if (scraped["title"] not in blacklist) and (search.lower() in longtitle.lower()):
             it = Item(
                 channel=item.channel,
@@ -263,7 +270,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 args=item.args,
                 contentSerieName= title if item.contentType != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
                 contentTitle= title if item.contentType == 'movie' else '',
-                contentLanguage=lang,
+                contentLanguage = lang,
                 ep=episode if episode else ''
             )
 
