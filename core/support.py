@@ -197,7 +197,6 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 val = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
             scraped[kk] = val
 
-
         episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
         title = cleantitle(scraped['title']) if scraped['title'] else ''
         title2 = cleantitle(scraped['title2']) if scraped['title2'] else ''
@@ -220,7 +219,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             lang = ''
 
         # if title is set, probably this is a list of episodes or video sources
-        if item.infoLabels["title"]:
+        # necessaria l'aggiunta di == scraped["title"] altrimenti non prende lo scraped dopo le categorie
+        if item.infoLabels["title"] == scraped["title"]:
             infolabels = item.infoLabels
         else:
             infolabels = {}
@@ -253,8 +253,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 if str(scraped['type']).lower() in variants:
                     AC = name
                 else: AC = action
-                
-        
+
         if (scraped["title"] not in blacklist) and (search.lower() in longtitle.lower()):
             it = Item(
                 channel=item.channel,
