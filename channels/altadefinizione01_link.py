@@ -49,15 +49,18 @@ def genres(item):
 
     action = 'peliculas'
     if item.args == 'genres':
-        patronBlock = r'<ul class="listSubCat" id="Film">(?P<block>.*)</ul>'
+        patronBlock = r'<ul class="listSubCat" id="Film">(?P<block>.*)<ul class="listSubCat" id="Anno">'
+        #pass
     elif item.args == 'years':
-        patronBlock = r'<ul class="listSubCat" id="Anno">(?P<block>.*)</ul>'
+        patronBlock = r'<ul class="listSubCat" id="Anno">(?P<block>.*)<ul class="listSubCat" id="Qualita">'
     elif item.args == 'quality':
-        patronBlock = r'<ul class="listSubCat" id="Qualita">(?P<block>.*)</ul>'
-    elif item.args == 'lucky': # sono i titoli random nella pagina, cambiano 1 volta al dì
+        patronBlock = r'<ul class="listSubCat" id="Qualita">(?P<block>.*)<blockquote'
+    elif item.args == 'lucky': # sono i titoli random nella pagina
         patronBlock = r'FILM RANDOM.*?class="listSubCat">(?P<block>.*)</ul>'
         action = 'findvideos'
     patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
+
+    debug = True
 
     return locals()
 
@@ -91,7 +94,7 @@ def newest(categoria):
 
             if itemlist[-1].action == "peliculas":
                 itemlist.pop()
-    # Continua la ricerca in caso di errore 
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():

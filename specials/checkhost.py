@@ -219,6 +219,10 @@ def test_conn(is_exit, check_dns, view_msg,
             if view_msg == True:
                 ktest.view_Advise(config.get_localized_string(70722))
 
+    xbmc.log("############ Inizio Check DNS ############", level=xbmc.LOGNOTICE)
+    xbmc.log("IP: %s" %  (ktest.ip_addr), level=xbmc.LOGNOTICE)
+    xbmc.log("DNS: %s" %  (ktest.dns), level=xbmc.LOGNOTICE)
+    xbmc.log("############ Fine Check DNS ############", level=xbmc.LOGNOTICE)
     if ktest.check_Ip() and ktest.check_Adsl() and ktest.check_Dns():
         return True
     else:

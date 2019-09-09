@@ -2,12 +2,10 @@
 # ------------------------------------------------------------
 # Canale per altadefinizione01
 # ------------------------------------------------------------
-import xbmc
+
 from core import scrapertoolsV2, httptools, support
 from core.item import Item
 from platformcode import config, logger
-
-__channel__ = "altadefinizione01"
 
 #impostati dinamicamente da findhost()
 host = ""
@@ -17,10 +15,7 @@ def findhost():
     global host, headers
     data = httptools.downloadpage('https://altadefinizione01-nuovo.link/').data
     host = scrapertoolsV2.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
-    xbmc.log("host vale: %s" % host, level=xbmc.LOGNOTICE)
     headers = [['Referer', host]]
-    
-#host = config.get_channel_url(__channel__)
 
 #headers = [['User-Agent', 'Mozilla/50.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0'],
 #           ['Referer', host]]
@@ -46,9 +41,9 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     support.log('peliculas',item)
-    
+
     action="findvideos"
-   
+
     if item.args == "search":
         patronBlock = r'</script> <div class="boxgrid caption">(?P<block>.*)<div id="right_bar">'
     elif item.args == 'update':
@@ -64,9 +59,9 @@ def peliculas(item):
          '.+?[^>]+>[^>]+<div class="trdublaj"> (?P<quality>[A-Z/]+)<[^>]+>(?:.[^>]+>(?P<lang>.*?)<[^>]+>).*?'\
          '<p class="h4">(?P<title>.*?)</p>[^>]+> [^>]+> [^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> [^>]+> '\
          '[^>]+>[^>]+>(?P<year>\d{4})[^>]+>[^>]+> [^>]+>[^>]+>(?P<duration>\d+).+?>.*?<p>(?P<plot>[^<]+)<'
-    
+
     patronNext =  '<span>\d</span> <a href="([^"]+)">'
-    debug = True
+    #debug = True
     return locals()
 
 @support.scrape
@@ -75,7 +70,7 @@ def categorie(item):
     findhost()
     if item.args != 'orderalf': action = "peliculas"
     else: action = 'orderalf'
-    
+
     blacklist = ['Altadefinizione01']
     if item.args == 'genres':
         patronBlock = r'<ul class="kategori_list">(?P<block>.*?)<div class="tab-pane fade" id="wtab2">'
@@ -108,7 +103,8 @@ def findvideos(item):
     return support.server(item, headers=headers)
 
 def search(item, text):
-    logger.info("%s mainlist search log: %s %s" % (__channel__, item, text))
+    support.log(item, text)
+    findhost()
     itemlist = []
     text = text.replace(" ", "+")
     item.url = host + "/index.php?do=search&story=%s&subaction=search" % (text)
@@ -119,7 +115,7 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("search except %s: %s" % (__channel__, line))
+            logger.error("search except: %s" % line)
         return []
 
 def newest(categoria):
@@ -131,7 +127,6 @@ def newest(categoria):
             item.url = host
             item.action = "peliculas"
             itemlist = peliculas(item)
-
             if itemlist[-1].action == "peliculas":
                 itemlist.pop()
     # Continua la ricerca in caso di errore
