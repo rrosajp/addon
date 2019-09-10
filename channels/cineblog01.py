@@ -112,7 +112,7 @@ def peliculas(item):
 
 @support.scrape
 def episodios(item):
-    patronBlock = r'(?P<block><div class="sp-head[a-z ]*?" title="Espandi">\s*STAGIONE [0-9]+ - (?P<lang>[^\s]+)(?: - (?P<quality>[^-<]+))?.*?[^<>]*?</div>.*?)<div class="spdiv">\[riduci\]</div>'
+    patronBlock = r'(?P<block><div class="sp-head[a-z ]*?" title="Espandi">\s*STAGIONE [0-9]+ - (?P<lang>[^-<]+)(?:- (?P<quality>[^-<]+))?.*?[^<>]*?</div>.*?)<div class="spdiv">\[riduci\]</div>'
     patron = '(?:<p>)(?P<episode>[0-9]+(?:&#215;|×)[0-9]+)(?P<url>.*?)(?:</p>|<br)'
 
     return locals()
