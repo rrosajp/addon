@@ -222,17 +222,17 @@ def save_movie(item):
     p_dialog.close()
     return 0, 0, -1
 
-def filter_list(episodelist, action, path=None):
+def filter_list(episodelist, action=None, path=None):
     lang_sel = quality_sel = ''
-
-    tvshow_path = filetools.join(path, "tvshow.nfo")
-    head_nfo, tvshow_item = read_nfo(tvshow_path)
-    if action == 'get_seasons':
-        if tvshow_item:
-            if "favourite_language" in tvshow_item:
-                lang_sel = tvshow_item.favourite_language
-            if "favourite_quality" in tvshow_item:
-                quality_sel = tvshow_item.favourite_quality
+    if action:
+        tvshow_path = filetools.join(path, "tvshow.nfo")
+        head_nfo, tvshow_item = read_nfo(tvshow_path)
+        if action == 'get_seasons':
+            if tvshow_item:
+                if "favourite_language" in tvshow_item:
+                    lang_sel = tvshow_item.favourite_language
+                if "favourite_quality" in tvshow_item:
+                    quality_sel = tvshow_item.favourite_quality
 
     # SELECT EISODE BY LANG AND QUALITY
     quality_dict = {"BLURAY": ["br", "bluray"],
@@ -260,7 +260,7 @@ def filter_list(episodelist, action, path=None):
         it = []
         for episode in episodelist:
             if episode.contentLanguage == lang_list[selection]:
-                tvshow_item.favourite_language = lang_list[selection]
+                if action: tvshow_item.favourite_language = lang_list[selection]
                 it.append(episode)
         episodelist = it
 
@@ -284,12 +284,12 @@ def filter_list(episodelist, action, path=None):
         it = []
         for episode in episodelist:
             if episode.title in ep_list:
-                tvshow_item.favourite_quality = quality_list[favourite_quality_selection]
+                if action: tvshow_item.favourite_quality = quality_list[favourite_quality_selection]
                 it.append(episode)
         episodelist = it
 
     # logger.info('ITEM NFO= ' + str(tvshow_item))
-    filetools.write(tvshow_path, head_nfo + tvshow_item.tojson())
+    if action: filetools.write(tvshow_path, head_nfo + tvshow_item.tojson())
     return episodelist
 
 def save_tvshow(item, episodelist):

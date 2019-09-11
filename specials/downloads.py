@@ -271,7 +271,7 @@ def move_to_libray(item):
         FOLDER = FOLDER_MOVIES
         path_title = "%s [%s]" % (item.contentTitle.strip(), item.infoLabels['IMDBNumber'])
         move_path = filetools.join(config.get_videolibrary_path(), FOLDER, path_title)
-        
+
     else:
         FOLDER = FOLDER_TVSHOWS
         path_title = "%s [%s]" % (item.contentSerieName, item.infoLabels['IMDBNumber'])
@@ -280,7 +280,7 @@ def move_to_libray(item):
     download_path = filetools.join(config.get_setting("downloadpath"), item.downloadFilename)
     library_path = filetools.join(move_path, *filetools.split(item.downloadFilename))
     final_path = download_path
-    
+
     if config.get_setting("library_add", "downloads") == True and config.get_setting("library_move", "downloads") == True:
         if not filetools.isdir(filetools.dirname(library_path)):
             filetools.mkdir(filetools.dirname(library_path))
@@ -294,12 +294,12 @@ def move_to_libray(item):
 
             if len(filetools.listdir(filetools.dirname(download_path))) == 0:
                 filetools.rmdir(filetools.dirname(download_path))
-        
-        
+
+
         logger.info('ITEM = ' + str(item))
         name = item.contentTitle if item.contentType == 'movie' else str(item.infoLabels['season']) + 'x' + str(item.infoLabels['episode']).zfill(2)
         list_item = os.listdir(filetools.join(config.get_videolibrary_path(), FOLDER, path_title))
-                
+
         clean = False
         for File in list_item:
             filename = File.lower()
@@ -309,18 +309,13 @@ def move_to_libray(item):
                 logger.info('Delete File: ' + str(os.path.join(config.get_videolibrary_path(), FOLDER, path_title, File)))
                 os.remove(os.path.join(config.get_videolibrary_path(), FOLDER, path_title, File))
         from platformcode import xbmc_videolibrary
-        
+
         xbmc_videolibrary.update(FOLDER)
         if clean == True:
             import xbmc
             while xbmc.getCondVisibility('Library.IsScanningVideo()'):
                 xbmc.sleep(500)
             xbmc_videolibrary.clean()
-        
-        
-                    
-            
-        
 
     if config.get_setting("library_add", "downloads") == True and config.get_setting("library_move", "downloads") == False:
         if filetools.isfile(final_path):
@@ -335,7 +330,7 @@ def move_to_libray(item):
                 tvshow = Item(channel="downloads", contentType="tvshow",
                               infoLabels={"tmdb_id": item.infoLabels["tmdb_id"]})
                 videolibrarytools.save_tvshow(tvshow, [library_item])
-            
+
 
 def update_json(path, params):
     item = Item().fromjson(filetools.read(path))
@@ -385,14 +380,14 @@ def get_match_list(data, match_list, order_list=None, only_ascii=False, ignoreca
      { "ID1" : ["Cadena 1", "Cadena 2", "Cadena 3"],
        "ID2" : ["Cadena 4", "Cadena 5", "Cadena 6"]
      }
-     
+
      El diccionario no pude contener una misma cadena de busqueda en varías IDs.
-     
+
      La busqueda se realiza por orden de tamaño de cadena de busqueda (de mas larga a mas corta) si una cadena coincide,
      se elimina de la cadena a buscar para las siguientes, para que no se detecten dos categorias si una cadena es parte de otra:
-     por ejemplo: "Idioma Español" y "Español" si la primera aparece en la cadena "Pablo sabe hablar el Idioma Español" 
+     por ejemplo: "Idioma Español" y "Español" si la primera aparece en la cadena "Pablo sabe hablar el Idioma Español"
      coincidira con "Idioma Español" pero no con "Español" ya que la coincidencia mas larga tiene prioridad.
-     
+
     """
     match_dict = dict()
     matches = []
@@ -442,7 +437,7 @@ def get_match_list(data, match_list, order_list=None, only_ascii=False, ignoreca
 
 def sort_method(item):
     """
-    Puntua cada item en funcion de varios parametros:     
+    Puntua cada item en funcion de varios parametros:
     @type item: item
     @param item: elemento que se va a valorar.
     @return:  puntuacion otenida
@@ -509,7 +504,7 @@ def download_from_url(url, item):
     d.start_dialog(config.get_localized_string(60332))
 
     # Descarga detenida. Obtenemos el estado:
-    # Se ha producido un error en la descarga   
+    # Se ha producido un error en la descarga
     if d.state == d.states.error:
         logger.info("Error trying to download %s" % (url))
         status = STATUS_CODES.error
@@ -715,9 +710,9 @@ def get_episodes(item):
     if 'dlseason' in item:
         season = True
         season_number = item.dlseason
-    else: 
+    else:
         season = False
-        
+
             # El item que pretendemos descargar YA es un episodio
     if item.contentType == "episode":
         episodes = [item.clone()]
@@ -778,28 +773,10 @@ def get_episodes(item):
         # Cualquier otro resultado no nos vale, lo ignoramos
         else:
             logger.info("Omitting invalid item: %s" % episode.tostring())
-    
+
     # if Multiple Languages or Qualities
-    list_lang = []
-    list_quality = []
-    for item in itemlist:
-        if not item.language: item.language = item.contentLanguage
-        if item.language not in list_lang: list_lang.append(item.language)
-        if item.infoLabels['quality'] not in list_quality: list_quality.append(item.infoLabels['quality'])
-    if len(list_lang) > 1:        
-        selection = platformtools.dialog_select(config.get_localized_string(70725),list_lang)
-        it = []
-        for item in itemlist:
-            if not item.language: item.language = item.contentLanguage
-            if item.language == list_lang[selection]:
-                it.append(item)            
-        itemlist = it
-    if len(list_quality) > 1:
-        selection = platformtools.dialog_select(config.get_localized_string(70726),list_quality)
-        it = []
-        for item in itemlist:
-            if item.infoLabels['quality'] == list_quality[selection]: it.append(item)
-        itemlist = it
+    itemlist = videolibrarytools.filter_list(itemlist)
+
 
     return itemlist
 
@@ -910,7 +887,7 @@ def save_download_tvshow(item):
     item.show = item.fulltitle
     scraper.find_and_set_infoLabels(item)
     item.contentSerieName = item.fulltitle
-    
+
     item.downloadFilename = filetools.validate_path("%s [%s]" % (item.contentSerieName, item.infoLabels['IMDBNumber']))
     if config.get_setting("lowerize_title", "videolibrary") == 0:
         item.downloadFilename = item.downloadFilename.lower()
