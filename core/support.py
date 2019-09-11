@@ -166,7 +166,7 @@ def scrapeLang(scraped, lang, longtitle):
     if not language: language = lang
     if language: longtitle += typo(language, '_ [] color kod')
 
-    return lang, longtitle
+    return language, longtitle
 
 def cleantitle(title):
     cleantitle = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(title).replace('"', "'").replace('×', 'x').replace('–', '-')).strip()
@@ -213,13 +213,6 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         longtitle = title + (s if title and title2 else '') + title2
         longtitle = typo(longtitle, 'bold')
         longtitle += (typo(Type,'_ () bold') if Type else '') +  (typo(quality, '_ [] color kod') if quality else '')
-
-        # # per togliere la voce [ITA] da liste che non siano titoli (es.: genere)
-        # if action != 'peliculas':
-        #     lang, longtitle = scrapeLang(scraped, lang, longtitle)
-        # else:
-        #     longtitle = longtitle.replace('[ITA]','')
-        #     lang = ''
 
         lang, longtitle = scrapeLang(scraped, lang, longtitle)
 
