@@ -222,6 +222,75 @@ def save_movie(item):
     p_dialog.close()
     return 0, 0, -1
 
+def filter_list(episodelist, action, path=None):
+    lang_sel = quality_sel = ''
+
+    tvshow_path = filetools.join(path, "tvshow.nfo")
+    head_nfo, tvshow_item = read_nfo(tvshow_path)
+    if action == 'get_seasons':
+        if tvshow_item:
+            if "favourite_language" in tvshow_item:
+                lang_sel = tvshow_item.favourite_language
+            if "favourite_quality" in tvshow_item:
+                quality_sel = tvshow_item.favourite_quality
+
+    # SELECT EISODE BY LANG AND QUALITY
+    quality_dict = {"BLURAY": ["br", "bluray"],
+                    "FULLHD": ["fullhd", "fullhd 1080", "fullhd 1080p", "full hd", "full hd 1080", "full hd 1080p", "hd1080", "hd1080p", "hd 1080", "hd 1080p", "1080", "1080p"],
+                    "HD": ["hd", "hd720", "hd720p", "hd 720", "hd 720p", "720", "720p", "hdtv"],
+                    "480P": ["sd", "480p", '480'],
+                    "360P": ["360p", "360"],
+                    "240P": ["240p", "240"]}
+    ep_list = []
+    lang_list = []
+    quality_list = []
+
+    # Make lang_list and Quality_list
+    for episode in episodelist:
+        if episode.contentLanguage and episode.contentLanguage not in lang_list: lang_list.append(episode.contentLanguage)
+        for name, var in quality_dict.items():
+            if not episode.quality and 'N/A' not in quality_list:
+                quality_list.append('N/A')
+            if episode.quality.lower() in var and name not in quality_list:
+                quality_list.append(name)
+
+    # if more than one language
+    if len(lang_list) > 1:
+        selection = lang_list.index(lang_sel) if lang_sel else platformtools.dialog_select(config.get_localized_string(70725),lang_list)
+        it = []
+        for episode in episodelist:
+            if episode.contentLanguage == lang_list[selection]:
+                tvshow_item.favourite_language = lang_list[selection]
+                it.append(episode)
+        episodelist = it
+
+    # if more than one quality
+    if len(quality_list) > 1:
+        selection = favourite_quality_selection =  quality_list.index(quality_sel) if quality_sel else platformtools.dialog_select(config.get_localized_string(70726),quality_list)
+        stop = False
+        while not stop:
+            for episode in episodelist:
+                title = scrapertools.find_single_match(episode.title, '(\d+x\d+)')
+                if not any(title in word for word in ep_list) and episode.quality.lower() in quality_dict[quality_list[selection]]:
+                    ep_list.append(episode.title)
+            if selection != 0: selection = selection - 1
+            else: stop = True
+            if quality_list[selection] == 'N/A':
+                for episode in episodelist:
+                    title = scrapertools.find_single_match(episode.title, '(\d+x\d+)')
+                    if not any(title in word for word in ep_list) and not episode.quality.lower():
+                        ep_list.append(episode.title)
+
+        it = []
+        for episode in episodelist:
+            if episode.title in ep_list:
+                tvshow_item.favourite_quality = quality_list[favourite_quality_selection]
+                it.append(episode)
+        episodelist = it
+
+    # logger.info('ITEM NFO= ' + str(tvshow_item))
+    filetools.write(tvshow_path, head_nfo + tvshow_item.tojson())
+    return episodelist
 
 def save_tvshow(item, episodelist):
     """
@@ -314,72 +383,19 @@ def save_tvshow(item, episodelist):
 
     # FILTERTOOLS
     # si el canal tiene filtro de idiomas, añadimos el canal y el show
-    # if episodelist and "list_language" in episodelist[0]:
-    #     # si ya hemos añadido un canal previamente con filtro, añadimos o actualizamos el canal y show
-    #     if "library_filter_show" in item_tvshow:
-    #         if item.title_from_channel:
-    #             item_tvshow.library_filter_show[item.channel] = item.title_from_channel
-    #         else:
-    #             item_tvshow.library_filter_show[item.channel] = item.show
-    #     # no habia ningún canal con filtro y lo generamos por primera vez
-    #     else:
-    #         if item.title_from_channel:
-    #             item_tvshow.library_filter_show = {item.channel: item.title_from_channel}
-    #         else:
-    #             item_tvshow.library_filter_show = {item.channel: item.show}
-
-
-    # SELECT EISODE BY LANG AND QUALITY
-    quality_dict = {"BLURAY": ["br", "bluray"],
-                    "FULLHD": ["fullhd", "fullhd 1080", "fullhd 1080p", "full hd", "full hd 1080", "full hd 1080p", "hd1080", "hd1080p", "hd 1080", "hd 1080p", "1080", "1080p"],
-                    "HD": ["hd", "hd720", "hd720p", "hd 720", "hd 720p", "720", "720p", "hdtv"],
-                    "480P": ["sd", "480p", '480'],
-                    "360P": ["360p", "360"],
-                    "240P": ["240p", "240"]}
-    ep_list = []
-    lang_list = []
-    quality_list = []
-
-    # Make lang_list and Quality_list
-    for episode in episodelist:
-        if episode.contentLanguage and episode.contentLanguage not in lang_list: lang_list.append(episode.contentLanguage)
-        for name, var in quality_dict.items():
-            if not episode.quality and 'N/A' not in quality_list:
-                quality_list.append('N/A')
-            if episode.quality.lower() in var and name not in quality_list:
-                quality_list.append(name)
-
-    # if more than one language
-    if len(lang_list) > 1:
-        selection = platformtools.dialog_select(config.get_localized_string(70725),lang_list)
-        it = []
-        for episode in episodelist:
-            if episode.contentLanguage == lang_list[selection]:
-                it.append(episode)
-        episodelist = it
-
-    # if more than one quality
-    if len(quality_list) > 1:
-        selection = platformtools.dialog_select(config.get_localized_string(70726),quality_list)
-        stop = False
-        while not stop:
-            for episode in episodelist:
-                title = scrapertools.find_single_match(episode.title, '(\d+x\d+)')
-                if not any(title in word for word in ep_list) and episode.quality.lower() in quality_dict[quality_list[selection]]:
-                    ep_list.append(episode.title)
-            if selection != 0: selection = selection - 1
-            else: stop = True
-            if quality_list[selection] == 'N/A':
-                for episode in episodelist:
-                    title = scrapertools.find_single_match(episode.title, '(\d+x\d+)')
-                    if not any(title in word for word in ep_list) and not episode.quality.lower():
-                        ep_list.append(episode.title)
-
-        it = []
-        for episode in episodelist:
-            if episode.title in ep_list:
-                it.append(episode)
-        episodelist = it
+    if episodelist and "list_language" in episodelist[0]:
+        # si ya hemos añadido un canal previamente con filtro, añadimos o actualizamos el canal y show
+        if "library_filter_show" in item_tvshow:
+            if item.title_from_channel:
+                item_tvshow.library_filter_show[item.channel] = item.title_from_channel
+            else:
+                item_tvshow.library_filter_show[item.channel] = item.show
+        # no habia ningún canal con filtro y lo generamos por primera vez
+        else:
+            if item.title_from_channel:
+                item_tvshow.library_filter_show = {item.channel: item.title_from_channel}
+            else:
+                item_tvshow.library_filter_show = {item.channel: item.show}
 
     if item.channel != "downloads":
         item_tvshow.active = 1  # para que se actualice a diario cuando se llame a videolibrary_service
@@ -421,8 +437,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     @rtype fallidos: int
     @return:  el número de episodios fallidos
     """
-    logger.info()
-
+    episodelist = filter_list(episodelist, serie.action, path)
     # No hay lista de episodios, no hay nada que guardar
     if not len(episodelist):
         logger.info("No hay lista de episodios, salimos sin crear strm")
