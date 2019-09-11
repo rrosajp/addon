@@ -407,7 +407,7 @@ def scrape(func):
         if 'fullItemlistHook' in args:
             itemlist = args['fullItemlistHook'](itemlist)
 
-        itemlist = filterLang(item, itemlist)
+        # itemlist = filterLang(item, itemlist)   # causa problemi a newest
 
         return itemlist
 
