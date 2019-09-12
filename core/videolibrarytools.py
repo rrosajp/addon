@@ -227,25 +227,37 @@ def filter_list(episodelist, action=None, path=None):
     if action:
         tvshow_path = filetools.join(path, "tvshow.nfo")
         head_nfo, tvshow_item = read_nfo(tvshow_path)
+        channel = episodelist[0].channel
+        if not tvshow_item.channel_prefs:
+            tvshow_item.channel_prefs={channel:{}}
+        if channel not in tvshow_item.channel_prefs:
+            tvshow_item.channel_prefs[channel] = {}
+        channel_prefs = tvshow_item.channel_prefs[channel]
+
         if action == 'get_seasons':
-            if tvshow_item:
-                if "favourite_language" in tvshow_item:
-                    lang_sel = tvshow_item.favourite_language
-                if "favourite_quality" in tvshow_item:
-                    quality_sel = tvshow_item.favourite_quality
+            if channel_prefs:
+                if channel_prefs['favourite_language']:
+                    lang_sel = channel_prefs['favourite_language']
+                if channel_prefs['favourite_quality']:
+                    quality_sel = channel_prefs['favourite_quality']
 
     # SELECT EISODE BY LANG AND QUALITY
-    quality_dict = {"BLURAY": ["br", "bluray"],
+    quality_dict = {"N/A": ["n/a"],
+                    "BLURAY": ["br", "bluray"],
                     "FULLHD": ["fullhd", "fullhd 1080", "fullhd 1080p", "full hd", "full hd 1080", "full hd 1080p", "hd1080", "hd1080p", "hd 1080", "hd 1080p", "1080", "1080p"],
                     "HD": ["hd", "hd720", "hd720p", "hd 720", "hd 720p", "720", "720p", "hdtv"],
                     "480P": ["sd", "480p", '480'],
                     "360P": ["360p", "360"],
-                    "240P": ["240p", "240"]}
+                    "240P": ["240p", "240"],
+                    config.get_localized_string(70241):["MAX"]}
+    quality_order = ["N/A", "240P", "360P","480P", "HD", "FULLHD", "BLURAY", config.get_localized_string(70241)]
+
     ep_list = []
     lang_list = []
-    quality_list = []
+    quality_list = [config.get_localized_string(70241)]
 
     # Make lang_list and Quality_list
+
     for episode in episodelist:
         if episode.contentLanguage and episode.contentLanguage not in lang_list: lang_list.append(episode.contentLanguage)
         for name, var in quality_dict.items():
@@ -253,6 +265,7 @@ def filter_list(episodelist, action=None, path=None):
                 quality_list.append('N/A')
             if episode.quality.lower() in var and name not in quality_list:
                 quality_list.append(name)
+    quality_list = sorted(quality_list, key=lambda x:quality_order.index(x))
 
     # if more than one language
     if len(lang_list) > 1:
@@ -260,12 +273,12 @@ def filter_list(episodelist, action=None, path=None):
         it = []
         for episode in episodelist:
             if episode.contentLanguage == lang_list[selection]:
-                if action: tvshow_item.favourite_language = lang_list[selection]
+                if action: lang_sel = channel_prefs['favourite_language'] = lang_list[selection]
                 it.append(episode)
         episodelist = it
 
     # if more than one quality
-    if len(quality_list) > 1:
+    if len(quality_list) > 2:
         selection = favourite_quality_selection =  quality_list.index(quality_sel) if quality_sel else platformtools.dialog_select(config.get_localized_string(70726),quality_list)
         stop = False
         while not stop:
@@ -278,18 +291,18 @@ def filter_list(episodelist, action=None, path=None):
             if quality_list[selection] == 'N/A':
                 for episode in episodelist:
                     title = scrapertools.find_single_match(episode.title, '(\d+x\d+)')
-                    if not any(title in word for word in ep_list) and not episode.quality.lower():
+                    if not any(title in word for word in ep_list):
                         ep_list.append(episode.title)
 
         it = []
         for episode in episodelist:
             if episode.title in ep_list:
-                if action: tvshow_item.favourite_quality = quality_list[favourite_quality_selection]
+                if action: channel_prefs['favourite_quality'] = quality_list[favourite_quality_selection]
                 it.append(episode)
         episodelist = it
 
-    # logger.info('ITEM NFO= ' + str(tvshow_item))
     if action: filetools.write(tvshow_path, head_nfo + tvshow_item.tojson())
+
     return episodelist
 
 def save_tvshow(item, episodelist):
