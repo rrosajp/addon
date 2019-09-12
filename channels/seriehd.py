@@ -28,7 +28,6 @@ list_quality = ['1080p', '720p', '480p', '360']
 checklinks = support.config.get_setting('checklinks', __channel__)
 checklinks_number = support.config.get_setting('checklinks_number', __channel__)
 
-headers = [['Referer', host]]
 
 @support.menu
 def mainlist(item):

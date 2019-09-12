@@ -65,7 +65,7 @@ def newest(categoria):
         if categoria == "series":
             item.url = host
             # item.action = "serietv"
-            itemlist = pelicuals_tv(item)
+            itemlist = peliculas(item)
 
             if itemlist[-1].action == "serietv":
                 itemlist.pop()
@@ -80,7 +80,7 @@ def newest(categoria):
     return itemlist
 
 
-def pelicuals_tv(item):
+def peliculas(item):
     log()
     itemlist = []
 

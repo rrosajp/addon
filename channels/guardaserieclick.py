@@ -50,7 +50,7 @@ def mainlist(item):
     return itemlist
 
 @support.scrape
-def serietv(item):
+def peliculas(item):
 ##    import web_pdb; web_pdb.set_trace()
     log('serietv ->\n')
 ##<<<<<<< HEAD
@@ -177,10 +177,10 @@ def newest(categoria):
     try:
         if categoria == "series":
             item.url = "%s/lista-serie-tv" % host
-            item.action = "serietv"
-            itemlist = serietv(item)
+            item.action = "peliculas"
+            itemlist = peliculas(item)
 
-            if itemlist[-1].action == "serietv":
+            if itemlist[-1].action == "peliculas":
                 itemlist.pop()
 
     # Continua la ricerca in caso di errore 
