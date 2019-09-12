@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
 # Canale per Guardaserie.click
-# Thanks to Icarus crew & Alfa addon & 4l3x87
 # ------------------------------------------------------------
 
 """
@@ -19,35 +18,24 @@ __channel__ = 'guardaserieclick'
 host = config.get_channel_url(__channel__)
 headers = [['Referer', host]]
 
-IDIOMAS = {'Italiano': 'IT'}
-list_language = IDIOMAS.values()
 list_servers = ['speedvideo', 'openload']
 list_quality = ['default']
 
-headers = [['Referer', host]]
-
 
 # ----------------------------------------------------------------------------------------------------------------
+@support.menu
 def mainlist(item):
-    log()
+    tvshow = ["/lista-serie-tv",
+              ('Ultimi Aggiornamenti', ["/lista-serie-tv", 'peliculas', 'update']),
+                ('Categorie', ['categorie', 'categorie']),
+                ('Serie inedite Sub-ITA', ["/lista-serie-tv", 'peliculas', 'inedite']),
+                ('Da non perdere', ["/lista-serie-tv", 'peliculas', ['tv', 'da non perdere']]),
+                ('Classiche', ["/lista-serie-tv", 'peliculas', ['tv', 'classiche']]),
+                ('Anime', ["/category/animazione/", 'tvserie', 'tvshow','anime'])
+    ]
 
-    itemlist = []
+    return locals()
 
-    support.menu(itemlist, 'Serie', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args=['news'])
-    support.menu(itemlist, 'Ultimi Aggiornamenti submenu', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args= ['update'])
-    support.menu(itemlist, 'Categorie', 'categorie', host, 'tvshow', args=['cat'])
-    support.menu(itemlist, 'Serie inedite Sub-ITA submenu', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args=['inedite'])
-    support.menu(itemlist, 'Da non perdere bold submenu', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args=['tv', 'da non perdere'])
-    support.menu(itemlist, 'Classiche bold submenu', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args=['tv', 'classiche'])
-    support.menu(itemlist, 'Disegni che si muovono sullo schermo per magia bold', 'tvserie', "%s/category/animazione/" % host, 'tvshow', args= ['anime'])
-
-
-    # autoplay
-    support.aplay(item, itemlist, list_servers, list_quality)
-    # configurazione del canale
-    support.channel_config(item, itemlist)
-
-    return itemlist
 
 @support.scrape
 def peliculas(item):
@@ -154,8 +142,6 @@ def findvideos(item):
 
 @support.scrape
 def categorie(item):
-    log
-
     action = 'tvserie'
     listGroups = ['url', 'title']
     patron = r'<li>\s<a\shref="([^"]+)"[^>]+>([^<]+)</a></li>'
