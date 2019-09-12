@@ -162,10 +162,15 @@ def scrapeLang(scraped, lang, longtitle):
             language = 'ITA'
         if 'sub' in scraped['lang'].lower():
             language = 'Sub-' + language
+    # se scraped['lang'] è None
+    # nei siti dove la lingua è opzionale per il sub-ita e manca l'ita
+    else:
+        lang = 'ITA'
 
     if not language: language = lang
-    if language: longtitle += typo(language, '_ [] color kod')
-
+    #if language: longtitle += typo(language, '_ [] color kod')
+    longtitle += typo(language, '_ [] color kod')
+    
     return language, longtitle
 
 def cleantitle(title):
@@ -245,11 +250,13 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             for name, variants in typeContentDict.items():
                 if str(scraped['type']).lower() in variants:
                     CT = name
+                    break
                 else: CT = item.contentType
         if typeActionDict:
             for name, variants in typeActionDict.items():
                 if str(scraped['type']).lower() in variants:
                     AC = name
+                    break
                 else: AC = action
 
         if (scraped["title"] not in blacklist) and (search.lower() in longtitle.lower()):
