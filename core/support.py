@@ -157,14 +157,28 @@ def scrapeLang(scraped, lang, longtitle):
     # e credo sia utile per filtertools
     language = ''
 
-    if scraped['lang']:
+##    if scraped['lang']:
+##        if 'ita' in scraped['lang'].lower():
+##            language = 'ITA'
+##        if 'sub' in scraped['lang'].lower():
+##            language = 'Sub-' + language
+##    # se scraped['lang'] è None
+##    # nei siti dove la lingua è opzionale per il sub-ita e manca l'ita
+##    else:
+##        lang = 'ITA'
+##      if not language: language = lang
+##      if language: longtitle += typo(language, '_ [] color kod')
+
+    if not scraped['lang']:
+        pass
+    else:
         if 'ita' in scraped['lang'].lower():
             language = 'ITA'
         if 'sub' in scraped['lang'].lower():
             language = 'Sub-' + language
 
-    if not language: language = lang
-    if language: longtitle += typo(language, '_ [] color kod')
+        if language != '':
+            longtitle += typo(language, '_ [] color kod')
 
     return language, longtitle
 
@@ -215,7 +229,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         longtitle += (typo(Type,'_ () bold') if Type else '') +  (typo(quality, '_ [] color kod') if quality else '')
 
         lang, longtitle = scrapeLang(scraped, lang, longtitle)
-
+        if lang == '': lang = 'ITA'
         # if title is set, probably this is a list of episodes or video sources
         # necessaria l'aggiunta di == scraped["title"] altrimenti non prende i gruppi dopo le categorie
         if item.infoLabels["title"] == scraped["title"]:
@@ -245,11 +259,13 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             for name, variants in typeContentDict.items():
                 if str(scraped['type']).lower() in variants:
                     CT = name
+                    break
                 else: CT = item.contentType
         if typeActionDict:
             for name, variants in typeActionDict.items():
                 if str(scraped['type']).lower() in variants:
                     AC = name
+                    break
                 else: AC = action
 
         if (scraped["title"] not in blacklist) and (search.lower() in longtitle.lower()):
