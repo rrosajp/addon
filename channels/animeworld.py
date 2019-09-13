@@ -9,8 +9,6 @@ __channel__ = "animeworld"
 host = support.config.get_channel_url(__channel__)
 headers = [['Referer', host]]
 
-IDIOMAS = {'Italiano': 'Italiano'}
-list_language = IDIOMAS.values()
 list_servers = ['animeworld', 'verystream', 'streamango', 'openload', 'directo']
 list_quality = ['default', '480p', '720p', '1080p']
 
@@ -130,6 +128,15 @@ def episodios(item):
         item.title += support.typo(item.fulltitle,'-- bold')
         return item
     action='findvideos'
+    def itemlistHook(itemlist):
+        if len(itemlist) == 0:
+            itemlist.append(
+                support.Item(
+                    channel=item.channel,
+                    title=support.typo('VVVVID NON SUPPORTATO','bold'),
+                    folder=False
+                    ))
+        return itemlist
     return locals()
 
 
@@ -146,23 +153,32 @@ def findvideos(item):
         ID = support.scrapertoolsV2.find_single_match(str(block),r'<a data-id="([^"]+)" data-base="' + (number if number else '1') + '"')
         support.log('ID= ',serverid)
         if id:
-            dataJson = support.httptools.downloadpage('%s/ajax/episode/info?id=%s&server=%s&ts=%s' % (host, ID, serverid, int(time.time())), headers=[['x-requested-with', 'XMLHttpRequest']]).data
-            json = jsontools.load(dataJson)
-            videoData +='\n'+json['grabber']
-
-            if serverid == '28':
+            if serverid == '26': # IF VVVVID
                 itemlist.append(
                     support.Item(
                         channel=item.channel,
-                        action="play",
-                        title='diretto',
-                        quality='',
-                        url=json['grabber'],
-                        server='directo',
-                        fulltitle=item.fulltitle,
-                        show=item.show,
-                        contentType=item.contentType,
+                        title=support.typo('VVVVID NON SUPPORTATO','bold'),
                         folder=False))
+                return itemlist
+
+            else:
+                dataJson = support.httptools.downloadpage('%s/ajax/episode/info?id=%s&server=%s&ts=%s' % (host, ID, serverid, int(time.time())), headers=[['x-requested-with', 'XMLHttpRequest']]).data
+                json = jsontools.load(dataJson)
+                videoData +='\n'+json['grabber']
+
+                if serverid == '28':
+                    itemlist.append(
+                        support.Item(
+                            channel=item.channel,
+                            action="play",
+                            title='diretto',
+                            quality='',
+                            url=json['grabber'],
+                            server='directo',
+                            fulltitle=item.fulltitle,
+                            show=item.show,
+                            contentType=item.contentType,
+                            folder=False))
 
     return support.server(item, videoData, itemlist)
 
