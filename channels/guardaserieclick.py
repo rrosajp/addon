@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
 # Canale per Guardaserie.click
-# Thanks to Icarus crew & Alfa addon & 4l3x87
 # ------------------------------------------------------------
 
 """
@@ -19,40 +18,50 @@ __channel__ = 'guardaserieclick'
 host = config.get_channel_url(__channel__)
 headers = [['Referer', host]]
 
-IDIOMAS = {'Italiano': 'IT'}
-list_language = IDIOMAS.values()
+##IDIOMAS = {'Italiano': 'IT'}
+##list_language = IDIOMAS.values()
 list_servers = ['speedvideo', 'openload']
 list_quality = ['default']
 
-headers = [['Referer', host]]
-
-
 # ----------------------------------------------------------------------------------------------------------------
+@support.menu
 def mainlist(item):
-    log()
+    log('mainlist', item)
 
-    itemlist = []
+    tvshow = ['/lista-serie-tv',
+              ]
+              
+              
+              
+            
+              
+              
+    
+##    support.menu(itemlist, 'Serie', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args=['news'])
+##    support.menu(itemlist, 'Ultimi Aggiornamenti submenu', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args= ['update'])
+##    support.menu(itemlist, 'Categorie', 'categorie', host, 'tvshow', args=['cat'])
+##    support.menu(itemlist, 'Serie inedite Sub-ITA submenu', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args=['inedite'])
+##    support.menu(itemlist, 'Da non perdere bold submenu', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args=['tv', 'da non perdere'])
+##    support.menu(itemlist, 'Classiche bold submenu', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args=['tv', 'classiche'])
+##    support.menu(itemlist, 'Disegni che si muovono sullo schermo per magia bold', 'tvserie', "%s/category/animazione/" % host, 'tvshow', args= ['anime'])
 
-    support.menu(itemlist, 'Serie', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args=['news'])
-    support.menu(itemlist, 'Ultimi Aggiornamenti submenu', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args= ['update'])
-    support.menu(itemlist, 'Categorie', 'categorie', host, 'tvshow', args=['cat'])
-    support.menu(itemlist, 'Serie inedite Sub-ITA submenu', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args=['inedite'])
-    support.menu(itemlist, 'Da non perdere bold submenu', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args=['tv', 'da non perdere'])
-    support.menu(itemlist, 'Classiche bold submenu', 'serietv', "%s/lista-serie-tv" % host, 'tvshow', args=['tv', 'classiche'])
-    support.menu(itemlist, 'Disegni che si muovono sullo schermo per magia bold', 'tvserie', "%s/category/animazione/" % host, 'tvshow', args= ['anime'])
+    return locals()
 
+@support.scrape
+def peliculas(item):
+    log('peliculas: ', item)
 
-    # autoplay
-    support.aplay(item, itemlist, list_servers, list_quality)
-    # configurazione del canale
-    support.channel_config(item, itemlist)
+    action = 'episodios'
+    patronBlock = r'<div class="container container-title-serie-new container-scheda" meta-slug="new">(?P<block>.*?)</div></div><div>'
+    patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
 
-    return itemlist
+    debug = True
+    return locals()
 
 @support.scrape
 def serietv(item):
 ##    import web_pdb; web_pdb.set_trace()
-    log('serietv ->\n')
+    log('serietv ->\n', item)
 ##<<<<<<< HEAD
 ##
 ##    action = 'episodios'
@@ -166,8 +175,7 @@ def categorie(item):
     return locals()
 
 # ================================================================================================================
-##
-### ----------------------------------------------------------------------------------------------------------------
+
 def newest(categoria):
     log()
     itemlist = []
@@ -183,7 +191,7 @@ def newest(categoria):
             if itemlist[-1].action == "serietv":
                 itemlist.pop()
 
-    # Continua la ricerca in caso di errore 
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
@@ -201,7 +209,7 @@ def search(item, texto):
     item.args = 'cerca'
     try:
         return tvserie(item)
-    # Continua la ricerca in caso di errore 
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
