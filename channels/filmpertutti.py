@@ -17,26 +17,16 @@ list_servers = ['verystream', 'openload', 'streamango', 'wstream', 'akvideo']
 list_quality = ['HD', 'SD']
 
 
+@support.menu
 def mainlist(item):
-    logger.info()
+    film = ['/category/film/',
+            ('Film per Genere', ['', 'genre'])
+    ]
+    tvshow = ['/category/serie-tv/',
+              ('in ordine alfabetico', ['/category/serie-tv/', 'az'])
+    ]
 
-    itemlist =[]
-
-    support.menu(itemlist, '[B]Film[/B]', 'peliculas', host + '/category/film/', 'movie')
-    support.menu(itemlist, '[B] > Film per Genere[/B]', 'genre', host, 'tvshow')
-    support.menu(itemlist, '[COLOR blue]Cerca Film...[/COLOR]', 'search', '')
-    support.menu(itemlist, '[B]Serie TV[/B]', 'peliculas', host + '/category/serie-tv/', 'tvshow')
-    support.menu(itemlist, '[B] > Serie TV in ordine alfabetico[/B]', 'az', host + '/category/serie-tv/', 'tvshow')
-    support.menu(itemlist, '[COLOR blue]Cerca Serie TV...[/COLOR]', 'search', '', 'tvshow')
-
-
-    autoplay.init(item.channel, list_servers, list_quality)
-    autoplay.show_option(item.channel, itemlist)
-
-    for item in itemlist:
-        logger.info('MENU=' + str(item) )
-
-    return itemlist
+    return locals()
 
 
 def newest(categoria):

@@ -32,18 +32,14 @@ headers = [
 PERPAGE = 15
 
 
+@support.menu
 def mainlist(item):
-    log()
-    itemlist = []
+    tvshow = ['',
+        ('Novità', ['', 'peliculas']),
+        ('Archivio A-Z ', ['', 'list_az'])
+    ]
 
-    support.menu(itemlist, 'Novità bold', 'pelicuals_tv', host, 'tvshow')
-    support.menu(itemlist, 'Serie TV bold', 'lista_serie', host, 'tvshow')
-    ('Archivio A-Z ', [, 'list_az', ]), 'tvshow', args=['serie'])
-
-    support.aplay(item, itemlist, list_servers, list_quality)
-    support.channel_config(item, itemlist)
-
-    return itemlist
+    return locals()
 
 
 # ----------------------------------------------------------------------------------------------------------------
@@ -65,7 +61,7 @@ def newest(categoria):
         if categoria == "series":
             item.url = host
             # item.action = "serietv"
-            itemlist = pelicuals_tv(item)
+            itemlist = peliculas(item)
 
             if itemlist[-1].action == "serietv":
                 itemlist.pop()
@@ -80,7 +76,7 @@ def newest(categoria):
     return itemlist
 
 
-def pelicuals_tv(item):
+def peliculas(item):
     log()
     itemlist = []
 

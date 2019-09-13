@@ -22,22 +22,18 @@ checklinks_number = config.get_setting('checklinks_number', 'filmigratis')
 headers = [['Referer', host]]
 
 #-----------------------------------------------------------------------------------------------------------------------
-
+@support.menu
 def mainlist(item):
+    film = [
+            ('Al Cinema ', ['', 'carousel']),
+            ('Film alta definizione', ['', 'peliculas']),
+            ('Categorie', ['', 'categorias_film']),
+    ]
+    tvshow = [
+        ('Categorie', ['', 'categorias_serie'])
+    ]
 
-    # Main options
-    itemlist = []
-    support.menu(itemlist, 'Al Cinema bold', 'carousel', host, contentType='movie')
-    support.menu(itemlist, 'Film alta definizione bold', 'peliculas', host, contentType='movie', args='film')
-    support.menu(itemlist, 'Categorie Film bold', 'categorias_film', host , contentType='movie', args='film')
-    support.menu(itemlist, 'Categorie Serie bold', 'categorias_serie', host, contentType='tvshow', args='serie')
-
-
-
-    autoplay.init(item.channel, list_servers, list_quality)
-    autoplay.show_option(item.channel, itemlist)
-
-    return itemlist
+    return locals()
 
 #-----------------------------------------------------------------------------------------------------------------------
 

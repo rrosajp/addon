@@ -20,16 +20,14 @@ list_servers = ['speedvideo']
 list_quality = ['default']
 
 
+@support.menu
 def mainlist(item):
-    log()
-    itemlist = []
-    support.menu(itemlist, 'Novità bold', 'latestep', "%s/ultimi-episodi" % host, 'tvshow')
-    support.menu(itemlist, 'Serie TV bold', 'lista_serie', "%s/category/serie-tv" % host, 'tvshow')
-    support.menu(itemlist, 'Categorie', 'categorie', host, 'tvshow')
+    tvshow = ['/category/serie-tv',
+              ('Novità', ['/ultimi-episodi', 'latestep']),
+              ('Categorie', ['', 'categorie'])
+    ]
 
-    support.aplay(item, itemlist, list_servers, list_quality)
-    support.channel_config(item, itemlist)
-    return itemlist
+    return locals()
 
 
 # ----------------------------------------------------------------------------------------------------------------
@@ -47,7 +45,7 @@ def cleantitle(scrapedtitle):
 # ================================================================================================================
 
 # ----------------------------------------------------------------------------------------------------------------
-def lista_serie(item):
+def peliculas(item):
     log()
     itemlist = []
 
@@ -282,7 +280,7 @@ def search(item, texto):
     log(texto)
     item.url = host + "/?s=" + texto
     try:
-        return lista_serie(item)
+        return peliculas(item)
     # Continua la ricerca in caso di errore
     except:
         import sys
@@ -298,6 +296,6 @@ def categorie(item):
     log()
     patron_block= r'<h2>Sfoglia</h2>\s*<ul>(.*?)</ul>\s*</section>'
     patron = r'<li><a href="([^"]+)">([^<]+)</a></li>'
-    return support.scrape(item, patron, ['url','title'], patron_block=patron_block, action='lista_serie', blacklist=["Home Page", "Calendario Aggiornamenti"])
+    return support.scrape(item, patron, ['url','title'], patron_block=patron_block, action='peliculas', blacklist=["Home Page", "Calendario Aggiornamenti"])
 
 # ================================================================================================================
