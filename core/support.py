@@ -479,7 +479,10 @@ def dooplay_get_links(item, host):
 def dooplay_get_episodes(item):
     item.contentType = "episode"
     patron = '<li class="mark-[0-9]+">.*?<img.*?(?:data-lazy-)?src="(?P<thumb>[^"]+).*?(?P<episode>[0-9]+ - [0-9]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+).*?(?P<year>[0-9]{4})'
-    # debug = True
+
+    def itemlistHook(itemlist):
+        return videolibrary(itemlist, item, function='episodios')
+
     return locals()
 
 
