@@ -64,6 +64,8 @@ def run(item=None):
                         config.get_localized_string(59976): 'latino',
                         config.get_localized_string(70171): 'torrent',
                     }
+                    if not config.get_setting("category") in dictCategory.keys():
+                        config.set_setting('category', config.get_localized_string(70137))
                     category = dictCategory[config.get_setting("category")]
                     item = Item(channel="news", action="novedades", extra=category, mode = 'silent')
                 else:
