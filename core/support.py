@@ -195,8 +195,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
     if debug:
         regexDbg(item, patron, headers, block)
 
-    known_keys = ['url', 'title', 'title2', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
-    # lang = ''  # aggiunto per gestire i siti con pagine di serietv dove si hanno i video in ita e in subita
+    known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
+    stagione = '' # per quei siti che hanno la stagione nel blocco ma non nelle puntate
     for i, match in enumerate(matches):
         if pagination and (pag - 1) * pagination > i: continue  # pagination
         if pagination and i >= pag * pagination: break          # pagination
