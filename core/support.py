@@ -214,6 +214,13 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 val = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
             scraped[kk] = val
 
+        if scraped['season'] != None:
+            stagione = scraped['season']
+        if stagione:
+            episode = stagione +'x'+ scraped['episode']
+        else:
+            episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
+
         episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
         title = cleantitle(scraped['title']) if scraped['title'] else ''
         title2 = cleantitle(scraped['title2']) if scraped['title2'] else ''
@@ -407,7 +414,7 @@ def scrape(func):
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
         from specials import autorenumber
-        if anime:            
+        if anime:
             if function == 'episodios' or item.action == 'episodios': autorenumber.renumber(itemlist, item, 'bold')
             else: autorenumber.renumber(itemlist)
         if anime and autorenumber.check(item) == False:
