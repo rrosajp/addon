@@ -281,8 +281,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 infoLabels=infolabels,
                 thumbnail=item.thumbnail if function == 'episodios' else scraped["thumb"] ,
                 args=item.args,
-                contentSerieName= title if item.contentType != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
-                contentTitle= title if item.contentType == 'movie' else '',
+                contentSerieName= title if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
+                contentTitle= title if item.contentType or CT == 'movie' else '',
                 contentLanguage = lang,
                 ep=episode if episode else ''
             )
@@ -406,16 +406,18 @@ def scrape(func):
         if action != 'play' and function != 'episodios' and 'patronMenu' not in args:
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
-        if anime:
-            from specials import autorenumber
+        from specials import autorenumber
+        if anime:            
             if function == 'episodios' or item.action == 'episodios': autorenumber.renumber(itemlist, item, 'bold')
             else: autorenumber.renumber(itemlist)
-
-        if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
-            # item.fulltitle = item.infoLabels["title"]
-            videolibrary(itemlist, item, function=function)
-        if config.get_setting('downloadenabled') and (function == 'episodios' or function == 'finvideos'):
-            download(itemlist, item, function=function)
+        if anime and autorenumber.check(item) == False:
+            pass
+        else:
+            if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
+                # item.fulltitle = item.infoLabels["title"]
+                videolibrary(itemlist, item, function=function)
+            if config.get_setting('downloadenabled') and (function == 'episodios' or function == 'finvideos'):
+                download(itemlist, item, function=function)
 
         if 'patronMenu' in args:
             itemlist = thumb(itemlist, genre=True)
@@ -477,7 +479,10 @@ def dooplay_get_links(item, host):
 def dooplay_get_episodes(item):
     item.contentType = "episode"
     patron = '<li class="mark-[0-9]+">.*?<img.*?(?:data-lazy-)?src="(?P<thumb>[^"]+).*?(?P<episode>[0-9]+ - [0-9]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+).*?(?P<year>[0-9]{4})'
-    # debug = True
+
+    def itemlistHook(itemlist):
+        return videolibrary(itemlist, item, function='episodios')
+
     return locals()
 
 

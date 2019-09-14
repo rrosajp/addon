@@ -63,7 +63,7 @@
                  enable="eq(-1,False)+eq(-2,True"/>
          <setting id="category" type="labelenum" label="70124"
                  lvalues="70137|30123|30124|60513"
-                 default="70137" visible="eq(-3,True)+eq(-1,True)+eq(-2,False)" enable="eq(-3,True)+eq(-1,True)+(-2,false)"/>
+                 default="Film" visible="eq(-3,True)+eq(-1,True)+eq(-2,False)" enable="eq(-3,True)+eq(-1,True)+(-2,false)"/>
    </category>
     <category label="70126">
         <setting id="icon_set" type="labelenum" label="70108" values="default|light|dark|alfa|mike" default="default"/>
