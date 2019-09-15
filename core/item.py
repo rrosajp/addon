@@ -138,7 +138,7 @@ class Item(object):
 
         kw = copy.copy(kwargs)
         for k in kw:
-            if k in ["contentTitle", "contentPlot", "contentSerieName", "show", "contentType", "contentEpisodeTitle",
+            if k in ["contentTitle", "contentPlot", "contentSerieName", "show", "contentEpisodeTitle",# "contentType", "contentEpisodeTitle",
                      "contentSeason", "contentEpisodeNumber", "contentThumbnail", "plot", "duration", "contentQuality",
                      "quality"]:
                 self.__setattr__(k, kw[k])
