@@ -471,7 +471,7 @@ def dooplay_get_links(item, host):
             "nume": nume,
             "type": type
         })
-        dataAdmin = httptools.downloadpage(host + 'wp-admin/admin-ajax.php', post=postData,headers={'Referer': item.url}).data
+        dataAdmin = httptools.downloadpage(host + '/wp-admin/admin-ajax.php', post=postData,headers={'Referer': item.url}).data
         link = scrapertoolsV2.find_single_match(dataAdmin, "<iframe.*src='([^']+)'")
         ret.append({
             'url': link,
