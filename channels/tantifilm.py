@@ -2,6 +2,13 @@
 # ------------------------------------------------------------
 # Canale per Tantifilm
 # ------------------------------------------------------------
+"""
+
+    Trasformate le sole def per support.menu e support.scrape
+    da non inviare nel test.
+    Test solo a trasformazione completa
+
+"""
 
 import re
 
@@ -24,25 +31,45 @@ host = config.get_channel_url(__channel__)
 
 headers = [['Referer', host]]
 
-
+@support.menu
 def mainlist(item):
     log()
-    itemlist = []
+    
+    film = ['/film/',
+        ('Al Cinema', ['/watch-genre/al-cinema/', 'peliculas', 'movie']),
+        ('HD',['/watch-genre/altadefinizione/', 'peliculas', 'movie']),
+        ('Categorie', ['', 'category', 'movie'])
+        ]
 
-    menu(itemlist, 'Film', 'peliculas', host + '/film/', 'movie', args='movie')
-    menu(itemlist, 'Film Al Cinema submenu', 'peliculas', host + '/watch-genre/al-cinema/', 'movie')    
-    menu(itemlist, 'Film HD submenu', 'peliculas', host + '/watch-genre/altadefinizione/', 'movie')
-    menu(itemlist, 'Film Per Categoria submenu', 'category', host, 'movie')
-    menu(itemlist, 'Cerca film... submenu color kod', 'search', contentType='movie', args='findvideos')
-    menu(itemlist, 'Serie TV', 'peliculas', host + '/watch-genre/serie-tv/', contentType='episode')
-    menu(itemlist, 'Serie TV HD submenu', 'peliculas', host + '/watch-genre/serie-altadefinizione/', contentType='episode')
-    menu(itemlist, 'Miniserie submenu', 'peliculas', host + '/watch-genre/miniserie/', contentType='episode', args='serie')
-    menu(itemlist, 'Programmi TV submenu', 'peliculas', host + '/watch-genre/programmi-tv/', contentType='episode')
-    menu(itemlist, 'Anime submenu', 'peliculas', host + '/watch-genre/anime/', contentType='episode', args='anime')
-    menu(itemlist, 'Cerca Serie TV... submenu color kod', 'search', contentType='episode', args='episodios')
-    aplay(item, itemlist, list_servers, list_quality)
+    tvshow = ['/watch-genre/serie-tv/',
+              ('HD', ['/watch-genre/serie-altadefinizione/', 'peliculas']),
+              ('Miniserie', ['/watch-genre/miniserie/', 'peliculas', 'serie']),
+              ('Programmi TV', ['/watch-genre/programmi-tv/', 'peliculas'])
+              ]
 
-    return itemlist
+    pinco = [('Anime', ['/watch-genre/anime/', 'peliculas', 'anime'])]
+        
+
+    return locals()
+
+##def mainlist(item):
+##    log()
+##    itemlist = []
+##
+##    menu(itemlist, 'Film', 'peliculas', host + '/film/', 'movie', args='movie')
+##    menu(itemlist, 'Film Al Cinema submenu', 'peliculas', host + '/watch-genre/al-cinema/', 'movie')    
+##    menu(itemlist, 'Film HD submenu', 'peliculas', host + '/watch-genre/altadefinizione/', 'movie')
+##    menu(itemlist, 'Film Per Categoria submenu', 'category', host, 'movie')
+##    menu(itemlist, 'Cerca film... submenu color kod', 'search', contentType='movie', args='findvideos')
+##    menu(itemlist, 'Serie TV', 'peliculas', host + '/watch-genre/serie-tv/', contentType='episode')
+##    menu(itemlist, 'Serie TV HD submenu', 'peliculas', host + '/watch-genre/serie-altadefinizione/', contentType='episode')
+##    menu(itemlist, 'Miniserie submenu', 'peliculas', host + '/watch-genre/miniserie/', contentType='episode', args='serie')
+##    menu(itemlist, 'Programmi TV submenu', 'peliculas', host + '/watch-genre/programmi-tv/', contentType='episode')
+##    menu(itemlist, 'Anime submenu', 'peliculas', host + '/watch-genre/anime/', contentType='episode', args='anime')
+##    menu(itemlist, 'Cerca Serie TV... submenu color kod', 'search', contentType='episode', args='episodios')
+##    aplay(item, itemlist, list_servers, list_quality)
+##
+##    return itemlist
 
 
 def newest(categoria):
@@ -120,24 +147,43 @@ def search_peliculas(item):
 
     return itemlist
 
-
+@support.scrape
 def category(item):
-    blacklist = ['Serie TV Altadefinizione', 'HD AltaDefinizione', 'Al Cinema', 'Serie TV', 'Miniserie', 'Programmi Tv', 'Live', 'Trailers', 'Serie TV Aggiornate', 'Aggiornamenti', 'Featured']
-    itemlist = support.scrape(item, '<li><a href="([^"]+)"><span></span>([^<]+)</a></li>', ['url', 'title'], headers, blacklist, patron_block='<ul class="table-list">(.*?)</ul>', action='peliculas')
-    return support.thumb(itemlist)
+    log()
+    action = 'peliculas'
+    blacklist = ['Serie TV Altadefinizione', 'HD AltaDefinizione', 'Al Cinema',
+                 'Serie TV', 'Miniserie', 'Programmi Tv', 'Live', 'Trailers',
+                 'Serie TV Aggiornate', 'Aggiornamenti', 'Featured', 'Ultimi Film Aggiornati']
 
+    patron = r'<li><a href="(?P<url>[^"]+)"><span></span>(?P<title>[^<]+)</a></li>'
+    patronBlock = r'<ul class="table-list">(?P<block>.*?)</ul>'
 
+    return locals()
+##    itemlist = support.scrape(item, '<li><a href="([^"]+)"><span></span>([^<]+)</a></li>', ['url', 'title'], headers, blacklist, patron_block='<ul class="table-list">(.*?)</ul>', action='peliculas')
+
+##    return support.thumb(itemlist)
+
+@support.scrape
 def peliculas(item):
     log()
+    
     action = 'findvideos' if item.extra == 'movie' else 'episodios'
-    if item.args == 'movie':
-        patron= r'<div class="mediaWrap mediaWrapAlt">[^<]+<a href="([^"]+)" title="Permalink to\s([^"]+) \(([^<]+)\).*?"[^>]+>[^<]+<img[^s]+src="([^"]+)"[^>]+>[^<]+<\/a>.*?<p>\s*([a-zA-Z-0-9]+)\s*<\/p>'  
-        itemlist = support.scrape(item, patron, ['url', 'title', 'year', 'thumb', 'quality'], headers, action=action, patron_block='<div id="main_col">(.*?)main_col', patronNext='<a class="nextpostslink" rel="next" href="([^"]+)">')
+    
+    if item.args == 'movie' or item.extra == 'movie':
+        patron = r'<div class="mediaWrap mediaWrapAlt">[^<]+<a href="(?P<url>[^"]+)" title="Permalink to\s(?P<title>[^"]+) \((?P<year>[^<]+)\).*?"[^>]+>[^<]+<img[^s]+src="(?P<thumb>[^"]+)"[^>]+>[^<]+<\/a>.*?<p>\s*(?P<quality>[a-zA-Z-0-9]+)\s*<\/p>'  
+        patronBlock = '<div id="main_col">(?P<block>.*?)main_col'
+##        itemlist = support.scrape(item, patron, ['url', 'title', 'year', 'thumb', 'quality'], headers, action=action, patron_block='<div id="main_col">(.*?)main_col', patronNext='<a class="nextpostslink" rel="next" href="([^"]+)">')
+        patronNext = '<a class="nextpostslink" rel="next" href="([^"]+)">'
+        
     else:
-        patron = r'<div class="media3">[^>]+><a href="([^"]+)"><img[^s]+src="([^"]+)"[^>]+><\/a><[^>]+><a[^<]+><p>([^<]+) \(([^\)]+)[^<]+<\/p>.*?<p>\s*([a-zA-Z-0-9]+)\s*<\/p>'
-        itemlist = support.scrape(item, patron, ['url', 'thumb', 'title', 'year', 'quality'], headers, action=action, patronNext='<a class="nextpostslink" rel="next" href="([^"]+)">')
+        patron = r'<div class="media3">[^>]+><a href="(?P<url>[^"]+)"><img[^s]+src="(?P<thumb>[^"]+)"[^>]+><\/a><[^>]+><a[^<]+><p>(?P<title>[^<]+) \((?P<year>[^\)]+)[^<]+<\/p>.*?<p>\s*(?P<quality>[a-zA-Z-0-9]+)\s*<\/p>'
+        patronNext='<a class="nextpostslink" rel="next" href="([^"]+)">'
+        action = action
+#        itemlist = support.scrape(item, patron, ['url', 'thumb', 'title', 'year', 'quality'], headers, action=action, patronNext='<a class="nextpostslink" rel="next" href="([^"]+)">')
         if item.args == 'anime': autorenumber.renumber(itemlist)
-    return itemlist
+
+##    return itemlist
+    return locals()
 
 
 def episodios(item):
@@ -149,7 +195,9 @@ def episodios(item):
 
     # Check if is series
     check = scrapertoolsV2.find_single_match(data.replace('\t','').replace('\n',''), r'<div class="category-film"><h3>([^<]+)<\/h3>')
+    
     if 'serie tv' not in check.lower(): return findvideos(item)
+    
     elif 'anime' in check.lower(): return findvideos(item)
 
     patron = r'<iframe src="([^"]+)" scrolling="no" frameborder="0" width="626" height="550" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">'

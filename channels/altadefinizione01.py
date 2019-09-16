@@ -3,6 +3,11 @@
 # Canale per altadefinizione01
 # ------------------------------------------------------------
 
+"""
+
+
+"""
+
 from core import scrapertoolsV2, httptools, support
 from core.item import Item
 from platformcode import config, logger
@@ -17,16 +22,14 @@ def findhost():
     host = scrapertoolsV2.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
     headers = [['Referer', host]]
 
-#headers = [['User-Agent', 'Mozilla/50.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0'],
-#           ['Referer', host]]
+findhost()
 
 list_servers = ['verystream','openload','rapidvideo','streamango']
 list_quality = ['default']
 
-
 @support.menu
 def mainlist(item):
-    findhost()
+
     film = [
         ('Al Cinema', ['/cinema/', 'peliculas', 'pellicola']),
         ('Ultimi Aggiornati-Aggiunti', ['','peliculas', 'update']),
@@ -41,8 +44,13 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     support.log('peliculas',item)
-
+    deflang = 'ITA'
     action="findvideos"
+
+    patron = r'<div class="cover boxcaption"> <h2>.<a href="(?P<url>[^"]+)">.*?<.*?src="(?P<thumb>[^"]+)"'\
+         '.+?[^>]+>[^>]+<div class="trdublaj"> (?P<quality>[A-Z/]+)<[^>]+>(?:.[^>]+>(?P<lang>.*?)<[^>]+>).*?'\
+         '<p class="h4">(?P<title>.*?)</p>[^>]+> [^>]+> [^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> [^>]+> '\
+         '[^>]+>[^>]+>(?P<year>\d{4})[^>]+>[^>]+> [^>]+>[^>]+>(?P<duration>\d+).+?>.*?<p>(?P<plot>[^<]+)<'
 
     if item.args == "search":
         patronBlock = r'</script> <div class="boxgrid caption">(?P<block>.*)<div id="right_bar">'
@@ -55,11 +63,6 @@ def peliculas(item):
     else:
         patronBlock = r'<div class="cover_kapsul ml-mask">(?P<block>.*)<div class="page_nav">'
 
-    patron = r'<div class="cover boxcaption"> <h2>.<a href="(?P<url>[^"]+)">.*?<.*?src="(?P<thumb>[^"]+)"'\
-         '.+?[^>]+>[^>]+<div class="trdublaj"> (?P<quality>[A-Z/]+)<[^>]+>(?:.[^>]+>(?P<lang>.*?)<[^>]+>).*?'\
-         '<p class="h4">(?P<title>.*?)</p>[^>]+> [^>]+> [^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> [^>]+> '\
-         '[^>]+>[^>]+>(?P<year>\d{4})[^>]+>[^>]+> [^>]+>[^>]+>(?P<duration>\d+).+?>.*?<p>(?P<plot>[^<]+)<'
-
     patronNext =  '<span>\d</span> <a href="([^"]+)">'
     #debug = True
     return locals()
@@ -67,7 +70,7 @@ def peliculas(item):
 @support.scrape
 def categorie(item):
     support.log('categorie',item)
-    findhost()
+
     if item.args != 'orderalf': action = "peliculas"
     else: action = 'orderalf'
 
@@ -81,7 +84,6 @@ def categorie(item):
     elif item.args == 'orderalf':
         patronBlock = r'<div class="movies-letter">(?P<block>.*?)<div class="clearfix">'
         patron = '<a title=.*?href="(?P<url>[^"]+)"><span>(?P<title>.*?)</span>'
-    #support.regexDbg(item, patronBlock, headers)
 
     #debug = True
     return locals()
@@ -104,7 +106,7 @@ def findvideos(item):
 
 def search(item, text):
     support.log(item, text)
-    findhost()
+
     itemlist = []
     text = text.replace(" ", "+")
     item.url = host + "/index.php?do=search&story=%s&subaction=search" % (text)

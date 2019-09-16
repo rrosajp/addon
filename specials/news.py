@@ -124,9 +124,11 @@ def set_category_context(item):
 
 def get_channels_list():
     logger.info()
-
-    list_canales = {'peliculas': [], '4k': [], 'terror': [], 'infantiles': [], 'series': [], 'anime': [],
-                    'castellano': [], 'latino':[], 'italiano':[], 'torrent':[], 'documentales': []}
+##    import web_pdb; web_pdb.set_trace()
+##    list_canales = {'peliculas': [], '4k': [], 'terror': [], 'infantiles': [], 'series': [], 'anime': [],
+##                    'castellano': [], 'latino':[], 'italiano':[], 'torrent':[], 'documentales': []}
+    list_canales = {'peliculas': [], 'series': [],'anime': [], 'italiano':[], 'documentales': []}
+    
     any_active = False
     # Rellenar listas de canales disponibles
     channels_path = os.path.join(config.get_runtime_path(), "channels", '*.json')

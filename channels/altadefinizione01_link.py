@@ -18,7 +18,7 @@ list_quality = ['default']
 # =========== home menu ===================
 @support.menu
 def mainlist(item):
-##    support.dbg()
+    support.log('mainlist',item)
 
     film = [
         ('Al Cinema', ['/film-del-cinema', 'peliculas', '']),
@@ -35,11 +35,17 @@ def mainlist(item):
 
 @support.scrape
 def peliculas(item):
-##    support.dbg()
     support.log('peliculas',item)
-    patron = r'class="innerImage">.*?href="(?P<url>[^"]+)".*?src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> (?P<year>\d{4})[^>]+>[^>]+> (?P<duration>\d+)[^>]+>[^>]+> (?P<quality>[a-zA-Z\\]+)[^>]+>[^>]+> (?P<lang>.*?) [^>]+>'
+
+    patron = r'class="innerImage">.*?href="(?P<url>[^"]+)".*?src="(?P<thumb>[^"]+)"'\
+             '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)[^>]+>'\
+             '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>'\
+             '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>'\
+             '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>'\
+             '[^>]+>[^>]+>[^>]+>[^>]+> (?P<year>\d{4})[^>]+>[^>]+> (?P<duration>\d+)'\
+             '[^>]+>[^>]+> (?P<quality>[a-zA-Z]+) [^>]+>[^>]+> (?P<lang>.*?) [^>]+>'
     patronNext =  r'<span>\d</span> <a href="([^"]+)">'
-##    debug = True
+    #debug = True
     return locals()
 
 # =========== def pagina categorie ======================================
@@ -50,7 +56,6 @@ def genres(item):
     action = 'peliculas'
     if item.args == 'genres':
         patronBlock = r'<ul class="listSubCat" id="Film">(?P<block>.*)<ul class="listSubCat" id="Anno">'
-        #pass
     elif item.args == 'years':
         patronBlock = r'<ul class="listSubCat" id="Anno">(?P<block>.*)<ul class="listSubCat" id="Qualita">'
     elif item.args == 'quality':
@@ -60,8 +65,7 @@ def genres(item):
         action = 'findvideos'
     patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
 
-    debug = True
-
+    #debug = True
     return locals()
 
 # =========== def per cercare film/serietv =============
@@ -104,4 +108,5 @@ def newest(categoria):
     return itemlist
 
 def findvideos(item):
+    support.log('findvideos', item)
     return support.server(item, headers=headers)

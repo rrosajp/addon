@@ -2,6 +2,12 @@
 # ------------------------------------------------------------
 # Canale per Streaming Altadefinizione
 # ------------------------------------------------------------
+"""
+    Trasformate le sole def per support.menu e support.scrape
+    da non inviare nel test.
+    Test solo a trasformazione completa
+
+"""
 
 from core import support
 from core.item import Item

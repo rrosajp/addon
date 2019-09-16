@@ -2,6 +2,13 @@
 # ------------------------------------------------------------
 # Canale per CinemaLibero - First Version
 # ------------------------------------------------------------
+"""
+    Trasformate le sole def per support.menu e support.scrape
+    da non inviare nel test.
+    Test solo a trasformazione completa
+
+"""
+
 import re
 
 from core import scrapertools, servertools, httptools, support
@@ -30,6 +37,7 @@ headers = [['Referer', host]]
 
 @support.menu
 def mainlist(item):
+    support.log()    
     film = '/category/film/'
     filmSub = [
         ('Generi', ['', 'genres']),
@@ -42,9 +50,16 @@ def mainlist(item):
 
     return locals()
 
+@support.scrape
 def genres(item):
-    return support.scrape2(item, patronBlock=r'<div id="bordobar" class="dropdown-menu(?P<block>.*)</li>', patron=r'<a class="dropdown-item" href="([^"]+)" title="([A-z]+)"', listGroups=['url', 'title'], action='video')
+    support.log()
+    action='video'
+    patron=r'<a class="dropdown-item" href="(?P<url>[^"]+)" title="(?P<title>[A-z]+)"'
+##    return support.scrape2(item, patronBlock=r'<div id="bordobar" class="dropdown-menu(?P<block>.*)</li>',
+##    patron=r'<a class="dropdown-item" href="([^"]+)" title="([A-z]+)"',
+##    listGroups=['url', 'title'], action='video')
 
+    return locals()
 
 def peliculas(item):
     logger.info('[cinemalibero.py] video')

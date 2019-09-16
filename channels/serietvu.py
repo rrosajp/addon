@@ -3,12 +3,19 @@
 # Canale per SerieTVU
 # Thanks to Icarus crew & Alfa addon & 4l3x87
 # ----------------------------------------------------------
+
+"""
+    Trasformate le sole def per support.menu e support.scrape
+    da non inviare nel test.
+    Test solo a trasformazione completa
+
+"""
 import re
 
 from core import tmdb, scrapertools, support
 from core.item import Item
 from core.support import log
-from platformcode import logger, config
+from platformcode import config, logger
 
 __channel__ = 'serietvu'
 host = config.get_channel_url(__channel__)
@@ -22,6 +29,7 @@ list_quality = ['default']
 
 @support.menu
 def mainlist(item):
+    log()
     tvshow = ['/category/serie-tv',
               ('Novità', ['/ultimi-episodi', 'latestep']),
               ('Categorie', ['', 'categorie'])
@@ -32,6 +40,7 @@ def mainlist(item):
 
 # ----------------------------------------------------------------------------------------------------------------
 def cleantitle(scrapedtitle):
+    log()
     scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle.strip())
     scrapedtitle = scrapedtitle.replace('[HD]', '').replace('’', '\'').replace('– Il Trono di Spade', '').replace(
         'Flash 2014', 'Flash').replace('"', "'")
@@ -292,10 +301,16 @@ def search(item, texto):
 # ================================================================================================================
 
 # ----------------------------------------------------------------------------------------------------------------
+@support.scrape
 def categorie(item):
     log()
-    patron_block= r'<h2>Sfoglia</h2>\s*<ul>(.*?)</ul>\s*</section>'
-    patron = r'<li><a href="([^"]+)">([^<]+)</a></li>'
-    return support.scrape(item, patron, ['url','title'], patron_block=patron_block, action='peliculas', blacklist=["Home Page", "Calendario Aggiornamenti"])
+
+    blacklist = ["Home Page", "Calendario Aggiornamenti"]
+    action = 'peliculas'
+    patronBlock = r'<h2>Sfoglia</h2>\s*<ul>(?P<block>.*?)</ul>\s*</section>'
+    patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<]+)</a></li>'
+    debug = True
+
+    return locals()
 
 # ================================================================================================================
