@@ -7,6 +7,7 @@ import errno
 import math
 import traceback
 import re
+import os
 
 from core import filetools
 from core import scraper
@@ -223,43 +224,71 @@ def save_movie(item):
     return 0, 0, -1
 
 def filter_list(episodelist, action=None, path=None):
-    lang_sel = quality_sel = ''
+    lang_sel = quality_sel = show_title = channel =''
     if action:
         tvshow_path = filetools.join(path, "tvshow.nfo")
         head_nfo, tvshow_item = read_nfo(tvshow_path)
         channel = episodelist[0].channel
+        show_title = tvshow_item.infoLabels['tvshowtitle']
         if not tvshow_item.channel_prefs:
             tvshow_item.channel_prefs={channel:{}}
+
+            list_item = os.listdir(path)
+            for File in list_item:
+                if (File.endswith('.strm') or File.endswith('.json') or File.endswith('.nfo')) and not File == 'twshow.info':
+                    os.remove(os.path.join(path, File))
         if channel not in tvshow_item.channel_prefs:
             tvshow_item.channel_prefs[channel] = {}
         channel_prefs = tvshow_item.channel_prefs[channel]
-
+        logger.info(str(tvshow_item))
         if action == 'get_seasons':
-            if channel_prefs:
-                if channel_prefs['favourite_language']:
-                    lang_sel = channel_prefs['favourite_language']
-                if channel_prefs['favourite_quality']:
-                    quality_sel = channel_prefs['favourite_quality']
-
+            if 'favourite_language' not in channel_prefs:
+                channel_prefs['favourite_language'] = ''
+            if 'favourite_quality' not in channel_prefs:
+                channel_prefs['favourite_quality'] = ''
+            if channel_prefs['favourite_language']:
+                lang_sel = channel_prefs['favourite_language']
+            if channel_prefs['favourite_quality']:
+                quality_sel = channel_prefs['favourite_quality']
+    # if Download
+        if not show_title: show_title = episodelist[0].fulltitle
+        if not channel: channel= episodelist[0].channel
     # SELECT EISODE BY LANG AND QUALITY
-    quality_dict = {"N/A": ["n/a"],
-                    "BLURAY": ["br", "bluray"],
-                    "FULLHD": ["fullhd", "fullhd 1080", "fullhd 1080p", "full hd", "full hd 1080", "full hd 1080p", "hd1080", "hd1080p", "hd 1080", "hd 1080p", "1080", "1080p"],
-                    "HD": ["hd", "hd720", "hd720p", "hd 720", "hd 720p", "720", "720p", "hdtv"],
-                    "480P": ["sd", "480p", '480'],
-                    "360P": ["360p", "360"],
-                    "240P": ["240p", "240"],
-                    config.get_localized_string(70241):["MAX"]}
-    quality_order = ["N/A", "240P", "360P","480P", "HD", "FULLHD", "BLURAY", config.get_localized_string(70241)]
+    quality_dict = {'N/A': ['n/a'],
+                    'BLURAY': ['br', 'bluray'],
+                    'FULLHD': ['fullhd', 'fullhd 1080', 'fullhd 1080p', 'full hd', 'full hd 1080', 'full hd 1080p', 'hd1080', 'hd1080p', 'hd 1080', 'hd 1080p', '1080', '1080p'],
+                    'HD': ['hd', 'hd720', 'hd720p', 'hd 720', 'hd 720p', '720', '720p', 'hdtv'],
+                    '480P': ['sd', '480p', '480'],
+                    '360P': ['360p', '360'],
+                    '240P': ['240p', '240'],
+                    'MAX':['MAX']}
+    quality_order = ['N/A', '240P', '360P','480P', 'HD', 'FULLHD', 'BLURAY', 'MAX']
 
-    ep_list = []
+
     lang_list = []
-    quality_list = [config.get_localized_string(70241)]
+    sub_list = []
+    quality_list = ['MAX']
 
-    # Make lang_list and Quality_list
-
+    # Make Language List
     for episode in episodelist:
-        if episode.contentLanguage and episode.contentLanguage not in lang_list: lang_list.append(episode.contentLanguage)
+        if episode.contentLanguage and episode.contentLanguage not in lang_list:
+            # Make list of subtitled languages
+            if 'sub' in episode.contentLanguage.lower():
+                sub = re.sub('Sub-','', episode.contentLanguage)
+                if sub not in sub_list: sub_list.append(sub)
+            else:
+                lang_list.append(episode.contentLanguage)
+    # add to Language List subtitled languages
+    if sub_list:
+        for sub in sub_list:
+            if sub in lang_list:
+                lang_list.insert(lang_list.index(sub) + 1, 'Sub-' + sub)
+                lang_list.insert(lang_list.index(sub) + 2, sub + ' + Sub-' + sub)
+            else:
+                lang_list.append('Sub-' + sub)
+
+    # Make Quality List
+    for episode in episodelist:
         for name, var in quality_dict.items():
             if not episode.quality and 'N/A' not in quality_list:
                 quality_list.append('N/A')
@@ -269,17 +298,34 @@ def filter_list(episodelist, action=None, path=None):
 
     # if more than one language
     if len(lang_list) > 1:
-        selection = lang_list.index(lang_sel) if lang_sel else platformtools.dialog_select(config.get_localized_string(70725),lang_list)
+        selection = lang_list.index(lang_sel) if lang_sel else platformtools.dialog_select(config.get_localized_string(70725) % (show_title, channel),lang_list)
+        if action: lang_sel = channel_prefs['favourite_language'] = lang_list[selection]
+        langs = lang_list[selection].split(' + ')
+
+        ep_list = []
+        count = 0
+        stop = False
+        while not stop:
+            for episode in episodelist:
+                title = scrapertools.find_single_match(episode.title, '(\d+x\d+)')
+                if not any(title in word for word in ep_list) and episode.contentLanguage == langs[count]:
+                    ep_list.append(episode.title)
+            if count < len(langs)-1: count += 1
+            else: stop = True
         it = []
         for episode in episodelist:
-            if episode.contentLanguage == lang_list[selection]:
-                if action: lang_sel = channel_prefs['favourite_language'] = lang_list[selection]
+            if episode.title in ep_list:
                 it.append(episode)
         episodelist = it
 
+    else: channel_prefs['favourite_language'] = ''
+
     # if more than one quality
     if len(quality_list) > 2:
-        selection = favourite_quality_selection =  quality_list.index(quality_sel) if quality_sel else platformtools.dialog_select(config.get_localized_string(70726),quality_list)
+        if config.get_setting('videolibrary_max_quality'): selection = favourite_quality_selection = len(quality_list)-1
+        else: selection = favourite_quality_selection = quality_list.index(quality_sel) if quality_sel else platformtools.dialog_select(config.get_localized_string(70726) % (show_title, channel) ,quality_list)
+
+        ep_list = []
         stop = False
         while not stop:
             for episode in episodelist:
@@ -300,6 +346,8 @@ def filter_list(episodelist, action=None, path=None):
                 if action: channel_prefs['favourite_quality'] = quality_list[favourite_quality_selection]
                 it.append(episode)
         episodelist = it
+
+    else:channel_prefs['favourite_quality'] = ''
 
     if action: filetools.write(tvshow_path, head_nfo + tvshow_item.tojson())
 

@@ -5618,11 +5618,11 @@ msgid "Channel"
 msgstr ""
 
 msgctxt "#70725"
-msgid "Select the language"
+msgid "Select the language of [B]%s[/B] in [B]%s[/B]"
 msgstr ""
 
 msgctxt "#70726"
-msgid "Seleziona la qualità"
+msgid "Select the preferred quality of [B]%s[/B] in [B]%s[/B]"
 msgstr ""
 
 msgctxt "#70727"
@@ -5631,4 +5631,8 @@ msgstr ""
 
 msgctxt "#70728"
 msgid "Include in Global Search"
+msgstr ""
+
+msgctxt "#70729"
+msgid "Always add the highest quality"
 msgstr ""
