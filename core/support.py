@@ -215,13 +215,16 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             scraped[kk] = val
 
         if scraped['season'] != None:
+            log("SEASON : ", scraped['season'])
             stagione = scraped['season']
-        if stagione:
+        if stagione != '':
+            log("SEASON 2: ", scraped['season'])
             episode = stagione +'x'+ scraped['episode']
         else:
             episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
-
-        episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
+        log("episode : ", scraped['season'], stagione, episode)
+        
+        #episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
         title = cleantitle(scraped['title']) if scraped['title'] else ''
         title2 = cleantitle(scraped['title2']) if scraped['title2'] else ''
         quality = scraped['quality'].strip() if scraped['quality'] else ''
