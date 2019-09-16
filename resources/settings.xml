@@ -44,16 +44,18 @@
         <setting id="enable_library_menu" label="30131" type="bool" default="true"/>
     </category>
 
-    <category label="30501">
+    <category label="30131">
         <!-- <setting id="downloadpath" type="folder" label="30017" default=""/>
         <setting id="downloadlistpath" type="folder" label="30018" default=""/> -->
+        <setting label="30501" type="lsep"/>
         <setting id="videolibrarypath" type="folder" label="30067" default=""/>
-        <setting label="30131" type="lsep"/>
         <setting id="folder_tvshows" type="text" label="70118" default="SERIES"/>
         <setting id="folder_movies" type="text" label="70119" default="CINE"/>
+        <setting label="59997" type="lsep"/>
         <setting id="videolibrary_kodi_flag" type="number" label="" default="0" visible="false"/>
         <setting id="videolibrary_kodi_force" type="bool" label="" default="false" visible="false"/>
         <setting id="videolibrary_kodi" type="bool" label="70120" enable="lt(-1,2)+eq(0,false)" default="false"/>
+        <setting id="videolibrary_max_quality" type="bool" label="70729" default="false" visible="true"/>
     </category>
      <category label="70121">
         <setting id="start_page" type="bool" label="70121" default="false"/>
