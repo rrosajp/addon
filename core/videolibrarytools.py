@@ -93,8 +93,8 @@ def save_movie(item):
     # 1. contentTitle: Este deberia ser el sitio correcto, ya que title suele contener "Añadir a la videoteca..."
     # 2. fulltitle
     # 3. title
-    if item.contentTitle: item.title = item.contentTitle
-    elif item.fulltitle: item.title = item.fulltitle
+    # if item.contentTitle: item.title = item.contentTitle
+    # elif item.fulltitle: item.title = item.fulltitle
 
     if not item.contentTitle:
         # Colocamos el titulo correcto en su sitio para que scraper lo localize
@@ -105,7 +105,7 @@ def save_movie(item):
 
     # Si llegados a este punto no tenemos titulo, salimos
     if not item.contentTitle or not item.channel:
-        logger.debug("NO ENCONTRADO contentTitle")
+        logger.debug("contentTitle NOT FOUND")
         return 0, 0, -1  # Salimos sin guardar
 
     scraper_return = scraper.find_and_set_infoLabels(item)
@@ -117,7 +117,7 @@ def save_movie(item):
     if not scraper_return or not item.infoLabels['code']:
         # TODO de momento si no hay resultado no añadimos nada,
         # aunq podriamos abrir un cuadro para introducir el identificador/nombre a mano
-        logger.debug("NO ENCONTRADO EN SCRAPER O NO TIENE code")
+        logger.debug("NOT FOUND IN SCRAPER OR DO NOT HAVE code")
         return 0, 0, -1
 
     _id = item.infoLabels['code'][0]
@@ -146,9 +146,9 @@ def save_movie(item):
     if not path:
         # Crear carpeta
         path = filetools.join(MOVIES_PATH, ("%s [%s]" % (base_name, _id)).strip())
-        logger.info("Creando directorio pelicula:" + path)
+        logger.info("Creating movie directory:" + path)
         if not filetools.mkdir(path):
-            logger.debug("No se ha podido crear el directorio")
+            logger.debug("Could not create directory")
             return 0, 0, -1
 
     nfo_path = filetools.join(path, "%s [%s].nfo" % (base_name, _id))
@@ -161,7 +161,7 @@ def save_movie(item):
 
     if not nfo_exists:
         # Creamos .nfo si no existe
-        logger.info("Creando .nfo: " + nfo_path)
+        logger.info("Creating .nfo: " + nfo_path)
         head_nfo = scraper.get_nfo(item)
 
         item_nfo = Item(title=item.contentTitle, channel="videolibrary", action='findvideos',
@@ -184,7 +184,7 @@ def save_movie(item):
     if item_nfo and strm_exists:
 
         if json_exists:
-            logger.info("El fichero existe. Se sobreescribe")
+            logger.info("The file exists. Is overwritten")
             sobreescritos += 1
         else:
             insertados += 1
@@ -200,11 +200,11 @@ def save_movie(item):
                     item_nfo.emergency_urls = dict()
                 item_nfo.emergency_urls.update({item.channel: True})
         except:
-            logger.error("No se ha podido guardar las urls de emergencia de %s en la videoteca" % item.contentTitle)
+            logger.error("Unable to save %s emergency urls in the video library" % item.contentTitle)
             logger.error(traceback.format_exc())
 
         if filetools.write(json_path, item.tojson()):
-            p_dialog.update(100, 'Añadiendo película...', item.contentTitle)
+            p_dialog.update(100, config.get_localized_string(60062), item.contentTitle)
             item_nfo.library_urls[item.channel] = item.url
 
             if filetools.write(nfo_path, head_nfo + item_nfo.tojson()):
@@ -218,7 +218,7 @@ def save_movie(item):
                 return insertados, sobreescritos, fallidos
 
     # Si llegamos a este punto es por q algo ha fallado
-    logger.error("No se ha podido guardar %s en la videoteca" % item.contentTitle)
+    logger.error("Could not save %s in the video library" % item.contentTitle)
     p_dialog.update(100, config.get_localized_string(60063), item.contentTitle)
     p_dialog.close()
     return 0, 0, -1
@@ -232,15 +232,14 @@ def filter_list(episodelist, action=None, path=None):
         show_title = tvshow_item.infoLabels['tvshowtitle']
         if not tvshow_item.channel_prefs:
             tvshow_item.channel_prefs={channel:{}}
-
             list_item = os.listdir(path)
             for File in list_item:
-                if (File.endswith('.strm') or File.endswith('.json') or File.endswith('.nfo')) and not File == 'twshow.info':
+                if (File.endswith('.strm') or File.endswith('.json') or File.endswith('.nfo')):
                     os.remove(os.path.join(path, File))
         if channel not in tvshow_item.channel_prefs:
             tvshow_item.channel_prefs[channel] = {}
         channel_prefs = tvshow_item.channel_prefs[channel]
-        logger.info(str(tvshow_item))
+
         if action == 'get_seasons':
             if 'favourite_language' not in channel_prefs:
                 channel_prefs['favourite_language'] = ''
@@ -375,7 +374,7 @@ def save_tvshow(item, episodelist):
 
     # Si llegados a este punto no tenemos titulo o code, salimos
     if not (item.contentSerieName or item.infoLabels['code']) or not item.channel:
-        logger.debug("NO ENCONTRADO contentSerieName NI code")
+        logger.debug("NOT FOUND contentSerieName or code")
         return 0, 0, -1, path  # Salimos sin guardar
 
     scraper_return = scraper.find_and_set_infoLabels(item)
@@ -386,7 +385,7 @@ def save_tvshow(item, episodelist):
     if not scraper_return or not item.infoLabels['code']:
         # TODO de momento si no hay resultado no añadimos nada,
         # aunq podriamos abrir un cuadro para introducir el identificador/nombre a mano
-        logger.debug("NO ENCONTRADO EN SCRAPER O NO TIENE code")
+        logger.debug("NOT FOUND IN SCRAPER OR DO NOT HAVE code")
         return 0, 0, -1, path
 
     _id = item.infoLabels['code'][0]
@@ -415,7 +414,7 @@ def save_tvshow(item, episodelist):
 
     if not path:
         path = filetools.join(TVSHOWS_PATH, ("%s [%s]" % (base_name, _id)).strip())
-        logger.info("Creando directorio serie: " + path)
+        logger.info("Creating series directory: " + path)
         try:
             filetools.mkdir(path)
         except OSError, exception:
@@ -425,7 +424,7 @@ def save_tvshow(item, episodelist):
     tvshow_path = filetools.join(path, "tvshow.nfo")
     if not filetools.exists(tvshow_path):
         # Creamos tvshow.nfo, si no existe, con la head_nfo, info de la serie y marcas de episodios vistos
-        logger.info("Creando tvshow.nfo: " + tvshow_path)
+        logger.info("Creating tvshow.nfo: " + tvshow_path)
         head_nfo = scraper.get_nfo(item)
         item.infoLabels['mediatype'] = "tvshow"
         item.infoLabels['title'] = item.contentSerieName
@@ -498,10 +497,11 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     @rtype fallidos: int
     @return:  el número de episodios fallidos
     """
+    logger.info()
     episodelist = filter_list(episodelist, serie.action, path)
     # No hay lista de episodios, no hay nada que guardar
     if not len(episodelist):
-        logger.info("No hay lista de episodios, salimos sin crear strm")
+        logger.info("There is no episode list, we go out without creating strm")
         return 0, 0, 0
 
     insertados = 0
@@ -582,13 +582,13 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
             new_episodelist.append(e)
         except:
             if e.contentType == 'episode':
-                logger.error("No se ha podido guardar las urls de emergencia de %s en la videoteca" % e.contentTitle)
+                logger.error("Unable to save %s emergency urls in the video library" % e.contentTitle)
                 logger.error(traceback.format_exc())
             continue
 
     # No hay lista de episodios, no hay nada que guardar
     if not len(new_episodelist):
-        logger.info("No hay lista de episodios, salimos sin crear strm")
+        logger.info("There is no episode list, we go out without creating strm")
         return 0, 0, 0
 
     # fix float porque la division se hace mal en python 2.x
@@ -625,7 +625,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
                     item_strm.library_filter_show = serie.library_filter_show
 
                 if item_strm.library_filter_show == "":
-                    logger.error("Se ha producido un error al obtener el nombre de la serie a filtrar")
+                    logger.error("There was an error getting the name of the series to filter")
 
             # logger.debug("item_strm" + item_strm.tostring('\n'))
             # logger.debug("serie " + serie.tostring('\n'))
@@ -656,7 +656,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
 
                 if filetools.write(json_path, e.tojson()):
                     if not json_exists:
-                        logger.info("Insertado: %s" % json_path)
+                        logger.info("Inserted: %s" % json_path)
                         insertados += 1
                         # Marcamos episodio como no visto
                         news_in_playcounts[season_episode] = 0
@@ -667,14 +667,14 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
                         news_in_playcounts[serie.contentSerieName] = 0
 
                     else:
-                        logger.info("Sobreescrito: %s" % json_path)
+                        logger.info("Overwritten: %s" % json_path)
                         sobreescritos += 1
                 else:
-                    logger.info("Fallido: %s" % json_path)
+                    logger.info("Failed: %s" % json_path)
                     fallidos += 1
 
         else:
-            logger.info("Fallido: %s" % json_path)
+            logger.info("Failed: %s" % json_path)
             fallidos += 1
 
         if not silent and p_dialog.iscanceled():
@@ -712,8 +712,8 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
 
             filetools.write(tvshow_path, head_nfo + tvshow_item.tojson())
         except:
-            logger.error("Error al actualizar tvshow.nfo")
-            logger.error("No se ha podido guardar las urls de emergencia de %s en la videoteca" % tvshow_item.contentSerieName)
+            logger.error("Error updating tvshow.nfo")
+            logger.error("Unable to save %s emergency urls in the video library" % tvshow_item.contentSerieName)
             logger.error(traceback.format_exc())
             fallidos = -1
         else:
@@ -725,7 +725,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     if fallidos == len(episodelist):
         fallidos = -1
 
-    logger.debug("%s [%s]: insertados= %s, sobreescritos= %s, fallidos= %s" %
+    logger.debug("%s [%s]: inserted= %s, overwritten= %s, failed= %s" %
                  (serie.contentSerieName, serie.channel, insertados, sobreescritos, fallidos))
     return insertados, sobreescritos, fallidos
 
@@ -834,20 +834,20 @@ def add_tvshow(item, channel=None):
 
     if not insertados and not sobreescritos and not fallidos:
         platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60067))
-        logger.error("La serie %s no se ha podido añadir a la videoteca. No se ha podido obtener ningun episodio"
+        logger.error("The %s series could not be added to the video library. Could not get any episode"
                      % item.show)
 
     elif fallidos == -1:
         platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60068))
-        logger.error("La serie %s no se ha podido añadir a la videoteca" % item.show)
+        logger.error("The %s series could not be added to the video library" % item.show)
 
     elif fallidos > 0:
         platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60069))
-        logger.error("No se han podido añadir %s episodios de la serie %s a la videoteca" % (fallidos, item.show))
+        logger.error("Could not add %s episodes of the %s series to the video library" % (fallidos, item.show))
 
     else:
         platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60070))
-        logger.info("Se han añadido %s episodios de la serie %s a la videoteca" %
+        logger.info("%s episodes of the %s series have been added to the video library" %
                     (insertados, item.show))
         if config.is_xbmc():
             if config.get_setting("sync_trakt_new_tvshow", "videolibrary"):
@@ -886,7 +886,7 @@ def emergency_urls(item, channel=None, path=None):
             item_res.category = channel_save.capitalize()                   #... y la categoría
             del item_res.videolibray_emergency_urls                         #... y se borra la marca de lookup
     except:
-        logger.error('ERROR al procesar el título en Findvideos del Canal: ' + item.channel + ' / ' + item.title)
+        logger.error('ERROR when processing the title in Findvideos del Canal: ' + item.channel + ' / ' + item.title)
         logger.error(traceback.format_exc())
         item_res = item.clone()                         #Si ha habido un error, se devuelve el Item original
         if item_res.videolibray_emergency_urls:
@@ -929,7 +929,7 @@ def emergency_urls(item, channel=None, path=None):
                 item_res.url = item.url
 
         except:
-            logger.error('ERROR al cachear el .torrent de: ' + item.channel + ' / ' + item.title)
+            logger.error('ERROR when caching the .torrent of: ' + item.channel + ' / ' + item.title)
             logger.error(traceback.format_exc())
             item_res = item.clone()                             #Si ha habido un error, se devuelve el Item original
 
@@ -966,7 +966,7 @@ def caching_torrents(url, referer=None, post=None, torrents_path=None, timeout=1
     torrents_path_encode = filetools.encode(torrents_path)              #encode utf-8 del path
 
     if url.endswith(".rar") or url.startswith("magnet:"):               #No es un archivo .torrent
-        logger.error('No es un archivo Torrent: ' + url)
+        logger.error('It is not a Torrent file: ' + url)
         torrents_path = ''
         if data_torrent:
             return (torrents_path, torrent_file)
@@ -979,7 +979,7 @@ def caching_torrents(url, referer=None, post=None, torrents_path=None, timeout=1
         else:                                                           #Descarga sin post
             response = httptools.downloadpage(url, timeout=timeout)
         if not response.sucess:
-            logger.error('Archivo .torrent no encontrado: ' + url)
+            logger.error('.Torrent file not found: ' + url)
             torrents_path = ''
             if data_torrent:
                 return (torrents_path, torrent_file)
@@ -998,7 +998,7 @@ def caching_torrents(url, referer=None, post=None, torrents_path=None, timeout=1
 
         #Si es un archivo .ZIP tratamos de extraer el contenido
         if torrent_file.startswith("PK"):
-            logger.info('Es un archivo .ZIP: ' + url)
+            logger.info('It is a .ZIP file: ' + url)
 
             torrents_path_zip = filetools.join(videolibrary_path, 'temp_torrents_zip')  #Carpeta de trabajo
             torrents_path_zip = filetools.encode(torrents_path_zip)
@@ -1031,7 +1031,7 @@ def caching_torrents(url, referer=None, post=None, torrents_path=None, timeout=1
 
         #Si no es un archivo .torrent (RAR, HTML,..., vacío) damos error
         if not scrapertools.find_single_match(torrent_file, '^d\d+:.*?\d+:'):
-            logger.error('No es un archivo Torrent: ' + url)
+            logger.error('It is not a Torrent file: ' + url)
             torrents_path = ''
             if data_torrent:
                 return (torrents_path, torrent_file)
@@ -1040,7 +1040,7 @@ def caching_torrents(url, referer=None, post=None, torrents_path=None, timeout=1
         #Salvamos el .torrent
         if not lookup:
             if not filetools.write(torrents_path_encode, torrent_file):
-                logger.error('ERROR: Archivo .torrent no escrito: ' + torrents_path_encode)
+                logger.error('ERROR: Unwritten .torrent file: ' + torrents_path_encode)
                 torrents_path = ''                                          #Si hay un error, devolvemos el "path" vacío
                 torrent_file = ''                                           #... y el buffer del .torrent
                 if data_torrent:
@@ -1049,7 +1049,7 @@ def caching_torrents(url, referer=None, post=None, torrents_path=None, timeout=1
     except:
         torrents_path = ''                                                  #Si hay un error, devolvemos el "path" vacío
         torrent_file = ''                                                   #... y el buffer del .torrent
-        logger.error('Error en el proceso de descarga del .torrent: ' + url + ' / ' + torrents_path_encode)
+        logger.error('ERROR: .Torrent download process failed: ' + url + ' / ' + torrents_path_encode)
         logger.error(traceback.format_exc())
 
     #logger.debug(torrents_path)
