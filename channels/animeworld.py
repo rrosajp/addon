@@ -164,7 +164,12 @@ def findvideos(item):
             else:
                 dataJson = support.httptools.downloadpage('%s/ajax/episode/info?id=%s&server=%s&ts=%s' % (host, ID, serverid, int(time.time())), headers=[['x-requested-with', 'XMLHttpRequest']]).data
                 json = jsontools.load(dataJson)
-                videoData +='\n'+json['grabber']
+                if 'keepsetsu' in json['grabber']:
+                    matches = support.match(item, r'<iframe\s*src="([^"]+)"', url=json['grabber'])[0]
+                    for url in matches:
+                        videoData += '\n' + url
+                else:
+                    videoData += '\n' + json['grabber']
 
                 if serverid == '28':
                     itemlist.append(
