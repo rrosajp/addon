@@ -896,11 +896,11 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
 
 
     itemList = servertools.find_video_items(data=str(data))
-    itemlist += itemList
+    itemlist = itemlist + itemList
 
     for videoitem in itemlist:
         item.title = item.contentTitle if config.get_localized_string(30161) in item.title else item.title
-        videoitem.title = "".join([item.title, ' ', typo(videoitem.title, 'color kod []'), typo(videoitem.quality, 'color kod []') if videoitem.quality else ""])
+        videoitem.title = item.title + typo(videoitem.title, '_ color kod []') + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail
