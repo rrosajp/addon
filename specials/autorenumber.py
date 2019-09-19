@@ -300,7 +300,7 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
         regular = {}
         complete = {}
         allep = 1
-        ep = 1
+        ep = 0
         specialep = 0
         for episode in EpList:
             complete[allep] = [str(episode[1]) + 'x' + str(episode[2]), episode[0]]

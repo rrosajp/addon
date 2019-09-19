@@ -79,6 +79,7 @@ def search(item, texto):
     support.log(texto)
     item.args = 'noorder'
     item.url = host + '/search?keyword=' + texto
+    item.contentType = 'tvshow'
     try:
         return peliculas(item)
     # Continua la ricerca in caso di errore
@@ -98,10 +99,13 @@ def peliculas(item):
         action='findvideos'
     else:
         if item.args != 'noorder' and not item.url[-1].isdigit(): item.url += order() # usa l'ordinamento di configura canale
-        patron= r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<year>\d+)\) )?(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>[^>]+>[^>]+>\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?'
+        patron= r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<year>\d+)\) )?(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>(?:\s*<div class="dub">[^>]+>)?\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?'
         action='episodios'
 
     # Controlla la lingua se assente
+    patronNext=r'href="([^"]+)" rel="next"'
+    type_content_dict={'movie':['movie', 'special']}
+    type_action_dict={'findvideos':['movie', 'special']}
     check_lang = item.url
     def itemHook(item):
         if not item.contentLanguage:
@@ -113,9 +117,7 @@ def peliculas(item):
                 item.title += support.typo(item.contentLanguage,'_ [] color kod')
         return item
 
-    patronNext=r'href="([^"]+)" rel="next"'
-    type_content_dict={'movie':['movie']}
-    type_action_dict={'findvideos':['movie']}
+
     return locals()
 
 
