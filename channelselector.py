@@ -42,7 +42,7 @@ def getmainlist(view="thumb_"):
 
     if addon.getSetting('enable_onair_menu') == "true":
         itemlist.append(Item(channel="filmontv", action="mainlist", title=config.get_localized_string(50001),
-                            thumbnail=get_thumb("on_the_air.png"), viewmode="thumbnails"))  
+                            thumbnail=get_thumb("on_the_air.png"), viewmode="thumbnails"))
 
     if addon.getSetting('enable_link_menu') == "true":
         itemlist.append(Item(title=config.get_localized_string(70527), channel="kodfavorites", action="mainlist",
@@ -106,7 +106,7 @@ def getchanneltypes(view="thumb_"):
 
     # itemlist.append(Item(title='Oggi in TV', channel="filmontv", action="mainlist", view=view,
     #                      category=title, channel_type="all", thumbnail=get_thumb("on_the_air.png", view),
-    #                      viewmode="thumbnails")) 
+    #                      viewmode="thumbnails"))
 
 
 
@@ -117,7 +117,7 @@ def getchanneltypes(view="thumb_"):
 
 
 def filterchannels(category, view="thumb_"):
-    logger.info()
+    logger.info('Filterchannl'+category)
 
     channelslist = []
 
@@ -128,8 +128,11 @@ def filterchannels(category, view="thumb_"):
         appenddisabledchannels = True
 
     # Lee la lista de canales
-    channel_path = os.path.join(config.get_runtime_path(), "channels", '*.json')
-    logger.info("channel_path=%s" % channel_path)
+    if category != 'adult':
+        channel_path = os.path.join(config.get_runtime_path(), 'channels', '*.json')
+    else:
+        channel_path = os.path.join(config.get_runtime_path(), 'channels', 'porn', '*.json')
+    logger.info("channel_path = %s" % channel_path)
 
     channel_files = glob.glob(channel_path)
     logger.info("channel_files encontrados %s" % (len(channel_files)))
@@ -139,7 +142,7 @@ def filterchannels(category, view="thumb_"):
     logger.info("channel_language=%s" % channel_language)
 
     for channel_path in channel_files:
-        logger.info("channel=%s" % channel_path)
+        logger.info("channel in for = %s" % channel_path)
 
         channel = os.path.basename(channel_path).replace(".json", "")
 
@@ -252,12 +255,12 @@ def get_thumb(thumb_name, view="thumb_", auto=False):
         thumbnail = ''
 
         thumb_name = unify.set_genre(unify.simplify(thumb_name))
-        
+
 
         if thumb_name in thumb_dict:
             thumbnail = thumb_dict[thumb_name]
         return thumbnail
-       
+
     else:
         icon_pack_name = config.get_setting('icon_set', default="default")
         resource_path = os.path.join(config.get_runtime_path(), "resources", "media", "themes")
@@ -315,12 +318,12 @@ def auto_filter(auto_lang=False):
     lang = 'all'
 
     lang_dict = {'ita':'it'}
-  
+
     if config.get_setting("channel_language") == 'auto' or auto_lang == True:
         for langs, variant in lang_dict.items():
             if def_lang in variant:
                 lang = langs
-                
+
     else:
         lang = config.get_setting("channel_language", default="all")
 
@@ -330,7 +333,7 @@ def auto_filter(auto_lang=False):
 def thumb(itemlist=[], genre=False):
     if itemlist:
         import re
-        
+
         icon_dict = {'channels_movie':['film'],
                      'channels_tvshow':['serie','tv','episodi','episodio'],
                      'channels_documentary':['documentari','documentario'],
@@ -341,7 +344,7 @@ def thumb(itemlist=[], genre=False):
                      'genres':['genere', 'generi', 'categorie', 'categoria'],
                      'channels_animation': ['animazione', 'cartoni', 'cartoon'],
                      'channels_action':['azione', 'arti marziali'],
-                     'channels_adventure': ['avventura'],                     
+                     'channels_adventure': ['avventura'],
                      'channels_biographical':['biografico'],
                      'channels_comedy':['comico','commedia', 'demenziale'],
                      'channels_adult':['erotico', 'hentai'],
@@ -353,7 +356,7 @@ def thumb(itemlist=[], genre=False):
                      'channels_war':['guerra'],
                      'channels_children':['bambini'],
                      'horror':['horror'],
-                     'lucky': ['fortunato'], 
+                     'lucky': ['fortunato'],
                      'channels_musical':['musical', 'musica'],
                      'channels_mistery':['mistero', 'giallo'],
                      'channels_noir':['noir'],
@@ -367,7 +370,7 @@ def thumb(itemlist=[], genre=False):
                      'channels_family':['famiglia','famiglie'],
                      'channels_historical':['storico'],
                      'autoplay':[config.get_localized_string(60071)]
-                    }    
+                    }
 
         suffix_dict = {'_hd':['hd','altadefinizione','alta definizione'],
                        '_4k':['4K'],
@@ -381,14 +384,14 @@ def thumb(itemlist=[], genre=False):
                         '_tvshow':['serie','tv']}
 
         for item in itemlist:
-            
+
             if genre == False:
 
                 for thumb, titles in icon_dict.items():
                     if any( word in item.title.lower() for word in search):
                         thumb = 'search'
                         for suffix, titles in search_suffix.items():
-                            if any( word in item.title.lower() for word in titles ): 
+                            if any( word in item.title.lower() for word in titles ):
                                 thumb = thumb + suffix
                         item.thumbnail = get_thumb(thumb + '.png')
                     elif any( word in item.title.lower() for word in titles ):
@@ -408,7 +411,7 @@ def thumb(itemlist=[], genre=False):
                     else:
                         thumb = item.thumbnails
 
-            
+
             item.title = re.sub(r'\s*\{[^\}]+\}','',item.title)
         return itemlist
     else:

@@ -40,7 +40,7 @@ def start():
     # check_adsl = test_conn(is_exit = True, check_dns = True, view_msg = True,
     #           lst_urls = [], lst_site_check_dns = [], in_addon = True)
 
-    
+
 def run(item=None):
     logger.info()
     if not item:
@@ -157,11 +157,17 @@ def run(item=None):
             # Checks if channel exists
             if os.path.isfile(os.path.join(config.get_runtime_path(), 'channels', item.channel + ".py")):
                 CHANNELS = 'channels'
+            elif os.path.isfile(os.path.join(config.get_runtime_path(), 'channels', 'porn', item.channel + ".py")):
+                CHANNELS = 'channels.porn'
             else:
                 CHANNELS ='specials'
-            channel_file = os.path.join(config.get_runtime_path(), CHANNELS, item.channel + ".py")            
-                
-            logger.info("channel_file= " + channel_file)
+
+            if CHANNELS != 'channels.porn':
+                channel_file = os.path.join(config.get_runtime_path(), CHANNELS, item.channel + ".py")
+            else:
+                channel_file = os.path.join(config.get_runtime_path(), 'channels', 'porn', item.channel + ".py")
+
+            logger.info("channel_file= " + channel_file + ' - ' + CHANNELS +' - ' + item.channel)
 
             channel = None
 
@@ -169,7 +175,8 @@ def run(item=None):
                 try:
                     channel = __import__(CHANNELS + item.channel, None, None, [CHANNELS + item.channel])
                 except ImportError:
-                    importer = "import " + CHANNELS + "." + item.channel + " as channel"
+                    importer = "import " + CHANNELS + "." + item.channel + " as channel "
+
                     exec(importer)
 
             logger.info("Running channel %s | %s" % (channel.__name__, channel.__file__))
@@ -276,7 +283,7 @@ def run(item=None):
 
                 platformtools.render_items(itemlist, item)
 
-            # For all other actions            
+            # For all other actions
             else:
                 # import web_pdb; web_pdb.set_trace()
                 logger.info("Executing channel '%s' method" % item.action)
@@ -430,7 +437,7 @@ def play_from_library(item):
     import xbmcplugin
     import xbmc
     from time import sleep
-    
+
     # Intentamos reproducir una imagen (esto no hace nada y ademas no da error)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True,
                               xbmcgui.ListItem(
