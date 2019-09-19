@@ -2,31 +2,36 @@
 # ------------------------------------------------------------
 # Canale per 'idcanale nel json'
 # ------------------------------------------------------------
-# Rev: 0.1
-# Update 17-09-2019
+# Rev: 0.2
+# Update 18-09-2019
+# fix:
+# 1. aggiunto pagination e sistemate alcune voci
+
+# Questo vuole solo essere uno scheletro per velocizzare la scrittura di un canale.
+# I commenti sono più un promemoria... che una vera e propria spiegazione!
+# Niente di più.
+# Ulteriori informazioni sono reperibili nel wiki:
+# https://github.com/kodiondemand/addon/wiki/decoratori
 """
-    
+
     Problemi noti che non superano il test del canale:
        - indicare i problemi
 
     Avvisi:
         - Eventuali avvisi per i tester
-        
+
     Ulteriori info:
-    
+
 
 """
-# Questo vuole solo essere uno scheletro per velocizzare la scrittura di un canale.
-# I commenti sono più un promemoria... che una vera e propria spiegazione!
-# Niente di più. Ulteriori informazioni sono reperibili nel wiki:
-# https://github.com/kodiondemand/addon/wiki/decoratori
 # CANCELLARE Ciò CHE NON SERVE per il canale, lascia il codice commentato
 # ma fare PULIZIA quando si è finito di testarlo
 
 # Qui gli import
+#import re
 
 # per l'uso dei decoratori, per i log, e funzioni per siti particolari
-from core import support 
+from core import support
 # se non si fa uso di findhost()
 from platformcode import config
 
@@ -43,7 +48,7 @@ from platformcode import config
 # da cancellare se non utilizzata
 __channel__ = "id nel json"
 # da cancellare se si utilizza findhost()
-host = config.get_channel_url(id nel json o __channel__)
+host = config.get_channel_url('id nel json OR '__channel__) # <-- ATTENZIONE
 headers = [['Referer', host]]
 
 # Inizio findhost() - da cancellare se usato l'altro metodo
@@ -75,10 +80,10 @@ list_quality = ['default', 'HD', '3D', '4K', 'DVD', 'SD']
 @support.menu
 def mainlist(item):
     support.log(item)
-    
+
     # Ordine delle voci
     # Voce FILM, puoi solo impostare l'url
-    film = [ 
+    film = ['',
         #'url', # url per la voce FILM, se possibile la pagina principale con le ultime novità
         #Voce Menu,['url','action','args',contentType]
         ('Al Cinema', ['', 'peliculas', '']),
@@ -90,9 +95,9 @@ def mainlist(item):
         ('Popolari', ['', 'peliculas', '']),
         ('Sub-ITA', ['', 'peliculas', ''])
         ]
-    
+
     # Voce SERIE, puoi solo impostare l'url
-    tvshow = [
+    tvshow = ['',
         #'url', # url per la voce Serie, se possibile la pagina principale con le ultime novità
         #Voce Menu,['url','action','args',contentType]
         ('Per Lettera', ['', 'genres', 'letters']),
@@ -100,16 +105,16 @@ def mainlist(item):
         ('Per anno', ['', 'genres', 'years'])
 
     # Voce ANIME, puoi solo impostare l'url
-    anime = [
+    anime = ['',
         #'url', # url per la voce Anime, se possibile la pagina principale con le ultime novità
         #Voce Menu,['url','action','args',contentType]
         ('In Corso',['', '', '', '']),
         ('Ultimi Episodi',['', '', '', '']),
         ('Ultime Serie',['', '', '', ''])
         ]
-    
+
     """
-        Eventuali Menu per voci non contemplate!        
+        Eventuali Menu per voci non contemplate!
     """
 
     # se questa voce non è presente il menu genera una voce
@@ -145,51 +150,54 @@ def mainlist(item):
 
 
 @support.scrape
-def peliculas(item): 
+def peliculas(item):
     support.log(item)
     #dbg # decommentare per attivare web_pdb
-    
-    action = ''
-    blacklist = ''
-    patron = ''
-    patronBlock = ''
-    patronNext = ''
-    
-    debug = False  # True per testare le regex sul sito
-    return locals()
-    
-@support.scrape
-def episodios(item): 
-    support.log(item)
-    #dbg 
 
     action = ''
-    blacklist = ''
-    patron = ''
-    patronBlock = ''
-    patronNext = ''  
-    
+    blacklist = ['']
+    patron = r''
+    patronBlock = r''
+    patronNext = ''
+    pagination = 0
+
+    debug = False  # True per testare le regex sul sito
+    return locals()
+
+@support.scrape
+def episodios(item):
+    support.log(item)
+    #dbg
+
+    action = ''
+    blacklist = ['']
+    patron = r''
+    patronBlock = r''
+    patronNext = ''
+    pagination = 0
+
     debug = False
     return locals()
 
 # Questa def è utilizzata per generare i menu del canale
-# per genere, per anno, per lettera, per qualità ecc ecc            
+# per genere, per anno, per lettera, per qualità ecc ecc
 @support.scrape
 def genres(item):
     support.log(item)
-    #dbg 
+    #dbg
 
     action = ''
-    blacklist = ''
-    patron = ''
-    patronBlock = ''
-    patronNext = ''  
-    
+    blacklist = ['']
+    patron = r''
+    patronBlock = r''
+    patronNext = ''
+    pagination = 0
+
     debug = False
     return locals()
-    
+
 ############## Fine ordine obbligato
-## Def ulteriori 
+## Def ulteriori
 
 ############## Fondo Pagina
 # da adattare al canale
@@ -207,9 +215,9 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            log('search log:', line))
+            log('search log:', line)
         return []
-        
+
 
 # da adattare al canale
 # inserire newest solo se il sito ha la pagina con le ultime novità/aggiunte
@@ -230,7 +238,7 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            log'(newest log: ', {0}.format(line))
+            log('newest log: ', {0}.format(line))
         return []
 
     return itemlist
@@ -240,4 +248,4 @@ def newest(categoria):
 def findvideos(item):
     support.log('findvideos ->', item)
     return support.server(item, headers=headers)
- 
+
