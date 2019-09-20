@@ -11,17 +11,6 @@ from lib import unshortenit
 from platformcode import logger, config
 from specials import autoplay
 
-#impostati dinamicamente da getUrl()
-host = ""
-headers = ""
-
-
-def findhost():
-    global host, headers
-    permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
-    host = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-    headers = [['Referer', host]]
-
 __channel__ = "cineblog01"
 host = config.get_channel_url(__channel__)
 headers = [['Referer', host]]
@@ -41,7 +30,6 @@ blacklist = ['BENVENUTI', 'Richieste Serie TV', 'CB01.UNO &#x25b6; TROVA L&#8217
 
 
 def mainlist(item):
-    # findhost()
 
     autoplay.init(item.channel, list_servers, list_quality)
 
@@ -68,7 +56,6 @@ def mainlist(item):
 
 
 def menu(item):
-    findhost()
     itemlist= []
     data = httptools.downloadpage(item.url, headers=headers).data
     data = re.sub('\n|\t', '', data)
@@ -107,7 +94,6 @@ def search(item, text):
 
 
 def newest(categoria):
-    findhost()
     itemlist = []
     item = Item()
     item.contentType = 'movie'
@@ -232,7 +218,6 @@ def episodios(item):
 
 
 def findvideos(item):
-    findhost()
 
     if item.contentType == "episode":
         return findvid_serie(item)
