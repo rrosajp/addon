@@ -22,6 +22,10 @@ def findhost():
     host = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
     headers = [['Referer', host]]
 
+__channel__ = "cineblog01"
+host = config.get_channel_url(__channel__)
+headers = [['Referer', host]]
+
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
 list_servers = ['verystream', 'openload', 'streamango', 'wstream']
@@ -37,7 +41,7 @@ blacklist = ['BENVENUTI', 'Richieste Serie TV', 'CB01.UNO &#x25b6; TROVA L&#8217
 
 
 def mainlist(item):
-    findhost()
+    # findhost()
 
     autoplay.init(item.channel, list_servers, list_quality)
 
