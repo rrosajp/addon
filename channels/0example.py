@@ -98,16 +98,18 @@ def mainlist(item):
 
     # Voce SERIE, puoi solo impostare l'url
     tvshow = ['',
-        #'url', # url per la voce Serie, se possibile la pagina principale con le ultime novità
+        #'url', # url per la voce Serie, se possibile la pagina con titoli di serie
         #Voce Menu,['url','action','args',contentType]
+        ('Novità', ['', '', ''])
         ('Per Lettera', ['', 'genres', 'letters']),
         ('Per Genere', ['', 'genres', 'genres']),
         ('Per anno', ['', 'genres', 'years'])
 
     # Voce ANIME, puoi solo impostare l'url
     anime = ['',
-        #'url', # url per la voce Anime, se possibile la pagina principale con le ultime novità
+        #'url', # url per la voce Anime, se possibile la pagina con titoli di anime
         #Voce Menu,['url','action','args',contentType]
+        ('Novità', ['', '', ''])        
         ('In Corso',['', '', '', '']),
         ('Ultimi Episodi',['', '', '', '']),
         ('Ultime Serie',['', '', '', ''])
