@@ -1,12 +1,12 @@
 {
-    "id": "animeworld", 
-    "name": "AnimeWorld", 
-    "active": true, 
-    "adult": false, 
-    "language": ["ita", "vos", "vosi"],
+    "id": "animeworld",
+    "name": "AnimeWorld",
+    "active": true,
+    "adult": false,
+    "language": ["ita", "vos"],
     "thumbnail": "animeworld.png",
     "banner": "animeworld.png",
-    "categories": ["anime"],
+    "categories": ["anime", "vos"],
     "settings": [
         {
             "id": "order",

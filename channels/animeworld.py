@@ -124,21 +124,12 @@ def peliculas(item):
 @support.scrape
 def episodios(item):
     anime=True
-    patronBlock= r'server  active(?P<block>.*?)server  hidden '
+    patronBlock= r'<div class="server\s*active\s*"(?P<block>.*?)</ul>'
     patron = r'<li><a [^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+" href="(?P<url>[^"]+)"[^>]+>(?P<episode>[^<]+)<'
     def itemHook(item):
         item.title += support.typo(item.fulltitle,'-- bold')
         return item
     action='findvideos'
-    def itemlistHook(itemlist):
-        if len(itemlist) == 0:
-            itemlist.append(
-                support.Item(
-                    channel=item.channel,
-                    title=support.typo('VVVVID NON SUPPORTATO','bold'),
-                    folder=False
-                    ))
-        return itemlist
     return locals()
 
 
@@ -155,17 +146,14 @@ def findvideos(item):
         ID = support.scrapertoolsV2.find_single_match(str(block),r'<a data-id="([^"]+)" data-base="' + (number if number else '1') + '"')
         support.log('ID= ',serverid)
         if id:
-            if serverid == '26': # IF VVVVID
-                itemlist.append(
-                    support.Item(
-                        channel=item.channel,
-                        title=support.typo('VVVVID NON SUPPORTATO','bold'),
-                        folder=False))
-                return itemlist
-
+            if serverid == '26':
+                matches = support.match(item, r'<a href="([^"]+)"', url='%s/ajax/episode/serverPlayer?id=%s' % (host, item.url.split('/')[-1]))[0]
+                for url in matches:
+                        videoData += '\n' + url
             else:
                 dataJson = support.httptools.downloadpage('%s/ajax/episode/info?id=%s&server=%s&ts=%s' % (host, ID, serverid, int(time.time())), headers=[['x-requested-with', 'XMLHttpRequest']]).data
                 json = jsontools.load(dataJson)
+                support.log(json)
                 if 'keepsetsu' in json['grabber']:
                     matches = support.match(item, r'<iframe\s*src="([^"]+)"', url=json['grabber'])[0]
                     for url in matches:
