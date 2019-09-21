@@ -1,151 +1,140 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per casacinema
+# Canale per 'casacinemaInfo'
 # ------------------------------------------------------------
+"""
 
-from core import scrapertoolsV2, httptools, servertools, tmdb, support
+    Problemi noti che non superano il test del canale:
+       - indicare i problemi
+
+    Avvisi:
+        - Sub-ita è nel titolo, lascia il puntatore sulla locandina
+        per visualizzare il titolo completo!
+
+    Ulteriori info:
+
+
+"""
+# CANCELLARE Ciò CHE NON SERVE per il canale, lascia il codice commentato
+# ma fare PULIZIA quando si è finito di testarlo
+
+# Qui gli import
+#import re
+
+# per l'uso dei decoratori, per i log, e funzioni per siti particolari
+from core import support
+
+# in caso di necessità
+from core import scrapertoolsV2, httptools #, servertools, tmdb
 from core.item import Item
-from platformcode import logger, config
-from specials import autoplay
+#from lib import unshortenit
 
-__channel__ = "casacinemainfo"
-host = config.get_channel_url(__channel__)
-IDIOMAS = {'Italiano': 'IT'}
-list_language = IDIOMAS.values()
-list_servers = ['verystream', 'openload', 'wstream', 'speedvideo']
-list_quality = ['1080p', '720', '480p', '360p']
+##### fine import
 
-checklinks = config.get_setting('checklinks', 'casacinema')
-checklinks_number = config.get_setting('checklinks_number', 'casacinema')
+host = ""
+headers = ""
 
+def findhost():
+    global host, headers
+    data = httptools.downloadpage('https://casacinema.nuovo.link').data
+    host = scrapertoolsV2.find_single_match(data, r'<div class="elementor-widget-container"><div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    headers = [['Referer', host]]
+    if host.endswith('/'):
+        host = host[:-1]
+findhost()
 
+# server di esempio...
+list_servers = ['supervideo', 'streamcherry','rapidvideo', 'streamango', 'openload']
+# quality di esempio
+list_quality = ['default', 'HD', '3D', '4K', 'DVD', 'SD']
+
+@support.menu
 def mainlist(item):
-    logger.info("alfa.casacinema mainlist")
+    support.log(item)
 
-    autoplay.init(item.channel, list_servers, list_quality)
+    # Ordine delle voci
+    # Voce FILM, puoi solo impostare l'url
+    film = ['',
+        #'url', # url per la voce FILM, se possibile la pagina principale con le ultime novità
+        #Voce Menu,['url','action','args',contentType]
+        ('Al Cinema', ['/category/in-sala/', 'peliculas', '']),
+        ('Novità', ['/category/nuove-uscite/', 'peliculas', '']),
+        ('Generi', ['', 'genres', 'genres']),
+        ('Sub-ITA', ['/category/sub-ita/', 'peliculas', ''])
+        ]
 
-    itemlist = [Item(channel=item.channel,
-                     title="Film",
-                     action="peliculas",
-                     extra="movie",
-                     url=host,
-                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
-                Item(channel=item.channel,
-                     title="In sala",
-                     action="peliculas",
-                     extra="movie",
-                     url="%s/category/in-sala/" % host,
-                     thumbnail="http://jcrent.com/apple%20tv%20final/HD.png"),
-                Item(channel=item.channel,
-                     title="Novità",
-                     action="peliculas",
-                     extra="movie",
-                     url="%s/category/nuove-uscite/" % host,
-                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
-                Item(channel=item.channel,
-                     title="Sub - Ita",
-                     action="peliculas",
-                     extra="movie",
-                     url="%s/category/sub-ita/" % host,
-                     thumbnail="http://i.imgur.com/qUENzxl.png"),
-                Item(channel=item.channel,
-                     title="[COLOR yellow]Cerca...[/COLOR]",
-                     action="search",
-                     extra="movie",
-                     thumbnail="http://dc467.4shared.com/img/fEbJqOum/s7/13feaf0c8c0/Search")]
-
-    
-    autoplay.show_option(item.channel, itemlist)
-
-    return itemlist
+    return locals()
 
 
-def search(item, texto):
-    logger.info("[casacinemaInfo.py] " + item.url + " search " + texto)
-
-    item.url = host + "/?s=" + texto
-    data = httptools.downloadpage(item.url).data
-
-    itemlist = []
-
-    patron = '<li class="col-md-12 itemlist">.*?<a href="([^"]+)" title="([^"]+)".*?<img src="([^"]+)".*?Film dell\\\'anno: ([0-9]{4}).*?<p class="text-list">([^<>]+)</p>'
-    matches = scrapertoolsV2.find_multiple_matches(data, patron)
-    for scrapedurl, scrapedtitle, scrapedthumbnail, scrapedyear, scrapedplot in matches:
-        title = scrapertoolsV2.decodeHtmlentities(scrapedtitle)
-        cleantitle = title.replace('[Sub-ITA]', '').strip()
-
-        infoLabels = {"plot": scrapertoolsV2.decodeHtmlentities(scrapedplot), "year": scrapedyear}
-
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="findvideos",
-                 contentType="movie",
-                 title=title,
-                 url=scrapedurl,
-                 thumbnail=scrapedthumbnail,
-                 infoLabels=infoLabels,
-                 fulltitle=cleantitle))
-
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-
-    return itemlist
-
-
+@support.scrape
 def peliculas(item):
-    logger.info("[casacinemaInfo.py] peliculas")
+    support.log(item)
+    #dbg # decommentare per attivare web_pdb
 
+##    action = 'episodios'
+    blacklist = ['']
+    if item.args != 'search':
+        patron = r'<div class="col-mt-5 postsh">[^<>]+<div class="poster-media-card">[^<>]+<a href="(?P<url>[^"]+)" title="(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA)\])?".*?<img(?:.+?)?src="(?P<thumb>[^"]+)"'
+        patronBlock = r'<div class="showpost4 posthome">(?P<block>.*?)</section>'
+    else:
+        patron = r'<li class="col-md-12 itemlist">.*?<a href="(?P<url>[^"]+)" title="(?P<title>[^"]+)".*?<img src="(?P<thumb>[^"]+)".*?Film dell"anno: (?P<year>\d{4})(?:[\d\-]+)?</p> <p class="text-list">(?P<plot>[^<>]+)</p>'
+        patronBlock = r'<ul class="search-results-content infinite">(?P<block>.*?)</section>'
+    patronNext = '<a href="([^"]+)"><i class="glyphicon glyphicon-chevron-right"'
+
+    #debug = True  # True per testare le regex sul sito
+    return locals()
+
+
+@support.scrape
+def genres(item):
+    support.log(item)
+    #dbg
+
+    action = 'peliculas'
+    blacklist = ['']
+    patron = r'href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
+    patronBlock = r'</span>Generi</h3>(?P<block>.*?)<div class="clear"></div>'
+
+    debug = False
+    return locals()
+
+
+def search(item, text):
+    support.log('search', item)
     itemlist = []
+    text = text.replace(' ', '+')
+    item.args = 'search'
+    item.url = host+'/?s=%s' % (text)
+    try:
+        return peliculas(item)
+    # Se captura la excepcion, para no interrumpir al buscador global si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            log('search log:', line)
+        return []
 
-    # Carica la pagina 
-    data = httptools.downloadpage(item.url).data
+def newest(categoria):
+    support.log('newest ->', categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == 'peliculas':
+            item.url = host
+            item.action = 'peliculas'
+            itemlist = peliculas(item)
 
-    # Estrae i contenuti
-
-    patron = '<div class="col-mt-5 postsh">[^<>]+<div class="poster-media-card">[^<>]+<a href="([^"]+)" title="([^"]+)".*?<img src="([^"]+)"'
-
-    matches = scrapertoolsV2.find_multiple_matches(data, patron)
-
-    for scrapedurl, scrapedtitle, scrapedthumbnail in matches:
-        title = scrapertoolsV2.decodeHtmlentities(scrapedtitle)
-        cleantitle = title.replace('[Sub-ITA]', '').strip()
-
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="findvideos",
-                 contentType="movie",
-                 title=title,
-                 url=scrapedurl,
-                 thumbnail=scrapedthumbnail,
-                 fulltitle=cleantitle))
-
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-
-    ## Paginación
-    next_page = scrapertoolsV2.find_single_match(data, '<a href="([^"]+)"><i class="glyphicon glyphicon-chevron-right"')  ### <- Regex rimosso spazio - precedente <li><a href="([^"]+)" >Pagina -> Continua. riga 221
-
-    if next_page != "":
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="peliculas",
-                 title="[COLOR lightgreen]" + config.get_localized_string(30992) + "[/COLOR]",
-                 url=next_page,
-                 extra=item.extra,
-                 thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png"))
+            if itemlist[-1].action == 'peliculas':
+                itemlist.pop()
+    # Continua la ricerca in caso di errore
+    except:
+        import sys
+        for line in sys.exc_info():
+            log('newest log: ', {0}.format(line))
+        return []
 
     return itemlist
-
 
 def findvideos(item):
-    logger.info("[casacinemaInfo.py] findvideos")
-
-    itemlist = support.hdpass_get_servers(item)
-
-    # Requerido para Filtrar enlaces
-
-    if checklinks:
-        itemlist = servertools.check_list_links(itemlist, checklinks_number)
-
-    # Requerido para AutoPlay
-
-    autoplay.start(itemlist, item)
-    return itemlist
+    support.log('findvideos ->', item)
+    return support.hdpass_get_servers(item)
