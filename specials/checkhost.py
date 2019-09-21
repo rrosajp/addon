@@ -13,10 +13,11 @@ addonname = addon.getAddonInfo('name')
 addonid = addon.getAddonInfo('id')
 
 LIST_SITE = ['https://www.google.com', 'https://www.google.it',
-                'http://www.ansa.it/', 'https://www.debian.org/']
+                'http://www.ansa.it/']#, 'https://www.debian.org/']
 
 # lista di siti che non verranno raggiunti con i DNS del gestore
-LST_SITE_CHCK_DNS = ['https://www.italia-film.pw', 'https://casacinema.space']
+LST_SITE_CHCK_DNS = ['https://www.italia-film.pw', 'https://casacinema.space',
+                     'https://documentari-streaming-da.com']
 
 
 class Kdicc():
