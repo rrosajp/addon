@@ -441,15 +441,16 @@ class UnshortenIt(object):
             return uri, str(e)
 
     def _unshorten_rapidcrypt(self, uri):
+        # import web_pdb; web_pdb.set_trace()
         try:
             r = httptools.downloadpage(uri, timeout=self._timeout, cookies=False)
             html = r.data
+            html = html.replace("'",'"')
 
             if 'embed' in uri:
-                uri = re.findall(r'<a class="play-btn" href=([^">]*)>', html)[0]
+                uri = re.findall(r'<a class="play-btn" href=(?:")?([^">]+)', html)[0]
             else:
-                uri = re.findall(r'<a class="push_button blue" href=([^>]+)>', html)[0]
-
+                uri = re.findall(r'<a class="push_button blue" href=(?:")?([^">]+)', html)[0]
             return uri, r.code
 
         except Exception as e:
