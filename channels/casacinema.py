@@ -1,340 +1,170 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Kodi on Demand - Kodi Addon
-# Canale per casacinema
+# Canale per 'idcanale nel json'
 # ------------------------------------------------------------
-import re
-import urlparse
+# Rev: 0.2
+# Update 18-09-2019
+# fix:
+# 1. aggiunto pagination e sistemate alcune voci
 
-from channelselector import thumb, get_thumb
-from core import scrapertools, scrapertoolsV2, httptools, tmdb, support
-from core.item import Item
-from platformcode import logger, config
-from specials import autoplay
+# Questo vuole solo essere uno scheletro per velocizzare la scrittura di un canale.
+# I commenti sono più un promemoria... che una vera e propria spiegazione!
+# Niente di più.
+# Ulteriori informazioni sono reperibili nel wiki:
+# https://github.com/kodiondemand/addon/wiki/decoratori
+"""
 
+    Problemi noti che non superano il test del canale:
+       - indicare i problemi
+
+    Avvisi:
+        - NON è presente nella ricerca globale
+        - TUTTE le pagine delle serie contengono al max 20 titoli
+
+    Ulteriori info:
+
+"""
+# Qui gli import
+# per l'uso dei decoratori, per i log, e funzioni per siti particolari
+from core import support
+from platformcode import config
+
+# in caso di necessità
+#from core import scrapertoolsV2#, httptools, servertools, tmdb
+from core.item import Item # per newest
+#from lib import unshortenit
+
+##### fine import
 __channel__ = "casacinema"
 host = config.get_channel_url(__channel__)
-IDIOMAS = {'Italiano': 'IT'}
-list_language = IDIOMAS.values()
+headers = [['Referer', host]]
+
 list_servers = ['verystream', 'openload', 'wstream', 'speedvideo']
 list_quality = ['HD', 'SD']
 
-__comprueba_enlaces__ = config.get_setting('comprueba_enlaces', 'casacinema')
-__comprueba_enlaces_num__ = config.get_setting('comprueba_enlaces_num', 'casacinema')
-
-headers = [['Referer', '%s/genere/serie-tv' % host]]
-
-
+@support.menu
 def mainlist(item):
-    logger.info("kod.casacinema mainlist")
+    support.log(item)
 
-    autoplay.init(item.channel, list_servers, list_quality)
+    film = ['/category/film',
+        ('Generi', ['', 'genres', 'genres']),
+        ('Sub-ITA', ['/category/sub-ita/', 'peliculas', 'sub'])
+        ]
 
-    itemlist = [Item(channel=item.channel,
-                     title="[B]Film[/B]",
-                     action="peliculas",
-                     extra="movie",
-                     url="%s/genere/film" % host),
-                Item(channel=item.channel,
-                     title="[B]Film - HD[/B]",
-                     action="peliculas",
-                     extra="movie",
-                     url="%s/?s=[HD]" % host),
-                Item(channel=item.channel,
-                     title="[B] > Categorie[/B]",
-                     action="categorias",
-                     extra="movie",
-                     url="%s/genere/film" % host),
-                Item(channel=item.channel,
-                     title="[B]Film Sub - Ita[/B]",
-                     action="peliculas",
-                     extra="movie",
-                     url="%s/genere/sub-ita" % host),
-                Item(channel=item.channel,
-                     title="[COLOR blue]Cerca Film...[/COLOR]",
-                     action="search",
-                     extra="movie",),
-                Item(channel=item.channel,
-                     title="[B]Serie TV[/B]",
-                     extra="tvshow",
-                     action="peliculas_tv",
-                     url="%s/genere/serie-tv" % host),
-                Item(channel=item.channel,
-                     title="[COLOR blue]Cerca Serie TV...[/COLOR]",
-                     action="search",
-                     extra="tvshow")]
+    # Voce SERIE, puoi solo impostare l'url
+    tvshow = ['/aggiornamenti-serie-tv',
+        ('Ultime', ['/category/serie-tv', 'peliculas', '']),
+        ]
+    return locals()
 
-    
-    autoplay.show_option(item.channel, itemlist)
+@support.scrape
+def peliculas(item):
+    support.log(item)
+    #dbg # decommentare per attivare web_pdb
 
-    # auto thumb
-    itemlist=thumb(itemlist) 
+    if item.contentType == 'movie':
+        action = 'findvideos'
+    else:
+        action = 'episodios'
+        pagination = ''
+    blacklist = ['']
 
-    return itemlist
+    patron = r'<li><a href="(?P<url>[^"]+)"[^=]+="(?P<thumb>[^"]+)"><div> <div[^>]+>(?P<title>.*?)[ ]?(?:\[(?P<quality1>HD)\])?[ ]?(?:\(|\[)?(?P<lang>Sub-ITA)?(?:\)|\])?[ ]?(?:\[(?P<quality>.+?)\])?[ ]?(?:\((?P<year>\d+)\))?<(?:[^>]+>.+?(?:title="Nuovi episodi">(?P<episode>\d+x\d+)[ ]?(?P<lang2>Sub-Ita)?|title="IMDb">(?P<rating>[^<]+)))?'
+    if item.args != 'search':
+        patronBlock = r'<h1>.+?</h1>(?P<block>.*?)<aside>'
+    else:
+        patronBlock = r'<h1>Risultati per.+?</h1> <ul class="posts">(?P<block>.*?)<aside>'
+    patronNext = '<a href="([^"]+)" >Pagina'
 
+    def itemHook(item):
+        if item.quality1:
+            item.title = item.title + support.typo(item.quality1, '_ [] color kod')
+        if item.lang2:
+            item.contentLanguage = item.lang2
+            item.title = item.title + support.typo(item.lang2, '_ [] color kod')
+
+        return item
+
+    #debug = True  # True per testare le regex sul sito
+    return locals()
+
+@support.scrape
+def episodios(item):
+    support.log(item)
+    #dbg
+
+    action = 'findvideos'
+    blacklist = ['']
+    patron = r'(?P<episode>\d+(?:&#215;|×)?\d+\-\d+|\d+(?:&#215;|×)\d+)[;]?(?:(?P<title>[^<]+)<(?P<url>.*?)|(\2[ ])(?:<(\3.*?)))(?:</a><br />|</a></p>)'
+    patronBlock = r'<strong>(?P<block>(?:.+?Stagione*.+?(?P<lang>ITA|Sub-ITA))?(?:.+?|</strong>)(/?:</span>)?</p>.*?</p>)'
+
+##    debug = True
+    return locals()
+
+# Questa def è utilizzata per generare i menu del canale
+# per genere, per anno, per lettera, per qualità ecc ecc
+@support.scrape
+def genres(item):
+    support.log(item)
+    #dbg
+
+    action = 'peliculas'
+    blacklist = ['PRIME VISIONI', 'ULTIME SERIE TV']
+    patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></li>'
+    patronBlock = r'<div class="container home-cats">(?P<block>.*?)<div class="clear">'
+
+    #debug = True
+    return locals()
+
+############## Fondo Pagina
+
+def search(item, text):
+    support.log('search ->', item)
+    itemlist = []
+    text = text.replace(' ', '+')
+    item.url = host + '/?s=' + text
+    # bisogna inserire item.contentType per la ricerca globale
+    # se il canale è solo film, si può omettere, altrimenti bisgona aggiungerlo e discriminare.
+    item.contentType = item.contentType
+    try:
+        return peliculas(item)
+    # Se captura la excepcion, para no interrumpir al buscador global si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            log('search log:', line)
+        return []
 
 def newest(categoria):
-    logger.info("[casacinema.py] newest" + categoria)
+    support.log('newest ->', categoria)
     itemlist = []
     item = Item()
+
     try:
-        if categoria == "film":
-            item.url = host + '/genere/film'
-            item.extra = "movie"
-            item.action = "peliculas"
-            itemlist = peliculas(item)
+        if categoria == 'series':
+            item.contentType = 'tvshow'
+            item.url = host+'/aggiornamenti-serie-tv'
+        else:
+            item.contentType = 'movie'
+            item.url = host+'/category/film'
+        item.action = 'peliculas'
+        itemlist = peliculas(item)
 
-            if itemlist[-1].action == "peliculas":
-                itemlist.pop()
-
-    # Continua la ricerca in caso di errore 
+        if itemlist[-1].action == 'peliculas':
+            itemlist.pop()
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("{0}".format(line))
+            log('newest log: ', {0}.format(line))
         return []
-
-    return itemlist
-
-
-def search(item, texto):
-    logger.info("[casacinema.py] " + item.url + " search " + texto)
-
-    item.url = host + "/?s=" + texto
-
-    try:
-        if item.extra == "tvshow":
-            return peliculas_tv(item)
-        if item.extra == "movie":
-            return peliculas(item)
-    # Continua la ricerca in caso di errore 
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error("%s" % line)
-        return []
-
-
-def peliculas(item):
-    logger.info("kod.casacinema peliculas")
-
-    itemlist = []
-
-    # Carica la pagina 
-    data = httptools.downloadpage(item.url, headers=headers).data
-    logger.info('DATA=' +data)
-
-    # Estrae i contenuti 
-    patron = '<li><a href="([^"]+)"[^=]+="([^"]+)"><div>\s*<div[^>]+>(.*?)<'
-
-    matches = re.compile(patron, re.DOTALL).findall(data)
-
-    for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
-        title = scrapertools.decodeHtmlentities(scrapedtitle)
-        cleantitle = re.sub(r'[-–]*\s*[Ii]l [Ff]ilm\s*[-–]*?', '', title).strip()
-        cleantitle = cleantitle.replace('[HD]', '').strip()
-
-        year = scrapertools.find_single_match(title, r'\((\d{4})\)')
-        infolabels = {}
-        if year:
-            cleantitle = cleantitle.replace("(%s)" % year, '').strip()
-            infolabels['year'] = year
-
-        scrapedplot = ""
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="findvideos",
-                 contentType="movie",
-                 title=title,
-                 text_color="azure",
-                 url=scrapedurl,
-                 thumbnail=scrapedthumbnail,
-                 fulltitle=cleantitle,
-                 show=cleantitle,
-                 plot=scrapedplot,
-                 infoLabels=infolabels,
-                 extra=item.extra,
-                 folder=True))
-
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-
-    ## Paginación
-    next_page = scrapertools.find_single_match(data, '<li><a href="([^"]+)".*?>Pagina')
-
-    if next_page != "":
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="peliculas",
-                 title="[COLOR blue]" + config.get_localized_string(30992) + " >[/COLOR]",
-                 url=next_page,
-                 extra=item.extra,
-                 thumbnail=get_thumb('next.png')))
-
-    return itemlist
-
-
-def peliculas_tv(item):
-    logger.info("kod.casacinema peliculas")
-
-    itemlist = []
-
-    # Carica la pagina 
-    data = httptools.downloadpage(item.url, headers=headers).data
-
-    # Estrae i contenuti 
-    patron = '<li><a href="([^"]+)"[^=]+="([^"]+)"><div>\s*<div[^>]+>(.*?)<'
-
-    matches = re.compile(patron, re.DOTALL).findall(data)
-
-    for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
-        title = scrapertools.decodeHtmlentities(scrapedtitle)
-        cleantitle = re.sub(r'[-–]*\s*[Ss]erie [Tt]v\s*[-–]*?', '', title).strip()
-        cleantitle = cleantitle.replace('[HD]', '').replace('[SD]', '').strip()
-
-        year = scrapertools.find_single_match(title, r'\((\d{4})\)')
-        infolabels = {}
-        if year:
-            cleantitle = cleantitle.replace("(%s)" % year, '').strip()
-            infolabels['year'] = year
-
-        scrapedplot = ""
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="episodios",
-                 contentType="tvshow",
-                 title=title,
-                 text_color="azure",
-                 url=scrapedurl,
-                 thumbnail=scrapedthumbnail,
-                 fulltitle=cleantitle,
-                 show=cleantitle,
-                 plot=scrapedplot,
-                 infoLabels=infolabels,
-                 extra=item.extra,
-                 folder=True))
-
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-
-    ## Paginación
-    next_page = scrapertools.find_single_match(data, '<li><a href="([^"]+)">Pagina') ### <- Regex rimosso spazio - precedente <li><a href="([^"]+)" >Pagina
-
-    if next_page != "":
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="peliculas_tv",
-                 title="[COLOR lightgreen]" + config.get_localized_string(30992) + "[/COLOR]",
-                 url=next_page,
-                 extra=item.extra,
-                 thumbnail=get_thumb('next.png')))
-
-    return itemlist
-
-def categorias(item):
-    logger.info("kod.casacinema categorias")
-
-    itemlist = []
-
-    data = httptools.downloadpage(item.url, headers=headers).data
-
-    # Narrow search by selecting only the combo
-    bloque = scrapertools.find_single_match(data, 'Categorie(.*?)</ul>')
-
-    # The categories are the options for the combo
-    patron = '<a href="(.*?)">(.*?)</a></li>'
-    matches = re.compile(patron, re.DOTALL).findall(bloque)
-
-    for scrapedurl, scrapedtitle in matches:
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="peliculas",
-                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                 extra=item.extra,
-                 url=urlparse.urljoin(host, scrapedurl)))
-
-    return itemlist
-
-
-def episodios(item):
-    def load_episodios(html, item, itemlist, lang_title):
-        patron = '.*?<a href="[^"]+"[^o]+ofollow[^>]+>[^<]+</a><(?:b|/)[^>]+>'
-        matches = re.compile(patron).findall(html)
-        for data in matches:
-            # Estrae i contenuti
-            scrapedtitle = scrapertoolsV2.htmlclean(re.sub(r'(<a [^>]+>)*(<\/a>.*)*(Speedvideo)*', '', data)).strip()
-            if scrapedtitle != 'Categorie':
-                scrapedtitle = scrapedtitle.replace('&#215;', 'x')
-                scrapedtitle = scrapedtitle.replace('×', 'x')
-                scrapedtitle = scrapedtitle.replace(';', '')
-                itemlist.append(
-                    Item(channel=item.channel,
-                         action="findvideos",
-                         contentType="episode",
-                         title="[COLOR azure]%s[/COLOR]" % (scrapedtitle + " (" + lang_title + ")"),
-                         url=data,
-                         thumbnail=item.thumbnail,
-                         extra=item.extra,
-                         fulltitle=scrapedtitle + " (" + lang_title + ")" + ' - ' + item.show,
-                         show=item.show))
-
-    logger.info("[casacinema.py] episodios")
-
-    itemlist = []
-
-    # Carica la pagina 
-    data = httptools.downloadpage(item.url).data
-    data = scrapertools.decodeHtmlentities(data)
-    data = scrapertools.find_single_match(data, '<p>(?:<strong>|)(.*?)<div id="disqus_thread">')
-
-    lang_titles = []
-    starts = []
-    patron = r"Stagione.*?(?:ITA|\d+)"
-    matches = re.compile(patron, re.IGNORECASE).finditer(data)
-    for match in matches:
-        season_title = match.group()
-        if season_title != '':
-            lang_titles.append('SUB ITA' if 'SUB' in season_title.upper() else 'ITA')
-            starts.append(match.end())
-
-    i = 1
-    len_lang_titles = len(lang_titles)
-
-    while i <= len_lang_titles:
-        inizio = starts[i - 1]
-        fine = starts[i] if i < len_lang_titles else -1
-
-        html = data[inizio:fine]
-        lang_title = lang_titles[i - 1]
-
-        load_episodios(html, item, itemlist, lang_title)
-
-        i += 1
-
-    if config.get_videolibrary_support() and len(itemlist) != 0:
-        itemlist.append(
-            Item(channel=item.channel,
-                 title="[COLOR lightblue]%s[/COLOR]" % config.get_localized_string(30161),
-                 url=item.url,
-                 action="add_serie_to_library",
-                 extra="episodios" + "###" + item.extra,
-                 show=item.show))
 
     return itemlist
 
 
 def findvideos(item):
-    logger.info("kod.casacinema findvideos")
-
-    data = item.url if item.extra == "tvshow" else httptools.downloadpage(item.url, headers=headers).data
-
-    html = httptools.downloadpage(data).data
-    patron = '"http:\/\/shrink-service\.it\/[^\/]+\/[^\/]+\/([^"]+)"'
-    matches = re.compile(patron, re.DOTALL).findall(html)
-
-    for url in matches:
-        if url is not None:
-            data = data
-        else:
-            continue
-    
-    return support.server(item, data=data)
-
+    support.log('findvideos ->', item)
+    if item.contentType != 'movie':
+        return support.server(item, item.url)
+    else:
+        return support.server(item)
