@@ -291,7 +291,7 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
 
         if data:
             for episodes in data['data']:
-                EpList.append([episodes['firstAired'], episodes['airedSeason'], episodes['airedEpisodeNumber']])
+                if episodes['firstAired']: EpList.append([episodes['firstAired'], episodes['airedSeason'], episodes['airedEpisodeNumber']])
         EpList.sort()
         log(EpList)
 
@@ -301,9 +301,10 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
         regular = {}
         complete = {}
         allep = 1
-        ep = 0
+        ep = 1
         specialep = 0
         for episode in EpList:
+            log('EPISODE= ', episode[1])
             complete[allep] = [str(episode[1]) + 'x' + str(episode[2]), episode[0]]
             if episode[1] == 0:
                 specials.append(allep)
