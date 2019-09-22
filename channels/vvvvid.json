@@ -1,0 +1,11 @@
+{
+    "id": "vvvvid",
+    "name": "VVVVID",
+    "active": true,
+    "adult": false,
+    "language": ["ita","vos"],
+    "thumbnail": "",
+    "bannermenu": "",
+    "categories": ["anime","tvshow","movie","vos"],
+    "settings": []
+}
