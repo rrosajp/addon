@@ -224,6 +224,7 @@ def save_movie(item):
     return 0, 0, -1
 
 def filter_list(episodelist, action=None, path=None):
+    channel_prefs = {}
     lang_sel = quality_sel = show_title = channel =''
     if action:
         tvshow_path = filetools.join(path, "tvshow.nfo")
