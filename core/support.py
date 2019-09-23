@@ -169,8 +169,14 @@ def scrapeLang(scraped, lang, longtitle):
 ##      if not language: language = lang
 ##      if language: longtitle += typo(language, '_ [] color kod')
 
-    if not scraped['lang']:
-        pass
+    if not scraped['lang'] and not lang:
+        #pass
+        language = 'ITA' # setta contentLanguage
+    elif not scraped['lang'] and lang:
+        # in caso di deflang attiva
+        language = lang
+        if language != 'ITA':
+            longtitle += typo(language, '_ [] color kod')
     else:
         if 'ita' in scraped['lang'].lower():
             language = 'ITA'
