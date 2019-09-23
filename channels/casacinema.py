@@ -1,17 +1,8 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per 'idcanale nel json'
+# Canale per 'casacinema'
 # ------------------------------------------------------------
-# Rev: 0.2
-# Update 18-09-2019
-# fix:
-# 1. aggiunto pagination e sistemate alcune voci
 
-# Questo vuole solo essere uno scheletro per velocizzare la scrittura di un canale.
-# I commenti sono più un promemoria... che una vera e propria spiegazione!
-# Niente di più.
-# Ulteriori informazioni sono reperibili nel wiki:
-# https://github.com/kodiondemand/addon/wiki/decoratori
 """
 
     Problemi noti che non superano il test del canale:
@@ -51,7 +42,6 @@ def mainlist(item):
         ('Sub-ITA', ['/category/sub-ita/', 'peliculas', 'sub'])
         ]
 
-    # Voce SERIE, puoi solo impostare l'url
     tvshow = ['/aggiornamenti-serie-tv',
         ('Ultime', ['/category/serie-tv', 'peliculas', '']),
         ]
@@ -70,10 +60,7 @@ def peliculas(item):
     blacklist = ['']
 
     patron = r'<li><a href="(?P<url>[^"]+)"[^=]+="(?P<thumb>[^"]+)"><div> <div[^>]+>(?P<title>.*?)[ ]?(?:\[(?P<quality1>HD)\])?[ ]?(?:\(|\[)?(?P<lang>Sub-ITA)?(?:\)|\])?[ ]?(?:\[(?P<quality>.+?)\])?[ ]?(?:\((?P<year>\d+)\))?<(?:[^>]+>.+?(?:title="Nuovi episodi">(?P<episode>\d+x\d+)[ ]?(?P<lang2>Sub-Ita)?|title="IMDb">(?P<rating>[^<]+)))?'
-    if item.args != 'search':
-        patronBlock = r'<h1>.+?</h1>(?P<block>.*?)<aside>'
-    else:
-        patronBlock = r'<h1>Risultati per.+?</h1> <ul class="posts">(?P<block>.*?)<aside>'
+    patronBlock = r'<h1>.+?</h1>(?P<block>.*?)<aside>'
     patronNext = '<a href="([^"]+)" >Pagina'
 
     def itemHook(item):
@@ -123,8 +110,7 @@ def search(item, text):
     itemlist = []
     text = text.replace(' ', '+')
     item.url = host + '/?s=' + text
-    # bisogna inserire item.contentType per la ricerca globale
-    # se il canale è solo film, si può omettere, altrimenti bisgona aggiungerlo e discriminare.
+    item.args = 'search'
     item.contentType = item.contentType
     try:
         return peliculas(item)
@@ -132,7 +118,7 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            log('search log:', line)
+            support.log('search log:', line)
         return []
 
 def newest(categoria):
@@ -156,11 +142,10 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            log('newest log: ', {0}.format(line))
+            support.log('newest log: ', {0}.format(line))
         return []
 
     return itemlist
-
 
 def findvideos(item):
     support.log('findvideos ->', item)
