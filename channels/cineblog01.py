@@ -10,11 +10,16 @@ from core.item import Item
 from lib import unshortenit
 from platformcode import logger, config
 
+#impostati dinamicamente da findhost()
+host = ""
+headers = ""
 
-__channel__ = "cineblog01"
-host = config.get_channel_url(__channel__)
-headers = [['Referer', host]]
 
+def findhost():
+    global host, headers
+    permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
+    host = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    headers = [['Referer', host]]
 
 list_servers = ['verystream', 'openload', 'streamango', 'wstream']
 list_quality = ['HD', 'SD', 'default']
@@ -30,6 +35,7 @@ blacklist = ['BENVENUTI', 'Richieste Serie TV', 'CB01.UNO &#x25b6; TROVA L&#8217
 
 @support.menu
 def mainlist(item):
+    findhost()
     film = [
         ('HD', ['', 'menu', 'Film HD Streaming']),
         ('Generi', ['', 'menu', 'Film per Genere']),
@@ -47,6 +53,7 @@ def mainlist(item):
 
 @support.scrape
 def menu(item):
+    findhost()
     patronBlock = item.args + r'<span.*?><\/span>.*?<ul.*?>(?P<block>.*?)<\/ul>'
     patronMenu = r'href="?(?P<url>[^">]+)"?>(?P<title>.*?)<\/a>'
     action = 'peliculas'
@@ -56,6 +63,7 @@ def menu(item):
 
 @support.scrape
 def newest(categoria):
+    findhost()
     if type(categoria) != Item:
         item = Item()
         item.contentType = 'movie'
@@ -111,6 +119,7 @@ def episodios(item):
 
 
 def findvideos(item):
+    findhost()
 
     if item.contentType == "episode":
         return findvid_serie(item)
