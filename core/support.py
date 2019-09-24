@@ -166,11 +166,10 @@ def scrapeLang(scraped, lang, longtitle):
 ##    # nei siti dove la lingua è opzionale per il sub-ita e manca l'ita
 ##    else:
 ##        lang = 'ITA'
-##      if not language: language = lang
-##      if language: longtitle += typo(language, '_ [] color kod')
+##        if not language: language = lang
+##        if language: longtitle += typo(language, '_ [] color kod')
 
-    if not scraped['lang'] and not lang:
-        #pass
+    if not scraped['lang'] and lang == '':
         language = 'ITA' # setta contentLanguage
     elif not scraped['lang'] and lang:
         # in caso di deflang attiva
@@ -240,6 +239,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         longtitle = title + (s if title and title2 else '') + title2
         longtitle = typo(longtitle, 'bold')
         longtitle += (typo(Type,'_ () bold') if Type else '') +  (typo(quality, '_ [] color kod') if quality else '')
+
 
         lang, longtitle = scrapeLang(scraped, lang, longtitle)
         if lang == '': lang = 'ITA'
