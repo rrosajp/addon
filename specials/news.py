@@ -417,8 +417,13 @@ def get_title(item):
     title = re.compile("\[/*I\]", re.DOTALL).sub("", title)
 
     title = '[B]'+title+'[/B]'
-    if (type(item.contentLanguage) != list and 'ITA' not in item.contentLanguage) or item.contentLanguage != 'ITA':
-        title += support.typo(item.contentLanguage, '_ [] color kod')
+    if type(item.contentLanguage) == list and len(item.contentLanguage) ==1:
+        if 'ITA' not in item.contentLanguage:
+            title += support.typo(item.contentLanguage[0], '_ [] color kod')
+    elif type(item.contentLanguage) != list and item.contentLanguage != 'ITA':
+          title += support.typo(item.contentLanguage, '_ [] color kod')
+    else:
+        title += item.contentLanguage
     if item.quality:
         title += support.typo(item.quality, '_ [] color kod')
     return title
