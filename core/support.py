@@ -184,7 +184,6 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
     known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
     stagione = '' # per quei siti che hanno la stagione nel blocco ma non nelle puntate
     for i, match in enumerate(matches):
-        lang = ''
         if pagination and (pag - 1) * pagination > i: continue  # pagination
         if pagination and i >= pag * pagination: break          # pagination
         listGroups = match.keys()
@@ -202,9 +201,9 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             scraped[kk] = val
 
         if scraped['season'] != None:
-            stagione = scraped['season']
+            season = scraped['season']
         if stagione:
-            episode = stagione +'x'+ scraped['episode']
+            episode = season +'x'+ scraped['episode']
         else:
             episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
 
@@ -217,13 +216,13 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
         # make formatted Title [longtitle]
         s = ' - '
-        title = episode +  (s if episode and title else '') + title
+        title = episode + (s if episode and title else '') + title
         longtitle = title + (s if title and title2 else '') + title2
         longtitle = typo(longtitle, 'bold')
-        longtitle += (typo(Type,'_ () bold') if Type else '') +  (typo(quality, '_ [] color kod') if quality else '')
+        longtitle += (typo(Type,'_ () bold') if Type else '') + (typo(quality, '_ [] color kod') if quality else '')
 
 
-        lang, longtitle = scrapeLang(scraped, lang, longtitle)
+        lang1, longtitle = scrapeLang(scraped, lang, longtitle)
 
         # if title is set, probably this is a list of episodes or video sources
         # necessaria l'aggiunta di == scraped["title"] altrimenti non prende i gruppi dopo le categorie
@@ -278,8 +277,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 args=item.args,
                 contentSerieName= title if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
                 contentTitle= title if item.contentType or CT == 'movie' else '',
-                contentLanguage = lang,
-                ep=episode if episode else ''
+                contentLanguage = lang1,
+                contentEpisodeNumber=episode if episode else ''
             )
 
             for lg in list(set(listGroups).difference(known_keys)):
@@ -366,8 +365,10 @@ def scrape(func):
                 blockItemlist, blockMatches = scrapeBlock(item, args, bl['block'], patron, headers, action, pagination, debug,
                                             typeContentDict, typeActionDict, blacklist, search, pag, function, lang)
                 for it in blockItemlist:
+                    log('IT LANG ----> ', it)
                     if 'lang' in bl:
                         it.contentLanguage, it.title = scrapeLang(bl, it.contentLanguage, it.title)
+                        log('IT LANG ----> ', it.contentLanguage)
                     if 'quality' in bl and bl['quality']:
                         it.quality = bl['quality'].strip()
                         it.title = it.title + typo(bl['quality'].strip(), '_ [] color kod')
