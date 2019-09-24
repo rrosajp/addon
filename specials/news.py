@@ -417,13 +417,16 @@ def get_title(item):
     title = re.compile("\[/*I\]", re.DOTALL).sub("", title)
 
     title = '[B]'+title+'[/B]'
-    if type(item.contentLanguage) == list and len(item.contentLanguage) ==1:
-        if 'ITA' not in item.contentLanguage:
-            title += support.typo(item.contentLanguage[0], '_ [] color kod')
-    elif type(item.contentLanguage) != list and item.contentLanguage != 'ITA':
+    
+    if item.contentLanguage == '':
+        pass
+    elif type(item.contentLanguage) == list and len(item.contentLanguage) ==1:
+        title += support.typo(item.contentLanguage[0], '_ [] color kod')
+    elif type(item.contentLanguage) != '':
           title += support.typo(item.contentLanguage, '_ [] color kod')
-    else:
+    elif type(item.contentLanguage) == list:
         title += item.contentLanguage
+    
     if item.quality:
         title += support.typo(item.quality, '_ [] color kod')
     return title
@@ -432,7 +435,6 @@ def get_title(item):
 def no_group(list_result_canal):
     itemlist = []
     global channels_id_name
-    support.log("NO GROUP -> ", list_result_canal)
 
     for i in list_result_canal:
         support.log("NO GROUP i -> ", i)
