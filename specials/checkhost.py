@@ -172,6 +172,8 @@ class Kdicc():
                 # per siti irraggiungibili senza DNS corretti
                 #[Errno 111] Connection refused
                 rslt['code'] = 111
+            except:
+                rslt['code'] = 'Connection error'
         return rslt
 
     def view_Advise(self, txt = '' ):
