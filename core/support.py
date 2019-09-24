@@ -157,33 +157,14 @@ def scrapeLang(scraped, lang, longtitle):
     # e credo sia utile per filtertools
     language = ''
 
-##    if scraped['lang']:
-##        if 'ita' in scraped['lang'].lower():
-##            language = 'ITA'
-##        if 'sub' in scraped['lang'].lower():
-##            language = 'Sub-' + language
-##    # se scraped['lang'] è None
-##    # nei siti dove la lingua è opzionale per il sub-ita e manca l'ita
-##    else:
-##        lang = 'ITA'
-##        if not language: language = lang
-##        if language: longtitle += typo(language, '_ [] color kod')
-
-    if not scraped['lang'] and lang == '':
-        language = 'ITA' # setta contentLanguage
-    elif not scraped['lang'] and lang:
-        # in caso di deflang attiva
-        language = lang
-        if language != 'ITA':
-            longtitle += typo(language, '_ [] color kod')
-    else:
+    if scraped['lang']:
         if 'ita' in scraped['lang'].lower():
             language = 'ITA'
         if 'sub' in scraped['lang'].lower():
             language = 'Sub-' + language
 
-        if language != '':
-            longtitle += typo(language, '_ [] color kod')
+    if not language: language = lang
+    if language: longtitle += typo(language, '_ [] color kod')
 
     return language, longtitle
 
@@ -203,6 +184,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
     known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
     stagione = '' # per quei siti che hanno la stagione nel blocco ma non nelle puntate
     for i, match in enumerate(matches):
+        lang = ''
         if pagination and (pag - 1) * pagination > i: continue  # pagination
         if pagination and i >= pag * pagination: break          # pagination
         listGroups = match.keys()
@@ -242,7 +224,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
 
         lang, longtitle = scrapeLang(scraped, lang, longtitle)
-        if lang == '': lang = 'ITA'
+
         # if title is set, probably this is a list of episodes or video sources
         # necessaria l'aggiunta di == scraped["title"] altrimenti non prende i gruppi dopo le categorie
         if item.infoLabels["title"] == scraped["title"]:
