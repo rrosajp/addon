@@ -47,6 +47,22 @@ def mainlist(item):
              ('Generi',['series/', 'peliculas', 'channel/10004/last/?category=']),
              ('A-Z',['series/', 'peliculas', 'channel/10003/last/?filter='])
              ]
+    show = [('Show bold',['show/', 'peliculas', 'channel/10005/last/', 'tvshow']),
+             ('In Evidenza submenu',['show/', 'peliculas', 'channel/10005/last/', 'tvshow']),
+             ('Popolari submenu',['show/', 'peliculas', 'channel/10002/last/', 'tvshow']),
+             ('Nuove Uscite submenu',['show/', 'peliculas', 'channel/10007/last/', 'tvshow']),
+             ('Generi submenu',['show/', 'peliculas', 'channel/10004/last/?category=', 'tvshow']),
+             ('A-Z submenu',['show/', 'peliculas', 'channel/10003/last/?filter=', 'tvshow']),
+             ('Cerca Show... bold submenu', ['show/', 'search', '', 'tvshow'])
+             ]
+    kids = [('Kids bold',['kids/', 'peliculas', 'channel/10005/last/', 'tvshow']),
+             ('In Evidenza submenu',['kids/', 'peliculas', 'channel/10005/last/', 'tvshow']),
+             ('Popolari submenu',['kids/', 'peliculas', 'channel/10002/last/', 'tvshow']),
+             ('Nuove Uscite submenu',['kids/', 'peliculas', 'channel/10007/last/', 'tvshow']),
+             ('Generi submenu',['kids/', 'peliculas', 'channel/10004/last/?category=', 'tvshow']),
+             ('A-Z submenu',['kids/', 'peliculas', 'channel/10003/last/?filter=', 'tvshow']),
+             ('Cerca Show... bold submenu', ['kids/', 'search', '', 'tvshow'])
+             ]
     return locals()
 
 def search(item, text):
@@ -127,6 +143,7 @@ def findvideos(item):
     for episode in json_file['data']:
         if episode['video_id'] == item.video_id:
             url = vvvvid_decoder.dec_ei(episode['embed_info'] or episode['embed_info'])
+            if 'youtube' in url: item.url = url
             item.url = url.replace('manifest.f4m','master.m3u8').replace('http://','https://').replace('/z/','/i/')
             if 'https' not in item.url:
                 url = support.match(item, url='https://or01.top-ix.org/videomg/_definst_/mp4:' + item.url + '/playlist.m3u')[1]
