@@ -72,8 +72,7 @@ def peliculas(item):
 
     elif ('=' not in item.args) and ('=' not in item.url):
         json_file = current_session.get(item.url + item.args, headers=headers, params=payload).json()
-        for key in json_file['data']:
-            make_itemlist(itemlist, item, json_file)
+        make_itemlist(itemlist, item, json_file)
 
     elif '=' in item.args:
         json_file = current_session.get(item.url + 'channels', headers=headers, params=payload).json()
