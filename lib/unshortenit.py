@@ -469,16 +469,19 @@ class UnshortenIt(object):
 
     def _unshorten_vcrypt(self, uri):
         r = None
-        import base64
-        from Crypto.Cipher import AES
+        import base64, pyaes
+
         def decrypt(str):
             str = str.replace("_ppl_", "+").replace("_eqq_", "=").replace("_sll_", "/")
             iv = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
             key = "naphajU2usWUswec"
-            crypt_object = AES.new(key=key, mode=AES.MODE_CBC, IV=iv)
-
             decoded = base64.b64decode(str)
-            return crypt_object.decrypt(decoded).replace('\0', '')
+            decoded = decoded + '\0' * (len(decoded) % 16)
+            crypt_object = pyaes.AESModeOfOperationCBC(key, iv)
+            decrypted = ''
+            for p in range(0, len(decoded), 16):
+                decrypted += crypt_object.decrypt(decoded[p:p + 16]).replace('\0', '')
+            return decrypted
         if '/shield' in uri:
             uri = decrypt(uri.split('/')[-1])
         else:
@@ -496,7 +499,10 @@ class UnshortenIt(object):
             uri = r.headers['location']
 
         if "4snip" in uri:
-            uri = decrypt(uri)
+            if 'out_generator' in uri:
+                uri = re.findall('url=(.*)$', uri)[0]
+            else:
+                uri = decrypt(uri)
 
         return uri, r.code if r else 200
 
