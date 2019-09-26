@@ -468,32 +468,37 @@ class UnshortenIt(object):
             return uri, str(e)
 
     def _unshorten_vcrypt(self, uri):
-        try:
-            req = httptools.downloadpage(uri, timeout=self._timeout, follow_redirects=False)
-            idata = req.data
-            from core import scrapertools
+        r = None
+        import base64
+        from Crypto.Cipher import AES
+        def decrypt(str):
+            str = str.replace("_ppl_", "+").replace("_eqq_", "=").replace("_sll_", "/")
+            iv = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+            key = "naphajU2usWUswec"
+            crypt_object = AES.new(key=key, mode=AES.MODE_CBC, IV=iv)
 
-            patron = r"document.cookie\s=\s.*?'(.*)'"
-            match_str = re.compile(patron, re.MULTILINE).findall(idata)[0]
+            decoded = base64.b64decode(str)
+            return crypt_object.decrypt(decoded).replace('\0', '')
+        if '/shield' in uri:
+            uri = decrypt(uri.split('/')[-1])
+        else:
+            import datetime, hashlib
+            ip = urllib.urlopen('http://ip.42.pl/raw').read()
+            day = datetime.date.today().strftime('%Y%m%d')
+            headers = {
+                "Cookie": hashlib.md5(ip+day).hexdigest() + "=1"
+            }
+            uri = uri.replace('sb/','sb1/')
+            uri = uri.replace('akv/','akv1/')
+            uri = uri.replace('wss/','wss1/')
+            uri = uri.replace('wsd/','wsd1/')
+            r = httptools.downloadpage(uri, timeout=self._timeout, headers=headers, follow_redirects=False)
+            uri = r.headers['location']
 
-            patron = r';URL=([^\"]+)\">'
-            dest = scrapertools.find_single_match(idata, patron)
-            http_headers = {"Cookie": match_str}
-            r = httptools.downloadpage(dest, post=' ', headers=http_headers)
-            uri = r.url
+        if "4snip" in uri:
+            uri = decrypt(uri)
 
-            if "4snip" in uri:
-                desturl = uri.replace("/out/", "/outlink/")
-                import os
-                par = os.path.basename(desturl)
-                post = 'url=' + par
-                r = httptools.downloadpage(desturl, post=post)
-                uri = r.url
-
-            return uri, r.code
-
-        except Exception, e:
-            return uri, str(e)
+        return uri, r.code if r else 200
 
 def unwrap_30x_only(uri, timeout=10):
     unshortener = UnshortenIt()
