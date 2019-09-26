@@ -5,6 +5,7 @@
 import requests, re
 from core import  support, tmdb
 from core.item import Item
+from specials import autorenumber
 
 __channel__ = "vvvvid"
 host = support.config.get_channel_url(__channel__)
@@ -19,70 +20,94 @@ conn_id = current_session.get(login_page, headers=headers).json()['data']['conn_
 payload = {'conn_id': conn_id}
 
 main_host = host
-host += '/vvvvid/ondemand'
+host += '/vvvvid/ondemand/'
 list_servers = ['vvvvid']
 list_quality = ['default']
 
 @support.menu
 def mainlist(item):
-    anime = ['/anime/channels/',
-             ('In Evidenza',['/anime/channel/10005/last/', 'peliculas', 'sort']),
-             ('Popolari',['/anime/channel/10003/last/', 'peliculas', 'sort']),
-             ('Nuove Uscite',['/anime/channel/10007/last/', 'peliculas', 'sort']),
-             ('Generi',['/anime/channels/', 'peliculas', '/anime/channel/10004/last/?category=']),
-             ('A-Z',['/anime/channels/', 'peliculas', '/anime/channel/10003/last/?filter=']),
-             ('Extra',['/anime/channels/', 'peliculas', '/anime/channel/10010/last/?extras='])
+    anime = ['anime/',
+             ('In Evidenza',['anime/', 'peliculas', 'channel/10005/last/']),
+             ('Popolari',['anime/', 'peliculas', 'channel/10002/last/']),
+             ('Nuove Uscite',['anime/', 'peliculas', 'channel/10007/last/']),
+             ('Generi',['anime/', 'peliculas', 'channel/10004/last/?category=']),
+             ('A-Z',['anime/', 'peliculas', 'channel/10003/last/?filter='])
+             ]
+    film =  ['film/',
+             ('In Evidenza',['film/', 'peliculas', 'channel/10005/last/']),
+             ('Popolari',['film/', 'peliculas', 'channel/10002/last/']),
+             ('Nuove Uscite',['film/', 'peliculas', 'channel/10007/last/']),
+             ('Generi',['film/', 'peliculas', 'channel/10004/last/?category=']),
+             ('A-Z',['film/', 'peliculas', 'channel/10003/last/?filter=']),
+             ]
+    tvshow = ['series/',
+             ('In Evidenza',['series/', 'peliculas', 'channel/10005/last/']),
+             ('Popolari',['series/', 'peliculas', 'channel/10002/last/']),
+             ('Nuove Uscite',['series/', 'peliculas', 'channel/10007/last/']),
+             ('Generi',['series/', 'peliculas', 'channel/10004/last/?category=']),
+             ('A-Z',['series/', 'peliculas', 'channel/10003/last/?filter='])
+             ]
+    show = [('Show bold',['show/', 'peliculas', 'channel/10005/last/', 'tvshow']),
+             ('In Evidenza submenu',['show/', 'peliculas', 'channel/10005/last/', 'tvshow']),
+             ('Popolari submenu',['show/', 'peliculas', 'channel/10002/last/', 'tvshow']),
+             ('Nuove Uscite submenu',['show/', 'peliculas', 'channel/10007/last/', 'tvshow']),
+             ('Generi submenu',['show/', 'peliculas', 'channel/10004/last/?category=', 'tvshow']),
+             ('A-Z submenu',['show/', 'peliculas', 'channel/10003/last/?filter=', 'tvshow']),
+             ('Cerca Show... bold submenu', ['show/', 'search', '', 'tvshow'])
+             ]
+    kids = [('Kids bold',['kids/', 'peliculas', 'channel/10005/last/', 'tvshow']),
+             ('In Evidenza submenu',['kids/', 'peliculas', 'channel/10005/last/', 'tvshow']),
+             ('Popolari submenu',['kids/', 'peliculas', 'channel/10002/last/', 'tvshow']),
+             ('Nuove Uscite submenu',['kids/', 'peliculas', 'channel/10007/last/', 'tvshow']),
+             ('Generi submenu',['kids/', 'peliculas', 'channel/10004/last/?category=', 'tvshow']),
+             ('A-Z submenu',['kids/', 'peliculas', 'channel/10003/last/?filter=', 'tvshow']),
+             ('Cerca Show... bold submenu', ['kids/', 'search', '', 'tvshow'])
              ]
     return locals()
 
+def search(item, text):
+    support.log(text)
+    itemlist = []
+    if 'film' in item.url: item.contentType = 'movie'
+    else: item.contentType = 'tvshow'
+    item.search = text
+    itemlist = peliculas(item)
+    return itemlist
+
 def peliculas(item):
     itemlist = []
-    blacklist = ['Generi','A - Z', 'Extra']
-    json_file = current_session.get(item.url, headers=headers, params=payload).json()
-    support.log(json_file)
-    if 'data' in json_file:
-        if not item.args:
-            names = [i['filter'] for i in json_file['data'] if 'filter' in i][0]
-            for name in names:
-                support.log(name)
-                url =  item.url + '10003/last/?filter=' + str(name)
+    if not item.args:
+        json_file = current_session.get(item.url + 'channels', headers=headers, params=payload).json()
+        names = [i['filter'] for i in json_file['data'] if 'filter' in i][0]
+        for name in names:
+            url =  item.url + 'channel/10003/last/?filter=' + str(name)
+            json_file = current_session.get(url, headers=headers, params=payload).json()
+            if 'data' in json_file:
                 json_file = current_session.get(url, headers=headers, params=payload).json()
-                if 'data' in json_file:
-                    json_file = current_session.get(url, headers=headers, params=payload).json()
-                    for key in json_file['data']:
-                        support.log(key['thumbnail'])
-                        itemlist.append(
-                            Item(
-                                channel = item.channel,
-                                title = key['title'],
-                                fulltitle= key['title'],
-                                show= key['title'],
-                                url=  host + '/' + str(key['show_id']) + '/seasons/',
-                                action= 'episodios'
-                        ))
-        elif item.args == 'sort':
-            for key in json_file['data']:
-                for key in json_file['data']:
-                    itemlist.append(
-                        Item(
-                            channel = item.channel,
-                            title = key['title'],
-                            fulltitle= key['title'],
-                            show= key['title'],
-                            url=  host + '/' + str(key['show_id']) + '/seasons/',
-                            action= 'episodios',
-                            thumbnail= key['thumbnail']
-                        ))
-        elif 'last' in item.args:
-            Filter = support.match(item.args,r'\?([^=]+)=')[0][0]
-            keys = [i[Filter] for i in json_file['data'] if Filter in i][0]
-            for key in keys:
+                make_itemlist(itemlist, item, json_file)
+
+    elif ('=' not in item.args) and ('=' not in item.url):
+        json_file = current_session.get(item.url + item.args, headers=headers, params=payload).json()
+        make_itemlist(itemlist, item, json_file)
+
+    elif '=' in item.args:
+        json_file = current_session.get(item.url + 'channels', headers=headers, params=payload).json()
+        Filter = support.match(item.args,r'\?([^=]+)=')[0][0]
+        keys = [i[Filter] for i in json_file['data'] if Filter in i][0]
+        for key in keys:
+            if key not in ['1','2']:
                 itemlist.append(
                     Item(channel = item.channel,
-                        title = key if Filter == 'filter' else key['name'],
-                        url =  host + item.args + (key if Filter == 'filter' else str(key['id'])),
+                        title = support.typo(key.upper() if Filter == 'filter' else key['name'], 'bold'),
+                        url =  item.url + item.args + (key if Filter == 'filter' else str(key['id'])),
                         action = 'peliculas',
-                        args = 'sort'))
+                        args = 'filters',
+                        contentType = item.contentType))
+
+    else :
+        json_file = current_session.get(item.url, headers=headers, params=payload).json()
+        make_itemlist(itemlist, item, json_file)
+    if item.contentType != 'movie': autorenumber.renumber(itemlist)
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
     return itemlist
 
@@ -90,30 +115,67 @@ def episodios(item):
     itemlist = []
     json_file = current_session.get(item.url, headers=headers, params=payload).json()
     show_id = str(json_file['data'][0]['show_id'])
-
     for key in json_file['data'][0]['episodes']:
-        support.log(key)
-        support.log('KEY= ',key)
         itemlist.append(
             Item(
                 channel = item.channel,
                 title = 'Episodio ' + str(key['number']) + ' - ' + key['title'],
                 fulltitle= item.fulltitle,
                 show= item.show,
-                url=  host + '/' + show_id + '/season/' + str(key['season_id']) + '/',
+                url=  host + show_id + '/season/' + str(key['season_id']) + '/',
                 action= 'findvideos',
-                video_id= key['video_id']
+                video_id= key['video_id'],
+                contentType = item.contentType
             ))
+    autorenumber.renumber(itemlist, item, 'bold')
+    support.videolibrary(itemlist,item)
     return itemlist
 
 def findvideos(item):
     from lib import vvvvid_decoder
     itemlist = []
+    if item.contentType == 'movie':
+        json_file = current_session.get(item.url, headers=headers, params=payload).json()
+        item.url = host + str(json_file['data'][0]['show_id']) + '/season/' + str(json_file['data'][0]['episodes'][0]['season_id']) + '/'
+        item.video_id = json_file['data'][0]['episodes'][0]['video_id']
+
     json_file = current_session.get(item.url, headers=headers, params=payload).json()
-    support.log(json_file['data'])
     for episode in json_file['data']:
         if episode['video_id'] == item.video_id:
-            url = vvvvid_decoder.dec_ei(episode['embed_info'])
+            url = vvvvid_decoder.dec_ei(episode['embed_info'] or episode['embed_info'])
+            if 'youtube' in url: item.url = url
             item.url = url.replace('manifest.f4m','master.m3u8').replace('http://','https://').replace('/z/','/i/')
-            if 'https' not in item.url: item.url = url='https://or01.top-ix.org/videomg/_definst_/mp4:' + item.url + '/playlist.m3u'
-    return support.server(item)
+            if 'https' not in item.url:
+                url = support.match(item, url='https://or01.top-ix.org/videomg/_definst_/mp4:' + item.url + '/playlist.m3u')[1]
+                url = url.split()[-1]
+                itemlist.append(
+                    Item(action= 'play',
+                         title='direct',
+                         url= 'https://or01.top-ix.org/videomg/_definst_/mp4:' + item.url + '/' + url,
+                         server= 'directo')
+                )
+    return support.server(item, itemlist=itemlist)
+
+def make_itemlist(itemlist, item, data):
+    search = item.search if item.search else ''
+    infoLabels = {}
+    for key in data['data']:
+        if search.lower() in key['title'].lower():
+            infoLabels['year'] = key['date_published']
+            infoLabels['title'] = infoLabels['tvshowtitle'] = key['title']
+            support.log(infoLabels)
+            itemlist.append(
+                Item(
+                    channel = item.channel,
+                    title = support.typo(key['title'], 'bold'),
+                    fulltitle= key['title'],
+                    show= key['title'],
+                    url= host + str(key['show_id']) + '/seasons/',
+                    action= 'findvideos' if item.contentType == 'movie' else 'episodios',
+                    contentType = item.contentType,
+                    contentSerieName= key['title'] if item.contentType != 'movie' else '',
+                    contentTitle= key['title'] if item.contentType == 'movie' else '',
+                    thumbnail= key['thumbnail'],
+                    infoLabels=infoLabels
+            ))
+    return itemlist

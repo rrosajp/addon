@@ -4,10 +4,6 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(https://vvvvid-vh.akamaihd.net/i/.*?m3u8)",
-        "url": "\\1"
-      },
-      {
         "pattern": "https://www.vvvvid.it/.*?show/([a-z0-9/-]+)",
         "url": "https://www.vvvvid.it/show/\\1"
       }

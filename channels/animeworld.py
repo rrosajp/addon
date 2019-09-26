@@ -124,7 +124,9 @@ def peliculas(item):
 @support.scrape
 def episodios(item):
     anime=True
-    patronBlock= r'<div class="server\s*active\s*"(?P<block>.*?)</ul>'
+    data = support.match(item, headers=headers)[1]
+    if 'VVVVID' in data: patronBlock= r'<div class="server\s*active\s*"(?P<block>.*?)</ul>'
+    else: patronblock= 'server  active(?P<block>.*?)server  hidden'
     patron = r'<li><a [^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+" href="(?P<url>[^"]+)"[^>]+>(?P<episode>[^<]+)<'
     def itemHook(item):
         item.title += support.typo(item.fulltitle,'-- bold')

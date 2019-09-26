@@ -27,37 +27,31 @@ def test_video_exists(page_url):
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     video_urls = []
-    # if Direct
-    if 'm3u8' in page_url:
-        filename = '[B]' + re.findall('/([a-zA-Z0-9_]+.mp4)', page_url)[0] + '[/B]'
-        video_urls.append([filename, str(page_url)])
-        
-    # if Page
-    else:
-        page_url = page_url.replace("/show/","/#!show/")
 
-        # Getting info from given URL
-        show_id = re.findall("#!show/([0-9]+)/", page_url)[0]
-        name = re.findall(show_id + "/(.+?)/", page_url)[0]
-        season_id = re.findall(name + "/(.+?)/", page_url)[0]
-        video_id = re.findall(season_id + "/(.+?)/", page_url)[0]
-        
-        # Getting info from Site
-        json_url = "https://www.vvvvid.it/vvvvid/ondemand/" + show_id + '/season/' +season_id + '/'
-        # logger.info('URL= ' + json_url)
-        json_file = current_session.get(json_url, headers=headers, params=payload).json()
-        # logger.info(json_file['data'])
+    page_url = page_url.replace("/show/","/#!show/")
 
-        # Search for the correct episode
-        for episode in json_file['data']:
-            # import web_pdb; web_pdb.set_trace()
-            if episode['video_id'] == int(video_id):
-                ep_title = '[B]' + episode['title'] + '[/B]'
-                embed_info = vvvvid_decoder.dec_ei(episode['embed_info'])
-                embed_info = embed_info.replace('manifest.f4m','master.m3u8').replace('http://','https://').replace('/z/','/i/')
+    # Getting info from given URL
+    show_id = re.findall("#!show/([0-9]+)/", page_url)[0]
+    name = re.findall(show_id + "/(.+?)/", page_url)[0]
+    season_id = re.findall(name + "/(.+?)/", page_url)[0]
+    video_id = re.findall(season_id + "/(.+?)/", page_url)[0]
 
+    # Getting info from Site
+    json_url = "https://www.vvvvid.it/vvvvid/ondemand/" + show_id + '/season/' +season_id + '/'
+    # logger.info('URL= ' + json_url)
+    json_file = current_session.get(json_url, headers=headers, params=payload).json()
+    logger.info(json_file['data'])
+
+    # Search for the correct episode
+    for episode in json_file['data']:
         # import web_pdb; web_pdb.set_trace()
+        if episode['video_id'] == int(video_id):
+            ep_title = '[B]' + episode['title'] + '[/B]'
+            embed_info = vvvvid_decoder.dec_ei(episode['embed_info'])
+            embed_info = embed_info.replace('manifest.f4m','master.m3u8').replace('http://','https://').replace('/z/','/i/')
 
-        video_urls.append([ep_title, str(embed_info)])
+    # import web_pdb; web_pdb.set_trace()
+
+    video_urls.append([ep_title, str(embed_info)])
 
     return video_urls
