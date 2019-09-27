@@ -262,7 +262,8 @@ def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, 
         if len(EpisodeDict) >= len(itemlist):
             for item in itemlist:
                 number = scrapertoolsV2.find_single_match(item.title, r'\d+')
-                if number != '0': number.lstrip("0")
+                log('TIPO NUMBER= ', type(number))
+                number = int(number)
                 item.title = typo(EpisodeDict[str(number)] + ' - ', typography) + item.title
         else:
             make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE)

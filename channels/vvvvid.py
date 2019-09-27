@@ -115,20 +115,30 @@ def episodios(item):
     itemlist = []
     json_file = current_session.get(item.url, headers=headers, params=payload).json()
     show_id = str(json_file['data'][0]['show_id'])
-    for key in json_file['data'][0]['episodes']:
-        itemlist.append(
-            Item(
-                channel = item.channel,
-                title = 'Episodio ' + str(key['number']) + ' - ' + key['title'],
-                fulltitle= item.fulltitle,
-                show= item.show,
-                url=  host + show_id + '/season/' + str(key['season_id']) + '/',
-                action= 'findvideos',
-                video_id= key['video_id'],
-                contentType = item.contentType
-            ))
+    episodes = []
+    for episode in json_file['data']:
+        episodes.append(episode['episodes'])
+    for episode in episodes:
+        for key in episode:
+            if 'stagione' in key['title'].lower():
+                match = support.match(key['title'].encode('ascii', 'replace'), r'[Ss]tagione\s*(\d+) - [Ee]pisodio\s*(\d+)')[0][0]
+                title = match[0]+'x'+match[1] + ' - ' + item.fulltitle
+            else:
+                title = 'Episodio ' + key['number'].encode('ascii', 'replace') + ' - ' + key['title'],
+            itemlist.append(
+                Item(
+                    channel = item.channel,
+                    title = title,
+                    fulltitle= item.fulltitle,
+                    show= item.show,
+                    url=  host + show_id + '/season/' + str(key['season_id']) + '/',
+                    action= 'findvideos',
+                    video_id= key['video_id'],
+                    contentType = item.contentType
+                ))
     autorenumber.renumber(itemlist, item, 'bold')
-    support.videolibrary(itemlist,item)
+    if autorenumber.check(item) == True:
+        support.videolibrary(itemlist,item)
     return itemlist
 
 def findvideos(item):
@@ -154,7 +164,7 @@ def findvideos(item):
                          url= 'https://or01.top-ix.org/videomg/_definst_/mp4:' + item.url + '/' + url,
                          server= 'directo')
                 )
-    return support.server(item, itemlist=itemlist)
+    return support.server(item, itemlist=itemlist, download=False)
 
 def make_itemlist(itemlist, item, data):
     search = item.search if item.search else ''
