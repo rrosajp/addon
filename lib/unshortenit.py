@@ -26,7 +26,7 @@ def find_in_text(regex, text, flags=re.IGNORECASE | re.DOTALL):
 
 
 class UnshortenIt(object):
-    _adfly_regex = r'adf\.ly|j\.gs|q\.gs|u\.bb|ay\.gy|atominik\.com|tinyium\.com|microify\.com|threadsphere\.bid|clearload\.bid|activetect\.net|swiftviz\.net|briskgram\.net|activetect\.net|baymaleti\.net|thouth\.net|uclaut\.net|gloyah\.net'
+    _adfly_regex = r'adf\.ly|j\.gs|q\.gs|u\.bb|ay\.gy|atominik\.com|tinyium\.com|microify\.com|threadsphere\.bid|clearload\.bid|activetect\.net|swiftviz\.net|briskgram\.net|activetect\.net|baymaleti\.net|thouth\.net|uclaut\.net|gloyah\.net|larati\.net'
     _linkbucks_regex = r'linkbucks\.com|any\.gs|cash4links\.co|cash4files\.co|dyo\.gs|filesonthe\.net|goneviral\.com|megaline\.co|miniurls\.co|qqc\.co|seriousdeals\.net|theseblogs\.com|theseforums\.com|tinylinks\.co|tubeviral\.com|ultrafiles\.net|urlbeat\.net|whackyvidz\.com|yyv\.co'
     _adfocus_regex = r'adfoc\.us'
     _lnxlu_regex = r'lnx\.lu'
@@ -441,7 +441,6 @@ class UnshortenIt(object):
             return uri, str(e)
 
     def _unshorten_rapidcrypt(self, uri):
-        # import web_pdb; web_pdb.set_trace()
         try:
             r = httptools.downloadpage(uri, timeout=self._timeout, cookies=False)
             html = r.data
@@ -470,30 +469,44 @@ class UnshortenIt(object):
 
     def _unshorten_vcrypt(self, uri):
         try:
-            req = httptools.downloadpage(uri, timeout=self._timeout, follow_redirects=False)
-            idata = req.data
-            from core import scrapertools
+            r = None
+            import base64, pyaes
 
-            patron = r"document.cookie\s=\s.*?'(.*)'"
-            match_str = re.compile(patron, re.MULTILINE).findall(idata)[0]
-
-            patron = r';URL=([^\"]+)\">'
-            dest = scrapertools.find_single_match(idata, patron)
-            http_headers = {"Cookie": match_str}
-            r = httptools.downloadpage(dest, post=' ', headers=http_headers)
-            uri = r.url
+            def decrypt(str):
+                str = str.replace("_ppl_", "+").replace("_eqq_", "=").replace("_sll_", "/")
+                iv = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+                key = "naphajU2usWUswec"
+                decoded = base64.b64decode(str)
+                decoded = decoded + '\0' * (len(decoded) % 16)
+                crypt_object = pyaes.AESModeOfOperationCBC(key, iv)
+                decrypted = ''
+                for p in range(0, len(decoded), 16):
+                    decrypted += crypt_object.decrypt(decoded[p:p + 16]).replace('\0', '')
+                return decrypted
+            if 'shield' in uri.split('/')[-2]:
+                uri = decrypt(uri.split('/')[-1])
+            else:
+                import datetime, hashlib
+                ip = urllib.urlopen('http://ip.42.pl/raw').read()
+                day = datetime.date.today().strftime('%Y%m%d')
+                headers = {
+                    "Cookie": hashlib.md5(ip+day).hexdigest() + "=1"
+                }
+                uri = uri.replace('sb/','sb1/')
+                uri = uri.replace('akv/','akv1/')
+                uri = uri.replace('wss/','wss1/')
+                uri = uri.replace('wsd/','wsd1/')
+                r = httptools.downloadpage(uri, timeout=self._timeout, headers=headers, follow_redirects=False)
+                uri = r.headers['location']
 
             if "4snip" in uri:
-                desturl = uri.replace("/out/", "/outlink/")
-                import os
-                par = os.path.basename(desturl)
-                post = 'url=' + par
-                r = httptools.downloadpage(desturl, post=post)
-                uri = r.url
+                if 'out_generator' in uri:
+                    uri = re.findall('url=(.*)$', uri)[0]
+                else:
+                    uri = decrypt(uri)
 
-            return uri, r.code
-
-        except Exception, e:
+            return uri, r.code if r else 200
+        except Exception as e:
             return uri, str(e)
 
 def unwrap_30x_only(uri, timeout=10):
