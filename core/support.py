@@ -878,7 +878,7 @@ def pagination(itemlist, item, page, perpage, function_level=1):
                  thumbnail=thumb()))
     return itemlist
 
-def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True):
+def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, download=True):
 
     if not data:
         data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
@@ -929,7 +929,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True):
         autoplay.start(itemlist, item)
 
     if item.contentChannel != 'videolibrary': videolibrary(itemlist, item, function_level=3)
-    if get_setting('downloadenabled'): download(itemlist, item, function_level=3)
+    if get_setting('downloadenabled') and download == True: download(itemlist, item, function_level=3)
     return itemlist
 
 def filterLang(item, itemlist):
