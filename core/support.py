@@ -365,10 +365,8 @@ def scrape(func):
                 blockItemlist, blockMatches = scrapeBlock(item, args, bl['block'], patron, headers, action, pagination, debug,
                                             typeContentDict, typeActionDict, blacklist, search, pag, function, lang)
                 for it in blockItemlist:
-                    log('IT LANG ----> ', it)
                     if 'lang' in bl:
                         it.contentLanguage, it.title = scrapeLang(bl, it.contentLanguage, it.title)
-                        log('IT LANG ----> ', it.contentLanguage)
                     if 'quality' in bl and bl['quality']:
                         it.quality = bl['quality'].strip()
                         it.title = it.title + typo(bl['quality'].strip(), '_ [] color kod')
