@@ -115,18 +115,27 @@ def episodios(item):
     itemlist = []
     json_file = current_session.get(item.url, headers=headers, params=payload).json()
     show_id = str(json_file['data'][0]['show_id'])
-    for key in json_file['data'][0]['episodes']:
-        itemlist.append(
-            Item(
-                channel = item.channel,
+    episodes = []
+    for episode in json_file['data']:
+        episodes.append(episode['episodes'])
+    for episode in episodes:
+        for key in episode:
+            if 'stagione' in key['title'].lower():
+                match = support.match(key['title'].encode('ascii', 'replace'), r'[Ss]tagione\s*(\d+) - [Ee]pisodio\s*(\d+)')[0][0]
+                title = match[0]+'x'+match[1] + ' - ' + item.fulltitle
+            else:
                 title = 'Episodio ' + key['number'].encode('ascii', 'replace') + ' - ' + key['title'],
-                fulltitle= item.fulltitle,
-                show= item.show,
-                url=  host + show_id + '/season/' + str(key['season_id']) + '/',
-                action= 'findvideos',
-                video_id= key['video_id'],
-                contentType = item.contentType
-            ))
+            itemlist.append(
+                Item(
+                    channel = item.channel,
+                    title = title,
+                    fulltitle= item.fulltitle,
+                    show= item.show,
+                    url=  host + show_id + '/season/' + str(key['season_id']) + '/',
+                    action= 'findvideos',
+                    video_id= key['video_id'],
+                    contentType = item.contentType
+                ))
     autorenumber.renumber(itemlist, item, 'bold')
     if autorenumber.check(item) == True:
         support.videolibrary(itemlist,item)
