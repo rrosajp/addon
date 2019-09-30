@@ -56,15 +56,6 @@
       "enabled": true,
       "visible": "eq(-1,true)",
       "lvalues": [ "3", "5", "10", "15", "20" ]
-    },
-    {
-      "id": "filter_languages",
-      "type": "list",
-      "label": "@30019",
-      "default": 0,
-      "enabled": true,
-      "visible": true,
-      "lvalues": ["Non Filtrare"]
     }
   ],
   
