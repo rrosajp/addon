@@ -584,8 +584,10 @@ def set_context_commands(item, parent_item):
                                                                   action="set_custom_start",
                                                                   parent=item.tourl()).tourl())))
 
-        if item.channel != "videolibrary":
+        if (item.channel != "videolibrary" and not config.get_localized_string(70585) in str(item.context)) \
+            or (item.channel != "videolibrary" and config.get_localized_string(70585) in str(item.context) and config.get_localized_string(70714) in str(item.context)):
             # Añadir Serie a la videoteca
+            logger.info('context= '+ str(item.context))
             if item.action in ["episodios", "get_episodios"] and item.contentSerieName:
                 context_commands.append((config.get_localized_string(60352), "XBMC.RunPlugin(%s?%s)" %
                                          (sys.argv[0], item.clone(action="add_serie_to_library",
@@ -596,7 +598,8 @@ def set_context_commands(item, parent_item):
                                          (sys.argv[0], item.clone(action="add_pelicula_to_library",
                                                                   from_action=item.action).tourl())))
 
-        if item.channel != "downloads" and item.channel != "videolibrary" and downloadenabled != "false":
+        if (item.channel != "downloads" and item.channel != "videolibrary" and downloadenabled != "false" and not config.get_localized_string(70585) in str(item.context))\
+            or (item.channel != "downloads" and item.channel != "videolibrary" and downloadenabled != "false" and config.get_localized_string(70585) in str(item.context) and config.get_localized_string(70714) in str(item.context)):
             # Descargar pelicula
             if item.contentType == "movie":
                 context_commands.append((config.get_localized_string(60354), "XBMC.RunPlugin(%s?%s)" %
