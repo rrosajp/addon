@@ -238,7 +238,7 @@ def renumber(itemlist, item='', typography=''):
                     item.context = context(exist)
 
 def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE):
-    log()
+    log('EPISODE= ', EPISODE)
     # Se ID è 0 salta la rinumerazione
     if ID == '0':
         return itemlist
@@ -247,24 +247,26 @@ def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, 
     elif SEASON == '0':
         EpisodeDict = {}
         for item in itemlist:
-            number = scrapertoolsV2.find_single_match(item.title, r'\d+')
-            item.title = typo('0x' + number + ' - ', typography) + item.title
+            if config.get_localized_string(30992) not in item.title:
+                number = scrapertoolsV2.find_single_match(item.title, r'\d+')
+                item.title = typo('0x' + number + ' - ', typography) + item.title
 
 
     # Usa la lista degli Episodi se esiste nel Json
 
     elif EPISODE:
         EpisodeDict = json.loads(base64.b64decode(EPISODE))
+        log('EPISODE DICT= ', EpisodeDict)
 
         # Controlla che la lista egli Episodi sia della stessa lunghezza di Itemlist
         if EpisodeDict == 'none':
             return error(itemlist)
-        if len(EpisodeDict) >= len(itemlist):
+        if len(EpisodeDict) >= len(itemlist) and EpisodeDict.has_key(scrapertoolsV2.find_single_match(itemlist[0].title, r'\d+')):
             for item in itemlist:
-                number = scrapertoolsV2.find_single_match(item.title, r'\d+')
-                log('TIPO NUMBER= ', type(number))
-                number = int(number)
-                item.title = typo(EpisodeDict[str(number)] + ' - ', typography) + item.title
+                if config.get_localized_string(30992) not in item.title:
+                    number = scrapertoolsV2.find_single_match(item.title, r'\d+')
+                    number = int(number) # if number !='0': number.lstrip('0')
+                    item.title = typo(EpisodeDict[str(number)] + ' - ', typography) + item.title
         else:
             make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE)
 
@@ -276,7 +278,10 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
     log()
     page = 1
     EpList = []
-    EpisodeDict = {}
+    if EPISODE:
+        EpisodeDict = json.loads(base64.b64decode(EPISODE))
+    else:
+        EpisodeDict = {}
     exist = True
     item.infoLabels['tvdb_id'] = ID
     tvdb.set_infoLabels_item(item)
@@ -329,33 +334,33 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
         addiction = 0
         for item in itemlist:
             # Otiene Numerazione Episodi
-            episode = int(scrapertoolsV2.find_single_match(item.title, r'\d+'))
-            log('EPISODE= ',episode)
-            number = episode + FirstOfSeason - addiction
-            count = number + addiction
-            # find = episode + FirstOfSeason
-            # log('FIND= ',find, ' ',str(episode) + ' ' + str(FirstOfSeason))
-            # Crea Dizionario Episodi
+            if config.get_localized_string(30992) not in item.title:
+                episode = int(scrapertoolsV2.find_single_match(item.title, r'\d+'))
+                log('EPISODE= ',episode)
+                number = episode + FirstOfSeason - addiction
+                count = number + addiction
+                # find = episode + FirstOfSeason
+                # log('FIND= ',find, ' ',str(episode) + ' ' + str(FirstOfSeason))
+                # Crea Dizionario Episodi
 
-            # log(episode, ' ', number, ' ', count)
-            if episode == 0:
-                EpisodeDict[str(episode)] = str(complete[regular[FirstOfSeason+1][2]][0])
-            elif addiction < len(SPECIAL):
-                if episode in SPECIAL:
-                    season = complete[regular[count][2]][0]
-                    EpisodeDict[str(episode)] = str(complete[regular[count][2]][0]) if season.startswith( '0' ) else '0x' + platformtools.dialog_numeric(0, item.title + '?', '')
-                    addiction = addiction + 1
-                else:
+                if episode == 0:
+                    EpisodeDict[str(episode)] = str(complete[regular[FirstOfSeason+1][2]][0])
+                elif addiction < len(SPECIAL):
+                    if episode in SPECIAL:
+                        season = complete[regular[count][2]][0]
+                        EpisodeDict[str(episode)] = str(complete[regular[count][2]][0]) if season.startswith( '0' ) else '0x' + platformtools.dialog_numeric(0, item.title + '?', '')
+                        addiction = addiction + 1
+                    else:
+                        EpisodeDict[str(episode)] = str(regular[number][0])
+                elif number <= len(regular):
                     EpisodeDict[str(episode)] = str(regular[number][0])
-            elif number <= len(regular):
-                EpisodeDict[str(episode)] = str(regular[number][0])
-            else:
-                try: EpisodeDict[str(episode)] = str(complete[regular[number+2][2]][0])
-                except: EpisodeDict[str(episode)] = '0x0'
+                else:
+                    try: EpisodeDict[str(episode)] = str(complete[regular[number+2][2]][0])
+                    except: EpisodeDict[str(episode)] = '0x0'
 
-            # Aggiunge numerazione agli Episodi
+                # Aggiunge numerazione agli Episodi
 
-            item.title = typo(EpisodeDict[str(episode)] + ' - ', typography) + item.title
+                item.title = typo(EpisodeDict[str(episode)] + ' - ', typography) + item.title
 
         # Scrive Dizionario Episodi sul json
         EpisodeDict = base64.b64encode(json.dumps(EpisodeDict))

@@ -323,6 +323,7 @@ def scrape(func):
         itemlist = []
 
         args = func(*args)
+        log('STACK= ',inspect.stack()[1][3])
 
         item = args['item']
 
@@ -344,7 +345,7 @@ def scrape(func):
         typeActionDict = args['type_action_dict'] if 'type_action_dict' in args else {}
         typeContentDict = args['type_content_dict'] if 'type_content_dict' in args else {}
         debug = args['debug'] if 'debug' in args else False
-        if 'pagination' in args: pagination = args['pagination'] if args['pagination'] else 20
+        if 'pagination' in args and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes']: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
         lang = args['deflang'] if 'deflang' in args else ''
         pag = item.page if item.page else 1  # pagination
@@ -392,6 +393,8 @@ def scrape(func):
                      action = item.action,
                      contentType=item.contentType,
                      title=typo(config.get_localized_string(30992), 'color kod bold'),
+                     fulltitle= item.fulltitle,
+                     show= item.show,
                      url=item.url,
                      args=item.args,
                      page=pag + 1,
