@@ -68,7 +68,9 @@ class Kdicc():
         http_errr = 0
         for rslt in r:
             xbmc.log("check_Adsl rslt: %s" % rslt['code'], level=xbmc.LOGNOTICE)
-            if rslt['code'] == '111' or '[Errno -3]' in str(rslt['code']):
+            # Errno -2 potrebbe essere mancanza di connessione adsl o sito non raggiungibile....
+            # anche nei casi in cui ci sia il cambio gestore.
+            if rslt['code'] == '111' or '[Errno -3]' in str(rslt['code']) or 'Errno -2' in str(rslt['code']):
                 http_errr +=1
 
         if len(LIST_SITE) == http_errr:
@@ -137,7 +139,8 @@ class Kdicc():
                      or '[Errno 110]' in str(conn_errr) \
                      or 'ConnectTimeoutError' in str(conn_errr) \
                      or 'Errno 11002' in str(conn_errr) or 'ReadTimeout' in str(conn_errr) \
-                     or 'Errno 11001' in str(conn_errr): # questo errore è anche nel code: -2
+                     or 'Errno 11001' in str(conn_errr) \
+                     or 'Errno -2' in str(conn_errr): # questo errore è anche nel code: -2
                     rslt['code'] = '111'
                     rslt['url'] = str(sito)
                     rslt['http_err'] = 'Connection error'
