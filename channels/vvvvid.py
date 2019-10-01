@@ -125,6 +125,7 @@ def episodios(item):
                 title = match[0]+'x'+match[1] + ' - ' + item.fulltitle
             else:
                 title = 'Episodio ' + key['number'].encode('ascii', 'replace') + ' - ' + key['title'],
+                if type(title) == tuple: title = title[0]
             itemlist.append(
                 Item(
                     channel = item.channel,
