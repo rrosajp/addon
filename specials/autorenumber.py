@@ -34,7 +34,7 @@ except:
 import xbmc
 import re, base64, json, os
 from core import jsontools, tvdb, scrapertoolsV2
-from core.support import typo, log
+from core.support import typo, log, dbg
 from platformcode import config, platformtools,  logger
 from platformcode.config import get_setting
 
@@ -173,6 +173,7 @@ def config_item(item, itemlist=[], typography='', active=False):
 
 def renumber(itemlist, item='', typography=''):
     log()
+    # dbg()
     if 'fromchannel' in item:
         item.channel = item.fromchannel if item.fromchannel else item.channel
     # Seleziona la funzione Adatta, Menu Contestuale o Rinumerazione
@@ -182,7 +183,7 @@ def renumber(itemlist, item='', typography=''):
 
         try:
             dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
-            TITLE = item.fulltitle.rstrip()
+            TITLE = item.fulltitle.rstrip() if item.fulltitle else item.contentTitle
             ID = dict_series[TITLE][TAG_ID]
 
             exist = True
@@ -199,7 +200,7 @@ def renumber(itemlist, item='', typography=''):
             # se non è stata rinumerata controlla se è attiva la rinumerazione automatica
             if 'autorenumber' not in settings_node: return itemlist
             if settings_node['autorenumber'] == True:
-                    config_item(item, itemlist, typography, True)
+                config_item(item, itemlist, typography, True)
 
         # if exist:
         #     menu_title= config.get_localized_string(70714) + config.get_localized_string(70585)
