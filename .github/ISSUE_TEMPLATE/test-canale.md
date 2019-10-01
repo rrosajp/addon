@@ -6,223 +6,283 @@ labels: Test Canale
 assignees: ''
 
 ---
+Documento Template per il Test del canale (textile)
 
-Di ogni test mantieni la voce dell'esito e cancella le altre, dove occorre aggiungi informazioni. Specifica, dove possibile, il tipo di problema che incontri in quel test.
+Copia-incolla nell'ISSUE aperto da PROJECT.
+
+Specifica, dove possibile, il tipo di problema che incontri, anche se non è presente alcuna voce per indicarlo.
 Se hai suggerimenti/consigli/dubbi sui test...Proponili e/o chiedi!
- 
-***
 
-Test N°.1: Lista Canali
+**Quando finisci il test, torna in PROJECT e sposta la scheda del canale testato, nella corrispettiva COLONNA: test non superato o test superato.
+In caso contrario verrà valutato come da terminare!** 
 
-Cosa serve: il file .json
+**Avvertenze:**
 
-1. Verifica del canale nelle sezioni indicate nel file .json, voce "categories".
+Per il test dei canali al momento DEVI utilizzare la versione **MASTER** di KOD!
 
-- [ ] Tutte
-- [ ] Alcune - Indicare le sezioni dove manca il canale
-- [ ] Nessuna - Voce Canale mancante nella lista. In questo caso non puoi continuare il test.
+Quando fai il test puoi spuntare i quadratini con il mouse.
+*MA*
+Per poter scrivere eventuali problemi: **DEVI** cliccare sul tab **WRITE** dell'ISSUE aperto per il test.
 
-2. Icone del canale [ ]
+* *SE hai un ERRORE con avviso di LOG, copia IMMEDIATAMENTE l'ERRORE dal file e copialo nell'ISSUE nel punto del TEST*
 
-- [ ] Presenti
-- [ ] Non Presenti
+Se hai problemi non previsti dal test, segnalali aggiungendoli in fondo al test.
 
 ***
+I file relativi al canale li trovi:
+- su browser:
+"Apre la pagina dei Canali":https://github.com/kodiondemand/addon/tree/master/channels
+- * [sul device, nella specifica cartella](https://github.com/kodiondemand/addon/wiki/Percorsi-sui-diversi-S.O.), .kodi/addons/channels:
+Per aprirli non servono programmi particolari un semplice editor di testo è sufficiente.
 
-Test N°.2: Configura Canale 
+**Test N.1**: Controllo del file .json
 
-1. Presenza della voce "Configura Canale"
+Occorrente: file .json
 
-- [Si] 
-- [No]
+**1. Indica la coerenza delle voci presenti in "language" con i contenuti presenti sul sito:**
+valori: ita, vosi (sub-ita)
 
-2. Voci presenti in Configura Canale
+- [ ] coerenti
+- [ ] non coerenti
 
-a. Cerca Informazioni extra (Default: Attivo)
+Se non sono coerenti il test è FALLITO, continua comunque a revisionare il resto
 
-- [Si] 
-- [No]
+**4. Icone del canale**
+Controlla sia presente qualcosa, tra le " " di thumbnail e banner, e che le immagini appaiano su KoD
 
-b. Includi in Novità (Default: Attivo)
+**in thumbnail:**
+- [ ] Presente 
+- [ ] Assente
 
-- [Si] 
-- [No]
+**in banner:**
+- [ ] Presente 
+- [ ] Assente
 
-c. Includi in Novità - Italiano (Default: Attivo)
+**5. Verifica la coerenza delle voci presenti in "categories" con i contenuti presenti sul sito:**
 
-- [Si] 
-- [No]
+Riepilogo voci:
 
-d. Includi in ricerca globale (Default: Attivo)
+	movie, tvshow, anime, documentary, vos, adult
 
-- [Si] 
-- [No]
+(se il sito contiene film e serie, devono esserci sia movie che tvshow, se contiene solo film, solo movie)
 
-e. Verifica se i link esistono (Default: Attivo)
+- [ ] Corrette
+- [ ] 1 o più Errata/e
+- [ ] Assenti - Non sono presenti voci in categories, in questo caso non puoi continuare il test.
 
-- [Si] 
-- [No]
-
-f. Numero de link da verificare (Default: 10)
-
-- [Si] 
-- [No]
-
-g. Mostra link in lingua (Default: Non filtrare)
-
-- [Si] 
-- [No]
+Se le voci sono: Assenti, dopo aver compilato la risposta, salva il test e **NON** proseguire.
+**TEST FALLITO**
 
 ***
 
-Test N°.3: Voci menu nella pagina del Canale
+**Test su KOD.**
 
-1. Configurazione Autoplay
+Entra in KOD -> Canali. Nella lista accedi al canale che stai testando.
+**N.B.**: Il nome del canale è il campo **name** nel file .json.
 
-- [Si] 
-- [No]
+**Test N.2: Pagina Canale**
 
-2. Configurazione Canale
+1. Cerca o Cerca Film...
+Cerca un titolo a caso in KOD e lo stesso titolo sul sito. Confronta i risultati.
 
-- [Si] 
-- [No]
-
-***
-
-Test N°.4: Confronto Sito - Pagina Canale
-
-Cosa serve: il file .py, consultare la def mainlist()
-
-Promemoria: 
-della mainlist la struttura è:
-
-( 'Voce menu1', ['/url/', etc, etc])
-( 'Voce menu2', ['', etc, etc])
-Dove url è una stringa aggiuntiva da aggiungere all'url principale, se in url appare '' allora corrisponde all'indirizzo principale del sito.
-
-Questo Test confronta i titoli che trovi accedendo alle voci di menu del canale con quello che vedi nella corrispettiva pagina del sito.
-
-- [Voce menu con problemi - Tipo di problema] ( copiare per tutte le voci che non hanno corrispondenza )
-Tipo di problema = mancano dei titoli, i titoli sono errati, ai titoli corrispondono locandine errate o altro
-
-
-I test successivi sono divisi a seconda si tratta di film, serie tv o anime.
-Cancella le sezioni non interessate dal canale. Verificale dalla voce "categories" del file .json.
+- [ ] OK
+- indica il tipo di problema
 
 **Sezione FILM
 
-Test da effettuare mentre sei nella pagina dei titoli. Per ogni titolo verfica ci siano le voci nel menu contestuale.
+**TestN.3: Pagina dei Titoli
+*Test da effettuare mentre sei dentro un menu del canale (film, serietv, in corso ecc..)*.
+Voci nel menu contestuale di KOD. Posizionati su di un titolo e controlla se hai le seguenti voci, nel menu contestuale (tasto c o tenendo enter premuto):
 
 1. Aggiungi Film in videoteca
 
-- [Si] 
-- [No]
+- [ ] Si
+- [ ] No
 
-Aggiungi 2-3 titoli in videoteca. Verificheremo successivamente la videoteca.
-- [Aggiunti correttamente]
-- [Indica eventuali problemi] (copia-incolla per tutti i titoli con cui hai avuto il problema)
+2. Scarica Film (devi avere il download abilitato)
 
-2. Scarica Film
+- [ ] Si
+- [ ] No
 
-- [Si] 
-- [No]
+**Fine test menu contestuale
 
-3. Paginazione ( cliccare sulla voce "Successivo" e verifica la 2° pagina nello stesso modo in cui lo hai fatto per la 1°)
+**Fondo pagina dei titoli
 
-- [Ok] 
-- [X - indica il tipo di problema]
+3. Paginazione, controlla cia sia la voce "Successivo" (se non c'è controlla sul sito se è presente)
 
-4. Cerca o Cerca Film...
-Cerca un titolo a caso in KOD e lo stesso titolo sul sito. Confronta i risultati.
+- [ ] Sì
+- [ ] NO
 
-- [Ok]
-- [X - indica il tipo di problema]
+**Dentro un titolo
 
-5. Entra nella pagina del titolo, verifica che come ultima voce ci sia "Aggiungi in videoteca":
+4. Entra nella pagina del titolo e verifica ci sia almeno 1 server:
 
-- [Si, appare]
-- [Non appare]
+- [ ] Si
+- [ ] No
 
 6. Eventuali problemi riscontrati
-- [ scrivi qui il problema/i ]
+- scrivi qui il problema/i 
 
 **Sezione Serie TV
 
-Test da effettuare mentre sei nella pagina dei titoli. Per ogni titolo verfica ci siano le voci nel menu contestuale.
+Test da effettuare mentre sei nella pagina dei titoli.
+Per ogni titolo verifica ci siano le voci nel menu contestuale.
 
 1. Aggiungi Serie in videoteca
 
-- [Si] 
-- [No]
+- [ ] Si
+- [ ] No
 
-2. Aggiungi 2-3 titoli in videoteca. Verificheremo successivamente la videoteca.
-- [Aggiunti correttamente]
-- [Indica eventuali problemi] (copia-incolla per tutti i titoli con cui hai avuto il problema)
+2. Scarica Stagione (devi avere il download abilitato)
 
-3. Scarica Serie
+- [ ] Si
+- [ ] No
 
-- [Si] 
-- [No]
+3. Scarica Serie (devi avere il download abilitato)
+
+- [ ] Si
+- [ ] No
 
 4. Cerca o Cerca Serie...
 Cerca un titolo a caso in KOD e lo stesso titolo sul sito. Confronta i risultati.
 
-- [Ok]
-- [X - indica il tipo di problema]
+- [ ] Ok
+- indica il tipo di problema
 
 5. Entra nella pagina della serie,  verifica che come ultima voce ci sia "Aggiungi in videoteca":
 
-- [Non appare]
-- [Si, appare]
+- [ ] Si, appare
+- [ ] Non appare
 
-6. Entra nella pagina dell'episodio, NON deve apparire la voce "Aggiungi in videoteca":
+6. Entra nella pagina dell'episodio, **NON** deve apparire la voce "Aggiungi in videoteca":
 
-- [Non appare]
-- [Si, appare]
+- [ ] Si, appare
+- [ ] Non appare
 
 7. Eventuali problemi riscontrati
-- [ scrivi qui il problema/i ]
+- scrivi qui il problema/i 
 
 **Sezione Anime
 
-Test da effettuare mentre sei nella pagina dei titoli. Per ogni titolo verfica ci siano le voci nel menu contestuale.
+Test da effettuare mentre sei nella pagina dei titoli. Per ogni titolo verifica ci siano le voci nel menu contestuale.
 
-1. Aggiungi Serie in videoteca
+1. Rinumerazione (se gli episodi non appaiono nella forma 1x01)
 
-- [Si] 
-- [No]
+- [ ] Si
+- [ ] No
 
-2. Aggiungi 2-3 titoli in videoteca. Verificheremo successivamente la videoteca.
-- [Aggiunti correttamente]
+2. Aggiungi Serie in videoteca
+
+- [ ] Si
+- [ ] No
+
+3. Aggiungi 2-3 titoli in videoteca.
+- [ ] Aggiunti correttamente
 - [Indica eventuali problemi] (copia-incolla per tutti i titoli con cui hai avuto il problema)
 
-3. Scarica Serie
+- COPIA qui l'ERRORE dal LOG
 
-- [Si] 
-- [No]
+4. Scarica Serie
 
-4. Rinumerazione
-
-- [Si] 
-- [No]
+- [ ] Si
+- [ ] No
 
 5. Cerca o Cerca Serie...
 Cerca un titolo a caso in KOD e lo stesso titolo sul sito. Confronta i risultati.
 
-- [Ok]
-- [X - indica il tipo di problema]
+- [ ] Ok
+- indica il tipo di problema
 
-6. Entra nella pagina della serie,  verifica che come ultima voce ci sia "Aggiungi in videoteca":
+6. Entra nella pagina della serie, verifica che come ultima voce ci sia "Aggiungi in videoteca":
 
-- [Si, appare]
-- [Non appare]
+- [ ] Appare
+- [ ] Non appare
 
-7. Entra nella pagina dell'episodio, NON deve apparire la voce "Aggiungi in videoteca":
+7. Entra nella pagina dell'episodio, NON ci deve essere la voce "Aggiungi in videoteca":
 
-- [Non appare]
-- [Si, appare]
+- [ ] Non appare
+- [ ] Appare
 
 8. Eventuali problemi riscontrati
-- [ scrivi qui il problema/i ]
+- scrivi qui il problema/i
 
-**Fine test del canale preso singolarmente!!!
+** TEST PER IL CONFRONTO TRA SITO E CANALE **
+
+TestN.4: Pagina Sito - Menu Canale
+
+Occorrente: Browser, KOD! e il file canale.py ( da browser o da file )
+Avviso:
+- Sul Browser disattiva eventuali componenti aggiuntivi che bloccano i JS (javascript), li riattivi alla fine del test.
+
+Entra in ogni menu e controlla che i risultati siano gli stessi che trovi sul sito, comprese le varie info (ita/sub-ita, qualità ecc..), inoltre entra, se ci sono, nei menu dei generi - anni - lettera, verifica che cliccando su una voce si visualizzino i titoli.
+
+  *Copia questa sezione per ogni voce che presenta problemi:*
+
+- [ ] Voce menu ( del canale dove riscontri errori)
+
+Titoli non corrispondenti:
+
+- [ ] Il totale dei Titoli è diverso da quello del sito. Alcuni Titoli non compaiono.
+- [ ] Appaiono titoli per pagine informative o link a siti esterni. Es: Avviso agli utenti.
+- [ ] La lingua, del titolo, è diversa da quella riportata dal sito
+- [ ] Non è indicato in 1 o più titoli che sono SUB-ITA
+- [ ] Cliccando su "Successivo" non si visualizzano titoli
+- [ ] Non è indicata la qualità: Hd-DVD/rip e altri, nonostante sul sito siano presenti
+
+- [ ] NO
+
+
+  *Fine Copia*
+
+  
+Test.N8: Ricerca Globale
+
+Per questo test ti consiglio di inserire come UNICO sito quello che stai testando, come canale incluso in: Ricerca Globale -> scegli i canali da includere
+Il test è già compilato con le spunte, dato che devi copiarlo solo in caso di errori. Togli la spunta dove funziona.
+Si consiglia di cercare almeno a fino 5 titoli. O perlomeno non fermarti al 1°.
+
+Cerca 5 FILM a tuo piacimento, se il titolo non esce controlla, confronta i risultati sul sito...:
+
+ *Copia questa sezione per ogni voce che presenta problemi*
+
+controlla ci siano queste voci se titolo è un FILM:
+
+- [ ] inserisci il titolo cercato che da problemi
+- [x] Aggiungi in videoteca
+- [x] Scarica Film
+
+  *Fine Copia*
+
+controlla ci siano queste voci se titolo è una SERIE/ANIME:  
+  
+  *Copia questa sezione per ogni voce che presenta problemi*
+
+controlla ci siano queste voci se titolo è un FILM:
+
+- [ ] inserisci il titolo cercato che da problemi
+- [x] Aggiungi in videoteca
+- [x] Scarica Serie
+- [x] Scarica Stagione
+
+- [ ] inserisci il titolo cercato che da problemi
+
+  *Fine Copia*
+  
+  
+Se il canale ha la parte Novità.
+
+Test.N7: Novità.
+Per questo test ti consiglio di inserire come UNICO sito quello che stai testando, come canale incluso in: Novità -> categoria (film, serie o altro )
+
+- [ ] Descrivere il problema
+
+Fine TEST!
+
+SALVA 
+
+Se non hai riscontrato problemi, vai in PROJECT e sposta la scheda nella colonna:
+ TEST SUPERATO
+altrimenti nella colonna 
+ TEST NON SUPERATO!
+
+Grazie mille da parte di tutto il team KoD!
