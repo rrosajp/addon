@@ -164,7 +164,7 @@ def findvideos(item):
                          url= 'https://or01.top-ix.org/videomg/_definst_/mp4:' + item.url + '/' + url,
                          server= 'directo')
                 )
-    return support.server(item, itemlist=itemlist, download=False)
+    return support.server(item, itemlist=itemlist, down_load=False)
 
 def make_itemlist(itemlist, item, data):
     search = item.search if item.search else ''
@@ -185,7 +185,6 @@ def make_itemlist(itemlist, item, data):
                     contentType = item.contentType,
                     contentSerieName= key['title'] if item.contentType != 'movie' else '',
                     contentTitle= key['title'] if item.contentType == 'movie' else '',
-                    thumbnail= key['thumbnail'],
                     infoLabels=infoLabels
             ))
     return itemlist

@@ -879,7 +879,7 @@ def pagination(itemlist, item, page, perpage, function_level=1):
                  thumbnail=thumb()))
     return itemlist
 
-def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True):#, down_load=True):
+def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, down_load=True):
 
     if not data:
         data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
@@ -897,7 +897,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         videoitem.channel = item.channel
         videoitem.contentType = item.contentType
 
-    return controls(itemlist, item, AutoPlay, CheckLinks)
+    return controls(itemlist, item, AutoPlay, CheckLinks, down_load)
 
 def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
     from core import jsontools
