@@ -46,6 +46,8 @@ TAG_SPECIAL = "Special"
 TAG_MODE = "Mode"
 TAG_EPLIST = "EpList"
 TAG_CHECK = "ReCheck"
+TAG_SPLIST = "SpList"
+TAG_TYPE = "Type"
 
 __channel__ = "autorenumber"
 
@@ -61,10 +63,76 @@ def context(exist):
     if access():
         modify = config.get_localized_string(70714) if exist else ''
         _context = [{"title": typo(modify + config.get_localized_string(70585), 'bold'),
-                     "action": "semiautomatic_config_item",
+                     "action": "select_type",
                      "channel": "autorenumber",}]
 
     return _context
+
+def select_type(item):
+    select = platformtools.dialog_select(config.get_localized_string(70730),[config.get_localized_string(70731), config.get_localized_string(70732)])
+    if select == 0: semiautomatic_config_item(item)
+    else: manual_renumeration(item)
+
+def manual_renumeration(item):
+    log()
+    _list = []
+    EpisodeDict = {}
+    item.channel = item.from_channel
+    title = item.show if item.show else item.fulltitle
+    dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
+    dict_series[title] = {}
+    dict_series[title][TAG_TYPE] = 'manual'
+    jsontools.update_node(dict_series, item.channel, TAG_TVSHOW_RENUMERATE)[0]
+    tvdb.find_and_set_infoLabels(item)
+
+    # Trova l'ID della serie
+    while not item.infoLabels['tvdb_id']:
+        try:
+            item.show = platformtools.dialog_input(default=item.show, heading=config.get_localized_string(30112)) # <- Enter title to search
+            tvdb.find_and_set_infoLabels(item)
+        except:
+            heading = config.get_localized_string(70704) # <- TMDB ID (0 to cancel)
+            info = platformtools.dialog_numeric(0, heading)
+            item.infoLabels['tvdb_id'] = '0' if info == '' else info
+
+    if item.infoLabels['tvdb_id']:
+        ID = item.infoLabels['tvdb_id']
+        dict_renumerate = {TAG_ID: ID}
+        dict_series[title] = dict_renumerate
+
+    channel = __import__('channels.' + item.channel, fromlist=["channels.%s" % item.channel])
+    itemlist = channel.episodios(item)
+    for item in itemlist:
+        Title = re.sub(r'\d+x\d+ - ', '', item.title)
+        if item.action == 'findvideos':
+            _list.append(Title)
+
+    count = 1
+    while len(_list) > 0:
+        season = platformtools.dialog_numeric(0, config.get_localized_string(70733))
+        selected = platformtools.dialog_multiselect(config.get_localized_string(70734) % season, _list)
+        if selected == None: break
+        for select in selected:
+            ep = scrapertoolsV2.find_single_match(_list[select], r'(\d+)')
+            if season == '0':
+                episode = ''
+                while not episode:
+                    episode = platformtools.dialog_numeric(0, config.get_localized_string(70735) % _list[select] )
+                EpisodeDict[ep] = '%sx%s' %(season, episode.zfill(2))
+            else:
+                EpisodeDict[ep] = '%sx%s' %(season, str(count).zfill(2))
+                count += 1
+
+        for select in reversed(selected):
+            del _list[select]
+    if len(_list) == 0:
+        EpisodeDict = base64.b64encode(json.dumps(EpisodeDict))
+        dict_series[title][TAG_EPISODE] = EpisodeDict
+    else:
+        dict_series[title] = {}
+    jsontools.update_node(dict_series, item.channel, TAG_TVSHOW_RENUMERATE)[0]
+    xbmc.executebuiltin("Container.Refresh")
+
 
 def semiautomatic_config_item(item):
     log()
@@ -75,7 +143,7 @@ def semiautomatic_config_item(item):
     dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
     title = item.show
 
-    # Trova l'ID dellla serie
+    # Trova l'ID della serie
     while not item.infoLabels['tvdb_id']:
         try:
             item.show = platformtools.dialog_input(default=item.show, heading=config.get_localized_string(30112)) # <- Enter title to search
@@ -119,6 +187,7 @@ def semiautomatic_config_item(item):
                 else: stop = True
         dict_renumerate[TAG_MODE] = False
 
+        dict_renumerate[TAG_TYPE] = 'auto'
         # Imposta la voce Episode
         dict_renumerate[TAG_EPISODE] = ''
         # Scrive nel json
@@ -173,62 +242,55 @@ def config_item(item, itemlist=[], typography='', active=False):
 
 def renumber(itemlist, item='', typography=''):
     log()
-    # dbg()
-    if 'fromchannel' in item:
-        item.channel = item.fromchannel if item.fromchannel else item.channel
+    # Carica Impostazioni
+    settings_node = jsontools.get_node_from_file(itemlist[0].channel, 'settings')
+    try: dict_series = jsontools.get_node_from_file(itemlist[0].channel, TAG_TVSHOW_RENUMERATE)
+    except: dict_series = {}
+
     # Seleziona la funzione Adatta, Menu Contestuale o Rinumerazione
     if item:
-        settings_node = jsontools.get_node_from_file(item.channel, 'settings')
+        if 'from_channel' in item:
+            item.channel = item.from_channel if item.from_channel else item.channel
         # Controlla se la Serie è già stata rinumerata
+        TITLE = item.fulltitle.rstrip() if item.fulltitle else item.contentTitle
+        if dict_series[TITLE].has_key(TAG_TYPE):
+            TYPE = dict_series[TITLE][TAG_TYPE]
+        else:
+            TYPE = 'auto'
+            dict_series[TITLE][TAG_TYPE] = TYPE
+            jsontools.update_node(dict_series, item.channel, TAG_TVSHOW_RENUMERATE)[0]
 
-        try:
-            dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
-            TITLE = item.fulltitle.rstrip() if item.fulltitle else item.contentTitle
+        if TYPE == 'manual':
+            return itemlist
+
+        elif dict_series.has_key(TITLE) and dict_series[TITLE].has_key(TAG_ID):
             ID = dict_series[TITLE][TAG_ID]
-
-            exist = True
-        except:
-            exist = False
-
-        if exist:
-            ID = dict_series[TITLE][TAG_ID]
-            SEASON = dict_series[TITLE][TAG_SEASON]
             EPISODE = dict_series[TITLE][TAG_EPISODE]
-            MODE = dict_series[TITLE][TAG_MODE]
+
+            if dict_series[TITLE].has_key(TAG_SEASON): SEASON = dict_series[TITLE][TAG_SEASON]
+            else: SEASON = ''
+
+            if dict_series[TITLE].has_key(TAG_MODE): MODE = dict_series[TITLE][TAG_MODE]
+            else: MODE = False
+
             renumeration(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE)
+
         else:
             # se non è stata rinumerata controlla se è attiva la rinumerazione automatica
-            if 'autorenumber' not in settings_node: return itemlist
+            if 'autorenumber' not in settings_node:
+                return itemlist
             if settings_node['autorenumber'] == True:
                 config_item(item, itemlist, typography, True)
 
-        # if exist:
-        #     menu_title= config.get_localized_string(70714) + config.get_localized_string(70585)
-        # else:
-        #     menu_title= config.get_localized_string(70585)
-        # from core.item import Item
-        # from channelselector import thumb
-        # itemlist.append(
-        #         Item(channel='autorenumber',
-        #             from_channel=item.channel,
-        #             action = 'semiautomatic_config_item',
-        #             contentType=item.contentType,
-        #             title=typo(menu_title, 'color kod bold'),
-        #             fulltitle= item.fulltitle,
-        #             show= item.show,
-        #             url=item.url,
-        #             args=item.args,
-        #             thumbnail=thumb()))
-
     else:
         for item in itemlist:
-            try:
-                dict_series = jsontools.get_node_from_file(itemlist[0].channel, TAG_TVSHOW_RENUMERATE)
-                TITLE = item.show.rstrip()
+            TITLE = item.show.rstrip()
+            if dict_series.has_key(TITLE) and dict_series[TITLE].has_key(TAG_ID):
                 ID = dict_series[TITLE][TAG_ID]
                 exist = True
-            except:
+            else:
                 exist = False
+
             if item.contentType != 'movie':
                 if item.context:
                     context2 = item.context
@@ -239,6 +301,7 @@ def renumber(itemlist, item='', typography=''):
                     item.context = context(exist)
 
 def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE):
+
     # Se ID è 0 salta la rinumerazione
     if ID == '0':
         return itemlist

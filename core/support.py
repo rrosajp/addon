@@ -323,7 +323,7 @@ def scrape(func):
         itemlist = []
 
         args = func(*args)
-        log('STACK= ',inspect.stack()[1][3])
+        # log('STACK= ',inspect.stack()[1][3])
 
         item = args['item']
 
@@ -345,7 +345,8 @@ def scrape(func):
         typeActionDict = args['type_action_dict'] if 'type_action_dict' in args else {}
         typeContentDict = args['type_content_dict'] if 'type_content_dict' in args else {}
         debug = args['debug'] if 'debug' in args else False
-        if 'pagination' in args and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes']: pagination = args['pagination'] if args['pagination'] else 20
+        log('STACK= ', inspect.stack()[1][3])
+        if 'pagination' in args and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'manual_renumeration']: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
         lang = args['deflang'] if 'deflang' in args else ''
         pag = item.page if item.page else 1  # pagination
@@ -772,7 +773,7 @@ def download(itemlist, item, typography='', function_level=1, function=''):
     if itemlist and item.contentChannel != 'videolibrary':
         itemlist.append(
             Item(channel='downloads',
-                fromchannel=item.channel,
+                from_channel=item.channel,
                 title=title,
                 fulltitle=item.fulltitle,
                 show=item.fulltitle,
@@ -786,7 +787,7 @@ def download(itemlist, item, typography='', function_level=1, function=''):
         if fromaction == 'episodios':
             itemlist.append(
                 Item(channel='downloads',
-                    fromchannel=item.channel,
+                    from_channel=item.channel,
                     title=typo(config.get_localized_string(60357),typography),
                     fulltitle=item.fulltitle,
                     show=item.fulltitle,

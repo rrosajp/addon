@@ -5636,3 +5636,27 @@ msgstr "Includi in Ricerca Globale"
 msgctxt "#70729"
 msgid "Always add the highest quality"
 msgstr "Aggiungi sempre la qualità più alta"
+
+msgctxt "#70730"
+msgid "Select the renumbering method"
+msgstr "Seleziona il metodo di rinumerazione"
+
+msgctxt "#70731"
+msgid "Semi-Automatic"
+msgstr "Semi-Automatico"
+
+msgctxt "#70732"
+msgid "Manual"
+msgstr "Manuale"
+
+msgctxt "#70733"
+msgid "Enter the Series number"
+msgstr "Digita il numero della Serie"
+
+msgctxt "#70734"
+msgid "Select Series %s Episodes"
+msgstr "Seleziona gli Episodi della Serie %s"
+
+msgctxt "#70735"
+msgid "%s Special Episode Number"
+msgstr "Numero dell'Episodio Speciale"
