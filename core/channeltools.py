@@ -227,40 +227,48 @@ def get_default_settings(channel_name):
     default_controls = jsontools.load(filetools.read(default_path)).get('settings', list())
     default_controls_renumber = jsontools.load(filetools.read(default_path)).get('renumber', list())
     categories = get_channel_json(channel_name).get('categories', list())
+    not_active = get_channel_json(channel_name).get('not_active', list())
+    default_off = get_channel_json(channel_name).get('default_off', list())
 
     # Apply default configurations if they do not exist
     for control in default_controls:
         if control['id'] not in str(channel_controls):
-            if 'include_in_newest' in control['id']:
+            if 'include_in_newest' in control['id'] and 'include_in_newest' not in not_active:
                 label = control['id'].split('_')
                 label = label[-1]
                 if label == 'peliculas':
                     if 'movie' in categories:
                         control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30122)
+                        control['default'] = True if 'include_in_newest' not in default_off else False
                         channel_controls.append(control)
                     else: pass
                 elif label == 'series':
                     if 'tvshow' in categories:
                         control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30123)
+                        control['default'] = True if 'include_in_newest' not in default_off else False
                         channel_controls.append(control)
                     else: pass
                 elif label == 'anime':
                     if 'anime' in categories:
                         control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30124)
+                        control['default'] = True if 'include_in_newest' not in default_off else False
                         channel_controls.append(control)
                     else: pass
 
                 else:
                     control['label'] = config.get_localized_string(70727) + ' - ' + label.capitalize()
+                    control['default'] = True if control['id'] not in default_off else False
                     channel_controls.append(control)
 
-            elif control['id'] == 'filter_languages':
-                if len(channel_language) > 1:
-                    control['lvalues'] = list_language
-                    channel_controls.append(control)
-                else: pass
+            # elif control['id'] == 'filter_languages':
+            #     if len(channel_language) > 1:
+            #         control['lvalues'] = list_language
+            #         channel_controls.append(control)
+            #     else: pass
 
-            else:
+            elif control['id'] not in not_active:
+                if type(control['default']) == bool:
+                    control['default'] = True if control['id'] not in default_off else False
                 channel_controls.append(control)
 
     if renumber:

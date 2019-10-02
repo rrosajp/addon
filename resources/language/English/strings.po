@@ -5636,3 +5636,27 @@ msgstr ""
 msgctxt "#70729"
 msgid "Always add the highest quality"
 msgstr ""
+
+msgctxt "#70730"
+msgid ""
+msgstr "Seleziona il metodo di rinumerazione"
+
+msgctxt "#70731"
+msgid ""
+msgstr "Semi-Automatico"
+
+msgctxt "#70732"
+msgid ""
+msgstr "Manuale"
+
+msgctxt "#70733"
+msgid ""
+msgstr "Digita il numero della Serie"
+
+msgctxt "#70734"
+msgid ""
+msgstr "Seleziona gli Episodi della Serie %s"
+
+msgctxt "#70735"
+msgid ""
+msgstr "Numero dell'Episodio Speciale"

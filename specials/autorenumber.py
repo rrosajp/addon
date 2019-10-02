@@ -31,10 +31,10 @@ try:
     import xbmcgui
 except:
     xbmcgui = None
-
+import xbmc
 import re, base64, json, os
 from core import jsontools, tvdb, scrapertoolsV2
-from core.support import typo, log
+from core.support import typo, log, dbg
 from platformcode import config, platformtools,  logger
 from platformcode.config import get_setting
 
@@ -44,6 +44,10 @@ TAG_SEASON = "Season"
 TAG_EPISODE = "Episode"
 TAG_SPECIAL = "Special"
 TAG_MODE = "Mode"
+TAG_EPLIST = "EpList"
+TAG_CHECK = "ReCheck"
+TAG_SPLIST = "SpList"
+TAG_TYPE = "Type"
 
 __channel__ = "autorenumber"
 
@@ -59,10 +63,76 @@ def context(exist):
     if access():
         modify = config.get_localized_string(70714) if exist else ''
         _context = [{"title": typo(modify + config.get_localized_string(70585), 'bold'),
-                     "action": "semiautomatic_config_item",
-                     "channel": "autorenumber"}]
+                     "action": "select_type",
+                     "channel": "autorenumber",}]
 
     return _context
+
+def select_type(item):
+    select = platformtools.dialog_select(config.get_localized_string(70730),[config.get_localized_string(70731), config.get_localized_string(70732)])
+    if select == 0: semiautomatic_config_item(item)
+    else: manual_renumeration(item)
+
+def manual_renumeration(item):
+    log()
+    _list = []
+    EpisodeDict = {}
+    item.channel = item.from_channel
+    title = item.show if item.show else item.fulltitle
+    dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
+    dict_series[title] = {}
+    dict_series[title][TAG_TYPE] = 'manual'
+    jsontools.update_node(dict_series, item.channel, TAG_TVSHOW_RENUMERATE)[0]
+    tvdb.find_and_set_infoLabels(item)
+
+    # Trova l'ID della serie
+    while not item.infoLabels['tvdb_id']:
+        try:
+            item.show = platformtools.dialog_input(default=item.show, heading=config.get_localized_string(30112)) # <- Enter title to search
+            tvdb.find_and_set_infoLabels(item)
+        except:
+            heading = config.get_localized_string(70704) # <- TMDB ID (0 to cancel)
+            info = platformtools.dialog_numeric(0, heading)
+            item.infoLabels['tvdb_id'] = '0' if info == '' else info
+
+    if item.infoLabels['tvdb_id']:
+        ID = item.infoLabels['tvdb_id']
+        dict_renumerate = {TAG_ID: ID}
+        dict_series[title] = dict_renumerate
+
+    channel = __import__('channels.' + item.channel, fromlist=["channels.%s" % item.channel])
+    itemlist = channel.episodios(item)
+    for item in itemlist:
+        Title = re.sub(r'\d+x\d+ - ', '', item.title)
+        if item.action == 'findvideos':
+            _list.append(Title)
+
+    count = 1
+    while len(_list) > 0:
+        season = platformtools.dialog_numeric(0, config.get_localized_string(70733))
+        selected = platformtools.dialog_multiselect(config.get_localized_string(70734) % season, _list)
+        if selected == None: break
+        for select in selected:
+            ep = scrapertoolsV2.find_single_match(_list[select], r'(\d+)')
+            if season == '0':
+                episode = ''
+                while not episode:
+                    episode = platformtools.dialog_numeric(0, config.get_localized_string(70735) % _list[select] )
+                EpisodeDict[ep] = '%sx%s' %(season, episode.zfill(2))
+            else:
+                EpisodeDict[ep] = '%sx%s' %(season, str(count).zfill(2))
+                count += 1
+
+        for select in reversed(selected):
+            del _list[select]
+    if len(_list) == 0:
+        EpisodeDict = base64.b64encode(json.dumps(EpisodeDict))
+        dict_series[title][TAG_EPISODE] = EpisodeDict
+    else:
+        dict_series[title] = {}
+    jsontools.update_node(dict_series, item.channel, TAG_TVSHOW_RENUMERATE)[0]
+    xbmc.executebuiltin("Container.Refresh")
+
 
 def semiautomatic_config_item(item):
     log()
@@ -73,7 +143,7 @@ def semiautomatic_config_item(item):
     dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
     title = item.show
 
-    # Trova l'ID dellla serie
+    # Trova l'ID della serie
     while not item.infoLabels['tvdb_id']:
         try:
             item.show = platformtools.dialog_input(default=item.show, heading=config.get_localized_string(30112)) # <- Enter title to search
@@ -102,9 +172,9 @@ def semiautomatic_config_item(item):
             season = platformtools.dialog_numeric(0, heading, '1')
             dict_renumerate[TAG_SEASON] = season
 
-        ########### PROVVISORIO ###################
+
         mode = platformtools.dialog_yesno(config.get_localized_string(70687), config.get_localized_string(70688), nolabel=config.get_localized_string(30023), yeslabel=config.get_localized_string(30022))
-        if mode == 1:
+        if mode == True:
             dict_renumerate[TAG_MODE] = False
             specials = []
             stop = False
@@ -116,37 +186,18 @@ def semiautomatic_config_item(item):
                     dict_renumerate[TAG_SPECIAL] = specials
                 else: stop = True
         dict_renumerate[TAG_MODE] = False
-        # Richede se ci sono speciali nella stagione
-        # mode = platformtools.dialog_yesno(config.get_localized_string(70687), config.get_localized_string(70688), nolabel=config.get_localized_string(30023), yeslabel=config.get_localized_string(30022))
-        # if mode == 0: dict_renumerate[TAG_MODE] = False
-        # else:
-        #     select = platformtools.dialog_yesno(config.get_localized_string(70687), config.get_localized_string(70717), nolabel=config.get_localized_string(30023), yeslabel=config.get_localized_string(30022))
-        #     if select == 0:
-        #         dict_renumerate[TAG_MODE] = False
-        #         specials = []
-        #         stop = False
-        #         while not stop:
-        #             heading = config.get_localized_string(70718) + str(specials)
-        #             special = platformtools.dialog_numeric(0, heading, '')
-        #             if special:
-        #                 specials.append(int(special))
-        #                 dict_renumerate[TAG_SPECIAL] = specials
-        #             else: stop = True
-        #     else:
-        #         dict_renumerate[TAG_MODE] = True
-        ########### PROVVISORIO ###################
 
-
+        dict_renumerate[TAG_TYPE] = 'auto'
         # Imposta la voce Episode
         dict_renumerate[TAG_EPISODE] = ''
         # Scrive nel json
         jsontools.update_node(dict_series, item.channel, TAG_TVSHOW_RENUMERATE)[0]
+        xbmc.executebuiltin("Container.Refresh")
 
     else:
         message = config.get_localized_string(60444)
         heading = item.show.strip()
         platformtools.dialog_notification(heading, message)
-
 
 
 def config_item(item, itemlist=[], typography='', active=False):
@@ -161,7 +212,6 @@ def config_item(item, itemlist=[], typography='', active=False):
     # Pulizia del Titolo
     if any( word in title.lower() for word in ['specials', 'speciali']):
         item.show = re.sub(r'\sspecials|\sspeciali', '', item.show.lower())
-        log('ITEM SHOW= ',item.show)
         tvdb.find_and_set_infoLabels(item)
     elif not item.infoLabels['tvdb_id']:
             item.show = title.rstrip('123456789 ')
@@ -192,42 +242,55 @@ def config_item(item, itemlist=[], typography='', active=False):
 
 def renumber(itemlist, item='', typography=''):
     log()
-    if 'fromchannel' in item:
-        item.channel = item.fromchannel if item.fromchannel else item.channel
+    # Carica Impostazioni
+    settings_node = jsontools.get_node_from_file(itemlist[0].channel, 'settings')
+    try: dict_series = jsontools.get_node_from_file(itemlist[0].channel, TAG_TVSHOW_RENUMERATE)
+    except: dict_series = {}
+
     # Seleziona la funzione Adatta, Menu Contestuale o Rinumerazione
     if item:
-        settings_node = jsontools.get_node_from_file(item.channel, 'settings')
+        if 'from_channel' in item:
+            item.channel = item.from_channel if item.from_channel else item.channel
         # Controlla se la Serie è già stata rinumerata
+        TITLE = item.fulltitle.rstrip() if item.fulltitle else item.contentTitle
+        if dict_series[TITLE].has_key(TAG_TYPE):
+            TYPE = dict_series[TITLE][TAG_TYPE]
+        else:
+            TYPE = 'auto'
+            dict_series[TITLE][TAG_TYPE] = TYPE
+            jsontools.update_node(dict_series, item.channel, TAG_TVSHOW_RENUMERATE)[0]
 
-        try:
-            dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
-            TITLE = item.fulltitle.rstrip()
+        if TYPE == 'manual':
+            return itemlist
+
+        elif dict_series.has_key(TITLE) and dict_series[TITLE].has_key(TAG_ID):
             ID = dict_series[TITLE][TAG_ID]
-
-            exist = True
-        except:
-            exist = False
-
-        if exist:
-            ID = dict_series[TITLE][TAG_ID]
-            SEASON = dict_series[TITLE][TAG_SEASON]
             EPISODE = dict_series[TITLE][TAG_EPISODE]
-            MODE = dict_series[TITLE][TAG_MODE]
+
+            if dict_series[TITLE].has_key(TAG_SEASON): SEASON = dict_series[TITLE][TAG_SEASON]
+            else: SEASON = ''
+
+            if dict_series[TITLE].has_key(TAG_MODE): MODE = dict_series[TITLE][TAG_MODE]
+            else: MODE = False
+
             renumeration(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE)
+
         else:
             # se non è stata rinumerata controlla se è attiva la rinumerazione automatica
-            if 'autorenumber' not in settings_node: return itemlist
+            if 'autorenumber' not in settings_node:
+                return itemlist
             if settings_node['autorenumber'] == True:
-                    config_item(item, itemlist, typography, True)
+                config_item(item, itemlist, typography, True)
+
     else:
         for item in itemlist:
-            try:
-                dict_series = jsontools.get_node_from_file(itemlist[0].channel, TAG_TVSHOW_RENUMERATE)
-                TITLE = item.show.rstrip()
+            TITLE = item.show.rstrip()
+            if dict_series.has_key(TITLE) and dict_series[TITLE].has_key(TAG_ID):
                 ID = dict_series[TITLE][TAG_ID]
                 exist = True
-            except:
+            else:
                 exist = False
+
             if item.contentType != 'movie':
                 if item.context:
                     context2 = item.context
@@ -238,7 +301,7 @@ def renumber(itemlist, item='', typography=''):
                     item.context = context(exist)
 
 def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE):
-    log('EPISODE= ', EPISODE)
+
     # Se ID è 0 salta la rinumerazione
     if ID == '0':
         return itemlist
@@ -256,7 +319,6 @@ def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, 
 
     elif EPISODE:
         EpisodeDict = json.loads(base64.b64decode(EPISODE))
-        log('EPISODE DICT= ', EpisodeDict)
 
         # Controlla che la lista egli Episodi sia della stessa lunghezza di Itemlist
         if EpisodeDict == 'none':
@@ -274,35 +336,59 @@ def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, 
         make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE)
 
 def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE):
-    from core import support
     log()
-    page = 1
-    EpList = []
-    if EPISODE:
-        EpisodeDict = json.loads(base64.b64decode(EPISODE))
-    else:
-        EpisodeDict = {}
     exist = True
     item.infoLabels['tvdb_id'] = ID
     tvdb.set_infoLabels_item(item)
     FirstOfSeason= 0
+
+    if EPISODE: EpisodeDict = json.loads(base64.b64decode(EPISODE))
+    else: EpisodeDict = {}
     try: SPECIAL = dict_series[TITLE][TAG_SPECIAL]
     except: SPECIAL = []
+    try: EpList = json.loads(base64.b64decode(dict_series[TITLE][TAG_EPLIST]))
+    except: EpList = []
+    try: Pages = dict_series[TITLE][TAG_CHECK]
+    except: Pages = [1]
 
     # Ricava Informazioni da TVDB
-    while exist:
-        data = tvdb.otvdb_global.get_list_episodes(ID,page)
-        if data: page = page + 1
-        else: exist = False
+    checkpages = []
+    check = True
+    Page = Pages[-1]
 
+    while exist:
+        if check:
+            for page in Pages:
+                data = tvdb.otvdb_global.get_list_episodes(ID,page)
+                for episodes in data['data']:
+                    if episodes['firstAired'] and [episodes['firstAired'], episodes['airedSeason'], episodes['airedEpisodeNumber']] not in EpList:
+                        EpList.append([episodes['firstAired'], episodes['airedSeason'], episodes['airedEpisodeNumber']])
+                    else:
+                        if page not in checkpages:
+                            checkpages.append(page)
+        check = False
+
+        data = tvdb.otvdb_global.get_list_episodes(ID,Page)
         if data:
+            Page = Page + 1
             for episodes in data['data']:
-                if episodes['firstAired']: EpList.append([episodes['firstAired'], episodes['airedSeason'], episodes['airedEpisodeNumber']])
-        EpList.sort()
-        log(EpList)
+                if episodes['firstAired'] and [episodes['firstAired'], episodes['airedSeason'], episodes['airedEpisodeNumber']] not in EpList:
+                    EpList.append([episodes['firstAired'], episodes['airedSeason'], episodes['airedEpisodeNumber']])
+        else:
+            if page not in checkpages:
+                checkpages.append(Page -1)
+            exist = False
+
+    EpList.sort()
+
+    dict_series[TITLE][TAG_CHECK] = checkpages
+    EpList = base64.b64encode(json.dumps(EpList))
+    dict_series[TITLE][TAG_EPLIST] = EpList
+    jsontools.update_node(dict_series, item.channel, TAG_TVSHOW_RENUMERATE)[0]
 
     # Crea Dizionari per la numerazione
     if EpList:
+        EpList = json.loads(base64.b64decode(dict_series[TITLE][TAG_EPLIST]))
         specials = []
         regular = {}
         complete = {}
@@ -310,7 +396,6 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
         ep = 1
         specialep = 0
         for episode in EpList:
-            log('EPISODE= ', episode[1])
             complete[allep] = [str(episode[1]) + 'x' + str(episode[2]), episode[0]]
             if episode[1] == 0:
                 specials.append(allep)
@@ -327,20 +412,14 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
                     FirstOfSeason = numbers - 1
 
         if MODE == True: SPECIAL = specials
-        log(SPECIAL)
-        log(complete)
-        log(regular)
 
         addiction = 0
         for item in itemlist:
             # Otiene Numerazione Episodi
             if config.get_localized_string(30992) not in item.title:
                 episode = int(scrapertoolsV2.find_single_match(item.title, r'\d+'))
-                log('EPISODE= ',episode)
                 number = episode + FirstOfSeason - addiction
                 count = number + addiction
-                # find = episode + FirstOfSeason
-                # log('FIND= ',find, ' ',str(episode) + ' ' + str(FirstOfSeason))
                 # Crea Dizionario Episodi
 
                 if episode == 0:
