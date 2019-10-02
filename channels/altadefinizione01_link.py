@@ -1,6 +1,20 @@
 # -*- coding: utf-8 -*-
-# -*- Channel Altadefinizione01L Film -*-
-# -*- By Greko -*-
+# -*- Channel altadefinizione01_link -*-
+"""
+
+    Eccezioni che non superano il test del canale:
+       - indicare i problemile eccezioni
+
+    Novità. Indicare in quale/i sezione/i è presente il canale:
+       -film
+    
+    Avvisi:
+        - la voce 'Mi sento fortunato' è il rettangolino in basso nel sito
+        con scritto 'FILM RANDOM'
+        
+    Ulteriori info:
+
+"""
 
 from core import support
 from core.item import Item
