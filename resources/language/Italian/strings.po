@@ -5654,9 +5654,9 @@ msgid "Enter the Series number"
 msgstr "Digita il numero della Serie"
 
 msgctxt "#70734"
-msgid "Select Series %s Episodes"
-msgstr "Seleziona gli Episodi della Serie %s"
+msgid "Select Series Episodes"
+msgstr "Seleziona gli Episodi della Serie"
 
 msgctxt "#70735"
 msgid "%s Special Episode Number"
-msgstr "Numero dell'Episodio Speciale"
+msgstr "Numero dell'Episodio Speciale %s"

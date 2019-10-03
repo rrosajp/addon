@@ -115,7 +115,9 @@ def episodios(item):
     itemlist = []
     json_file = current_session.get(item.url, headers=headers, params=payload).json()
     show_id = str(json_file['data'][0]['show_id'])
+    season_id = str(json_file['data'][0]['season_id'])
     episodes = []
+    support.log('SEASON ID= ',season_id)
     for episode in json_file['data']:
         episodes.append(episode['episodes'])
     for episode in episodes:
@@ -123,20 +125,25 @@ def episodios(item):
             if 'stagione' in key['title'].lower():
                 match = support.match(key['title'].encode('ascii', 'replace'), r'[Ss]tagione\s*(\d+) - [Ee]pisodio\s*(\d+)')[0][0]
                 title = match[0]+'x'+match[1] + ' - ' + item.fulltitle
+                make_item = True
+            elif int(key['season_id']) == int(season_id):
+                title = 'Episodio ' + key['number'] + ' - ' + key['title'].encode('ascii', 'replace'),
+                make_item = True
             else:
-                title = 'Episodio ' + key['number'].encode('ascii', 'replace') + ' - ' + key['title'],
+                make_item = False
+            if make_item == True:
                 if type(title) == tuple: title = title[0]
-            itemlist.append(
-                Item(
-                    channel = item.channel,
-                    title = title,
-                    fulltitle= item.fulltitle,
-                    show= item.show,
-                    url=  host + show_id + '/season/' + str(key['season_id']) + '/',
-                    action= 'findvideos',
-                    video_id= key['video_id'],
-                    contentType = item.contentType
-                ))
+                itemlist.append(
+                    Item(
+                        channel = item.channel,
+                        title = title,
+                        fulltitle= item.fulltitle,
+                        show= item.show,
+                        url=  host + show_id + '/season/' + str(key['season_id']) + '/',
+                        action= 'findvideos',
+                        video_id= key['video_id'],
+                        contentType = item.contentType
+                    ))
     autorenumber.renumber(itemlist, item, 'bold')
     if autorenumber.check(item) == True:
         support.videolibrary(itemlist,item)
