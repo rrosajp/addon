@@ -2,28 +2,27 @@
 # ------------------------------------------------------------
 # Canale per 'casacinema'
 # ------------------------------------------------------------
-
 """
 
     Problemi noti che non superano il test del canale:
        - indicare i problemi
 
     Avvisi:
-        - NON è presente nella ricerca globale
-        - TUTTE le pagine delle serie contengono al max 20 titoli
+        -
 
+    Novità:
+        - Film, SerieTv
     Ulteriori info:
 
 """
-# Qui gli import
-# per l'uso dei decoratori, per i log, e funzioni per siti particolari
+import re
 from core import support
 from platformcode import config
 
 # in caso di necessità
-#from core import scrapertoolsV2#, httptools, servertools, tmdb
-from core.item import Item # per newest
-#from lib import unshortenit
+from core import scrapertoolsV2, httptools#, servertools, tmdb
+from core.item import Item
+
 
 ##### fine import
 __channel__ = "casacinema"
@@ -45,6 +44,9 @@ def mainlist(item):
     tvshow = ['/aggiornamenti-serie-tv',
         ('Ultime', ['/category/serie-tv', 'peliculas', '']),
         ]
+
+    search = ''
+
     return locals()
 
 @support.scrape
@@ -54,9 +56,12 @@ def peliculas(item):
 
     if item.contentType == 'movie':
         action = 'findvideos'
-    else:
+    if item.contentType == 'tvshow':
         action = 'episodios'
         pagination = ''
+    else:
+        # è una ricerca
+        action = 'select'
     blacklist = ['']
 
     patron = r'<li><a href="(?P<url>[^"]+)"[^=]+="(?P<thumb>[^"]+)"><div> <div[^>]+>(?P<title>.*?)[ ]?(?:\[(?P<quality1>HD)\])?[ ]?(?:\(|\[)?(?P<lang>Sub-ITA)?(?:\)|\])?[ ]?(?:\[(?P<quality>.+?)\])?[ ]?(?:\((?P<year>\d+)\))?<(?:[^>]+>.+?(?:title="Nuovi episodi">(?P<episode>\d+x\d+)[ ]?(?P<lang2>Sub-Ita)?|title="IMDb">(?P<rating>[^<]+)))?'
@@ -79,10 +84,12 @@ def peliculas(item):
 def episodios(item):
     support.log(item)
     #dbg
-
+    if item.data1:
+        data = item.data1
     action = 'findvideos'
+    item.contentType = 'tvshow'
     blacklist = ['']
-    patron = r'(?P<episode>\d+(?:&#215;|×)?\d+\-\d+|\d+(?:&#215;|×)\d+)[;]?(?:(?P<title>[^<]+)<(?P<url>.*?)|(\2[ ])(?:<(\3.*?)))(?:</a><br />|</a></p>)'
+    patron = r'(?P<episode>\d+(?:&#215;|×)?\d+\-\d+|\d+(?:&#215;|×)\d+)[;]?(?:(?P<title>[^<]+)<(?P<url>.*?)|(\2[ ])(?:<(\3.*?)))(?:<br />|</p>)'
     patronBlock = r'<strong>(?P<block>(?:.+?Stagione*.+?(?P<lang>ITA|Sub-ITA))?(?:.+?|</strong>)(/?:</span>)?</p>.*?</p>)'
 
 ##    debug = True
@@ -103,6 +110,36 @@ def genres(item):
     #debug = True
     return locals()
 
+def select(item):
+    support.log('select --->', item)
+    debug = True
+    #support.dbg()
+    data = httptools.downloadpage(item.url, headers=headers).data
+    data = re.sub('\n|\t', ' ', data)
+    data = re.sub(r'>\s+<', '> <', data)
+    if 'continua con il video' in data.lower():
+##    block = scrapertoolsV2.find_single_match(data, r'<div class="col-md-8 bg-white rounded-left p-5"><div>(.*?)<div style="margin-left: 0.5%; color: #FFF;">')
+##    if re.findall('rel="category tag">serie', data, re.IGNORECASE):
+        support.log('select = ### è un film ###')
+        return findvideos(Item(channel=item.channel,
+                              title=item.title,
+                              fulltitle=item.fulltitle,
+                              url=item.url,
+                              #args='serie',
+                              contentType='movie',
+                              data1 = data
+                              ))
+    else:
+        support.log('select = ### è una serie ###')
+        return episodios(Item(channel=item.channel,
+                              title=item.title,
+                              fulltitle=item.fulltitle,
+                              url=item.url,
+                              #args='serie',
+                              contentType='tvshow',
+                              data1 = data
+                              ))
+
 ############## Fondo Pagina
 
 def search(item, text):
@@ -111,7 +148,7 @@ def search(item, text):
     text = text.replace(' ', '+')
     item.url = host + '/?s=' + text
     item.args = 'search'
-    item.contentType = item.contentType
+    item.contentType = 'episode' # non fa uscire le voci nel context menu
     try:
         return peliculas(item)
     # Se captura la excepcion, para no interrumpir al buscador global si un canal falla
@@ -133,6 +170,7 @@ def newest(categoria):
         else:
             item.contentType = 'movie'
             item.url = host+'/category/film'
+
         item.action = 'peliculas'
         itemlist = peliculas(item)
 
@@ -149,7 +187,15 @@ def newest(categoria):
 
 def findvideos(item):
     support.log('findvideos ->', item)
+    itemlist = []
     if item.contentType != 'movie':
         return support.server(item, item.url)
     else:
-        return support.server(item)
+        block = r'<div class="col-md-10">(.+?)<div class="swappable" id="links">'
+        patron = r'SRC="([^"]+)"'
+        links = re.findall(patron, block, re.IGNORECASE)
+        if "#" in links:
+            links = link.replace('#', 'speedvideo.net')
+            return support.server(item, links)
+        else:
+            return support.server(item)

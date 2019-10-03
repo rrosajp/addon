@@ -8,13 +8,5 @@
     "banner": "https://raw.githubusercontent.com/Zanzibar82/images/master/posters/casacinema.png",
     "categories": ["tvshow", "movie","vos"],
     "settings": [
-		{
-		  "id": "include_in_global_search",
-		  "type": "bool",
-		  "label": "@70728",
-		  "default": false,
-		  "enabled": false,
-		  "visible": false
-		}
     ]
 }
