@@ -95,7 +95,7 @@ def manual_renumeration(item, modify=False):
     dict_series[title][TAG_TYPE] = 'manual'
 
     jsontools.update_node(dict_series, item.channel, TAG_TVSHOW_RENUMERATE)[0]
-    if not dict_series[title].has_key(TAG_ID) and not dict_series[title][TAG_ID]:
+    if not dict_series[title].has_key(TAG_ID) or (dict_series[title].has_key(TAG_ID) and not dict_series[title][TAG_ID]):
         tvdb.find_and_set_infoLabels(item)
 
         # Trova l'ID della serie
