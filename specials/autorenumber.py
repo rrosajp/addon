@@ -126,8 +126,13 @@ def manual_renumeration(item, modify=False):
                 _list.append(Title)
 
     count = 1
+    preselect = platformtools.dialog_select(config.get_localized_string(70732),[typo(config.get_localized_string(70518),'bold'),typo(config.get_localized_string(70519),'bold')])
+    selection = []
+    if preselect == 0:
+        for i in _list:
+            selection.append(_list.index(i))
     while len(_list) > 0:
-        selected = platformtools.dialog_multiselect(config.get_localized_string(70734), _list)
+        selected = platformtools.dialog_multiselect(config.get_localized_string(70734), _list, preselect=selection)
         if selected == None: break
         season = ''
         while not season:
