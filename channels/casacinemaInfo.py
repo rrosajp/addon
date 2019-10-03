@@ -5,12 +5,14 @@
 """
 
     Problemi noti che non superano il test del canale:
-       - indicare i problemi
+       - 
 
     Avvisi:
         - Sub-ita è nel titolo, lascia il puntatore sulla locandina
         per visualizzare il titolo completo!
 
+    Novità:
+        - Film
     Ulteriori info:
 
 
@@ -25,7 +27,7 @@
 from core import support
 
 # in caso di necessità
-from core import scrapertoolsV2, httptools #, servertools, tmdb
+from core import scrapertoolsV2, httptools
 from core.item import Item
 #from lib import unshortenit
 
@@ -55,8 +57,6 @@ def mainlist(item):
     # Ordine delle voci
     # Voce FILM, puoi solo impostare l'url
     film = ['',
-        #'url', # url per la voce FILM, se possibile la pagina principale con le ultime novità
-        #Voce Menu,['url','action','args',contentType]
         ('Al Cinema', ['/category/in-sala/', 'peliculas', '']),
         ('Novità', ['/category/nuove-uscite/', 'peliculas', '']),
         ('Generi', ['', 'genres', 'genres']),
@@ -95,7 +95,7 @@ def genres(item):
     patron = r'href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
     patronBlock = r'</span>Generi</h3>(?P<block>.*?)<div class="clear"></div>'
 
-    debug = False
+##    debug = True
     return locals()
 
 
