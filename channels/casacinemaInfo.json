@@ -1,11 +1,11 @@
 {
     "id": "casacinemaInfo",
-    "name": "La casa del cinema",
+    "name": "La Casa del Cinema",
     "language": ["ita", "vosi"],
     "active": true,
     "adult": false,
     "thumbnail": "",
     "banner": "",
-    "categories": ["movie"],
+    "categories": ["movie", "vos"],
     "settings": []
 }

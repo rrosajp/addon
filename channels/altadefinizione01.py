@@ -2,12 +2,17 @@
 # ------------------------------------------------------------
 # Canale per altadefinizione01
 # ------------------------------------------------------------
+"""
+    
+    Eccezioni note che non superano il test del canale:
+
+    Avvisi:
+        - L'url si prende da questo file.
+        - è presente nelle novità-> Film.
+
+    Ulteriori info:
 
 """
-
-
-"""
-
 from core import scrapertoolsV2, httptools, support
 from core.item import Item
 from platformcode import config, logger
@@ -33,9 +38,9 @@ def mainlist(item):
     film = [
         ('Al Cinema', ['/cinema/', 'peliculas', 'pellicola']),
         ('Ultimi Aggiornati-Aggiunti', ['','peliculas', 'update']),
-        ('Generi', ['', 'categorie', 'genres']),
-        ('Lettera', ['/catalog/a/', 'categorie', 'orderalf']),
-        ('Anni', ['', 'categorie', 'years']),
+        ('Generi', ['', 'genres', 'genres']),
+        ('Lettera', ['/catalog/a/', 'genres', 'orderalf']),
+        ('Anni', ['', 'genres', 'years']),
         ('Sub-ITA', ['/sub-ita/', 'peliculas', 'pellicola'])
     ]
 
@@ -44,7 +49,7 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     support.log('peliculas',item)
-    deflang = 'ITA'
+##    deflang = 'ITA'
     action="findvideos"
 
     patron = r'<div class="cover boxcaption"> <h2>.<a href="(?P<url>[^"]+)">.*?<.*?src="(?P<thumb>[^"]+)"'\
@@ -54,22 +59,20 @@ def peliculas(item):
 
     if item.args == "search":
         patronBlock = r'</script> <div class="boxgrid caption">(?P<block>.*)<div id="right_bar">'
+        
     elif item.args == 'update':
         patronBlock = r'<div class="widget-title">Ultimi Film Aggiunti/Aggiornati</div>(?P<block>.*?)<div id="alt_menu">'
-        patron = r'style="background-image:url\((?P<thumb>[^\)]+).+?<p class="h4">'\
-                 '(?P<title>.*?)</p>[^>]+> [^>]+> [^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> '\
-                 '[^>]+> [^>]+>[^>]+>(?P<year>\d{4})[^>]+>[^>]+> [^>]+>[^>]+>'\
-                 '(?P<duration>\d+).+?>.*?<p>(?P<plot>[^<]+)<.*?href="(?P<url>[^"]+)'
+        patron = r'style="background-image:url\((?P<thumb>[^\)]+).+?<p class="h4">(?P<title>.*?)</p>[^>]+> [^>]+> [^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> [^>]+> [^>]+>[^>]+>(?P<year>\d{4})[^>]+>[^>]+> [^>]+>[^>]+>(?P<duration>\d+).+?>.*?(?:>Film (?P<lang>Sub ITA)</a></p> )?<p>(?P<plot>[^<]+)<.*?href="(?P<url>[^"]+)'
     else:
         patronBlock = r'<div class="cover_kapsul ml-mask">(?P<block>.*)<div class="page_nav">'
 
     patronNext =  '<span>\d</span> <a href="([^"]+)">'
-    #debug = True
+    debug = True
     return locals()
 
 @support.scrape
-def categorie(item):
-    support.log('categorie',item)
+def genres(item):
+    support.log('genres',item)
 
     if item.args != 'orderalf': action = "peliculas"
     else: action = 'orderalf'
@@ -100,9 +103,6 @@ def orderalf(item):
 
     return locals()
 
-def findvideos(item):
-    support.log('findvideos', item)
-    return support.server(item, headers=headers)
 
 def search(item, text):
     support.log(item, text)
@@ -139,3 +139,7 @@ def newest(categoria):
         return []
 
     return itemlist
+
+def findvideos(item):
+    support.log('findvideos', item)
+    return support.server(item, headers=headers)
