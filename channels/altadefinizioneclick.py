@@ -2,17 +2,32 @@
 # ------------------------------------------------------------
 # Canale per altadefinizioneclick
 # ----------------------------------------------------------
+"""
 
-from core import servertools, support
+    Eccezioni che non superano il test del canale:
+       - indicare le eccezioni
+
+    Novità. Indicare in quale/i sezione/i è presente il canale:
+       - film
+    
+    Avvisi:
+        - Eventuali avvisi per i tester
+
+    Ulteriori info:
+
+
+"""
+from core import support
 from core.item import Item
-from platformcode import config#, logger
+from platformcode import config
 
 __channel__ = 'altadefinizioneclick'
 
 host = config.get_channel_url(__channel__)
 headers = [['Referer', host]]
-list_servers = ['verystream', 'openload', 'streamango', "vidoza", "thevideo", "okru", 'youtube']
-list_quality = ['1080p']
+list_servers = ['verystream', 'rapidvideo', 'openload', 'streamango', 'vidoza',
+                'vidcloud', 'thevideo', 'okru', 'hdload', 'youtube']
+list_quality = ['1080p', '720', '360']
 
 @support.menu
 def mainlist(item):
@@ -24,28 +39,21 @@ def mainlist(item):
         ('Anni', ['', 'genres', 'years']),
         ('Qualità', ['', 'genres', 'quality']),
         ('Mi sento Fortunato',[ '', 'genres', 'lucky']),
-        ('Sub-ITA', ['/sub-ita/', 'peliculas', 'vos'])
+        ('Sub-ITA', ['/sub-ita/', 'peliculas', 'sub'])
     ]
     return locals()
 
 @support.scrape
 def peliculas(item):
     support.log()
-    #debug = True
+
     patron = r'<div class="wrapperImage">[ ]?(?:<span class="hd">(?P<quality>[^<>]+))?.+?'\
              'href="(?P<url>[^"]+)".+?src="(?P<thumb>[^"]+)".+?<h2 class="titleFilm">[^>]+>'\
              '(?P<title>.+?)[ ]?(?:|\[(?P<lang>[^\]]+)\])?(?:\((?P<year>\d{4})\))?</a>.*?'\
              '(?:IMDB\:</strong>[ ](?P<rating>.+?)<|</h2> )'
-    patronBlock = r'<h1 class="titleSection titleLastIns">(?P<block>.*?)<div class="row ismobile">'
+    patronBlock = r'<h1 class="titleSection titleLastIns">.+?</h1>(?P<block>.*?)<div class="row ismobile">'
 
-    if item.args == 'news':
-        patronBlock = r'Nuove uscite</h1>(?P<block>.*?)<div class="row ismobile">'
-    elif item.args == 'cinema':
-        patronBlock = r'<h1 class="titleSection titleLastIns">Al cinema</h1>(?P<block>.*?)<div class="row ismobile">'
-    elif item.args == 'vos':
-        patronBlock = r'<h1 class="titleSection titleLastIns">SUB-ITA</h1>(?P<block>.*?)<div class="row ismobile">'
-    elif item.args == 'genres':
-        patronBlock = '<h1 class="titleSection titleLastIns">(?P<block>.*?)<div class="row ismobile">'
+    if item.args == 'genres':
         patron = r'<div class="wrapperImage">[ ]?(?:<span class="hd">'\
                  '(?P<quality>[^<>]+))?.+?href="(?P<url>[^"]+)".+?src="(?P<thumb>[^"]+)"'\
                  '.+?<h2 class="titleFilm(?:Mobile)?">[^>]+>(?P<title>.+?)[ ]?'\
@@ -56,12 +64,13 @@ def peliculas(item):
         patron = r'<a href="(?P<url>[^"]+)">\s*<div class="wrapperImage">(?:<span class="hd">(?P<quality>[^<]+)'\
                  '<\/span>)?<img[^s]+src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)<[^<]+>'\
                  '(?:.*?IMDB:\s(\2[^<]+)<\/div>)?'
-    else:
+    elif not item.args:
         patronBlock = r'ULTIMI INSERITI(?P<block>.*?)<div class="sliderLastUpdate ismobile ">'
 
-    # in caso di CERCA si apre la maschera di inserimento dati
+    # nella pagina "CERCA", la voce "SUCCESSIVO" apre la maschera di inserimento dati
     patronNext = r'<a class="next page-numbers" href="([^"]+)">'
 
+    #debug = True
     return locals()
 
 @support.scrape
@@ -107,6 +116,7 @@ def newest(categoria):
     item = Item()
     try:
         if categoria == "peliculas":
+            item.args = 'news'
             item.url = host + "/nuove-uscite/"
             item.action = "peliculas"
             itemlist = peliculas(item)
