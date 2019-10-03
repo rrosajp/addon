@@ -5650,11 +5650,11 @@ msgid "Manual"
 msgstr ""
 
 msgctxt "#70733"
-msgid "Enter the Series number"
+msgid "Enter the Season Number"
 msgstr ""
 
 msgctxt "#70734"
-msgid "Select Series Episodes"
+msgid "Select Season Episodes"
 msgstr ""
 
 msgctxt "#70735"
