@@ -76,7 +76,6 @@ def peliculas(item):
         patronNext = r'<link rel="next" href="([^"]+)"\s*/>'
         action = 'findvideos'
     elif item.args == 'alt':
-        # debug = True
         patron = r'<div class="post-thumbnail">\s*<a href="(?P<url>[^"]+)" title="(?P<title>.*?)(?: [Oo][Aa][Vv])?(?:\s*(?P<lang>[Ss][Uu][Bb].[Ii][Tt][Aa]))[^"]+">\s*<img[^src]+src="(?P<thumb>[^"]+)"'
         patronNext = r'<link rel="next" href="([^"]+)"\s*/>'
         action = 'episodios'
@@ -85,7 +84,6 @@ def peliculas(item):
         patronBlock = r'<ul class="lcp_catlist"[^>]+>(?P<block>.*?)</ul>'
         patron = r'<a href="(?P<url>[^"]+)"[^>]+>(?P<title>.*?)(?: [Oo][Aa][Vv])?(?:\s*(?P<lang>[Ss][Uu][Bb].[Ii][Tt][Aa])[^<]+)?</a>'
         action = 'episodios'
-    debug = True
     return locals()
 
 
