@@ -288,7 +288,10 @@ def config_item(item, itemlist=[], typography='', active=False):
 def renumber(itemlist, item='', typography=''):
     log()
     # Carica Impostazioni
-    settings_node = jsontools.get_node_from_file(itemlist[0].channel, 'settings')
+    if itemlist:
+        settings_node = jsontools.get_node_from_file(itemlist[0].channel, 'settings')
+    else:
+        settings_node = {}
     try: dict_series = jsontools.get_node_from_file(itemlist[0].channel, TAG_TVSHOW_RENUMERATE)
     except: dict_series = {}
 
