@@ -75,27 +75,55 @@ def peliculas(item):
 
 @support.scrape
 def episodios(item):
-    url = item.url
-    anime = True
-    patronBlock = r'(?:<p style="text-align: left;">|<div class="pagination clearfix">\s*)(?P<block>.*?)</span></a></div>'
-    patron = r'(?:<a href="(?P<url>[^"]+)"[^>]+>)?<span class="pagelink">(?P<episode>\d+)</span>'
-    def itemHook(item):
-        if not item.url:
-            item.url = url
-        item.title = support.typo('Episodio ', 'bold') + item.title
-        return item
+    data = support.match(item, headers=headers)[1]
+    if 'Lista Episodi' not in data:
+        patron = r'(?:iframe src|str)="(?P<url>[^"]+)"'
+        title = item.title
+        def fullItemlistHook(itemlist):
+            url = ''
+            for item in itemlist:
+                url += item.url +'\n'
+            item = itemlist[0]
+            item.data = url
+            item.title = title
+            item.contentType = 'movie'
+            itemlist = []
+            itemlist.append(item)
+            return itemlist
+    else:
+        url = item.url
+        anime = True
+        patronBlock = r'(?:<p style="text-align: left;">|<div class="pagination clearfix">\s*)(?P<block>.*?)</span></a></div>'
+        patron = r'(?:<a href="(?P<url>[^"]+)"[^>]+>)?<span class="pagelink">(?P<episode>\d+)</span>'
+        def itemHook(item):
+            if not item.url:
+                item.url = url
+            item.title = support.typo('Episodio ', 'bold') + item.title
+            return item
     return locals()
 
+def check(item):
+    data = support.match(item, headers=headers)[1]
+    if 'Lista Episodi' not in data:
+        item.data = data
+        return findvideos(item)
+
+    data = ''
+    return data
 
 def findvideos(item):
     support.log()
-    data = ''
-    matches = support.match(item, 'str="([^"]+)"')[0]
-    if matches:
-        for match in matches:
-            data += str(jsfunctions.unescape(support.re.sub('@|g','%', match)))
-            data += str(match)
+    if item.data:
+        data = item.data
     else:
+        matches = support.match(item, '(?:str="([^"]+)"|iframe src="([^"]+)")')[0]
         data = ''
+        if matches:
+            for match in matches:
+                try: data += str(jsfunctions.unescape(support.re.sub('@|g','%', match)))
+                except: data += ''
+                data += str(match)
+        else:
+            data = ''
 
     return support.server(item,data)

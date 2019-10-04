@@ -3,9 +3,9 @@
     "name": "AnimePerTutti",
     "active": true,
     "adult": false,
-    "language": ["ita"],
+    "language": ["ita", "vosi"],
     "thumbnail": "animepertutti.png",
     "bannermenu": "animepertutti.png",
-    "categories": ["anime"],
+    "categories": ["anime", "vos"],
     "settings": []
 }
