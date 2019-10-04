@@ -587,7 +587,6 @@ def set_context_commands(item, parent_item):
         if (item.channel != "videolibrary" and not config.get_localized_string(70585) in str(item.context)) \
             or (item.channel != "videolibrary" and config.get_localized_string(70585) in str(item.context) and config.get_localized_string(70714) in str(item.context)):
             # Añadir Serie a la videoteca
-            logger.info('context= '+ str(item.context))
             if item.action in ["episodios", "get_episodios"] and item.contentSerieName:
                 context_commands.append((config.get_localized_string(60352), "XBMC.RunPlugin(%s?%s)" %
                                          (sys.argv[0], item.clone(action="add_serie_to_library",

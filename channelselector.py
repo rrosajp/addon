@@ -88,7 +88,7 @@ def getchanneltypes(view="thumb_"):
         channel_types.append("adult")
 
     # channel_language = config.get_setting("channel_language", default="all")
-    channel_language = auto_filter()
+    channel_language = auto_filter()[0]
     logger.info("channel_language=%s" % channel_language)
 
     # Ahora construye el itemlist ordenadamente
@@ -138,7 +138,7 @@ def filterchannels(category, view="thumb_"):
     logger.info("channel_files encontrados %s" % (len(channel_files)))
 
     # channel_language = config.get_setting("channel_language", default="all")
-    channel_language = auto_filter()
+    channel_language, channel_language_list = auto_filter()
     logger.info("channel_language=%s" % channel_language)
 
     for channel_path in channel_files:
@@ -192,8 +192,16 @@ def filterchannels(category, view="thumb_"):
             # Se muestran todos los canales si se elige "all" en el filtrado de idioma
             # Se muestran sólo los idiomas filtrados, cast o lat
             # Los canales de adultos se mostrarán siempre que estén activos
-            if channel_language != "all" and channel_language not in channel_parameters["language"] \
-                    and "*" not in channel_parameters["language"]:
+
+            for c in channel_language_list:
+                if c in channel_parameters["language"]:
+                    L = True
+                else:
+                    L = False
+            # logger.info('CCLANG= ' + channel_language + ' ' + str(channel_language_list))
+            if channel_language != "all" and "*" not in channel_parameters["language"] \
+                and L == False and channel_language not in channel_parameters["language"]:
+                logger.info('STOP!!!!')
                 continue
 
             # Se salta el canal si está en una categoria filtrado
@@ -283,12 +291,13 @@ def set_channel_info(parameters):
     content = ''
     langs = parameters['language']
     lang_dict = {'ita':'Italiano',
-                 '*':'Italiano, VOSI, VO'}
+                 'vosi':'Sottotitolato in Italiano',
+                 '*':'Italiano, Sottotitolato in Italiano'}
     for lang in langs:
-        if 'vos' in parameters['categories']:
-            lang = '*'
-        if 'vosi' in parameters['categories']:
-            lang = 'ita'
+        # if 'vos' in parameters['categories']:
+        #     lang = '*'
+        # if 'vosi' in parameters['categories']:
+        #     lang = 'ita'
 
         if lang in lang_dict:
             if language != '' and language != '*' and not parameters['adult']:
@@ -316,18 +325,20 @@ def auto_filter(auto_lang=False):
     addon = xbmcaddon.Addon('metadata.themoviedb.org')
     def_lang = addon.getSetting('language')
     lang = 'all'
+    lang_list = ['all']
 
-    lang_dict = {'ita':'it'}
+    lang_dict = {'it':'ita'}
+    lang_list_dict = {'it':['ita','vosi']}
 
     if config.get_setting("channel_language") == 'auto' or auto_lang == True:
-        for langs, variant in lang_dict.items():
-            if def_lang in variant:
-                lang = langs
+        lang = lang_dict[def_lang]
+        lang_list = lang_list_dict[def_lang]
 
     else:
         lang = config.get_setting("channel_language", default="all")
+        lang_list = lang_list_dict[def_lang]
 
-    return lang
+    return lang, lang_list
 
 
 def thumb(itemlist=[], genre=False):
