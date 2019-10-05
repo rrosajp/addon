@@ -475,7 +475,7 @@ def do_search(item, categories=None):
     logger.info("channels_path=%s" % channels_path)
 
     # channel_language = config.get_setting("channel_language", default="all")
-    channel_language = auto_filter()
+    channel_language = auto_filter()[0]
     logger.info("channel_language=%s" % channel_language)
 
     # Para Kodi es necesario esperar antes de cargar el progreso, de lo contrario
