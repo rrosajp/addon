@@ -30,6 +30,7 @@ def mainlist(item):
 def search(item, texto):
     search = texto
     item.contentType = 'tvshow'
+    anime = True
     patron = r'href="(?P<url>[^"]+)"[^>]+>[^>]+>(?P<title>[^<|(]+)(?:(?P<lang>\(([^\)]+)\)))?<|\)'
     action = 'check'    
     return locals()
@@ -85,13 +86,13 @@ def check(item):
     movie, data = support.match(item, r'Episodi:</b> (\d*) Movie')
     anime_id = support.match(data, r'anime_id=(\d+)')[0][0]    
     item.url = host + "/loading_anime?anime_id=" + anime_id
-    support.log('MOVIE= ', movie)
     if movie:
         item.contentType = 'movie'
         episodes = episodios(item)
         if len(episodes) > 0: item.url = episodes[0].url
         return findvideos(item)
     else:
+        item.contentType = 'tvshow'
         return episodios(item)
 
 
@@ -103,8 +104,7 @@ def episodios(item):
 
 
 def findvideos(item):
-    support.log(item)
-    itemlist = []
+    support.log()
     url = support.match(item, r'<a href="([^"]+)"><div class="downloadestreaming">',headers=headers)[0]
     if url: item.url = url[0]
     return support.server(item)
