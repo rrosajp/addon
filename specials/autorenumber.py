@@ -287,7 +287,6 @@ def config_item(item, itemlist=[], typography='', active=False):
 
 def renumber(itemlist, item='', typography=''):
     log()
-    # dbg()
     # Carica Impostazioni
     if itemlist:
         settings_node = jsontools.get_node_from_file(itemlist[0].channel, 'settings')
@@ -295,19 +294,13 @@ def renumber(itemlist, item='', typography=''):
         settings_node = {}
     try: dict_series = jsontools.get_node_from_file(itemlist[0].channel, TAG_TVSHOW_RENUMERATE)
     except: dict_series = {}
-    log('CHANNEL', itemlist[0])
-
     # Seleziona la funzione Adatta, Menu Contestuale o Rinumerazione
     if item:
         item.channel = item.from_channel if item.from_channel else item.channel
         # Controlla se la Serie è già stata rinumerata
         TITLE = item.fulltitle.rstrip() if item.fulltitle else item.contentTitle
-        log('dict', dict_series)
-        log('TITLE ', TITLE)
-        log('TITLE EXIST? ', TITLE in dict_series)
-        log('HAS ID? ',dict_series[TITLE].has_key(TAG_ID))
+       
         if inspect.stack()[2][3] == 'find_episodes':
-            log('PRENDO ITEMLIST ',inspect.stack()[2][3])
             return itemlist
         
         elif dict_series.has_key(TITLE) and dict_series[TITLE].has_key(TAG_ID):
