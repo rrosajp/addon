@@ -346,7 +346,7 @@ def scrape(func):
         typeContentDict = args['type_content_dict'] if 'type_content_dict' in args else {}
         debug = args['debug'] if 'debug' in args else False
         log('STACK= ', inspect.stack()[1][3])
-        if 'pagination' in args and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update']: pagination = args['pagination'] if args['pagination'] else 20
+        if 'pagination' in args and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
         lang = args['deflang'] if 'deflang' in args else ''
         pag = item.page if item.page else 1  # pagination
