@@ -275,7 +275,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 infoLabels=infolabels,
                 thumbnail=item.thumbnail if function == 'episodios' else scraped["thumb"] ,
                 args=item.args,
-                contentSerieName= title if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
+                contentSerieName= item.title if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
                 contentTitle= title if item.contentType or CT == 'movie' else '',
                 contentLanguage = lang1,
                 contentEpisodeNumber=episode if episode else ''
@@ -756,13 +756,13 @@ def download(itemlist, item, typography='', function_level=1, function=''):
     if not typography: typography = 'color kod bold'
 
     if item.contentType == 'movie':
-        fromaction = 'findvideos'
+        from_action = 'findvideos'
         title = typo(config.get_localized_string(60354), typography)
     elif item.contentType == 'episode':
-        fromaction = 'findvideos'
+        from_action = 'findvideos'
         title = typo(config.get_localized_string(60356), typography) + ' - ' + item.title
     else:
-        fromaction = 'episodios'
+        from_action = 'episodios'
         title = typo(config.get_localized_string(60355), typography)
 
     function = function if function else inspect.stack()[function_level][3]
@@ -781,10 +781,10 @@ def download(itemlist, item, typography='', function_level=1, function=''):
                 contentSerieName=contentSerieName,
                 url=item.url,
                 action='save_download',
-                fromaction=fromaction,
+                from_action=from_action,
                 contentTitle=contentTitle
             ))
-        if fromaction == 'episodios':
+        if from_action == 'episodios':
             itemlist.append(
                 Item(channel='downloads',
                     from_channel=item.channel,
@@ -795,7 +795,7 @@ def download(itemlist, item, typography='', function_level=1, function=''):
                     contentSerieName=contentSerieName,
                     url=item.url,
                     action='save_download',
-                    fromaction=fromaction,
+                    from_action=from_action,
                     contentTitle=contentTitle,
                     download='season'
                 ))
