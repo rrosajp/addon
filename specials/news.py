@@ -46,7 +46,7 @@ def mainlist(item):
     list_canales, any_active = get_channels_list()
     channel_language = config.get_setting("channel_language", default="auto")
     if channel_language == 'auto':
-        channel_language = auto_filter()
+        channel_language = auto_filter()[0]
 
     #if list_canales['peliculas']:
     thumbnail = get_thumb("channels_movie.png")
@@ -400,9 +400,6 @@ def get_title(item):
             if not item.contentSeason:
                 item.contentSeason = '1'
             title = "%s - %sx%s" % (title, item.contentSeason, str(item.contentEpisodeNumber).zfill(2))
-##            #4l3x87 - fix to add Sub-ITA in newest
-##            if item.contentLanguage:
-##                title+=" "+item.contentLanguage
 
     elif item.contentTitle:  # Si es una pelicula con el canal adaptado
         title = item.contentTitle
@@ -412,9 +409,9 @@ def get_title(item):
         title = item.title
 
     # Limpiamos el titulo de etiquetas de formato anteriores
-    title = re.compile("\[/*COLO.*?\]", re.DOTALL).sub("", title)
-    title = re.compile("\[/*B\]", re.DOTALL).sub("", title)
-    title = re.compile("\[/*I\]", re.DOTALL).sub("", title)
+##    title = re.compile("\[/*COLO.*?\]", re.DOTALL).sub("", title)
+##    title = re.compile("\[/*B\]", re.DOTALL).sub("", title)
+##    title = re.compile("\[/*I\]", re.DOTALL).sub("", title)
 
     title = '[B]'+title+'[/B]'
     
