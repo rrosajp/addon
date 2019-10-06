@@ -414,7 +414,7 @@ def get_title(item):
 ##    title = re.compile("\[/*I\]", re.DOTALL).sub("", title)
 
     title = '[B]'+title+'[/B]'
-    
+
     if item.contentLanguage == '':
         pass
     elif type(item.contentLanguage) == list and len(item.contentLanguage) ==1:
@@ -423,7 +423,7 @@ def get_title(item):
           title += support.typo(item.contentLanguage, '_ [] color kod')
     elif type(item.contentLanguage) == list:
         title += item.contentLanguage
-    
+
     if item.quality:
         title += support.typo(item.quality, '_ [] color kod')
     return title
@@ -436,7 +436,7 @@ def no_group(list_result_canal):
     for i in list_result_canal:
         support.log("NO GROUP i -> ", i)
         canale = channels_id_name[i.channel]
-        canale = '[COLOR yellow]'+canale+'[/COLOR]'
+        canale = '[COLOR blue]'+canale+'[/COLOR]' # per differenziarlo dal colore delle altre voci
         i.title = get_title(i) + " [" + canale + "]"
 #        i.text_color = color3
 
