@@ -7,8 +7,7 @@
 from core import scrapertoolsV2, httptools, support
 from core.item import Item
 
-
-__channel__ = 'seriehd'
+##__channel__ = 'seriehd'
 # host = support.config.get_channel_url(__channel__)
 
 # impostati dinamicamente da findhost()
@@ -22,11 +21,13 @@ def findhost():
     headers = [['Referer', host]]
     return host
 
+findhost()
+
 list_servers = ['verystream', 'openload', 'streamango', 'thevideome']
 list_quality = ['1080p', '720p', '480p', '360']
 
-checklinks = support.config.get_setting('checklinks', __channel__)
-checklinks_number = support.config.get_setting('checklinks_number', __channel__)
+##checklinks = support.config.get_setting('checklinks', __channel__)
+##checklinks_number = support.config.get_setting('checklinks_number', __channel__)
 
 
 @support.menu
@@ -40,9 +41,9 @@ def mainlist(item):
 
 def search(item, texto):
     support.log(texto)
-        
+
     item.contentType = 'tvshow'
-    item.url = findhost() + "/?s=" + texto
+    item.url = host + "/?s=" + texto
     try:
         return peliculas(item)
 
@@ -57,12 +58,13 @@ def search(item, texto):
 def newest(categoria):
     support.log(categoria)
     itemlist = []
-    item = support.Item()    
+    item = support.Item()
     try:
         if categoria == "series":
-            item.url = findhost()
+            item.url = host
+            item.contentType = 'tvshow'
             itemlist = peliculas(item)
-
+            itemlist.pop()
     # Continua la ricerca in caso di errore
     except:
         import sys
@@ -94,7 +96,7 @@ def peliculas(item):
 def episodios(item):
     data =''
     url = support.match(item, patronBlock=r'<iframe width=".+?" height=".+?" src="([^"]+)" allowfullscreen frameborder="0">')[1]
-    seasons = support.match(item, r'<a href="([^"]+)">(\d+)<', r'<h3>STAGIONE</h3><ul>(.*?)</ul>', headers, url)[0]    
+    seasons = support.match(item, r'<a href="([^"]+)">(\d+)<', r'<h3>STAGIONE</h3><ul>(.*?)</ul>', headers, url)[0]
     for season_url, season in seasons:
         season_url = support.urlparse.urljoin(url, season_url)
         episodes = support.match(item, r'<a href="([^"]+)">(\d+)<', '<h3>EPISODIO</h3><ul>(.*?)</ul>', headers, season_url)[0]
@@ -110,7 +112,4 @@ def episodios(item):
 
 def findvideos(item):
     support.log()
-    return support.hdpass_get_servers(item) 
-
-
-
+    return support.hdpass_get_servers(item)
