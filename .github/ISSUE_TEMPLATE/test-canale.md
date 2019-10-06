@@ -16,11 +16,9 @@ Se hai suggerimenti/consigli/dubbi sui test...Proponili e/o chiedi!
 Per il test dei canali DEVI utilizzare la versione **[BETA](https://kodiondemand.github.io/repo/KoD-installer-BETA.zip)** di KOD!
 **ABILITA IL DEBUG PER I LOG**
 
-Quando fai il test puoi spuntare i quadratini con il mouse.
-*MA*
-Per poter scrivere eventuali problemi: **DEVI** cliccare sul tab **WRITE** dell'ISSUE aperto per il test.
+**Per far apparire le spunte devi mettere una X tra le [ ], puoi vedere il risultato finale andando nel tab "Preview"**
 
-* *SE hai un ERRORE con avviso di LOG, copia IMMEDIATAMENTE l'ERRORE dal file e copialo nell'ISSUE nel punto del TEST*
+* *SE hai un ERRORE con avviso di LOG, copia IMMEDIATAMENTE il file kodi.log [qua](https://del.dog/) e incolla il link nel punto del TEST che da l'errore*
 
 Se hai problemi non previsti dal test, segnalali aggiungendoli in fondo al test.
 
@@ -274,12 +272,5 @@ Per questo test ti consiglio di inserire come UNICO sito quello che stai testand
 - [ ] Descrivere il problema
 
 Fine TEST!
-
-SALVA 
-
-Se non hai riscontrato problemi, vai in PROJECT e sposta la scheda nella colonna:
- TEST SUPERATO
-altrimenti nella colonna 
- TEST NON SUPERATO!
 
 Grazie mille da parte di tutto il team KoD!
