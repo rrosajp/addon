@@ -97,7 +97,11 @@ def show_menu(item):
                 fanart = option['fanart']
             else:
                 fanart = item.fanart
-            itemlist.append(Item(channel=item.channel, title=option['title'], thumbnail=thumbnail, fanart=fanart, action='show_menu', url=option['link']))
+            if 'plot' in option and option['plot']:
+                plot = option['plot']
+            else:
+                plot = item.plot
+            itemlist.append(Item(channel=item.channel, title=option['title'], thumbnail=thumbnail, fanart=fanart, plot=plot, action='show_menu', url=option['link']))
         autoplay.show_option(item.channel, itemlist)
         return itemlist
 
@@ -109,6 +113,9 @@ def show_menu(item):
 
     elif "episodes_list" in json_data:
         item.media_type = 'episodes_list'
+
+    if "generic_list" in json_data:
+        item.media_type='generic_list'
 
     return list_all(item)
 
@@ -131,26 +138,19 @@ def list_all(item):
         new_item.infoLabels['year'] = media['year'] if 'year' in media else ''
         new_item.infoLabels['tmdb_id'] = media['tmdb_id'] if 'tmdb_id' in media else ''
 
-        if 'movies_list' in json_data:
+        if 'movies_list' or 'generic_list' in json_data:
             new_item.url = media
             new_item.contentTitle = media['title']
             new_item.action = 'findvideos'
-            if 'year' in media:
-                new_item.infoLabels['year'] = media['year']
-            if 'tmdb_id' in media:
-                new_item.infoLabels['tmdb_id'] = media['tmdb_id']
         else:
             new_item.url = media['seasons_list']
             new_item.contentSerieName = media['title']
             new_item.action = 'seasons'
-            if 'year' in media:
-                new_item.infoLabels['year'] = media['year']
-            if 'tmdb_id' in media:
-                new_item.infoLabels['tmdb_id'] = media['tmdb_id']
 
         itemlist.append(new_item)
 
-    tmdb.set_infoLabels(itemlist, seekTmdb=True)
+    if not 'generic_list' in json_data:
+        tmdb.set_infoLabels(itemlist, seekTmdb=True)
     return itemlist
 
 def seasons(item):
