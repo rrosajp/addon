@@ -436,7 +436,7 @@ def no_group(list_result_canal):
     for i in list_result_canal:
         support.log("NO GROUP i -> ", i)
         canale = channels_id_name[i.channel]
-        canale = '[COLOR blue]'+canale+'[/COLOR]' # per differenziarlo dal colore delle altre voci
+        canale = '[COLOR white]'+canale+'[/COLOR]' # per differenziarlo dal colore delle altre voci
         i.title = get_title(i) + " [" + canale + "]"
 #        i.text_color = color3
 
