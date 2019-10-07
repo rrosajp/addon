@@ -7,6 +7,6 @@
     "thumbnail": "seriehd.png",
     "banner": "seriehd.png",
     "categories": ["tvshow"],
-    "not_active":"include_in_newest",
+    "not_active": ["include_in_newest"],
     "settings": []
 }
