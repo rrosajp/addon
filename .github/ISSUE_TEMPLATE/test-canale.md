@@ -1,7 +1,7 @@
 ---
 name: Test Canale
 about: Pagina per il test di un canale
-title: ''
+title: 'Test Di Un Canale'
 labels: Test Canale
 assignees: ''
 
@@ -9,25 +9,24 @@ assignees: ''
 Documento Template per il Test del canale
 
 Specifica, dove possibile, il tipo di problema che incontri, anche se non è presente alcuna voce per indicarlo.
-Se hai suggerimenti/consigli/dubbi sui test...Proponili e/o chiedi!
+Se hai **suggerimenti/consigli/dubbi sul test**...Proponili e/o chiedi! Scrivi un commento a questo stesso issue che trovi dopo questa pagina
 
 **Avvertenze:**
 
-Per il test dei canali DEVI utilizzare la versione **[BETA](https://kodiondemand.github.io/repo/KoD-installer-BETA.zip)** di KOD!
-**ABILITA IL DEBUG PER I LOG**
+Per il test dei canali **DEVI**:
+- utilizzare la versione **[BETA](https://kodiondemand.github.io/repo/KoD-installer-BETA.zip)** di KOD!
+- **ABILITARE IL DEBUG PER I LOG**
 
-**Per eseguire il test ricordati di titolarlo con il nome del canale da te scelte e salvare la pagina cliccando sul bottone verde in basso "SUBMIT NEW ISSUE"**
+**Per eseguire il test ricordati di titolarlo con il nome del canale da te scelto e salvare la pagina cliccando sul bottone verde in basso "SUBMIT NEW ISSUE"**
 
 **Per poter scrivere o allegare file nella pagina devi cliccare sul tab WRITE **
 
 **Ogni volta che hai un ERRORE con avviso di LOG. Puoi scegliere se:
- - ALLEGARE IMMEDIATAMENTE il file kodi.log nel punto, della pagina, in cui sei nel test
- - Allegare il file kodi.log a fine pagina.
-########## cancellare? #########
-- Copia dal file di log l'errore [qua](https://del.dog/) e incolla il link nel punto del TEST che da l'errore**
-################################
+ ALLEGARE IMMEDIATAMENTE il file kodi.log nel punto, della pagina, in cui sei nel test
+ Allegare il file kodi.log a fine pagina.**
 
-Se hai problemi non previsti dal test, segnalali aggiungendoli in fondo al test. Ricordo che per potere scrivere devi cliccare sul tab WRITE.
+Se hai problemi non previsti dal test, segnalali aggiungendoli in fondo al test.
+**Ricordo che per potere scrivere devi cliccare sul tab WRITE.**
 
 **SE VEDI I QUADRATINI MA NON RIESCI A CLICCARLI... DEVI CLICCARE SUL BOTTONE VERDE "SUBMIT NEW ISSUE"**
 
