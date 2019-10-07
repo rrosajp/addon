@@ -9,7 +9,7 @@ assignees: ''
 Documento Template per il Test del canale
 
 Specifica, dove possibile, il tipo di problema che incontri, anche se non è presente alcuna voce per indicarlo.
-Se hai **suggerimenti/consigli/dubbi sul test**...Proponili e/o chiedi! Scrivi un commento a questo stesso issue che trovi dopo questa pagina
+Se hai **suggerimenti/consigli/dubbi sul test**...Proponili e/o Chiedi! Scrivendo un commento a questo stesso issue, che trovi in fondo, dopo questa pagina.
 
 **Avvertenze:**
 
@@ -17,24 +17,26 @@ Per il test dei canali **DEVI**:
 - utilizzare la versione **[BETA](https://kodiondemand.github.io/repo/KoD-installer-BETA.zip)** di KOD!
 - **ABILITARE IL DEBUG PER I LOG**
 
-**Per eseguire il test ricordati di titolarlo con il nome del canale da te scelto e salvare la pagina cliccando sul bottone verde in basso "SUBMIT NEW ISSUE"**
-
-**Per poter scrivere o allegare file nella pagina devi cliccare sul tab WRITE **
+**Per eseguire il test, ricordati di titolarlo con il nome del canale da te scelto, e salvare la pagina cliccando sul bottone verde in basso "SUBMIT NEW ISSUE"**
 
 **Ogni volta che hai un ERRORE con avviso di LOG. Puoi scegliere se:
  ALLEGARE IMMEDIATAMENTE il file kodi.log nel punto, della pagina, in cui sei nel test
  Allegare il file kodi.log a fine pagina.**
 
+**Per poter scrivere o allegare file nella pagina devi:**
+    - cliccare sui [ ... ] in alto a destra della scheda 
+    - Edit. Da questo momento puoi scrivere e/o inviare file.
+Dopodiché clicca sul bottone verde "Update comment" per continuare il test nel modo consueto o per terminarlo!
+
 Se hai problemi non previsti dal test, segnalali aggiungendoli in fondo al test.
-**Ricordo che per potere scrivere devi cliccare sul tab WRITE.**
 
 **SE VEDI I QUADRATINI MA NON RIESCI A CLICCARLI... DEVI CLICCARE SUL BOTTONE VERDE "SUBMIT NEW ISSUE"**
 
 ***
 I file relativi al canale li trovi:
 - su browser:
-"Apre la pagina dei Canali":https://github.com/kodiondemand/addon/tree/master/channels
-- sul device
+[Apre la pagina dei Canali](https://github.com/kodiondemand/addon/tree/master/channels)
+- sul device:
 [nella specifica cartella](https://github.com/kodiondemand/addon/wiki/Percorsi-sui-diversi-S.O.) , .kodi/addons/channels.
 Per aprirli non servono programmi particolari un semplice editor di testo è sufficiente.
 
