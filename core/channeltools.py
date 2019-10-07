@@ -229,6 +229,7 @@ def get_default_settings(channel_name):
     categories = get_channel_json(channel_name).get('categories', list())
     not_active = get_channel_json(channel_name).get('not_active', list())
     default_off = get_channel_json(channel_name).get('default_off', list())
+    logger.info('NON ATTIVI= ' + str(not_active))
 
     # Apply default configurations if they do not exist
     for control in default_controls:
@@ -266,7 +267,7 @@ def get_default_settings(channel_name):
             #         channel_controls.append(control)
             #     else: pass
 
-            elif control['id'] not in not_active:
+            elif control['id'] not in not_active and 'include_in_newest' not in control['id']:
                 if type(control['default']) == bool:
                     control['default'] = True if control['id'] not in default_off else False
                 channel_controls.append(control)
