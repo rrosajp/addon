@@ -74,6 +74,21 @@ def search(item, text):
     itemlist = peliculas(item)
     return itemlist
 
+def newest(categoria):
+    item = Item()
+    item.args = 'channel/10007/last/'
+    if categoria == 'peliculas':
+        item.contentType = 'movie'
+        item.url = host + 'film/'
+    if categoria == 'series':
+        item.contentType = 'tvshow'
+        item.url = host + 'series/'
+    if categoria == 'anime':
+        item.contentType = 'tvshow'
+        item.url = host + 'anime/'
+    return peliculas(item)
+        
+
 def peliculas(item):
     itemlist = []
     if not item.args:
