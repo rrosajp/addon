@@ -67,7 +67,7 @@ def peliculas(item):
         patronBlock = r'<div class="cover_kapsul ml-mask">(?P<block>.*)<div class="page_nav">'
 
     patronNext =  '<span>\d</span> <a href="([^"]+)">'
-    debug = True
+##    debug = True
     return locals()
 
 @support.scrape
