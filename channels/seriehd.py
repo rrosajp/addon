@@ -55,26 +55,6 @@ def search(item, texto):
         return []
 
 
-def newest(categoria):
-    support.log(categoria)
-    itemlist = []
-    item = support.Item()
-    try:
-        if categoria == "series":
-            item.url = host
-            item.contentType = 'tvshow'
-            itemlist = peliculas(item)
-            itemlist.pop()
-    # Continua la ricerca in caso di errore
-    except:
-        import sys
-        for line in sys.exc_info():
-            support.logger.error("{0}".format(line))
-        return []
-
-    return itemlist
-
-
 @support.scrape
 def genre(item):
     patronMenu = '<a href="(?P<url>[^"]+)">(?P<title>[^<]+)</a>'
