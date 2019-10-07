@@ -9,24 +9,34 @@ assignees: ''
 Documento Template per il Test del canale
 
 Specifica, dove possibile, il tipo di problema che incontri, anche se non è presente alcuna voce per indicarlo.
-Se hai suggerimenti/consigli/dubbi sui test...Proponili e/o chiedi!
+Se hai **suggerimenti/consigli/dubbi sul test**...Proponili e/o Chiedi! Scrivendo un commento a questo stesso issue, che trovi in fondo, dopo questa pagina.
 
 **Avvertenze:**
 
-Per il test dei canali DEVI utilizzare la versione **[BETA](https://kodiondemand.github.io/repo/KoD-installer-BETA.zip)** di KOD!
-**ABILITA IL DEBUG PER I LOG**
+Per il test dei canali **DEVI**:
+- utilizzare la versione **[BETA](https://kodiondemand.github.io/repo/KoD-installer-BETA.zip)** di KOD!
+- **ABILITARE IL DEBUG PER I LOG**
 
-**Per far apparire le spunte devi mettere una X tra le [ ], puoi vedere il risultato finale andando nel tab "Preview"**
+**Per eseguire il test, ricordati di titolarlo con il nome del canale da te scelto, e salvare la pagina cliccando sul bottone verde in basso "SUBMIT NEW ISSUE"**
 
-* *SE hai un ERRORE con avviso di LOG, copia IMMEDIATAMENTE il file kodi.log [qua](https://del.dog/) e incolla il link nel punto del TEST che da l'errore*
+**Ogni volta che hai un ERRORE con avviso di LOG. Puoi scegliere se:
+ ALLEGARE IMMEDIATAMENTE il file kodi.log nel punto, della pagina, in cui sei nel test
+ Allegare il file kodi.log a fine pagina.**
+
+**Per poter scrivere o allegare file nella pagina devi:**
+    - cliccare sui [ ... ] in alto a destra della scheda 
+    - Edit. Da questo momento puoi scrivere e/o inviare file.
+Dopodiché clicca sul bottone verde "Update comment" per continuare il test nel modo consueto o per terminarlo!
 
 Se hai problemi non previsti dal test, segnalali aggiungendoli in fondo al test.
+
+**SE VEDI I QUADRATINI MA NON RIESCI A CLICCARLI... DEVI CLICCARE SUL BOTTONE VERDE "SUBMIT NEW ISSUE"**
 
 ***
 I file relativi al canale li trovi:
 - su browser:
-"Apre la pagina dei Canali":https://github.com/kodiondemand/addon/tree/master/channels
-- sul device
+[Apre la pagina dei Canali](https://github.com/kodiondemand/addon/tree/master/channels)
+- sul device:
 [nella specifica cartella](https://github.com/kodiondemand/addon/wiki/Percorsi-sui-diversi-S.O.) , .kodi/addons/channels.
 Per aprirli non servono programmi particolari un semplice editor di testo è sufficiente.
 
@@ -83,7 +93,7 @@ Cerca un titolo a caso in KOD e lo stesso titolo sul sito. Confronta i risultati
 - [ ] OK
 - indica il tipo di problema
 
-**Sezione FILM
+**Sezione FILM (se il sito non ha film elimina questa parte)
 
 **TestN.3: Pagina dei Titoli
 *Test da effettuare mentre sei dentro un menu del canale (film, serietv, in corso ecc..)*.
@@ -103,7 +113,7 @@ Voci nel menu contestuale di KOD. Posizionati su di un titolo e controlla se hai
 
 **Fondo pagina dei titoli
 
-**3. Paginazione, controlla cia sia la voce "Successivo" (se non c'è controlla sul sito se è presente)**
+**3. Paginazione, controlla ci sia la voce "Successivo" (se non c'è controlla sul sito se è presente)**
 
 - [ ] Sì
 - [ ] NO
@@ -118,7 +128,7 @@ Voci nel menu contestuale di KOD. Posizionati su di un titolo e controlla se hai
 **5. Eventuali problemi riscontrati**
 - scrivi qui il problema/i 
 
-**Sezione Serie TV
+**Sezione Serie TV (se il sito non ha serietv elimina questa parte)
 
 Test da effettuare mentre sei nella pagina dei titoli.
 Per ogni titolo verifica ci siano le voci nel menu contestuale.
@@ -157,7 +167,7 @@ Cerca un titolo a caso in KOD e lo stesso titolo sul sito. Confronta i risultati
 **7. Eventuali problemi riscontrati**
 - scrivi qui il problema/i 
 
-**Sezione Anime
+**Sezione Anime (se il sito non ha anime elimina questa parte)
 
 Test da effettuare mentre sei nella pagina dei titoli. Per ogni titolo verifica ci siano le voci nel menu contestuale.
 
@@ -264,7 +274,7 @@ controlla ci siano queste voci se titolo è un FILM:
   *Fine Copia*
   
   
-Se il canale ha la parte Novità.
+Se il canale ha la parte Novità (questa stringa avvisa che NON è presente: "not_active": ["include_in_newest"]).
 
 **Test.N6: Novità.**
 Per questo test ti consiglio di inserire come UNICO sito quello che stai testando, come canale incluso in: Novità -> categoria (film, serie o altro )
