@@ -11,6 +11,7 @@ import json
 import xbmc
 import re
 import xbmcaddon
+from lib import githash
 
 addon = xbmcaddon.Addon('plugin.video.kod')
 
@@ -112,8 +113,7 @@ def check_addon_init():
                                                                silent=True, continuar=True, resumir=False)
                         else:  # è un file NON testuale, lo devo scaricare
                             # se non è già applicato
-                            if not (filetools.isfile(addonDir + file['filename']) and getSha(
-                                    filetools.read(addonDir + file['filename']) == file['sha'])):
+                            if not (filetools.isfile(addonDir + file['filename']) and getSha(addonDir + file['filename']) == file['sha']):
                                 remove(addonDir + file["filename"])
                                 downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'], silent=True,
                                                            continuar=True, resumir=False)
@@ -123,8 +123,7 @@ def check_addon_init():
                         alreadyApplied = False
                     elif file['status'] == 'renamed':
                         # se non è già applicato
-                        if not (filetools.isfile(addonDir + file['filename']) and getSha(
-                                filetools.read(addonDir + file['filename']) == file['sha'])):
+                        if not (filetools.isfile(addonDir + file['filename']) and getSha(addonDir + file['filename']) == file['sha']):
                             dirs = file['filename'].split('/')
                             for d in dirs[:-1]:
                                 if not filetools.isdir(addonDir + d):
@@ -150,7 +149,6 @@ def check_addon_init():
 
 
 def calcCurrHash():
-    from lib import githash
     treeHash = githash.tree_hash(addonDir).hexdigest()
     logger.info('tree hash: ' + treeHash)
     commits = loadCommits()
@@ -210,8 +208,9 @@ def apply_patch(s,patch,revert=False):
   return t
 
 
-def getSha(fileText):
-    return hashlib.sha1("blob " + str(len(fileText)) + "\0" + fileText).hexdigest()
+def getSha(path):
+    f = open(path).read()
+    return githash.generic_hash(path, '100644', len(f)).hexdigest()
 
 
 def updateFromZip():
