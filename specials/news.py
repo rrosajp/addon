@@ -134,7 +134,7 @@ def get_channels_list():
     channels_path = os.path.join(config.get_runtime_path(), "channels", '*.json')
     channel_language = config.get_setting("channel_language", default="all")
     if channel_language =="auto":
-        channel_language = auto_filter()
+        channel_language = auto_filter()[0]
 
     for infile in sorted(glob.glob(channels_path)):
         channel_id = os.path.basename(infile)[:-5]
@@ -436,7 +436,7 @@ def no_group(list_result_canal):
     for i in list_result_canal:
         support.log("NO GROUP i -> ", i)
         canale = channels_id_name[i.channel]
-        canale = '[COLOR white]'+canale+'[/COLOR]' # per differenziarlo dal colore delle altre voci
+        canale = canale # per differenziarlo dal colore delle altre voci
         i.title = get_title(i) + " [" + canale + "]"
 #        i.text_color = color3
 
@@ -596,7 +596,7 @@ def setting_channel(item):
     channels_path = os.path.join(config.get_runtime_path(), "channels", '*.json')
     channel_language = config.get_setting("channel_language", default="auto")
     if channel_language == 'auto':
-        channel_language = auto_filter()
+        channel_language = auto_filter()[0]
 
 
     list_controls = []
