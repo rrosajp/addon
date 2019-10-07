@@ -93,7 +93,7 @@ Cerca un titolo a caso in KOD e lo stesso titolo sul sito. Confronta i risultati
 - [ ] OK
 - indica il tipo di problema
 
-**Sezione FILM
+**Sezione FILM (se il sito non ha film elimina questa parte)
 
 **TestN.3: Pagina dei Titoli
 *Test da effettuare mentre sei dentro un menu del canale (film, serietv, in corso ecc..)*.
@@ -113,7 +113,7 @@ Voci nel menu contestuale di KOD. Posizionati su di un titolo e controlla se hai
 
 **Fondo pagina dei titoli
 
-**3. Paginazione, controlla cia sia la voce "Successivo" (se non c'è controlla sul sito se è presente)**
+**3. Paginazione, controlla ci sia la voce "Successivo" (se non c'è controlla sul sito se è presente)**
 
 - [ ] Sì
 - [ ] NO
@@ -128,7 +128,7 @@ Voci nel menu contestuale di KOD. Posizionati su di un titolo e controlla se hai
 **5. Eventuali problemi riscontrati**
 - scrivi qui il problema/i 
 
-**Sezione Serie TV
+**Sezione Serie TV (se il sito non ha serietv elimina questa parte)
 
 Test da effettuare mentre sei nella pagina dei titoli.
 Per ogni titolo verifica ci siano le voci nel menu contestuale.
@@ -167,7 +167,7 @@ Cerca un titolo a caso in KOD e lo stesso titolo sul sito. Confronta i risultati
 **7. Eventuali problemi riscontrati**
 - scrivi qui il problema/i 
 
-**Sezione Anime
+**Sezione Anime (se il sito non ha anime elimina questa parte)
 
 Test da effettuare mentre sei nella pagina dei titoli. Per ogni titolo verifica ci siano le voci nel menu contestuale.
 
@@ -274,7 +274,7 @@ controlla ci siano queste voci se titolo è un FILM:
   *Fine Copia*
   
   
-Se il canale ha la parte Novità.
+Se il canale ha la parte Novità (questa stringa avvisa che NON è presente: "not_active": ["include_in_newest"]).
 
 **Test.N6: Novità.**
 Per questo test ti consiglio di inserire come UNICO sito quello che stai testando, come canale incluso in: Novità -> categoria (film, serie o altro )
