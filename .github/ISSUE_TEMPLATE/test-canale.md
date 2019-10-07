@@ -16,11 +16,20 @@ Se hai suggerimenti/consigli/dubbi sui test...Proponili e/o chiedi!
 Per il test dei canali DEVI utilizzare la versione **[BETA](https://kodiondemand.github.io/repo/KoD-installer-BETA.zip)** di KOD!
 **ABILITA IL DEBUG PER I LOG**
 
-**Per far apparire le spunte devi mettere una X tra le [ ], puoi vedere il risultato finale andando nel tab "Preview"**
+**Per eseguire il test ricordati di titolarlo con il nome del canale da te scelte e salvare la pagina cliccando sul bottone verde in basso "SUBMIT NEW ISSUE"**
 
-* *SE hai un ERRORE con avviso di LOG, copia IMMEDIATAMENTE il file kodi.log [qua](https://del.dog/) e incolla il link nel punto del TEST che da l'errore*
+**Per poter scrivere o allegare file nella pagina devi cliccare sul tab WRITE **
 
-Se hai problemi non previsti dal test, segnalali aggiungendoli in fondo al test.
+**Ogni volta che hai un ERRORE con avviso di LOG. Puoi scegliere se:
+ - ALLEGARE IMMEDIATAMENTE il file kodi.log nel punto, della pagina, in cui sei nel test
+ - Allegare il file kodi.log a fine pagina.
+########## cancellare? #########
+- Copia dal file di log l'errore [qua](https://del.dog/) e incolla il link nel punto del TEST che da l'errore**
+################################
+
+Se hai problemi non previsti dal test, segnalali aggiungendoli in fondo al test. Ricordo che per potere scrivere devi cliccare sul tab WRITE.
+
+**SE VEDI I QUADRATINI MA NON RIESCI A CLICCARLI... DEVI CLICCARE SUL BOTTONE VERDE "SUBMIT NEW ISSUE"**
 
 ***
 I file relativi al canale li trovi:
