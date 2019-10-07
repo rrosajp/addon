@@ -1,7 +1,7 @@
 ---
 name: Test Canale
 about: Pagina per il test di un canale
-title: 'Test Di Un Canale'
+title: ''
 labels: Test Canale
 assignees: ''
 
