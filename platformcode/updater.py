@@ -107,29 +107,20 @@ def check_addon_init():
                                     alreadyApplied = False
                                 else:  # nel caso ci siano stati problemi
                                     logger.info('lo sha non corrisponde, scarico il file')
-                                    try:
-                                        os.remove(addonDir + file["filename"])
-                                    except:
-                                        pass
+                                    remove(addonDir + file["filename"])
                                     downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'],
                                                                silent=True, continuar=True, resumir=False)
                         else:  # è un file NON testuale, lo devo scaricare
                             # se non è già applicato
                             if not (filetools.isfile(addonDir + file['filename']) and getSha(
                                     filetools.read(addonDir + file['filename']) == file['sha'])):
-                                try:
-                                    os.remove(addonDir + file["filename"])
-                                except:
-                                    pass
+                                remove(addonDir + file["filename"])
                                 downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'], silent=True,
                                                            continuar=True, resumir=False)
                                 alreadyApplied = False
                     elif file['status'] == 'removed':
-                        try:
-                            os.remove(addonDir+file["filename"])
-                            alreadyApplied = False
-                        except:
-                            pass
+                        remove(addonDir+file["filename"])
+                        alreadyApplied = False
                     elif file['status'] == 'renamed':
                         # se non è già applicato
                         if not (filetools.isfile(addonDir + file['filename']) and getSha(
@@ -257,7 +248,7 @@ def updateFromZip():
     filetools.rename(destpathname + "addon-" + branch, addonDir)
 
     logger.info("Cancellando il file zip...")
-    os.remove(localfilename)
+    remove(localfilename)
 
     dp.update(100)
     return hash
@@ -290,3 +281,14 @@ def _pbhook(numblocks, blocksize, filesize, url, dp):
     except:
         percent = 90
         dp.update(percent)
+
+
+def remove(file):
+    if os.path.isfile(file):
+        removed = False
+        while not removed:
+            try:
+                os.remove(file)
+                removed = True
+            except:
+                logger.info('File ' + file + ' NON eliminato')
