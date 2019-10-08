@@ -232,11 +232,11 @@ class Downloader:
                 self.file.seek(2 ** 31)
             except OverflowError:
                 self._seekable = False
-                logger.info("No se puede hacer seek() ni tell() en ficheros mayores de 2GB")
+                logger.info("Cannot do seek() or tell() in files larger than 2GB")
 
         self.__get_download_info__()
 
-        logger.info("Descarga inicializada: Partes: %s | Ruta: %s | Archivo: %s | Tamaño: %s" % (
+        logger.info("Initialized Download: Parts: %s | Path: %s | Archive: %s | Size: %s" % (
         len(self._download_info["parts"]), self._path, self._filename, self._download_info["size"]))
 
     def __url_to_headers__(self, url):
@@ -394,7 +394,7 @@ class Downloader:
         return id == 0 or (len(self.completed_parts) >= id and sorted(self.completed_parts)[id - 1] == id - 1)
 
     def __save_file__(self):
-        logger.info("Thread iniciado: %s" % threading.current_thread().name)
+        logger.info("Thread started: %s" % threading.current_thread().name)
 
         while self._state == self.states.downloading:
             if not self.pending_parts and not self.download_parts and not self.save_parts:  # Descarga finalizada
@@ -434,7 +434,7 @@ class Downloader:
                 self._download_info["parts"][s]["status"] = self.states.stopped
                 self._download_info["parts"][s]["current"] = self._download_info["parts"][s]["start"]
 
-        logger.info("Thread detenido: %s" % threading.current_thread().name)
+        logger.info("Thread stopped: %s" % threading.current_thread().name)
 
     def __get_part_id__(self):
         self._download_lock.acquire()
@@ -449,21 +449,21 @@ class Downloader:
             return None
 
     def __set_part_connecting__(self, id):
-        logger.info("ID: %s Estableciendo conexión" % id)
+        logger.info("ID: %s Establishing connection" % id)
         self._download_info["parts"][id]["status"] = self.states.connecting
 
     def __set_part__error__(self, id):
-        logger.info("ID: %s Error al descargar" % id)
+        logger.info("ID: %s Download failed" % id)
         self._download_info["parts"][id]["status"] = self.states.error
         self.pending_parts.add(id)
         self.download_parts.remove(id)
 
     def __set_part__downloading__(self, id):
-        logger.info("ID: %s Descargando datos..." % id)
+        logger.info("ID: %s Downloading data ..." % id)
         self._download_info["parts"][id]["status"] = self.states.downloading
 
     def __set_part_completed__(self, id):
-        logger.info("ID: %s ¡Descarga finalizada!" % id)
+        logger.info("ID: %s Download finished!" % id)
         self._download_info["parts"][id]["status"] = self.states.saving
         self.download_parts.remove(id)
         self.save_parts.add(id)
@@ -483,7 +483,7 @@ class Downloader:
         return file
 
     def __start_part__(self):
-        logger.info("Thread Iniciado: %s" % threading.current_thread().name)
+        logger.info("Thread Started: %s" % threading.current_thread().name)
         while self._state == self.states.downloading:
             id = self.__get_part_id__()
             if id is None: break
@@ -511,7 +511,7 @@ class Downloader:
                     buffer = connection.read(self._block_size)
                     speed.append(len(buffer) / ((time.time() - start) or 0.001))
                 except:
-                    logger.info("ID: %s Error al descargar los datos" % id)
+                    logger.info("ID: %s Error downloading data" % id)
                     self._download_info["parts"][id]["status"] = self.states.error
                     self.pending_parts.add(id)
                     self.download_parts.remove(id)
@@ -533,7 +533,7 @@ class Downloader:
                                             self._download_info["parts"][id]["end"]:
                                 connection.fp._sock.close()
                                 logger.info(
-                                    "ID: %s ¡Reiniciando conexión! | Velocidad minima: %.2f %s/s | Velocidad: %.2f %s/s" % \
+                                    "ID: %s Restarting connection! | Minimum Speed: %.2f %s/s | Speed: %.2f %s/s" % \
                                     (id, vm[1], vm[2], v[1], v[2]))
                                 # file.close()
                                 break
@@ -544,4 +544,4 @@ class Downloader:
                         break
 
             self.__set_part_stopped__(id)
-        logger.info("Thread detenido: %s" % threading.current_thread().name)
+        logger.info("Thread stopped: %s" % threading.current_thread().name)
