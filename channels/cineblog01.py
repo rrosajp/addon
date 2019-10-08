@@ -271,13 +271,13 @@ def findvideos(item):
         QualityStr = scrapertoolsV2.decodeHtmlentities(match.group(1))[6:]
 
     # Estrae i contenuti - Streaming
-    load_links(itemlist, '<strong>Streaming:</strong>(.*?)<tableclass=cbtable height=30>', "orange", "Streaming", "SD")
+    load_links(itemlist, '<strong>Streaming:</strong>(.*?)cbtable', "orange", "Streaming", "SD")
 
     # Estrae i contenuti - Streaming HD
-    load_links(itemlist, '<strong>Streaming HD[^<]+</strong>(.*?)<tableclass=cbtable height=30>', "yellow", "Streaming HD", "HD")
+    load_links(itemlist, '<strong>Streaming HD[^<]+</strong>(.*?)cbtable', "yellow", "Streaming HD", "HD")
 
     # Estrae i contenuti - Streaming 3D
-    load_links(itemlist, '<strong>Streaming 3D[^<]+</strong>(.*?)<tableclass=cbtable height=30>', "pink", "Streaming 3D")
+    load_links(itemlist, '<strong>Streaming 3D[^<]+</strong>(.*?)cbtable', "pink", "Streaming 3D")
 
     return support.server(item, itemlist=itemlist)
 
