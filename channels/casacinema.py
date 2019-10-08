@@ -41,8 +41,8 @@ def mainlist(item):
         ('Sub-ITA', ['/category/sub-ita/', 'peliculas', 'sub'])
         ]
 
-    tvshow = ['/aggiornamenti-serie-tv',
-        ('Ultime', ['/category/serie-tv', 'peliculas', '']),
+    tvshow = ['/category/serie-tv',
+        ('Novità', ['/aggiornamenti-serie-tv', 'peliculas', '']),
         ]
 
     search = ''
