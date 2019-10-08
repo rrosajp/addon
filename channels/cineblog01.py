@@ -19,7 +19,9 @@ headers = ""
 def findhost():
     global host, headers
     permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
-    host = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    support.log('HOST= ',permUrl)
+    host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    support.log('HOST= ',host)
     headers = [['Referer', host]]
 
 IDIOMAS = {'Italiano': 'IT'}
@@ -173,7 +175,7 @@ def last(item):
 def peliculas(item):
     support.log()
     if item.contentType == 'movie' or '/serietv/' not in item.url:
-        patron = r'<div class="?card-image"?>.*?<img src="?([^" ]+)"? alt.*?<a href="?([^" >]+)(?:\/|")>([^<[(]+)(?:\[([A-Za-z0-9/-]+)])? (?:\(([0-9]{4})\))?.*?<strong>([^<>&]+).*?DURATA ([0-9]+).*?<br(?: /)?>([^<>]+)'
+        patron = r'<div class="?card-image"?>.*?<img src="?([^" ]+)"? alt.*?<a href="?([^" >]+)(?:\/|")>([^<[(]+)(?:\[([A-Za-z0-9/-]+)])? (?:\(([0-9]{4})\))?.*?<strong>([^<>&–]+).*?DURATA ([0-9]+).*?<br(?: /)?>([^<>]+)'
         listGroups = ['thumb', 'url', 'title', 'quality', 'year', 'genre', 'duration', 'plot']
         action = 'findvideos'
     else:
