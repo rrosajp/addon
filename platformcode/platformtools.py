@@ -685,7 +685,8 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
             xlistitem.setThumbnailImage(item.thumbnail)
 
         set_infolabels(xlistitem, item, True)
-        xbmc_player.play(item.url, xlistitem)
+        set_player(item, xlistitem, item.url, True, None) # Fix Play From Download Section
+        # xbmc_player.play(item.url, xlistitem)
         return
 
     default_action = config.get_setting("default_action")
@@ -1081,7 +1082,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         logger.info("mediaurl=" + mediaurl)
         if config.get_setting("player_mode") == 3 or "megacrypter.com" in mediaurl:
             import download_and_play
-            download_and_play.download_and_play(mediaurl, "download_and_play.tmp", config.get_setting("downloadpath"))
+            download_and_play.download_and_play(mediaurl, "download_and_play.mp4", config.get_setting("downloadpath"))
             return
 
         elif config.get_setting("player_mode") == 0 or \
