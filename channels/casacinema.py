@@ -5,13 +5,17 @@
 """
 
     Problemi noti che non superano il test del canale:
-       - indicare i problemi
+       - Nella ricerca globale non sono presenti le voci:
+           - "Aggiungi in videoteca"
+           - "Scarica film/serie"
+        presenti però quando si entra nella pagina
 
     Avvisi:
-        -
+
 
     Novità:
         - Film, SerieTv
+
     Ulteriori info:
 
 """
@@ -20,7 +24,7 @@ from core import support
 from platformcode import config
 
 # in caso di necessità
-from core import scrapertoolsV2, httptools#, servertools, tmdb
+from core import scrapertoolsV2, httptools
 from core.item import Item
 
 
@@ -35,6 +39,7 @@ list_quality = ['HD', 'SD']
 @support.menu
 def mainlist(item):
     support.log(item)
+##    support.dbg()
 
     film = ['/category/film',
         ('Generi', ['', 'genres', 'genres']),
@@ -52,11 +57,11 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     support.log(item)
-    #dbg # decommentare per attivare web_pdb
+##    support.dbg() # decommentare per attivare web_pdb
 
     if item.contentType == 'movie':
         action = 'findvideos'
-    if item.contentType == 'tvshow':
+    elif item.contentType == 'tvshow':
         action = 'episodios'
         pagination = ''
     else:
@@ -95,7 +100,7 @@ def episodios(item):
 ##    debug = True
     return locals()
 
-# Questa def è utilizzata per generare i menu del canale
+# Questa def è utilizzata per generare il menu 'Generi' del canale
 # per genere, per anno, per lettera, per qualità ecc ecc
 @support.scrape
 def genres(item):
@@ -103,7 +108,7 @@ def genres(item):
     #dbg
 
     action = 'peliculas'
-    blacklist = ['PRIME VISIONI', 'ULTIME SERIE TV']
+    blacklist = ['PRIME VISIONI', 'ULTIME SERIE TV', 'ULTIMI FILM']
     patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></li>'
     patronBlock = r'<div class="container home-cats">(?P<block>.*?)<div class="clear">'
 
@@ -112,7 +117,7 @@ def genres(item):
 
 def select(item):
     support.log('select --->', item)
-    debug = True
+##    debug = True
     #support.dbg()
     data = httptools.downloadpage(item.url, headers=headers).data
     data = re.sub('\n|\t', ' ', data)
@@ -148,8 +153,8 @@ def search(item, text):
     text = text.replace(' ', '+')
     item.url = host + '/?s=' + text
     item.args = 'search'
-    item.contentType = 'episode' # non fa uscire le voci nel context menu
     try:
+        item.contentType = 'episode' # non fa uscire le voci nel context menu
         return peliculas(item)
     # Se captura la excepcion, para no interrumpir al buscador global si un canal falla
     except:
