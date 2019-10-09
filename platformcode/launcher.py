@@ -515,6 +515,7 @@ def play_from_library(item):
                     return
                 else:
                     item = videolibrary.play(itemlist[seleccion])[0]
+                    item.play_from = 'window'
                     platformtools.play_video(item)
 
                 from specials import autoplay

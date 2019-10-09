@@ -673,6 +673,8 @@ def is_playing():
 
 def play_video(item, strm=False, force_direct=False, autoplay=False):
     logger.info()
+    if item.play_from == 'window':
+        force_direct=True
     # logger.debug(item.tostring('\n'))
     logger.debug('item play: %s'%item)
     xbmc_player = XBMCPlayer()
@@ -916,10 +918,10 @@ def get_dialogo_opciones(item, default_action, strm, autoplay):
             # "Descargar"
             import xbmcaddon
             addon = xbmcaddon.Addon('plugin.video.kod')
-            downloadenabled = addon.getSetting('downloadenabled')
-            if downloadenabled != "false":
-                opcion = config.get_localized_string(30153)
-                opciones.append(opcion)
+            # downloadenabled = addon.getSetting('downloadenabled')
+            # if downloadenabled != "false":
+            #     opcion = config.get_localized_string(30153)
+            #     opciones.append(opcion)
 
             if item.isFavourite:
                 # "Quitar de favoritos"
