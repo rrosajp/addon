@@ -3,6 +3,7 @@ import hashlib
 import io
 import os
 import shutil
+from cStringIO import StringIO
 
 from core import httptools, filetools, downloadtools
 from core.ziptools import ziptools
@@ -100,7 +101,7 @@ def check_addon_init():
 
                             patched = apply_patch(text, (file['patch']+'\n').encode('utf-8'))
                             if patched != text:  # non eseguo se già applicata (es. scaricato zip da github)
-                                if getSha(patched) == file['sha']:
+                                if getShaStr(patched) == file['sha']:
                                     localFile.seek(0)
                                     localFile.truncate()
                                     localFile.writelines(patched)
@@ -210,7 +211,10 @@ def apply_patch(s,patch,revert=False):
 
 def getSha(path):
     f = open(path).read()
-    return githash.generic_hash(path, '100644', len(f)).hexdigest()
+    return githash.blob_hash(path, len(f)).hexdigest()
+
+def getShaStr(str):
+    return githash.blob_hash(StringIO(str), len(str)).hexdigest()
 
 
 def updateFromZip():
