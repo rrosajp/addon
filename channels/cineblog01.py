@@ -20,7 +20,9 @@ def findhost():
     global host, headers
     permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
     support.log('HOST= ',permUrl)
-    host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    if host[:4] != 'http':
+        host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
     support.log('HOST= ',host)
     headers = [['Referer', host]]
 
