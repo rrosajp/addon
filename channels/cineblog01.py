@@ -75,7 +75,7 @@ def newest(categoria):
     else:
         patronBlock = r'Ultimi 100 film Aggiornati:(?P<block>.*?)<\/td>'
         item = categoria
-    patron = "<a href=(?P<url>[^>]+)>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N)\])?\s?(?:\[(?P<quality>HD|SD|HD/3D)\])?\s?\((?P<year>[0-9]{4})\)<\/a>"
+    patron = r'<a href="(?P<url>[^"]+)"\s*>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N)\])?\s?(?:\[(?P<quality>HD|SD|HD/3D)\])?\s?\((?P<year>[0-9]{4})\)<\/a>'
     pagination = 20
 
     return locals()
