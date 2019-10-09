@@ -389,17 +389,18 @@ def scrape(func):
 
         # next page for pagination
         if pagination and len(matches) >= pag * pagination:
-            itemlist.append(
-                Item(channel=item.channel,
-                     action = item.action,
-                     contentType=item.contentType,
-                     title=typo(config.get_localized_string(30992), 'color kod bold'),
-                     fulltitle= item.fulltitle,
-                     show= item.show,
-                     url=item.url,
-                     args=item.args,
-                     page=pag + 1,
-                     thumbnail=thumb()))
+            if inspect.stack()[1][3] != 'get_newest':
+                itemlist.append(
+                    Item(channel=item.channel,
+                         action = item.action,
+                         contentType=item.contentType,
+                         title=typo(config.get_localized_string(30992), 'color kod bold'),
+                         fulltitle= item.fulltitle,
+                         show= item.show,
+                         url=item.url,
+                         args=item.args,
+                         page=pag + 1,
+                         thumbnail=thumb()))
 
         if action != 'play' and function != 'episodios' and 'patronMenu' not in args:
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
