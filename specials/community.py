@@ -17,6 +17,7 @@ from core.item import Item
 from platformcode import logger, config, platformtools
 from specials import autoplay
 from specials import filtertools
+from core.support import typo
 
 list_data = {}
 
@@ -49,7 +50,7 @@ def show_channels(item):
     file = open(path, "r")
     json = jsontools.load(file.read())
 
-    itemlist.append(Item(channel=item.channel, title=config.get_localized_string(70676), action='add_channel', thumbnail=get_thumb('add.png')))
+    itemlist.append(Item(channel=item.channel, title=typo(config.get_localized_string(70676),'bold color kod'), action='add_channel', thumbnail=get_thumb('add.png')))
 
     for key, channel in json['channels'].items():
         file_path = channel ['path']
@@ -59,7 +60,7 @@ def show_channels(item):
         fanart = json_url['fanart'] if 'fanart' in json_url else ''
 
         itemlist.append(Item(channel=item.channel,
-                             title=channel['channel_name'],
+                             title=typo(channel['channel_name'],'bold'),
                              url=file_path,
                              thumbnail=thumbnail,
                              fanart=fanart,
@@ -101,7 +102,7 @@ def show_menu(item):
                 plot = option['plot']
             else:
                 plot = item.plot
-            itemlist.append(Item(channel=item.channel, title=option['title'], thumbnail=thumbnail, fanart=fanart, plot=plot, action='show_menu', url=option['link']))
+            itemlist.append(Item(channel=item.channel, title=format_title(option['title']), thumbnail=thumbnail, fanart=fanart, plot=plot, action='show_menu', url=option['link']))
         autoplay.show_option(item.channel, itemlist)
         return itemlist
 
@@ -132,7 +133,7 @@ def list_all(item):
         title = media['title']
         title = set_title(title, language, quality)
 
-        new_item = Item(channel=item.channel, title=title, quality=quality,
+        new_item = Item(channel=item.channel, title=format_title(title), quality=quality,
                         language=language, plot=plot, thumbnail=poster)
 
         new_item.infoLabels['year'] = media['year'] if 'year' in media else ''
@@ -161,7 +162,7 @@ def seasons(item):
     for season in list_seasons:
         infoLabels['season'] = season['season']
         title = config.get_localized_string(60027) % season['season']
-        itemlist.append(Item(channel=item.channel, title=title, url=season['link'], action='episodesxseason',
+        itemlist.append(Item(channel=item.channel, title=format_title(title), url=season['link'], action='episodesxseason',
                              contentSeasonNumber=season['season'], infoLabels=infoLabels))
 
     tmdb.set_infoLabels(itemlist, seekTmdb=True)
@@ -185,7 +186,7 @@ def episodesxseason(item):
 
         title = config.get_localized_string(70677) + ' %s' % (episode_number)
 
-        itemlist.append(Item(channel=item.channel, title=title, url=episode, action='findvideos',
+        itemlist.append(Item(channel=item.channel, title=format_title(title), url=episode, action='findvideos',
                              contentEpisodeNumber=episode_number, infoLabels=infoLabels))
 
     tmdb.set_infoLabels(itemlist, seekTmdb=True)
@@ -201,7 +202,7 @@ def findvideos(item):
         title = ''
         title = set_title(title, language, quality)
 
-        itemlist.append(Item(channel=item.channel, title='%s'+title, url=url['url'], action='play', quality=quality,
+        itemlist.append(Item(channel=item.channel, title=format_title('%s'+title), url=url['url'], action='play', quality=quality,
                              language=language, infoLabels = item.infoLabels))
 
     itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
@@ -307,13 +308,21 @@ def set_title(title, language, quality):
 
     if not config.get_setting('unify'):
         if quality != '':
-            title += ' [%s]' % quality
+            title += typo(quality, '_ [] color kod')
         if language != '':
             if not isinstance(language, list):
-                title += ' [%s]' % language.upper()
+                title += typo(language.upper(), '_ [] color kod')
             else:
-                title += ' '
                 for lang in language:
-                    title += '[%s]' % lang.upper()
+                    title += typo(lang.upper(), '_ [] color kod')
 
-    return title.capitalize()
+    return title
+
+def format_title(title):
+    t = scrapertools.find_single_match(title, r'\{([^\}]+)\}')
+    logger.info(t)
+    logger.info(title)
+    if 'bold' not in t: t += ' bold'
+    title = re.sub(r'(\{[^\}]+\})','',title)
+    logger.info(title)
+    return typo(title,t)
