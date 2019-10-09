@@ -133,7 +133,7 @@ def last(item):
     if item.contentType == 'tvshow':
         matches = support.match(item, r'<a href="([^">]+)".*?>([^(:(|[)]+)([^<]+)<\/a>', '<article class="sequex-post-content.*?</article>', headers)[0]
     else:
-        matches = support.match(item, r'<a href=([^>]+)>([^(:(|[)]+)([^<]+)<\/a>', r'<strong>Ultimi 100 film Aggiornati:<\/a><\/strong>(.*?)<td>', headers)[0]
+        matches = support.match(item, r'<a href="([^"]+)".*?>([^(:(|[)]+)([^<]+)<\/a>', r'<strong>Ultimi 100 film Aggiornati:<\/a><\/strong>(.*?)<td>', headers)[0]
 
     for i, (url, title, info) in enumerate(matches):
         if (page - 1) * PERPAGE > i - count: continue
