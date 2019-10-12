@@ -182,6 +182,24 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         regexDbg(item, patron, headers, block)
 
     known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
+    # Legenda known_keys per i groups nei patron
+    # known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality',
+    #                'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
+    # url = link relativo o assoluto alla pagina titolo film/serie
+    # title = titolo Film/Serie/Anime/Altro
+    # title2 = titolo dell'episodio Serie/Anime/Altro
+    # season = stagione in formato numerico
+    # episode = numero episodio, in formato numerico.
+    # thumb = linkrealtivo o assoluto alla locandina Film/Serie/Anime/Altro
+    # quality = qualità indicata del video
+    # year = anno in formato numerico (4 cifre)
+    # duration = durata del Film/Serie/Anime/Altro
+    # genere = genere del Film/Serie/Anime/Altro. Es: avventura, commedia
+    # rating = punteggio/voto in formato numerico
+    # type = tipo del video. Es. movie per film o tvshow per le serie. Di solito sono discrimanti usati dal sito
+    # lang = lingua del video. Es: ITA, Sub-ITA, Sub, SUB ITA.
+    # AVVERTENZE: Se il titolo è trovato nella ricerca TMDB/TVDB/Altro allora le locandine e altre info non saranno quelle recuperate nel sito.!!!!
+    
     stagione = '' # per quei siti che hanno la stagione nel blocco ma non nelle puntate
     for i, match in enumerate(matches):
         if pagination and (pag - 1) * pagination > i: continue  # pagination
@@ -275,7 +293,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 infoLabels=infolabels,
                 thumbnail=item.thumbnail if function == 'episodios' else scraped["thumb"] ,
                 args=item.args,
-                contentSerieName= title if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
+                contentSerieName= scraped['title'],#title if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
                 contentTitle= title if item.contentType or CT == 'movie' else '',
                 contentLanguage = lang1,
                 contentEpisodeNumber=episode if episode else ''
