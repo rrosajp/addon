@@ -43,6 +43,7 @@ def search(item, texto):
 @support.scrape
 def peliculas(item):
     blacklist = Blacklist
+    item.contentType = 'tvshow'
     patron = r'<div class="span4">\s*<a href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)"[^>]+><\/a>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> <h1>(?P<title>[^<\[]+)(?:\[(?P<lang>[^\]]+)\])?</h1></a>.*?-->(?:.*?<br />)?\s*(?P<plot>[^<]+)'
     patronNext = r'<link rel="next" href="([^"]+)"'
     action = 'check'
@@ -65,21 +66,27 @@ def episodios(item):
     season = 1
     s = 1
     e = 0
+    sp = 0
     for match in item.url:
         if 'stagione' in match.lower():
             find_season = support.match(match, r'Stagione\s*(\d+)')[0]
             season = int(find_season[0]) if find_season else season + 1 if 'prima' not in match.lower() else season
-        else:            
+        else:
             title = support.match(match,'<a[^>]+>([^<]+)</a>')[0][0]
             if 'episodio' in title.lower():
-                ep = int(support.match(match, r'Episodio (\d+)')[0][0])
-                if season > s and ep > 1:
-                    s += 1
-                    e = ep - 1
-                title = str(season) + 'x' + str(ep-e).zfill(2) + ' - ' + title
-                data += title + '|' + match + '\n'           
-        
-    
+                ep = support.match(match, r'Episodio ((?:\d+.\d|\d+))')[0][0]
+                if '.' in ep:
+                    sp += 1
+                    title = '0' + 'x' + str(sp).zfill(2) + ' - ' + title
+                else:
+                    ep = int(ep)
+                    if season > s and ep > 1:
+                        s += 1
+                        e = ep - 1
+                    title = str(season) + 'x' + str(ep-e).zfill(2) + ' - ' + title
+                data += title + '|' + match + '\n'
+
+
     patron = r'(?P<title>[^\|]+)\|(?P<url>[^\n]+)\n'
     action = 'findvideos'
     return locals()
