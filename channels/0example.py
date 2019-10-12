@@ -1,30 +1,42 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
 # Canale per 'idcanale nel json'
+# By: pincopallo!
+# Eventuali crediti se vuoi aggiungerli
 # ------------------------------------------------------------
 # Rev: 0.2
-# Update 18-09-2019
+# Update 12-10-2019
 # fix:
 # 1. aggiunto pagination e sistemate alcune voci
+# 2. modificato problemi in eccezioni
+# 3. aggiunta la def select
+# 4. modifica alla legenda e altre aggiunte
 
 # Questo vuole solo essere uno scheletro per velocizzare la scrittura di un canale.
+# La maggior parte dei canali può essere scritta con il decoratore.
 # I commenti sono più un promemoria... che una vera e propria spiegazione!
 # Niente di più.
 # Ulteriori informazioni sono reperibili nel wiki:
 # https://github.com/kodiondemand/addon/wiki/decoratori
+ 
 """
+    Questi sono commenti per i beta-tester.
 
-    Problemi noti che non superano il test del canale:
-       - indicare i problemi
+    Su questo canale, nella categoria 'Ricerca Globale'
+    non saranno presenti le voci 'Aggiungi alla Videoteca'
+    e 'Scarica Film'/'Scarica Serie', dunque,
+    la loro assenza, nel Test, NON dovrà essere segnalata come ERRORE.
+
+    Novità. Indicare in quale/i sezione/i è presente il canale:
+       - Nessuna, film, serie, anime...
 
     Avvisi:
         - Eventuali avvisi per i tester
 
     Ulteriori info:
 
-
 """
-# CANCELLARE Ciò CHE NON SERVE per il canale, lascia il codice commentato
+# CANCELLARE Ciò CHE NON SERVE per il canale, lascia il codice commentato ove occorre,
 # ma fare PULIZIA quando si è finito di testarlo
 
 # Qui gli import
@@ -37,7 +49,7 @@ from platformcode import config
 
 # in caso di necessità
 #from core import scrapertoolsV2, httptools, servertools, tmdb
-#from core.item import Item
+from core.item import Item # per newest
 #from lib import unshortenit
 
 ##### fine import
@@ -48,7 +60,7 @@ from platformcode import config
 # da cancellare se non utilizzata
 __channel__ = "id nel json"
 # da cancellare se si utilizza findhost()
-host = config.get_channel_url('id nel json OR '__channel__) # <-- ATTENZIONE
+host = config.get_channel_url('id nel json' OR __channel__) # <-- ATTENZIONE
 headers = [['Referer', host]]
 
 # Inizio findhost() - da cancellare se usato l'altro metodo
@@ -62,7 +74,7 @@ def findhost():
     permUrl = httptools.downloadpage('INSERIRE-URL-QUI', follow_redirects=False).headers
     host = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
     # cancellare host non utilizzato
-    host = scrapertoolsV2.find_single_match(data, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    host = scrapertoolsV2.find_single_match(permUrl, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
     headers = [['Referer', host]]
 
 findhost() # così le imposta una volta per tutte
@@ -83,8 +95,7 @@ def mainlist(item):
 
     # Ordine delle voci
     # Voce FILM, puoi solo impostare l'url
-    film = ['',
-        #'url', # url per la voce FILM, se possibile la pagina principale con le ultime novità
+    film = ['', # url per la voce FILM, se possibile la pagina principale con le ultime novità
         #Voce Menu,['url','action','args',contentType]
         ('Al Cinema', ['', 'peliculas', '']),
         ('Generi', ['', 'genres', 'genres']),
@@ -97,19 +108,17 @@ def mainlist(item):
         ]
 
     # Voce SERIE, puoi solo impostare l'url
-    tvshow = ['',
-        #'url', # url per la voce Serie, se possibile la pagina con titoli di serie
+    tvshow = ['', # url per la voce Serie, se possibile la pagina con titoli di serie
         #Voce Menu,['url','action','args',contentType]
-        ('Novità', ['', '', ''])
+        ('Novità', ['', '', '']),
         ('Per Lettera', ['', 'genres', 'letters']),
         ('Per Genere', ['', 'genres', 'genres']),
         ('Per anno', ['', 'genres', 'years'])
-
+        ]
     # Voce ANIME, puoi solo impostare l'url
-    anime = ['',
-        #'url', # url per la voce Anime, se possibile la pagina con titoli di anime
+    anime = ['', # url per la voce Anime, se possibile la pagina con titoli di anime
         #Voce Menu,['url','action','args',contentType]
-        ('Novità', ['', '', ''])        
+        ('Novità', ['', '', '']),
         ('In Corso',['', '', '', '']),
         ('Ultimi Episodi',['', '', '', '']),
         ('Ultime Serie',['', '', '', ''])
@@ -133,52 +142,53 @@ def mainlist(item):
     nome = [( '' ['', '', '', ''])
     return locals()
 
-# riepilogo key per il match nei patron
-# known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality',
-#                'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
-# url = link relativo o assoluto
-# title = titolo Film/Serie/Anime/Altro
-# title2 = titolo dell'episodio Serie/Anime/Altro
-# season = stagione in formato numerico
-# episode = numero episodio, in formato numerico. Se il sito ha stagionexepisodio potete omettere season
-# thumb = locandina Film/Serie/Anime/Altro
-# quality = qualità indicata del video
-# year = anno in formato numerico (4 cifre)
-# duration = durata del Film/Serie/Anime/Altro
-# genere = genere del Film/Serie/Anime/Altro. Es: avventura, commedia
-# rating = punteggio/voto in formato numerico
-# type = tipo del video. Es. movie per film o tvshow per le serie. Di solito sono discrimanti usati dal sito
-# lang = lingua del video. Es: ITA, Sub-ITA, Sub, SUB ITA. Se non appare 'ITA' è di default
+    # Legenda known_keys per i groups nei patron
+    # known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality',
+    #                'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
+    # url = link relativo o assoluto alla pagina titolo film/serie
+    # title = titolo Film/Serie/Anime/Altro
+    # title2 = titolo dell'episodio Serie/Anime/Altro
+    # season = stagione in formato numerico
+    # episode = numero episodio, in formato numerico.
+    # thumb = linkrealtivo o assoluto alla locandina Film/Serie/Anime/Altro
+    # quality = qualità indicata del video
+    # year = anno in formato numerico (4 cifre)
+    # duration = durata del Film/Serie/Anime/Altro
+    # genere = genere del Film/Serie/Anime/Altro. Es: avventura, commedia
+    # rating = punteggio/voto in formato numerico
+    # type = tipo del video. Es. movie per film o tvshow per le serie. Di solito sono discrimanti usati dal sito
+    # lang = lingua del video. Es: ITA, Sub-ITA, Sub, SUB ITA.
+    # AVVERTENZE: Se il titolo è trovato nella ricerca TMDB/TVDB/Altro allora le locandine e altre info non saranno quelle recuperate nel sito.!!!!
 
 
 @support.scrape
 def peliculas(item):
     support.log(item)
-    #dbg # decommentare per attivare web_pdb
+    #support.dbg() # decommentare per attivare web_pdb
 
     action = ''
     blacklist = ['']
     patron = r''
     patronBlock = r''
     patronNext = ''
-    pagination = 0
+    pagination = ''
 
-    debug = False  # True per testare le regex sul sito
+    #debug = True  # True per testare le regex sul sito
     return locals()
 
 @support.scrape
 def episodios(item):
     support.log(item)
-    #dbg
+    #support.dbg()
 
     action = ''
     blacklist = ['']
     patron = r''
     patronBlock = r''
     patronNext = ''
-    pagination = 0
+    pagination = ''
 
-    debug = False
+    #debug = True
     return locals()
 
 # Questa def è utilizzata per generare i menu del canale
@@ -186,20 +196,42 @@ def episodios(item):
 @support.scrape
 def genres(item):
     support.log(item)
-    #dbg
+    #support.dbg()
 
     action = ''
     blacklist = ['']
     patron = r''
     patronBlock = r''
     patronNext = ''
-    pagination = 0
+    pagination = ''
 
-    debug = False
+    #debug = True
     return locals()
 
 ############## Fine ordine obbligato
 ## Def ulteriori
+
+# per quei casi dove il sito non differenzia film e/o serie e/o anime
+# e la ricerca porta i titoli mischiati senza poterli distinguere tra loro
+# andranno modificate anche le def peliculas e episodios ove occorre
+def select(item):
+    support.log('select --->', item)
+    #support.dbg()
+    data = httptools.downloadpage(item.url, headers=headers).data
+    # pulizia di data, in caso commentare le prossime 2 righe
+    data = re.sub('\n|\t', ' ', data)
+    data = re.sub(r'>\s+<', '> <', data)
+    block = scrapertoolsV2.find_single_match(data, r'')
+    if re.findall('', data, re.IGNORECASE):
+        support.log('select = ### è una serie ###')
+        return episodios(Item(channel=item.channel,
+                              title=item.title,
+                              fulltitle=item.fulltitle,
+                              url=item.url,
+                              args='serie',
+                              contentType='tvshow',
+                              #data1 = data decommentando portiamo data nella def senza doverla riscaricare
+                            ))
 
 ############## Fondo Pagina
 # da adattare al canale
@@ -207,7 +239,7 @@ def search(item, text):
     support.log('search', item)
     itemlist = []
     text = text.replace(' ', '+')
-    item.url = '/index.php?do=search&story=%s&subaction=search' % (text)
+    item.url = host + '/index.php?do=search&story=%s&subaction=search' % (text)
     # bisogna inserire item.contentType per la ricerca globale
     # se il canale è solo film, si può omettere, altrimenti bisgona aggiungerlo e discriminare.
     item.contentType = item.contentType
@@ -240,14 +272,15 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            log('newest log: ', {0}.format(line))
+            support.log('newest log: ', {0}.format(line))
         return []
 
     return itemlist
 
-# da adattare... ( support.server ha vari parametri )
+# da adattare...
+# consultare il wiki sia per support.server che ha vari parametri,
+# sia per i siti con hdpass
 #support.server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True)
 def findvideos(item):
     support.log('findvideos ->', item)
     return support.server(item, headers=headers)
-
