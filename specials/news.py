@@ -409,9 +409,9 @@ def get_title(item):
         title = item.title
 
     # Limpiamos el titulo de etiquetas de formato anteriores
-##    title = re.compile("\[/*COLO.*?\]", re.DOTALL).sub("", title)
-##    title = re.compile("\[/*B\]", re.DOTALL).sub("", title)
-##    title = re.compile("\[/*I\]", re.DOTALL).sub("", title)
+    title = re.compile("\[/*COLO.*?\]", re.DOTALL).sub("", title)
+    title = re.compile("\[/*B\]", re.DOTALL).sub("", title)
+    title = re.compile("\[/*I\]", re.DOTALL).sub("", title)
 
     title = '[B]'+title+'[/B]'
 
