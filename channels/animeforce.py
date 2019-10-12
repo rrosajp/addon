@@ -29,7 +29,7 @@ def mainlist(item):
             ]
     return locals()
 
-    
+
 def newest(categoria):
     support.log(categoria)
     itemlist = []
@@ -38,11 +38,11 @@ def newest(categoria):
         if categoria == "anime":
             item.url = host
             item.args = 'update'
-            itemlist = peliculas(item)            
+            itemlist = peliculas(item)
 
             if itemlist[-1].action == "peliculas":
                 itemlist.pop()
-    # Continua la ricerca in caso di errore 
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
@@ -56,7 +56,7 @@ def search(item, texto):
     search = texto
     item.contentType = 'tvshow'
     patron = '<strong><a href="(?P<url>[^"]+)">(?P<title>.*?) [Ss][Uu][Bb]'
-    action = 'episodios'    
+    action = 'episodios'
     return locals()
 
 
@@ -66,10 +66,11 @@ def peliculas(item):
     if item.args == 'update':
         patron = r'src="(?P<thumb>[^"]+)" class="attachment-grid-post[^"]+" alt="[^"]*" title="(?P<title>[^"]+").*?<h2><a href="(?P<url>[^"]+)"'
         def itemHook(item):
+            item.contentType = 'episode'
             delete = support.scrapertoolsV2.find_single_match(item.fulltitle, r'( Episodio.*)')
             number = support.scrapertoolsV2.find_single_match(item.title, r'Episodio (\d+)')
             item.title = support.typo(number + ' - ','bold') + item.title.replace(delete,'')
-            item.fulltitle = item.show = item.fulltitle.replace(delete,'')    
+            item.fulltitle = item.show = item.title.replace(delete,'')
             item.url = item.url.replace('-episodio-'+ number,'')
             item.number = number
             return item
@@ -102,16 +103,16 @@ def findvideos(item):
     support.log(item)
 
     itemlist = []
-    
-    if item.number:       
-        item.url = support.match(item, r'<a href="([^"]+)"[^>]*>', patronBlock=r'Episodio %s(.*?)</tr>' % item.number)[0][0]   
-    
+
+    if item.number:
+        item.url = support.match(item, r'<a href="([^"]+)"[^>]*>', patronBlock=r'Episodio %s(.*?)</tr>' % item.number)[0][0]
+
     if 'http' not in item.url:
         if '//' in item.url[:2]:
             item.url = 'http:' + item.url
-        elif host not in item.url:        
+        elif host not in item.url:
             item.url = host + item.url
-    
+
     if 'adf.ly' in item.url:
         item.url = adfly.get_long_url(item.url)
     elif 'bit.ly' in item.url:
