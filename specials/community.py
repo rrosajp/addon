@@ -3,21 +3,15 @@
 # -*- Created for Alfa-addon -*-
 # -*- By the Alfa Develop Group -*-
 
-import re
-import urllib
-import os
+import re, urllib, os
 
-from core import httptools
-from core import scrapertools
-from core import servertools
-from core import jsontools
-from channelselector import get_thumb
-from core import tmdb
+from core import httptools, scrapertoolsV2, servertools, jsontools, tmdb
 from core.item import Item
+from core.support import typo
+from channelselector import get_thumb
 from platformcode import logger, config, platformtools
 from specials import autoplay
-from specials import filtertools
-from core.support import typo
+
 
 list_data = {}
 
@@ -41,7 +35,7 @@ def mainlist(item):
 def show_channels(item):
     logger.info()
     itemlist = []
-    
+
     context = [{"title": config.get_localized_string(50005),
                  "action": "remove_channel",
                  "channel": "community"}]
@@ -53,17 +47,23 @@ def show_channels(item):
     itemlist.append(Item(channel=item.channel, title=typo(config.get_localized_string(70676),'bold color kod'), action='add_channel', thumbnail=get_thumb('add.png')))
 
     for key, channel in json['channels'].items():
-        file_path = channel ['path']
-        file_url = httptools.downloadpage(file_path, follow_redirects=True).data
+        file_path = channel['path']
+        path = os.path.dirname(os.path.abspath(file_path))
+        if file_path.startswith('http'):
+            file_url = httptools.downloadpage(file_path, follow_redirects=True).data
+        else:
+            file_url = open(file_path, "r").read()
         json_url = jsontools.load(file_url)
-        thumbnail = json_url['thumbnail'] if 'thumbnail' in json_url else ''
-        fanart = json_url['fanart'] if 'fanart' in json_url else ''
+        thumbnail = json_url['thumbnail'] if 'thumbnail' in json_url and ':/' in json_url['thumbnail'] else path + json_url['thumbnail'] if 'thumbnail' in json_url and  '/' in json_url['thumbnail'] else ''
+        fanart = json_url['fanart'] if 'fanart' in json_url and ':/' in json_url['fanart'] else path + json_url['fanart'] if 'fanart' in json_url and  '/' in json_url['fanart'] else ''
+        plot = json_url['plot'] if 'plot' in json_url else ''
 
         itemlist.append(Item(channel=item.channel,
                              title=typo(channel['channel_name'],'bold'),
                              url=file_path,
                              thumbnail=thumbnail,
                              fanart=fanart,
+                             plot=plot,
                              action='show_menu',
                              channel_id = key,
                              context=context))
@@ -83,26 +83,26 @@ def load_json(item):
 
 def show_menu(item):
     global list_data
-    logger.info()
     itemlist = []
 
     json_data = load_json(item)
-
+    path = os.path.dirname(os.path.abspath(item.url))
     if "menu" in json_data:
         for option in json_data['menu']:
             if 'thumbnail' in json_data:
-                thumbnail = option['thumbnail']
+                thumbnail = option['thumbnail'] if ':/' in option['thumbnail'] else path + option['thumbnail'] if '/' in option['thumbnail'] else get_thumb(option['thumbnail'])
             else:
                 thumbnail = ''
             if 'fanart' in option and option['fanart']:
-                fanart = option['fanart']
+                fanart = option['fanart'] if ':/' in option['fanart'] else path + option['fanart']
             else:
                 fanart = item.fanart
             if 'plot' in option and option['plot']:
                 plot = option['plot']
             else:
                 plot = item.plot
-            itemlist.append(Item(channel=item.channel, title=format_title(option['title']), thumbnail=thumbnail, fanart=fanart, plot=plot, action='show_menu', url=option['link']))
+            url = option['link'] if ':/' in option['link'] else path + option['link']
+            itemlist.append(Item(channel=item.channel, title=format_title(option['title']), thumbnail=thumbnail, fanart=fanart, plot=plot, action='show_menu', url=url))
         autoplay.show_option(item.channel, itemlist)
         return itemlist
 
@@ -134,7 +134,7 @@ def list_all(item):
         title = set_title(title, language, quality)
 
         new_item = Item(channel=item.channel, title=format_title(title), quality=quality,
-                        language=language, plot=plot, thumbnail=poster)
+                        language=language, plot=plot, personal_plot=plot, thumbnail=poster)
 
         new_item.infoLabels['year'] = media['year'] if 'year' in media else ''
         new_item.infoLabels['tmdb_id'] = media['tmdb_id'] if 'tmdb_id' in media else ''
@@ -149,9 +149,13 @@ def list_all(item):
             new_item.action = 'seasons'
 
         itemlist.append(new_item)
+        personal_plot = new_item.plot
 
     if not 'generic_list' in json_data:
         tmdb.set_infoLabels(itemlist, seekTmdb=True)
+        for item in itemlist:
+            if item.personal_plot != item.plot and item.personal_plot:
+                item.plot += '\n\n' + typo('','submenu') + '\n\n' + item.personal_plot
     return itemlist
 
 def seasons(item):
@@ -206,11 +210,6 @@ def findvideos(item):
                              language=language, infoLabels = item.infoLabels))
 
     itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
-
-    # Requerido para FilterTools
-    # itemlist = filtertools.get_links(itemlist, item, list_language)
-
-    # Requerido para AutoPlay
 
     autoplay.start(itemlist, item)
 
@@ -319,10 +318,7 @@ def set_title(title, language, quality):
     return title
 
 def format_title(title):
-    t = scrapertools.find_single_match(title, r'\{([^\}]+)\}')
-    logger.info(t)
-    logger.info(title)
+    t = scrapertoolsV2.find_single_match(title, r'\{([^\}]+)\}')
     if 'bold' not in t: t += ' bold'
     title = re.sub(r'(\{[^\}]+\})','',title)
-    logger.info(title)
     return typo(title,t)
