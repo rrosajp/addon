@@ -293,8 +293,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 infoLabels=infolabels,
                 thumbnail=item.thumbnail if function == 'episodios' else scraped["thumb"] ,
                 args=item.args,
-                contentSerieName= title if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
-                contentTitle= title if item.contentType or CT == 'movie' else '',
+                contentSerieName= scraped['title'] if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
+                contentTitle= scraped['title'] if item.contentType or CT == 'movie' else '',
                 contentLanguage = lang1,
                 contentEpisodeNumber=episode if episode else ''
             )
