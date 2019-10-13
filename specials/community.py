@@ -49,6 +49,7 @@ def show_channels(item):
     for key, channel in json['channels'].items():
         file_path = channel['path']
         path = os.path.dirname(os.path.abspath(file_path))
+        if 'http' in path: path = path[path.find('http'):].replace('\\','/').replace(':/','://')
         if file_path.startswith('http'):
             file_url = httptools.downloadpage(file_path, follow_redirects=True).data
         else:
@@ -66,7 +67,8 @@ def show_channels(item):
                              plot=plot,
                              action='show_menu',
                              channel_id = key,
-                             context=context))
+                             context=context,
+                             path=path))
     return itemlist
 
 def load_json(item):
@@ -84,25 +86,26 @@ def load_json(item):
 def show_menu(item):
     global list_data
     itemlist = []
+    logger.info(item)
 
-    json_data = load_json(item)
-    path = os.path.dirname(os.path.abspath(item.url))
+    json_data = load_json(item) 
+    
     if "menu" in json_data:
         for option in json_data['menu']:
             if 'thumbnail' in json_data:
-                thumbnail = option['thumbnail'] if ':/' in option['thumbnail'] else path + option['thumbnail'] if '/' in option['thumbnail'] else get_thumb(option['thumbnail'])
+                thumbnail = option['thumbnail'] if ':/' in option['thumbnail'] else item.path + option['thumbnail'] if '/' in option['thumbnail'] else get_thumb(option['thumbnail'])
             else:
                 thumbnail = ''
             if 'fanart' in option and option['fanart']:
-                fanart = option['fanart'] if ':/' in option['fanart'] else path + option['fanart']
+                fanart = option['fanart'] if ':/' in option['fanart'] else item.path + option['fanart']
             else:
                 fanart = item.fanart
             if 'plot' in option and option['plot']:
                 plot = option['plot']
             else:
                 plot = item.plot
-            url = option['link'] if ':/' in option['link'] else path + option['link']
-            itemlist.append(Item(channel=item.channel, title=format_title(option['title']), thumbnail=thumbnail, fanart=fanart, plot=plot, action='show_menu', url=url))
+            url = option['link'] if ':/' in option['link'] else item.path + option['link']
+            itemlist.append(Item(channel=item.channel, title=format_title(option['title']), thumbnail=thumbnail, fanart=fanart, plot=plot, action='show_menu', url=url, path=item.path))
         autoplay.show_option(item.channel, itemlist)
         return itemlist
 
@@ -155,7 +158,7 @@ def list_all(item):
         tmdb.set_infoLabels(itemlist, seekTmdb=True)
         for item in itemlist:
             if item.personal_plot != item.plot and item.personal_plot:
-                item.plot += '\n\n' + typo('','submenu') + '\n\n' + item.personal_plot
+                item.plot = item.personal_plot + '\n\n' + typo('','submenu') + '\n\n' + item.plot
     return itemlist
 
 def seasons(item):
