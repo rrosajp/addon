@@ -24,7 +24,7 @@ headers = [['Referer', host]]
 def mainlist(item):
     anime = ['/lista-anime/',
              ('In Corso',['/lista-anime-in-corso/']),
-             ('Ultimi Episodi',['','peliculas','update']),
+             ('Ultimei Aggiornamenti',['','peliculas','newest']),
              ('Ultime Serie',['/category/anime/articoli-principali/','peliculas','last'])
             ]
     return locals()
@@ -36,12 +36,10 @@ def newest(categoria):
     item = support.Item()
     try:
         if categoria == "anime":
+            item.contentType = 'tvshow'
             item.url = host
-            item.args = 'update'
+            item.args = 'newest'
             itemlist = peliculas(item)
-
-            if itemlist[-1].action == "peliculas":
-                itemlist.pop()
     # Continua la ricerca in caso di errore
     except:
         import sys
@@ -63,27 +61,16 @@ def search(item, texto):
 @support.scrape
 def peliculas(item):
     anime = True
-    if item.args == 'update':
-        patron = r'src="(?P<thumb>[^"]+)" class="attachment-grid-post[^"]+" alt="[^"]*" title="(?P<title>[^"]+").*?<h2><a href="(?P<url>[^"]+)"'
-        def itemHook(item):
-            item.contentType = 'episode'
-            delete = support.scrapertoolsV2.find_single_match(item.fulltitle, r'( Episodio.*)')
-            number = support.scrapertoolsV2.find_single_match(item.title, r'Episodio (\d+)')
-            item.title = support.typo(number + ' - ','bold') + item.title.replace(delete,'')
-            item.fulltitle = item.show = item.title.replace(delete,'')
-            item.url = item.url.replace('-episodio-'+ number,'')
-            item.number = number
-            return item
-        action = 'findvideos'
+    if item.args == 'newest':
+        patron = r'src="(?P<thumb>[^"]+)" class="attachment-grid-post[^"]+" alt="[^"]*" title="(?P<title>.*?) Episodi[^"]+".*?<h2><a href="(?P<url>[^"]+)"'
 
     elif item.args == 'last':
         patron = r'src="(?P<thumb>[^"]+)" class="attachment-grid-post[^"]+" alt="[^"]*" title="(?P<title>.*?)(?: Sub| sub| SUB|").*?<h2><a href="(?P<url>[^"]+)"'
-        action = 'episodios'
 
     else:
         pagination = ''
         patron = '<strong><a href="(?P<url>[^"]+)">(?P<title>.*?) [Ss][Uu][Bb]'
-        action = 'episodios'
+    action = 'episodios'
 
     return locals()
 
