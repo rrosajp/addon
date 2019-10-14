@@ -76,12 +76,15 @@ def show_channels(item):
 def load_json(item):
     logger.info()
 
-    if item.url.startswith('http'):
-        json_file = httptools.downloadpage(item.url).data
-    else:
-        json_file = open(item.url, "r").read()
+    if item.url:
+        if item.url.startswith('http'):
+            json_file = httptools.downloadpage(item.url).data
+        else:
+            json_file = open(item.url, "r").read()
 
-    json_data = jsontools.load(json_file)
+        json_data = jsontools.load(json_file)
+    else:
+        json_data = ''
 
     return json_data
 
@@ -106,7 +109,7 @@ def show_menu(item):
                 plot = option['plot']
             else:
                 plot = item.plot
-            url = option['link'] if ':/' in option['link'] else item.path + option['link']
+            url = '' if not option['link'] else option['link'] if ':/' in option['link'] else item.path + option['link']
             itemlist.append(Item(channel=item.channel, title=format_title(option['title']), thumbnail=thumbnail, fanart=fanart, plot=plot, action='show_menu', url=url, path=item.path))
         if 'channel_name' in json_data: autoplay.show_option(item.channel, itemlist)
         return itemlist
@@ -131,37 +134,37 @@ def list_all(item):
     itemlist = []
     media_type = item.media_type
     json_data = load_json(item)
-    logger.info('JSON= ' + str(json_data))
-    for media in json_data[media_type]:
+    if json_data:
+        for media in json_data[media_type]:
 
-        quality, language, plot, poster = set_extra_values(media)
+            quality, language, plot, poster = set_extra_values(media)
 
-        title = media['title']
-        title = set_title(title, language, quality)
+            title = media['title']
+            title = set_title(title, language, quality)
 
-        new_item = Item(channel=item.channel, title=format_title(title), quality=quality,
-                        language=language, plot=plot, personal_plot=plot, thumbnail=poster, path=item.path)
+            new_item = Item(channel=item.channel, title=format_title(title), quality=quality,
+                            language=language, plot=plot, personal_plot=plot, thumbnail=poster, path=item.path)
 
-        new_item.infoLabels['year'] = media['year'] if 'year' in media else ''
-        new_item.infoLabels['tmdb_id'] = media['tmdb_id'] if 'tmdb_id' in media else ''
+            new_item.infoLabels['year'] = media['year'] if 'year' in media else ''
+            new_item.infoLabels['tmdb_id'] = media['tmdb_id'] if 'tmdb_id' in media else ''
 
-        if 'movies_list' in json_data or 'generic_list' in json_data:
-            new_item.url = media
-            new_item.contentTitle = media['title']
-            new_item.action = 'findvideos'
-        else:
-            new_item.url = media['seasons_list']
-            new_item.contentSerieName = media['title']
-            new_item.action = 'seasons'
+            if 'movies_list' in json_data or 'generic_list' in json_data:
+                new_item.url = media
+                new_item.contentTitle = media['title']
+                new_item.action = 'findvideos'
+            else:
+                new_item.url = media['seasons_list']
+                new_item.contentSerieName = media['title']
+                new_item.action = 'seasons'
 
-        itemlist.append(new_item)
+            itemlist.append(new_item)
 
-    if not 'generic_list' in json_data:
-        tmdb.set_infoLabels(itemlist, seekTmdb=True)
-        for item in itemlist:
-            if item.personal_plot != item.plot and item.personal_plot:
-                item.plot = '\n\n' + typo('','submenu') + '\n' + item.personal_plot + '\n' + typo('','submenu') + '\n\n' + item.plot
-    return itemlist
+        if not 'generic_list' in json_data:
+            tmdb.set_infoLabels(itemlist, seekTmdb=True)
+            for item in itemlist:
+                if item.personal_plot != item.plot and item.personal_plot:
+                    item.plot = '\n\n' + typo('','submenu') + '\n' + item.personal_plot + '\n' + typo('','submenu') + '\n\n' + item.plot
+        return itemlist
 
 def seasons(item):
     logger.info('PATH= ' + item.path)
@@ -171,7 +174,7 @@ def seasons(item):
     for season in list_seasons:
         infoLabels['season'] = season['season']
         title = config.get_localized_string(60027) % season['season']
-        url = season['link'] if ':/' in season['link'] else item.path + season['link']
+        url = '' if not season['link'] else season['link'] if ':/' in season['link'] else item.path + season['link']
         itemlist.append(Item(channel=item.channel, title=format_title(title), url=url, action='episodesxseason',
                              contentSeasonNumber=season['season'], infoLabels=infoLabels))
 
