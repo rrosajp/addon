@@ -199,7 +199,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
     # type = tipo del video. Es. movie per film o tvshow per le serie. Di solito sono discrimanti usati dal sito
     # lang = lingua del video. Es: ITA, Sub-ITA, Sub, SUB ITA.
     # AVVERTENZE: Se il titolo è trovato nella ricerca TMDB/TVDB/Altro allora le locandine e altre info non saranno quelle recuperate nel sito.!!!!
-    
+
     stagione = '' # per quei siti che hanno la stagione nel blocco ma non nelle puntate
     for i, match in enumerate(matches):
         if pagination and (pag - 1) * pagination > i: continue  # pagination
@@ -222,6 +222,9 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             season = scraped['season']
         if stagione:
             episode = season +'x'+ scraped['episode']
+        elif item.contentType == 'tvshow' and (scraped['episode'] == '' and season == ''):
+            item.args = 'season_completed'
+            episode = ''
         else:
             episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
 
@@ -234,11 +237,10 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
         # make formatted Title [longtitle]
         s = ' - '
-        title = episode + (s if episode and title else '') + title
+        title = episode + (s if episode and title else '') + title 
         longtitle = title + (s if title and title2 else '') + title2
         longtitle = typo(longtitle, 'bold')
         longtitle += (typo(Type,'_ () bold') if Type else '') + (typo(quality, '_ [] color kod') if quality else '')
-
 
         lang1, longtitle = scrapeLang(scraped, lang, longtitle)
 
