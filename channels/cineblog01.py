@@ -20,9 +20,10 @@ def findhost():
     global host, headers
     permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
     support.log('HOST= ',permUrl)
-    host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    host = permUrl['location'].replace('https://www.google.it/search?q=site:', '').replace('https://www.google.it/search?&q=', '')
+    support.log('HOST ',host, ' ', host[:4])
     if host[:4] != 'http':
-        host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+        host = 'https://' + host
     support.log('HOST= ',host)
     headers = [['Referer', host]]
 
@@ -61,7 +62,7 @@ def mainlist(item):
     support.menu(itemlist, 'Per Genere submenu', 'menu', host + '/serietv/', contentType='tvshow', args="Serie-Tv per Genere")
     support.menu(itemlist, 'Per anno submenu', 'menu', host + '/serietv/', contentType='tvshow', args="Serie-Tv per Anno")
     support.menu(itemlist, 'Cerca serie... submenu', 'search', host + '/serietv/', contentType='tvshow', args='serie')
-    
+
     autoplay.show_option(item.channel, itemlist)
 
     return itemlist
@@ -86,19 +87,19 @@ def menu(item):
                 url=host + scrapedurl
             )
         )
-    
+
     return support.thumb(itemlist)
 
 
 def search(item, text):
     support.log(item.url, "search" ,text)
-    
+
 
     try:
         item.url = item.url + "/?s=" + text.replace(' ','+')
         return peliculas(item)
 
-    # Continua la ricerca in caso di errore 
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
@@ -112,14 +113,14 @@ def newest(categoria):
     item = Item()
     item.contentType = 'movie'
     item.url = host + '/lista-film-ultimi-100-film-aggiunti/'
-    return support.scrape(item, r'<a href="([^"]+)">([^<([]+)(?:\[([A-Z]+)\])?\s\(([0-9]{4})\)<\/a>',
+    return support.scrape(item, r'<a href=(?:")?([^">]+)(?:")?>([^<([]+)(?:\[B/N\])?\s*(?:\[(Sub-ITA|SUB-ITA)\])?\s*(?:\[([^\[]+)\])?\s*\(([0-9]{4})\)<\/a>',
                    ['url', 'title', 'quality', 'year'],
                    patron_block=r'Ultimi 100 film aggiunti:.*?<\/td>')
 
 
 def last(item):
     support.log()
-    
+
     itemlist = []
     infoLabels = {}
     quality = ''
@@ -133,7 +134,7 @@ def last(item):
     if item.contentType == 'tvshow':
         matches = support.match(item, r'<a href="([^">]+)".*?>([^(:(|[)]+)([^<]+)<\/a>', '<article class="sequex-post-content.*?</article>', headers)[0]
     else:
-        matches = support.match(item, r'<a href="([^"]+)".*?>([^(:(|[)]+)([^<]+)<\/a>', r'<strong>Ultimi 100 film Aggiornati:<\/a><\/strong>(.*?)<td>', headers)[0]
+        matches = support.match(item, r'<a href=([^>]+)>([^(:(|[)]+)([^<]+)<\/a>', r'<strong>Ultimi 100 film Aggiornati:<\/a><\/strong>(.*?)<td>', headers)[0]
 
     for i, (url, title, info) in enumerate(matches):
         if (page - 1) * PERPAGE > i - count: continue
@@ -376,7 +377,7 @@ def play(item):
             data, c = unshortenit.unwrap_30x_only(data)
         else:
             data = scrapertoolsV2.find_single_match(data, r'<a href="([^"]+)".*?class="btn-wrapper">.*?licca.*?</a>')
-        
+
         logger.debug("##### play go.php data ##\n%s\n##" % data)
     else:
         data = support.swzz_get_url(item)
