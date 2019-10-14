@@ -155,13 +155,12 @@ def list_all(item):
             new_item.action = 'seasons'
 
         itemlist.append(new_item)
-        personal_plot = new_item.plot
 
     if not 'generic_list' in json_data:
         tmdb.set_infoLabels(itemlist, seekTmdb=True)
         for item in itemlist:
             if item.personal_plot != item.plot and item.personal_plot:
-                item.plot = item.personal_plot + '\n\n' + typo('','submenu') + '\n\n' + item.plot
+                item.plot = '\n\n' + typo('','submenu') + '\n' + item.personal_plot + '\n' + typo('','submenu') + '\n\n' + item.plot
     return itemlist
 
 def seasons(item):
@@ -207,20 +206,20 @@ def episodesxseason(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+    if 'links' in item.url:
+        for url in item.url['links']:
+            quality, language, plot, poster = set_extra_values(url)
+            title = ''
+            title = set_title(title, language, quality)
 
-    for url in item.url['links']:
-        quality, language, plot, poster = set_extra_values(url)
-        title = ''
-        title = set_title(title, language, quality)
+            itemlist.append(Item(channel=item.channel, title=format_title('%s'+title), url=url['url'], action='play', quality=quality,
+                                language=language, infoLabels = item.infoLabels))
 
-        itemlist.append(Item(channel=item.channel, title=format_title('%s'+title), url=url['url'], action='play', quality=quality,
-                             language=language, infoLabels = item.infoLabels))
+        itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
 
-    itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
+        autoplay.start(itemlist, item)
 
-    autoplay.start(itemlist, item)
-
-    return itemlist
+        return itemlist
 
 def add_channel(item):
     logger.info()
