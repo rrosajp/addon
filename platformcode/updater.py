@@ -142,7 +142,7 @@ def check_addon_init():
         localCommitFile.truncate()
         localCommitFile.writelines(c['sha'])
         localCommitFile.close()
-
+        xbmc.executebuiltin("UpdateLocalAddons")
     else:
         logger.info('Nessun nuovo aggiornamento')
 
@@ -218,20 +218,26 @@ def getShaStr(str):
 
 
 def updateFromZip():
-    dp = platformtools.dialog_progress_bg('Kodi on Demand', 'Aggiornamento in corso...')
+    dp = platformtools.dialog_progress_bg('Kodi on Demand', 'Installazione in corso...')
     dp.update(0)
 
     remotefilename = 'https://github.com/' + user + "/" + repo + "/archive/" + branch + ".zip"
-    localfilename = xbmc.translatePath("special://home/addons/") + "plugin.video.kod.update.zip"
+    localfilename = (xbmc.translatePath("special://home/addons/") + "plugin.video.kod.update.zip").encode('utf-8')
+    destpathname = xbmc.translatePath("special://home/addons/")
+
     logger.info("remotefilename=%s" % remotefilename)
     logger.info("localfilename=%s" % localfilename)
 
+    # pulizia preliminare
+    remove(localfilename)
+    removeTree(destpathname + "addon-" + branch)
+
     import urllib
-    urllib.urlretrieve(remotefilename, localfilename, lambda nb, bs, fs, url=remotefilename: _pbhook(nb, bs, fs, url, dp))
+    urllib.urlretrieve(remotefilename, localfilename,
+                       lambda nb, bs, fs, url=remotefilename: _pbhook(nb, bs, fs, url, dp))
 
     # Lo descomprime
     logger.info("decompressione...")
-    destpathname = xbmc.translatePath("special://home/addons/")
     logger.info("destpathname=%s" % destpathname)
 
     try:
@@ -246,15 +252,50 @@ def updateFromZip():
     dp.update(95)
 
     # puliamo tutto
-    shutil.rmtree(addonDir)
+    removeTree(addonDir)
 
-    filetools.rename(destpathname + "addon-" + branch, addonDir)
+    rename(destpathname + "addon-" + branch, addonDir)
 
     logger.info("Cancellando il file zip...")
     remove(localfilename)
 
     dp.update(100)
+    dp.close()
+    xbmc.executebuiltin("UpdateLocalAddons")
+
     return hash
+
+
+def remove(file):
+    if os.path.isfile(file):
+        removed = False
+        while not removed:
+            try:
+                os.remove(file)
+                removed = True
+            except:
+                logger.info('File ' + file + ' NON eliminato')
+
+
+def removeTree(dir):
+    if os.path.isdir(dir):
+        removed = False
+        while not removed:
+            try:
+                shutil.rmtree(dir)
+                removed = True
+            except:
+                logger.info('Cartella ' + dir + ' NON eliminato')
+
+
+def rename(dir1, dir2):
+    renamed = False
+    while not renamed:
+        try:
+            filetools.rename(dir1, dir2)
+            renamed = True
+        except:
+            logger.info('cartella ' + dir1 + ' NON rinominata')
 
 
 # https://stackoverflow.com/questions/3083235/unzipping-file-results-in-badzipfile-file-is-not-a-zip-file
