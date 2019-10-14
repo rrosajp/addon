@@ -5660,3 +5660,7 @@ msgstr "Seleziona gli Episodi della Stagione"
 msgctxt "#70735"
 msgid "%s Special Episode Number"
 msgstr "Numero dell'Episodio Speciale %s"
+
+msgctxt "#70736"
+msgid "Completed Serie"
+msgstr "Serie Completa"
