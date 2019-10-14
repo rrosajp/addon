@@ -401,10 +401,11 @@ def get_title(item):
             # contentSeason non c'è in support
             if not item.contentSeason:
                 item.contentSeason = '1'
-            title = "%s - %sx%s" % (title, item.contentSeason, str(item.contentEpisodeNumber).zfill(2))
+            title = "%sx%s - %s" % (item.contentSeason, str(item.contentEpisodeNumber).zfill(2), title)
         else:
             seas = scrapertools.get_season_and_episode(item.title)
-            title = "%s - %s" % (seas, title)
+            if seas:
+                title = "%s - %s" % (seas, title)
 
     elif item.contentTitle:  # Si es una pelicula con el canal adaptado
         title = item.contentTitle
