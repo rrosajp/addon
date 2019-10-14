@@ -392,14 +392,19 @@ def get_newest(channel_id, categoria):
 
 
 def get_title(item):
-    #support.log("ITEM NEWEST ->", item)
-    if item.contentSerieName:  # Si es una serie
+    support.log("ITEM NEWEST ->", item)
+    # item.contentSerieName c'è anche se è un film
+    if item.contentSerieName and item.contentType != 'movie':  # Si es una serie
         title = item.contentSerieName
         #title = re.compile("\[.*?\]", re.DOTALL).sub("", item.contentSerieName)
         if not scrapertools.get_season_and_episode(title) and item.contentEpisodeNumber:
+            # contentSeason non c'è in support
             if not item.contentSeason:
                 item.contentSeason = '1'
             title = "%s - %sx%s" % (title, item.contentSeason, str(item.contentEpisodeNumber).zfill(2))
+        else:
+            seas = scrapertools.get_season_and_episode(item.title)
+            title = "%s - %s" % (seas, title)
 
     elif item.contentTitle:  # Si es una pelicula con el canal adaptado
         title = item.contentTitle
