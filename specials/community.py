@@ -106,7 +106,7 @@ def show_menu(item):
                 plot = item.plot
             url = option['link'] if ':/' in option['link'] else item.path + option['link']
             itemlist.append(Item(channel=item.channel, title=format_title(option['title']), thumbnail=thumbnail, fanart=fanart, plot=plot, action='show_menu', url=url, path=item.path))
-        autoplay.show_option(item.channel, itemlist)
+        if 'channel_name' in json_data: autoplay.show_option(item.channel, itemlist)
         return itemlist
 
     if "movies_list" in json_data:
@@ -129,6 +129,7 @@ def list_all(item):
     itemlist = []
     media_type = item.media_type
     json_data = load_json(item)
+    logger.info('JSON= ' + str(json_data))
     for media in json_data[media_type]:
 
         quality, language, plot, poster = set_extra_values(media)
@@ -137,12 +138,12 @@ def list_all(item):
         title = set_title(title, language, quality)
 
         new_item = Item(channel=item.channel, title=format_title(title), quality=quality,
-                        language=language, plot=plot, personal_plot=plot, thumbnail=poster)
+                        language=language, plot=plot, personal_plot=plot, thumbnail=poster, path=item.path)
 
         new_item.infoLabels['year'] = media['year'] if 'year' in media else ''
         new_item.infoLabels['tmdb_id'] = media['tmdb_id'] if 'tmdb_id' in media else ''
 
-        if 'movies_list' or 'generic_list' in json_data:
+        if 'movies_list' in json_data or 'generic_list' in json_data:
             new_item.url = media
             new_item.contentTitle = media['title']
             new_item.action = 'findvideos'
@@ -162,14 +163,15 @@ def list_all(item):
     return itemlist
 
 def seasons(item):
-    logger.info()
+    logger.info('PATH= ' + item.path)
     itemlist = []
     infoLabels = item.infoLabels
     list_seasons = item.url
     for season in list_seasons:
         infoLabels['season'] = season['season']
         title = config.get_localized_string(60027) % season['season']
-        itemlist.append(Item(channel=item.channel, title=format_title(title), url=season['link'], action='episodesxseason',
+        url = season['link'] if ':/' in season['link'] else item.path + season['link']
+        itemlist.append(Item(channel=item.channel, title=format_title(title), url=url, action='episodesxseason',
                              contentSeasonNumber=season['season'], infoLabels=infoLabels))
 
     tmdb.set_infoLabels(itemlist, seekTmdb=True)
