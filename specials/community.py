@@ -4,6 +4,7 @@
 # -*- By the Alfa Develop Group -*-
 
 import re, urllib, os
+import requests
 
 from core import httptools, scrapertoolsV2, servertools, jsontools, tmdb
 from core.item import Item
@@ -47,7 +48,8 @@ def show_channels(item):
     itemlist.append(Item(channel=item.channel, title=typo(config.get_localized_string(70676),'bold color kod'), action='add_channel', thumbnail=get_thumb('add.png')))
 
     for key, channel in json['channels'].items():
-        file_path = channel['path']
+        if 'http' in channel['path']: file_path = requests.get(channel['path']).url
+        else: file_path = channel['path']
         path = os.path.dirname(os.path.abspath(file_path))
         if 'http' in path: path = path[path.find('http'):].replace('\\','/').replace(':/','://')
         if file_path.startswith('http'):
@@ -88,8 +90,8 @@ def show_menu(item):
     itemlist = []
     logger.info(item)
 
-    json_data = load_json(item) 
-    
+    json_data = load_json(item)
+
     if "menu" in json_data:
         for option in json_data['menu']:
             if 'thumbnail' in json_data:
