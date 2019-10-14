@@ -392,7 +392,7 @@ def get_newest(channel_id, categoria):
 
 
 def get_title(item):
-    support.log("ITEM NEWEST ->", item)
+    #support.log("ITEM NEWEST ->", item)
     if item.contentSerieName:  # Si es una serie
         title = item.contentSerieName
         #title = re.compile("\[.*?\]", re.DOTALL).sub("", item.contentSerieName)
@@ -413,6 +413,7 @@ def get_title(item):
     title = re.compile("\[/*B\]", re.DOTALL).sub("", title)
     title = re.compile("\[/*I\]", re.DOTALL).sub("", title)
 
+
     title = '[B]'+title+'[/B]'
 
     if item.contentLanguage == '':
@@ -426,6 +427,10 @@ def get_title(item):
 
     if item.quality:
         title += support.typo(item.quality, '_ [] color kod')
+
+    season_ = support.typo(config.get_localized_string(70736), '_ [] color white bold') if (type(item.args) != bool and 'season_completed' in item.args) else ''
+    if season_:
+        title += season_
     return title
 
 
@@ -434,7 +439,7 @@ def no_group(list_result_canal):
     global channels_id_name
 
     for i in list_result_canal:
-        support.log("NO GROUP i -> ", i)
+        #support.log("NO GROUP i -> ", i)
         canale = channels_id_name[i.channel]
         canale = canale # per differenziarlo dal colore delle altre voci
         i.title = get_title(i) + " [" + canale + "]"
