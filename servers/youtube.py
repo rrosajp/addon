@@ -109,27 +109,14 @@ def extract_videos(video_id):
         100: "360p vp8 3D",
         101: "480p vp8 3D",
         102: "720p vp8 3D",
-        167: "360p vp8 webm",
-        168: "480p vp8 webm",
-        169: "720p vp8 webm",
-        170: "1080p vp8 webm",
-        218: "480p vp8 webm",
-        219: "480p vp8 webm",
-        278: "144p vp9 webm",
-        242: "240p vp9 webm",
-        243: "360p vp9 webm",
-        244: "480p vp9 webm",
-        245: "480p vp9 webm",
-        246: "480p vp9 webm",
-        247: "720p vp9 webm",
-        248: "1080p vp9 webm",
-        271: "1440p vp9 webm",
-        272: "2160p vp9 webm",
-        302: "720p vp9 webm 60fps",
-        303: "1080p vp9 webm 60fps",
-        308: "1440p vp9 webm 60fps",
-        313: "2160p vp9 webm",
-        315: "2160p vp9 webm 60fps"
+        91:"144 h264 mp4",
+        92:"240 h264 mp4",
+        93:"360 h264 mp4",
+        94:"480 h264 mp4",
+        95:"720 h264 mp4",
+        96:"1080 h264 mp4",
+        132:"240 h264 mp4",
+        151:"72 h264 mp4"
     }
     # from core.support import dbg; dbg()
     url = 'https://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&ssl_stream=1' % \
@@ -155,10 +142,10 @@ def extract_videos(video_id):
     params = extract_flashvars(youtube_page_data)
     data_flashvars =[]
     if params.get('adaptive_fmts'):
-        data_flashvars += scrapertools.find_multiple_matches(params['adaptive_fmts'], '(quality.*?url[^,]+)')
+        data_flashvars += scrapertools.find_multiple_matches(params['adaptive_fmts'], '(fps.*?url[^,]+)')
     if params.get('url_encoded_fmt_stream_map'):
         data_flashvars += params["url_encoded_fmt_stream_map"].split(",")
-    
+
     for url_desc in data_flashvars:
         url_desc_map = dict(urlparse.parse_qsl(url_desc))
         if not url_desc_map.get("url") and not url_desc_map.get("stream"):
