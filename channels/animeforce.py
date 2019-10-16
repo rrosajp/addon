@@ -24,7 +24,6 @@ headers = [['Referer', host]]
 def mainlist(item):
     anime = ['/lista-anime/',
              ('In Corso',['/lista-anime-in-corso/']),
-             ('Ultimei Aggiornamenti',['','peliculas','newest']),
              ('Ultime Serie',['/category/anime/articoli-principali/','peliculas','last'])
             ]
     return locals()
@@ -61,16 +60,26 @@ def search(item, texto):
 @support.scrape
 def peliculas(item):
     anime = True
+    action = 'episodios'
+
     if item.args == 'newest':
-        patron = r'src="(?P<thumb>[^"]+)" class="attachment-grid-post[^"]+" alt="[^"]*" title="(?P<title>.*?) Episodi[^"]+".*?<h2><a href="(?P<url>[^"]+)"'
+        patron = r'src="(?P<thumb>[^"]+)" class="attachment-grid-post[^"]+" alt="[^"]*" title="(?P<title>[^"]+").*?<h2><a href="(?P<url>[^"]+)"'
+        def itemHook(item):
+            item.url = support.match(item, '<a href="([^"]+)" class="btn', headers=headers)[0][0]
+            delete = support.scrapertoolsV2.find_single_match(item.fulltitle, r'( Episodi.*)')
+            number = support.scrapertoolsV2.find_single_match(item.title, r'Episodi(?:o)? (?:\d+÷)?(\d+)')
+            item.title = support.typo(number + ' - ','bold') + item.title.replace(delete,'')
+            item.fulltitle = item.show = item.title.replace(delete,'')
+            item.number = number
+            return item
+        action = 'findvideos'
 
     elif item.args == 'last':
         patron = r'src="(?P<thumb>[^"]+)" class="attachment-grid-post[^"]+" alt="[^"]*" title="(?P<title>.*?)(?: Sub| sub| SUB|").*?<h2><a href="(?P<url>[^"]+)"'
 
     else:
         pagination = ''
-        patron = '<strong><a href="(?P<url>[^"]+)">(?P<title>.*?) [Ss][Uu][Bb]'
-    action = 'episodios'
+        patron = r'<strong><a href="(?P<url>[^"]+)">(?P<title>.*?) [Ss][Uu][Bb]'
 
     return locals()
 

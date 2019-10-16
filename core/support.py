@@ -223,7 +223,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         if stagione:
             episode = season +'x'+ scraped['episode']
         elif item.contentType == 'tvshow' and (scraped['episode'] == '' and season == ''):
-            item.args = 'season_completed'
+            item.news = 'season_completed'
             episode = ''
         else:
             episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
@@ -768,6 +768,7 @@ def match(item, patron='', patronBlock='', headers='', url='', post=''):
 
     if patron:
         matches = scrapertoolsV2.find_multiple_matches(block, patron)
+        if not matches: matches = ['']
         log('MATCHES= ',matches)
 
     return matches, block
