@@ -298,7 +298,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 contentSerieName= scraped['title'] if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
                 contentTitle= scraped['title'] if item.contentType or CT == 'movie' else '',
                 contentLanguage = lang1,
-                contentEpisodeNumber=episode if episode else ''
+                contentEpisodeNumber=episode if episode else '',
+                news= item.news if item.news else ''
             )
 
             for lg in list(set(listGroups).difference(known_keys)):
