@@ -11,7 +11,6 @@
 
 from core import support
 from core.item import Item
-from specials import autoplay
 from platformcode import config
 
 __channel__ = "streamingaltadefinizione"
@@ -49,7 +48,8 @@ def generos(item):
 
 
 def peliculas(item):
-    return support.dooplay_films(item)
+    support.dbg()
+    return support.dooplay_peliculas(item, True if "/genere/anime/" in item.url else False)
 
 
 def episodios(item):
@@ -59,20 +59,16 @@ def episodios(item):
 def findvideos(item):
     itemlist = []
     for link in support.dooplay_get_links(item, host):
-        server = link['server'][:link['server'].find(".")]
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="play",
-                 title=server + " [COLOR blue][" + link['title'] + "][/COLOR]",
-                 url=link['url'],
-                 server=server,
-                 fulltitle=item.fulltitle,
-                 thumbnail=item.thumbnail,
-                 show=item.show,
-                 quality=link['title'],
-                 contentType=item.contentType,
-                 folder=False))
+        if link['title'] != 'Guarda il trailer':
+            itemlist.append(
+                Item(channel=item.channel,
+                     action="play",
+                     url=link['url'],
+                     fulltitle=item.fulltitle,
+                     thumbnail=item.thumbnail,
+                     show=item.show,
+                     quality=link['title'],
+                     contentType=item.contentType,
+                     folder=False))
 
-    autoplay.start(itemlist, item)
-
-    return itemlist
+    return support.server(item, itemlist=itemlist)

@@ -340,10 +340,10 @@ def scrape(func):
     # IMPORTANT 'type' is a special key, to work need typeContentDict={} and typeActionDict={}
 
     def wrapper(*args):
-        function = func.__name__
         itemlist = []
 
         args = func(*args)
+        function = func.__name__ if not 'actLike' in args else args['actLike']
         # log('STACK= ',inspect.stack()[1][3])
 
         item = args['item']
@@ -497,17 +497,15 @@ def dooplay_get_links(item, host):
 
 @scrape
 def dooplay_get_episodes(item):
-    item.contentType = "episode"
     patron = '<li class="mark-[0-9]+">.*?<img.*?(?:data-lazy-)?src="(?P<thumb>[^"]+).*?(?P<episode>[0-9]+ - [0-9]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+).*?(?P<year>[0-9]{4})'
-
-    def itemlistHook(itemlist):
-        return videolibrary(itemlist, item, function='episodios')
+    actLike = 'episodios'
 
     return locals()
 
 
 @scrape
-def dooplay_films(item, blacklist=""):
+def dooplay_peliculas(item, mixed=False, blacklist=""):
+    actLike = 'peliculas'
     if item.args == 'searchPage':
         return dooplay_search_vars(item, blacklist)
     else:
@@ -516,7 +514,7 @@ def dooplay_films(item, blacklist=""):
             patron = '<article id="post-[0-9]+" class="item movies">.*?<img src="(?!data)(?P<thumb>[^"]+)".*?<span class="quality">(?P<quality>[^<>]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></h3>.*?(?:<span>[^<>]*(?P<year>[0-9]{4})</span>|</article>).*?(?:<span>(?P<duration>[0-9]+) min</span>|</article>).*?(?:<div class="texto">(?P<plot>[^<>]+)|</article>).*?(?:genres">(?P<genre>.*?)</div>|</article>)'
         else:
             action = 'episodios'
-            patron = '<article id="post-[0-9]+" class="item tvshows">.*?<img src="(?!data)(?P<thumb>[^"]+)".*?(?:<span class="quality">(?P<quality>[^<>]+))?.*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></h3>.*?(?:<span>(?P<year>[0-9]{4})</span>|</article>).*?(?:<div class="texto">(?P<plot>[^<>]+)|</article>).*?(?:genres">(?P<genre>.*?)</div>|</article>)'
+            patron = '<article id="post-[0-9]+" class="item ' + ('\w+' if mixed else 'tvshow') + '">.*?<img src="(?!data)(?P<thumb>[^"]+)".*?(?:<span class="quality">(?P<quality>[^<>]+))?.*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></h3>.*?(?:<span>(?P<year>[0-9]{4})</span>|</article>).*?(?:<div class="texto">(?P<plot>[^<>]+)|</article>).*?(?:genres">(?P<genre>.*?)</div>|</article>)'
         patronNext = '<div class="pagination">.*?class="current".*?<a href="([^"]+)".*?<div class="resppages">'
         addVideolibrary = False
 
@@ -536,6 +534,7 @@ def dooplay_search_vars(item, blacklist):
         action = 'episodios'
     patron = '<div class="result-item">.*?<img src="(?P<thumb>[^"]+)".*?<span class="' + type + '">(?P<quality>[^<>]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a>.*?<span class="year">(?P<year>[0-9]{4}).*?<div class="contenido"><p>(?P<plot>[^<>]+)'
     patronNext = '<a class="arrow_pag" href="([^"]+)"><i id="nextpagination"'
+
     def fullItemlistHook(itemlist):
         # se è una next page
         if itemlist[-1].title == typo(config.get_localized_string(30992), 'color kod bold'):
@@ -905,16 +904,19 @@ def pagination(itemlist, item, page, perpage, function_level=1):
 
 def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, down_load=True):
 
-    if not data:
+    if not (data and itemlist):
         data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
-
 
     itemList = servertools.find_video_items(data=str(data))
     itemlist = itemlist + itemList
 
     for videoitem in itemlist:
+        if not videoitem.server:
+            findS = servertools.findvideos(videoitem.url)[0]
+            videoitem.server = findS[2]
+            videoitem.title = findS[0]
         item.title = item.contentTitle if config.get_localized_string(30161) in item.title else item.title
-        videoitem.title = item.title + typo(videoitem.title, '_ color kod []') + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
+        videoitem.title = item.fulltitle + typo(videoitem.title, '_ color kod []') + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail
