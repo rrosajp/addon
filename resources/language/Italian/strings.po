@@ -5664,3 +5664,7 @@ msgstr "Numero dell'Episodio Speciale %s"
 msgctxt "#70736"
 msgid "Completed Serie"
 msgstr "Serie Completa"
+
+msgctxt "#70737"
+msgid "[B]SIDE MENU[/B]"
+msgstr "[B]MENU LATERALE[/B]"

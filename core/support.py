@@ -804,7 +804,8 @@ def download(itemlist, item, typography='', function_level=1, function=''):
                 url=item.url,
                 action='save_download',
                 from_action=from_action,
-                contentTitle=contentTitle
+                contentTitle=contentTitle,
+                path=item.path
             ))
         if from_action == 'episodios':
             itemlist.append(
@@ -849,7 +850,8 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
     contentTitle=item.contentTitle if item.contentTitle else ''
 
     if (function == 'findvideos' and contentType == 'movie') \
-        or (function == 'episodios' and contentType != 'movie'):
+        or (function == 'episodios' and contentType != 'movie') \
+        or function == 'get_seasons' and item.channel == 'community':
         if config.get_videolibrary_support() and len(itemlist) > 0:
             itemlist.append(
                 Item(channel=item.channel,
@@ -861,7 +863,8 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
                         url=item.url,
                         action=action,
                         extra=extra,
-                        contentTitle=contentTitle
+                        contentTitle=contentTitle,
+                        path=item.path
                         ))
 
     return itemlist

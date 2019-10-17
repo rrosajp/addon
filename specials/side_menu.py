@@ -104,6 +104,10 @@ def open_menu(item):
     main.doModal()
     del main
 
+def open_shortcut_menu(item):
+    from platformcode import keymaptools
+    keymaptools.open_shortcut_menu()
+
 
 class Main(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):

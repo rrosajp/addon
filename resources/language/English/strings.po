@@ -5660,3 +5660,7 @@ msgstr ""
 msgctxt "#70735"
 msgid "%s Special Episode Number"
 msgstr ""
+
+msgctxt "#70737"
+msgid "[B]SIDE MENU[/B]"
+msgstr ""

@@ -3,10 +3,10 @@
 # -*- Created for Alfa-addon -*-
 # -*- By the Alfa Develop Group -*-
 
-import re, urllib, os
+import re, urllib, os, inspect
 import requests
 
-from core import httptools, scrapertoolsV2, servertools, jsontools, tmdb
+from core import httptools, scrapertoolsV2, servertools, jsontools, tmdb, support
 from core.item import Item
 from core.support import typo
 from channelselector import get_thumb
@@ -74,7 +74,7 @@ def show_channels(item):
     return itemlist
 
 def load_json(item):
-
+    support.log(item)
     url= item if type(item) == str else item.url
 
     if url:
@@ -144,7 +144,7 @@ def list_all(item):
             title = media['title']
             title = set_title(title, language, quality)
 
-            new_item = Item(channel=item.channel, title=format_title(title), quality=quality,
+            new_item = Item(channel=item.channel, title=format_title(title), fulltitle=title, show=title, quality=quality,
                             language=language, plot=plot, personal_plot=plot, thumbnail=poster, path=item.path)
 
             new_item.infoLabels['year'] = media['year'] if 'year' in media else ''
@@ -154,10 +154,11 @@ def list_all(item):
                 new_item.url = media
                 new_item.contentTitle = media['title']
                 new_item.action = 'findvideos'
+                if 'movies_list' in json_data: new_item.contentType = 'movie'
             else:
                 new_item.url = media['seasons_list']
                 new_item.contentSerieName = media['title']
-                new_item.action = 'seasons'
+                new_item.action = 'get_seasons'
 
             itemlist.append(new_item)
 
@@ -168,20 +169,31 @@ def list_all(item):
                     item.plot = '\n\n' + typo('','submenu') + '\n' + item.personal_plot + '\n' + typo('','submenu') + '\n\n' + item.plot
         return itemlist
 
-def seasons(item):
-    logger.info()
+def get_seasons(item):
     itemlist = []
-    infoLabels = item.infoLabels
+    infoLabels = item.infoLabels if item.infolabels else {}
     list_seasons = item.url
+
     for season in list_seasons:
+        support.log()
         infoLabels['season'] = season['season']
         title = config.get_localized_string(60027) % season['season']
         url = '' if not season['link'] else season['link'] if ':/' in season['link'] else item.path + season['link']
-        itemlist.append(Item(channel=item.channel, title=format_title(title), url=url, action='episodesxseason',
-                             contentSeasonNumber=season['season'], infoLabels=infoLabels))
+        itemlist.append(Item(channel=item.channel, title=format_title(title), fulltitle=item.fulltitle, show=item.show, url=url, action='episodesxseason',
+                             contentSeason=season['season'], infoLabels=infoLabels ,contentType = 'tvshow'))
 
-    tmdb.set_infoLabels(itemlist, seekTmdb=True)
-    itemlist = sorted(itemlist, key=lambda i: i.title)
+    logger.info('CANALE= '+ str(inspect.stack()[1][3]))
+    if inspect.stack()[1][3] in ['add_tvshow', "get_seasons"]:
+        it = []
+        for item in itemlist:
+            logger.info(str(item))
+            it += episodesxseason(item)
+
+        itemlist = it
+    else:
+        tmdb.set_infoLabels(itemlist, seekTmdb=True)
+        itemlist = sorted(itemlist, key=lambda i: i.title)
+        support.videolibrary(itemlist,item)
 
     return itemlist
 
@@ -199,10 +211,10 @@ def episodesxseason(item):
         infoLabels['season'] = season_number
         infoLabels['episode'] = episode_number
 
-        title = config.get_localized_string(70677) + ' %s' % (episode_number)
+        title = '%sx%s - %s' % (item.contentSeason, episode_number, episode['title'])
 
         itemlist.append(Item(channel=item.channel, title=format_title(title), url=episode, action='findvideos',
-                             contentEpisodeNumber=episode_number, infoLabels=infoLabels))
+                             contentSeason= item.contentSeason, contentEpisode=episode_number, infoLabels=infoLabels, contentType = 'episode'))
 
     tmdb.set_infoLabels(itemlist, seekTmdb=True)
     return itemlist
