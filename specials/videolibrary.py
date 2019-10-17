@@ -42,7 +42,7 @@ def list_movies(item, silent=False):
         for f in ficheros:
             if f.endswith(".nfo"):
                 nfo_path = filetools.join(raiz, f)
-                
+
                 #Sincronizamos las películas vistas desde la videoteca de Kodi con la de Alfa
                 try:
                     if config.is_xbmc():                #Si es Kodi, lo hacemos
@@ -50,12 +50,12 @@ def list_movies(item, silent=False):
                         xbmc_videolibrary.mark_content_as_watched_on_alfa(nfo_path)
                 except:
                     logger.error(traceback.format_exc())
-                
+
                 head_nfo, new_item = videolibrarytools.read_nfo(nfo_path)
 
                 if not new_item:                        #Si no ha leído bien el .nfo, pasamos a la siguiente
                     continue
-                
+
                 if len(new_item.library_urls) > 1:
                     multicanal = True
                 else:
@@ -67,7 +67,10 @@ def list_movies(item, silent=False):
                 for canal_org in new_item.library_urls:
                     canal = generictools.verify_channel(canal_org)
                     try:
-                        channel_verify = __import__('channels.%s' % canal, fromlist=["channels.%s" % canal])
+                        if canal == 'community':
+                            channel_verify = __import__('specials.%s' % canal, fromlist=["channels.%s" % canal])
+                        else:
+                            channel_verify = __import__('channels.%s' % canal, fromlist=["channels.%s" % canal])
                         logger.debug('Channel %s seems correct' % channel_verify)
                     except:
                         dead_item = Item(multicanal=multicanal,
@@ -113,7 +116,7 @@ def list_movies(item, silent=False):
                 if not filetools.exists(filetools.join(new_item.path, filetools.basename(strm_path))):
                     # Si se ha eliminado el strm desde la bilbioteca de kodi, no mostrarlo
                     continue
-                
+
                 # Menu contextual: Marcar como visto/no visto
                 visto = new_item.library_playcounts.get(os.path.splitext(f)[0], 0)
                 new_item.infoLabels["playcount"] = visto
@@ -165,7 +168,7 @@ def list_tvshows(item):
             if f == "tvshow.nfo":
                 tvshow_path = filetools.join(raiz, f)
                 # logger.debug(tvshow_path)
-                
+
                 #Sincronizamos los episodios vistos desde la videoteca de Kodi con la de Alfa
                 try:
                     if config.is_xbmc():                #Si es Kodi, lo hacemos
@@ -173,7 +176,7 @@ def list_tvshows(item):
                         xbmc_videolibrary.mark_content_as_watched_on_alfa(tvshow_path)
                 except:
                     logger.error(traceback.format_exc())
-                
+
                 head_nfo, item_tvshow = videolibrarytools.read_nfo(tvshow_path)
 
                 if len(item_tvshow.library_urls) > 1:
@@ -187,7 +190,10 @@ def list_tvshows(item):
                 for canal in item_tvshow.library_urls:
                     canal = generictools.verify_channel(canal)
                     try:
-                        channel_verify = __import__('channels.%s' % canal, fromlist=["channels.%s" % canal])
+                        if canal == 'community':
+                            channel_verify = __import__('specials.%s' % canal, fromlist=["channels.%s" % canal])
+                        else:
+                            channel_verify = __import__('channels.%s' % canal, fromlist=["channels.%s" % canal])
                         logger.debug('El canal %s parece correcto' % channel_verify)
                     except:
                         dead_item = Item(multicanal=multicanal,
@@ -236,7 +242,7 @@ def list_tvshows(item):
                     else:
                         texto_visto = config.get_localized_string(60021)
                         contador = 1
-                
+
                 except:
                     logger.error('Not find: ' + str(tvshow_path))
                     logger.error(traceback.format_exc())
@@ -499,15 +505,18 @@ def findvideos(item):
     for nom_canal, json_path in list_canales.items():
         if filtro_canal and filtro_canal != nom_canal.capitalize():
             continue
-        
+
         item_canal = Item()
         item_canal.channel = nom_canal
 
         nom_canal = item_canal.channel
-            
+
         # Importamos el canal de la parte seleccionada
         try:
-            channel = __import__('channels.%s' % nom_canal, fromlist=["channels.%s" % nom_canal])
+            if nom_canal == 'community':
+                channel = __import__('specials.%s' % nom_canal, fromlist=["channels.%s" % nom_canal])
+            else:
+                channel = __import__('channels.%s' % nom_canal, fromlist=["channels.%s" % nom_canal])
         except ImportError:
             exec "import channels." + nom_canal + " as channel"
 
@@ -549,7 +558,7 @@ def findvideos(item):
             server.channel = "videolibrary"
             server.nfo = item.nfo
             server.strm_path = item.strm_path
-            
+
             #### Compatibilidad con Kodi 18: evita que se quede la ruedecedita dando vueltas en enlaces Directos
             if server.action == 'play':
                 server.folder = False
@@ -576,7 +585,10 @@ def play(item):
     # logger.debug("item:\n" + item.tostring('\n'))
 
     if not item.contentChannel == "local":
-        channel = __import__('channels.%s' % item.contentChannel, fromlist=["channels.%s" % item.contentChannel])
+        if item.contentChannel == 'community':
+            channel = __import__('specials.%s' % item.contentChannel, fromlist=["channels.%s" % item.contentChannel])
+        else:
+            channel = __import__('channels.%s' % item.contentChannel, fromlist=["channels.%s" % item.contentChannel])
         if hasattr(channel, "play"):
             itemlist = getattr(channel, "play")(item)
 
@@ -646,22 +658,22 @@ def update_tvshow(item):
 
 def verify_playcount_series(item, path):
     logger.info()
-    
+
     """
     Este método revisa y repara el PlayCount de una serie que se haya desincronizado de la lista real de episodios en su carpeta.  Las entradas de episodios, temporadas o serie que falten, son creado con la marca de "no visto".  Posteriormente se envia a verificar los contadores de Temporadas y Serie
-    
+
     En el retorno envía de estado de True si se actualizado o False si no, normalmente por error.  Con este estado, el caller puede actualizar el estado de la opción "verify_playcount" en "videolibrary.py".  La intención de este método es la de dar una pasada que repare todos los errores y luego desactivarse.  Se puede volver a activar en el menú de Videoteca de Alfa.
-    
+
     """
     #logger.debug("item:\n" + item.tostring('\n'))
-    
+
     #Si no ha hecho nunca la verificación, lo forzamos
     estado = config.get_setting("verify_playcount", "videolibrary")
     if not estado or estado == False:
         estado = True                                                               #Si no ha hecho nunca la verificación, lo forzamos
     else:
         estado = False
-        
+
     if item.contentType == 'movie':                                                 #Esto es solo para Series
         return (item, False)
     if filetools.exists(path):
@@ -670,7 +682,7 @@ def verify_playcount_series(item, path):
         if not hasattr(it, 'library_playcounts') or not it.library_playcounts:      #Si el .nfo no tiene library_playcounts se lo creamos
             logger.error('** It does not have PlayCount')
             it.library_playcounts = {}
-        
+
         # Obtenemos los archivos de los episodios
         raiz, carpetas_series, ficheros = filetools.walk(path).next()
         # Crear un item en la lista para cada strm encontrado
@@ -685,15 +697,15 @@ def verify_playcount_series(item, path):
                 if season_episode not in it.library_playcounts:                     #No está incluido el episodio
                     it.library_playcounts.update({season_episode: 0})               #actualizamos el playCount del .nfo
                     estado_update = True                                                   #Marcamos que hemos actualizado algo
-                    
+
                 if 'season %s' % season not in it.library_playcounts:               #No está incluida la Temporada
                     it.library_playcounts.update({'season %s' % season: 0})         #actualizamos el playCount del .nfo
                     estado_update = True                                                   #Marcamos que hemos actualizado algo
-                    
+
                 if it.contentSerieName not in it.library_playcounts:                #No está incluida la Serie
                     it.library_playcounts.update({item.contentSerieName: 0})        #actualizamos el playCount del .nfo
                     estado_update = True                                                   #Marcamos que hemos actualizado algo
-                
+
         if estado_update:
             logger.error('** Estado de actualización: ' + str(estado) + ' / PlayCount: ' + str(it.library_playcounts))
             estado = estado_update
@@ -713,35 +725,35 @@ def mark_content_as_watched2(item):
    # logger.debug("item:\n" + item.tostring('\n'))
 
     if filetools.exists(item.nfo):
-        head_nfo, it = videolibrarytools.read_nfo(item.nfo) 
-        #logger.debug(it) 
+        head_nfo, it = videolibrarytools.read_nfo(item.nfo)
+        #logger.debug(it)
 
         if item.contentType == 'movie':
             name_file = os.path.splitext(os.path.basename(item.nfo))[0]
-            
+
             if name_file != 'tvshow' :
-                it.library_playcounts.update({name_file: item.playcount}) 
+                it.library_playcounts.update({name_file: item.playcount})
 
         if item.contentType == 'episode' or item.contentType == 'tvshow' or item.contentType == 'list' or name_file == 'tvshow':
        # elif item.contentType == 'episode':
             name_file = os.path.splitext(os.path.basename(item.strm_path))[0]
             num_season = name_file [0]
-            item.__setattr__('contentType', 'episode') 
-            item.__setattr__('contentSeason', num_season) 
-            #logger.debug(name_file) 
-         
+            item.__setattr__('contentType', 'episode')
+            item.__setattr__('contentSeason', num_season)
+            #logger.debug(name_file)
+
         else:
             name_file = item.contentTitle
-           # logger.debug(name_file) 
+           # logger.debug(name_file)
 
         if not hasattr(it, 'library_playcounts'):
             it.library_playcounts = {}
-        it.library_playcounts.update({name_file: item.playcount}) 
+        it.library_playcounts.update({name_file: item.playcount})
 
         # se comprueba que si todos los episodios de una temporada están marcados, se marque tb la temporada
         if item.contentType != 'movie':
             it = check_season_playcount(it, item.contentSeason)
-            #logger.debug(it) 
+            #logger.debug(it)
 
         # Guardamos los cambios en item.nfo
         if filetools.write(item.nfo, head_nfo + it.tojson()):
@@ -756,9 +768,9 @@ def mark_content_as_watched2(item):
             if config.is_xbmc():
                 from platformcode import xbmc_videolibrary
                 xbmc_videolibrary.mark_content_as_watched_on_kodi(item , item.playcount)
-               # logger.debug(item) 
+               # logger.debug(item)
 
-            platformtools.itemlist_refresh() 
+            platformtools.itemlist_refresh()
 
 
 def mark_content_as_watched(item):
@@ -970,7 +982,7 @@ def check_tvshow_playcount(item, season):
                     temporadas_vistas_serie += 1
                     #logger.debug(temporadas_serie)
 
-        if temporadas_serie == temporadas_vistas_serie: 
+        if temporadas_serie == temporadas_vistas_serie:
             item.library_playcounts.update({item.title: 1})
         else:
             item.library_playcounts.update({item.title: 0})

@@ -539,7 +539,10 @@ def download_from_server(item):
     unsupported_servers = ["torrent"]
 
     progreso = platformtools.dialog_progress(config.get_localized_string(30101), config.get_localized_string(70178) % item.server)
-    channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
+    if item.contentChannel == 'community':
+        channel = __import__('specials.%s' % item.contentChannel, None, None, ['specials.%s' % item.contentChannel])
+    else:
+        channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
     if hasattr(channel, "play") and not item.play_menu:
 
         progreso.update(50, config.get_localized_string(70178) % item.server, config.get_localized_string(60003) % item.contentChannel)
@@ -606,7 +609,10 @@ def download_from_best_server(item):
     result = {"downloadStatus": STATUS_CODES.error}
 
     progreso = platformtools.dialog_progress(config.get_localized_string(30101), config.get_localized_string(70179))
-    channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
+    if item.contentChannel == 'community':
+        channel = __import__('specials.%s' % item.contentChannel, None, None, ['specials.%s' % item.contentChannel])
+    else:
+        channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
 
     progreso.update(50, config.get_localized_string(70184), config.get_localized_string(70180) % item.contentChannel)
 
@@ -652,7 +658,10 @@ def select_server(item):
         "contentAction: %s | contentChannel: %s | url: %s" % (item.contentAction, item.contentChannel, item.url))
 
     progreso = platformtools.dialog_progress(config.get_localized_string(30101), config.get_localized_string(70179))
-    channel = __import__('channels.%s' % item.contentChannel, None, None, ["channels.%s" % item.contentChannel])
+    if item.contentChannel == 'community':
+        channel = __import__('specials.%s' % item.contentChannel, None, None, ['specials.%s' % item.contentChannel])
+    else:
+        channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
     progreso.update(50, config.get_localized_string(70184), config.get_localized_string(70180) % item.contentChannel)
 
     if hasattr(channel, item.contentAction):
@@ -720,9 +729,13 @@ def get_episodes(item):
     # El item es uma serie o temporada
     if item.contentType in ["tvshow", "season"]:
         # importamos el canal
-        channel = __import__('channels.%s' % item.contentChannel, None, None, ["channels.%s" % item.contentChannel])
-        # Obtenemos el listado de episodios
-        episodes = getattr(channel, item.contentAction)(item)
+        if item.contentChannel == 'community':
+            channel = __import__('specials.%s' % item.contentChannel, None, None, ["specials.%s" % item.contentChannel])
+            episodes = getattr(channel, 'episodesxseason')(item)
+        else:
+            channel = __import__('channels.%s' % item.contentChannel, None, None, ["channels.%s" % item.contentChannel])
+            episodes = getattr(channel, item.contentAction)(item)
+        
 
     itemlist = []
 
@@ -818,7 +831,7 @@ def save_download(item):
     item.contentAction = item.from_action if item.from_action else item.action
 
     if item.contentType in ["tvshow", "episode", "season"]:
-        if 'download' in item:
+        if 'download' in item and item.channel != 'community':
             heading = config.get_localized_string(70594) # <- Enter the season number
             item.dlseason = platformtools.dialog_numeric(0, heading, '')
             if item.dlseason:
