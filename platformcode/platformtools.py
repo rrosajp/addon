@@ -22,7 +22,7 @@ from channelselector import get_thumb
 from core import channeltools
 from core import trakt_tools, scrapertoolsV2
 from core.item import Item
-from platformcode import logger
+from platformcode import logger, keymaptools
 from platformcode import unify
 
 addon = xbmcaddon.Addon('plugin.video.kod')
@@ -656,12 +656,17 @@ def set_context_commands(item, parent_item):
     context_commands = sorted(context_commands, key=lambda comand: comand[0])
     # Menu Rapido
     context_commands.insert(0, (config.get_localized_string(60360),
+                                            "XBMC.RunPlugin(%s?%s)" % (sys.argv[0], Item(channel='side_menu',
+                                                                                     action="open_shortcut_menu",
+                                                                                     parent=parent_item.tourl()).tourl(
+                                ))))
+    context_commands.insert(1, (config.get_localized_string(70737),
                                 "XBMC.Container.Update (%s?%s)" % (sys.argv[0], Item(channel='side_menu',
                                                                                      action="open_menu",
                                                                                      parent=parent_item.tourl()).tourl(
                                 ))))
     if config.dev_mode():
-        context_commands.insert(1, ("item info",
+        context_commands.insert(2, ("item info",
                                     "XBMC.Container.Update (%s?%s)" % (sys.argv[0], Item(action="itemInfo",
                                                                                 parent=item.tojson()).tourl())))
     return context_commands
