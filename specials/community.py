@@ -226,17 +226,20 @@ def episodios(item):
     ep = 1
     season_number = infoLabels['season'] if infoLabels.has_key('season') else item.contentSeason if item.contentSeason  else 1
     for episode in json_data['episodes_list']:
-        match = support.match(episode['number'], r'(?P<season>\d+)x(?P<episode>\d+)')[0][0]
-        if not match: match = support.match(episode['title'], r'(?P<season>\d+)x(?P<episode>\d+)')[0][0]
+        match = []
+        if episode.has_key('number'): match = support.match(episode['number'], r'(?P<season>\d+)x(?P<episode>\d+)')[0][0]
+        if not match and episode.has_key('title'): match = support.match(episode['title'], r'(?P<season>\d+)x(?P<episode>\d+)')[0][0]
         if match:
             episode_number = match[1]
+            ep = int(match[1]) + 1
             season_number = match[0]
         else:
            season_number = episode['season'] if episode.has_key('season') else 1
            episode_number = episode['number'] if episode.has_key('number') else ''
+           ep = int(episode_number) if episode_number else ep
         if not episode_number:
-            episode_number = str(ep)
-            ep +=1
+            episode_number = str(ep).zfill(2)
+            ep += 1
 
         infoLabels['season'] = season_number
         infoLabels['episode'] = episode_number
