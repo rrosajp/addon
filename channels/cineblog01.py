@@ -18,10 +18,13 @@ headers = ""
 def findhost():
     global host, headers
     permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
-    if host[:4] != 'http':
-        host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    if 'google' in permUrl['location']:
+        if host[:4] != 'http':
+            host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+        else:
+            host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
     else:
-        host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+        host = permUrl['location']
     headers = [['Referer', host]]
 
 list_servers = ['verystream', 'openload', 'streamango', 'wstream']
