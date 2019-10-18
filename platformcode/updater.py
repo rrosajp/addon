@@ -3,6 +3,7 @@ import hashlib
 import io
 import os
 import shutil
+from cStringIO import StringIO
 
 from core import httptools, filetools, downloadtools
 from core.ziptools import ziptools
@@ -11,6 +12,7 @@ import json
 import xbmc
 import re
 import xbmcaddon
+from lib import githash
 
 addon = xbmcaddon.Addon('plugin.video.kod')
 
@@ -99,7 +101,7 @@ def check_addon_init():
 
                             patched = apply_patch(text, (file['patch']+'\n').encode('utf-8'))
                             if patched != text:  # non eseguo se già applicata (es. scaricato zip da github)
-                                if getSha(patched) == file['sha']:
+                                if getShaStr(patched) == file['sha']:
                                     localFile.seek(0)
                                     localFile.truncate()
                                     localFile.writelines(patched)
@@ -107,33 +109,22 @@ def check_addon_init():
                                     alreadyApplied = False
                                 else:  # nel caso ci siano stati problemi
                                     logger.info('lo sha non corrisponde, scarico il file')
-                                    try:
-                                        os.remove(addonDir + file["filename"])
-                                    except:
-                                        pass
+                                    remove(addonDir + file["filename"])
                                     downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'],
                                                                silent=True, continuar=True, resumir=False)
                         else:  # è un file NON testuale, lo devo scaricare
                             # se non è già applicato
-                            if not (filetools.isfile(addonDir + file['filename']) and getSha(
-                                    filetools.read(addonDir + file['filename']) == file['sha'])):
-                                try:
-                                    os.remove(addonDir + file["filename"])
-                                except:
-                                    pass
+                            if not (filetools.isfile(addonDir + file['filename']) and getSha(addonDir + file['filename']) == file['sha']):
+                                remove(addonDir + file["filename"])
                                 downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'], silent=True,
                                                            continuar=True, resumir=False)
                                 alreadyApplied = False
                     elif file['status'] == 'removed':
-                        try:
-                            os.remove(addonDir+file["filename"])
-                            alreadyApplied = False
-                        except:
-                            pass
+                        remove(addonDir+file["filename"])
+                        alreadyApplied = False
                     elif file['status'] == 'renamed':
                         # se non è già applicato
-                        if not (filetools.isfile(addonDir + file['filename']) and getSha(
-                                filetools.read(addonDir + file['filename']) == file['sha'])):
+                        if not (filetools.isfile(addonDir + file['filename']) and getSha(addonDir + file['filename']) == file['sha']):
                             dirs = file['filename'].split('/')
                             for d in dirs[:-1]:
                                 if not filetools.isdir(addonDir + d):
@@ -145,13 +136,13 @@ def check_addon_init():
                 nCommitApplied += 1
         if addon.getSetting("addon_update_message"):
             time = nCommitApplied * 2000 if nCommitApplied < 10 else 20000
-            platformtools.dialog_notification('Kodi on Demand', changelog, time)
+            platformtools.dialog_notification('Kodi on Demand', 'Aggiornamenti applicati:\n' + changelog[:-3], time)
 
         localCommitFile.seek(0)
         localCommitFile.truncate()
         localCommitFile.writelines(c['sha'])
         localCommitFile.close()
-
+        xbmc.executebuiltin("UpdateLocalAddons")
     else:
         logger.info('Nessun nuovo aggiornamento')
 
@@ -159,7 +150,6 @@ def check_addon_init():
 
 
 def calcCurrHash():
-    from lib import githash
     treeHash = githash.tree_hash(addonDir).hexdigest()
     logger.info('tree hash: ' + treeHash)
     commits = loadCommits()
@@ -219,31 +209,42 @@ def apply_patch(s,patch,revert=False):
   return t
 
 
-def getSha(fileText):
-    return hashlib.sha1("blob " + str(len(fileText)) + "\0" + fileText).hexdigest()
+def getSha(path):
+    f = open(path).read()
+    return githash.blob_hash(path, len(f)).hexdigest()
+
+def getShaStr(str):
+    return githash.blob_hash(StringIO(str), len(str)).hexdigest()
 
 
 def updateFromZip():
-    dp = platformtools.dialog_progress_bg('Kodi on Demand', 'Aggiornamento in corso...')
+    dp = platformtools.dialog_progress_bg('Kodi on Demand', 'Installazione in corso...')
     dp.update(0)
 
     remotefilename = 'https://github.com/' + user + "/" + repo + "/archive/" + branch + ".zip"
-    localfilename = xbmc.translatePath("special://home/addons/") + "plugin.video.kod.update.zip"
+    localfilename = (xbmc.translatePath("special://home/addons/") + "plugin.video.kod.update.zip").encode('utf-8')
+    destpathname = xbmc.translatePath("special://home/addons/")
+
     logger.info("remotefilename=%s" % remotefilename)
     logger.info("localfilename=%s" % localfilename)
 
+    # pulizia preliminare
+    remove(localfilename)
+    removeTree(destpathname + "addon-" + branch)
+
     import urllib
-    urllib.urlretrieve(remotefilename, localfilename, lambda nb, bs, fs, url=remotefilename: _pbhook(nb, bs, fs, url, dp))
+    urllib.urlretrieve(remotefilename, localfilename,
+                       lambda nb, bs, fs, url=remotefilename: _pbhook(nb, bs, fs, url, dp))
 
     # Lo descomprime
     logger.info("decompressione...")
-    destpathname = xbmc.translatePath("special://home/addons/")
     logger.info("destpathname=%s" % destpathname)
 
     try:
         hash = fixZipGetHash(localfilename)
-        unzipper = ziptools()
-        unzipper.extract(localfilename, destpathname)
+        import zipfile
+        with zipfile.ZipFile(localfilename, "r") as zip_ref:
+            zip_ref.extractall(destpathname)
     except Exception as e:
         logger.info('Non sono riuscito ad estrarre il file zip')
         logger.info(e)
@@ -252,15 +253,50 @@ def updateFromZip():
     dp.update(95)
 
     # puliamo tutto
-    shutil.rmtree(addonDir)
+    removeTree(addonDir)
 
-    filetools.rename(destpathname + "addon-" + branch, addonDir)
+    rename(destpathname + "addon-" + branch, addonDir)
 
     logger.info("Cancellando il file zip...")
-    os.remove(localfilename)
+    remove(localfilename)
 
     dp.update(100)
+    dp.close()
+    xbmc.executebuiltin("UpdateLocalAddons")
+
     return hash
+
+
+def remove(file):
+    if os.path.isfile(file):
+        removed = False
+        while not removed:
+            try:
+                os.remove(file)
+                removed = True
+            except:
+                logger.info('File ' + file + ' NON eliminato')
+
+
+def removeTree(dir):
+    if os.path.isdir(dir):
+        removed = False
+        while not removed:
+            try:
+                shutil.rmtree(dir)
+                removed = True
+            except:
+                logger.info('Cartella ' + dir + ' NON eliminato')
+
+
+def rename(dir1, dir2):
+    renamed = False
+    while not renamed:
+        try:
+            filetools.rename(dir1, dir2)
+            renamed = True
+        except:
+            logger.info('cartella ' + dir1 + ' NON rinominata')
 
 
 # https://stackoverflow.com/questions/3083235/unzipping-file-results-in-badzipfile-file-is-not-a-zip-file
@@ -290,3 +326,14 @@ def _pbhook(numblocks, blocksize, filesize, url, dp):
     except:
         percent = 90
         dp.update(percent)
+
+
+def remove(file):
+    if os.path.isfile(file):
+        removed = False
+        while not removed:
+            try:
+                os.remove(file)
+                removed = True
+            except:
+                logger.info('File ' + file + ' NON eliminato')
