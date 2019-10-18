@@ -1,0 +1,22 @@
+{
+	"id": "polpotv",
+	"name": "PolpoTV",
+	"language": ["it"],
+	"active": true,
+	"adult": false,
+	"thumbnail": "https://polpo.tv/build/assets/apple-touch-icon-152x152.png",
+	"banner": "https://polpo.tv/build/assets/apple-touch-icon-152x152.png",
+	"categories": [
+	  "movie"
+	],
+    "settings": [
+        {
+            "id": "include_in_global_search",
+            "type": "bool",
+            "label": "Includi ricerca globale",
+            "default": false,
+            "enabled": false,
+            "visible": true
+        }
+    ]
+}
