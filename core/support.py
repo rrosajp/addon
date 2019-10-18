@@ -18,6 +18,7 @@ from specials import autoplay
 
 def hdpass_get_servers(item):
     # Carica la pagina
+    itemlist = []
     data = httptools.downloadpage(item.url).data.replace('\n', '')
     patron = r'<iframe(?: id="[^"]+")? width="[^"]+" height="[^"]+" src="([^"]+)"[^>]+><\/iframe>'
     url = scrapertoolsV2.find_single_match(data, patron).replace("?alta", "")
@@ -46,23 +47,21 @@ def hdpass_get_servers(item):
 
             mir = scrapertoolsV2.find_single_match(data, patron_mir)
 
-            for mir_url, server in scrapertoolsV2.find_multiple_matches(mir, '<option.*?value="([^"]+?)">([^<]+?)</value>'):
+            for mir_url, srv in scrapertoolsV2.find_multiple_matches(mir, '<option.*?value="([^"]+?)">([^<]+?)</value>'):
 
                 data = httptools.downloadpage(urlparse.urljoin(url, mir_url)).data.replace('\n', '')
                 for media_label, media_url in scrapertoolsV2.find_multiple_matches(data, patron_media):
                     itemlist.append(Item(channel=item.channel,
                                          action="play",
-                                         title=item.title + typo(server, '-- [] color kod') + typo(res_video, '-- [] color kod'),
                                          fulltitle=item.fulltitle,
                                          quality=res_video,
                                          show=item.show,
                                          thumbnail=item.thumbnail,
                                          contentType=item.contentType,
-                                         server=server,
                                          url=url_decode(media_url)))
                     log("video -> ", res_video)
 
-    return controls(itemlist, item, AutoPlay=True, CheckLinks=True)
+    return server(item, itemlist=itemlist)
 
 
 def url_decode(url_enc):
@@ -913,9 +912,15 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
     itemList = servertools.find_video_items(data=str(data))
     itemlist = itemlist + itemList
 
+    verifiedItemlist = []
     for videoitem in itemlist:
         if not videoitem.server:
-            findS = servertools.findvideos(videoitem.url)[0]
+            findS = servertools.findvideos(videoitem.url)
+            if findS:
+                findS = findS[0]
+            else:
+                log(videoitem, 'Non supportato')
+                continue
             videoitem.server = findS[2]
             videoitem.title = findS[0]
         item.title = item.contentTitle if config.get_localized_string(30161) in item.title else item.title
@@ -925,8 +930,9 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         videoitem.thumbnail = item.thumbnail
         videoitem.channel = item.channel
         videoitem.contentType = item.contentType
+        verifiedItemlist.append(videoitem)
 
-    return controls(itemlist, item, AutoPlay, CheckLinks, down_load)
+    return controls(verifiedItemlist, item, AutoPlay, CheckLinks, down_load)
 
 def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
     from core import jsontools

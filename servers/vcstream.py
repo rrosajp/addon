@@ -12,7 +12,7 @@ from platformcode import logger, config
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url).data
-    if "Not Found" in data or "File was deleted" in data:
+    if "We're Sorry" in data:
         return False, config.get_localized_string(70292) % "vcstream"
 
     return True, ""
@@ -41,7 +41,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             headers['Referer'] = referer
 
         page_url = urlparse.urljoin(page_url, url)
-        data = httptools.downloadpage(page_url, headers=headers, verify=False).data
+        data = httptools.downloadpage(page_url, headers=headers).data
         data = data.replace('\\\\', '\\').replace('\\','')
 
         media_urls = scrapertools.find_multiple_matches(data, '\{"file"\s*:\s*"([^"]+)"\}')
@@ -50,10 +50,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             ext = "mp4"
             if "m3u8" in media_url:
                 ext = "m3u8"
-            import urllib2
-            import ssl
-            context = ssl._create_unverified_context()
-            video_urls.append(["%s [vcstream]" % ext, media_url, urllib2.HTTPSHandler(context=context)])
+            video_urls.append(["%s [vcstream]" % ext, media_url])
 
     for video_url in video_urls:
         logger.info("%s - %s" % (video_url[0], video_url[1]))
