@@ -242,8 +242,9 @@ def updateFromZip():
 
     try:
         hash = fixZipGetHash(localfilename)
-        unzipper = ziptools()
-        unzipper.extract(localfilename, destpathname)
+        import zipfile
+        with zipfile.ZipFile(localfilename, "r") as zip_ref:
+            zip_ref.extractall(destpathname)
     except Exception as e:
         logger.info('Non sono riuscito ad estrarre il file zip')
         logger.info(e)
