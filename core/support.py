@@ -907,7 +907,7 @@ def pagination(itemlist, item, page, perpage, function_level=1):
 
 def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, down_load=True):
 
-    if not (data and itemlist):
+    if not data and not itemlist:
         data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
 
     itemList = servertools.find_video_items(data=str(data))
