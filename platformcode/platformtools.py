@@ -608,7 +608,7 @@ def set_context_commands(item, parent_item):
 
             # elif item.contentSerieName:
             # Descargar serie
-            elif item.contentType == "tvshow" and item.action in ["episodios", "episodesxseason"]:
+            elif item.contentType == "tvshow" and item.action in ["episodios"]:
                 item.contentType == "tvshow"
                 context_commands.append((config.get_localized_string(60355), "XBMC.RunPlugin(%s?%s)" %
                                             (sys.argv[0], item.clone(channel="downloads", action="save_download",

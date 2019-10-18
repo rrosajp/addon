@@ -731,11 +731,9 @@ def get_episodes(item):
         # importamos el canal
         if item.contentChannel == 'community':
             channel = __import__('specials.%s' % item.contentChannel, None, None, ["specials.%s" % item.contentChannel])
-            episodes = getattr(channel, 'episodesxseason')(item)
         else:
             channel = __import__('channels.%s' % item.contentChannel, None, None, ["channels.%s" % item.contentChannel])
-            episodes = getattr(channel, item.contentAction)(item)
-        
+        episodes = getattr(channel, item.contentAction)(item)
 
     itemlist = []
 
