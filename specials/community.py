@@ -205,6 +205,7 @@ def list_all(item):
 
     if json_data:
         for media in json_data[media_type]:
+            support.log(media)
 
             quality, language, plot, poster = set_extra_values(media, item.path)
 
@@ -244,6 +245,7 @@ def list_all(item):
                                  url=url,
                                  contentTitle=contentTitle,
                                  contentSerieName=contentSerieName,
+                                 infoLabels=infoLabels,
                                  action=action))
 
         if not 'generic_list' in json_data:
@@ -307,6 +309,7 @@ def list_filtered(item):
                                         url=url,
                                         contentTitle=contentTitle,
                                         contentSerieName=contentSerieName,
+                                        infoLabels=infoLabels,
                                         action=action))
 
         if not 'generic_list' in json_data:
