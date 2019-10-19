@@ -1,37 +1,44 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per Streaming Altadefinizione
+# Canale per Popcorn Stream
 # ------------------------------------------------------------
-"""
-    Trasformate le sole def per support.menu e support.scrape
-    da non inviare nel test.
-    Test solo a trasformazione completa
 
-"""
-
-from core import support
+from core import support, httptools
 from core.item import Item
 from platformcode import config
 
-__channel__ = "streamingaltadefinizione"
-host = config.get_channel_url(__channel__)
+# __channel__ = "streamingaltadefinizione"
+# host = config.get_channel_url(__channel__)
 
+host = headers = ''
 list_servers = ['verystream', 'openload', 'wstream']
 list_quality = ['1080p', 'HD', 'DVDRIP', 'SD', 'CAM']
 
+def findhost():
+    global host, headers
+    permUrl = httptools.downloadpage('https://www.popcornstream.info', follow_redirects=False).headers
+    if 'google' in permUrl['location']:
+        if host[:4] != 'http':
+            host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+        else:
+            host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    else:
+        host = permUrl['location']
+    headers = [['Referer', host]]
+
 @support.menu
 def mainlist(item):
+    findhost()
     film = ["/film/"]
-    anime = ["/genere/anime/",
-        ('Film Anime', ["/genere/anime/", 'peliculas']),
-        ('Film Anime per genere', ["/genere/anime/", 'generos'])
-    ]
+    anime = ["/genere/anime/"]
     tvshow = ["/serietv/"]
+    top = [('Generi',['', 'generos'])]
 
     return locals()
 
 
 def search(item, text):
+    findhost()
     support.log("[streamingaltadefinizione.py] " + item.url + " search " + text)
     item.url = item.url + "/?s=" + text
 
@@ -48,15 +55,17 @@ def generos(item):
 
 
 def peliculas(item):
-    support.dbg()
-    return support.dooplay_peliculas(item, True if "/genere/anime/" in item.url else False)
+    findhost()
+    return support.dooplay_peliculas(item, True if "/genere/" in item.url else False)
 
 
 def episodios(item):
+    findhost()
     return support.dooplay_get_episodes(item)
 
 
 def findvideos(item):
+    findhost()
     itemlist = []
     for link in support.dooplay_get_links(item, host):
         if link['title'] != 'Guarda il trailer':

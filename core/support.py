@@ -362,8 +362,8 @@ def scrape(func):
             headers = ''
         patronNext = args['patronNext'] if 'patronNext' in args else ''
         patronBlock = args['patronBlock'] if 'patronBlock' in args else ''
-        typeActionDict = args['type_action_dict'] if 'type_action_dict' in args else {}
-        typeContentDict = args['type_content_dict'] if 'type_content_dict' in args else {}
+        typeActionDict = args['typeActionDict'] if 'typeActionDict' in args else {}
+        typeContentDict = args['typeContentDict'] if 'typeContentDict' in args else {}
         debug = args['debug'] if 'debug' in args else False
         log('STACK= ', inspect.stack()[1][3])
         if 'pagination' in args and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']: pagination = args['pagination'] if args['pagination'] else 20
@@ -510,12 +510,16 @@ def dooplay_peliculas(item, mixed=False, blacklist=""):
     else:
         if item.contentType == 'movie':
             action = 'findvideos'
-            patron = '<article id="post-[0-9]+" class="item movies">.*?<img src="(?!data)(?P<thumb>[^"]+)".*?<span class="quality">(?P<quality>[^<>]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></h3>.*?(?:<span>[^<>]*(?P<year>[0-9]{4})</span>|</article>).*?(?:<span>(?P<duration>[0-9]+) min</span>|</article>).*?(?:<div class="texto">(?P<plot>[^<>]+)|</article>).*?(?:genres">(?P<genre>.*?)</div>|</article>)'
+            patron = '<article id="post-[0-9]+" class="item movies">.*?<img src="(?!data)(?P<thumb>[^"]+)".*?<span class="quality">(?P<quality>[^<>]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></h3>.*?(?:<span>[^<>]*(?P<year>[0-9]{4})</span>|</article>)'
         else:
             action = 'episodios'
-            patron = '<article id="post-[0-9]+" class="item ' + ('\w+' if mixed else 'tvshow') + '">.*?<img src="(?!data)(?P<thumb>[^"]+)".*?(?:<span class="quality">(?P<quality>[^<>]+))?.*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></h3>.*?(?:<span>(?P<year>[0-9]{4})</span>|</article>).*?(?:<div class="texto">(?P<plot>[^<>]+)|</article>).*?(?:genres">(?P<genre>.*?)</div>|</article>)'
+            patron = '<article id="post-[0-9]+" class="item (?P<type>' + ('\w+' if mixed else 'tvshows') + ')">.*?<img src="(?!data)(?P<thumb>[^"]+)".*?(?:<span class="quality">(?P<quality>[^<>]+))?.*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></h3>.*?(?:<span>(?P<year>[0-9]{4})</span>|</article>).*?(?:<div class="texto">(?P<plot>[^<>]+)|</article>).*?(?:genres">(?P<genre>.*?)</div>|</article>)'
         patronNext = '<div class="pagination">.*?class="current".*?<a href="([^"]+)".*?<div class="resppages">'
         addVideolibrary = False
+
+        if mixed:
+            typeActionDict={'findvideos': ['movies'], 'episodios': ['tvshows']}
+            typeContentDict={'film': ['movies'], 'serie': ['tvshows']}
 
         return locals()
 
@@ -523,6 +527,7 @@ def dooplay_peliculas(item, mixed=False, blacklist=""):
 @scrape
 def dooplay_search(item, blacklist=""):
     return dooplay_search_vars(item, blacklist)
+
 
 def dooplay_search_vars(item, blacklist):
     if item.contentType == 'movie':
@@ -534,12 +539,12 @@ def dooplay_search_vars(item, blacklist):
     patron = '<div class="result-item">.*?<img src="(?P<thumb>[^"]+)".*?<span class="' + type + '">(?P<quality>[^<>]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a>.*?<span class="year">(?P<year>[0-9]{4}).*?<div class="contenido"><p>(?P<plot>[^<>]+)'
     patronNext = '<a class="arrow_pag" href="([^"]+)"><i id="nextpagination"'
 
-    def fullItemlistHook(itemlist):
-        # se è una next page
-        if itemlist[-1].title == typo(config.get_localized_string(30992), 'color kod bold'):
-            itemlist[-1].action = 'peliculas'
-            itemlist[-1].args = 'searchPage'
-        return itemlist
+    # def fullItemlistHook(itemlist):
+    #     # se è una next page
+    #     if itemlist[-1].title == typo(config.get_localized_string(30992), 'color kod bold'):
+    #         itemlist[-1].action = 'peliculas'
+    #         itemlist[-1].args = 'searchPage'
+    #     return itemlist
     return locals()
 
 def swzz_get_url(item):
