@@ -12,12 +12,19 @@ from channelselector import get_thumb
 from platformcode import  config, platformtools
 from specials import autoplay
 
+import xbmc, xbmcaddon
+
+addon = xbmcaddon.Addon('metadata.themoviedb.org')
+lang = addon.getSetting('language')
+
 
 list_data = {}
 
-list_language = ['ITA', 'SUB-ITA']
+# list_language = ['ITA', 'SUB-ITA']
 list_servers = ['directo', 'akvideo', 'verystream', 'openload']
 list_quality = ['SD', '720', '1080', '4k']
+
+tmdb_api = 'a1ab8b8669da03637a4b98fa39c39228'
 
 
 def mainlist(item):
@@ -156,18 +163,32 @@ def submenu(item):
     for media in json_data[media_type]:
         if media.has_key(item.filterkey):
             if type(media[item.filterkey]) == str and media[item.filterkey] not in filter_list:
-                filter_list.append(media[item.filterkey].lower())
+                filter_list.append(media[item.filterkey])
             elif type(media[item.filterkey]) == list:
                 for f in media[item.filterkey]:
                     if f not in filter_list:
-                        filter_list.append(f.lower())
+                        filter_list.append(f)
     filter_list.sort()
+
     for filter in filter_list:
+        if item.filterkey in ['director','actors']:
+            load_info = load_json('http://api.themoviedb.org/3/search/person/?api_key=' + tmdb_api + '&language=' + lang + '&query=' + filter)
+            if load_info:
+                id = str(load_info['results'][0]['id'])
+            if id:
+                info = load_json('http://api.themoviedb.org/3/person/'+ id + '?api_key=' + tmdb_api + '&language=' + lang)
+            if not info['biography']:
+                bio = load_json('http://api.themoviedb.org/3/person/'+ id + '?api_key=' + tmdb_api + '&language=en')['biography']
+            thumbnail = 'https://image.tmdb.org/t/p/w600_and_h900_bestv2' + info['profile_path'] if info['profile_path'] else item.thumbnail
+            plot += info['biography'] if info['biography'] else bio if bio else ''
+
         itemlist.append(Item(channel=item.channel,
                              title=typo(filter, 'bold'),
                              url=item.url,
                              media_type=item.media_type,
                              action='list_filtered',
+                             thumbnail=thumbnail,
+                             plot=plot,
                              filterkey=item.filterkey,
                              filter=filter))
     return itemlist
@@ -185,7 +206,7 @@ def list_all(item):
     if json_data:
         for media in json_data[media_type]:
 
-            quality, language, plot, poster = set_extra_values(media)
+            quality, language, plot, poster = set_extra_values(media, item.path)
 
             fulltitle = media['title']
             title = set_title(fulltitle, language, quality)
@@ -244,47 +265,49 @@ def list_filtered(item):
 
     if json_data:
         for media in json_data[media_type]:
-            if media.has_key(item.filterkey) and (item.filter.lower() in media[item.filterkey]):
+            if media.has_key(item.filterkey):
+                filter_keys = [it.lower() for it in media[item.filterkey]] if type(media[item.filterkey]) == list else media[item.filterkey].lower()
+                if item.filter.lower() in filter_keys:
 
-                quality, language, plot, poster = set_extra_values(media)
+                    quality, language, plot, poster = set_extra_values(media, item.path)
 
-                fulltitle = media['title']
-                title = set_title(fulltitle, language, quality)
+                    fulltitle = media['title']
+                    title = set_title(fulltitle, language, quality)
 
-                infoLabels['year'] = media['year'] if media.has_key('year')else ''
-                infoLabels['tmdb_id'] = media['tmdb_id'] if media.has_key('tmdb_id') else ''
+                    infoLabels['year'] = media['year'] if media.has_key('year')else ''
+                    infoLabels['tmdb_id'] = media['tmdb_id'] if media.has_key('tmdb_id') else ''
 
-                if 'movies_list' in json_data or 'generic_list' in json_data:
-                    url= media
-                    contentTitle = fulltitle
-                    contentType = 'movie'
-                    action='findvideos'
+                    if 'movies_list' in json_data or 'generic_list' in json_data:
+                        url= media
+                        contentTitle = fulltitle
+                        contentType = 'movie'
+                        action='findvideos'
 
-                else:
-                    contentSerieName = fulltitle
-                    contentType = 'tvshow'
-                    if media.has_key('seasons_list'):
-                        url = media['seasons_list']
-                        action = 'get_seasons'
                     else:
-                        url = relative('link', media, item.path)
-                        action = 'episodios'
+                        contentSerieName = fulltitle
+                        contentType = 'tvshow'
+                        if media.has_key('seasons_list'):
+                            url = media['seasons_list']
+                            action = 'get_seasons'
+                        else:
+                            url = relative('link', media, item.path)
+                            action = 'episodios'
 
-                itemlist.append(Item(channel=item.channel,
-                                     contentType=contentType,
-                                     title=format_title(title),
-                                     fulltitle=fulltitle,
-                                     show=fulltitle,
-                                     quality=quality,
-                                     language=language,
-                                     plot=plot,
-                                     personal_plot=plot,
-                                     thumbnail=poster,
-                                     path=item.path,
-                                     url=url,
-                                     contentTitle=contentTitle,
-                                     contentSerieName=contentSerieName,
-                                     action=action))
+                    itemlist.append(Item(channel=item.channel,
+                                        contentType=contentType,
+                                        title=format_title(title),
+                                        fulltitle=fulltitle,
+                                        show=fulltitle,
+                                        quality=quality,
+                                        language=language,
+                                        plot=plot,
+                                        personal_plot=plot,
+                                        thumbnail=poster,
+                                        path=item.path,
+                                        url=url,
+                                        contentTitle=contentTitle,
+                                        contentSerieName=contentSerieName,
+                                        action=action))
 
         if not 'generic_list' in json_data:
             tmdb.set_infoLabels(itemlist, seekTmdb=True)
@@ -386,7 +409,7 @@ def findvideos(item):
     itemlist = []
     if 'links' in item.url:
         for url in item.url['links']:
-            quality, language, plot, poster = set_extra_values(url)
+            quality, language, plot, poster = set_extra_values(url, item.path)
             title = ''
             title = set_title(title, language, quality)
 
@@ -470,7 +493,7 @@ def remove_channel(item):
     return
 
 
-def set_extra_values(dict):
+def set_extra_values(dict, path):
     support.log()
     quality = ''
     language = ''
@@ -484,7 +507,7 @@ def set_extra_values(dict):
     if 'plot' in dict and dict['plot'] != '':
         plot = dict['plot']
     if 'poster' in dict and dict['poster'] != '':
-        poster = dict['poster']
+        poster = dict['poster']if ':/' in dict['poster'] else path + dict['poster'] if '/' in dict['poster'] else get_thumb(json[key]) if dict['poster'] else ''
 
     return quality, language, plot, poster
 
@@ -515,7 +538,6 @@ def search(item, text):
     support.log('Search ', text)
     itemlist = []
     json_data = load_json(item)
-    support.log('JSON= ', json_data)
 
     return load_links(item, itemlist, json_data, text)
 
@@ -533,7 +555,7 @@ def load_links(item, itemlist, json_data, text):
         if json_data:
             for media in json_data[media_type]:
                 if text.lower() in media['title'].lower():
-                    quality, language, plot, poster = set_extra_values(media)
+                    quality, language, plot, poster = set_extra_values(media, item.path)
 
                     title = media['title']
                     title = set_title(title, language, quality)
