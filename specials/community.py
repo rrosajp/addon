@@ -510,7 +510,9 @@ def set_extra_values(dict, path):
     if 'plot' in dict and dict['plot'] != '':
         plot = dict['plot']
     if 'poster' in dict and dict['poster'] != '':
-        poster = dict['poster']if ':/' in dict['poster'] else path + dict['poster'] if '/' in dict['poster'] else get_thumb(json[key]) if dict['poster'] else ''
+        poster = dict['poster']if ':/' in dict['poster'] else path + dict['poster'] if '/' in dict['poster'] else ''
+    elif 'thumbnail' in dict and dict['thumbnail'] != '':
+        poster = dict['thumbnail']if ':/' in dict['thumbnail'] else path + dict['thumbnail'] if '/' in dict['thumbnail'] else ''
 
     return quality, language, plot, poster
 
