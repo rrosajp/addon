@@ -162,6 +162,8 @@ def get_itemlist_movie(movie,item):
         scrapedfanart="http://"+movie['backdropPath']
     except:
         scrapedfanart=""
+    infoLabels = {}
+    infoLabels['tmdbid']=movie['tmdbId']
     itemlist.append(
         Item(channel=item.channel,
              action="findvideos",
@@ -174,5 +176,6 @@ def get_itemlist_movie(movie,item):
              contentType='movie',
              contentTitle=scrapedtitle,
              url="%s%s/releases" %(host,movie['@id'] ),
+             infoLabels=infoLabels,
              extra=item.extra))
     return itemlist
