@@ -8,8 +8,9 @@ from platformcode import logger
 from core import scrapertools, httptools
 from core.item import Item
 from platformcode import config
-import json
 from core import jsontools
+import json
+import datetime
 
 host = "https://polpo.tv"
 
@@ -18,9 +19,20 @@ headers = [['Accept', 'application/ld+json']]
 def mainlist(item):
     logger.info("kod.polpotv mainlist")
     itemlist = [Item(channel=item.channel,
-                     title="[COLOR azure]Ultimi Film Aggiunti[/COLOR]",
+                     title="[COLOR azure]Ultimi Film aggiunti[/COLOR]",
                      action="peliculas",
                      url="%s/api/movies?order[lastReleaseAt]=desc" %host,
+                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png",
+                     extra="movie"),
+                Item(channel=item.channel,
+                     title="[COLOR azure]Film per anno[/COLOR]",
+                     action="search_movie_by_year",
+                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png",
+                     extra="movie"),                       
+                Item(channel=item.channel,
+                     title="[COLOR azure]Film per genere[/COLOR]",
+                     action="search_movie_by_genre",
+                     url="%s/api/genres" %host,
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png",
                      extra="movie"),
                 Item(channel=item.channel,
@@ -32,8 +44,7 @@ def mainlist(item):
     return itemlist
 
 def peliculas(item):
-    logger.error("kod.polpotv peliculas")
-    logger.error(item.url)
+    logger.info("kod.polpotv peliculas")
     itemlist = []
     data = httptools.downloadpage(item.url, headers=headers).data
     json_object = jsontools.load(data)
@@ -41,14 +52,17 @@ def peliculas(item):
     for movie in json_object['hydra:member']:
         itemlist.extend(get_itemlist_movie(movie,item))
 
-    if json_object['hydra:view']['hydra:next'] is not None:
-        itemlist.append(
-                Item(channel=item.channel,
-                     action="peliculas",
-                     title="[COLOR lightgreen]" + config.get_localized_string(30992) + "[/COLOR]",
-                     url="%s"%host +json_object['hydra:view']['hydra:next'],
-                     extra=item.extra,
-                     thumbnail="http://badwolfrepo.altervista.org/themes/successivo2.png"))
+    try:
+        if json_object['hydra:view']['hydra:next'] is not None:
+            itemlist.append(
+                    Item(channel=item.channel,
+                         action="peliculas",
+                         title="[COLOR lightgreen]" + config.get_localized_string(30992) + "[/COLOR]",
+                         url="%s"%host +json_object['hydra:view']['hydra:next'],
+                         extra=item.extra,
+                         thumbnail="http://badwolfrepo.altervista.org/themes/successivo2.png"))
+    except:
+        pass
     
     return itemlist
         
@@ -68,6 +82,36 @@ def search(item, texto):
         for line in sys.exc_info():
             logger.error("%s" % line)
         return []
+    
+def search_movie_by_genre(item):
+    logger.info("kod.polpotv search_movie_by_genre")
+    itemlist = []
+    data = httptools.downloadpage(item.url, headers=headers).data
+    json_object = jsontools.load(data)
+    for genre in json_object['hydra:member']:
+        itemlist.append(
+            Item(channel=item.channel,
+             action="peliculas",
+             title="[COLOR azure]" + genre['name'] + "[/COLOR]",
+             contentType='movie',
+             url="%s/api/movies?genres.id=%s" %(host,genre['id']),
+             extra=item.extra))
+    return itemlist
+
+def search_movie_by_year(item):
+    logger.info("kod.polpo.tv search_movie_by_year")
+    now = datetime.datetime.now()
+    year = int(now.year)
+    result = []
+    for i in range(100):
+        year_to_search = year - i
+        result.append(Item(channel=item.channel,
+                           url="%s/api/movies?releaseDate=%s" %(host,year_to_search),
+                           plot="1",
+                           type="movie",
+                           title="[COLOR azure]%s[/COLOR]" % year_to_search,
+                           action="peliculas"))
+    return result 
     
 def findvideos(item):
     logger.info("kod.polpotv peliculas")
