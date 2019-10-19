@@ -60,7 +60,7 @@ def peliculas(item):
                          title="[COLOR lightgreen]" + config.get_localized_string(30992) + "[/COLOR]",
                          url="%s"%host +json_object['hydra:view']['hydra:next'],
                          extra=item.extra,
-                         thumbnail="http://badwolfrepo.altervista.org/themes/successivo2.png"))
+                         thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png"))
     except:
         pass
     
