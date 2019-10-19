@@ -95,6 +95,7 @@ def findvideos(item):
     return itemlist
 
 def get_itemlist_movie(movie,item):
+    logger.info("kod.polpotv get_itemlist_movie")
     itemlist=[]
     try:
         if movie['originalLanguage']['id']=='it':
@@ -102,24 +103,32 @@ def get_itemlist_movie(movie,item):
         else:
             scrapedtitle=movie['translations'][1]['name']
         if scrapedtitle=='':
-                scrapedtitle=movie['originalTitle']
+            scrapedtitle=movie['originalTitle']
     except:
         scrapedtitle=movie['originalTitle']
     try:
         scrapedplot=movie['translations'][1]['overview']
     except:
         scrapedplot = ""
-    scrapedthumbnail = ""
+    try:
+        scrapedthumbnail="http://"+movie['posterPath']
+    except:
+        scrapedthumbnail=""
+    try:
+        scrapedfanart="http://"+movie['backdropPath']
+    except:
+        scrapedfanart=""
     itemlist.append(
-            Item(channel=item.channel,
-                 action="findvideos",
-                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
-                 fulltitle=scrapedtitle,
-                 show=scrapedtitle,
-                 plot=scrapedplot,
-                 thumbnail=scrapedthumbnail,
-                 contentType='movie',
-                 contentTitle=scrapedtitle,
-                 url="%s%s/releases" %(host,movie['@id'] ),
-                 extra=item.extra))
+        Item(channel=item.channel,
+             action="findvideos",
+             title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
+             fulltitle=scrapedtitle,
+             show=scrapedtitle,
+             plot=scrapedplot,
+             fanart=scrapedfanart,
+             thumbnail=scrapedthumbnail,
+             contentType='movie',
+             contentTitle=scrapedtitle,
+             url="%s%s/releases" %(host,movie['@id'] ),
+             extra=item.extra))
     return itemlist

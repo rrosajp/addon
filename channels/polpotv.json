@@ -1,7 +1,7 @@
 {
 	"id": "polpotv",
 	"name": "PolpoTV",
-	"language": ["it"],
+	"language": ["ita"],
 	"active": true,
 	"adult": false,
 	"thumbnail": "https://polpo.tv/build/assets/apple-touch-icon-152x152.png",
