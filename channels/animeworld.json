@@ -3,7 +3,7 @@
     "name": "AnimeWorld",
     "active": true,
     "adult": false,
-    "language": ["ita", "vosi"],
+    "language": ["ita", "sub-ita"],
     "thumbnail": "animeworld.png",
     "banner": "animeworld.png",
     "categories": ["anime", "vos"],

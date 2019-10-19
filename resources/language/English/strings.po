@@ -21,6 +21,10 @@ msgctxt "#20000"
 msgid "KOD"
 msgstr ""
 
+msgctxt "#20001"
+msgid "eng"
+msgstr ""
+
 msgctxt "#30001"
 msgid "Check for updates:"
 msgstr ""
