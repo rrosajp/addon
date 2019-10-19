@@ -46,7 +46,7 @@ def mainlist(item):
     list_canales, any_active = get_channels_list()
     channel_language = config.get_setting("channel_language", default="auto")
     if channel_language == 'auto':
-        channel_language = auto_filter()[0]
+        channel_language = auto_filter()
 
     #if list_canales['peliculas']:
     thumbnail = get_thumb("channels_movie.png")
@@ -134,7 +134,7 @@ def get_channels_list():
     channels_path = os.path.join(config.get_runtime_path(), "channels", '*.json')
     channel_language = config.get_setting("channel_language", default="all")
     if channel_language =="auto":
-        channel_language = auto_filter()[0]
+        channel_language = auto_filter()
 
     for infile in sorted(glob.glob(channels_path)):
         channel_id = os.path.basename(infile)[:-5]
@@ -607,7 +607,7 @@ def setting_channel(item):
     channels_path = os.path.join(config.get_runtime_path(), "channels", '*.json')
     channel_language = config.get_setting("channel_language", default="auto")
     if channel_language == 'auto':
-        channel_language = auto_filter()[0]
+        channel_language = auto_filter()
 
 
     list_controls = []

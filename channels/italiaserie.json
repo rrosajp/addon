@@ -3,7 +3,7 @@
     "name": "Italia Serie",
     "active": true,
     "adult": false,
-    "language": ["ita","vosi"],
+    "language": ["ita","sub-ita"],
     "thumbnail": "https:\/\/raw.githubusercontent.com\/Zanzibar82\/images\/master\/posters\/italiaserie.png",
     "bannermenu": "https:\/\/raw.githubusercontent.com\/Zanzibar82\/images\/master\/posters\/italiaserie.png",
     "categories": ["tvshow"],

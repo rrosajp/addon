@@ -19,7 +19,7 @@ se vanno cancellati tutti deve rimanere la voce:
 {
     "id": "nome del file .json",
     "name": "Nome del canale visualizzato in KOD",
-    "language": ["ita", "vosi"],
+    "language": ["ita", "sub-ita"],
     "active": false,
     "adult": false,
     "thumbnail": "",

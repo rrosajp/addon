@@ -1,7 +1,7 @@
 {
 	"id": "cb01anime",
 	"name": "Cb01anime",
-	"language": ["ita", "vos", "vosi"],
+	"language": ["ita", "vos", "sub-ita"],
 	"active": true,
 	"adult": false,
 	"thumbnail": "cb01anime.png",

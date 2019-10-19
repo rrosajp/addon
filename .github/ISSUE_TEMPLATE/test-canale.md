@@ -45,7 +45,7 @@ Per aprirli non servono programmi particolari un semplice editor di testo è suf
 Occorrente: file .json
 
 **1. Indica la coerenza delle voci presenti in "language" con i contenuti presenti sul sito:**
-valori: ita, vosi (sub-ita)
+valori: ita, sub-ita (sub-ita)
 
 - [ ] coerenti
 - [ ] non coerenti

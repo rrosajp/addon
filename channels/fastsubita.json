@@ -1,7 +1,7 @@
 {
     "id": "fastsubita",
     "name": "Fastsubita",
-    "language": ["vosi"],
+    "language": ["sub-ita"],
     "active": true,
     "adult": false,
     "thumbnail": "fastsubita.png",

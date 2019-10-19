@@ -253,7 +253,7 @@ def set_lang(language):
     lat=['latino','lat','la', 'espanol latino', 'espaol latino', 'zl', 'mx', 'co', 'vl']
     vose=['subtitulado','subtitulada','sub','sub espanol','vose','espsub','su','subs castellano',
           'sub: español', 'vs', 'zs', 'vs', 'english-spanish subs', 'ingles sub espanol']
-    vosi=['sottotitolato','sottotitolata','sub','sub ita','vosi','sub-ita','subs italiano',
+    sub_ita=['sottotitolato','sottotitolata','sub','sub ita','subs italiano',
           'sub: italiano', 'inglese sottotitolato']
     vos=['vos', 'sub ingles', 'engsub','ingles subtitulado', 'sub: ingles']
     vo=['ingles', 'en','vo', 'ovos', 'eng','v.o', 'english']
@@ -272,8 +272,8 @@ def set_lang(language):
         language = 'lat'
     elif language in ita:
         language = 'ita'
-    elif language in vosi:
-        language = 'vosi'
+    elif language in sub_ita:
+        language = 'sub-ita'
     elif language in vose:
         language = 'vose'
     elif language in vos:
