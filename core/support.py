@@ -239,7 +239,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         title = episode + (s if episode and title else '') + title 
         longtitle = title + (s if title and title2 else '') + title2
         longtitle = typo(longtitle, 'bold')
-        longtitle += (typo(Type,'_ () bold') if Type else '') + (typo(quality, '_ [] color kod') if quality else '')
+        longtitle += typo(quality, '_ [] color kod') if quality else ''
 
         lang1, longtitle = scrapeLang(scraped, lang, longtitle)
 
@@ -530,7 +530,11 @@ def dooplay_search(item, blacklist=""):
 
 
 def dooplay_search_vars(item, blacklist):
-    if item.contentType == 'movie':
+    if item.contentType == 'list':  # ricerca globale
+        type = '(?P<type>movies|tvshows)'
+        typeActionDict = {'findvideos': ['movies'], 'episodios': ['tvshows']}
+        typeContentDict = {'movie': ['movies'], 'episode': ['tvshows']}
+    elif item.contentType == 'movie':
         type = 'movies'
         action = 'findvideos'
     else:

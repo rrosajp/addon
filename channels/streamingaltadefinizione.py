@@ -38,7 +38,6 @@ def mainlist(item):
 
 
 def search(item, text):
-    findhost()
     support.log("[streamingaltadefinizione.py] " + item.url + " search " + text)
     item.url = item.url + "/?s=" + text
 

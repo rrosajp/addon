@@ -243,11 +243,12 @@ def updateFromZip():
     try:
         hash = fixZipGetHash(localfilename)
         import zipfile
-        with zipfile.ZipFile(localfilename, "r") as zip_ref:
+        with zipfile.ZipFile(io.FileIO(localfilename), "r") as zip_ref:
             zip_ref.extractall(destpathname)
     except Exception as e:
         logger.info('Non sono riuscito ad estrarre il file zip')
         logger.info(e)
+        dp.close()
         return False
 
     dp.update(95)
