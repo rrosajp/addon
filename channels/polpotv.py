@@ -5,43 +5,29 @@
 # ------------------------------------------------------------
 
 from platformcode import logger
-from core import scrapertools, httptools
+from core import scrapertools, httptools, support
 from core.item import Item
 from platformcode import config
 from core import jsontools
 import json
 import datetime
 
-host = "https://polpo.tv"
+__channel__ = "polpotv"
+host = config.get_channel_url(__channel__)
 
 headers = [['Accept', 'application/ld+json']]
 
+list_servers = ['directo']
+list_quality = ['1080p','720p','480p','360p']
+
+@support.menu
 def mainlist(item):
-    logger.info("kod.polpotv mainlist")
-    itemlist = [Item(channel=item.channel,
-                     title="[COLOR azure]Ultimi Film aggiunti[/COLOR]",
-                     action="peliculas",
-                     url="%s/api/movies?order[lastReleaseAt]=desc" %host,
-                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png",
-                     extra="movie"),
-                Item(channel=item.channel,
-                     title="[COLOR azure]Film per anno[/COLOR]",
-                     action="search_movie_by_year",
-                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png",
-                     extra="movie"),                       
-                Item(channel=item.channel,
-                     title="[COLOR azure]Film per genere[/COLOR]",
-                     action="search_movie_by_genre",
-                     url="%s/api/genres" %host,
-                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png",
-                     extra="movie"),
-                Item(channel=item.channel,
-                     action="search",
-                     title="[COLOR yellow]Cerca...[/COLOR]",
-                     extra="movie",
-                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),                                    
-                ]
-    return itemlist
+    film = [
+        ('Ultimi Film aggiunti', ['/api/movies?order[lastReleaseAt]=desc', 'peliculas', '']),
+        ('Generi', ['/api/genres', 'search_movie_by_genre', '']),
+        ('Anni', ['', 'search_movie_by_year', '']),
+    ]
+    return locals()
 
 def peliculas(item):
     logger.info("kod.polpotv peliculas")
@@ -82,7 +68,7 @@ def search(item, texto):
         for line in sys.exc_info():
             logger.error("%s" % line)
         return []
-    
+
 def search_movie_by_genre(item):
     logger.info("kod.polpotv search_movie_by_genre")
     itemlist = []
@@ -102,41 +88,39 @@ def search_movie_by_year(item):
     logger.info("kod.polpo.tv search_movie_by_year")
     now = datetime.datetime.now()
     year = int(now.year)
-    result = []
+    itemlist = []
     for i in range(100):
         year_to_search = year - i
-        result.append(Item(channel=item.channel,
+        itemlist.append(Item(channel=item.channel,
                            url="%s/api/movies?releaseDate=%s" %(host,year_to_search),
                            plot="1",
                            type="movie",
                            title="[COLOR azure]%s[/COLOR]" % year_to_search,
                            action="peliculas"))
-    return result 
+    return itemlist 
     
 def findvideos(item):
     logger.info("kod.polpotv peliculas")
     itemlist = []
-    data = httptools.downloadpage(item.url, headers=headers).data
-    json_object = jsontools.load(data)
-    for video in json_object['hydra:member'][0]['playlist']['videos']:
-        data = httptools.downloadpage(video['src'], headers={'Origin': host},follow_redirects=None).data
-        patron = 'href="([^"]+)"'
-        video_link = scrapertools.find_single_match(data, patron)
-        itemlist.append(
-            Item(
-                channel=item.channel,
-                action="play",
-                thumbnail=item.thumbnail,
-                title=item.title +' [COLOR orange][' +str(video['size'])+ 'p][/COLOR]',
-                url=video_link,
-                folder=False))
-
-    if config.get_videolibrary_support() and len(itemlist) > 0 and item.extra != 'findvideos':
-        itemlist.append(
-                Item(channel=item.channel, title="[COLOR yellow]%s[/COLOR]" % config.get_localized_string(30161), url=item.url,
-                     action="add_pelicula_to_library", extra="findvideos", contentTitle=item.contentTitle))
-
-    return itemlist
+    try:
+        data = httptools.downloadpage(item.url, headers=headers).data
+        json_object = jsontools.load(data)
+        for video in json_object['hydra:member'][0]['playlist']['videos']:
+            data = httptools.downloadpage(video['src'], headers={'Origin': host},follow_redirects=None).data
+            patron = 'href="([^"]+)"'
+            video_link = scrapertools.find_single_match(data, patron)
+            itemlist.append(
+                Item(
+                    channel=item.channel,
+                    action="play",
+                    thumbnail=item.thumbnail,
+                    url=video_link,
+                    server='directo',
+                    quality=str(video['size'])+ 'p',
+                    folder=False))
+    except:
+        pass
+    return support.server(item, itemlist=itemlist)
 
 def get_itemlist_movie(movie,item):
     logger.info("kod.polpotv get_itemlist_movie")
@@ -167,7 +151,7 @@ def get_itemlist_movie(movie,item):
     itemlist.append(
         Item(channel=item.channel,
              action="findvideos",
-             title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
+             title="[COLOR azure]"+ scrapedtitle + "[/COLOR]" + " [COLOR yellow]["+movie['lastQuality']+"][/COLOR] ",
              fulltitle=scrapedtitle,
              show=scrapedtitle,
              plot=scrapedplot,
