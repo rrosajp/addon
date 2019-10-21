@@ -834,8 +834,6 @@ def add_tvshow(item, channel=None):
 
         # Obtiene el listado de episodios
         if item.channel == 'community':
-            itemlist = getattr(channel, 'get_seasons')(item)
-        else:
             itemlist = getattr(channel, item.action)(item)
 
     insertados, sobreescritos, fallidos, path = save_tvshow(item, itemlist)

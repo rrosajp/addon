@@ -3,31 +3,28 @@
   "name": "Community",
   "active": true,
   "adult": false,
-  "language": ["cast", "lat"],
+  "language": ["*"],
   "thumbnail": "",
   "banner": "",
   "fanart": "",
-  "categories": [
-    "direct",
-    "movie",
-    "tvshow",
-    "vo"
-  ],
+  "categories": [],
   "settings": [
     {
-      "id": "filterlanguages",
+      "id": "pagination",
       "type": "list",
-      "label": "Mostrar enlaces del canal en idioma...",
-      "default": 3,
+      "label": "Pagination",
+      "default": 2,
       "enabled": true,
       "visible": true,
-      "lvalues": [
-        "No Filtrar",
-        "LAT",
-        "CAST",
-        "VO",
-        "VOSE"
-      ]
+      "lvalues": ["@70708", "20", "40", "60", "80", "100"]
+    },
+    {
+      "id": "show_seasons",
+      "type": "bool",
+      "label": "Show Seasons",
+      "default": false,
+      "enabled": true,
+      "visible": true
     }
   ]
 }

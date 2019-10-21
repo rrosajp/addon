@@ -829,7 +829,7 @@ def save_download(item):
     item.contentAction = item.from_action if item.from_action else item.action
 
     if item.contentType in ["tvshow", "episode", "season"]:
-        if 'download' in item and item.channel != 'community':
+        if 'download' in item and config.get_setting('show_seasons',item.channel) == False:
             heading = config.get_localized_string(70594) # <- Enter the season number
             item.dlseason = platformtools.dialog_numeric(0, heading, '')
             if item.dlseason:

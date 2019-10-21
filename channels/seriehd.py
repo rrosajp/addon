@@ -76,9 +76,8 @@ def episodios(item):
         episodes = support.match(item, r'<a href="([^"]+)">(\d+)<', '<h3>EPISODIO</h3><ul>(.*?)</ul>', headers, season_url)[0]
         for episode_url, episode in episodes:
             episode_url = support.urlparse.urljoin(url, episode_url)
-            title = season + "x" + episode.zfill(2)
+            title = season + "x" + episode.zfill(2) + ' - ' + item.fulltitle
             data += title + '|' + episode_url + '\n'
-    support.log('DaTa= ',data)
     patron = r'(?P<title>[^\|]+)\|(?P<url>[^\n]+)\n'
     action = 'findvideos'
     return locals()
