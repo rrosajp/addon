@@ -22,7 +22,7 @@ list_quality = ['1080p','720p','480p','360p']
 
 @support.menu
 def mainlist(item):
-    film = [
+    menu = [
         ('Ultimi Film aggiunti', ['/api/movies?order[lastReleaseAt]=desc', 'peliculas', '']),
         ('Generi', ['/api/genres', 'search_movie_by_genre', '']),
         ('Anni', ['', 'search_movie_by_year', '']),
@@ -39,14 +39,7 @@ def peliculas(item):
         itemlist.extend(get_itemlist_movie(movie,item))
 
     try:
-        if json_object['hydra:view']['hydra:next'] is not None:
-            itemlist.append(
-                    Item(channel=item.channel,
-                         action="peliculas",
-                         title="[COLOR lightgreen]" + config.get_localized_string(30992) + "[/COLOR]",
-                         url="%s"%host +json_object['hydra:view']['hydra:next'],
-                         extra=item.extra,
-                         thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png"))
+        itemlist = support.nextPage(itemlist, item, next_page=json_object['hydra:view']['hydra:next'])
     except:
         pass
     
@@ -151,7 +144,7 @@ def get_itemlist_movie(movie,item):
     itemlist.append(
         Item(channel=item.channel,
              action="findvideos",
-             title="[COLOR azure]"+ scrapedtitle + "[/COLOR]" + " [COLOR yellow]["+movie['lastQuality']+"][/COLOR] ",
+             title=scrapedtitle + " " + support.typo(movie['lastQuality'].upper(), '[] color kod'),
              fulltitle=scrapedtitle,
              show=scrapedtitle,
              plot=scrapedplot,
