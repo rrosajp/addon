@@ -629,7 +629,7 @@ def do_search(item, categories=None):
                                                 channel="search", action="show_result", adult=element["adult"]))
     title = config.get_localized_string(59972) % (
     tecleado, total, time.time() - start_time)
-    itemlist.insert(0, Item(title=title, text_color='yellow'))
+    itemlist.insert(0, Item(title=typo(title, 'bold color kod')))
     progreso.close()
     #Para opcion Buscar en otros canales
     if item.contextual == True:
@@ -646,7 +646,7 @@ def exact_results(results, wanted):
         if item.action=='':
             channel=item.from_channel
         if item.action != '' and item.contentTitle==wanted:
-            item.title = '%s [%s]' % (item.title, channel)
+            item.title = typo(item.title,'bold') + typo(channel,'_ [] color kod bold') #'%s [%s]' % (item.title, channel)
             itemlist.append(item)
 
     return itemlist
@@ -703,7 +703,7 @@ def discover_list(item):
             title = unify.normalize(elem['name']).capitalize()
             tvshow = True
 
-        new_item = Item(channel='search', title=title, infoLabels=elem, action='do_search', extra=title,
+        new_item = Item(channel='search', title=typo(title, 'bold'), infoLabels=elem, action='do_search', extra=title,
                         category=config.get_localized_string(70695), context ='')
 
         if tvshow:
