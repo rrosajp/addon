@@ -7,9 +7,6 @@
 from core import scrapertoolsV2, httptools, support
 from core.item import Item
 
-##__channel__ = 'seriehd'
-# host = support.config.get_channel_url(__channel__)
-
 # impostati dinamicamente da findhost()
 host = ''
 headers = ''
@@ -25,9 +22,6 @@ findhost()
 
 list_servers = ['verystream', 'openload', 'streamango', 'thevideome']
 list_quality = ['1080p', '720p', '480p', '360']
-
-##checklinks = support.config.get_setting('checklinks', __channel__)
-##checklinks_number = support.config.get_setting('checklinks_number', __channel__)
 
 
 @support.menu
@@ -82,12 +76,30 @@ def episodios(item):
         episodes = support.match(item, r'<a href="([^"]+)">(\d+)<', '<h3>EPISODIO</h3><ul>(.*?)</ul>', headers, season_url)[0]
         for episode_url, episode in episodes:
             episode_url = support.urlparse.urljoin(url, episode_url)
-            title = season + "x" + episode.zfill(2)
+            title = season + "x" + episode.zfill(2) + ' - ' + item.fulltitle
             data += title + '|' + episode_url + '\n'
-    support.log('DaTa= ',data)
     patron = r'(?P<title>[^\|]+)\|(?P<url>[^\n]+)\n'
     action = 'findvideos'
     return locals()
+
+def newest(categoria):
+    support.log(categoria)
+    itemlist = []
+    item = support.Item()
+    try:
+        if categoria == "series":
+            item.url = host
+            item.contentType = 'tvshow'
+            itemlist = peliculas(item)
+            itemlist.pop()
+    # Continua la ricerca in caso di errore
+    except:
+        import sys
+        for line in sys.exc_info():
+            support.logger.error("{0}".format(line))
+        return []
+
+    return itemlist
 
 
 def findvideos(item):

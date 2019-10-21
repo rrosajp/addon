@@ -40,7 +40,7 @@ def search(item, text):
 
 
 def peliculas(item):
-    return support.dooplay_films(item, blacklist)
+    return support.dooplay_peliculas(item, False, blacklist)
 
 
 def findvideos(item):

@@ -4,14 +4,18 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "https://(?:vidcloud.co|vcstream.to)/embed/([a-z0-9]+)",
-        "url": "https://vidcloud.co/player?fid=\\1&page=embed"
+        "pattern": "vcstream.to/(?:embed|f)/([A-z0-9]+)/([A-z0-9.]+)",
+        "url": "https://vcstream.to/embed/\\1/\\2"
+      },
+      {
+        "pattern": "https://vidcloud.co/v/([a-z0-9A-Z]+)",
+        "url": "https:\/\/vidcloud.co\/v\/\\1"
       }
     ]
   },
   "free": true,
-  "id": "vidcloud",
-  "name": "vidcloud",
+  "id": "vcstream",
+  "name": "vcstream",
   "settings": [
     {
       "default": false,
@@ -38,5 +42,5 @@
       "visible": false
     }
   ],
-  "thumbnail": "https://i.postimg.cc/xjpwG0rK/0a-RVDzlb-400x400.jpg"
+  "thumbnail": "http://i.imgur.com/l45Tk0G.png"
 }

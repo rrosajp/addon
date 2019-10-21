@@ -21,6 +21,10 @@ msgctxt "#20000"
 msgid "KOD"
 msgstr "KOD"
 
+msgctxt "#20001"
+msgid "eng"
+msgstr "ita"
+
 msgctxt "#30001"
 msgid "Check for updates:"
 msgstr "Verifica aggiornamenti:"
@@ -5660,3 +5664,11 @@ msgstr "Seleziona gli Episodi della Stagione"
 msgctxt "#70735"
 msgid "%s Special Episode Number"
 msgstr "Numero dell'Episodio Speciale %s"
+
+msgctxt "#70736"
+msgid "Completed Serie"
+msgstr "Serie Completa"
+
+msgctxt "#70737"
+msgid "[B]SIDE MENU[/B]"
+msgstr "[B]MENU LATERALE[/B]"

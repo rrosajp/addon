@@ -24,25 +24,22 @@ headers = [['Referer', host]]
 def mainlist(item):
     anime = ['/lista-anime/',
              ('In Corso',['/lista-anime-in-corso/']),
-             ('Ultimi Episodi',['','peliculas','update']),
              ('Ultime Serie',['/category/anime/articoli-principali/','peliculas','last'])
             ]
     return locals()
 
-    
+
 def newest(categoria):
     support.log(categoria)
     itemlist = []
     item = support.Item()
     try:
         if categoria == "anime":
+            item.contentType = 'tvshow'
             item.url = host
-            item.args = 'update'
-            itemlist = peliculas(item)            
-
-            if itemlist[-1].action == "peliculas":
-                itemlist.pop()
-    # Continua la ricerca in caso di errore 
+            item.args = 'newest'
+            itemlist = peliculas(item)
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
@@ -56,33 +53,33 @@ def search(item, texto):
     search = texto
     item.contentType = 'tvshow'
     patron = '<strong><a href="(?P<url>[^"]+)">(?P<title>.*?) [Ss][Uu][Bb]'
-    action = 'episodios'    
+    action = 'episodios'
     return locals()
 
 
 @support.scrape
 def peliculas(item):
     anime = True
-    if item.args == 'update':
+    action = 'episodios'
+
+    if item.args == 'newest':
         patron = r'src="(?P<thumb>[^"]+)" class="attachment-grid-post[^"]+" alt="[^"]*" title="(?P<title>[^"]+").*?<h2><a href="(?P<url>[^"]+)"'
         def itemHook(item):
-            delete = support.scrapertoolsV2.find_single_match(item.fulltitle, r'( Episodio.*)')
-            number = support.scrapertoolsV2.find_single_match(item.title, r'Episodio (\d+)')
+            item.url = support.match(item, '<a href="([^"]+)" class="btn', headers=headers)[0][0]
+            delete = support.scrapertoolsV2.find_single_match(item.fulltitle, r'( Episodi.*)')
+            number = support.scrapertoolsV2.find_single_match(item.title, r'Episodi(?:o)? (?:\d+÷)?(\d+)')
             item.title = support.typo(number + ' - ','bold') + item.title.replace(delete,'')
-            item.fulltitle = item.show = item.fulltitle.replace(delete,'')    
-            item.url = item.url.replace('-episodio-'+ number,'')
+            item.fulltitle = item.show = item.title.replace(delete,'')
             item.number = number
             return item
         action = 'findvideos'
 
     elif item.args == 'last':
         patron = r'src="(?P<thumb>[^"]+)" class="attachment-grid-post[^"]+" alt="[^"]*" title="(?P<title>.*?)(?: Sub| sub| SUB|").*?<h2><a href="(?P<url>[^"]+)"'
-        action = 'episodios'
 
     else:
         pagination = ''
-        patron = '<strong><a href="(?P<url>[^"]+)">(?P<title>.*?) [Ss][Uu][Bb]'
-        action = 'episodios'
+        patron = r'<strong><a href="(?P<url>[^"]+)">(?P<title>.*?) [Ss][Uu][Bb]'
 
     return locals()
 
@@ -102,16 +99,16 @@ def findvideos(item):
     support.log(item)
 
     itemlist = []
-    
-    if item.number:       
-        item.url = support.match(item, r'<a href="([^"]+)"[^>]*>', patronBlock=r'Episodio %s(.*?)</tr>' % item.number)[0][0]   
-    
+
+    if item.number:
+        item.url = support.match(item, r'<a href="([^"]+)"[^>]*>', patronBlock=r'Episodio %s(.*?)</tr>' % item.number)[0][0]
+
     if 'http' not in item.url:
         if '//' in item.url[:2]:
             item.url = 'http:' + item.url
-        elif host not in item.url:        
+        elif host not in item.url:
             item.url = host + item.url
-    
+
     if 'adf.ly' in item.url:
         item.url = adfly.get_long_url(item.url)
     elif 'bit.ly' in item.url:

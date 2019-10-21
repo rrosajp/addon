@@ -1,5 +1,5 @@
-Rev:0.1
-Update: 18-9-2019
+Rev:0.2
+Update: 03-10-2019
 #####################
 
 Promemoria da cancellare pena la non visibilità del canale in KOD!!
@@ -11,8 +11,7 @@ le voci in settings sono state inserite per l'unico scopo
 di velocizzare la scrittura del file
 Vanno lasciate solo quelle voci il cui funzionamento sul 
 canale non vanno attivate.
-Per esempio se il canale non ha: newest()
-lasciare le voci dove c'è newest nell'id. Es: include_in_newest_series
+"not_active": ["include_in_newest"], VA INSERITO nei canali che NON hanno nessuna voce newest.
 Ovviamente va mantenuto tutto il codice di quell'id tra le {}
 se vanno cancellati tutti deve rimanere la voce:
 "settings": []
@@ -20,12 +19,13 @@ se vanno cancellati tutti deve rimanere la voce:
 {
     "id": "nome del file .json",
     "name": "Nome del canale visualizzato in KOD",
-    "language": ["ita", "vos"],
+    "language": ["ita", "sub-ita"],
     "active": false,
     "adult": false,
     "thumbnail": "",
     "banner": "",
     "categories": ["movie", "tvshow", "anime", "vos", "documentary", "adult"],
+    "not_active": ["include_in_newest"],
     "settings": [
 		{
 		  "id": "include_in_global_search",

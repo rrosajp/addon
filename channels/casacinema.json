@@ -1,7 +1,7 @@
 {
     "id": "casacinema",
     "name": "Casacinema",
-    "language": ["ita", "vosi"],
+    "language": ["ita", "sub-ita"],
     "active": true,
     "adult": false,
     "thumbnail": "https://raw.githubusercontent.com/Zanzibar82/images/master/posters/casacinema.png",

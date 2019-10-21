@@ -86,7 +86,7 @@ def extract_flashvars(data):
 def extract_videos(video_id):
     fmt_value = {
         5: "240p h263 flv",
-        6: "240p h263 flv",
+        6: "270p h263 flv",
         18: "360p h264 mp4",
         22: "720p h264 mp4",
         26: "???",
@@ -108,10 +108,18 @@ def extract_videos(video_id):
         85: "1080p h264 3D",
         100: "360p vp8 3D",
         101: "480p vp8 3D",
-        102: "720p vp8 3D"
+        102: "720p vp8 3D",
+        91:"144 h264 mp4",
+        92:"240 h264 mp4",
+        93:"360 h264 mp4",
+        94:"480 h264 mp4",
+        95:"720 h264 mp4",
+        96:"1080 h264 mp4",
+        132:"240 h264 mp4",
+        151:"72 h264 mp4"
     }
-
-    url = 'http://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&ssl_stream=1' % \
+    # from core.support import dbg; dbg()
+    url = 'https://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&ssl_stream=1' % \
           (video_id, video_id)
     data = httptools.downloadpage(url).data
 
@@ -132,53 +140,59 @@ def extract_videos(video_id):
     js_signature = ""
     youtube_page_data = httptools.downloadpage("http://www.youtube.com/watch?v=%s" % video_id).data
     params = extract_flashvars(youtube_page_data)
+    data_flashvars =[]
+    if params.get('adaptive_fmts'):
+        data_flashvars += scrapertools.find_multiple_matches(params['adaptive_fmts'], '(fps.*?url[^,]+)')
     if params.get('url_encoded_fmt_stream_map'):
-        data_flashvars = params["url_encoded_fmt_stream_map"].split(",")
-        for url_desc in data_flashvars:
-            url_desc_map = dict(urlparse.parse_qsl(url_desc))
-            if not url_desc_map.get("url") and not url_desc_map.get("stream"):
+        data_flashvars += params["url_encoded_fmt_stream_map"].split(",")
+
+    for url_desc in data_flashvars:
+        url_desc_map = dict(urlparse.parse_qsl(url_desc))
+        if not url_desc_map.get("url") and not url_desc_map.get("stream"):
+            continue
+        try:
+            key = int(url_desc_map["itag"])
+            if not fmt_value.get(key):
                 continue
 
-            try:
-                key = int(url_desc_map["itag"])
-                if not fmt_value.get(key):
-                    continue
+            if url_desc_map.get("url"):
+                url = urllib.unquote(url_desc_map["url"])
+            elif url_desc_map.get("conn") and url_desc_map.get("stream"):
+                url = urllib.unquote(url_desc_map["conn"])
+                if url.rfind("/") < len(url) - 1:
+                    url += "/"
+                url += urllib.unquote(url_desc_map["stream"])
+            elif url_desc_map.get("stream") and not url_desc_map.get("conn"):
+                url = urllib.unquote(url_desc_map["stream"])
 
-                if url_desc_map.get("url"):
-                    url = urllib.unquote(url_desc_map["url"])
-                elif url_desc_map.get("conn") and url_desc_map.get("stream"):
-                    url = urllib.unquote(url_desc_map["conn"])
-                    if url.rfind("/") < len(url) - 1:
-                        url += "/"
-                    url += urllib.unquote(url_desc_map["stream"])
-                elif url_desc_map.get("stream") and not url_desc_map.get("conn"):
-                    url = urllib.unquote(url_desc_map["stream"])
+            if url_desc_map.get("sig"):
+                url += "&signature=" + url_desc_map["sig"]
+            elif url_desc_map.get("s"):
+                sig = url_desc_map["s"]
+                if not js_signature:
+                    urljs = scrapertools.find_single_match(youtube_page_data, '"assets":.*?"js":\s*"([^"]+)"')
+                    urljs = urljs.replace("\\", "")
+                    if urljs:
+                        if not re.search(r'https?://', urljs):
+                            urljs = urlparse.urljoin("https://www.youtube.com", urljs)
+                        data_js = httptools.downloadpage(urljs).data
+                        from jsinterpreter import JSInterpreter
+                        funcname = scrapertools.find_single_match(data_js, '\.sig\|\|([A-z0-9$]+)\(')
+                        if not funcname:
+                            funcname = scrapertools.find_single_match(data_js, '["\']signature["\']\s*,\s*'
+                                                                                '([A-z0-9$]+)\(')
+                        if not funcname:
+                            funcname = scrapertools.find_single_match(data_js, r'\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(')
+                        jsi = JSInterpreter(data_js)
+                        js_signature = jsi.extract_function(funcname)
 
-                if url_desc_map.get("sig"):
-                    url += "&signature=" + url_desc_map["sig"]
-                elif url_desc_map.get("s"):
-                    sig = url_desc_map["s"]
-                    if not js_signature:
-                        urljs = scrapertools.find_single_match(youtube_page_data, '"assets":.*?"js":\s*"([^"]+)"')
-                        urljs = urljs.replace("\\", "")
-                        if urljs:
-                            if not re.search(r'https?://', urljs):
-                                urljs = urlparse.urljoin("https://www.youtube.com", urljs)
-                            data_js = httptools.downloadpage(urljs).data
-                            from jsinterpreter import JSInterpreter
-                            funcname = scrapertools.find_single_match(data_js, '\.sig\|\|([A-z0-9$]+)\(')
-                            if not funcname:
-                                funcname = scrapertools.find_single_match(data_js, '["\']signature["\']\s*,\s*'
-                                                                                   '([A-z0-9$]+)\(')
-                            jsi = JSInterpreter(data_js)
-                            js_signature = jsi.extract_function(funcname)
 
-                    signature = js_signature([sig])
-                    url += "&signature=" + signature
-                url = url.replace(",", "%2C")
-                video_urls.append(["(" + fmt_value[key] + ") [youtube]", url])
-            except:
-                import traceback
-                logger.info(traceback.format_exc())
+                signature = js_signature([sig])
+                url += "&sig=" + signature
+            url = url.replace(",", "%2C")
+            video_urls.append(["(" + fmt_value[key] + ") [youtube]", url])
+        except:
+            import traceback
+            logger.info(traceback.format_exc())
 
     return video_urls

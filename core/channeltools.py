@@ -258,7 +258,7 @@ def get_default_settings(channel_name):
 
                 else:
                     control['label'] = config.get_localized_string(70727) + ' - ' + label.capitalize()
-                    control['default'] = True if control['id'] not in default_off else False
+                    control['default'] = control['default'] if control['id'] not in default_off else False
                     channel_controls.append(control)
 
             # elif control['id'] == 'filter_languages':
@@ -269,7 +269,7 @@ def get_default_settings(channel_name):
 
             elif control['id'] not in not_active and 'include_in_newest' not in control['id']:
                 if type(control['default']) == bool:
-                    control['default'] = True if control['id'] not in default_off else False
+                    control['default'] = control['default'] if control['id'] not in default_off else False
                 channel_controls.append(control)
 
     if renumber:

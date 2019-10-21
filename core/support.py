@@ -18,6 +18,7 @@ from specials import autoplay
 
 def hdpass_get_servers(item):
     # Carica la pagina
+    itemlist = []
     data = httptools.downloadpage(item.url).data.replace('\n', '')
     patron = r'<iframe(?: id="[^"]+")? width="[^"]+" height="[^"]+" src="([^"]+)"[^>]+><\/iframe>'
     url = scrapertoolsV2.find_single_match(data, patron).replace("?alta", "")
@@ -46,23 +47,21 @@ def hdpass_get_servers(item):
 
             mir = scrapertoolsV2.find_single_match(data, patron_mir)
 
-            for mir_url, server in scrapertoolsV2.find_multiple_matches(mir, '<option.*?value="([^"]+?)">([^<]+?)</value>'):
+            for mir_url, srv in scrapertoolsV2.find_multiple_matches(mir, '<option.*?value="([^"]+?)">([^<]+?)</value>'):
 
                 data = httptools.downloadpage(urlparse.urljoin(url, mir_url)).data.replace('\n', '')
                 for media_label, media_url in scrapertoolsV2.find_multiple_matches(data, patron_media):
                     itemlist.append(Item(channel=item.channel,
                                          action="play",
-                                         title=item.title + typo(server, '-- [] color kod') + typo(res_video, '-- [] color kod'),
                                          fulltitle=item.fulltitle,
                                          quality=res_video,
                                          show=item.show,
                                          thumbnail=item.thumbnail,
                                          contentType=item.contentType,
-                                         server=server,
                                          url=url_decode(media_url)))
                     log("video -> ", res_video)
 
-    return controls(itemlist, item, AutoPlay=True, CheckLinks=True)
+    return server(item, itemlist=itemlist)
 
 
 def url_decode(url_enc):
@@ -182,6 +181,24 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         regexDbg(item, patron, headers, block)
 
     known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
+    # Legenda known_keys per i groups nei patron
+    # known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality',
+    #                'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
+    # url = link relativo o assoluto alla pagina titolo film/serie
+    # title = titolo Film/Serie/Anime/Altro
+    # title2 = titolo dell'episodio Serie/Anime/Altro
+    # season = stagione in formato numerico
+    # episode = numero episodio, in formato numerico.
+    # thumb = linkrealtivo o assoluto alla locandina Film/Serie/Anime/Altro
+    # quality = qualità indicata del video
+    # year = anno in formato numerico (4 cifre)
+    # duration = durata del Film/Serie/Anime/Altro
+    # genere = genere del Film/Serie/Anime/Altro. Es: avventura, commedia
+    # rating = punteggio/voto in formato numerico
+    # type = tipo del video. Es. movie per film o tvshow per le serie. Di solito sono discrimanti usati dal sito
+    # lang = lingua del video. Es: ITA, Sub-ITA, Sub, SUB ITA.
+    # AVVERTENZE: Se il titolo è trovato nella ricerca TMDB/TVDB/Altro allora le locandine e altre info non saranno quelle recuperate nel sito.!!!!
+
     stagione = '' # per quei siti che hanno la stagione nel blocco ma non nelle puntate
     for i, match in enumerate(matches):
         if pagination and (pag - 1) * pagination > i: continue  # pagination
@@ -204,6 +221,9 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             season = scraped['season']
         if stagione:
             episode = season +'x'+ scraped['episode']
+        elif item.contentType == 'tvshow' and (scraped['episode'] == '' and season == ''):
+            item.news = 'season_completed'
+            episode = ''
         else:
             episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
 
@@ -216,11 +236,10 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
         # make formatted Title [longtitle]
         s = ' - '
-        title = episode + (s if episode and title else '') + title
+        title = episode + (s if episode and title else '') + title 
         longtitle = title + (s if title and title2 else '') + title2
         longtitle = typo(longtitle, 'bold')
-        longtitle += (typo(Type,'_ () bold') if Type else '') + (typo(quality, '_ [] color kod') if quality else '')
-
+        longtitle += typo(quality, '_ [] color kod') if quality else ''
 
         lang1, longtitle = scrapeLang(scraped, lang, longtitle)
 
@@ -275,10 +294,11 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 infoLabels=infolabels,
                 thumbnail=item.thumbnail if function == 'episodios' else scraped["thumb"] ,
                 args=item.args,
-                contentSerieName= title if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
-                contentTitle= title if item.contentType or CT == 'movie' else '',
+                contentSerieName= scraped['title'] if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
+                contentTitle= scraped['title'] if item.contentType or CT == 'movie' else '',
                 contentLanguage = lang1,
-                contentEpisodeNumber=episode if episode else ''
+                contentEpisodeNumber=episode if episode else '',
+                news= item.news if item.news else ''
             )
 
             for lg in list(set(listGroups).difference(known_keys)):
@@ -319,10 +339,10 @@ def scrape(func):
     # IMPORTANT 'type' is a special key, to work need typeContentDict={} and typeActionDict={}
 
     def wrapper(*args):
-        function = func.__name__
         itemlist = []
 
         args = func(*args)
+        function = func.__name__ if not 'actLike' in args else args['actLike']
         # log('STACK= ',inspect.stack()[1][3])
 
         item = args['item']
@@ -342,8 +362,8 @@ def scrape(func):
             headers = ''
         patronNext = args['patronNext'] if 'patronNext' in args else ''
         patronBlock = args['patronBlock'] if 'patronBlock' in args else ''
-        typeActionDict = args['type_action_dict'] if 'type_action_dict' in args else {}
-        typeContentDict = args['type_content_dict'] if 'type_content_dict' in args else {}
+        typeActionDict = args['typeActionDict'] if 'typeActionDict' in args else {}
+        typeContentDict = args['typeContentDict'] if 'typeContentDict' in args else {}
         debug = args['debug'] if 'debug' in args else False
         log('STACK= ', inspect.stack()[1][3])
         if 'pagination' in args and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']: pagination = args['pagination'] if args['pagination'] else 20
@@ -389,17 +409,18 @@ def scrape(func):
 
         # next page for pagination
         if pagination and len(matches) >= pag * pagination:
-            itemlist.append(
-                Item(channel=item.channel,
-                     action = item.action,
-                     contentType=item.contentType,
-                     title=typo(config.get_localized_string(30992), 'color kod bold'),
-                     fulltitle= item.fulltitle,
-                     show= item.show,
-                     url=item.url,
-                     args=item.args,
-                     page=pag + 1,
-                     thumbnail=thumb()))
+            if inspect.stack()[1][3] != 'get_newest':
+                itemlist.append(
+                    Item(channel=item.channel,
+                         action = item.action,
+                         contentType=item.contentType,
+                         title=typo(config.get_localized_string(30992), 'color kod bold'),
+                         fulltitle= item.fulltitle,
+                         show= item.show,
+                         url=item.url,
+                         args=item.args,
+                         page=pag + 1,
+                         thumbnail=thumb()))
 
         if action != 'play' and function != 'episodios' and 'patronMenu' not in args:
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
@@ -475,28 +496,30 @@ def dooplay_get_links(item, host):
 
 @scrape
 def dooplay_get_episodes(item):
-    item.contentType = "episode"
     patron = '<li class="mark-[0-9]+">.*?<img.*?(?:data-lazy-)?src="(?P<thumb>[^"]+).*?(?P<episode>[0-9]+ - [0-9]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+).*?(?P<year>[0-9]{4})'
-
-    def itemlistHook(itemlist):
-        return videolibrary(itemlist, item, function='episodios')
+    actLike = 'episodios'
 
     return locals()
 
 
 @scrape
-def dooplay_films(item, blacklist=""):
+def dooplay_peliculas(item, mixed=False, blacklist=""):
+    actLike = 'peliculas'
     if item.args == 'searchPage':
         return dooplay_search_vars(item, blacklist)
     else:
         if item.contentType == 'movie':
             action = 'findvideos'
-            patron = '<article id="post-[0-9]+" class="item movies">.*?<img src="(?!data)(?P<thumb>[^"]+)".*?<span class="quality">(?P<quality>[^<>]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></h3>.*?(?:<span>[^<>]*(?P<year>[0-9]{4})</span>|</article>).*?(?:<span>(?P<duration>[0-9]+) min</span>|</article>).*?(?:<div class="texto">(?P<plot>[^<>]+)|</article>).*?(?:genres">(?P<genre>.*?)</div>|</article>)'
+            patron = '<article id="post-[0-9]+" class="item movies">.*?<img src="(?!data)(?P<thumb>[^"]+)".*?<span class="quality">(?P<quality>[^<>]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></h3>.*?(?:<span>[^<>]*(?P<year>[0-9]{4})</span>|</article>)'
         else:
             action = 'episodios'
-            patron = '<article id="post-[0-9]+" class="item tvshows">.*?<img src="(?!data)(?P<thumb>[^"]+)".*?(?:<span class="quality">(?P<quality>[^<>]+))?.*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></h3>.*?(?:<span>(?P<year>[0-9]{4})</span>|</article>).*?(?:<div class="texto">(?P<plot>[^<>]+)|</article>).*?(?:genres">(?P<genre>.*?)</div>|</article>)'
+            patron = '<article id="post-[0-9]+" class="item (?P<type>' + ('\w+' if mixed else 'tvshows') + ')">.*?<img src="(?!data)(?P<thumb>[^"]+)".*?(?:<span class="quality">(?P<quality>[^<>]+))?.*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a></h3>.*?(?:<span>(?P<year>[0-9]{4})</span>|</article>).*?(?:<div class="texto">(?P<plot>[^<>]+)|</article>).*?(?:genres">(?P<genre>.*?)</div>|</article>)'
         patronNext = '<div class="pagination">.*?class="current".*?<a href="([^"]+)".*?<div class="resppages">'
         addVideolibrary = False
+
+        if mixed:
+            typeActionDict={'findvideos': ['movies'], 'episodios': ['tvshows']}
+            typeContentDict={'film': ['movies'], 'serie': ['tvshows']}
 
         return locals()
 
@@ -505,8 +528,13 @@ def dooplay_films(item, blacklist=""):
 def dooplay_search(item, blacklist=""):
     return dooplay_search_vars(item, blacklist)
 
+
 def dooplay_search_vars(item, blacklist):
-    if item.contentType == 'movie':
+    if item.contentType == 'list':  # ricerca globale
+        type = '(?P<type>movies|tvshows)'
+        typeActionDict = {'findvideos': ['movies'], 'episodios': ['tvshows']}
+        typeContentDict = {'movie': ['movies'], 'episode': ['tvshows']}
+    elif item.contentType == 'movie':
         type = 'movies'
         action = 'findvideos'
     else:
@@ -514,12 +542,13 @@ def dooplay_search_vars(item, blacklist):
         action = 'episodios'
     patron = '<div class="result-item">.*?<img src="(?P<thumb>[^"]+)".*?<span class="' + type + '">(?P<quality>[^<>]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a>.*?<span class="year">(?P<year>[0-9]{4}).*?<div class="contenido"><p>(?P<plot>[^<>]+)'
     patronNext = '<a class="arrow_pag" href="([^"]+)"><i id="nextpagination"'
-    def fullItemlistHook(itemlist):
-        # se è una next page
-        if itemlist[-1].title == typo(config.get_localized_string(30992), 'color kod bold'):
-            itemlist[-1].action = 'peliculas'
-            itemlist[-1].args = 'searchPage'
-        return itemlist
+
+    # def fullItemlistHook(itemlist):
+    #     # se è una next page
+    #     if itemlist[-1].title == typo(config.get_localized_string(30992), 'color kod bold'):
+    #         itemlist[-1].action = 'peliculas'
+    #         itemlist[-1].args = 'searchPage'
+    #     return itemlist
     return locals()
 
 def swzz_get_url(item):
@@ -747,6 +776,7 @@ def match(item, patron='', patronBlock='', headers='', url='', post=''):
 
     if patron:
         matches = scrapertoolsV2.find_multiple_matches(block, patron)
+        if not matches: matches = ['']
         log('MATCHES= ',matches)
 
     return matches, block
@@ -782,7 +812,8 @@ def download(itemlist, item, typography='', function_level=1, function=''):
                 url=item.url,
                 action='save_download',
                 from_action=from_action,
-                contentTitle=contentTitle
+                contentTitle=contentTitle,
+                path=item.path
             ))
         if from_action == 'episodios':
             itemlist.append(
@@ -827,7 +858,8 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
     contentTitle=item.contentTitle if item.contentTitle else ''
 
     if (function == 'findvideos' and contentType == 'movie') \
-        or (function == 'episodios' and contentType != 'movie'):
+        or (function == 'episodios' and contentType != 'movie') \
+        or function == 'get_seasons' and item.channel == 'community':
         if config.get_videolibrary_support() and len(itemlist) > 0:
             itemlist.append(
                 Item(channel=item.channel,
@@ -839,7 +871,8 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
                         url=item.url,
                         action=action,
                         extra=extra,
-                        contentTitle=contentTitle
+                        contentTitle=contentTitle,
+                        path=item.path
                         ))
 
     return itemlist
@@ -882,23 +915,33 @@ def pagination(itemlist, item, page, perpage, function_level=1):
 
 def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, down_load=True):
 
-    if not data:
+    if not data and not itemlist:
         data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
-
 
     itemList = servertools.find_video_items(data=str(data))
     itemlist = itemlist + itemList
 
+    verifiedItemlist = []
     for videoitem in itemlist:
+        if not videoitem.server:
+            findS = servertools.findvideos(videoitem.url)
+            if findS:
+                findS = findS[0]
+            else:
+                log(videoitem, 'Non supportato')
+                continue
+            videoitem.server = findS[2]
+            videoitem.title = findS[0]
         item.title = item.contentTitle if config.get_localized_string(30161) in item.title else item.title
-        videoitem.title = item.title + (typo(videoitem.title, '_ color kod []') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
+        videoitem.title = item.fulltitle + (typo(videoitem.title, '_ color kod []') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail
         videoitem.channel = item.channel
         videoitem.contentType = item.contentType
+        verifiedItemlist.append(videoitem)
 
-    return controls(itemlist, item, AutoPlay, CheckLinks, down_load)
+    return controls(verifiedItemlist, item, AutoPlay, CheckLinks, down_load)
 
 def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
     from core import jsontools

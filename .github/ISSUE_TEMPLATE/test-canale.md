@@ -45,7 +45,7 @@ Per aprirli non servono programmi particolari un semplice editor di testo è suf
 Occorrente: file .json
 
 **1. Indica la coerenza delle voci presenti in "language" con i contenuti presenti sul sito:**
-valori: ita, vosi (sub-ita)
+valori: ita, sub-ita (sub-ita)
 
 - [ ] coerenti
 - [ ] non coerenti
@@ -93,9 +93,9 @@ Cerca un titolo a caso in KOD e lo stesso titolo sul sito. Confronta i risultati
 - [ ] OK
 - indica il tipo di problema
 
-**Sezione FILM (se il sito non ha film elimina questa parte)
+**Sezione FILM (se il sito non ha film elimina questa parte)**
 
-**TestN.3: Pagina dei Titoli
+**TestN.3: Pagina dei Titoli**
 *Test da effettuare mentre sei dentro un menu del canale (film, serietv, in corso ecc..)*.
 Voci nel menu contestuale di KOD. Posizionati su di un titolo e controlla se hai le seguenti voci, nel menu contestuale (tasto c o tenendo enter premuto):
 
@@ -109,9 +109,9 @@ Voci nel menu contestuale di KOD. Posizionati su di un titolo e controlla se hai
 - [ ] Si
 - [ ] No
 
-**Fine test menu contestuale
+**Fine test menu contestuale**
 
-**Fondo pagina dei titoli
+**Fondo pagina dei titoli**
 
 **3. Paginazione, controlla ci sia la voce "Successivo" (se non c'è controlla sul sito se è presente)**
 
@@ -128,7 +128,7 @@ Voci nel menu contestuale di KOD. Posizionati su di un titolo e controlla se hai
 **5. Eventuali problemi riscontrati**
 - scrivi qui il problema/i 
 
-**Sezione Serie TV (se il sito non ha serietv elimina questa parte)
+**Sezione Serie TV (se il sito non ha serietv elimina questa parte)**
 
 Test da effettuare mentre sei nella pagina dei titoli.
 Per ogni titolo verifica ci siano le voci nel menu contestuale.
@@ -167,7 +167,7 @@ Cerca un titolo a caso in KOD e lo stesso titolo sul sito. Confronta i risultati
 **7. Eventuali problemi riscontrati**
 - scrivi qui il problema/i 
 
-**Sezione Anime (se il sito non ha anime elimina questa parte)
+**Sezione Anime (se il sito non ha anime elimina questa parte)**
 
 Test da effettuare mentre sei nella pagina dei titoli. Per ogni titolo verifica ci siano le voci nel menu contestuale.
 

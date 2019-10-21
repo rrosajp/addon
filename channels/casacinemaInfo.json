@@ -1,7 +1,7 @@
 {
     "id": "casacinemaInfo",
     "name": "La Casa del Cinema",
-    "language": ["ita", "vosi"],
+    "language": ["ita", "sub-ita"],
     "active": true,
     "adult": false,
     "thumbnail": "",

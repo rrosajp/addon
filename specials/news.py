@@ -46,7 +46,7 @@ def mainlist(item):
     list_canales, any_active = get_channels_list()
     channel_language = config.get_setting("channel_language", default="auto")
     if channel_language == 'auto':
-        channel_language = auto_filter()[0]
+        channel_language = auto_filter()
 
     #if list_canales['peliculas']:
     thumbnail = get_thumb("channels_movie.png")
@@ -134,7 +134,7 @@ def get_channels_list():
     channels_path = os.path.join(config.get_runtime_path(), "channels", '*.json')
     channel_language = config.get_setting("channel_language", default="all")
     if channel_language =="auto":
-        channel_language = auto_filter()[0]
+        channel_language = auto_filter()
 
     for infile in sorted(glob.glob(channels_path)):
         channel_id = os.path.basename(infile)[:-5]
@@ -393,13 +393,19 @@ def get_newest(channel_id, categoria):
 
 def get_title(item):
     support.log("ITEM NEWEST ->", item)
-    if item.contentSerieName:  # Si es una serie
+    # item.contentSerieName c'è anche se è un film
+    if item.contentSerieName and item.contentType != 'movie':  # Si es una serie
         title = item.contentSerieName
         #title = re.compile("\[.*?\]", re.DOTALL).sub("", item.contentSerieName)
         if not scrapertools.get_season_and_episode(title) and item.contentEpisodeNumber:
+            # contentSeason non c'è in support
             if not item.contentSeason:
                 item.contentSeason = '1'
-            title = "%s - %sx%s" % (title, item.contentSeason, str(item.contentEpisodeNumber).zfill(2))
+            title = "%sx%s - %s" % (item.contentSeason, str(item.contentEpisodeNumber).zfill(2), title)
+        else:
+            seas = scrapertools.get_season_and_episode(item.title)
+            if seas:
+                title = "%s - %s" % (seas, title)
 
     elif item.contentTitle:  # Si es una pelicula con el canal adaptado
         title = item.contentTitle
@@ -409,9 +415,10 @@ def get_title(item):
         title = item.title
 
     # Limpiamos el titulo de etiquetas de formato anteriores
-##    title = re.compile("\[/*COLO.*?\]", re.DOTALL).sub("", title)
-##    title = re.compile("\[/*B\]", re.DOTALL).sub("", title)
-##    title = re.compile("\[/*I\]", re.DOTALL).sub("", title)
+    title = re.compile("\[/*COLO.*?\]", re.DOTALL).sub("", title)
+    title = re.compile("\[/*B\]", re.DOTALL).sub("", title)
+    title = re.compile("\[/*I\]", re.DOTALL).sub("", title)
+
 
     title = '[B]'+title+'[/B]'
 
@@ -426,6 +433,10 @@ def get_title(item):
 
     if item.quality:
         title += support.typo(item.quality, '_ [] color kod')
+
+    season_ = support.typo(config.get_localized_string(70736), '_ [] color white bold') if (type(item.args) != bool and 'season_completed' in item.news) else ''
+    if season_:
+        title += season_
     return title
 
 
@@ -434,7 +445,7 @@ def no_group(list_result_canal):
     global channels_id_name
 
     for i in list_result_canal:
-        support.log("NO GROUP i -> ", i)
+        #support.log("NO GROUP i -> ", i)
         canale = channels_id_name[i.channel]
         canale = canale # per differenziarlo dal colore delle altre voci
         i.title = get_title(i) + " [" + canale + "]"
@@ -596,7 +607,7 @@ def setting_channel(item):
     channels_path = os.path.join(config.get_runtime_path(), "channels", '*.json')
     channel_language = config.get_setting("channel_language", default="auto")
     if channel_language == 'auto':
-        channel_language = auto_filter()[0]
+        channel_language = auto_filter()
 
 
     list_controls = []

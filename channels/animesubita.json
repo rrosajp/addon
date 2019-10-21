@@ -3,10 +3,10 @@
     "name": "AnimeSubIta",
     "active": true,
     "adult": false,
-    "language": ["vosi"],
+    "language": ["sub-ita"],
     "thumbnail": "animesubita.png",
     "bannermenu": "animesubita.png",
-    "categories": ["anime", "vosi", "movie"],
+    "categories": ["anime", "vos", "movie"],
     "settings": []
 }
 

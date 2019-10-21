@@ -1,11 +1,11 @@
 {
 	"id": "cineblog01",
 	"name": "CB01",
-	"language": ["ita"],
+	"language": ["ita", "sub-ita"],
 	"active": true,
 	"adult": false,
 	"thumbnail": "cb01.png",
 	"banner": "cb01.png",
-	"categories": ["tvshow", "movie", "vosi"],
+	"categories": ["tvshow", "movie", "vos"],
 	"settings": []
 }

@@ -18,7 +18,13 @@ headers = ""
 def findhost():
     global host, headers
     permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
-    host = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    if 'google' in permUrl['location']:
+        if host[:4] != 'http':
+            host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+        else:
+            host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    else:
+        host = permUrl['location']
     headers = [['Referer', host]]
 
 list_servers = ['verystream', 'openload', 'streamango', 'wstream']
@@ -72,7 +78,7 @@ def newest(categoria):
     else:
         patronBlock = r'Ultimi 100 film Aggiornati:(?P<block>.*?)<\/td>'
         item = categoria
-    patron = "<a href=(?P<url>[^>]+)>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N)\])?\s?(?:\[(?P<quality>HD|SD|HD/3D)\])?\s?\((?P<year>[0-9]{4})\)<\/a>"
+    patron = r'<a href="(?P<url>[^"]+)"\s*>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N)\])?\s?(?:\[(?P<quality>HD|SD|HD/3D)\])?\s?\((?P<year>[0-9]{4})\)<\/a>'
     pagination = 20
 
     return locals()
@@ -160,13 +166,13 @@ def findvideos(item):
         QualityStr = scrapertoolsV2.decodeHtmlentities(match.group(1))[6:]
 
     # Estrae i contenuti - Streaming
-    load_links(itemlist, '<strong>Streaming:</strong>(.*?)<tableclass=cbtable height=30>', "orange", "Streaming", "SD")
+    load_links(itemlist, '<strong>Streaming:</strong>(.*?)cbtable', "orange", "Streaming", "SD")
 
     # Estrae i contenuti - Streaming HD
-    load_links(itemlist, '<strong>Streaming HD[^<]+</strong>(.*?)<tableclass=cbtable height=30>', "yellow", "Streaming HD", "HD")
+    load_links(itemlist, '<strong>Streaming HD[^<]+</strong>(.*?)cbtable', "yellow", "Streaming HD", "HD")
 
     # Estrae i contenuti - Streaming 3D
-    load_links(itemlist, '<strong>Streaming 3D[^<]+</strong>(.*?)<tableclass=cbtable height=30>', "pink", "Streaming 3D")
+    load_links(itemlist, '<strong>Streaming 3D[^<]+</strong>(.*?)cbtable', "pink", "Streaming 3D")
 
     return support.server(item, itemlist=itemlist)
 
