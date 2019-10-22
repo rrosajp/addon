@@ -704,7 +704,7 @@ def typo(string, typography=''):
 
     kod_color = '0xFF65B3DA' #'0xFF0081C2'
 
-
+    string = str(string)
     # Check if the typographic attributes are in the string or outside
     if typography:
         string = string + ' ' + typography
@@ -1000,7 +1000,7 @@ def log(stringa1="", stringa2="", stringa3="", stringa4="", stringa5=""):
     frame = inspect.stack()[1]
     filename = frame[0].f_code.co_filename
     filename = os.path.basename(filename)
-    logger.info("[" + filename + "] - [" + inspect.stack()[1][3] + "] " + str(stringa1) + str(stringa2) + str(stringa3) + str(stringa4) + str(stringa5))
+    logger.info("[" + filename + "] - [" + inspect.stack()[1][3] + "] " + str(stringa1) + ( ' ' + str(stringa2) if stringa2 else '') + ( ' ' + str(stringa3) if stringa3 else '') + ( ' ' + str(stringa4) if stringa4 else '') + ( ' ' + str(stringa5) if stringa5 else '') )
 
 
 def channel_config(item, itemlist):

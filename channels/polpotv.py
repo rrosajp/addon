@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# kod  - XBMC Plugin
+# KoD - XBMC Plugin
 # Canale polpotv
 # ------------------------------------------------------------
 
-from platformcode import logger
-from core import scrapertools, httptools, support
+from core import scrapertools, httptools, support, jsontools
 from core.item import Item
 from platformcode import config
-from core import jsontools
-import json
-import datetime
+import json, datetime
 
 __channel__ = "polpotv"
 host = config.get_channel_url(__channel__)
@@ -25,12 +22,21 @@ def mainlist(item):
     menu = [
         ('Ultimi Film aggiunti', ['/api/movies?order[lastReleaseAt]=desc', 'peliculas', '']),
         ('Generi', ['/api/genres', 'search_movie_by_genre', '']),
-        ('Anni', ['', 'search_movie_by_year', '']),
+        ('Anni {film}', ['', 'search_movie_by_year', '']),
+        ('Cerca Film... bold', ['', 'search', ''])
     ]
     return locals()
 
+def newest(categoria):
+    support.log()
+    item = Item()
+    if categoria == 'peliculas':
+        item.contentType = 'movie'
+        item.url = host + '/api/movies?order[lastReleaseAt]=desc'
+    return peliculas(item)
+
 def peliculas(item):
-    logger.info("kod.polpotv peliculas")
+    support.log()
     itemlist = []
     data = httptools.downloadpage(item.url, headers=headers).data
     json_object = jsontools.load(data)
@@ -39,14 +45,15 @@ def peliculas(item):
         itemlist.extend(get_itemlist_movie(movie,item))
 
     try:
-        itemlist = support.nextPage(itemlist, item, next_page=json_object['hydra:view']['hydra:next'])
+        if support.inspect.stack()[1][3] not in ['newest']:
+            support.nextPage(itemlist, item, next_page=json_object['hydra:view']['hydra:next'])
     except:
         pass
-    
+
     return itemlist
-        
+
 def search(item, texto):
-    logger.info("kod.polpotv " + item.url + " search " + texto)
+    support.log(item.url, "search", texto)
     itemlist=[]
     try:
         item.url = host + "/api/movies?originalTitle="+texto+"&translations.name=" +texto
@@ -55,15 +62,15 @@ def search(item, texto):
         for movie in json_object['hydra:member']:
             itemlist.extend(get_itemlist_movie(movie,item))
         return itemlist
-    # Continua la ricerca in caso di errore 
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("%s" % line)
+            support.logger.error("%s" % line)
         return []
 
 def search_movie_by_genre(item):
-    logger.info("kod.polpotv search_movie_by_genre")
+    support.log()
     itemlist = []
     data = httptools.downloadpage(item.url, headers=headers).data
     json_object = jsontools.load(data)
@@ -71,14 +78,14 @@ def search_movie_by_genre(item):
         itemlist.append(
             Item(channel=item.channel,
              action="peliculas",
-             title="[COLOR azure]" + genre['name'] + "[/COLOR]",
+             title=support.typo(genre['name'],'bold'),
              contentType='movie',
              url="%s/api/movies?genres.id=%s" %(host,genre['id']),
              extra=item.extra))
-    return itemlist
+    return support.thumb(itemlist, True)
 
 def search_movie_by_year(item):
-    logger.info("kod.polpo.tv search_movie_by_year")
+    support.log()
     now = datetime.datetime.now()
     year = int(now.year)
     itemlist = []
@@ -88,12 +95,12 @@ def search_movie_by_year(item):
                            url="%s/api/movies?releaseDate=%s" %(host,year_to_search),
                            plot="1",
                            type="movie",
-                           title="[COLOR azure]%s[/COLOR]" % year_to_search,
+                           title=support.typo(year_to_search,'bold'),
                            action="peliculas"))
-    return itemlist 
-    
+    return itemlist
+
 def findvideos(item):
-    logger.info("kod.polpotv peliculas")
+    support.log()
     itemlist = []
     try:
         data = httptools.downloadpage(item.url, headers=headers).data
@@ -116,7 +123,7 @@ def findvideos(item):
     return support.server(item, itemlist=itemlist)
 
 def get_itemlist_movie(movie,item):
-    logger.info("kod.polpotv get_itemlist_movie")
+    support.log()
     itemlist=[]
     try:
         if movie['originalLanguage']['id']=='it':
@@ -144,7 +151,7 @@ def get_itemlist_movie(movie,item):
     itemlist.append(
         Item(channel=item.channel,
              action="findvideos",
-             title=scrapedtitle + " " + support.typo(movie['lastQuality'].upper(), '[] color kod'),
+             title=support.typo(scrapedtitle,'bold') + support.typo(movie['lastQuality'].upper(), '_ [] color kod bold'),
              fulltitle=scrapedtitle,
              show=scrapedtitle,
              plot=scrapedplot,

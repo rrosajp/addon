@@ -458,8 +458,7 @@ def get_server_parameters(server):
 
             # Imagenes: se admiten url y archivos locales dentro de "resources/images"
             if dict_server.get("thumbnail") and "://" not in dict_server["thumbnail"]:
-                dict_server["thumbnail"] = os.path.join(config.get_runtime_path(), "resources", "media",
-                                                        "servers", dict_server["thumbnail"])
+                dict_server["thumbnail"] = os.path.join("https://raw.githubusercontent.com/kodiondemand/media/master/resources/servers", dict_server["thumbnail"])
             for k in ['premium', 'id']:
                 dict_server[k] = dict_server.get(k, list())
 
