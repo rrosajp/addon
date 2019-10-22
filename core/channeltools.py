@@ -12,6 +12,8 @@ from platformcode import config, logger
 DEFAULT_UPDATE_URL = "/channels/"
 dict_channels_parameters = dict()
 
+remote_path = 'https://raw.githubusercontent.com/kodiondemand/media/master/'
+
 
 def is_adult(channel_name):
     logger.info("channel_name=" + channel_name)
@@ -56,14 +58,11 @@ def get_channel_parameters(channel_name):
 
                 # Imagenes: se admiten url y archivos locales dentro de "resources/images"
                 if channel_parameters.get("thumbnail") and "://" not in channel_parameters["thumbnail"]:
-                    channel_parameters["thumbnail"] = os.path.join(config.get_runtime_path(), "resources", "media",
-                                                                   "channels", "thumb", channel_parameters["thumbnail"])
+                    channel_parameters["thumbnail"] = os.path.join(remote_path, 'resources', "thumb", channel_parameters["thumbnail"])
                 if channel_parameters.get("banner") and "://" not in channel_parameters["banner"]:
-                    channel_parameters["banner"] = os.path.join(config.get_runtime_path(), "resources", "media",
-                                                                "channels", "banner", channel_parameters["banner"])
+                    channel_parameters["banner"] = os.path.join(remote_path, 'resources', "banner", channel_parameters["banner"])
                 if channel_parameters.get("fanart") and "://" not in channel_parameters["fanart"]:
-                    channel_parameters["fanart"] = os.path.join(config.get_runtime_path(), "resources", "media",
-                                                                "channels", "fanart", channel_parameters["fanart"])
+                    channel_parameters["fanart"] = os.path.join(remote_path, 'resources', "fanart", channel_parameters["fanart"])
 
                 # Obtenemos si el canal tiene opciones de configuración
                 channel_parameters["has_settings"] = False
