@@ -263,20 +263,15 @@ def get_thumb(thumb_name, view="thumb_", auto=False):
 
         thumb_name = unify.set_genre(unify.simplify(thumb_name))
 
-
         if thumb_name in thumb_dict:
             thumbnail = thumb_dict[thumb_name]
         return thumbnail
 
     else:
         icon_pack_name = config.get_setting('icon_set', default="default")
-        resource_path = os.path.join(config.get_runtime_path(), "resources", "media", "themes")
-        media_path = os.path.join(resource_path, icon_pack_name)
+        media_path = os.path.join("https://raw.githubusercontent.com/kodiondemand/media/master/themes/", icon_pack_name)
 
-        if os.path.isdir(media_path) == False:
-            media_path = os.path.join("https://raw.githubusercontent.com/kodiondemand/media/master/themes/", icon_pack_name)
-
-        elif config.get_setting('enable_custom_theme') and config.get_setting('custom_theme') and os.path.isfile(config.get_setting('custom_theme') + view + thumb_name):
+        if config.get_setting('enable_custom_theme') and config.get_setting('custom_theme') and os.path.isfile(config.get_setting('custom_theme') + view + thumb_name):
             media_path = config.get_setting('custom_theme')
 
         return os.path.join(media_path, view + thumb_name)
@@ -355,39 +350,39 @@ def thumb(itemlist=[], genre=False):
 
         icon_dict = {'channels_movie':['film'],
                      'channels_tvshow':['serie','tv','episodi','episodio'],
-                     'channels_documentary':['documentari','documentario'],
+                     'channels_documentary':['documentari','documentario', 'documentary'],
                      'channels_all':['tutti'],
                      'news':['novità', "novita'", 'aggiornamenti', 'nuovi', 'nuove'],
                      'now_playing':['cinema', 'in sala'],
                      'channels_anime':['anime'],
                      'genres':['genere', 'generi', 'categorie', 'categoria'],
-                     'channels_animation': ['animazione', 'cartoni', 'cartoon'],
-                     'channels_action':['azione', 'arti marziali'],
-                     'channels_adventure': ['avventura'],
+                     'channels_animation': ['animazione', 'cartoni', 'cartoon', 'animation'],
+                     'channels_action':['azione', 'arti marziali', 'action'],
+                     'channels_adventure': ['avventura', 'adventure'],
                      'channels_biographical':['biografico'],
-                     'channels_comedy':['comico','commedia', 'demenziale'],
+                     'channels_comedy':['comico','commedia', 'demenziale', 'comedy'],
                      'channels_adult':['erotico', 'hentai'],
                      'channels_drama':['drammatico', 'drama'],
-                     'channels_syfy':['fantascienza'],
+                     'channels_syfy':['fantascienza', 'science fiction'],
                      'channels_fantasy':['fantasy'],
-                     'channels_crime':['gangster','poliziesco'],
+                     'channels_crime':['gangster','poliziesco', 'crime'],
                      'channels_grotesque':['grottesco'],
-                     'channels_war':['guerra'],
+                     'channels_war':['guerra', 'war'],
                      'channels_children':['bambini', 'kids'],
                      'horror':['horror'],
                      'lucky': ['fortunato'],
-                     'channels_musical':['musical', 'musica'],
-                     'channels_mistery':['mistero', 'giallo'],
+                     'channels_musical':['musical', 'musica', 'music'],
+                     'channels_mistery':['mistero', 'giallo', 'mystery'],
                      'channels_noir':['noir'],
                      'popular' : ['popolari','popolare', 'più visti'],
-                     'channels_thriller':['thriller'],
+                     'thriller':['thriller'],
                      'top_rated' : ['fortunato', 'votati'],
                      'on_the_air' : ['corso', 'onda'],
                      'channels_western':['western'],
                      'channels_vos':['sub','sub-ita'],
-                     'channels_romance':['romantico','sentimentale'],
-                     'channels_family':['famiglia','famiglie'],
-                     'channels_historical':['storico'],
+                     'channels_romance':['romantico','sentimentale', 'romance'],
+                     'channels_family':['famiglia','famiglie', 'family'],
+                     'channels_historical':['storico', 'history'],
                      'autoplay':[config.get_localized_string(60071)]
                     }
 

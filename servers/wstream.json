@@ -8,11 +8,11 @@
         "patterns": [
             {
                 "pattern": "wstream\\.video/video\\.php\\?file_code=([a-z0-9A-Z]+)",
-                "url": "http:\/\/wstream.video\/videoj\/\\1"
+                "url": "http:\/\/wstream.video\/videok\/\\1"
             },
             {
                 "pattern": "wstream\\.video/(?:embed-|videos/|video/|videow/|videoj/)?([a-z0-9A-Z]+)",
-                "url": "http:\/\/wstream.video\/videoj\/\\1"
+                "url": "http:\/\/wstream.video\/videok\/\\1"
             }
         ],
         "ignore_urls": [        ]

@@ -75,14 +75,16 @@ def peliculas(item):
 
     def itemHook(item):
         if item.quality1:
-            item.title = item.title + support.typo(item.quality1, '_ [] color kod')
+            item.quality = item.quality1
+            item.title += support.typo(item.quality, '_ [] color kod')
         if item.lang2:
             item.contentLanguage = item.lang2
-            item.title = item.title + support.typo(item.lang2, '_ [] color kod')
-
+            item.title += support.typo(item.lang2, '_ [] color kod')
+        if item.args == 'novita':
+            item.title = item.title
         return item
 
-    #debug = True  # True per testare le regex sul sito
+##    debug = True  # True per testare le regex sul sito
     return locals()
 
 @support.scrape
@@ -95,7 +97,7 @@ def episodios(item):
     item.contentType = 'tvshow'
     blacklist = ['']
     patron = r'(?P<episode>\d+(?:&#215;|×)?\d+\-\d+|\d+(?:&#215;|×)\d+)[;]?(?:(?P<title>[^<]+)<(?P<url>.*?)|(\2[ ])(?:<(\3.*?)))(?:<br />|</p>)'
-    patronBlock = r'<strong>(?P<block>(?:.+?Stagione*.+?(?P<lang>ITA|Sub-ITA))?(?:.+?|</strong>)(/?:</span>)?</p>.*?</p>)'
+    patronBlock = r'<strong>(?P<block>(?:.+?Stagione*.+?(?P<lang>[Ii][Tt][Aa]|[Ss][Uu][Bb][\-]?[iI][tT][aA]))?(?:.+?|</strong>)(/?:</span>)?</p>.*?</p>)'
 
 ##    debug = True
     return locals()
@@ -172,6 +174,7 @@ def newest(categoria):
         if categoria == 'series':
             item.contentType = 'tvshow'
             item.url = host+'/aggiornamenti-serie-tv'
+            item.args = 'novita'
         else:
             item.contentType = 'movie'
             item.url = host+'/category/film'
