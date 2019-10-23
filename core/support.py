@@ -365,7 +365,6 @@ def scrape(func):
         typeActionDict = args['typeActionDict'] if 'typeActionDict' in args else {}
         typeContentDict = args['typeContentDict'] if 'typeContentDict' in args else {}
         debug = args['debug'] if 'debug' in args else False
-        log('STACK= ', inspect.stack()[1][3])
         if 'pagination' in args and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
         lang = args['deflang'] if 'deflang' in args else ''
@@ -404,8 +403,8 @@ def scrape(func):
         if 'itemlistHook' in args:
             itemlist = args['itemlistHook'](itemlist)
 
-        if patronNext:
-            nextPage(itemlist, item, data, patronNext, 2)
+        if patronNext and inspect.stack()[1][3] != 'newest':
+            nextPage(itemlist, item, data, patronNext, function)
 
         # next page for pagination
         if pagination and len(matches) >= pag * pagination:
@@ -877,9 +876,10 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
 
     return itemlist
 
-def nextPage(itemlist, item, data='', patron='', function_level=1, next_page='', resub=[]):
+def nextPage(itemlist, item, data='', patron='', function_or_level=1, next_page='', resub=[]):
     # Function_level is useful if the function is called by another function.
     # If the call is direct, leave it blank
+    action = inspect.stack()[function_or_level][3] if type(function_or_level) == int else function_or_level
     if next_page == '':
         next_page = scrapertoolsV2.find_single_match(data, patron)
 
@@ -891,7 +891,7 @@ def nextPage(itemlist, item, data='', patron='', function_level=1, next_page='',
         log('NEXT= ', next_page)
         itemlist.append(
             Item(channel=item.channel,
-                 action = item.action,
+                 action = action,
                  contentType=item.contentType,
                  title=typo(config.get_localized_string(30992), 'color kod bold'),
                  url=next_page,
