@@ -233,25 +233,25 @@ def get_default_settings(channel_name):
     # Apply default configurations if they do not exist
     for control in default_controls:
         if control['id'] not in str(channel_controls):
-            if 'include_in_newest' in control['id'] and 'include_in_newest' not in not_active:
+            if 'include_in_newest' in control['id'] and 'include_in_newest' not in not_active and control['id'] not in not_active:
                 label = control['id'].split('_')
                 label = label[-1]
                 if label == 'peliculas':
                     if 'movie' in categories:
                         control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30122)
-                        control['default'] = True if 'include_in_newest' not in default_off else False
+                        control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_peliculas' in default_off) else True
                         channel_controls.append(control)
                     else: pass
                 elif label == 'series':
                     if 'tvshow' in categories:
                         control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30123)
-                        control['default'] = True if 'include_in_newest' not in default_off else False
+                        control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_series' in default_off) else True
                         channel_controls.append(control)
                     else: pass
                 elif label == 'anime':
                     if 'anime' in categories:
                         control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30124)
-                        control['default'] = True if 'include_in_newest' not in default_off else False
+                        control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_anime' in default_off) else True
                         channel_controls.append(control)
                     else: pass
 
