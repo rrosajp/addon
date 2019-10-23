@@ -4,8 +4,8 @@
     "language": ["ita", "sub-ita"],
     "active": true,
     "adult": false,
-    "thumbnail": "",
-    "banner": "",
+    "thumbnail": "casacinemainfo.png",
+    "banner": "casacinemainfo.png",
     "categories": ["movie", "vos"],
     "settings": []
 }
