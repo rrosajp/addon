@@ -14,7 +14,7 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url).data
     if "Not Found" in data or "File was deleted" in data:
-        return False, "[wstream.py] El fichero no existe o ha sido borrado"
+        return False, "[wstream.py] Il File Non esiste"
     return True, ""
 
 # Returns an array of possible video url's from the page_url
@@ -23,7 +23,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     logger.info("[wstream.py] url=" + page_url)
     video_urls = []
 
-    data = httptools.downloadpage(page_url, headers=headers).data.replace('https', 'http')
+    data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True).data.replace('https','http')
     logger.info("[wstream.py] data=" + data)
     vid = scrapertools.find_multiple_matches(data, 'download_video.*?>.*?<.*?<td>([^\,,\s]+)')
     headers.append(['Referer', page_url])
@@ -51,9 +51,11 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
         return video_urls
     else:
-        page_urls = scrapertools.find_multiple_matches(data, '''<a href=(?:"|')([^"']+)(?:"|')>''')
-        if page_urls: page_url = page_urls[-1]
-        return get_video_url(page_url)
+        page_urls = scrapertools.find_multiple_matches(data, '''<a href=(?:"|')([^"']+)(?:"|')''')
+        for page_url in page_urls:
+            if '404 Not Found' not in httptools.downloadpage(page_url, headers=headers).data.replace('https', 'http'):
+                return get_video_url(page_url)
+
 
 
 def find_videos(data):
