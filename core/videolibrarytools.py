@@ -833,8 +833,8 @@ def add_tvshow(item, channel=None):
         #    del item.tmdb_stat          #Limpiamos el status para que no se grabe en la Videoteca
 
         # Obtiene el listado de episodios
-        if item.channel == 'community':
-            itemlist = getattr(channel, item.action)(item)
+        #if item.channel == 'community':
+        itemlist = getattr(channel, item.action)(item)
 
     insertados, sobreescritos, fallidos, path = save_tvshow(item, itemlist)
 
