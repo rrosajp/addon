@@ -398,8 +398,6 @@ def scrape(func):
             itemlist, matches = scrapeBlock(item, args, data, patron, headers, action, pagination, debug, typeContentDict,
                                    typeActionDict, blacklist, search, pag, function, lang)
 
-        checkHost(item, itemlist)
-
         if 'itemlistHook' in args:
             itemlist = args['itemlistHook'](itemlist)
 
@@ -448,21 +446,6 @@ def scrape(func):
         return itemlist
 
     return wrapper
-
-
-def checkHost(item, itemlist):
-    # nel caso non ci siano risultati puo essere che l'utente abbia cambiato manualmente l'host, pertanto lo riporta
-    # al valore di default (fixa anche il problema  del cambio di host da parte nostra)
-    if len(itemlist) == 0:
-        # trovo il valore di default
-        defHost = None
-        for s in channeltools.get_channel_json(item.channel)['settings']:
-            if s['id'] == 'channel_host':
-                defHost = s['default']
-                break
-        # lo confronto con quello attuale
-        if config.get_setting('channel_host', item.channel) != defHost:
-            config.set_setting('channel_host', defHost, item.channel)
 
 
 def dooplay_get_links(item, host):
