@@ -775,7 +775,6 @@ def match(item, patron='', patronBlock='', headers='', url='', post=''):
 
     if patron:
         matches = scrapertoolsV2.find_multiple_matches(block, patron)
-        if not matches: matches = ['']
         log('MATCHES= ',matches)
 
     return matches, block
