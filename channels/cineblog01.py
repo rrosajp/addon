@@ -33,11 +33,6 @@ list_quality = ['HD', 'SD', 'default']
 checklinks = config.get_setting('checklinks', 'cineblog01')
 checklinks_number = config.get_setting('checklinks_number', 'cineblog01')
 
-# esclusione degli articoli 'di servizio'
-blacklist = ['BENVENUTI', 'Richieste Serie TV', 'CB01.UNO &#x25b6; TROVA L&#8217;INDIRIZZO UFFICIALE ',
-             'Aggiornamento Quotidiano Serie TV', 'OSCAR 2019 ▶ CB01.UNO: Vota il tuo film preferito! 🎬',
-             'Openload: la situazione. Benvenuto Verystream', 'Openload: lo volete ancora?']
-
 
 @support.menu
 def mainlist(item):
@@ -46,12 +41,13 @@ def mainlist(item):
         ('HD', ['', 'menu', 'Film HD Streaming']),
         ('Generi', ['', 'menu', 'Film per Genere']),
         ('Anni', ['', 'menu', 'Film per Anno']),
-        ('Ultimi aggiornati', ['/lista-film-ultimi-100-film-aggiornati/', 'newest', 'aggiornati'])
+        ('Ultimi aggiunti', ['/lista-film-ultimi-100-film-aggiunti/', 'newest'])
     ]
     tvshow = ['/serietv/',
         ('Per Lettera', ['/serietv/', 'menu', 'Serie-Tv per Lettera']),
         ('Per Genere', ['/serietv/', 'menu', 'Serie-Tv per Genere']),
-        ('Per anno', ['/serietv/', 'menu', 'Serie-Tv per Anno'])
+        ('Per anno', ['/serietv/', 'menu', 'Serie-Tv per Anno']),
+        ('Aggiornamento quotidiano', ['/serietv/aggiornamento-quotidiano-serie-tv/', 'newest'])
     ]
 
     return locals()
@@ -70,16 +66,29 @@ def menu(item):
 @support.scrape
 def newest(categoria):
     findhost()
+    # debug = True
+    patron = r'<a href="?(?P<url>[^">]+)"?>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N|SUB-ITA)\])?\s*(?:\[(?P<quality>HD|SD|HD/3D)\])?\s*\((?P<year>[0-9]{4})\)<\/a>'
+
     if type(categoria) != Item:
         item = Item()
+    else:
+        item = categoria
+        categoria = 'series' if item.contentType != 'movie' else 'movie'
+    pagination = 20
+
+    if categoria == 'series':
+        item.contentType = 'tvshow'
+        action = 'episodios'
+        item.url = host + 'serietv/aggiornamento-quotidiano-serie-tv/'
+        patronBlock = r'<article class="sequex-post-content">(?P<block>.*?)</article>'
+        patron = '<a href="(?P<url>[^"]+)".*?>(?P<title>[^<([|]+).*?(?P<lang>ITA|SUB-ITA)?</a'
+    else:
         item.contentType = 'movie'
         item.url = host + '/lista-film-ultimi-100-film-aggiunti/'
         patronBlock = r'Ultimi 100 film aggiunti:(?P<block>.*?)<\/td>'
-    else:
-        patronBlock = r'Ultimi 100 film Aggiornati:(?P<block>.*?)<\/td>'
-        item = categoria
-    patron = r'<a href="(?P<url>[^"]+)"\s*>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N)\])?\s?(?:\[(?P<quality>HD|SD|HD/3D)\])?\s?\((?P<year>[0-9]{4})\)<\/a>'
-    pagination = 20
+    # else:
+    #     patronBlock = r'Ultimi 100 film Aggiornati:(?P<block>.*?)<\/td>'
+    #     item = categoria
 
     return locals()
 
@@ -101,6 +110,11 @@ def search(item, text):
 
 @support.scrape
 def peliculas(item):
+    # esclusione degli articoli 'di servizio'
+    blacklist = ['BENVENUTI', 'Richieste Serie TV', 'CB01.UNO &#x25b6; TROVA L&#8217;INDIRIZZO UFFICIALE ',
+                 'Aggiornamento Quotidiano Serie TV', 'OSCAR 2019 ▶ CB01.UNO: Vota il tuo film preferito! 🎬',
+                 'Openload: la situazione. Benvenuto Verystream', 'Openload: lo volete ancora?']
+
     if '/serietv/' not in item.url:
         patron = r'<div class="?card-image"?>.*?<img src="?(?P<thumb>[^" ]+)"? alt.*?<a href="?(?P<url>[^" >]+)(?:\/|")>(?P<title>[^<[(]+)(?:\[(?P<quality>[A-Za-z0-9/-]+)])? (?:\((?P<year>[0-9]{4})\))?.*?<strong>(?P<genre>[^<>&–]+).*?DURATA (?P<duration>[0-9]+).*?<br(?: /)?>(?P<plot>[^<>]+)'
         action = 'findvideos'
