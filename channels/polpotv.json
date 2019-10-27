@@ -4,28 +4,10 @@
 	"language": ["ita"],
 	"active": true,
 	"adult": false,
-<<<<<<< HEAD
-	"thumbnail": "https://polpo.tv/build/assets/apple-touch-icon-152x152.png",
-	"banner": "https://polpo.tv/build/assets/apple-touch-icon-152x152.png",
-	"categories": [
-	  "movie"
-	],
-    "settings": [
-        {
-            "id": "include_in_global_search",
-            "type": "bool",
-            "label": "Includi ricerca globale",
-            "default": false,
-            "enabled": false,
-            "visible": true
-        }
-    ]
-=======
 	"thumbnail": "polpotv.png",
 	"banner": "polpotv.png",
 	"categories": ["movie"],
 	"not_active":[],
 	"default_off":["include_in_newest"],
 	"settings": []
->>>>>>> 6bc4b7199c1eed191a4b9c8f1e066c368126c872
 }
