@@ -365,7 +365,6 @@ def scrape(func):
         typeActionDict = args['typeActionDict'] if 'typeActionDict' in args else {}
         typeContentDict = args['typeContentDict'] if 'typeContentDict' in args else {}
         debug = args['debug'] if 'debug' in args else False
-        log('STACK= ', inspect.stack()[1][3])
         if 'pagination' in args and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
         lang = args['deflang'] if 'deflang' in args else ''
@@ -399,13 +398,11 @@ def scrape(func):
             itemlist, matches = scrapeBlock(item, args, data, patron, headers, action, pagination, debug, typeContentDict,
                                    typeActionDict, blacklist, search, pag, function, lang)
 
-        checkHost(item, itemlist)
-
         if 'itemlistHook' in args:
             itemlist = args['itemlistHook'](itemlist)
 
-        if patronNext:
-            nextPage(itemlist, item, data, patronNext, 2)
+        if patronNext and inspect.stack()[1][3] != 'newest':
+            nextPage(itemlist, item, data, patronNext, function)
 
         # next page for pagination
         if pagination and len(matches) >= pag * pagination:
@@ -451,21 +448,6 @@ def scrape(func):
     return wrapper
 
 
-def checkHost(item, itemlist):
-    # nel caso non ci siano risultati puo essere che l'utente abbia cambiato manualmente l'host, pertanto lo riporta
-    # al valore di default (fixa anche il problema  del cambio di host da parte nostra)
-    if len(itemlist) == 0:
-        # trovo il valore di default
-        defHost = None
-        for s in channeltools.get_channel_json(item.channel)['settings']:
-            if s['id'] == 'channel_host':
-                defHost = s['default']
-                break
-        # lo confronto con quello attuale
-        if config.get_setting('channel_host', item.channel) != defHost:
-            config.set_setting('channel_host', defHost, item.channel)
-
-
 def dooplay_get_links(item, host):
     # get links from websites using dooplay theme and dooplay_player
     # return a list of dict containing these values: url, title and server
@@ -496,6 +478,7 @@ def dooplay_get_links(item, host):
 
 @scrape
 def dooplay_get_episodes(item):
+    item.contentType = 'tvshow'
     patron = '<li class="mark-[0-9]+">.*?<img.*?(?:data-lazy-)?src="(?P<thumb>[^"]+).*?(?P<episode>[0-9]+ - [0-9]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+).*?(?P<year>[0-9]{4})'
     actLike = 'episodios'
 
@@ -704,7 +687,7 @@ def typo(string, typography=''):
 
     kod_color = '0xFF65B3DA' #'0xFF0081C2'
 
-
+    string = str(string)
     # Check if the typographic attributes are in the string or outside
     if typography:
         string = string + ' ' + typography
@@ -776,7 +759,6 @@ def match(item, patron='', patronBlock='', headers='', url='', post=''):
 
     if patron:
         matches = scrapertoolsV2.find_multiple_matches(block, patron)
-        if not matches: matches = ['']
         log('MATCHES= ',matches)
 
     return matches, block
@@ -877,9 +859,10 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
 
     return itemlist
 
-def nextPage(itemlist, item, data='', patron='', function_level=1, next_page='', resub=[]):
+def nextPage(itemlist, item, data='', patron='', function_or_level=1, next_page='', resub=[]):
     # Function_level is useful if the function is called by another function.
     # If the call is direct, leave it blank
+    action = inspect.stack()[function_or_level][3] if type(function_or_level) == int else function_or_level
     if next_page == '':
         next_page = scrapertoolsV2.find_single_match(data, patron)
 
@@ -891,7 +874,7 @@ def nextPage(itemlist, item, data='', patron='', function_level=1, next_page='',
         log('NEXT= ', next_page)
         itemlist.append(
             Item(channel=item.channel,
-                 action = item.action,
+                 action = action,
                  contentType=item.contentType,
                  title=typo(config.get_localized_string(30992), 'color kod bold'),
                  url=next_page,
@@ -1000,7 +983,7 @@ def log(stringa1="", stringa2="", stringa3="", stringa4="", stringa5=""):
     frame = inspect.stack()[1]
     filename = frame[0].f_code.co_filename
     filename = os.path.basename(filename)
-    logger.info("[" + filename + "] - [" + inspect.stack()[1][3] + "] " + str(stringa1) + str(stringa2) + str(stringa3) + str(stringa4) + str(stringa5))
+    logger.info("[" + filename + "] - [" + inspect.stack()[1][3] + "] " + str(stringa1) + ( ' ' + str(stringa2) if stringa2 else '') + ( ' ' + str(stringa3) if stringa3 else '') + ( ' ' + str(stringa4) if stringa4 else '') + ( ' ' + str(stringa5) if stringa5 else '') )
 
 
 def channel_config(item, itemlist):

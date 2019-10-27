@@ -12,6 +12,8 @@ from platformcode import config, logger
 DEFAULT_UPDATE_URL = "/channels/"
 dict_channels_parameters = dict()
 
+remote_path = 'https://raw.githubusercontent.com/kodiondemand/media/master/'
+
 
 def is_adult(channel_name):
     logger.info("channel_name=" + channel_name)
@@ -56,14 +58,11 @@ def get_channel_parameters(channel_name):
 
                 # Imagenes: se admiten url y archivos locales dentro de "resources/images"
                 if channel_parameters.get("thumbnail") and "://" not in channel_parameters["thumbnail"]:
-                    channel_parameters["thumbnail"] = os.path.join(config.get_runtime_path(), "resources", "media",
-                                                                   "channels", "thumb", channel_parameters["thumbnail"])
+                    channel_parameters["thumbnail"] = os.path.join(remote_path, 'resources', "thumb", channel_parameters["thumbnail"])
                 if channel_parameters.get("banner") and "://" not in channel_parameters["banner"]:
-                    channel_parameters["banner"] = os.path.join(config.get_runtime_path(), "resources", "media",
-                                                                "channels", "banner", channel_parameters["banner"])
+                    channel_parameters["banner"] = os.path.join(remote_path, 'resources', "banner", channel_parameters["banner"])
                 if channel_parameters.get("fanart") and "://" not in channel_parameters["fanart"]:
-                    channel_parameters["fanart"] = os.path.join(config.get_runtime_path(), "resources", "media",
-                                                                "channels", "fanart", channel_parameters["fanart"])
+                    channel_parameters["fanart"] = os.path.join(remote_path, 'resources', "fanart", channel_parameters["fanart"])
 
                 # Obtenemos si el canal tiene opciones de configuración
                 channel_parameters["has_settings"] = False
@@ -234,25 +233,25 @@ def get_default_settings(channel_name):
     # Apply default configurations if they do not exist
     for control in default_controls:
         if control['id'] not in str(channel_controls):
-            if 'include_in_newest' in control['id'] and 'include_in_newest' not in not_active:
+            if 'include_in_newest' in control['id'] and 'include_in_newest' not in not_active and control['id'] not in not_active:
                 label = control['id'].split('_')
                 label = label[-1]
                 if label == 'peliculas':
                     if 'movie' in categories:
                         control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30122)
-                        control['default'] = True if 'include_in_newest' not in default_off else False
+                        control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_peliculas' in default_off) else True
                         channel_controls.append(control)
                     else: pass
                 elif label == 'series':
                     if 'tvshow' in categories:
                         control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30123)
-                        control['default'] = True if 'include_in_newest' not in default_off else False
+                        control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_series' in default_off) else True
                         channel_controls.append(control)
                     else: pass
                 elif label == 'anime':
                     if 'anime' in categories:
                         control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30124)
-                        control['default'] = True if 'include_in_newest' not in default_off else False
+                        control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_anime' in default_off) else True
                         channel_controls.append(control)
                     else: pass
 

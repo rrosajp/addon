@@ -23,7 +23,7 @@ headers = [['Referer', host]]
 @support.menu
 def mainlist(item):
     anime = ['/lista-anime/',
-             ('In Corso',['/lista-anime-in-corso/']),
+             ('In Corso',['/lista-anime-in-corso/', 'peliculas', 'corso']),
              ('Ultime Serie',['/category/anime/articoli-principali/','peliculas','last'])
             ]
     return locals()
@@ -50,9 +50,10 @@ def newest(categoria):
 
 @support.scrape
 def search(item, texto):
+    # debug = True
     search = texto
     item.contentType = 'tvshow'
-    patron = '<strong><a href="(?P<url>[^"]+)">(?P<title>.*?) [Ss][Uu][Bb]'
+    patron = r'<a href="(?P<url>[^"]+)">\s*<strong[^>]+>(?P<title>[^<]+)<'
     action = 'episodios'
     return locals()
 
@@ -63,9 +64,10 @@ def peliculas(item):
     action = 'episodios'
 
     if item.args == 'newest':
-        patron = r'src="(?P<thumb>[^"]+)" class="attachment-grid-post[^"]+" alt="[^"]*" title="(?P<title>[^"]+").*?<h2><a href="(?P<url>[^"]+)"'
-        def itemHook(item):
-            item.url = support.match(item, '<a href="([^"]+)" class="btn', headers=headers)[0][0]
+        patron = r'<a href="(?P<url>[^"]+)">\s*<img src="(?P<thumb>[^"]+)" alt="(?P<title>.*?)(?: Sub| sub| SUB|")'
+        def itemHook(item):            
+            url = support.match(item, '<a href="([^"]+)" title="[^"]+" target="[^"]+" class="btn', headers=headers)[0]
+            item.url = url[0] if url else ''
             delete = support.scrapertoolsV2.find_single_match(item.fulltitle, r'( Episodi.*)')
             number = support.scrapertoolsV2.find_single_match(item.title, r'Episodi(?:o)? (?:\d+÷)?(\d+)')
             item.title = support.typo(number + ' - ','bold') + item.title.replace(delete,'')
@@ -75,11 +77,13 @@ def peliculas(item):
         action = 'findvideos'
 
     elif item.args == 'last':
-        patron = r'src="(?P<thumb>[^"]+)" class="attachment-grid-post[^"]+" alt="[^"]*" title="(?P<title>.*?)(?: Sub| sub| SUB|").*?<h2><a href="(?P<url>[^"]+)"'
+        patron = r'<a href="(?P<url>[^"]+)">\s*<img src="(?P<thumb>[^"]+)" alt="(?P<title>.*?)(?: Sub| sub| SUB|")'
 
-    else:
+    elif item.args == 'corso':
         pagination = ''
         patron = r'<strong><a href="(?P<url>[^"]+)">(?P<title>.*?) [Ss][Uu][Bb]'
+    else:
+        patron = r'<a href="(?P<url>[^"]+)">\s*<strong[^>]+>(?P<title>[^<]+)<'
 
     return locals()
 
@@ -101,7 +105,10 @@ def findvideos(item):
     itemlist = []
 
     if item.number:
-        item.url = support.match(item, r'<a href="([^"]+)"[^>]*>', patronBlock=r'Episodio %s(.*?)</tr>' % item.number)[0][0]
+        from lib import unshortenit
+        url, c = unshortenit.unshorten(item.url)
+        url = support.match(item, r'<a href="([^"]+)"[^>]*>', patronBlock=r'Episodio %s(.*?)</tr>' % item.number ,url=url)[0]
+        item.url = url[0] if url else ''
 
     if 'http' not in item.url:
         if '//' in item.url[:2]:

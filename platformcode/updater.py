@@ -210,8 +210,13 @@ def apply_patch(s,patch,revert=False):
 
 
 def getSha(path):
-    f = open(path).read()
-    return githash.blob_hash(path, len(f)).hexdigest()
+    try:
+        f = open(path, 'rb')
+    except:
+        return ''
+    size = len(f.read())
+    f.seek(0)
+    return githash.blob_hash(f, size).hexdigest()
 
 def getShaStr(str):
     return githash.blob_hash(StringIO(str), len(str)).hexdigest()

@@ -219,7 +219,7 @@ Occorrente: Browser, KOD! e il file canale.py ( da browser o da file )
 Avviso:
 - Sul Browser disattiva eventuali componenti aggiuntivi che bloccano i JS (javascript), li riattivi alla fine del test.
 
-Entra in ogni menu e controlla che i risultati siano gli stessi che trovi sul sito, comprese le varie info (ita/sub-ita, qualità ecc..), inoltre entra, se ci sono, nei menu dei generi - anni - lettera, verifica che cliccando su una voce si visualizzino i titoli.
+Entra in ogni menu e controlla che i risultati, delle prime 5-6 pagine, siano gli stessi che trovi sul sito, comprese le varie info (ita/sub-ita, qualità ecc..), inoltre entra, se ci sono, nei menu dei generi - anni - lettera, verifica che cliccando su una voce si visualizzino i titoli.
 
   *Copia questa sezione per ogni voce che presenta problemi:*
 
