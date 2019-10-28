@@ -4,14 +4,17 @@
 # by Greko
 # ------------------------------------------------------------
 """
-    Problemi noti:
-        - Alcune sezioni di anime-cartoni non vanno, alcune hanno solo la lista degli episodi, ma non hanno link,
-          altre cambiano la struttura
+    Problemi noti da non considerare come errori nel test:
+        - Alcune sezioni di anime-cartoni non vanno:
+            - alcune hanno solo la lista degli episodi, ma non hanno link!
+
+    Novità(globale):
+       - serie, anime
 """
 import re
 from core import scrapertoolsV2, httptools, support
 from core.item import Item
-from platformcode import logger, config
+from platformcode import config
 
 #impostati dinamicamente da findhost()
 host = ""
@@ -32,11 +35,18 @@ list_quality = ['default']
 def mainlist(item):
     support.log()
 
-    tvshow = [
-        ('Archivio ', ['/category/serie-tv-archive/', 'peliculas', '', 'tvshow']),
-        ('Aggiornamenti ', ['/aggiornamento-episodi/', 'peliculas', True, 'tvshow'])
+    tvshow = [''
         ]
-    anime = ['/category/anime-cartoni-animati/']
+
+    anime = ['/category/anime-cartoni-animati/'
+        ]
+
+    mix = [
+        (support.typo('Aggiornamenti Serie-Anime', 'bullet bold'), ['/aggiornamento-episodi/', 'peliculas', 'newest']),
+        (support.typo('Archivio Serie-Anime', 'bullet bold'), ['/category/serie-tv-archive/', 'peliculas'])
+        ]
+    search = ''
+
     return locals()
 
 
@@ -45,25 +55,14 @@ def peliculas(item):
     support.log()
 
     action = 'episodios'
-
-    if item.args == True:
-        patron = r'<span class="serieTitle" style="font-size:20px">(?P<title>.*?)'\
-                 '.[^–][\s]?<a href="(?P<url>[^"]+)"\s+target="_blank">'\
-                 '(?P<episode>\d+x\d+-\d+|\d+x\d+) (?P<title2>.*?)[ ]?'\
-                 '(?:|\((?P<lang>SUB ITA)\))?</a>'
-##        # permette di vedere episodio e titolo + titolo2 in novità
-##        # se attivo questo da problemi nell'aggiunta alla videoteca
-##        def itemHook(item):
-##            item.show = item.episode + item.title
-##            return item
-
+    if item.args == 'newest':
+        #patron = r'<span class="serieTitle" style="font-size:20px">(?P<title>.*?).[^–][\s]?<a href="(?P<url>[^"]+)"\s+target="_blank">(?P<episode>\d+x\d+-\d+|\d+x\d+) (?P<title2>.*?)[ ]?(?:|\((?P<lang>SUB ITA)\))?</a>'
+        patron = r'<span class="serieTitle" style="font-size:20px">(?P<title>.*?).[^â][\s]?<a href="(?P<url>[^"]+)"\s+target="_blank">(?:<episode>\d+x\d+-\d+|\d+x\d+) .*?[ ]?\(?(?P<lang>SUB ITA)?\)?</a>'
     else:
-        patron = r'<div class="post-thumb">.*?\s<img src="(?P<thumb>[^"]+)".*?>'\
-                 '<a href="(?P<url>[^"]+)".*?>(?P<title>.*?(?:\((?P<year>\d{4})\)'\
-                 '|(\4\d{4}))?)<\/a><\/h2>'
-
+        patron = r'<div class="post-thumb">.*?\s<img src="(?P<thumb>[^"]+)".*?><a href="(?P<url>[^"]+)"[^>]+>(?P<title>.+?)\s?(?: Serie Tv)?\s?\(?(?P<year>\d{4})?\)?<\/a><\/h2>'
         patronNext='a class="next page-numbers" href="?([^>"]+)">Avanti &raquo;</a>'
-##    debug = True
+
+    #debug = True
     return locals()
 
 @support.scrape
@@ -73,32 +72,33 @@ def episodios(item):
     action = 'findvideos'
     item.contentType = 'tvshow'
     # Carica la pagina
-    data = httptools.downloadpage(item.url, headers=headers).data.replace("'", '"')
+    data = pagina(item.url)
+    data = re.sub('\n|\t', ' ', data)
+    patronBlock = r'(?P<block>STAGIONE\s\d+ (?:\()?(?P<lang>ITA|SUB ITA)(?:\))?.*?)</div></div>'
+    patron = r'(?:\s|\Wn)?(?:<strong>|)?(?P<episode>\d+&#\d+;\d+-\d+|\d+&#\d+;\d+)(?:</strong>|)?(?P<title>.+?)(?:–|-.+?-|â.+?â|â|.)?<a (?P<url>.*?)<br />'
 
+    return locals()
+
+def pagina(url):
+    support.log(url)
+
+    data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
+    #support.log("DATA ----###----> ", data)
+##    if 'class="menu-item menu-item-type-taxonomy menu-item-object-category '\
+##       'current-post-ancestor current-menu-parent current-post-parent menu-item-4529"' in data.lower():
+##        item.args = 'anime'
     if 'clicca qui per aprire' in data.lower():
-        item.url = scrapertoolsV2.find_single_match(data, '"go_to":"([^"]+)"')
-        item.url = item.url.replace("\\","")
+        url = scrapertoolsV2.find_single_match(data, '"go_to":"([^"]+)"')
+        url = url.replace("\\","")
         # Carica la pagina
-        data = httptools.downloadpage(item.url, headers=headers).data.replace("'", '"')
+        data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
 
     elif 'clicca qui</span>' in data.lower():
         item.url = scrapertoolsV2.find_single_match(data, '<h2 style="text-align: center;"><a href="([^"]+)">')
         # Carica la pagina
-        data = httptools.downloadpage(item.url, headers=headers).data.replace("'", '"')
+        data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
 
-    data = re.sub('\n|\t', ' ', data)
-    patronBlock = r'(?P<block>STAGIONE\s\d+ (?:\()?(?P<lang>ITA|SUB ITA)(?:\))?.*?)</div></div>'
-    patron = r'(?:\s|\Wn)?(?:<strong>|)?(?P<episode>\d+&#\d+;\d+-\d+|\d+&#\d+;\d+)'\
-             '(?:</strong>|)?(?P<title>.+?)(?:–|-.+?-|â.+?â|â|.)?<a (?P<url>.*?)<br />'
-
-##    debug = True
-    return locals()
-
-# ===========  def findvideos  =============
-
-def findvideos(item):
-    support.log('findvideos', item)
-    return support.server(item, item.url)
+    return data
 
 # ===========  def ricerca  =============
 def search(item, texto):
@@ -113,29 +113,31 @@ def search(item, texto):
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("%s" % line)
+            support.log(line)
         return []
 
 # ===========  def novità in ricerca globale  =============
+
 def newest(categoria):
     support.log()
     itemlist = []
     item = Item()
     item.contentType = 'tvshow'
-    item.args = True
+    item.args = 'newest'
     try:
         item.url = "%s/aggiornamento-episodi/" % host
         item.action = "peliculas"
         itemlist = peliculas(item)
-
-        if itemlist[-1].action == "peliculas":
-            itemlist.pop()
-
     # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("{0}".format(line))
+            support.log("{0}".format(line))
         return []
 
     return itemlist
+
+# ===========  def findvideos  =============
+def findvideos(item):
+    support.log('findvideos', item)
+    return support.server(item, item.url)
