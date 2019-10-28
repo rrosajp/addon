@@ -15,7 +15,7 @@ headers = [['User-Agent', 'Mozilla/50.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/
 list_servers = ['verystream','openload','rapidvideo','streamango']
 list_quality = ['default']
 
-                                       
+
 @support.menu
 def mainlist(item):
 
@@ -24,7 +24,7 @@ def mainlist(item):
         ('ITA', ['/category/anime-ita/', 'peliculas']),
         ('SUB-ITA', ['/category/anime-sub-ita/', 'peliculas']),
         ('Conclusi', ['/category/serie-anime-concluse/', 'peliculas']),
-        ('in Corso', ['/category/serie-anime-in-corso/', 'last_ep']),
+        ('in Corso', ['/category/serie-anime-in-corso/', 'peliculas']),
         ('Genere', ['', 'genres'])
     ]
 
@@ -33,7 +33,7 @@ def mainlist(item):
 
 def search(item, texto):
     support.log(texto)
-    
+
     item.url = host + "/?s=" + texto
     try:
         return peliculas(item)
@@ -76,7 +76,8 @@ def peliculas(item):
 @support.scrape
 def episodios(item):
     data = support.match(item, headers=headers)[1]
-    if 'Lista Episodi' not in data:
+    if not any(x in data for x in ['Lista Episodi', 'Movie Parte']):
+        support.log('NOT IN DATA')
         patron = r'(?:iframe src|str)="(?P<url>[^"]+)"'
         title = item.title
         def fullItemlistHook(itemlist):
@@ -94,11 +95,15 @@ def episodios(item):
         url = item.url
         anime = True
         patronBlock = r'(?:<p style="text-align: left;">|<div class="pagination clearfix">\s*)(?P<block>.*?)</span></a></div>'
-        patron = r'(?:<a href="(?P<url>[^"]+)"[^>]+>)?<span class="pagelink">(?P<episode>\d+)</span>'
+        patron = r'(?:<a href="(?P<url>[^"]+)"[^>]+>)?<span class="pagelink">(?P<episode>\d+)'
         def itemHook(item):
             if not item.url:
                 item.url = url
-            item.title = support.typo('Episodio ', 'bold') + item.title
+            if 'Movie Parte' in data:
+                item.title = support.typo(item.fulltitle + ' - Part ','bold') + item.title
+                item.contentType = 'movie'
+            else:
+                item.title = support.typo('Episodio ', 'bold') + item.title
             return item
     return locals()
 

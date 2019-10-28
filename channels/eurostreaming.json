@@ -3,7 +3,7 @@
     "name": "Eurostreaming",
     "active": true,
     "adult": false,
-    "language": ["ita","vos"],
+    "language": ["ita","sub-ita"],
     "thumbnail": "eurostreaming.png",
     "banner": "eurostreaming.png",
     "categories": ["tvshow","anime","vos"],
