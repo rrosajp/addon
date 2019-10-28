@@ -17,8 +17,8 @@ list_quality = ['default', '480p', '720p', '1080p']
 
 @support.menu
 def mainlist(item):
-    
-    anime = ['/animelist?load_all=1',    
+
+    anime = ['/animelist?load_all=1',
              ('Più Votati',['/toplist','menu', 'top']),
              ('In Corso',['/animeincorso','peliculas','incorso']),
              ('Ultimi Episodi',['/fetch_pages.php?request=episodes','peliculas','updated'])]
@@ -32,7 +32,7 @@ def search(item, texto):
     item.contentType = 'tvshow'
     anime = True
     patron = r'href="(?P<url>[^"]+)"[^>]+>[^>]+>(?P<title>[^<|(]+)(?:(?P<lang>\(([^\)]+)\)))?<|\)'
-    action = 'check'    
+    action = 'check'
     return locals()
 
 
@@ -45,7 +45,7 @@ def newest(categoria):
             item.url = host + '/fetch_pages.php?request=episodes'
             item.args = "updated"
             return peliculas(item)
-    # Continua la ricerca in caso di errore 
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
@@ -64,6 +64,7 @@ def menu(item):
 @support.scrape
 def peliculas(item):
     anime = True
+    # debug = True
     if item.args == 'updated':
         post = "page=" + str(item.page if item.page else 1) if item.page > 1 else None
         page, data = support.match(item, r'data-page="(\d+)" title="Next">', post=post, headers=headers)
@@ -72,19 +73,19 @@ def peliculas(item):
         action = 'findvideos'
     elif item.args == 'top':
         data = item.url
-        patron = r'<a href="(?P<url>[^"]+)">[^>]+>(?P<title>[^<\(]+)(?:\((?P<year>[^\)]+)\))?</div></a><div class="numero">(?P<title2>[^<]+)</div>.*?src="(?P<thumb>[^"]+)"' 
+        patron = r'<a href="(?P<url>[^"]+)">[^>]+>(?P<title>[^<\(]+)(?:\((?P<year>[^\)]+)\))?</div></a><div class="numero">(?P<title2>[^<]+)</div>.*?src="(?P<thumb>[^"]+)"'
         action = 'check'
     else:
         pagination = ''
-        if item.args == 'incorso': patron = r'"slider_title" href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)"[^>]+>(?P<title>[^\(<]+)(?:\((?P<year>\d+)\))?</a>' 
-        else: patron = r'href="(?P<url>[^"]+)"[^>]+>[^>]+>(?P<title>[^<|(]+)(?:(?P<lang>\(([^\)]+)\)))?<|\)'
+        if item.args == 'incorso': patron = r'"slider_title" href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)"[^>]+>(?P<title>[^\(<]+)(?:\((?P<year>\d+)\))?</a>'
+        else: patron = r'href="(?P<url>[^"]+)"[^>]+>[^>]+>(?P<title>.+?)(?:\((?P<lang>ITA)\))?(?:(?P<year>\((\d+)\)))?</span>'
         action = 'check'
     return locals()
 
 
 def check(item):
     movie, data = support.match(item, r'Episodi:</b> (\d*) Movie')
-    anime_id = support.match(data, r'anime_id=(\d+)')[0][0]    
+    anime_id = support.match(data, r'anime_id=(\d+)')[0][0]
     item.url = host + "/loading_anime?anime_id=" + anime_id
     if movie:
         item.contentType = 'movie'
