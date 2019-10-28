@@ -426,7 +426,7 @@ def scrape(func):
         if anime:
             if function == 'episodios' or item.action == 'episodios': autorenumber.renumber(itemlist, item, 'bold')
             else: autorenumber.renumber(itemlist)
-        if anime and autorenumber.check(item) == False:
+        if anime and autorenumber.check(item) == False and not scrapertoolsV2.find_single_match(itemlist[0].title, r'(\d+.\d+)'):
             pass
         else:
             if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
