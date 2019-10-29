@@ -64,16 +64,17 @@ def menu(item):
 @support.scrape
 def peliculas(item):
     anime = True
-    # debug = True
+    deflang= 'Sub-ITA'
     if item.args == 'updated':
         post = "page=" + str(item.page if item.page else 1) if item.page > 1 else None
         page, data = support.match(item, r'data-page="(\d+)" title="Next">', post=post, headers=headers)
         patron = r'<img alt="[^"]+" src="(?P<thumb>[^"]+)" [^>]+></div></a>\s*<a href="(?P<url>[^"]+)"><div class="testo">(?P<title>[^\(<]+)(?:(?P<lang>\(([^\)]+)\)))?</div></a>\s*<a href="[^"]+"><div class="testo2">[^\d]+(?P<episode>\d+)</div></a>'
         if page: nextpage = page
+        item.contentType='episode'
         action = 'findvideos'
     elif item.args == 'top':
         data = item.url
-        patron = r'<a href="(?P<url>[^"]+)">[^>]+>(?P<title>[^<\(]+)(?:\((?P<year>[^\)]+)\))?</div></a><div class="numero">(?P<title2>[^<]+)</div>.*?src="(?P<thumb>[^"]+)"'
+        patron = r'<a href="(?P<url>[^"]+)">[^>]+>(?P<title>[^<\(]+)(?:\((?P<year>[0-9]+)\))?(?:\((?P<lang>[A-Za-z]+)\))?</div></a><div class="numero">(?P<title2>[^<]+)</div>.*?src="(?P<thumb>[^"]+)"'
         action = 'check'
     else:
         pagination = ''
