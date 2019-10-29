@@ -434,7 +434,7 @@ def get_title(item):
     if item.quality:
         title += support.typo(item.quality, '_ [] color kod')
 
-    season_ = support.typo(config.get_localized_string(70736), '_ [] color white bold') if (type(item.args) != bool and 'season_completed' in item.news) else ''
+    season_ = support.typo(config.get_localized_string(70736), '_ [] color white bold') if (type(item.args) != bool and 'season_completed' in item.news and not item.episode) else ''
     if season_:
         title += season_
     return title
