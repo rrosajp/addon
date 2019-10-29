@@ -516,7 +516,7 @@ def dooplay_search_vars(item, blacklist):
     if item.contentType == 'list':  # ricerca globale
         type = '(?P<type>movies|tvshows)'
         typeActionDict = {'findvideos': ['movies'], 'episodios': ['tvshows']}
-        typeContentDict = {'movie': ['movies'], 'episode': ['tvshows']}
+        typeContentDict = {'movie': ['movies'], 'tvshow': ['tvshows']}
     elif item.contentType == 'movie':
         type = 'movies'
         action = 'findvideos'
@@ -526,12 +526,6 @@ def dooplay_search_vars(item, blacklist):
     patron = '<div class="result-item">.*?<img src="(?P<thumb>[^"]+)".*?<span class="' + type + '">(?P<quality>[^<>]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a>.*?<span class="year">(?P<year>[0-9]{4}).*?<div class="contenido"><p>(?P<plot>[^<>]+)'
     patronNext = '<a class="arrow_pag" href="([^"]+)"><i id="nextpagination"'
 
-    # def fullItemlistHook(itemlist):
-    #     # se è una next page
-    #     if itemlist[-1].title == typo(config.get_localized_string(30992), 'color kod bold'):
-    #         itemlist[-1].action = 'peliculas'
-    #         itemlist[-1].args = 'searchPage'
-    #     return itemlist
     return locals()
 
 def swzz_get_url(item):
