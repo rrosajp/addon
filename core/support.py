@@ -400,12 +400,13 @@ def scrape(func):
 
         if 'itemlistHook' in args:
             itemlist = args['itemlistHook'](itemlist)
-
-        if patronNext and inspect.stack()[1][3] != 'newest':
-            nextPage(itemlist, item, data, patronNext, function)
+        
+        if (pagination and len(matches) <= pag * pagination) or not pagination: # next page with pagination
+            if patronNext and inspect.stack()[1][3] != 'newest':
+                nextPage(itemlist, item, data, patronNext, function)
 
         # next page for pagination
-        if pagination and len(matches) >= pag * pagination:
+        if pagination and len(matches) > pag * pagination and not search:
             if inspect.stack()[1][3] != 'get_newest':
                 itemlist.append(
                     Item(channel=item.channel,
