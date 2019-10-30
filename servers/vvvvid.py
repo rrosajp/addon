@@ -22,6 +22,11 @@ def test_video_exists(page_url):
     data = httptools.downloadpage(page_url).data
     if "Not Found" in data or "File was deleted" in data:
         return False, "[VVVVID] The file does not exist or has been deleted"
+    else:
+        page_url = page_url.replace("/show/","/#!show/")
+        show_id = re.findall("#!show/([0-9]+)/", page_url)[0]
+        name = re.findall(show_id + "/(.+?)/", page_url)
+        if not name: return False, "[VVVVID] The file does not exist or has been deleted"
     return True, ""
 
 

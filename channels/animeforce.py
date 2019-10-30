@@ -11,11 +11,9 @@ host = support.config.get_channel_url(__channel__)
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
-list_servers = ['directo', 'openload']
+list_servers = ['directo', 'openload', 'vvvvid']
 list_quality = ['default']
 
-checklinks = support.config.get_setting('checklinks', __channel__)
-checklinks_number = support.config.get_setting('checklinks_number', __channel__)
 
 headers = [['Referer', host]]
 
@@ -38,7 +36,7 @@ def newest(categoria):
             item.contentType = 'tvshow'
             item.url = host
             item.args = 'newest'
-            itemlist = peliculas(item)
+            return peliculas(item)
     # Continua la ricerca in caso di errore
     except:
         import sys
@@ -65,15 +63,6 @@ def peliculas(item):
 
     if item.args == 'newest':
         patron = r'<a href="(?P<url>[^"]+)">\s*<img src="(?P<thumb>[^"]+)" alt="(?P<title>.*?)(?: Sub| sub| SUB|")'
-        def itemHook(item):            
-            url = support.match(item, '<a href="([^"]+)" title="[^"]+" target="[^"]+" class="btn', headers=headers)[0]
-            item.url = url[0] if url else ''
-            delete = support.scrapertoolsV2.find_single_match(item.fulltitle, r'( Episodi.*)')
-            number = support.scrapertoolsV2.find_single_match(item.title, r'Episodi(?:o)? (?:\d+÷)?(\d+)')
-            item.title = support.typo(number + ' - ','bold') + item.title.replace(delete,'')
-            item.fulltitle = item.show = item.title.replace(delete,'')
-            item.number = number
-            return item
         action = 'findvideos'
 
     elif item.args == 'last':
@@ -83,7 +72,22 @@ def peliculas(item):
         pagination = ''
         patron = r'<strong><a href="(?P<url>[^"]+)">(?P<title>.*?) [Ss][Uu][Bb]'
     else:
+        pagination = ''
         patron = r'<a href="(?P<url>[^"]+)">\s*<strong[^>]+>(?P<title>[^<]+)<'
+
+    def itemHook(item):
+        if 'sub-ita' in item.url:
+            if item.args != 'newest': item.title = item.title + support.typo('Sub-ITA','_ [] color kod')
+            item.contentLanguage = 'Sub-ITA'
+        if item.args == 'newest':
+            url = support.match(item, '<a href="([^"]+)" title="[^"]+" target="[^"]+" class="btn', headers=headers)[0]
+            item.url = url[0] if url else ''
+            delete = support.scrapertoolsV2.find_single_match(item.fulltitle, r'( Episodi.*)')
+            episode = support.scrapertoolsV2.find_single_match(item.title, r'Episodi(?:o)? (?:\d+÷)?(\d+)')
+            item.title = support.typo(episode + ' - ','bold') + item.title.replace(delete,'')
+            item.fulltitle = item.show = item.title.replace(delete,'')
+            item.episode = episode
+        return item
 
     return locals()
 
@@ -104,11 +108,15 @@ def findvideos(item):
 
     itemlist = []
 
-    if item.number:
+    if item.episode:
         from lib import unshortenit
         url, c = unshortenit.unshorten(item.url)
-        url = support.match(item, r'<a href="([^"]+)"[^>]*>', patronBlock=r'Episodio %s(.*?)</tr>' % item.number ,url=url)[0]
+        url = support.match(item, r'<a href="([^"]+)"[^>]*>', patronBlock=r'Episodio %s(.*?)</tr>' % item.episode ,url=url)[0]
         item.url = url[0] if url else ''
+
+    if 'vvvvid' in item.url:
+        item.action = 'play'
+        itemlist.append(item)
 
     if 'http' not in item.url:
         if '//' in item.url[:2]:
@@ -126,11 +134,9 @@ def findvideos(item):
     for video in matches:
         itemlist.append(
             support.Item(channel=item.channel,
-                         action="play",
-                         title='diretto',
-                         url=video,
-                         server='directo'))
+                        action="play",
+                        title='diretto',
+                        url=video,
+                        server='directo'))
 
-    support.server(item, itemlist=itemlist)
-
-    return itemlist
+    return support.server(item, itemlist=itemlist)
