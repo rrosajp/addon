@@ -12,6 +12,7 @@
 
     Novità (globale). Indicare in quale/i sezione/i è presente il canale:
        - film, serie
+       - I titoli in questa sezione a gruppi di 20
 
 """
 import re
@@ -50,10 +51,12 @@ def peliculas(item):
         patronBlock = r'<ul class="posts">(?P<block>.*)<\/ul>'
         patron = r'<li><a href="(?P<url>[^"]+)" data-thumbnail="(?P<thumb>[^"]+)">.*?<div class="title">(?P<title>.+?)(?:\[(?P<lang>Sub-ITA)\])?(?:[ ]\[?(?P<quality>[HD]+)?\])?(?:[ ]\((?P<year>\d+)\)?)?<\/div>'
         patronNext = r'<a href="([^"]+)" >Pagina'
+
     else:
         patronBlock = r'<ul class="posts">(?P<block>.*)<div class="clear">'
         patron = r'<li>\s?<a href="(?P<url>[^"]+)" data-thumbnail="(?P<thumb>[^"]+)">.*?<div class="title">(?P<title>.+?)(?:\s\[(?P<quality>HD)\])?<\/div>[^>]+>(?:[\dx]+)\s?(?:[ ]\((?P<lang>[a-zA-Z\-]+)\))?.+?</div>'
-
+        pagination = ''
+        
     if item.args == 'search':
         action = 'select'
     elif item.contentType == 'tvshow':
@@ -66,7 +69,7 @@ def peliculas(item):
     def itemHook(item):
         item.title = item.title.replace(r'-', ' ')
         return item
-    debug = True
+    #debug = True
     return locals()
 
 @support.scrape
