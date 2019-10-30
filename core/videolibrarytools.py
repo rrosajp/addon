@@ -224,6 +224,7 @@ def save_movie(item):
     return 0, 0, -1
 
 def filter_list(episodelist, action=None, path=None):
+    if path: path = path.decode('utf8')
     channel_prefs = {}
     lang_sel = quality_sel = show_title = channel =''
     if action:
@@ -396,13 +397,13 @@ def save_tvshow(item, episodelist):
     _id = item.infoLabels['code'][0]
 
     if config.get_setting("original_title_folder", "videolibrary") == 1 and item.infoLabels['originaltitle']:
-        base_name = item.infoLabels['originaltitle']
+        base_name = item.infoLabels[u'originaltitle']
     elif item.infoLabels['tvshowtitle']:
-        base_name = item.infoLabels['tvshowtitle']
+        base_name = item.infoLabels[u'tvshowtitle']
     elif item.infoLabels['title']:
-        base_name = item.infoLabels['title']
+        base_name = item.infoLabels[u'title']
     else:
-        base_name = item.contentSerieName
+        base_name = u'%s' % item.contentSerieName
 
     base_name = unicode(filetools.validate_path(base_name.replace('/', '-')), "utf8").encode("utf8")
 
