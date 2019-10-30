@@ -5,14 +5,14 @@ import os
 import shutil
 from cStringIO import StringIO
 
-from core import httptools, filetools, downloadtools
-from core.ziptools import ziptools
+from core import httptools, filetools
 from platformcode import logger, platformtools
 import json
 import xbmc
 import re
 import xbmcaddon
 from lib import githash
+import urllib
 
 addon = xbmcaddon.Addon('plugin.video.kod')
 
@@ -21,7 +21,7 @@ _hdr_pat = re.compile("^@@ -(\d+),?(\d+)? \+(\d+),?(\d+)? @@.*")
 branch = 'master'
 user = 'kodiondemand'
 repo = 'addon'
-addonDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'
+addonDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/') + '/'
 maxPage = 5  # le api restituiscono 30 commit per volta, quindi se si è rimasti troppo indietro c'è bisogno di andare avanti con le pagine
 trackingFile = "last_commit.txt"
 
@@ -109,15 +109,12 @@ def check_addon_init():
                                     alreadyApplied = False
                                 else:  # nel caso ci siano stati problemi
                                     logger.info('lo sha non corrisponde, scarico il file')
-                                    remove(addonDir + file["filename"])
-                                    downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'],
-                                                               silent=True, continuar=True, resumir=False)
+                                    localFile.close()
+                                    urllib.urlretrieve(file['raw_url'], os.path.join(addonDir, file['filename']))
                         else:  # è un file NON testuale, lo devo scaricare
                             # se non è già applicato
                             if not (filetools.isfile(addonDir + file['filename']) and getSha(addonDir + file['filename']) == file['sha']):
-                                remove(addonDir + file["filename"])
-                                downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'], silent=True,
-                                                           continuar=True, resumir=False)
+                                urllib.urlretrieve(file['raw_url'], os.path.join(addonDir, file['filename']))
                                 alreadyApplied = False
                     elif file['status'] == 'removed':
                         remove(addonDir+file["filename"])
@@ -237,7 +234,6 @@ def updateFromZip():
     remove(localfilename)
     removeTree(destpathname + "addon-" + branch)
 
-    import urllib
     urllib.urlretrieve(remotefilename, localfilename,
                        lambda nb, bs, fs, url=remotefilename: _pbhook(nb, bs, fs, url, dp))
 
@@ -260,6 +256,7 @@ def updateFromZip():
 
     # puliamo tutto
     removeTree(addonDir)
+    xbmc.sleep(1000)
 
     rename(destpathname + "addon-" + branch, addonDir)
 
@@ -275,34 +272,25 @@ def updateFromZip():
 
 def remove(file):
     if os.path.isfile(file):
-        removed = False
-        while not removed:
-            try:
-                os.remove(file)
-                removed = True
-            except:
-                logger.info('File ' + file + ' NON eliminato')
+        try:
+            os.remove(file)
+        except:
+            logger.info('File ' + file + ' NON eliminato')
 
 
 def removeTree(dir):
     if os.path.isdir(dir):
-        removed = False
-        while not removed:
-            try:
-                shutil.rmtree(dir)
-                removed = True
-            except:
-                logger.info('Cartella ' + dir + ' NON eliminato')
+        try:
+            shutil.rmtree(dir)
+        except:
+            logger.info('Cartella ' + dir + ' NON eliminata')
 
 
 def rename(dir1, dir2):
-    renamed = False
-    while not renamed:
-        try:
-            filetools.rename(dir1, dir2)
-            renamed = True
-        except:
-            logger.info('cartella ' + dir1 + ' NON rinominata')
+    try:
+        filetools.rename(dir1, dir2)
+    except:
+        logger.info('cartella ' + dir1 + ' NON rinominata')
 
 
 # https://stackoverflow.com/questions/3083235/unzipping-file-results-in-badzipfile-file-is-not-a-zip-file
@@ -332,14 +320,3 @@ def _pbhook(numblocks, blocksize, filesize, url, dp):
     except:
         percent = 90
         dp.update(percent)
-
-
-def remove(file):
-    if os.path.isfile(file):
-        removed = False
-        while not removed:
-            try:
-                os.remove(file)
-                removed = True
-            except:
-                logger.info('File ' + file + ' NON eliminato')
