@@ -19,10 +19,9 @@ headers = {'Referer': host}
 def mainlist(item):
 
     film = ['/lista-film',
-            ('Ultimi Film Aggiunti', ['/ultimi-film-aggiunti/', 'peliculas' , 'last'])]
+            ('Ultimi Film Aggiunti', ['/ultimi-film-aggiunti', 'peliculas' , 'last'])]
 
     tvshow = ['/lista-serie-tv',
-                ('last', ['', 'newest']),
               ('HD {TV}', ['/lista-serie-tv-in-altadefinizione']),
               ('Anni 50 60 70 80 {TV}',['/lista-serie-tv-anni-60-70-80']),
               ('Serie Italiane',['/lista-serie-tv-italiane'])]
@@ -35,11 +34,20 @@ def mainlist(item):
     return locals()
 
 
+@support.scrape
 def search(item, text):
     support.log(text)
+    if item.contentType == 'movie' or item.extra == 'movie':
+        action = 'findvideos'
+    else:
+        action = 'episodios'
     try:
-        item.search = text
-        return peliculas(item)
+        search = text
+        data = support.match(item, headers=headers)[1]
+        if 'lcp_nextlink' in data:
+            data += support.match(item, url=support.scrapertoolsV2.find_single_match(data, r'href="([^"]+)" title="[^"]+" class="lcp_nextlink"'), headers=headers)[1]
+        patron = r'<li><a href="(?P<url>[^"]+)" title="(?P<title>.*?)(?:\s(?P<year>\d{4}))?"[^>]*>'
+        return locals()
 
     # Continua la ricerca in caso di errore 
     except:
@@ -54,9 +62,14 @@ def newest(categoria):
     item = support.Item()
     try:
         if categoria == "series":
+            item.contentType= 'tvshow'
             item.url = host + '/ultimi-episodi-aggiunti'
             item.args = "lastep"
-            return peliculas(item)
+        if categoria == "peliculas":
+            item.contentType= 'movie'
+            item.url = host + '/ultimi-film-aggiunti'
+            item.args = "last"
+        return peliculas(item)
     # Continua la ricerca in caso di errore
     except:
         import sys
@@ -68,13 +81,13 @@ def newest(categoria):
 @support.scrape
 def peliculas(item):
     pagination = ''
-    search = item.search
+    patronNext = r'href="([^"]+)" title="[^"]+" class="lcp_nextlink"'
     if item.args == 'last':
         patronBlock = r'<table>(?P<block>.*?)</table>'
         patron = r'<tr><td><a href="(?P<url>[^"]+)">\s*[^>]+>(?P<title>.*?)(?:\s(?P<year>\d{4}))? (?:Streaming|</b>)'
     elif item.args == 'lastep':
         patronBlock = r'<table>(?P<block>.*?)</table>'
-        patron = r'<td>\s*<a href="[^>]+>(?P<title>(?:\d+)?.*?)\s*(?:(?P<episode>(?:\d+x\d+|\d+)))\s*(?P<title2>[^<]+)(?P<url>.*?)<tr>'
+        patron = r'<td>\s*<a href="[^>]+>(?P<title>.*?)(?:\s(?P<year>\d{4}))?\s(?:(?P<episode>(?:\d+x\d+|\d+)))\s*(?P<title2>[^<]+)(?P<url>.*?)<tr>'
         action = 'findvideos'
     else:
         patronBlock = r'<div class="entry-content pagess">(?P<block>.*?)</ul>'
@@ -99,4 +112,5 @@ def episodios(item):
     return locals()
 
 def findvideos(item):
-    return support.server(item, item.url)
+    if item.contentType == 'movie': return support.server(item)
+    else: return support.server(item, item.url)
