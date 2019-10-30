@@ -217,11 +217,11 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 val = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
             scraped[kk] = val
 
-        if scraped['season'] != None:
-            season = scraped['season']
-        if stagione:
-            episode = season +'x'+ scraped['episode']
-        elif item.contentType == 'tvshow' and (scraped['episode'] == '' and season == ''):
+        if scraped['season']:
+            episode = scraped['season'] +'x'+ scraped['episode']
+        elif stagione:
+            episode = stagione +'x'+ scraped['episode']
+        elif item.contentType == 'tvshow' and (scraped['episode'] == '' and scraped['season'] == '' and stagione == ''):
             item.news = 'season_completed'
             episode = ''
         else:
