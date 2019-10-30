@@ -20,7 +20,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     patronvideos = [
         r'(https?://(gestyy|rapidteria|sprysphere)\.com/[a-zA-Z0-9]+)',
         r'(https?://(?:www\.)?(vcrypt|linkup)\.[^/]+/[^/]+/[a-zA-Z0-9_]+)',
-        r'(https?://(?:www\.)?(bit)\.ly/[a-zA-Z0-9]+)',        
+        r'(https?://(?:www\.)?(bit)\.ly/[a-zA-Z0-9]+)',
+        r'(https?://(?:www\.)?(xshield)\.[^/]+/[^/]+/[^/]+/[a-zA-Z0-9_\.]+)'
     ]
 
     for patron in patronvideos:
@@ -41,6 +42,10 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                         replace_headers=True,
                         headers={'User-Agent': 'curl/7.59.0'})
                     data = resp.headers.get("location", "")
+                elif 'xshield' in url:
+                    from lib import unshortenit
+                    data, status = unshortenit.unshorten(url)
+                    logger.info("Data - Status zcrypt xshield.net: [%s] [%s] " %(data, status)) 
                 elif 'vcrypt.net' in url:
                     from lib import unshortenit
                     data, status = unshortenit.unshorten(url)
@@ -49,7 +54,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                     idata = httptools.downloadpage(url).data
                     data = scrapertoolsV2.find_single_match(idata, "<iframe[^<>]*src=\\'([^'>]*)\\'[^<>]*>")
                     #fix by greko inizio
-                    if not data:  
+                    if not data:
                         data = scrapertoolsV2.find_single_match(idata, 'action="(?:[^/]+.*?/[^/]+/([a-zA-Z0-9_]+))">')
                     from lib import unshortenit
                     data, status = unshortenit.unshorten(url)
