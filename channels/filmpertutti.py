@@ -32,7 +32,7 @@ list_quality = ['HD', 'SD']
 def mainlist(item):
 
     film = ['/category/film/',
-        ('Per Lettera', ['/category/film/', 'genres', 'lettersF'])
+        ('Generi', ['/category/film/', 'genres', 'lettersF'])
         ]
 
     tvshow = ['/category/serie-tv/',
