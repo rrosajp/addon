@@ -5,10 +5,10 @@
 """
 
     Problemi noti che non superano il test del canale:
-       - 
+       -
 
     Avvisi:
-        - Sub-ita è nel titolo, lascia il puntatore sulla locandina
+        - Sub-ita non è nel titolo, lascia il puntatore sulla locandina
         per visualizzare il titolo completo!
 
     Novità:
@@ -17,21 +17,10 @@
 
 
 """
-# CANCELLARE Ciò CHE NON SERVE per il canale, lascia il codice commentato
-# ma fare PULIZIA quando si è finito di testarlo
 
-# Qui gli import
-#import re
-
-# per l'uso dei decoratori, per i log, e funzioni per siti particolari
 from core import support
-
-# in caso di necessità
 from core import scrapertoolsV2, httptools
 from core.item import Item
-#from lib import unshortenit
-
-##### fine import
 
 host = ""
 headers = ""
@@ -45,17 +34,13 @@ def findhost():
         host = host[:-1]
 findhost()
 
-# server di esempio...
 list_servers = ['supervideo', 'streamcherry','rapidvideo', 'streamango', 'openload']
-# quality di esempio
 list_quality = ['default', 'HD', '3D', '4K', 'DVD', 'SD']
 
 @support.menu
 def mainlist(item):
     support.log(item)
 
-    # Ordine delle voci
-    # Voce FILM, puoi solo impostare l'url
     film = ['',
         ('Al Cinema', ['/category/in-sala/', 'peliculas', '']),
         ('Novità', ['/category/nuove-uscite/', 'peliculas', '']),
@@ -69,9 +54,8 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     support.log(item)
-    #dbg # decommentare per attivare web_pdb
+    #support.dbg() # decommentare per attivare web_pdb
 
-##    action = 'episodios'
     blacklist = ['']
     if item.args != 'search':
         patron = r'<div class="col-mt-5 postsh">[^<>]+<div class="poster-media-card">[^<>]+<a href="(?P<url>[^"]+)" title="(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA)\])?".*?<img(?:.+?)?src="(?P<thumb>[^"]+)"'
@@ -79,16 +63,17 @@ def peliculas(item):
     else:
         patron = r'<li class="col-md-12 itemlist">.*?<a href="(?P<url>[^"]+)" title="(?P<title>[^"]+)".*?<img src="(?P<thumb>[^"]+)".*?Film dell"anno: (?P<year>\d{4})(?:[\d\-]+)?</p> <p class="text-list">(?P<plot>[^<>]+)</p>'
         patronBlock = r'<ul class="search-results-content infinite">(?P<block>.*?)</section>'
-    patronNext = '<a href="([^"]+)"><i class="glyphicon glyphicon-chevron-right"'
 
-    #debug = True  # True per testare le regex sul sito
+    patronNext = '<a href="([^"]+)"\s+?><i class="glyphicon glyphicon-chevron-right"'
+
+    #debug = True
     return locals()
 
 
 @support.scrape
 def genres(item):
     support.log(item)
-    #dbg
+    #support.dbg()
 
     action = 'peliculas'
     blacklist = ['']

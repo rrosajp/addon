@@ -35,7 +35,7 @@ class UnshortenIt(object):
     _anonymz_regex = r'anonymz\.com'
     _shrink_service_regex = r'shrink-service\.it'
     _rapidcrypt_regex = r'rapidcrypt\.net'
-    _cryptmango_regex = r'cryptmango'
+    _cryptmango_regex = r'cryptmango|xshield\.net'
     _vcrypt_regex = r'vcrypt\.net'
 
     _maxretries = 5
@@ -466,6 +466,7 @@ class UnshortenIt(object):
 
         except Exception as e:
             return uri, str(e)
+
 
     def _unshorten_vcrypt(self, uri):
         r = None

@@ -3,7 +3,7 @@
   "name": "Filmpertutti",
   "active": true,
   "adult": false,
-  "language": ["ita"],
+  "language": ["ita", "sub-ita"],
   "thumbnail": "filmpertutti.png",
   "banner": "filmpertutti.png",
   "categories": ["tvshow","movie"],
