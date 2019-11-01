@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import re
+
 import urlparse
+
 from core import httptools
 from core import scrapertools
 from core import servertools
 from core.item import Item
 from platformcode import logger
+from platformcode import config
 
 host = 'http://sexkino.to'
 
@@ -131,6 +134,7 @@ def play(item):
     itemlist = servertools.find_video_items(data=data)
     for videoitem in itemlist:
         videoitem.title = item.title
+        videoitem.fulltitle = item.fulltitle
         videoitem.thumbnail = item.thumbnail
         videoitem.channel = item.channel
     return itemlist

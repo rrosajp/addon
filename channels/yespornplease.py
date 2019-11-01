@@ -2,12 +2,12 @@
 
 import re
 
-from core import httptools
-from core.item import Item
-from platformcode import logger
 from urlparse import urljoin
-from core import servertools
 
+from core import httptools
+from core import servertools
+from platformcode import logger
+from platformcode import config
 
 HOST="http://yespornplease.com"
 
@@ -70,7 +70,7 @@ def links(item):
         if quality:
             formattedQuality += " [%s]" % (quality)
         titleFormatted = "%(title)s%(quality)s [%(duration)s]" % ({"title": title, "quality": formattedQuality, "duration": duration})
-        result.append(item.clone(action = "play", title = titleFormatted, url = urljoin(item.url, "/v/%s" % (vID)), thumbnail = urljoin(item.url, img), vID = vID))
+        result.append(item.clone(action = "play", title = titleFormatted, url = urljoin(item.url, "/view/%s" % (vID)), thumbnail = urljoin(item.url, img), vID = vID))
     # Has pagination
     paginationOccurences = data.count('class="prevnext"')
     if paginationOccurences:
@@ -85,6 +85,6 @@ def links(item):
 
 def play(item):
     logger.info(item)
-    embededURL = urljoin(item.url, "/v/%s" % (item.vID))
+    embededURL = urljoin(item.url, "/view/%s" % (item.vID))
     itemlist = servertools.find_video_items(item.clone(url = embededURL))
     return itemlist

@@ -192,8 +192,6 @@ def config_item(item, itemlist=[], typography='', active=False):
 
 def renumber(itemlist, item='', typography=''):
     log()
-    if 'fromchannel' in item:
-        item.channel = item.fromchannel if item.fromchannel else item.channel
     # Seleziona la funzione Adatta, Menu Contestuale o Rinumerazione
     if item:
         settings_node = jsontools.get_node_from_file(item.channel, 'settings')
@@ -261,7 +259,7 @@ def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, 
             return error(itemlist)
         if len(EpisodeDict) >= len(itemlist):
             for item in itemlist:
-                number = scrapertoolsV2.find_single_match(item.title, r'\d+').lstrip("0")
+                number = scrapertoolsV2.find_single_match(item.title, r'\d+')
                 item.title = typo(EpisodeDict[str(number)] + ' - ', typography) + item.title
         else:
             make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE) 
@@ -270,7 +268,6 @@ def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, 
         make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE)
 
 def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE):
-    from core import support
     log()
     page = 1
     EpList = []
@@ -327,7 +324,6 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
         for item in itemlist:
             # Otiene Numerazione Episodi
             episode = int(scrapertoolsV2.find_single_match(item.title, r'\d+'))
-            log('EPISODE= ',episode)
             number = episode + FirstOfSeason - addiction
             count = number + addiction
             # find = episode + FirstOfSeason

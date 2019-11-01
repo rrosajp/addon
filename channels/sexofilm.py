@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import urlparse,urllib2,urllib,re
-import os, sys
+import re
+import urlparse
+
+from core import httptools
 from core import scrapertools
 from core import servertools
 from core.item import Item
-from platformcode import config, logger
-from core import httptools
+from platformcode import logger
+from platformcode import config
 
 host = 'http://sexofilm.com'
 
@@ -42,7 +44,7 @@ def categorias(item):
     itemlist = []
     data = httptools.downloadpage(item.url).data
     if item.title == "Canal" :
-        data = scrapertools.find_single_match(data,'>Best Porn Studios</a>(.*?)</ul>')
+        data = scrapertools.find_single_match(data,'>Adult Porn Parodies</a></li>(.*?)</ul>')
     else:
         data = scrapertools.find_single_match(data,'<div class="nav-wrap">(.*?)<ul class="sub-menu">')
         itemlist.append( Item(channel=item.channel, action="lista", title="Big tit", url="https://sexofilm.com/?s=big+tits"))
@@ -70,17 +72,14 @@ def lista(item):
     logger.info()
     itemlist = []
     data = httptools.downloadpage(item.url).data
-    patron = '<article id="post-\d+".*?'
-    patron += '<a href="([^"]+)".*?'
-    patron += 'data-src="([^"]+)".*?'
-    patron += '<h2 class="post-title.*?title="([^"]+)"'
+    patron  = '<div class="post-thumbnail.*?<a href="([^"]+)".*?src="([^"]+)".*?title="([^"]+)"'
     matches = re.compile(patron,re.DOTALL).findall(data)
     for scrapedurl,scrapedthumbnail,scrapedtitle in matches:
         plot = ""
         title = scrapedtitle.replace(" Porn DVD", "").replace("Permalink to ", "").replace(" Porn Movie", "")
         itemlist.append(item.clone(action="play", title=title, url=scrapedurl, thumbnail=scrapedthumbnail,
                                    fanart=scrapedthumbnail, plot=plot) )
-    next_page = scrapertools.find_single_match(data,'<a class="nextpostslink" rel="next" href="([^"]+)">')
+    next_page = scrapertools.find_single_match(data,'<a class="nextpostslink" rel="next" href="([^"]+)">&raquo;</a>')
     if next_page!="":
         next_page = urlparse.urljoin(item.url,next_page)
         itemlist.append(item.clone(action="lista", title="Página Siguiente >>", text_color="blue", url=next_page) )
@@ -89,14 +88,12 @@ def lista(item):
 
 def play(item):
     logger.info()
-    itemlist = []
     data = httptools.downloadpage(item.url).data
-    url = scrapertools.find_single_match(data,'<div class="entry-inner">.*?<source src="([^"]+)"')
-    if not url:
-        url = scrapertools.find_single_match(data,'<div class="entry-inner">.*?<source src=\'([^\']+)\'')
-    itemlist = servertools.find_video_items(item.clone(url = item.url))
-    if url:
-        itemlist.append(item.clone(action="play", title=url, url=url))
+    itemlist = servertools.find_video_items(data=data)
+    for videoitem in itemlist:
+        videoitem.title = item.title
+        videoitem.fulltitle = item.fulltitle
+        videoitem.thumbnail = item.thumbnail
+        videoitem.channel = item.channel
     return itemlist
-
 

@@ -28,8 +28,8 @@ perfil = [['0xFF0B7B92', '0xFF89FDFB', '0xFFACD5D4'],
           ['0xFFA5DEE5', '0xFFE0F9B5', '0xFFFEFDCA'],
           ['0xFFF23557', '0xFF22B2DA', '0xFFF0D43A']]
 
-color1, color2, color3 = ["white", "white", "white"]
-# color1, color2, color3 = perfil[__perfil__]
+#color1, color2, color3 = ["white", "white", "white"]
+color1, color2, color3 = perfil[__perfil__]
 
 list_newest = []
 list_newest_tourl = []

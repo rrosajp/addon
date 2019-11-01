@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import urlparse,urllib2,urllib,re
-import os, sys
-from platformcode import config, logger
+import re
+import urlparse
+
+from core import httptools
 from core import scrapertools
 from core.item import Item
-from core import servertools
-from core import httptools
+from platformcode import logger
+from platformcode import config
 
 host = 'http://www.siska.tv/'
 
@@ -15,11 +16,11 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    itemlist.append( Item(channel=item.channel, title="Nuevos" , action="lista", url=host + "newVideo.php?language=en"))
-    itemlist.append( Item(channel=item.channel, title="Mas vistos" , action="lista", url=host + "MostViewed.php?views=month&language=en"))
-    itemlist.append( Item(channel=item.channel, title="Canal" , action="categorias", url=host + "Channel.php?language=en"))
+    itemlist.append( Item(channel=item.channel, title="Nuevos" , action="lista", url=host + "/newVideo.php?language=en"))
+    itemlist.append( Item(channel=item.channel, title="Mas vistos" , action="lista", url=host + "/MostViewed.php?views=month&language=en"))
+    itemlist.append( Item(channel=item.channel, title="Canal" , action="categorias", url=host + "/Channel.php?language=en"))
 
-    itemlist.append( Item(channel=item.channel, title="Categorias" , action="categorias", url=host + "index.php?category=1&language=en"))
+    itemlist.append( Item(channel=item.channel, title="Categorias" , action="categorias", url=host + "/index.php?category=1&language=en"))
     itemlist.append( Item(channel=item.channel, title="Buscar", action="search"))
     return itemlist
 
@@ -27,7 +28,7 @@ def mainlist(item):
 def search(item, texto):
     logger.info()
     texto = texto.replace(" ", "+")
-    item.url = host + "search.php?q=%s&language=en&search=Search" % texto
+    item.url = host + "/search.php?q=%s&language=en&search=Search" % texto
     try:
         return lista(item)
     except:

@@ -35,17 +35,15 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     page_url = page_url.replace('https://waaw.tv/', 'http://hqq.watch/')
 
     data = httptools.downloadpage(page_url).data
-    logger.debug(data)
+    # ~ logger.debug(data)
 
-    # js_wise = scrapertools.find_single_match(data, "<script type=[\"']text/javascript[\"']>\s*;?(eval.*?)</script>")
-    js_wise = scrapertools.find_single_match(data, "<script>\s*;(eval.*?)\s*</script>")
-    logger.info('JS_WISE= '+ js_wise)
+    js_wise = scrapertools.find_single_match(data, "<script type=[\"']text/javascript[\"']>\s*;?(eval.*?)</script>")
     data = jswise(js_wise).replace("\\", "")
-    logger.debug(data)
+    # ~ logger.debug(data)
 
     alea = str(random.random())[2:]
     data_ip = httptools.downloadpage('http://hqq.watch/player/ip.php?type=json&rand=%s' % alea).data
-    logger.debug(data_ip)
+    # ~ logger.debug(data_ip)
     json_data_ip = jsontools.load(data_ip)
 
     url = scrapertools.find_single_match(data, 'self\.location\.replace\("([^)]+)\)')
@@ -53,15 +51,14 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     url = url.replace('"+data.ip+"', json_data_ip['ip'])
     url = url.replace('"+need_captcha+"', '0') #json_data_ip['need_captcha'])
     url = url.replace('"+token', '')
-    # logger.info('URL= '+url)
-    # logger.debug(url)
+    # ~ logger.debug(url)
 
     headers = { "User-Agent": 'Mozilla/5.0 (X11; U; Linux i686; en-US) AppleWebKit/533.4 (KHTML, like Gecko) Chrome/5.0.375.127 Large Screen Safari/533.4 GoogleTV/162671' }
     data = httptools.downloadpage('http://hqq.watch'+url, headers=headers).data
-    # logger.debug(data)
+    # ~ logger.debug(data)
     
     codigo_js = scrapertools.find_multiple_matches(data, '<script>document.write\(unescape\("([^"]+)')
-    # logger.debug(codigo_js)
+    # ~ logger.debug(codigo_js)
     
     js_aux = urllib.unquote(codigo_js[0])
     at = scrapertools.find_single_match(js_aux, 'var at = "([^"]+)')

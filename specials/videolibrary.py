@@ -68,7 +68,7 @@ def list_movies(item, silent=False):
                     canal = generictools.verify_channel(canal_org)
                     try:
                         channel_verify = __import__('channels.%s' % canal, fromlist=["channels.%s" % canal])
-                        logger.debug('Channel %s seems correct' % channel_verify)
+                        logger.debug('El canal %s parece correcto' % channel_verify)
                     except:
                         dead_item = Item(multicanal=multicanal,
                                          contentType='movie',
@@ -78,9 +78,9 @@ def list_movies(item, silent=False):
                                          library_urls=new_item.library_urls,
                                          infoLabels={'title': new_item.contentTitle})
                         if canal not in dead_list and canal not in zombie_list:
-                            confirm = platformtools.dialog_yesno(config.get_localized_string(30131),
-                                                                 config.get_localized_string(30132) % canal.upper(),
-                                                                 config.get_localized_string(30133))
+                            confirm = platformtools.dialog_yesno('Videoteca',
+                                                                 'Parece que el canal [COLOR red]%s[/COLOR] ya no existe.' % canal.upper(),
+                                                                 'Deseas eliminar los enlaces de este canal?')
 
                         elif canal in zombie_list:
                             confirm = False
@@ -198,9 +198,9 @@ def list_tvshows(item):
                                          library_urls=item_tvshow.library_urls,
                                          infoLabels={'title': item_tvshow.contentTitle})
                         if canal not in dead_list and canal not in zombie_list:
-                            confirm = platformtools.dialog_yesno(config.get_localized_string(30131),
-                                                                 config.get_localized_string(30132) % canal.upper(),
-                                                                 config.get_localized_string(30133))
+                            confirm = platformtools.dialog_yesno('Videoteca',
+                                                                 'Parece que el canal [COLOR red]%s[/COLOR] ya no existe.' % canal.upper(),
+                                                                 'Deseas eliminar los enlaces de este canal?')
 
                         elif canal in zombie_list:
                             confirm = False
@@ -238,7 +238,7 @@ def list_tvshows(item):
                         contador = 1
                 
                 except:
-                    logger.error('Not find: ' + str(tvshow_path))
+                    logger.error('No encuentra: ' + str(tvshow_path))
                     logger.error(traceback.format_exc())
                     continue
 
@@ -435,7 +435,7 @@ def findvideos(item):
     autoplay.set_status(False)
 
     if not item.contentTitle or not item.strm_path:
-        logger.debug("Unable to search for videos due to lack of parameters")
+        logger.debug("No se pueden buscar videos por falta de parametros")
         return []
 
     content_title = filter(lambda c: c not in ":*?<>|\/", item.contentTitle.strip().lower())
@@ -533,7 +533,7 @@ def findvideos(item):
                 from core import servertools
                 list_servers = servertools.find_video_items(item_json)
         except Exception, ex:
-            logger.error("The findvideos function for the channel %s failed" % nom_canal)
+            logger.error("Ha fallado la funcion findvideos para el canal %s" % nom_canal)
             template = "An exception of type %s occured. Arguments:\n%r"
             message = template % (type(ex).__name__, ex.args)
             logger.error(message)
@@ -623,7 +623,7 @@ def update_videolibrary(item):
                 break
 
         if ficheros and not strm:
-            logger.debug("Deleting deleted movie folder: %s" % raiz)
+            logger.debug("Borrando carpeta de pelicula eliminada: %s" % raiz)
             filetools.rmdirtree(raiz)
 
 
@@ -668,7 +668,7 @@ def verify_playcount_series(item, path):
         nfo_path = filetools.join(path, "tvshow.nfo")
         head_nfo, it = videolibrarytools.read_nfo(nfo_path)                         #Obtenemos el .nfo de la Serie
         if not hasattr(it, 'library_playcounts') or not it.library_playcounts:      #Si el .nfo no tiene library_playcounts se lo creamos
-            logger.error('** It does not have PlayCount')
+            logger.error('** No tiene PlayCount')
             it.library_playcounts = {}
         
         # Obtenemos los archivos de los episodios
@@ -879,7 +879,7 @@ def delete(item):
             from platformcode import xbmc_videolibrary
             xbmc_videolibrary.clean()
 
-        logger.info("All links removed")
+        logger.info("Eliminados todos los enlaces")
         platformtools.itemlist_refresh()
 
     # logger.info(item.contentTitle)

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import urlparse,urllib2,urllib,re
-import os, sys
-from platformcode import config, logger
+import re
+import urlparse
+
+from core import httptools
 from core import scrapertools
 from core.item import Item
-from core import servertools
-from core import httptools
+from platformcode import logger
+from platformcode import config
 
 host = 'https://www.pornburst.xxx'
 
@@ -42,21 +43,20 @@ def categorias(item):
     if "/sites/" in item.url:
         patron = '<div class="muestra-escena muestra-canales">.*?'
         patron += 'href="([^"]+)">.*?'
-        patron += 'data-src="([^"]+)".*?'
+        patron += 'src="([^"]+)".*?'
         patron += '<a title="([^"]+)".*?'
         patron += '</span> (\d+) videos</span>'
     if "/pornstars/" in item.url:
         patron = '<a class="muestra-escena muestra-pornostar" href="([^"]+)">.*?'
-        patron += 'data-src="([^"]+)".*?'
+        patron += 'src="([^"]+)".*?'
         patron += 'alt="([^"]+)".*?'
         patron += '</span> (\d+) videos</span>'
     else:
         patron  = '<a class="muestra-escena muestra-categoria" href="([^"]+)" title="[^"]+">.*?'
-        patron += 'data-src="([^"]+)".*?'
+        patron += 'src="([^"]+)".*?'
         patron += '</span> ([^"]+) </h2>(.*?)>'
     matches = re.compile(patron,re.DOTALL).findall(data)
     for scrapedurl,scrapedthumbnail,scrapedtitle,cantidad in matches:
-        logger.debug(scrapedurl + ' / ' + scrapedthumbnail + ' / ' + cantidad + ' / ' + scrapedtitle)
         scrapedplot = ""
         cantidad =  " (" + cantidad + ")"
         if "</a" in cantidad:
@@ -107,6 +107,6 @@ def play(item):
     matches = scrapertools.find_multiple_matches(data, patron)
     for scrapedurl  in matches:
         title = scrapedurl
-    itemlist.append(item.clone(action="play", title=title, url=scrapedurl))
+    itemlist.append(item.clone(action="play", title=title, fulltitle = item.title, url=scrapedurl))
     return itemlist
 

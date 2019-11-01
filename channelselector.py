@@ -16,10 +16,6 @@ def getmainlist(view="thumb_"):
     logger.info()
     itemlist = list()
 
-    if config.dev_mode():
-        itemlist.append(Item(title="Redirect", channel="checkhost", action="check_channels",
-                            thumbnail='',
-                            category=config.get_localized_string(30119), viewmode="thumbnails"))
     # Añade los canales que forman el menú principal
     if addon.getSetting('enable_news_menu') == "true":
         itemlist.append(Item(title=config.get_localized_string(30130), channel="news", action="mainlist",
@@ -327,10 +323,10 @@ def auto_filter(auto_lang=False):
     return lang
 
 
-def thumb(itemlist=[], genre=False):
+def thumb(itemlist=[]):
     if itemlist:
         import re
-        
+
         icon_dict = {'channels_movie':['film'],
                      'channels_tvshow':['serie','tv','episodi','episodio'],
                      'channels_documentary':['documentari','documentario'],
@@ -339,13 +335,13 @@ def thumb(itemlist=[], genre=False):
                      'now_playing':['cinema', 'in sala'],
                      'channels_anime':['anime'],
                      'genres':['genere', 'generi', 'categorie', 'categoria'],
-                     'channels_animation': ['animazione', 'cartoni', 'cartoon'],
+                     'channels_animation': ['animazione', 'cartoni'],
+                     'channels_adventure': ['avventura'],
                      'channels_action':['azione', 'arti marziali'],
-                     'channels_adventure': ['avventura'],                     
                      'channels_biographical':['biografico'],
                      'channels_comedy':['comico','commedia', 'demenziale'],
                      'channels_adult':['erotico', 'hentai'],
-                     'channels_drama':['drammatico', 'drama'],
+                     'channels_drama':['drammatico'],
                      'channels_syfy':['fantascienza'],
                      'channels_fantasy':['fantasy'],
                      'channels_crime':['gangster','poliziesco'],
@@ -359,8 +355,7 @@ def thumb(itemlist=[], genre=False):
                      'channels_noir':['noir'],
                      'popular' : ['popolari','popolare', 'più visti'],
                      'channels_thriller':['thriller'],
-                     'top_rated' : ['fortunato', 'votati'],
-                     'on_the_air' : ['corso', 'onda'],
+                     'top_rated' : ['fortunato'],
                      'channels_western':['western'],
                      'channels_vos':['sub','sub-ita'],
                      'channels_romance':['romantico','sentimentale'],
@@ -372,44 +367,39 @@ def thumb(itemlist=[], genre=False):
         suffix_dict = {'_hd':['hd','altadefinizione','alta definizione'],
                        '_4k':['4K'],
                        '_az':['lettera','lista','alfabetico','a-z'],
-                       '_year':['anno', 'anni'],
+                       '_year':['anno'],
                        '_genre':['genere', 'generi', 'categorie', 'categoria']}
 
         search = ['cerca']
 
         search_suffix ={'_movie':['film'],
                         '_tvshow':['serie','tv']}
-
         for item in itemlist:
-            
-            if genre == False:
 
-                for thumb, titles in icon_dict.items():
-                    if any( word in item.title.lower() for word in search):
-                        thumb = 'search'
-                        for suffix, titles in search_suffix.items():
-                            if any( word in item.title.lower() for word in titles ): 
+            # Check if item has args propriety
+            if item.args: item.title = item.title + ' || ' + str(item.args)
+
+            for thumb, titles in icon_dict.items():
+                if any( word in item.title.lower() for word in search):
+                    thumb = 'search'
+                    for suffix, titles in search_suffix.items():
+                        if any( word in item.title.lower() for word in titles ): 
+                            thumb = thumb + suffix
+                    item.thumbnail = get_thumb(thumb + '.png')
+                elif any( word in item.title.lower() for word in titles ):
+                    if thumb == 'channels_movie' or thumb == 'channels_tvshow':
+                        for suffix, titles in suffix_dict.items():
+                            if any( word in item.title.lower() for word in titles ):
                                 thumb = thumb + suffix
-                        item.thumbnail = get_thumb(thumb + '.png')
-                    elif any( word in item.title.lower() for word in titles ):
-                        if thumb == 'channels_movie' or thumb == 'channels_tvshow':
-                            for suffix, titles in suffix_dict.items():
-                                if any( word in item.title.lower() for word in titles ):
-                                    thumb = thumb + suffix
-                            item.thumbnail = get_thumb(thumb + '.png')
-                        else: item.thumbnail = get_thumb(thumb + '.png')
-                    else:
-                        thumb = item.thumbnails
+                    item.thumbnail = get_thumb(thumb + '.png')
+                else:
+                    thumb = item.thumbnails
 
-            else:
-                for thumb, titles in icon_dict.items():
-                    if any(word in item.title.lower() for word in titles ):
-                        item.thumbnail = get_thumb(thumb + '.png')
-                    else:
-                        thumb = item.thumbnails
+                if item.thumbnail != '':
+                    break
 
-            
-            item.title = re.sub(r'\s*\{[^\}]+\}','',item.title)
+            # Remove args from title
+            if item.args: item.title = item.title.replace(' || ' + str(item.args), '')
         return itemlist
     else:
         return get_thumb('next.png')

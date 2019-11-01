@@ -5,12 +5,26 @@
 
 from core import scrapertoolsV2, httptools, support
 from core.item import Item
-from platformcode import logger, config
+from platformcode import logger
 from specials import autoplay
+from platformcode import config
 
-__channel__ = "vedohd"
-host = config.get_channel_url(__channel__)
 headers = ""
+host = ""
+
+
+def findhost():
+    permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
+    cb01Url = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    data = httptools.downloadpage(cb01Url).data
+    global host, headers
+
+    host = scrapertoolsV2.find_single_match(data, r'class="?mega-menu-link"? href="?(https://vedohd[^/"]+)"?')+'/'
+
+    if 'https' not in host:  # in caso cb01 cambi, si spera di riuscire ad accedere da questo URL
+        host = "https://vedohd.pw/"
+    headers = [['Referer', host]]
+
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
@@ -20,16 +34,25 @@ list_quality = ['HD', 'SD']
 #esclusione degli articoli 'di servizio'
 blacklist = ['CB01.UNO &#x25b6; TROVA L&#8217;INDIRIZZO UFFICIALE ', 'AVVISO IMPORTANTE – CB01.UNO', 'GUIDA VEDOHD']
 
-@support.menu
-def mainlist(item):
 
-    film = [
-        ('I più votati', ["ratings/?get=movies", 'peliculas']),
-        ('I più popolari', ["trending/?get=movies", 'peliculas']),
-        ('Generi', ['ratings/?get=movies', 'menu', 'genres']),
-        ('Anno', ["", 'menu', 'releases']),
-    ]
-    return locals()
+def mainlist(item):
+    logger.info("[vedohd.py] mainlist")
+    findhost()
+
+    autoplay.init(item.channel, list_servers, list_quality)
+
+    # Main options
+    itemlist = []
+    support.menu(itemlist, 'Film', "peliculas", host+"film-hd")
+    support.menu(itemlist, 'I più votati', "peliculas", host+"ratings/?get=movies")
+    support.menu(itemlist, 'I più popolari', "peliculas", host+"trending/?get=movies")
+    support.menu(itemlist, 'Generi', "generos", host)
+    support.menu(itemlist, 'Anno', "year", host)
+    support.menu(itemlist, 'Cerca', "search", host)
+
+    autoplay.show_option(item.channel, itemlist)
+
+    return itemlist
 
 
 def search(item, text):
@@ -40,10 +63,13 @@ def search(item, text):
 
 
 def peliculas(item):
+    logger.info("[vedohd.py] video")
+
     return support.dooplay_films(item, blacklist)
 
 
 def findvideos(item):
+    findhost()
     itemlist = []
     for link in support.dooplay_get_links(item, host):
         if link['title'] != 'Trailer':
@@ -71,13 +97,16 @@ def findvideos(item):
     return itemlist
 
 
-@support.scrape
-def menu(item):
-    patron = '<a href="(?P<url>[^"#]+)"(?: title="[^"]+")?>(?P<title>[a-zA-Z0-9]+)'
-    patronBlock = '<nav class="' + item.args + '">(?P<block>.*?)</nav>'
-    action = 'peliculas'
+def generos(item):
+    findhost()
+    patron = '<a href="([^"#]+)">([a-zA-Z]+)'
+    return support.scrape(item, patron, ['url', 'title'], patron_block='<a href="#">Genere</a><ul class="sub-menu">.*?</ul>', action='peliculas')
 
-    return locals()
+
+def year(item):
+    findhost()
+    patron = r'<a href="([^"#]+)">(\d+)'
+    return support.scrape(item, patron, ['url', 'title'], patron_block='<a href="#">Anno</a><ul class="sub-menu">.*?</ul>', action='peliculas')
 
 
 def play(item):

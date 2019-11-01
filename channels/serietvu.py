@@ -26,7 +26,7 @@ def mainlist(item):
     support.menu(itemlist, 'Novità bold', 'latestep', "%s/ultimi-episodi" % host, 'tvshow')
     support.menu(itemlist, 'Serie TV bold', 'lista_serie', "%s/category/serie-tv" % host, 'tvshow')
     support.menu(itemlist, 'Categorie', 'categorie', host, 'tvshow')
-
+    support.menu(itemlist, 'Cerca', 'search', host, 'tvshow')
     support.aplay(item, itemlist, list_servers, list_quality)
     support.channel_config(item, itemlist)
     return itemlist

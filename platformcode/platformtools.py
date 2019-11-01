@@ -596,7 +596,7 @@ def set_context_commands(item, parent_item):
                                          (sys.argv[0], item.clone(action="add_pelicula_to_library",
                                                                   from_action=item.action).tourl())))
 
-        if item.channel != "downloads" and item.channel != "videolibrary" and downloadenabled != "false":
+        if item.channel != "downloads" and downloadenabled != "false":
             # Descargar pelicula
             if item.contentType == "movie":
                 context_commands.append((config.get_localized_string(60354), "XBMC.RunPlugin(%s?%s)" %
@@ -612,11 +612,6 @@ def set_context_commands(item, parent_item):
                                             (sys.argv[0], item.clone(channel="downloads", action="save_download",
                                                                     from_channel=item.channel,
                                                                     from_action=item.action).tourl())))
-                context_commands.append((config.get_localized_string(60357), "XBMC.RunPlugin(%s?%s)" %
-                                            (sys.argv[0], item.clone(channel="downloads", action="save_download",
-                                                                    from_channel=item.channel,
-                                                                    from_action=item.action,
-                                                                    download='season').tourl())))
 
             # Descargar episodio
             elif item.contentType == 'episode' and item.action in ["findvideos"]:
@@ -627,12 +622,11 @@ def set_context_commands(item, parent_item):
                                                                     from_action=item.action).tourl())))
 
             # Descargar temporada
-            # elif item.contentType == "season":
-            #     context_commands.append((config.get_localized_string(60357), "XBMC.RunPlugin(%s?%s)" %
-            #                                 (sys.argv[0], item.clone(channel="downloads", action="save_download",
-            #                                                         from_channel=item.channel,
-            #                                                         from_action=item.action,
-            #                                                         download='season').tourl())))
+            elif item.contentType == "season":
+                context_commands.append((config.get_localized_string(60357), "XBMC.RunPlugin(%s?%s)" %
+                                            (sys.argv[0], item.clone(channel="downloads", action="save_download",
+                                                                    from_channel=item.channel,
+                                                                    from_action=item.action).tourl())))
 
         # Abrir configuración
         if parent_item.channel not in ["setting", "news", "search"]:
@@ -658,10 +652,6 @@ def set_context_commands(item, parent_item):
                                                                                      action="open_menu",
                                                                                      parent=parent_item.tourl()).tourl(
                                 ))))
-    if config.dev_mode():
-        context_commands.insert(1, ("item info",
-                                    "XBMC.Container.Update (%s?%s)" % (sys.argv[0], Item(action="itemInfo",
-                                                                                parent=item.tojson()).tourl())))
     return context_commands
 
 

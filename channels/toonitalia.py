@@ -1,59 +1,251 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
+# Ringraziamo Icarus crew
 # Canale per ToonItalia
 # ------------------------------------------------------------
 
-from core import support
+import re
+
+from core import scrapertools, httptools, tmdb, support, servertools
+from core.item import Item
+from platformcode import logger
+from specials import autoplay
+from platformcode import config
 
 __channel__ = "toonitalia"
-host = support.config.get_channel_url(__channel__)
+host = config.get_channel_url(__channel__)
 
 headers = [['Referer', host]]
 
 list_servers = ['wstream', 'openload', 'streamango']
 list_quality = ['HD', 'default']
 
-
-@support.menu
 def mainlist(item):
 
-    top = [('Novità',['', 'peliculas', 'new', 'tvshow']),
-           ('Aggiornamenti', ['', 'peliculas', 'last', 'tvshow']),
-           ('Popolari', ['', 'peliculas', 'most_view', 'tvshow'])]   
-    tvshow = '/lista-serie-tv/'
-    anime =['/lista-anime-2/',
-               ('Sub-Ita',['/lista-anime-sub-ita/']),
-               ('Film Animati',['/lista-film-animazione/','peliculas', '', 'movie'])]    
-    search = ''
+    # Main options
+    itemlist = []
+    support.menu(itemlist, 'Ultimi episodi inseriti bold', 'insert', host, contentType='episode')
+    support.menu(itemlist, 'Ultime novità bold', 'updates', host, contentType='episode')
+    support.menu(itemlist, 'Episodi più visti bold', 'most_view', host, contentType='episode')
+    support.menu(itemlist, 'Anime', 'list', host + '/lista-anime-2/', contentType='episode')
+    support.menu(itemlist, 'Sub-Ita submenu', 'list', host + '/lista-anime-sub-ita/', contentType='episode')
+    support.menu(itemlist, 'Serie TV bold', 'list', host + '/lista-serie-tv/', contentType='episode')
+    support.menu(itemlist, 'Film Animazione bold', 'list', host + '/lista-film-animazione/', contentType="episode", args="film")
+    support.menu(itemlist, '[COLOR blue]Cerca anime e serie...[/COLOR] bold', 'search', host, contentType='episode')
 
-    return locals()
+    autoplay.init(item.channel, list_servers, list_quality)
+    autoplay.show_option(item.channel, itemlist)
 
+    return itemlist
 
-@support.scrape
+#----------------------------------------------------------------------------------------------------------------------------------------------
+
+def insert(item):
+    logger.info("[toonitalia.py] insert")
+    itemlist = []
+    minpage = 14
+
+    p = 1
+    if '{}' in item.url:
+        item.url, p = item.url.split('{}')
+        p = int(p)
+
+    data = httptools.downloadpage(item.url, headers=headers).data
+
+    patron = r'<h2 class="entry-title"><a href="([^"]+)" rel="bookmark">([^<]+)</a></h2>.*?'
+    patron += r'<p class[^>]+><a href="[^"]+"><img width[^>]+src="([^"]+)" class[^>]+>.*?'
+    patron += r'<p>(.*?)<\/p>'
+    matches = re.compile(patron, re.DOTALL).findall(data)
+
+    for i, (scrapedurl, scrapedtitle, scrapedthumbnail, scrapedplot) in enumerate(matches):
+        if (p - 1) * minpage > i: continue
+        if i >= p * minpage: break
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
+
+        itemlist.append(
+            Item(channel=__channel__,
+                 action="episodios",
+                 contentType="episode",
+                 title=scrapedtitle,
+                 fulltitle=scrapedtitle,
+                 url=scrapedurl,
+                 show=scrapedtitle,
+                 thumbnail=scrapedthumbnail,
+                 plot=scrapedplot,
+                 folder=True))
+
+    if len(matches) >= p * minpage:
+        scrapedurl = item.url + '{}' + str(p + 1)
+        itemlist.append(
+            Item(channel=__channel__,
+                 args=item.args,
+                 action="insert",
+                 title="[COLOR blue][B]Successivo >[/B][/COLOR]",
+                 url=scrapedurl,
+                 thumbnail="thumb_next.png",
+                 folder=True))
+
+    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+
+    return itemlist
+
+#----------------------------------------------------------------------------------------------------------------------------------------------
+
+def updates(item):
+    logger.info("[toonitalia.py] updates")
+    itemlist = []
+
+    data = httptools.downloadpage(item.url, headers=headers).data
+
+    blocco = r'Aggiornamenti</h2>(.*?)</ul>'
+    matches = re.compile(blocco, re.DOTALL).findall(data)
+    for scrapedurl in matches:
+        blocco = scrapedurl
+
+    patron = r'<a href="(.*?)">(.*?)</a>'
+    matches = re.compile(patron, re.DOTALL).findall(blocco)
+
+    for scrapedurl, scrapedtitle in matches:
+        scrapedplot = ""
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
+        itemlist.append(
+            Item(channel=__channel__,
+                 action="episodios",
+                 contentType="episode",
+                 title=scrapedtitle,
+                 fulltitle=scrapedtitle,
+                 url=scrapedurl,
+                 show=scrapedtitle,
+                 plot=scrapedplot))
+
+    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+    return itemlist
+
+#----------------------------------------------------------------------------------------------------------------------------------------------
+
+def most_view(item):
+    logger.info("[toonitalia.py] most_view")
+    itemlist = []
+
+    data = httptools.downloadpage(item.url, headers=headers).data
+
+    blocco = r'I piu visti</h2>(.*?)</ul>'
+    matches = re.compile(blocco, re.DOTALL).findall(data)
+    for scrapedurl in matches:
+        blocco = scrapedurl
+
+    patron = r'<a href="([^"]+)" title="[^"]+" class="wpp-post-title" target="_self">([^<]+)</a>'
+    matches = re.compile(patron, re.DOTALL).findall(blocco)
+
+    for scrapedurl, scrapedtitle in matches:
+        scrapedplot = ""
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
+        itemlist.append(
+            Item(channel=__channel__,
+                 action="episodios",
+                 contentType="episode",
+                 title=scrapedtitle,
+                 fulltitle=scrapedtitle,
+                 url=scrapedurl,
+                 show=scrapedtitle,
+                 plot=scrapedplot))
+
+    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+    return itemlist
+
+#----------------------------------------------------------------------------------------------------------------------------------------------
+
+def list(item):
+    logger.info("[toonitalia.py] list")
+    itemlist = []
+    minpage = 14
+
+    p = 1
+    if '{}' in item.url:
+        item.url, p = item.url.split('{}')
+        p = int(p)
+
+    data = httptools.downloadpage(item.url, headers=headers).data
+
+    patron = r'<li ><a href="([^"]+)" title="[^>]+">([^<]+)</a>'
+    matches = re.compile(patron, re.DOTALL).findall(data)
+
+    for i, (scrapedurl, scrapedtitle) in enumerate(matches):
+        if (p - 1) * minpage > i: continue
+        if i >= p * minpage: break
+        if 'Film Animazione disponibili' not in scrapedtitle:
+            scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
+            scrapedplot = ""
+            itemlist.append(
+                Item(channel=__channel__,
+                     action = 'episodios' if not 'film' in item.args else 'findvideos',
+                     contentType=item.contentType,
+                     title=scrapedtitle,
+                     fulltitle=scrapedtitle,
+                     url=scrapedurl,
+                     show=scrapedtitle,
+                     args=item.args,
+                     plot=scrapedplot))
+
+    if len(matches) >= p * minpage:
+        scrapedurl = item.url + '{}' + str(p + 1)
+        itemlist.append(
+            Item(channel=__channel__,
+                 args=item.args,
+                 contentType=item.contentType,
+                 action="list",
+                 title="[COLOR blue][B]Successivo >[/B][/COLOR]",
+                 url=scrapedurl))
+
+    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+    return itemlist
+
+#----------------------------------------------------------------------------------------------------------------------------------------------
+
 def peliculas(item):
-    pagination = ''
-    anime = True
-    blacklist = ['-Film Animazione disponibili in attesa di recensione ']
-    
-    if item.args == 'search':
-        patron = r'<h2 class="entry-title"><a href="(?P<url>[^"]+)" rel="bookmark">(?P<title>[^<]+)</a>'
-    elif item.args == 'last':
-        patronBlock = 'Aggiornamenti</h2>(?P<block>.*)</ul>'
-        patron = '<a href="(?P<url>[^"]+)">(?P<title>[^<]+)</a>'
-    elif item.args == 'most_view':
-        patronBlock = 'I piu visti</h2>(?P<block>.*)</ul>'
-        patron = '<a href="(?P<url>[^"]+)" title="(?P<title>[^"]+)"'
-    elif item.args == 'new':
-        patronBlock = '<main[^>]+>(?P<block>.*)</main>'
-        patron = '<a href="(?P<url>[^"]+)" rel="bookmark">(?P<title>[^<]+)</a>[^>]+>[^>]+>[^>]+><img.*?src="(?P<thumb>[^"]+)".*?<p>(?P<plot>[^<]+)</p>'
-        patronNext = '<a class="next page-numbers" href="([^"]+)">'
-    else:
-        patronBlock = '"lcp_catlist"[^>]+>(?P<block>.*)</ul>'
-        patron = r'<li ><a href="(?P<url>[^"]+)" title="[^>]+">(?P<title>[^<|\(]+)?(?:\([^\d]*(?P<year>\d+)\))?[^<]*</a>'
-        
-    action = 'findvideos' if item.contentType == 'movie' else 'episodios'
+    logger.info("[toonitalia] peliculas")
+    itemlist = []
+    minpage = 14
 
-    return locals()
+    p = 1
+    if '{}' in item.url:
+        item.url, p = item.url.split('{}')
+        p = int(p)
+
+    data = httptools.downloadpage(item.url, headers=headers).data
+
+    patron = r'<h2 class="entry-title"><a href="([^"]+)" rel="bookmark">([^<]+)</a></h2>.*?<p>([^<]+)</p>'
+    matches = re.compile(patron, re.DOTALL).findall(data)
+
+    print data
+
+    for i, (scrapedurl, scrapedtitle, scrapedplot) in enumerate(matches):
+        if (p - 1) * minpage > i: continue
+        if i >= p * minpage: break
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
+        itemlist.append(
+            Item(channel=__channel__,
+                 action="episodios",
+                 contentType="episode",
+                 title=scrapedtitle,
+                 fulltitle=scrapedtitle,
+                 url=scrapedurl,
+                 show=scrapedtitle,
+                 plot=scrapedplot))
+
+    if len(matches) >= p * minpage:
+        scrapedurl = item.url + '{}' + str(p + 1)
+        itemlist.append(
+            Item(channel=__channel__,
+                 extra=item.extra,
+                 action="peliculas",
+                 title="[COLOR blue][B]Successivo >[/B][/COLOR]",
+                 url=scrapedurl))
+
+    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+    return itemlist
+
+#----------------------------------------------------------------------------------------------------------------------------------------------
 
 def episodios(item):
     logger.info("[toonitalia.py] episodios")
@@ -93,14 +285,79 @@ def episodios(item):
                              show=item.show,
                              plot=item.plot))
     else:
-        patron = '<br /> <a href="(?P<url>[^"]+)" target="_blank" rel="noopener[^>]+>(?P<title>[^<]+)</a>'
+        for scrapedurl, scrapedtitle in matches:
+            if 'Wikipedia' not in scrapedurl:
+                scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle).replace("×", "x")
+                scrapedtitle = scrapedtitle.replace("_", " ")
+                scrapedtitle = scrapedtitle.replace(".mp4", "")
+                # puntata = scrapertools.find_single_match(scrapedtitle, '[0-9]+x[0-9]+')
+                puntata = scrapedtitle
+                for i in itemlist:
+                    if i.args == puntata: #è già stata aggiunta
+                        i.url +=  " " + scrapedurl
+                        break
 
-    def itemHook(item):
-        item.title = item.title.replace('_',' ').replace('–','-')
-        item.title = support.re.sub(item.fulltitle + ' - ','',item.title)
-        return item
+                else:
+                    itemlist.append(
+                        Item(channel=__channel__,
+                            action="findvideos",
+                            contentType=item.contentType,
+                            title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
+                            thumbnail=item.thumbnail,
+                            fulltitle=scrapedtitle,
+                            url=scrapedurl,
+                            args = puntata,
+                            show=item.show,
+                            plot=item.plot))
 
-    return locals()
+    support.videolibrary(itemlist, item, 'color kod')
+
+    return itemlist
+
+#----------------------------------------------------------------------------------------------------------------------------------------------
+
+def search(item, texto):
+    logger.info("[toonitalia.py] " + item.url + " search " + texto)
+    item.url = host + "/?s=" + texto
+    try:
+        return peliculas(item)
+
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("%s" % line)
+        return []
+
+#----------------------------------------------------------------------------------------------------------------------------------------------
 
 def findvideos(item):
-    return support.server(item, item.url if item.contentType != 'movie' else support.httptools.downloadpage(item.url, headers=headers).data )
+    logger.info("[toonitalia.py] findvideos")
+
+    if item.args == 'film':
+        data = httptools.downloadpage(item.url, headers=headers).data
+        itemlist = servertools.find_video_items(data=data)
+
+        for videoitem in itemlist:
+            videoitem.channel = __channel__
+            server = re.sub(r'[-\[\]\s]+', '', videoitem.title)
+            videoitem.title = "".join(['[COLOR blue] ' + "[[B]" + server + "[/B]][/COLOR] " + item.title])
+            videoitem.thumbnail = item.thumbnail
+            videoitem.plot = item.plot
+            videoitem.fulltitle = item.fulltitle
+            videoitem.show = item.show
+
+    else:
+        itemlist = servertools.find_video_items(data=item.url)
+
+        for videoitem in itemlist:
+            videoitem.channel = __channel__
+            server = re.sub(r'[-\[\]\s]+', '', videoitem.title)
+            videoitem.title = "".join(['[COLOR blue] ' + "[[B]" + server + "[/B]] " + item.title + '[/COLOR]'])
+            videoitem.thumbnail = item.thumbnail
+            videoitem.plot = item.plot
+            videoitem.fulltitle = item.fulltitle
+            videoitem.show = item.show
+
+    autoplay.start(itemlist, item)
+
+    return itemlist

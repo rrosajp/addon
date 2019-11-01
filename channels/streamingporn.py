@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import urlparse,urllib2,urllib,re
-import os, sys
-from platformcode import config, logger
-from core import scrapertools
-from core.item import Item
-from core import servertools
+import re
+import urlparse
+
 from core import httptools
+from core import scrapertools
+from core import servertools
+from core.item import Item
+from platformcode import logger
+from platformcode import config
 
 host = 'http://streamingporn.xyz'
 
@@ -88,12 +90,24 @@ def lista(item):
         contentTitle = title
         thumbnail = scrapedthumbnail
         plot = ""
-        itemlist.append( Item(channel=item.channel, action="findvideos" , title=title , url=url, thumbnail=thumbnail, 
+        itemlist.append( Item(channel=item.channel, action="play" , title=title , url=url, thumbnail=thumbnail, 
                               fanart=scrapedthumbnail, plot=plot, contentTitle = contentTitle) )
     next_page_url = scrapertools.find_single_match(data,'<div class="loadMoreInfinite"><a href="(.*?)" >Load More')
     if next_page_url!="":
         next_page_url = urlparse.urljoin(item.url,next_page_url)
         itemlist.append( Item(channel=item.channel , action="lista" , title="Página Siguiente >>" , 
                         text_color="blue", url=next_page_url) )
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    data = httptools.downloadpage(item.url).data
+    itemlist = servertools.find_video_items(data=data)
+    for videoitem in itemlist:
+        videoitem.title = item.title
+        videoitem.fulltitle = item.fulltitle
+        videoitem.thumbnail = item.thumbnail
+        videoitem.channel = item.channel
     return itemlist
 

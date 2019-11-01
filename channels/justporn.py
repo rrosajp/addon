@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import urlparse,urllib2,urllib,re
-import os, sys
-from core import scrapertools
-from core import servertools
-from core.item import Item
-from platformcode import config, logger
+import re
+import urlparse
+
 from core import httptools
+from core import scrapertools
+from core.item import Item
+from platformcode import logger
+from platformcode import config
 
 host = 'http://xxx.justporno.tv'
 
@@ -92,6 +93,10 @@ def lista(item):
                     next_page = "%s?mode=async&function=get_block&block_id=list_videos_common_videos_list" \
                                 "&sort_by=post_date&from=%s" % (item.url, next_page)
                 itemlist.append(item.clone(action="lista", title="Página Siguiente >>", text_color="blue", url=next_page))
+
+    # if next_page!="":
+        # next_page = urlparse.urljoin(item.url,next_page)
+        # itemlist.append(item.clone(action="lista", title="Página Siguiente >>", text_color="blue", url=next_page) )
     return itemlist
 
 
@@ -104,6 +109,6 @@ def play(item):
     matches = re.compile(patron,re.DOTALL).findall(data)
     for scrapedurl in matches:
         scrapedplot = ""
-        itemlist.append(item.clone(channel=item.channel, action="play", title=item.title , url=scrapedurl , plot="" , folder=True) )
+        itemlist.append(item.clone(channel=item.channel, action="play", title=scrapedurl , url=scrapedurl , plot="" , folder=True) )
     return itemlist
 

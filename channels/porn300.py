@@ -1,31 +1,35 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import urlparse,urllib2,urllib,re
-import os, sys
-from platformcode import config, logger
+import re
+import urlparse
+
+from core import httptools
 from core import scrapertools
 from core.item import Item
-from core import servertools
-from core import httptools
+from platformcode import logger
+from platformcode import config
 
 host = 'https://www.porn300.com'
 
+#BLOQUEO ANTIVIRUS STREAMCLOUD
 
 def mainlist(item):
     logger.info()
     itemlist = []
-    itemlist.append( Item(channel=item.channel, title="Nuevas" , action="lista", url=host + "/en_US/ajax/page/list_videos/?page=1"))
-    itemlist.append( Item(channel=item.channel, title="Canal" , action="categorias", url=host + "/channels/?page=1"))
-    itemlist.append( Item(channel=item.channel, title="Pornstars" , action="categorias", url=host + "/pornstars/?page=1"))
-    itemlist.append( Item(channel=item.channel, title="Categorias" , action="categorias", url=host + "/categories/?page=1"))
+    itemlist.append( Item(channel=item.channel, title="Nuevas" , action="lista", url=host + "/es/videos/"))
+    itemlist.append( Item(channel=item.channel, title="Mas Vistas" , action="lista", url=host + "/es/mas-vistos/"))
+    itemlist.append( Item(channel=item.channel, title="Mejor valorada" , action="lista", url=host + "/es/mas-votados/"))
+    itemlist.append( Item(channel=item.channel, title="Canal" , action="categorias", url=host + "/es/canales/?page=1"))
+    itemlist.append( Item(channel=item.channel, title="Pornstars" , action="categorias", url=host + "/es/pornostars/?page=1"))
+    itemlist.append( Item(channel=item.channel, title="Categorias" , action="categorias", url=host + "/es/categorias/"))
     itemlist.append( Item(channel=item.channel, title="Buscar", action="search"))
     return itemlist
-# view-source:https://www.porn300.com/en_US/ajax/page/show_search?q=big+tit&page=1
-# https://www.porn300.com/en_US/ajax/page/show_search?page=2 
+
+
 def search(item, texto):
     logger.info()
     texto = texto.replace(" ", "+")
-    item.url = host + "/en_US/ajax/page/show_search?q=%s&?page=1" % texto
+    item.url = host + "/es/buscar/?q=%s" % texto
     try:
         return lista(item)
     except:
@@ -40,18 +44,20 @@ def categorias(item):
     itemlist = []
     data = httptools.downloadpage(item.url).data
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>", "", data)
-    patron  = '<a itemprop="url" href="/([^"]+)".*?'
-    patron += 'data-src="([^"]+)" alt=.*?'
-    patron += 'itemprop="name">([^<]+)</h3>.*?'
-    patron += '</svg>([^<]+)<'
+    patron  = '<a itemprop="url" href="([^"]+)".*?'
+    patron += 'title="([^"]+)">.*?'
+    if "/pornostars/" in item.url:
+        patron += '<img itemprop="image" src=([^"]+) alt=.*?'
+        patron += '</svg>([^<]+)<'
+    else:
+        patron += '<img itemprop="image" src="([^"]+)" alt=.*?'
+        patron += '</svg>([^<]+)<'
     matches = re.compile(patron,re.DOTALL).findall(data)
-    for scrapedurl,scrapedthumbnail,scrapedtitle,cantidad in matches:
+    for scrapedurl,scrapedtitle,scrapedthumbnail,cantidad in matches:
         scrapedplot = ""
         cantidad = re.compile("\s+", re.DOTALL).sub(" ", cantidad)
         scrapedtitle = scrapedtitle + " (" + cantidad +")"
-        scrapedurl = scrapedurl.replace("channel/", "producer/")
-        scrapedurl = "/en_US/ajax/page/show_" + scrapedurl + "?page=1"
-        scrapedurl = urlparse.urljoin(item.url,scrapedurl)
+        scrapedurl = urlparse.urljoin(item.url,scrapedurl) + "/?sort=latest"
         itemlist.append( Item(channel=item.channel, action="lista", title=scrapedtitle, url=scrapedurl,
                               fanart=scrapedthumbnail, thumbnail=scrapedthumbnail, plot=scrapedplot) )
     next_page = scrapertools.find_single_match(data,'<link rel="next" href="([^"]+)" />')
@@ -69,29 +75,22 @@ def lista(item):
     itemlist = []
     data = httptools.downloadpage(item.url).data
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>", "", data)
-    patron = '<a itemprop="url" href="([^"]+)".*?'
-    patron += 'data-src="([^"]+)".*?'
-    patron += 'itemprop="name">([^<]+)<.*?'
+    patron = '<a itemprop="url" href="([^"]+)" data-video-id="\d+" title="([^"]+)">.*?'
+    patron += '<img itemprop="thumbnailUrl" src="([^"]+)".*?'
     patron += '</svg>([^<]+)<'
     matches = re.compile(patron,re.DOTALL).findall(data)
-    for scrapedurl,scrapedthumbnail,scrapedtitle,scrapedtime  in matches:
+    for scrapedurl,scrapedtitle,scrapedthumbnail,cantidad  in matches:
         url = urlparse.urljoin(item.url,scrapedurl)
-        scrapedtime = scrapedtime.strip()
-        title = "[COLOR yellow]" + scrapedtime + "[/COLOR] " + scrapedtitle
+        cantidad = re.compile("\s+", re.DOTALL).sub(" ", cantidad)
+        title = "[COLOR yellow]" + cantidad + "[/COLOR] " + scrapedtitle
         contentTitle = title
         thumbnail = scrapedthumbnail
         plot = ""
         itemlist.append( Item(channel=item.channel, action="play" , title=title , url=url, thumbnail=thumbnail,
                               fanart=thumbnail, plot=plot, contentTitle = contentTitle) )
-    prev_page = scrapertools.find_single_match(item.url,"(.*?)page=\d+")
-    num= int(scrapertools.find_single_match(item.url,".*?page=(\d+)"))
-    num += 1
-    num_page = "?page=" + str(num)
-    if num_page!="":
-        next_page = urlparse.urljoin(item.url,num_page)
-        if "show_search" in next_page:
-            next_page = prev_page + num_page
-            next_page = next_page.replace("&?", "&")
+    next_page = scrapertools.find_single_match(data,'<link rel="next" href="([^"]+)" />')
+    if next_page!="":
+        next_page = urlparse.urljoin(item.url,next_page)
         itemlist.append(item.clone(action="lista", title="Página Siguiente >>", text_color="blue", url=next_page) )
     return itemlist
 
@@ -102,6 +101,6 @@ def play(item):
     patron  = '<source src="([^"]+)"'
     matches = re.compile(patron,re.DOTALL).findall(data)
     for url  in matches:
-        itemlist.append(item.clone(action="play", title=url, url=url))
+        itemlist.append(item.clone(action="play", title=url, fulltitle = item.title, url=url))
     return itemlist
 

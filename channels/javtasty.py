@@ -109,7 +109,8 @@ def menu_info(item):
     itemlist = []
     video_urls, data = play(item.clone(extra="play_menu"))
     itemlist.append(item.clone(action="play", title="Ver -- %s" % item.title, video_urls=video_urls))
-    matches = scrapertools.find_multiple_matches(data, '<a href="([^"]+)" class="item" rel="screenshots"')
+    bloque = scrapertools.find_single_match(data, '<div class="carousel-inner"(.*?)<div class="container">')
+    matches = scrapertools.find_multiple_matches(bloque, 'src="([^"]+)"')
     for i, img in enumerate(matches):
         if i == 0:
             continue

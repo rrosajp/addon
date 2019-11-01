@@ -12,6 +12,14 @@
   ],
   "settings": [
     {
+    "id": "channel_host",
+    "type": "text",
+    "label": "Host del canale",
+    "default": "https://altadefinizione01.estate/",
+    "enabled": true,
+    "visible": true
+    },
+    {
       "id": "modo_grafico",
       "type": "bool",
       "label": "Cerca informazioni extra",

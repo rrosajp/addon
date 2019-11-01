@@ -4,11 +4,24 @@
   "active": true,
   "adult": false,
   "language": ["ita"],
-  "bannermenu": "altadefinizione01link.png",
-  "banner": "altadefinizione01link.png",
-  "fanart": "altadefinizione01link.png",
-  "categories": ["movie","vosi"],
+  "fanart": "https://altadefinizione01.estate/templates/Dark/img/nlogo.png",
+  "thumbnail": "https://altadefinizione01.estate/templates/Dark/img/nlogo.png",
+  "banner": "https://altadefinizione01.estate/templates/Dark/img/nlogo.png",
+  "fix" : "reimpostato url e modificato file per KOD",
+  "change_date": "2019-30-04",
+  "categories": [
+    "movie",
+    "vosi"
+  ],
   "settings": [
+    {
+    "id": "channel_host",
+    "type": "text",
+    "label": "Host del canale",
+    "default": "https://altadefinizione01.estate/",
+    "enabled": true,
+    "visible": true
+    },  
     {
       "id": "modo_grafico",
       "type": "bool",

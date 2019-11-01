@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-import urlparse
-import urllib2
-import urllib
 import re
-import os
-import sys
 
-from platformcode import config, logger
+import urlparse
+
+from core import httptools
 from core import scrapertools
 from core.item import Item
-from core import servertools
-from core import httptools
+from platformcode import logger
+from platformcode import config
 
 host = 'https://www.xozilla.com'
 
@@ -59,8 +56,6 @@ def categorias(item):
             scrapedtitle += " (" + cantidad + ")"
         itemlist.append(Item(channel=item.channel, action="lista", title=scrapedtitle, url=scrapedurl,
                              thumbnail=scrapedthumbnail, fanart=scrapedthumbnail, plot=scrapedplot))
-    if "Categorias" in item.title:
-        itemlist.sort(key=lambda x: x.title)
     next_page = scrapertools.find_single_match(data, '<li class="next"><a href="([^"]+)"')
     if next_page != "#videos":
         next_page = urlparse.urljoin(item.url, next_page)
@@ -109,6 +104,6 @@ def play(item):
     media_url = scrapertools.find_single_match(data, 'video_alt_url: \'([^\']+)/\'')
     if media_url == "":
         media_url = scrapertools.find_single_match(data, 'video_url: \'([^\']+)/\'')
-    itemlist.append(Item(channel=item.channel, action="play", title=item.title, url=media_url,
+    itemlist.append(Item(channel=item.channel, action="play", title=item.title, fulltitle=item.fulltitle, url=media_url,
                          thumbnail=item.thumbnail, plot=item.plot, show=item.title, server="directo", folder=False))
     return itemlist

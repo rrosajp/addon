@@ -1,49 +1,53 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per SerieHD
+# Canale per seriehd
 # ------------------------------------------------------------
+import urlparse
+import re
 
-
-from core import scrapertoolsV2, httptools, support
+from channelselector import thumb
+from lib import cloudscraper
+from core import scrapertoolsV2, servertools, httptools, support
 from core.item import Item
+from core.support import menu, log
+from platformcode import logger, config
+from specials import autoplay
 
 
-__channel__ = 'seriehd'
-# host = support.config.get_channel_url(__channel__)
+__channel__ = "seriehd"
+host = config.get_channel_url(__channel__)
 
-# impostati dinamicamente da findhost()
-host = ''
-headers = ''
-
-def findhost():
-    data= httptools.downloadpage('https://seriehd.nuovo.link/').data
-    global host, headers
-    host = scrapertoolsV2.find_single_match(data, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
-    headers = [['Referer', host]]
-    return host
-
+IDIOMAS = {'Italiano': 'IT'}
+list_language = IDIOMAS.values()
 list_servers = ['verystream', 'openload', 'streamango', 'thevideome']
 list_quality = ['1080p', '720p', '480p', '360']
 
-checklinks = support.config.get_setting('checklinks', __channel__)
-checklinks_number = support.config.get_setting('checklinks_number', __channel__)
+checklinks = config.get_setting('checklinks', 'seriehd')
+checklinks_number = config.get_setting('checklinks_number', 'seriehd')
 
 headers = [['Referer', host]]
 
-@support.menu
+
 def mainlist(item):
-    findhost()
-    tvshow = [('Genere', ['', 'genre']),
-              ('Americane', ['serie-tv-streaming/serie-tv-americane', 'peliculas']),
-              ('Italiane', ['serie-tv-streaming/serie-tv-italiane', 'peliculas']),]
-    return locals()
+    log()
+    itemlist = []
+
+    menu(itemlist, 'Serie TV', 'peliculas', host + '/serie-tv-streaming', 'tvshow')
+    menu(itemlist, 'Per Genere submenu', 'genre', host, 'tvshow', 'TV')
+    menu(itemlist, 'Per Nazione submenu', 'nation', host + '/serie-tv-streaming/', 'tvshow', 'TV')
+    menu(itemlist, 'Cerca...', 'search', contentType='tvshow', args='TV')
+
+    autoplay.init(item.channel, list_servers, list_quality)
+    autoplay.show_option(item.channel, itemlist)
+
+    return itemlist
 
 
 def search(item, texto):
-    support.log(texto)
-    
-    # item.contentType = 'tvshow'
-    item.url = findhost() + "/?s=" + texto
+    log(texto)
+
+    item.url = host + "/?s=" + texto
+
     try:
         return peliculas(item)
 
@@ -51,36 +55,46 @@ def search(item, texto):
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("%s" % line)
+            logger.error("%s" % line)
         return []
 
 
 def newest(categoria):
-    support.log(categoria)
+    log(categoria)
     itemlist = []
-    item = support.Item()    
+    item = Item()
     try:
+
+        ## cambiar los valores "peliculas, infantiles, series, anime, documentales por los que correspondan aqui en
+        # el py y en l json ###
         if categoria == "series":
-            item.url = findhost()
+            item.url = host
             itemlist = peliculas(item)
+
+            if 'Successivo>>' in itemlist[-1].title:
+                itemlist.pop()
 
     # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("{0}".format(line))
+            logger.error("{0}".format(line))
         return []
 
     return itemlist
 
 
-@support.scrape
 def genre(item):
-    patronMenu = '<a href="(?P<url>[^"]+)">(?P<title>[^<]+)</a>'
-    blacklist = ['Serie TV','Serie TV Americane','Serie TV Italiane','altadefinizione']
-    patronBlock = '<ul class="sub-menu">(?P<block>.*)</ul>'
-    action = 'peliculas'
-    return locals()
+    itemlist = support.scrape(item, '<a href="([^"]+)">([^<]+)</a>', ['url', 'title'], headers,['Serie TV','Serie TV Americane','Serie TV Italiane','altadefinizione'], action='peliculas')
+    return thumb(itemlist)
+
+
+def nation(item):
+    log()
+    itemlist = []
+    menu(itemlist, 'Serie TV Americane', 'peliculas', host + '/serie-tv-streaming/serie-tv-americane/')
+    menu(itemlist, 'Serie TV Italiane', 'peliculas', host + '/serie-tv-streaming/serie-tv-italiane/')
+    return itemlist
 
 
 def peliculas(item):
@@ -88,27 +102,48 @@ def peliculas(item):
     return support.scrape(item,r'<h2>(.*?)</h2>\s*<img src="([^"]+)" alt="[^"]*" />\s*<A HREF="([^"]+)">.*?<span class="year">([0-9]{4}).*?<span class="calidad">([A-Z]+)',['title', 'thumb', 'url', 'year', 'quality'], headers, patronNext=r'<link rel="next" href="([^"]+)"', action='episodios')
 
 
-@support.scrape
 def episodios(item):
-    data =''
-    url = support.match(item, patronBlock=r'<iframe width=".+?" height=".+?" src="([^"]+)" allowfullscreen frameborder="0">')[1]
-    seasons = support.match(item, r'<a href="([^"]+)">(\d+)<', r'<h3>STAGIONE</h3><ul>(.*?)</ul>', headers, url)[0]    
+    log()
+    itemlist = []
+
+    data = httptools.downloadpage(item.url).data
+    patron = r'<iframe width=".+?" height=".+?" src="([^"]+)" allowfullscreen frameborder="0">'
+    url = scrapertoolsV2.find_single_match(data, patron).replace("?seriehd", "")
+    seasons = support.match(item, r'<a href="([^"]+)">(\d+)<', r'<h3>STAGIONE</h3><ul>(.*?)</ul>', headers, url)[0]
     for season_url, season in seasons:
-        season_url = support.urlparse.urljoin(url, season_url)
+        season_url = urlparse.urljoin(url, season_url)
         episodes = support.match(item, r'<a href="([^"]+)">(\d+)<', '<h3>EPISODIO</h3><ul>(.*?)</ul>', headers, season_url)[0]
         for episode_url, episode in episodes:
-            episode_url = support.urlparse.urljoin(url, episode_url)
+            episode_url = urlparse.urljoin(url, episode_url)
             title = season + "x" + episode.zfill(2)
-            data += title + '|' + episode_url + '\n'
-    support.log('DaTa= ',data)
-    patron = r'(?P<title>[^\|]+)\|(?P<url>[^\n]+)\n'
-    action = 'findvideos'
-    return locals()
+
+            itemlist.append(
+                Item(channel=item.channel,
+                     action="findvideos",
+                     contentType="episode",
+                     title=support.typo(title + ' - ' +item.show,'bold'),
+                     url=episode_url,
+                     fulltitle=title + ' - ' + item.show,
+                     show=item.show,
+                     thumbnail=item.thumbnail))
+
+    support.videolibrary(itemlist, item, 'color kod bold')
+
+    return itemlist
 
 
 def findvideos(item):
-    support.log()
-    return support.hdpass_get_servers(item) 
+    log()
+
+    itemlist = []
+    itemlist = support.hdpass_get_servers(item)
+
+    if checklinks:
+        itemlist = servertools.check_list_links(itemlist, checklinks_number)
+
+    autoplay.start(itemlist, item)
+
+    return itemlist
 
 
 

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import urlparse,urllib2,urllib,re
-import os, sys
-from platformcode import config, logger
+import re
+import urlparse
+
+from core import httptools
 from core import scrapertools
 from core.item import Item
-from core import servertools
-from core import httptools
+from platformcode import logger
+from platformcode import config
 
 host = 'http://www.tryboobs.com'
 
@@ -89,8 +90,7 @@ def play(item):
     patron  = '<video src="([^"]+)"'
     matches = scrapertools.find_multiple_matches(data, patron)
     for url  in matches:
-        url += "|Referer=%s" % host
-        itemlist.append(Item(channel=item.channel, action="play", title=item.title, url=url,
+        itemlist.append(Item(channel=item.channel, action="play", title=item.title, fulltitle=item.fulltitle, url=url,
                          thumbnail=item.thumbnail, plot=item.plot, show=item.title, server="directo", folder=False))
     return itemlist
 

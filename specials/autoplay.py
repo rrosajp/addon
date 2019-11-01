@@ -16,8 +16,6 @@ PLAYED = False
 
 autoplay_node = {}
 
-colorKOD = '0xFF65B3DA'
-
 
 def context():
     '''
@@ -38,7 +36,7 @@ def context():
 context = context()
 
 
-def show_option(channel, itemlist, text_color=colorKOD, thumbnail=None, fanart=None):
+def show_option(channel, itemlist, text_color='yellow', thumbnail=None, fanart=None):
     '''
     Agrega la opcion Configurar AutoPlay en la lista recibida
 
@@ -56,8 +54,8 @@ def show_option(channel, itemlist, text_color=colorKOD, thumbnail=None, fanart=N
 
     if thumbnail == None:
         thumbnail = get_thumb('autoplay.png')
-    # if fanart == None:
-    #     fanart = get_thumb('autoplay.png')
+    if fanart == None:
+        fanart = get_thumb('autoplay.png')
 
     plot_autoplay = config.get_localized_string(60399)
     itemlist.append(
@@ -65,12 +63,10 @@ def show_option(channel, itemlist, text_color=colorKOD, thumbnail=None, fanart=N
              title=config.get_localized_string(60071),
              action="autoplay_config",
              text_color=text_color,
-             text_bold=True,
              thumbnail=thumbnail,
-            #  fanart=fanart,
+             fanart=fanart,
              plot=plot_autoplay,
-             from_channel=channel,
-             folder=False
+             from_channel=channel
              ))
     return itemlist
 
@@ -645,7 +641,7 @@ def get_languages(channel):
     :return: list
     '''
     logger.info()
-    list_language = ['Non filtrare']
+    list_language = ['No filtrar']
     list_controls, dict_settings = channeltools.get_channel_controls_settings(channel)
     for control in list_controls:
         try:

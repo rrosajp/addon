@@ -21,20 +21,18 @@ list_language = IDIOMAS.values()
 list_servers = ['gounlimited', 'verystream', 'streamango', 'openload']
 list_quality = ['default']
 
-@support.menu
+
 def mainlist(item):
     log()
     itemlist = []
-    tvshowSub = [
-        ('Novità bold',[ '', 'peliculas_tv', '', 'tvshow']),
-        ('Serie TV bold',[ '', 'lista_serie', '', 'tvshow']),
-        ('Per Lettera', ['', 'list_az', 'serie', 'tvshow'])
-    ]
-##    support.aplay(item, itemlist, list_servers, list_quality)
-##    support.channel_config(item, itemlist)
+    support.menu(itemlist, 'Novità bold', 'peliculas_tv', host, 'tvshow')
+    support.menu(itemlist, 'Serie TV bold', 'lista_serie', host, 'tvshow')
+    support.menu(itemlist, 'Archivio A-Z submenu', 'list_az', host, 'tvshow', args=['serie'])
+    support.menu(itemlist, 'Cerca', 'search', host, 'tvshow')
+    support.aplay(item, itemlist, list_servers, list_quality)
+    support.channel_config(item, itemlist)
 
-    return locals()
-
+    return itemlist
 
 
 # ----------------------------------------------------------------------------------------------------------------
@@ -161,7 +159,7 @@ def episodios(item, itemlist=[]):
             # recupero la stagione
             season = scrapertools.find_single_match(scrapedtitle, 'Stagione ([0-9]*)')
             blocco = scrapertools.find_single_match(data, '<div class="entry">[\s\S.]*?<div class="post')
-            blocco = blocco.replace('<strong>Episodio ', '<strong>Episodio ').replace(' </strong>', ' </strong>')
+            blocco = blocco.replace('<strong>Episodio ', '<strong>Episodio ').replace(' </strong>', ' </strong>')
             blocco = blocco.replace('<strong>Episodio ', '<strong>S' + season.zfill(2) + 'E')
             matches = scrapertools.find_multiple_matches(blocco, r'(S(\d*)E(\d*))\s')
             episodes = []
@@ -353,4 +351,3 @@ def list_az(item):
     return itemlist
 
 # ================================================================================================================
- 

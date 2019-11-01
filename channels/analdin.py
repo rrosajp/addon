@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import urlparse,urllib2,urllib,re
-import os, sys
-from platformcode import config, logger
+import re
+import urlparse
+
+from core import httptools
 from core import scrapertools
 from core.item import Item
-from core import servertools
-from core import httptools
-
+from platformcode import logger
+from platformcode import config
 
 host = 'https://www.analdin.com/es'
 
@@ -108,6 +108,6 @@ def play(item):
     matches = re.compile(patron,re.DOTALL).findall(data)
     for scrapedurl  in matches:
         url = scrapedurl
-    itemlist.append(item.clone(action="play", title=url, url=url))
+    itemlist.append(item.clone(action="play", title=url, fulltitle = item.title, url=url))
     return itemlist
 

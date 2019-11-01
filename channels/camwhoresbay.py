@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import urlparse,urllib2,urllib,re
-import os, sys
-from platformcode import config, logger
+import re
+import urlparse
+
+from core import httptools
 from core import scrapertools
 from core.item import Item
-from core import servertools
-from core import httptools
+from platformcode import logger
+from platformcode import config
 
 host = 'https://www.camwhoresbay.com'
 
@@ -65,7 +66,7 @@ def lista(item):
     for scrapedurl,scrapedtitle,scrapedthumbnail,scrapedtime in matches:
         url = urlparse.urljoin(item.url,scrapedurl)
         title = "[COLOR yellow]" + scrapedtime + "[/COLOR] " + scrapedtitle
-        thumbnail = "http:" + scrapedthumbnail + "|Referer=%s" % item.url
+        thumbnail = scrapedthumbnail
         plot = ""
         itemlist.append( Item(channel=item.channel, action="play", title=title, url=url, thumbnail=thumbnail, plot=plot,
                               contentTitle = scrapedtitle, fanart=thumbnail))
@@ -107,7 +108,7 @@ def play(item):
     if scrapedurl == "" :
         scrapedurl = scrapertools.find_single_match(data, 'video_url: \'([^\']+)\'')
 
-    itemlist.append(Item(channel=item.channel, action="play", title=scrapedurl, url=scrapedurl,
+    itemlist.append(Item(channel=item.channel, action="play", title=scrapedurl, fulltitle=item.title, url=scrapedurl,
                         thumbnail=item.thumbnail, plot=item.plot, show=item.title, server="directo"))
     return itemlist
 

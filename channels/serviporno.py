@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import re
+
 import urlparse
 
 from core import httptools
 from core import scrapertools
 from core.item import Item
 from platformcode import logger
+from platformcode import config
 
 host = "https://www.serviporno.com"
 
@@ -45,9 +47,7 @@ def search(item, texto):
 def get_last_page(url):
     logger.info()
     data = httptools.downloadpage(url).data
-    last_page= scrapertools.find_single_match(data,'data-ajax-last-page="(\d+)"')
-    if last_page:
-        last_page= int(last_page)
+    last_page= int(scrapertools.find_single_match(data,'data-ajax-last-page="(\d+)"'))
     return last_page
 
 
@@ -59,7 +59,7 @@ def videos(item):
     patron += '<div class="box-escena">.*?'
     patron += '<a\s*href="([^"]+)".*?'
     patron += 'data-stats-video-name="([^"]+)".*?'
-    patron += 'data-src="([^"]+)".*?'
+    patron += '<img\s*src="([^"]+)".*?'
     patron += '<div class="duracion">([^"]+) min</div>'
     matches = re.compile(patron,re.DOTALL).findall(data)
     for url, title, thumbnail,duration in matches:
@@ -114,17 +114,15 @@ def categorias(item):
     itemlist = []
     data = httptools.downloadpage(item.url).data
     patron = '<div class="wrap-box-escena.*?'
-    patron += '<img src="([^"]+)".*?'
-    patron += '<h4.*?<a href="([^"]+)">([^<]+)<'
+    patron += 'href="([^"]+)"><img src="([^"]+)".*?'
+    patron += '<h4.*?<a href="[^"]+">([^<]+)</a></h4>'
     matches = re.compile(patron, re.DOTALL).findall(data)
-    for thumbnail, url, title in matches:
+    for url, thumbnail, title in matches:
         last = urlparse.urljoin(item.url, url)
         url= last.replace("/videos-porno", "/ajax/show_category").replace("/sitio","/ajax/show_producer") + "?page=1"
         itemlist.append(Item(channel=item.channel, action='videos', title=title, url=url, last=last, thumbnail=thumbnail, plot=""))
     # Paginador   "Página Siguiente >>"
-    current_page = scrapertools.find_single_match(item.url, "/?page=(\d+)")
-    if current_page:
-        current_page = int(current_page)
+    current_page = int(scrapertools.find_single_match(item.url, "/?page=(\d+)"))
     if not item.last_page:
         last_page = get_last_page(item.last)
     else:

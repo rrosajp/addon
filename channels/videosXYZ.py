@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import urlparse,urllib2,urllib,re
-import os, sys
+import re
+import urlparse
+
+from core import httptools
 from core import scrapertools
 from core import servertools
 from core.item import Item
-from platformcode import config, logger
-from core import httptools
+from platformcode import logger
+from platformcode import config
 
 host = 'http://free-porn-videos.xyz'
 
@@ -62,6 +64,7 @@ def play(item):
     itemlist = servertools.find_video_items(data=data)
     for videoitem in itemlist:
         videoitem.title = item.title
+        videoitem.fulltitle = item.fulltitle
         videoitem.thumbnail = item.thumbnail
         videoitem.channel = item.channel
     return itemlist

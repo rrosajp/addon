@@ -5,9 +5,8 @@
     <import addon="script.module.libtorrent" optional="true"/>
     <import addon="metadata.themoviedb.org"/>
     <import addon="metadata.tvdb.com"/>
-    
   </requires>
-  <extension library="default.py" point="xbmc.python.pluginsource">
+  <extension point="xbmc.python.pluginsource" library="default.py">
     <provides>video</provides>
   </extension>
   <extension point="xbmc.addon.metadata">
@@ -20,9 +19,7 @@
       <screenshot>resources/media/themes/ss/2.png</screenshot>
       <screenshot>resources/media/themes/ss/3.png</screenshot>
     </assets>
-      <news>KoD 0.5
-          -riscritti molti canali per cambiamenti nella struttura stessa di kod
-          -altre robe carine</news>
+      <news>Benvenuto su KOD!</news>
     <description lang="it">Naviga velocemente sul web e guarda i contenuti presenti</description>
     <disclaimer>[COLOR red]The owners and submitters to this addon do not host or distribute any of the content displayed by these addons nor do they have any affiliation with the content providers.[/COLOR]
     [COLOR yellow]Kodi © is a registered trademark of the XBMC Foundation. We are not connected to or in any other way affiliated with Kodi, Team Kodi, or the XBMC Foundation. Furthermore, any software, addons, or products offered by us will receive no support in official Kodi channels, including the Kodi forums and various social networks.[/COLOR]</disclaimer>
@@ -32,6 +29,6 @@
     <forum>https://t.me/kodiondemand</forum>
     <source>https://github.com/kodiondemand/addon</source>
   </extension>
-  <extension library="videolibrary_service.py" point="xbmc.service" start="login|startup">
+  <extension point="xbmc.service" library="videolibrary_service.py" start="login|startup">
   </extension>
 </addon>

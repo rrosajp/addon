@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import urlparse,urllib2,urllib,re
-import os, sys
-from core import scrapertools
-from core import servertools
-from core.item import Item
-from platformcode import config, logger
+import re
+import urlparse
+
 from core import httptools
+from core import scrapertools
+from core import tmdb
+from core.item import Item
+from platformcode import logger
+from platformcode import config
 
 host = 'https://xxxparodyhd.net'
 
@@ -17,8 +19,8 @@ def mainlist(item):
     itemlist.append( Item(channel=item.channel, title="Peliculas" , action="lista", url=host + "/movies/"))
     itemlist.append( Item(channel=item.channel, title="Nuevas" , action="lista", url=host + "/genre/new-release/"))
     itemlist.append( Item(channel=item.channel, title="Parodias" , action="lista", url=host + "/genre/parodies/"))
-    itemlist.append( Item(channel=item.channel, title="Canal" , action="categorias", url=host))
-    itemlist.append( Item(channel=item.channel, title="Categorias" , action="categorias", url=host))
+    itemlist.append( Item(channel=item.channel, title="Canal" , action="categorias", url=host + "/categories"))
+    itemlist.append( Item(channel=item.channel, title="Categorias" , action="categorias", url=host + "/categories"))
     itemlist.append( Item(channel=item.channel, title="Buscar", action="search"))
     return itemlist
 
@@ -67,6 +69,7 @@ def lista(item):
         scrapedplot = ""
         itemlist.append( Item(channel=item.channel, action="findvideos", title=scrapedtitle, url=scrapedurl,
                               thumbnail=scrapedthumbnail, fanart=scrapedthumbnail, plot=scrapedplot, infoLabels={'year':scrapedyear}) )
+    tmdb.set_infoLabels(itemlist, True)
     next_page = scrapertools.find_single_match(data,'<li class=\'active\'>.*?href=\'([^\']+)\'>')
     if next_page!="":
         next_page = urlparse.urljoin(item.url,next_page)

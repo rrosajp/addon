@@ -4,8 +4,8 @@
   "active": true,
   "adult": false,
   "language": ["ita"],
-  "thumbnail": "",
-  "banner": "",
+  "thumbnail": "https://www.filmpertutti.club/wp-content/themes/blunge/assets/logo.png",
+  "banner": "https://www.filmpertutti.club/wp-content/themes/blunge/assets/logo.png",
   "categories": ["tvshow","movie"],
   "settings": [
         {

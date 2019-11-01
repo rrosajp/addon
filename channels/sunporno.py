@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import urlparse,urllib2,urllib,re
-import os, sys
-from platformcode import config, logger
+import re
+import urlparse
+
+from core import httptools
 from core import scrapertools
 from core.item import Item
-from core import servertools
-from core import httptools
+from platformcode import logger
+from platformcode import config
 
 host = 'https://www.sunporno.com'
 
@@ -18,7 +19,7 @@ def mainlist(item):
     itemlist.append( Item(channel=item.channel, title="Mejor valorada" , action="lista", url=host + "/top-rated/date-last-week/"))
     itemlist.append( Item(channel=item.channel, title="Mas largas" , action="lista", url=host + "/long-movies/date-last-month/"))
     itemlist.append( Item(channel=item.channel, title="PornStars" , action="catalogo", url=host + "/pornstars/most-viewed/1/"))
-    itemlist.append( Item(channel=item.channel, title="Categorias" , action="categorias", url=host + "/channels/"))
+    itemlist.append( Item(channel=item.channel, title="Categorias" , action="categorias", url=host + "/channels"))
     itemlist.append( Item(channel=item.channel, title="Buscar", action="search"))
     return itemlist
 
@@ -41,7 +42,7 @@ def categorias(item):
     itemlist = []
     data = httptools.downloadpage(item.url).data
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>", "", data)
-    patron = '<div class="thumb-container with-title moviec.*?'
+    patron = '<div class="thumb-container with-title moviec">.*?'
     patron += '<a href="([^"]+)".*?'
     patron += 'src="([^"]+)".*?'
     patron += '<a title="([^"]+)".*?'
@@ -112,7 +113,6 @@ def play(item):
     matches = scrapertools.find_multiple_matches(data, patron)
     for scrapedurl  in matches:
         scrapedurl = scrapedurl.replace("https:", "http:")
-        scrapedurl += "|Referer=%s" % host
         itemlist.append(Item(channel=item.channel, action="play", title=item.title, url=scrapedurl,
                             thumbnail=item.thumbnail, plot=item.plot, show=item.title, server="directo", folder=False))
     return itemlist

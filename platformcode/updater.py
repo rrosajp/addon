@@ -19,7 +19,7 @@ addon = xbmcaddon.Addon('plugin.video.kod')
 _hdr_pat = re.compile("^@@ -(\d+),?(\d+)? \+(\d+),?(\d+)? @@.*")
 
 branch = 'stable'
-user = 'mac12m99'
+user = 'kodiondemand'
 repo = 'addon'
 addonDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'
 maxPage = 5  # le api restituiscono 30 commit per volta, quindi se si è rimasti troppo indietro c'è bisogno di andare avanti con le pagine
@@ -74,6 +74,9 @@ def check_addon_init():
         for c in reversed(commits[:pos]):
             commit = httptools.downloadpage(c['url']).data
             commitJson = json.loads(commit)
+            # evitiamo di applicare i merge commit
+            if 'Merge' in commitJson['commit']['message']:
+                continue
             logger.info('aggiornando a ' + commitJson['sha'])
             alreadyApplied = True
 
@@ -128,7 +131,7 @@ def check_addon_init():
                                     filetools.mkdir(addonDir + d)
                             filetools.move(addonDir + file['previous_filename'], addonDir + file['filename'])
                             alreadyApplied = False
-            if not alreadyApplied and 'Merge' not in commitJson['commit']['message']: # non mando notifica se già applicata (es. scaricato zip da github) o se è un merge
+            if not alreadyApplied:  # non mando notifica se già applicata (es. scaricato zip da github)
                 changelog += commitJson['commit']['message'] + " | "
                 nCommitApplied += 1
         if addon.getSetting("addon_update_message"):

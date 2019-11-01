@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import urlparse,urllib2,urllib,re
-import os, sys
+import re
+import urlparse
 
-from platformcode import config, logger
+from core import httptools
 from core import scrapertools
 from core.item import Item
-from core import servertools
-from core import httptools
+from platformcode import logger
+from platformcode import config
 
 host = 'http://xxxdan.com'
 
@@ -93,7 +93,7 @@ def play(item):
     data = httptools.downloadpage(item.url).data
     media_url = scrapertools.find_single_match(data, 'src:\'([^\']+)\'')
     media_url = media_url.replace("https","http")
-    itemlist.append(Item(channel=item.channel, action="play", title=item.title, url=media_url,
+    itemlist.append(Item(channel=item.channel, action="play", title=item.title, fulltitle=item.fulltitle, url=media_url,
                         thumbnail=item.thumbnail, plot=item.plot, show=item.title, server="directo", folder=False))
     return itemlist
 

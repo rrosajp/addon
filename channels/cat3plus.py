@@ -5,8 +5,7 @@
 
 
 import re
-import urllib
-import urlparse
+
 from channelselector import get_thumb
 from core import httptools
 from core import scrapertools
@@ -84,7 +83,7 @@ def search(item, texto):
     logger.info()
     if texto != "":
         texto = texto.replace(" ", "+")
-    item.url = host + "search?q=" + texto
+    item.url = host + "/search?q=" + texto
     item.extra = "busqueda"
     try:
         return list_all(item)
