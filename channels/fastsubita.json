@@ -8,6 +8,22 @@
     "banner": "fastsubita.png",
     "categories": ["tvshow", "vos"],
     "settings": [
+		{
+		  "id": "include_in_newest_peliculas",
+		  "type": "bool",
+		  "label": "@70727",
+		  "default": false,
+		  "enabled": false,
+		  "visible": false
+        },   
+		{
+		  "id": "include_in_newest_anime",
+		  "type": "bool",
+		  "label": "@70727",
+		  "default": false,
+		  "enabled": false,
+		  "visible": false
+		},
         {
 		  "id": "include_in_newest_italiano",
 		  "type": "bool",
