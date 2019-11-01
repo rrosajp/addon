@@ -166,7 +166,7 @@ def peliculas(item):
 
     patronNext = '<span class="current">[^<]+<[^>]+><a href="([^"]+)"'
 
-    debug = True
+##    debug = True
     return locals()
 
 
@@ -238,4 +238,3 @@ def findvideos(item):
         data += str(scrapertoolsV2.find_multiple_matches(html, '<meta name="og:url" content="([^"]+)">'))
     itemlist = support.server(item, data)
     return itemlist
-
