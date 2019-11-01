@@ -2,14 +2,11 @@
 #------------------------------------------------------------
 
 import re
-
 import urlparse
-
 from core import httptools
 from core import scrapertools
 from core.item import Item
 from platformcode import logger
-from platformcode import config
 
 host = 'https://es.redtube.com'
 
@@ -117,6 +114,6 @@ def play(item):
     matches = re.compile(patron,re.DOTALL).findall(data)
     for scrapedurl  in matches:
         url =  scrapedurl.replace("\/", "/")
-    itemlist.append(item.clone(action="play", title=url, fulltitle = item.title, url=url))
+    itemlist.append(item.clone(action="play", title=url, url=url))
     return itemlist
 

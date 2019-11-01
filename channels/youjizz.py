@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-import re
-
 import urlparse
-
-from core import httptools
+import urllib2
+import urllib
+import re
+import os
+import sys
+from platformcode import config, logger
 from core import scrapertools
 from core.item import Item
-from platformcode import logger
-from platformcode import config
+from core import servertools
+from core import httptools
 
 host = 'https://www.youjizz.com'
 
@@ -42,7 +44,7 @@ def categorias(item):
     logger.info()
     itemlist = []
     data = httptools.downloadpage(item.url).data
-    data = scrapertools.find_single_match(data, '<h4>Trending(.*?)</ul>')
+    data = scrapertools.find_single_match(data, '>Trending Categories<(.*?)</ul>')
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>", "", data)
     patron = '<li><a href="([^"]+)">([^"]+)</a>'
     matches = re.compile(patron, re.DOTALL).findall(data)
@@ -104,6 +106,6 @@ def play(item):
         patron = '"1080".*?"filename"\:"(.*?)"'
     media_url = scrapertools.find_single_match(data, patron)
     media_url = "https:" + media_url.replace("\\", "")
-    itemlist.append(Item(channel=item.channel, action="play", title=item.title, fulltitle=item.fulltitle, url=media_url,
+    itemlist.append(Item(channel=item.channel, action="play", title=item.title, url=media_url,
                          thumbnail=item.thumbnail, plot=item.plot, show=item.title, server="directo", folder=False))
     return itemlist

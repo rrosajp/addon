@@ -79,7 +79,7 @@ def get_channel_parameters(channel_name):
                     #             break
                     #     if found:
                     #         break
-
+                    channel_parameters['settings'] = get_default_settings(channel_name)                    
                     for s in channel_parameters['settings']:
                         if 'id' in s:
                             if s['id'] == "include_in_global_search":
@@ -155,7 +155,8 @@ def get_channel_controls_settings(channel_name):
     # logger.info("channel_name=" + channel_name)
     dict_settings = {}
     # import web_pdb; web_pdb.set_trace()
-    list_controls = get_channel_json(channel_name).get('settings', list())
+    # list_controls = get_channel_json(channel_name).get('settings', list())
+    list_controls = get_default_settings(channel_name)
 
     for c in list_controls:
         if 'id' not in c or 'type' not in c or 'default' not in c:
@@ -166,6 +167,67 @@ def get_channel_controls_settings(channel_name):
         dict_settings[c['id']] = c['default']
 
     return list_controls, dict_settings
+
+def get_default_settings(channel_name):
+    import filetools, inspect
+    from core import support, scrapertoolsV2
+    channel = __import__('channels.%s' % channel_name, fromlist=["channels.%s" % channel_name])
+    if hasattr(channel, 'list_language'):
+        list_language = channel.list_language
+        list_language.insert(0, config.get_localized_string(70522))
+    else:
+        list_language = []
+    if 'episodios' in dir(channel):
+        episodios = getattr(__import__('channels.%s' % channel_name, fromlist=['episodios']), 'episodios')
+        anime = scrapertoolsV2.find_single_match(inspect.getsource(support.extract_wrapped(episodios)), r'(anime\s*=\s*True)')
+
+    channel_controls = get_channel_json(channel_name).get('settings', list())
+    default_path = filetools.join(config.get_runtime_path(), 'default_channel_settings' + '.json')
+    default_controls = jsontools.load(filetools.read(default_path)).get('settings', list())
+    default_controls_anime = jsontools.load(filetools.read(default_path)).get('anime', list())
+    categories = get_channel_json(channel_name).get('categories', list())
+    for control in default_controls:
+        if control['id'] not in str(channel_controls):
+            if 'include_in_newest' in control['id']:
+                label = control['id'].split('_')
+                label = label[-1]
+                if label == 'peliculas':
+                    if 'movie' not in categories:
+                        pass
+                    else:
+                        control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30122)
+                        channel_controls.append(control)
+                        logger.info(control)
+                elif label == 'series':
+                    if 'tvshow' not in categories:
+                        pass
+                    else:
+                        control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30123)
+                        channel_controls.append(control)
+                elif label == 'anime':
+                    if 'anime' not in categories:
+                        pass
+                    else:
+                        control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30124)   
+                        channel_controls.append(control) 
+                else:
+                    control['label'] = config.get_localized_string(70727) + ' - ' + label.capitalize()
+                    channel_controls.append(control)
+
+            elif control['id'] == 'filter_languages':
+                if len(list_language) > 1:
+                    control['lvalues'] = list_language
+                    channel_controls.append(control)
+                else:
+                    pass         
+            else:
+                channel_controls.append(control)
+    if anime:
+        for control in default_controls_anime:
+            if control['id'] not in str(channel_controls):
+                channel_controls.append(control)
+            else: pass
+    return channel_controls
 
 
 def get_channel_setting(name, channel, default=None):

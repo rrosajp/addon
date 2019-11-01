@@ -2,14 +2,12 @@
 
 import re
 import urllib
-
 import urlparse
 
 from core import httptools
 from core import scrapertools
 from core.item import Item
 from platformcode import config, logger
-from platformcode import config
 
 host = "https://www.porntrex.com"
 perpage = 20
@@ -27,6 +25,7 @@ def mainlist(item):
     itemlist.append(item.clone(action="categorias", title="Modelos",
                                url=host + "/models/?mode=async&function=get_block&block_id=list_models_models" \
                                           "_list&sort_by=total_videos"))
+    itemlist.append(item.clone(action="categorias", title="Canal", url=host + "/channels/"))
     itemlist.append(item.clone(action="playlists", title="Listas", url=host + "/playlists/"))
     itemlist.append(item.clone(action="tags", title="Tags", url=host + "/tags/"))
     itemlist.append(item.clone(title="Buscar...", action="search"))
@@ -59,15 +58,14 @@ def search(item, texto):
 def lista(item):
     logger.info()
     itemlist = []
-
     # Descarga la pagina 
     data = get_data(item.url)
-
     action = "play"
     if config.get_setting("menu_info", "porntrex"):
         action = "menu_info"
-    # Quita las entradas, que no son private
-    patron  = '<div class="video-preview-screen video-item thumb-item  ".*?<a href="([^"]+)".*?'
+    # Quita las entradas, que no son private <div class="video-preview-screen video-item thumb-item private "
+    patron  = '<div class="video-preview-screen video-item thumb-item  ".*?'
+    patron += '<a href="([^"]+)".*?'
     patron += 'data-src="([^"]+)".*?'
     patron += 'alt="([^"]+)".*?'
     patron += '<span class="quality">(.*?)<.*?'
@@ -120,21 +118,25 @@ def lista(item):
 def categorias(item):
     logger.info()
     itemlist = []
-
-    # Descarga la pagina    
     data = get_data(item.url)
 
     # Extrae las entradas
-    patron = '<a class="item" href="([^"]+)" title="([^"]+)".*?src="([^"]+)".*?<div class="videos">([^<]+)<'
+    if "/channels/" in item.url:
+        patron = '<div class="video-item   ">.*?<a href="([^"]+)" title="([^"]+)".*?src="([^"]+)".*?<li>([^<]+)<'
+    else:
+        patron = '<a class="item" href="([^"]+)" title="([^"]+)".*?src="([^"]+)".*?<div class="videos">([^<]+)<'
     matches = scrapertools.find_multiple_matches(data, patron)
     for scrapedurl, scrapedtitle, scrapedthumbnail, videos in matches:
         if "go.php?" in scrapedurl:
             scrapedurl = urllib.unquote(scrapedurl.split("/go.php?u=")[1].split("&")[0])
             scrapedthumbnail = urllib.unquote(scrapedthumbnail.split("/go.php?u=")[1].split("&")[0])
+            scrapedthumbnail += "|Referer=https://www.porntrex.com/"
         else:
             scrapedurl = urlparse.urljoin(host, scrapedurl)
             if not scrapedthumbnail.startswith("https"):
                 scrapedthumbnail = "https:%s" % scrapedthumbnail
+                scrapedthumbnail += "|Referer=https://www.porntrex.com/"
+                scrapedthumbnail = scrapedthumbnail.replace(" " , "%20")
         if videos:
             scrapedtitle = "%s  (%s)" % (scrapedtitle, videos)
         itemlist.append(item.clone(action="lista", title=scrapedtitle, url=scrapedurl, thumbnail=scrapedthumbnail,
@@ -158,7 +160,10 @@ def playlists(item):
     # Descarga la pagina    
     data = get_data(item.url)
     # Extrae las entradas
-    patron = '<div class="item.*?href="([^"]+)" title="([^"]+)".*?data-original="([^"]+)".*?<div class="totalplaylist">([^<]+)<'
+    patron = '<div class="item.*?'
+    patron += 'href="([^"]+)" title="([^"]+)".*?'
+    patron += 'data-original="([^"]+)".*?'
+    patron += '<div class="totalplaylist">([^<]+)<'
     matches = scrapertools.find_multiple_matches(data, patron)
     for scrapedurl, scrapedtitle, scrapedthumbnail, videos in matches:
         if "go.php?" in scrapedurl:
@@ -168,6 +173,8 @@ def playlists(item):
             scrapedurl = urlparse.urljoin(host, scrapedurl)
             if not scrapedthumbnail.startswith("https"):
                 scrapedthumbnail = "https:%s" % scrapedthumbnail
+                scrapedthumbnail += "|Referer=https://www.porntrex.com/"
+                scrapedthumbnail = scrapedthumbnail.replace(" " , "%20")
         if videos:
             scrapedtitle = "%s  [COLOR red](%s)[/COLOR]" % (scrapedtitle, videos)
         itemlist.append(item.clone(action="videos", title=scrapedtitle, url=scrapedurl, thumbnail=scrapedthumbnail,
@@ -195,7 +202,12 @@ def videos(item):
     if config.get_setting("menu_info", "porntrex"):
         action = "menu_info"
     # Extrae las entradas
-    patron = '<div class="video-item.*?href="([^"]+)".*?title="([^"]+)".*?src="([^"]+)"(.*?)<div class="durations">.*?</i>([^<]+)</div>'
+    # Quita las entradas, que no son private  <div class="video-item private ">
+    patron = '<div class="video-item  ".*?'
+    patron += 'href="([^"]+)".*?'
+    patron += 'title="([^"]+)".*?'
+    patron += 'src="([^"]+)"(.*?)<div class="durations">.*?'
+    patron += '</i>([^<]+)</div>'
     matches = scrapertools.find_multiple_matches(data, patron)
     count = 0
     for scrapedurl, scrapedtitle, scrapedthumbnail, quality, duration in matches:
@@ -209,60 +221,51 @@ def videos(item):
             scrapedurl = urlparse.urljoin(host, scrapedurl)
             if not scrapedthumbnail.startswith("https"):
                 scrapedthumbnail = "https:%s" % scrapedthumbnail
-        if duration:
-            scrapedtitle = "%s - %s" % (duration, scrapedtitle)
-        if '>HD<' in quality:
-            scrapedtitle += "  [COLOR red][HD][/COLOR]"
+                scrapedthumbnail += "|Referer=https://www.porntrex.com/"
+                scrapedthumbnail = scrapedthumbnail.replace(" " , "%20")
+        if 'k4"' in quality:
+            quality = "4K"
+            scrapedtitle = "%s - [COLOR yellow]%s[/COLOR] %s" % (duration, quality, scrapedtitle)
+        else:
+            quality = scrapertools.find_single_match(quality, '<span class="quality">(.*?)<.*?')
+            scrapedtitle = "%s - [COLOR red]%s[/COLOR] %s" % (duration, quality, scrapedtitle)
         if len(itemlist) >= perpage:
             break;
-        itemlist.append(item.clone(action=action, title=scrapedtitle, url=scrapedurl, thumbnail=scrapedthumbnail, contentThumbnail=scrapedthumbnail,
-                                   fanart=scrapedthumbnail))
+        itemlist.append(item.clone(action=action, title=scrapedtitle, url=scrapedurl, contentThumbnail=scrapedthumbnail,
+                                   fanart=scrapedthumbnail, thumbnail=scrapedthumbnail))
     #Extrae la marca de siguiente página
     if item.channel and len(itemlist) >= perpage:
         itemlist.append( item.clone(title = "Página siguiente >>>", indexp = count + 1) )
-
     return itemlist
 
 def play(item):
     logger.info()
     itemlist = []
-
     data = get_data(item.url)
-    patron = '(?:video_url|video_alt_url[0-9]*)\s*:\s*\'([^\']+)\'.*?(?:video_url_text|video_alt_url[0-9]*_text)\s*:\s*\'([^\']+)\''
+    patron = '(?:video_url|video_alt_url[0-9]*):\s*\'([^\']+)\'.*?'
+    patron += '(?:video_url_text|video_alt_url[0-9]*_text):\s*\'([^\']+)\''
     matches = scrapertools.find_multiple_matches(data, patron)
-    if not matches:
-        patron = '<iframe.*?height="(\d+)".*?video_url\s*:\s*\'([^\']+)\''
-        matches = scrapertools.find_multiple_matches(data, patron)
+    scrapertools.printMatches(matches)
     for url, quality in matches:
-        if "https" in quality:
-            calidad = url
-            url = quality
-            quality = calidad + "p"
-
+        quality = quality.replace(" HD" , "").replace(" 4k", "")
         itemlist.append(['.mp4 %s [directo]' % quality, url])
-
     if item.extra == "play_menu":
         return itemlist, data
-
     return itemlist
 
 
 def menu_info(item):
     logger.info()
     itemlist = []
-
     video_urls, data = play(item.clone(extra="play_menu"))
     itemlist.append(item.clone(action="play", title="Ver -- %s" % item.title, video_urls=video_urls))
-
-    matches = scrapertools.find_multiple_matches(data, '<img class="thumb lazy-load".*?data-original="([^"]+)"')
+    matches = scrapertools.find_multiple_matches(data, '<img class="thumb lazy-load" src="([^"]+)"')
     for i, img in enumerate(matches):
         if i == 0:
             continue
-        img = urlparse.urljoin(host, img)
-        img += "|Referer=https://www.porntrex.com/"
+        img = "https:" + img + "|Referer=https://www.porntrex.com/"
         title = "Imagen %s" % (str(i))
         itemlist.append(item.clone(action="", title=title, thumbnail=img, fanart=img))
-
     return itemlist
 
 
@@ -321,5 +324,4 @@ def get_data(url_orig):
                 post = ""
             else:
                 break
-
     return response.data

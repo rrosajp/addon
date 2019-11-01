@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import re
-
 import urlparse
 
 from core import httptools
 from core import scrapertools
 from core.item import Item
 from platformcode import logger
-from platformcode import config
 
 CHANNEL_HOST = "http://hentai-id.tv/"
 
@@ -70,11 +68,11 @@ def series(item):
         action = "episodios"
 
     for url, thumbnail, title in matches:
-        fulltitle = title
+        contentTitle = title
         show = title
         # logger.debug("title=[{0}], url=[{1}], thumbnail=[{2}]".format(title, url, thumbnail))
         itemlist.append(Item(channel=item.channel, action=action, title=title, url=url, thumbnail=thumbnail,
-                             show=show, fulltitle=fulltitle, fanart=thumbnail, folder=True))
+                             show=show, fanart=thumbnail, folder=True))
 
     if pagination:
         page = scrapertools.find_single_match(pagination, '>(?:Page|Página)\s*(\d+)\s*(?:of|de)\s*\d+<')
@@ -106,7 +104,7 @@ def episodios(item):
 
         # logger.debug("title=[{0}], url=[{1}], thumbnail=[{2}]".format(title, url, thumbnail))
         itemlist.append(Item(channel=item.channel, action="findvideos", title=title, url=url,
-                             thumbnail=thumbnail, plot=plot, show=item.show, fulltitle="%s %s" % (item.show, title),
+                             thumbnail=thumbnail, plot=plot,
                              fanart=thumbnail))
 
     return itemlist
@@ -116,20 +114,33 @@ def findvideos(item):
     logger.info()
 
     data = httptools.downloadpage(item.url).data
-
+    video_urls = []
+    down_urls = []
     patron = '<(?:iframe)?(?:IFRAME)?\s*(?:src)?(?:SRC)?="([^"]+)"'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for url in matches:
-        if 'goo.gl' in url:
+        if 'goo.gl' in url or 'tinyurl' in url:
             video = httptools.downloadpage(url, follow_redirects=False, only_headers=True).headers["location"]
-            matches.remove(url)
-            matches.append(video)
+            video_urls.append(video)
+        else:
+            video_urls.append(url)
+    paste = scrapertools.find_single_match(data, 'https://gpaste.us/([a-zA-Z0-9]+)')
+    if paste:
+        try:
+            new_data = httptools.downloadpage('https://gpaste.us/'+paste).data
 
+            bloq = scrapertools.find_single_match(new_data, 'id="input_text">(.*?)</div>')
+            matches = bloq.split('<br>')
+            for url in matches:
+                down_urls.append(url)
+        except:
+            pass
+    video_urls.extend(down_urls)
     from core import servertools
-    itemlist = servertools.find_video_items(data=",".join(matches))
+    itemlist = servertools.find_video_items(data=",".join(video_urls))
     for videoitem in itemlist:
-        videoitem.fulltitle = item.fulltitle
+        videoitem.contentTitle = item.contentTitle
         videoitem.channel = item.channel
         videoitem.thumbnail = item.thumbnail
 

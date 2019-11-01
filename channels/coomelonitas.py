@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import re
-
-from core import httptools
+import urlparse,urllib2,urllib,re
+import os, sys
 from core import scrapertools
+from core import servertools
 from core.item import Item
-from platformcode import logger
-from platformcode import config
+from platformcode import config, logger
+from core import httptools
 
 host ='http://www.coomelonitas.com'
-
 
 def mainlist(item):
     logger.info()
@@ -57,7 +56,7 @@ def lista(item):
         url = scrapertools.find_single_match(match,'<a href="([^"]+)"')
         plot = scrapertools.find_single_match(match,'<p class="summary">(.*?)</p>')
         thumbnail = scrapertools.find_single_match(match,'<img src="([^"]+)"')
-        itemlist.append( Item(channel=item.channel, action="findvideos", title=title, fulltitle=title, url=url,
+        itemlist.append( Item(channel=item.channel, action="findvideos", title=title, url=url,
                               fanart=thumbnail, thumbnail=thumbnail, plot=plot, viewmode="movie") )
     next_page = scrapertools.find_single_match(data,'<a href="([^"]+)" class="siguiente">')
     if next_page!="":

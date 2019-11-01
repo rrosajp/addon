@@ -4,18 +4,10 @@
     "active": true,
 	"adult": false,
 	"language": ["ita"],
-    "thumbnail": "https://eurostreaming.cafe/wp-content/uploads/2017/08/logocafe.png",
-    "bannermenu": "https://eurostreaming.cafe/wp-content/uploads/2017/08/logocafe.png",
+    "thumbnail": "eurostreaming.png",
+    "banner": "eurostreaming.png",
 	"categories": ["tvshow","anime","vosi"],
-  "settings": [
-    {
-    "id": "channel_host",
-    "type": "text",
-    "label": "Host del canale",
-    "default": "https://eurostreaming.cafe",
-    "enabled": true,
-    "visible": true
-    },   
+  "settings": [   
       {
       "id": "include_in_global_search",
       "type": "bool",

@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import re
-import urlparse
-
-from core import httptools
+import urlparse,urllib2,urllib,re
+import os, sys
+from platformcode import config, logger
 from core import scrapertools
 from core.item import Item
-from platformcode import logger
-from platformcode import config
+from core import servertools
+from core import httptools
 
 host = 'https://frprn.com'
 
@@ -97,6 +96,6 @@ def play(item):
     matches = scrapertools.find_multiple_matches(data, patron)
     for scrapedurl  in matches:
         title = scrapedurl
-    itemlist.append(item.clone(action="play", title=title, fulltitle = scrapedurl, url=scrapedurl))
+    itemlist.append(item.clone(action="play", title=title, contentTitle = scrapedurl, url=scrapedurl))
     return itemlist
 

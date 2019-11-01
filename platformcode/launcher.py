@@ -37,8 +37,10 @@ def start():
     from specials.checkhost import test_conn
     import threading
     threading.Thread(target=test_conn, args=(True, True, True, [], [], True)).start()
+    # check_adsl = test_conn(is_exit = True, check_dns = True, view_msg = True,
+    #           lst_urls = [], lst_site_check_dns = [], in_addon = True)
 
-
+    
 def run(item=None):
     logger.info()
     if not item:
@@ -58,7 +60,7 @@ def run(item=None):
                         config.get_localized_string(70018): 'infantiles',
                         config.get_localized_string(60513): 'documentales',
                         config.get_localized_string(70013): 'terror',
-                        config.get_localized_string(30124): 'castellano',
+                        config.get_localized_string(70014): 'castellano',
                         config.get_localized_string(59976): 'latino',
                         config.get_localized_string(70171): 'torrent',
                     }
@@ -129,7 +131,9 @@ def run(item=None):
             from core import tmdb
             if tmdb.drop_bd():
                 platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60011), time=2000, sound=False)
-
+        elif item.action == "itemInfo":
+            import base64
+            platformtools.dialog_textviewer('Item info', item.parent)
         # Action in certain channel specified in "action" and "channel" parameters
         else:
             # Entry point for a channel is the "mainlist" action, so here we check parental control
@@ -260,7 +264,11 @@ def run(item=None):
                         from specials import search
                         search.save_search(tecleado)
 
-                    itemlist = channel.search(item, tecleado)
+                    if 'search' in dir(channel):
+                        itemlist = channel.search(item, tecleado)
+                    else:
+                        from core import support
+                        itemlist = support.search(channel, item, tecleado)
                 else:
                     return
 

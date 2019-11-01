@@ -28,7 +28,7 @@ def mainlist(item):
     support.menu(itemlist, 'Ultime Uscite', 'peliculas', host + "/category/serie-tv/", "episode")
     support.menu(itemlist, 'Ultimi Episodi', 'peliculas', host + "/ultimi-episodi/", "episode", 'latest')
     support.menu(itemlist, 'Categorie', 'menu', host, "episode", args="Serie-Tv per Genere")
-    support.menu(itemlist, 'Cerca...', 'search', host, 'episode', args='serie')
+
 
     autoplay.init(item.channel, list_servers, [])
     autoplay.show_option(item.channel, itemlist)

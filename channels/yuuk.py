@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import re
-import urlparse
-
-from core import httptools
+import urlparse,urllib2,urllib,re
+import os, sys
 from core import scrapertools
+from core import servertools
 from core.item import Item
-from platformcode import logger
-from platformcode import config
+from platformcode import config, logger
+from core import httptools
 
 host = 'http://yuuk.net'
 
@@ -73,5 +72,22 @@ def lista(item):
         next_page = urlparse.urljoin(item.url,next_page)
         itemlist.append(item.clone(action="lista", title="Página Siguiente >>", text_color="blue", url=next_page) )
 
+    return itemlist
+
+
+def findvideos(item):
+    logger.info()
+    itemlist = []
+    data = httptools.downloadpage(item.url).data
+    data = re.sub(r"\n|\r|\t|&nbsp;|<br>", "", data)
+    data = scrapertools.find_single_match(data,'Streaming Server<(.*?)Screenshot<')
+    patron = '(?:src|SRC)="([^"]+)"'
+    matches = scrapertools.find_multiple_matches(data, patron)
+    for url in matches:
+        if "http://stream.yuuk.net/embed.php" in url:
+            data = httptools.downloadpage(url).data
+            url = scrapertools.find_single_match(data,'"file": "([^"]+)e=download"')
+        itemlist.append( Item(channel=item.channel, action="play", title = "%s", url=url ))
+    itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
     return itemlist
 

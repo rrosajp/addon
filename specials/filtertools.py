@@ -163,6 +163,8 @@ def load(item):
 
 
 def check_conditions(_filter, list_item, item, list_language, list_quality, quality_count=0, language_count=0):
+    if not item.language: item.language = item.contentLanguage 
+    
     is_language_valid = True
     if _filter.language:
         # logger.debug("title es %s" % item.title)

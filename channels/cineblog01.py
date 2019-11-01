@@ -9,9 +9,8 @@ from core import scrapertoolsV2, httptools, servertools, tmdb, support
 from core.item import Item
 from lib import unshortenit
 from platformcode import logger, config
-from specials import autoplay
 
-#impostati dinamicamente da getUrl()
+#impostati dinamicamente da findhost()
 host = ""
 headers = ""
 
@@ -44,18 +43,18 @@ blacklist = ['BENVENUTI', 'Richieste Serie TV', 'CB01.UNO &#x25b6; TROVA L&#8217
 
 def mainlist(item):
     findhost()
+    film = [
+        ('HD', ['', 'menu', 'Film HD Streaming']),
+        ('Generi', ['', 'menu', 'Film per Genere']),
+        ('Anni', ['', 'menu', 'Film per Anno'])
+    ]
+    tvshow = ['/serietv/',
+        ('Per Lettera', ['/serietv/', 'menu', 'Serie-Tv per Lettera']),
+        ('Per Genere', ['/serietv/', 'menu', 'Serie-Tv per Genere']),
+        ('Per anno', ['/serietv/', 'menu', 'Serie-Tv per Anno'])
+    ]
 
-    autoplay.init(item.channel, list_servers, list_quality)
-
-    # Main options
-    itemlist = []
-    support.menu(itemlist, 'Ultimi 100 Film Aggiornati bold', 'last', host + '/lista-film-ultimi-100-film-aggiornati/')
-
-    support.menu(itemlist, 'Film bold', 'peliculas', host)
-    support.menu(itemlist, 'HD submenu', 'menu', host, args="Film HD Streaming")
-    support.menu(itemlist, 'Per genere submenu', 'menu', host, args="Film per Genere")
-    support.menu(itemlist, 'Per anno submenu', 'menu', host, args="Film per Anno")
-    support.menu(itemlist, 'Cerca film... submenu', 'search', host, args='film')
+    return locals()
 
     support.menu(itemlist, 'Serie TV bold', 'peliculas', host + '/serietv/', contentType='tvshow')
     support.menu(itemlist, 'Aggiornamenti serie tv', 'last', host + '/serietv/aggiornamento-quotidiano-serie-tv/', contentType='tvshow')
@@ -66,10 +65,9 @@ def mainlist(item):
 
     autoplay.show_option(item.channel, itemlist)
 
-    return itemlist
+    return locals()
 
-
-def menu(item):
+def newest(categoria):
     findhost()
     itemlist= []
     data = httptools.downloadpage(item.url, headers=headers).data
@@ -94,10 +92,21 @@ def menu(item):
 
 def search(item, text):
     support.log(item.url, "search" ,text)
+    debug = True
+    item = Item()
+    item.contentType = 'movie'
+    item.url = host + '/lista-film-ultimi-100-film-aggiunti/'
+    patron = "<a href=(?P<url>[^>]+)>(?P<title>[^<([]+)(?:\[(?P<quality>[A-Z]+)\])?\s\((?P<year>[0-9]{4})\)<\/a>"
+    patronBlock = r'Ultimi 100 film aggiunti:.*?<\/td>'
 
+    return locals()
+
+
+def search(item, text):
+    support.log(item.url, "search", text)
 
     try:
-        item.url = item.url + "/?s=" + text.replace(' ','+')
+        item.url = item.url + "/?s=" + text.replace(' ', '+')
         return peliculas(item)
 
     # Continua la ricerca in caso di errore
@@ -106,7 +115,6 @@ def search(item, text):
         for line in sys.exc_info():
             logger.error("%s" % line)
         return []
-
 
 def newest(categoria):
     findhost()
@@ -183,54 +191,22 @@ def peliculas(item):
         listGroups = ['thumb', 'url', 'title', 'quality', 'year', 'genre', 'duration', 'plot']
         action = 'findvideos'
     else:
-        patron = r'div class="card-image">.*?<img src="([^ ]+)" alt.*?<a href="([^ >]+)">([^<[(]+)<\/a>.*?<strong><span style="[^"]+">([^<>0-9(]+)\(([0-9]{4}).*?</(?:p|div)>(.*?)</div'
-        listGroups = ['thumb', 'url', 'title', 'genre', 'year', 'plot']
+        patron = r'div class="card-image">.*?<img src="(?P<thumb>[^ ]+)" alt.*?<a href="(?P<url>[^ >]+)">(?P<title>[^<[(]+)<\/a>.*?<strong><span style="[^"]+">(?P<genre>[^<>0-9(]+)\((?P<year>[0-9]{4}).*?</(?:p|div)>(?P<plot>.*?)</div'
         action = 'episodios'
 
-    return support.scrape(item, patron_block=[r'<div class="?sequex-page-left"?>(.*?)<aside class="?sequex-page-right"?>',
-                                              '<div class="?card-image"?>.*?(?=<div class="?card-image"?>|<div class="?rating"?>)'],
-                          patron=patron, listGroups=listGroups,
-                          patronNext='<a class="?page-link"? href="?([^>]+)"?><i class="fa fa-angle-right">', blacklist=blacklist, action=action)
+    # patronBlock=[r'<div class="?sequex-page-left"?>(?P<block>.*?)<aside class="?sequex-page-right"?>',
+    #                                           '<div class="?card-image"?>.*?(?=<div class="?card-image"?>|<div class="?rating"?>)']
+    patronNext='<a class="?page-link"? href="?([^>]+)"?><i class="fa fa-angle-right">'
+
+    return locals()
 
 
+@support.scrape
 def episodios(item):
-    itemlist = []
+    patronBlock = r'(?P<block><div class="sp-head[a-z ]*?" title="Espandi">\s*STAGIONE [0-9]+ - (?P<lang>[^\s]+)(?: - (?P<quality>[^-<]+))?.*?[^<>]*?</div>.*?)<div class="spdiv">\[riduci\]</div>'
+    patron = '(?:<p>)(?P<episode>[0-9]+(?:&#215;|×)[0-9]+)(?P<url>.*?)(?:</p>|<br)'
 
-    data = httptools.downloadpage(item.url).data
-    matches = scrapertoolsV2.find_multiple_matches(data,
-                                                   r'(<div class="sp-head[a-z ]*?" title="Espandi">[^<>]*?</div>.*?)<div class="spdiv">\[riduci\]</div>')
-
-    for match in matches:
-        support.log(match)
-        blocks = scrapertoolsV2.find_multiple_matches(match, '(?:<p>)(.*?)(?:</p>|<br)')
-        season = scrapertoolsV2.find_single_match(match, r'title="Espandi">.*?STAGIONE\s+\d+([^<>]+)').strip()
-
-        for block in blocks:
-            episode = scrapertoolsV2.find_single_match(block, r'([0-9]+(?:&#215;|×)[0-9]+)').strip()
-            seasons_n = scrapertoolsV2.find_single_match(block, r'<strong>STAGIONE\s+\d+([^<>]+)').strip()
-
-            if seasons_n:
-                season = seasons_n
-
-            if not episode: continue
-
-            season = re.sub(r'&#8211;|–', "-", season)
-            itemlist.append(
-                Item(channel=item.channel,
-                     action="findvideos",
-                     contentType='episode',
-                     title="[B]" + episode + "[/B] " + season,
-                     fulltitle=episode + " " + season,
-                     show=episode + " " + season,
-                     url=block,
-                     extra=item.extra,
-                     thumbnail=item.thumbnail,
-                     infoLabels=item.infoLabels
-                     ))
-
-    support.videolibrary(itemlist, item)
-
-    return itemlist
+    return locals()
 
 
 def findvideos(item):
