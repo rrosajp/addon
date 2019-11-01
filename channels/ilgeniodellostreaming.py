@@ -6,8 +6,7 @@
 
 """
 
-    Problemi noti che non superano il test del canale:
-        NESSUNO (update 13-9-2019)
+    Alcuni video non si aprono sul sito...
 
     Avvisi per il test:
     i link per le categorie non sono TUTTI visibili nella pagina del sito:
@@ -22,17 +21,20 @@
     genere-> televisione film
         https://ilgeniodellostreaming.se/genere/televisione-film
 
-    Non va abilitato per:
-        Novità -> Anime
-    La pagina "Aggiornamenti Anime" del sito è vuota (update 13-9-2019)
+    Novità -> Serietv e Aggiornamenti nel canale:
+        - le pagine sono di 25 titoli
+
+
+    ##### note per i dev #########
+    - La pagina "Aggiornamenti Anime" del sito è vuota (update 13-9-2019)
+    - in url: film o serietv
 
 """
 
 import re
 
-from platformcode import  logger
-from core import scrapertoolsV2, httptools, tmdb, support
-from core.support import log, menu, aplay
+from core import scrapertoolsV2, httptools, support
+from core.support import log
 from core.item import Item
 from platformcode import config
 
@@ -49,19 +51,26 @@ def mainlist(item):
     support.log(item)
 
     film = ['/film/',
-        ('Film Per Categoria',['', 'category', 'genres']),
-        ('Film Per Anno',['', 'category', 'year']),
-        ('Film Per Lettera',['/film-a-z/', 'category', 'letter']),
+        ('Film Per Categoria',['', 'genres', 'genres']),
+        ('Film Per Anno',['', 'genres', 'year']),
+        ('Film Per Lettera',['/film-a-z/', 'genres', 'letter']),
         ('Popolari',['/trending/?get=movies', 'peliculas', 'populared']),
         ('Più Votati', ['/ratings/?get=movies', 'peliculas', 'populared'])
-            ]
-
-    tvshow = ['/serie/',
-        ('Nuovi Episodi', ['/aggiornamenti-serie/', 'newep', 'tvshow']),
-        ('TV Show', ['/tv-show/', 'peliculas', 'showtv', 'tvshow'])
         ]
 
-    anime = ['/anime/']
+    tvshow = ['/serie/',
+        ('Nuovi Episodi', ['/aggiornamenti-serie/', 'peliculas', 'update']),
+        ('Popolari',['/trending/?get=tv', 'peliculas', 'populared']),
+        ('Più Votati', ['/ratings/?get=tv', 'peliculas', 'populared'])
+
+        ]
+
+    anime = ['/anime/'
+        ]
+
+    Tvshow = [
+        ('Show TV', ['/tv-show/', 'peliculas', '', 'tvshow'])
+        ]
 
     search = ''
 
@@ -69,116 +78,60 @@ def mainlist(item):
 
 
 @support.scrape
-def category(item):
-    log(item)
-
-    action='peliculas'
-    if item.args == 'genres':
-        patronBlock = r'<div class="sidemenu"><h2>Genere</h2>(?P<block>.*?)/li></ul></div>'
-    elif item.args == 'year':
-        patronBlock = r'<div class="sidemenu"><h2>Anno di uscita</h2>(?P<block>.*?)/li></ul></div>'
-    elif item.args == 'letter':
-        patronBlock = r'<div class="movies-letter">(?P<block>.*?)<div class="clearfix">'
-    patron = r'<a(?:.+?)?href="(?P<url>.*?)"[ ]?>(?P<title>.*?)<\/a>'
-
-##    debug = True
-    return locals()
-
-def search(item, texto):
-    log(texto)
-    item.url = host + "/?s=" + texto
-    try:
-        return peliculas(item)
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error("%s" % line)
-
-    return []
-
-@support.scrape
 def peliculas(item):
-    log(item)
-##    import web_pdb; web_pdb.set_trace()
+    log()
 
-    if item.action == 'search':
+    if item.args == 'search':
+
         patronBlock = r'<div class="search-page">(?P<block>.*?)<footer class="main">'
         patron = r'<div class="thumbnail animation-2"><a href="(?P<url>[^"]+)">'\
                  '<img src="(?P<thumb>[^"]+)" alt="[^"]+" \/>[^>]+>(?P<type>[^<]+)'\
                  '<\/span>.*?<a href.*?>(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA)\])?'\
                  '<\/a>[^>]+>(?:<span class="rating">IMDb\s*(?P<rating>[0-9.]+)<\/span>)?'\
                  '.+?(?:<span class="year">(?P<year>[0-9]+)<\/span>)?[^>]+>[^>]+><p>(?P<plot>.*?)<\/p>'
-        type_content_dict={'movie': ['film'], 'tvshow': ['tv']}
-        type_action_dict={'findvideos': ['film'], 'episodios': ['tv']}
 
-##    elif item.args == 'newest':
-##        patronBlock = r'<div class="content"><header><h1>Aggiornamenti Serie</h1>'\
-##                      '</header>(?P<block>.*?)</li></ul></div></div></div>'
-##        patron = r'src="(?P<thumb>[^"]+)".*?href="(?P<url>[^"]+)">[^>]+>(?P<episode>[^<]+)'\
-##                 '<.*?"c">(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA)\])?<.+?<span class='\
-##                 '"quality">(\5SUB-ITA|.+?)</span>'
+##        type_content_dict={'movie': ['film'], 'tvshow': ['tv']}
+##        type_action_dict={'findvideos': ['film'], 'episodios': ['tv']}
+        def itemHook(item):
+            if 'film' not in item.url:
+                item.contentType = 'tvshow'
+                item.action = 'episodios'
+            return item
+    else:
 
-    elif item.args == 'letter':
-        patron = r'<td class="mlnh-2"><a href="(?P<url>[^"]+)">(?P<title>.+?)'\
-                 '[ ]?(?:\[(?P<lang>Sub-ITA)\])?<[^>]+>[^>]+>[^>]+>(?P<year>\d{4})\s+<'
-    elif item.args == 'populared':
-        patron = r'<div class="poster"><a href="(?P<url>[^"]+)"><img src='\
-                 '"(?P<thumb>[^"]+)" alt="[^"]+"><\/a>[^>]+>[^>]+>[^>]+> '\
-                 '(?P<rating>[0-9.]+)<[^>]+>[^>]+>'\
-                 '(?P<quality>[3]?[D]?[H]?[V]?[D]?[/]?[R]?[I]?[P]?)(?:SUB-ITA)?<'\
-                 '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>.+?)(?:[ ]\[(?P<lang>Sub-ITA)\])?<'\
-                 '[^>]+>[^>]+>[^>]+>(?P<year>\d{4})?<'
+        if item.contentType == 'movie':
+            endBlock = '</article></div>'
+        else:
+            endBlock = '<footer class="main">'
 
-    elif item.args == 'showtv':
-        action = 'episodios'
-        patron = r'<div class="poster"><a href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)" '\
-                 'alt="[^"]+"><\/a>[^>]+>[^>]+>[^>]+> (?P<rating>[0-9.]+)<[^>]+>[^>]+>[^>]+>'\
-                 '[^>]+>[^>]+>(?P<title>.+?)<[^>]+>[^>]+>[^>]+>(?P<year>\d{4})?<[^>]+>[^>]+>'\
-                 '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<plot>.+?)<'
+        patronBlock = r'<header><h1>.+?</h1>(?P<block>.*?)'+endBlock
 
-    elif item.contentType == 'movie' and item.args != 'genres':
-        patronBlock = r'<header><h1>Film</h1>(?P<block>.*?)<div class="pagination">'
-        patron = r'<div class="poster">\s*<a href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)" '\
-                 'alt="[^"]+"><\/a>[^>]+>[^>]+>[^>]+>\s*(?P<rating>[0-9.]+)<\/div>'\
-                 '<span class="quality">(?:SUB-ITA|)?(?P<quality>|[^<]+)?'\
-                 '<\/span>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA)\])?'\
-                 '<\/a>[^>]+>'\
-                 '[^>]+>(?P<year>[^<]+)<\/span>[^>]+>[^>]+>'\
-                 '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<plot>[^<]+)<div'
+        if item.contentType == 'movie':
+            if item.args == 'letter':
+                patronBlock = r'<table class="table table-striped">(?P<block>.+?)</table>'
+                patron = r'<img src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+><td class="mlnh-2"><a href="(?P<url>[^"]+)">(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA)\])?<[^>]+>[^>]+>[^>]+>(?P<year>\d{4})\s+<'
+            elif item.args == 'populared':
+                patron = r'<img src="(?P<thumb>[^"]+)" alt="[^"]+">[^>]+>[^>]+>[^>]+>[^>]+>\s+?(?P<rating>\d+.?\d+|\d+)<[^>]+>[^>]+>(?P<quality>[a-zA-Z\-]+)[^>]+>[^>]+>[^>]+>[^>]+><a href="(?P<url>[^"]+)">(?P<title>[^<]+)<[^>]+>[^>]+>[^>]+>(?P<year>\d+)<'
+            else:
 
-    elif item.contentType == 'tvshow' or item.args == 'genres':
-        action = 'episodios'
-        patron = r'<div class="poster">\s*<a href="(?P<url>[^"]+)"><img '\
-                 'src="(?P<thumb>[^"]+)" alt="[^"]+"><\/a>[^>]+>[^>]+>[^>]+> '\
-                 '(?P<rating>[0-9.]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>'\
-                 '(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA|Sub-ita)\])?<[^>]+>[^>]+>'\
-                 '[^>]+>(?P<year>[^<]+)<.*?<div class="texto">(?P<plot>[^<]+)'
-
-##    else:
-##        patron = r'<div class="thumbnail animation-2"><a href="(?P<url>[^"]+)">'\
-##                 '<img src="(?P<thumb>[^"]+)" alt="[^"]+" \/>'\
-##                 '[^>]+>(?P<type>[^<]+)<\/span>.*?<a href.*?>(?P<title>[^<]+)'\
-##                 '<\/a>(?P<lang>[^>])+>[^>]+>(?:<span class="rating">IMDb\s*'\
-##                 '(?P<rating>[0-9.]+)<\/span>)?.*?(?:<span class="year">(?P<year>[0-9]+)'\
-##                 '<\/span>)?[^>]+>[^>]+><p>(?P<plot>.*?)<\/p>'
-####        type_content_dict={'movie': ['film'], 'tvshow': ['tv']}
-####        type_action_dict={'findvideos': ['film'], 'episodios': ['tv']}
+                patron = r'<div class="poster">\s*<a href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)" alt="[^"]+"><\/a>[^>]+>[^>]+>[^>]+>\s*(?P<rating>[0-9.]+)<\/div><span class="quality">(?:SUB-ITA|)?(?P<quality>|[^<]+)?<\/span>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA)\])?<\/a>[^>]+>[^>]+>(?P<year>[^<]+)<\/span>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<plot>[^<]+)<div'
+        else:
+            # TVSHOW
+            action = 'episodios'
+            if item.args == 'update':
+                action = 'findvideos'
+                patron = r'<div class="poster"><img src="(?P<thumb>[^"]+)"[^>]+>[^>]+><a href="(?P<url>[^"]+)">[^>]+>(?P<episode>[\d\-x]+)[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>.+?)(?:\[(?P<lang>Sub-ITA|Sub-ita)\])?<[^>]+>[^>]+>[^>]+>[^>]+>(?P<quality>[HD]+)?(?:.+?)?/span><p class="serie"'
+                pagination = 25
+                def itemHook(item):
+                    item.contentType = 'episode'
+                    return item
+            else:
+                patron = r'<div class="poster">\s?<a href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)" alt="[^"]+"><\/a>[^>]+>[^>]+>[^>]+> (?P<rating>[0-9.]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA|Sub-ita)\])?<[^>]+>[^>]+>[^>]+>(?P<year>[^<]+)(?:<.*?<div class="texto">(?P<plot>[^<]+))?'
 
     patronNext = '<span class="current">[^<]+<[^>]+><a href="([^"]+)"'
 
-##    debug = True
-    return locals()
-
-
-@support.scrape
-def newep(item):
-
-    patron = r'<div class="poster"><img src="(?P<thumb>[^"]+)" alt="(?:.+?)[ ]?'\
-             '(?:\[(?P<lang>Sub-ITA|Sub-ita)\])?">[^>]+><a href="(?P<url>[^"]+)">'\
-             '[^>]+>(?P<episode>[^<]+)<[^>]+>[^>]+>[^>]+><span class="c">'\
-             '(?P<title>.+?)[ ]?(?:\[Sub-ITA\]|)<'
-    pagination = 10
-##    debug = True
+    #support.regexDbg(item, patron, headers)
+    #debug = True
     return locals()
 
 
@@ -195,35 +148,62 @@ def episodios(item):
 #    debug = True
     return locals()
 
+@support.scrape
+def genres(item):
+    log(item)
+
+    action='peliculas'
+    if item.args == 'genres':
+        patronBlock = r'<div class="sidemenu"><h2>Genere</h2>(?P<block>.*?)/li></ul></div>'
+    elif item.args == 'year':
+        item.args = 'genres'
+        patronBlock = r'<div class="sidemenu"><h2>Anno di uscita</h2>(?P<block>.*?)/li></ul></div>'
+    elif item.args == 'letter':
+        patronBlock = r'<div class="movies-letter">(?P<block>.*?)<div class="clearfix">'
+
+    patron = r'<a(?:.+?)?href="(?P<url>.*?)"[ ]?>(?P<title>.*?)<\/a>'
+
+##    debug = True
+    return locals()
+
+def search(item, text):
+    log(text)
+    itemlist = []
+    text = text.replace(' ', '+')
+    item.url = host + "/?s=" + text
+    try:
+        item.args = 'search'
+        return peliculas(item)
+    except:
+        import sys
+        for line in sys.exc_info():
+            log("%s" % line)
+
+    return []
 
 def newest(categoria):
     log(categoria)
     itemlist = []
     item = Item()
 
-    action = peliculas
-
     if categoria == 'peliculas':
         item.contentType = 'movie'
         item.url = host + '/film/'
     elif categoria == 'series':
-        action = newep
-        #item.args = 'newest'
+        item.args = 'update'
         item.contentType = 'tvshow'
         item.url = host + '/aggiornamenti-serie/'
 ##    elif categoria == 'anime':
 ##        item.contentType = 'tvshow'
 ##        item.url = host + '/anime/'
     try:
-        item.action = action
-        itemlist = action(item)
+        item.action = 'peliculas'
+        itemlist = peliculas(item)
 
-        if itemlist[-1].action == action:
-            itemlist.pop()
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("{0}".format(line))
+            log("{0}".format(line))
         return []
 
     return itemlist
@@ -232,9 +212,31 @@ def newest(categoria):
 def findvideos(item):
     log()
     itemlist =[]
+
     matches, data = support.match(item, '<iframe class="metaframe rptss" src="([^"]+)"[^>]+>',headers=headers)
     for url in matches:
         html = httptools.downloadpage(url, headers=headers).data
         data += str(scrapertoolsV2.find_multiple_matches(html, '<meta name="og:url" content="([^"]+)">'))
+
     itemlist = support.server(item, data)
+
+    if item.args == 'update':
+
+        data = httptools.downloadpage(item.url).data
+        patron = r'<div class="item"><a href="'+host+'/serietv/([^"\/]+)\/"><i class="icon-bars">'
+        series = scrapertoolsV2.find_single_match(data, patron)
+        titles = support.typo(series.upper().replace('-', ' '), 'bold color kod')
+        goseries = support.typo("Vai alla Serie:", ' bold color kod')
+        itemlist.append(
+            Item(channel=item.channel,
+                    title=goseries + titles,
+                    fulltitle=titles,
+                    show=series,
+                    contentType='tvshow',
+                    contentSerieName=series,
+                    url=host+"/serietv/"+series,
+                    action='episodios',
+                    contentTitle=titles,
+                    plot = "Vai alla Serie " + titles + " con tutte le puntate",
+                    ))
     return itemlist

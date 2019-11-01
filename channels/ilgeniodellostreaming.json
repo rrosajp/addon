@@ -7,14 +7,5 @@
     "thumbnail": "https://i.imgur.com/Nsa81r0.png",
     "banner": "https://i.imgur.com/Nsa81r0.png",
     "categories": ["movie", "tvshow", "anime", "vos"],
-    "settings": [
-        {
-            "id": "include_in_newest_anime",
-            "type": "bool",
-            "label": "Includi in Novità - Anime",
-            "default": false,
-            "enabled": false,
-            "visible": false
-        }
-    ]
+    "settings": []
 }
