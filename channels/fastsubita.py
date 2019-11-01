@@ -60,7 +60,7 @@ def peliculas(item):
 
     patronNext = '<a class="next page-numbers" href="(.*?)">Successivi'
 
-    debug = True
+    #debug = True
     return locals()
 
 
@@ -154,9 +154,7 @@ def findvideos(item):
 
     itemlist += support.server(item, data)
 
-
     data = httptools.downloadpage(item.url).data
-    support.log("HTML DATA /n", data)
     patron = r'>Posted in <a href="https?://fastsubita.com/serietv/([^/]+)/(?:[^"]+)?"'
     series = scrapertoolsV2.find_single_match(data, patron)
     titles = support.typo(series.upper().replace('-', ' '), 'bold color kod')
