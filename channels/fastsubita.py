@@ -36,6 +36,8 @@ def mainlist(item):
         ('Per Lettera', ['/elenco-serie-tv/', 'genres', 'genres'])
     ]
 
+    search = ''
+    
     return locals()
 
 

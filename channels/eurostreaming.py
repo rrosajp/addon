@@ -58,10 +58,11 @@ def peliculas(item):
     if item.args == 'newest':
         #patron = r'<span class="serieTitle" style="font-size:20px">(?P<title>.*?).[^–][\s]?<a href="(?P<url>[^"]+)"\s+target="_blank">(?P<episode>\d+x\d+-\d+|\d+x\d+) (?P<title2>.*?)[ ]?(?:|\((?P<lang>SUB ITA)\))?</a>'
         patron = r'<span class="serieTitle" style="font-size:20px">(?P<title>.*?).[^â][\s]?<a href="(?P<url>[^"]+)"\s+target="_blank">(?:<episode>\d+x\d+-\d+|\d+x\d+) .*?[ ]?\(?(?P<lang>SUB ITA)?\)?</a>'
+        pagination = ''
     else:
         patron = r'<div class="post-thumb">.*?\s<img src="(?P<thumb>[^"]+)".*?><a href="(?P<url>[^"]+)"[^>]+>(?P<title>.+?)\s?(?: Serie Tv)?\s?\(?(?P<year>\d{4})?\)?<\/a><\/h2>'
         patronNext='a class="next page-numbers" href="?([^>"]+)">Avanti &raquo;</a>'
-
+    
     #debug = True
     return locals()
 
@@ -72,11 +73,20 @@ def episodios(item):
     action = 'findvideos'
     item.contentType = 'tvshow'
     # Carica la pagina
-    data = pagina(item.url)
-    data = re.sub('\n|\t', ' ', data)
-    patronBlock = r'(?P<block>STAGIONE\s\d+ (?:\()?(?P<lang>ITA|SUB ITA)(?:\))?.*?)</div></div>'
-    patron = r'(?:\s|\Wn)?(?:<strong>|)?(?P<episode>\d+&#\d+;\d+-\d+|\d+&#\d+;\d+)(?:</strong>|)?(?P<title>.+?)(?:–|-.+?-|â.+?â|â|.)?<a (?P<url>.*?)<br />'
+    data1 = pagina(item.url)
+    data1 = re.sub('\n|\t', ' ', data1)
+    data = re.sub(r'>\s+<', '> <', data1)
+    patronBlock = r'(?P<block>STAGIONE\s\d+ (.+?)?(?:\()?(?P<lang>ITA|SUB ITA)(?:\))?.*?)</div></div>'
+    #patron = r'(?:\s|\Wn)?(?:<strong>|)?(?P<episode>\d+&#\d+;\d+-\d+|\d+&#\d+;\d+)(?:</strong>|)?(?P<title>.+?)(?:–|-.+?-|â.+?â|â|.)?<a (?P<url>.*?)<br />'
+    patron = r'(?:\s|\Wn)?(?:<strong>|)?(?P<episode>\d+&#\d+;\d+-\d+|\d+&#\d+;\d+)(?:</strong>|)?(?P<title>.+?)(?:â|-.+?-|Ã¢ÂÂ.+?Ã¢ÂÂ|Ã¢ÂÂ|.)?(?:<a (?P<url>.*?))?<br />'
 
+    def itemHook(item):
+        if not item.url:
+            item.title += ' [B][COLOR red]### NO LINK ###[/COLOR][/B]'
+        return item
+
+    #support.regexDbg(item, patronBlock, headers, data)
+    #debug = True
     return locals()
 
 def pagina(url):
@@ -84,9 +94,6 @@ def pagina(url):
 
     data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
     #support.log("DATA ----###----> ", data)
-##    if 'class="menu-item menu-item-type-taxonomy menu-item-object-category '\
-##       'current-post-ancestor current-menu-parent current-post-parent menu-item-4529"' in data.lower():
-##        item.args = 'anime'
     if 'clicca qui per aprire' in data.lower():
         url = scrapertoolsV2.find_single_match(data, '"go_to":"([^"]+)"')
         url = url.replace("\\","")
