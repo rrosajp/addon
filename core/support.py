@@ -217,11 +217,11 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 val = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
             scraped[kk] = val
 
-        if scraped['season'] != None:
-            season = scraped['season']
-        if stagione:
-            episode = season +'x'+ scraped['episode']
-        elif item.contentType == 'tvshow' and (scraped['episode'] == '' and season == ''):
+        if scraped['season']:
+            episode = scraped['season'] +'x'+ scraped['episode']
+        elif stagione:
+            episode = stagione +'x'+ scraped['episode']
+        elif item.contentType == 'tvshow' and (scraped['episode'] == '' and scraped['season'] == '' and stagione == ''):
             item.news = 'season_completed'
             episode = ''
         else:
@@ -400,12 +400,13 @@ def scrape(func):
 
         if 'itemlistHook' in args:
             itemlist = args['itemlistHook'](itemlist)
-
-        if patronNext and inspect.stack()[1][3] != 'newest':
-            nextPage(itemlist, item, data, patronNext, function)
+        
+        if (pagination and len(matches) <= pag * pagination) or not pagination: # next page with pagination
+            if patronNext and inspect.stack()[1][3] != 'newest':
+                nextPage(itemlist, item, data, patronNext, function)
 
         # next page for pagination
-        if pagination and len(matches) >= pag * pagination:
+        if pagination and len(matches) > pag * pagination and not search:
             if inspect.stack()[1][3] != 'get_newest':
                 itemlist.append(
                     Item(channel=item.channel,
@@ -426,7 +427,7 @@ def scrape(func):
         if anime:
             if function == 'episodios' or item.action == 'episodios': autorenumber.renumber(itemlist, item, 'bold')
             else: autorenumber.renumber(itemlist)
-        if anime and autorenumber.check(item) == False:
+        if anime and autorenumber.check(item) == False and not scrapertoolsV2.find_single_match(itemlist[0].title, r'(\d+.\d+)'):
             pass
         else:
             if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
@@ -516,7 +517,7 @@ def dooplay_search_vars(item, blacklist):
     if item.contentType == 'list':  # ricerca globale
         type = '(?P<type>movies|tvshows)'
         typeActionDict = {'findvideos': ['movies'], 'episodios': ['tvshows']}
-        typeContentDict = {'movie': ['movies'], 'episode': ['tvshows']}
+        typeContentDict = {'movie': ['movies'], 'tvshow': ['tvshows']}
     elif item.contentType == 'movie':
         type = 'movies'
         action = 'findvideos'
@@ -526,12 +527,6 @@ def dooplay_search_vars(item, blacklist):
     patron = '<div class="result-item">.*?<img src="(?P<thumb>[^"]+)".*?<span class="' + type + '">(?P<quality>[^<>]+).*?<a href="(?P<url>[^"]+)">(?P<title>[^<>]+)</a>.*?<span class="year">(?P<year>[0-9]{4}).*?<div class="contenido"><p>(?P<plot>[^<>]+)'
     patronNext = '<a class="arrow_pag" href="([^"]+)"><i id="nextpagination"'
 
-    # def fullItemlistHook(itemlist):
-    #     # se è una next page
-    #     if itemlist[-1].title == typo(config.get_localized_string(30992), 'color kod bold'):
-    #         itemlist[-1].action = 'peliculas'
-    #         itemlist[-1].args = 'searchPage'
-    #     return itemlist
     return locals()
 
 def swzz_get_url(item):
@@ -916,7 +911,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
             videoitem.server = findS[2]
             videoitem.title = findS[0]
         item.title = item.contentTitle if config.get_localized_string(30161) in item.title else item.title
-        videoitem.title = item.fulltitle + (typo(videoitem.title, '_ color kod []') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
+        videoitem.title = item.title + (typo(videoitem.title, '_ color kod []') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail

@@ -1,17 +1,17 @@
 {
-  "active": false,
+  "active": true,
   "find_videos": {
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "rapidvideo.(?:org|com)/(?:\\?v=|e/|embed/|v/|)([A-z0-9]+)",
-        "url": "https://www.rapidvideo.com/e/\\1"
+        "pattern": "mixdrop.co/(?:f|e)/([a-z0-9]+)",
+        "url": "https://mixdrop.co/e/\\1"
       }
     ]
   },
   "free": true,
-  "id": "rapidvideo",
-  "name": "rapidvideo",
+  "id": "mixdrop",
+  "name": "MixDrop",
   "settings": [
     {
       "default": false,
@@ -38,5 +38,5 @@
       "visible": false
     }
   ],
-  "thumbnail": "https://s26.postimg.cc/y5arjad1l/rapidvideo1.png"
+  "thumbnail": "https://mixdrop.co/imgs/mixdrop-logo2.png"
 }

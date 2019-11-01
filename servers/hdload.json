@@ -1,17 +1,17 @@
 {
-  "active": false,
+  "active": true,
   "find_videos": {
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "rapidvideo.(?:org|com)/(?:\\?v=|e/|embed/|v/|)([A-z0-9]+)",
-        "url": "https://www.rapidvideo.com/e/\\1"
+        "pattern": "https://hdload\\.space/public/dist/index\\.html\\?id=([a-z0-9]+)",
+        "url": "https://hdload.space/getHost/\\1"
       }
     ]
   },
   "free": true,
-  "id": "rapidvideo",
-  "name": "rapidvideo",
+  "id": "hdload",
+  "name": "hdload",
   "settings": [
     {
       "default": false,
@@ -38,5 +38,5 @@
       "visible": false
     }
   ],
-  "thumbnail": "https://s26.postimg.cc/y5arjad1l/rapidvideo1.png"
+  "thumbnail": "https://mixdrop.co/imgs/mixdrop-logo2.png"
 }

@@ -1,24 +1,22 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per Guardaserie.click
+# Canale per guardaserieclick
 # ------------------------------------------------------------
 
 """
-    Problemi noti che non superano il test del canale:
-        NESSUNO (update 13-9-2019)
 
     Avvisi per il test:
-        La voce "Serie TV" mostra per ogni pagina 24 titoli
+        - Le voci del menu le trovi in "lista serie" del sito, e Generi = Sfoglia
+        - SE capita che entrando in una voce trovi "nessun elemento" torna indietro e rientra nella voce.
+        - Tutte le voci, tranne: Anime/Cartoni, mostrano per ogni pagina, al max 25 titoli
 
-
-    Problemi noti:
-    - nella pagina categorie appaiono i risultati di tmdb in alcune voci
-
+    Presente in NOVITà:
+        - Serietv
 """
 
-from core import scrapertoolsV2, httptools, support
+from core import support
 from core.item import Item
-from platformcode import logger, config
+from platformcode import config
 from core.support import log
 
 __channel__ = 'guardaserieclick'
@@ -30,94 +28,145 @@ list_quality = ['default']
 
 @support.menu
 def mainlist(item):
+
     tvshow = ['/lista-serie-tv',
-        ('Ultimi Aggiornamenti', ['/lista-serie-tv', 'peliculas', 'new']),
-        ('Categorie', ['categorie', 'categorie']),
-        ('Serie inedite Sub-ITA', ['/lista-serie-tv', 'peliculas', 'ined']),
-        ('Da non perdere', ['/lista-serie-tv', 'peliculas', ['tv', 'da non perdere']]),
-        ('Classiche', ["/lista-serie-tv", 'peliculas', ['tv', 'classiche']]),
-        ('Anime', ["/category/animazione/", 'tvserie', 'tvshow','anime'])
+        ('Aggiornamenti', ['/lista-serie-tv', 'peliculas', 'update']),
+        ('Generi', ['/categorie', 'genres', 'genres']),
+        ('News Sub-ITA', ['/lista-serie-tv', 'peliculas', 'ined']),
+        ('Da non perdere', ['/lista-serie-tv', 'peliculas', 'nolost']),
+        ('Classiche', ["/lista-serie-tv", 'peliculas', 'classic']),
+        ('Anime/Cartoni', ["/category/animazione/", 'peliculas', 'genres'])
     ]
 
     return locals()
 
+##@support.scrape
+##def peliculas(item):
+####    import web_pdb; web_pdb.set_trace()
+##    log('peliculas ->\n', item)
+##
+##    action = 'episodios'
+##    block = r'(?P<block>.*?)<div\s+class="btn btn-lg btn-default btn-load-other-series">'
+##    
+##    if item.args == 'ined':
+##        deflang = 'SUB-ITA'
+##        patronBlock = r'<span\s+class="label label-default label-title-typology">'+block
+##        patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
+##        pagination = 25
+##    elif item.args == 'update':
+##        patronBlock = r'<div\s+class="container-fluid greybg title-serie-lastep title-last-ep fixed-title-wrapper containerBottomBarTitle">'+block
+##        patron = r'<a(?: rel="[^"]+")? href="(?P<url>[^"]+)"(?: class="[^"]+")?>[ ]<img class="[^"]+"[ ]title="[^"]+"[ ]alt="[^"]+"[ ]src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<episode>\d+.\d+)[ ]\((?P<lang>[a-zA-Z\-]+)[^<]+<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)<'
+##    elif item.args == 'genres':
+##        patronBlock = r'<h2 style="color: white !important" class="title-typology">(?P<block>.+?)<div class="container-fluid whitebg" style="">'
+##        patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)</p>'
+##        patronNext = r'rel="next" href="([^"]+)">'
+##        item.contentType = 'tvshow'
+##    elif item.args == 'nolost':
+##        patronBlock = r'<h2 class="title-typology styck-top" meta-class="title-serie-danonperd">'+block
+##        patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
+##        pagination = 25
+##    elif item.args == 'classic':
+##        patronBlock = r'<h2 class="title-typology  styck-top" meta-class="title-serie-classiche">'+block
+##        patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
+##        pagination = 25        
+##    else:
+##        patronBlock = r'<div\s+class="container container-title-serie-new container-scheda" meta-slug="new">'+block
+##        patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
+##        pagination = 25
+##
+##    debug = True
+##    return locals()
 
 @support.scrape
 def peliculas(item):
 ##    import web_pdb; web_pdb.set_trace()
-    log('serietv ->\n', item)
-
-    if item.args == 'ined':
-        #data = httptools.downloadpage(item.url).data
-        log("Sono qui orco")
-        pagination = 24
-        action = 'episodios'
-
-        patron_block = r'<span\s+class="label label-default label-title-typology">'\
-                       '(?P<lang>[^<]+)</span>'
-    else:
-        pagination = 24
-        action = 'episodios'
-        patronBlock = r'<div\s+class="container container-title-serie-new container-scheda" '\
-                      'meta-slug="new">(?P<block>.*?)<div\s+class='\
-                      '"btn btn-lg btn-default btn-load-other-series">'
-
-    patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>'\
-             '[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
-
-
-    debug = True
-    return locals()
-
-@support.scrape
-def tvserie(item):
+    log('peliculas ->\n', item)
 
     action = 'episodios'
-##    listGroups = ['url', 'thumb', 'title']
-    patron = r'<a\shref="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)" />'\
-             '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)</p></div>'
-    patron_block = r'<div\sclass="col-xs-\d+ col-sm-\d+-\d+">(?P<block>.*?)'\
-                   '<div\sclass="container-fluid whitebg" style="">'
-    patronNext = r'<link\s.*?rel="next"\shref="([^"]+)"'
-
+    blacklist = ['DMCA']
+    
+    if item.args == 'genres' or item.args == 'search':
+        patronBlock = r'<h2 style="color: white !important" class="title-typology">(?P<block>.+?)<div class="container-fluid whitebg" style="">'
+        patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)</p>'
+        patronNext = r'rel="next" href="([^"]+)">'
+        item.contentType = 'tvshow'
+##    elif item.args == 'search':      
+##        patronBlock = r'<h2 style="color:\s?white !important.?" class="title-typology">(?P<block>.*?)<div class="container-fluid whitebg" style="">'
+##        patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)</p>'
+    else:
+        end_block = r'(?P<block>.*?)<div\s+class="btn btn-lg btn-default btn-load-other-series">'
+        patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
+        pagination = 25
+        if item.args == 'ined':
+            deflang = 'SUB-ITA'
+            patronBlock = r'<span\s+class="label label-default label-title-typology">'+end_block
+##            patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
+##            pagination = 25
+        elif item.args == 'update':
+            patronBlock = r'<div\s+class="container-fluid greybg title-serie-lastep title-last-ep fixed-title-wrapper containerBottomBarTitle">'+end_block
+            patron = r'<a(?: rel="[^"]+")? href="(?P<url>[^"]+)"(?: class="[^"]+")?>[ ]<img class="[^"]+"[ ]title="[^"]+"[ ]alt="[^"]+"[ ](?:|meta-)?src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?:\d+.\d+)[ ]\((?P<lang>[a-zA-Z\-]+)[^<]+<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)<'
+        elif item.args == 'nolost':
+            patronBlock = r'<h2 class="title-typology styck-top" meta-class="title-serie-danonperd">'+end_block        
+##            pagination = 25
+        elif item.args == 'classic':
+            patronBlock = r'<h2 class="title-typology  styck-top" meta-class="title-serie-classiche">'+end_block
+##            patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
+##            pagination = 25
+##        elif item.args == 'anime':
+##            
+        else:
+            patronBlock = r'<div\s+class="container container-title-serie-new container-scheda" meta-slug="new">'+end_block
+##            patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
+##            pagination = 25
+    #support.regexDbg(item, patron, headers)
+    #debug = True
     return locals()
-
 @support.scrape
 def episodios(item):
-    log('episodios ->\n')
-    item.contentType = 'episode'
+    log()
 
     action = 'findvideos'
-##    listGroups = ['episode', 'lang', 'title2', 'plot', 'title', 'url']
-    patron = r'class="number-episodes-on-img"> (?P<episode>\d+.\d+)'\
-             '(?:|[ ]\((?P<lang>.*?)\))<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>'\
-             '(?P<title2>.*?)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>'\
-             '(?P<plot>.*?)<[^>]+></div></div>.<span\s.+?meta-serie="(?P<title>.*?)"'\
-             'meta-stag=(?P<url>.*?)</span>'
+    patron = r'<div class="number-episodes-on-img">\s?\d+.\d+\s?(?:\((?P<lang>[a-zA-Z\-]+)\))?</div>.+?(?:<span class="pull-left bottom-year">(?P<title2>[^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<plot>[^<]+)<[^>]+>[^>]+>[^>]+>\s?)?<span(?: meta-nextep="[^"]+")? class="[^"]+" meta-serie="(?P<title>[^"]+)" meta-stag="(?P<season>\d+)" meta-ep="(?P<episode>\d+)" meta-embed="(?P<url>[^>]+)">'
+    patronBlock = r'<h2 class="title-typology">Episodi (?P<stagione>\d+).{1,3}Stagione</h2>(?P<block>.*?)<div class="container">'
 
+    def itemHook(item):
+        item.title = item.title.replace(item.fulltitle, '').replace('-','',1)
+        return item
+    
+    #debug = True
     return locals()
-
-
-def findvideos(item):
-    log()
-    return support.server(item, item.url)
 
 @support.scrape
-def categorie(item):
-    action = 'tvserie'
-    #listGroups = ['url', 'title']
+def genres(item):
+    log()
+
+    action = 'peliculas'
     patron = r'<li>\s<a\shref="(?P<url>[^"]+)"[^>]+>(?P<title>[^<]+)</a></li>'
     patron_block = r'<ul\sclass="dropdown-menu category">(?P<block>.*?)</ul>'
+    item.contentType = ''
 
     return locals()
 
-# ================================================================================================================
+
+def search(item, text):
+    log(text)
+    item.url = host + "/?s=" + text
+    item.contentType = 'tvshow'
+    item.args = 'search'
+    try:
+        return peliculas(item)
+    # Continua la ricerca in caso di errore
+    except:
+        import sys
+        for line in sys.exc_info():
+            log("%s" % line)
+        return []
 
 def newest(categoria):
     log()
     itemlist = []
     item = Item()
-    item.contentType= 'episode'
+    item.contentType= 'tvshow'
     item.args = 'update'
     try:
         if categoria == "series":
@@ -125,30 +174,19 @@ def newest(categoria):
             item.action = "peliculas"
             itemlist = peliculas(item)
 
-            if itemlist[-1].action == "peliculas":
-                itemlist.pop()
+##            if itemlist[-1].action == "peliculas":
+##                itemlist.pop()
 
     # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("{0}".format(line))
+            log("{0}".format(line))
         return []
 
     return itemlist
 
-### ================================================================================================================
-### ----------------------------------------------------------------------------------------------------------------
 
-def search(item, texto):
-    log(texto)
-    item.url = host + "/?s=" + texto
-    item.args = 'cerca'
-    try:
-        return tvserie(item)
-    # Continua la ricerca in caso di errore
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error("%s" % line)
-        return []
+def findvideos(item):
+    log('--->', item)
+    return support.server(item, item.url)

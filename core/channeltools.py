@@ -228,7 +228,6 @@ def get_default_settings(channel_name):
     categories = get_channel_json(channel_name).get('categories', list())
     not_active = get_channel_json(channel_name).get('not_active', list())
     default_off = get_channel_json(channel_name).get('default_off', list())
-    logger.info('NON ATTIVI= ' + str(not_active))
 
     # Apply default configurations if they do not exist
     for control in default_controls:
@@ -364,6 +363,7 @@ def set_channel_setting(name, value, channel):
 
     file_settings = os.path.join(config.get_data_path(), "settings_channels", channel + "_data.json")
     dict_settings = {}
+    def_settings = get_default_settings(channel)
 
     dict_file = None
 
@@ -377,9 +377,21 @@ def set_channel_setting(name, value, channel):
 
     dict_settings[name] = value
 
+    # delete unused Settings
+    def_keys = []
+    del_keys = []
+    for key in def_settings:
+        def_keys.append(key['id'])
+    for key in dict_settings:
+        if key not in def_keys:
+            del_keys.append(key)
+    for key in del_keys:
+        del dict_settings[key]
+
     # comprobamos si existe dict_file y es un diccionario, sino lo creamos
     if dict_file is None or not dict_file:
         dict_file = {}
+
 
     dict_file['settings'] = dict_settings
 

@@ -7,14 +7,6 @@
     "thumbnail": "fastsubita.png",
     "banner": "fastsubita.png",
     "categories": ["tvshow", "vos"],
-    "settings": [
-        {
-		  "id": "include_in_newest_italiano",
-		  "type": "bool",
-		  "label": "@70727",
-		  "default": false,
-		  "enabled": false,
-		  "visible": false
-        }
-    ]
+    "not_active": ["include_in_newest_peliculas", "include_in_newest_anime", "include_in_newest_italiano"],
+    "settings": []
 }
