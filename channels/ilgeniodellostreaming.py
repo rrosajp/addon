@@ -7,7 +7,7 @@
 """
 
     Alcuni video non si aprono sul sito...
-
+        
     Avvisi per il test:
     i link per le categorie non sono TUTTI visibili nella pagina del sito:
     vanno costruiti con i nomi dei generi che vedete nel CANALE.
@@ -51,15 +51,15 @@ def mainlist(item):
     support.log(item)
 
     film = ['/film/',
-        ('Film Per Categoria',['', 'genres', 'genres']),
-        ('Film Per Anno',['', 'genres', 'year']),
-        ('Film Per Lettera',['/film-a-z/', 'genres', 'letter']),
+        ('Generi',['', 'genres', 'genres']),
+        ('Per Lettera',['/film-a-z/', 'genres', 'letter']),
+        ('Anni',['', 'genres', 'year']),
         ('Popolari',['/trending/?get=movies', 'peliculas', 'populared']),
         ('Più Votati', ['/ratings/?get=movies', 'peliculas', 'populared'])
         ]
 
     tvshow = ['/serie/',
-        ('Nuovi Episodi', ['/aggiornamenti-serie/', 'peliculas', 'update']),
+        ('Aggiornamenti', ['/aggiornamenti-serie/', 'peliculas', 'update']),
         ('Popolari',['/trending/?get=tv', 'peliculas', 'populared']),
         ('Più Votati', ['/ratings/?get=tv', 'peliculas', 'populared'])
 
@@ -114,7 +114,8 @@ def peliculas(item):
                 patron = r'<img src="(?P<thumb>[^"]+)" alt="[^"]+">[^>]+>[^>]+>[^>]+>[^>]+>\s+?(?P<rating>\d+.?\d+|\d+)<[^>]+>[^>]+>(?P<quality>[a-zA-Z\-]+)[^>]+>[^>]+>[^>]+>[^>]+><a href="(?P<url>[^"]+)">(?P<title>[^<]+)<[^>]+>[^>]+>[^>]+>(?P<year>\d+)<'
             else:
 
-                patron = r'<div class="poster">\s*<a href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)" alt="[^"]+"><\/a>[^>]+>[^>]+>[^>]+>\s*(?P<rating>[0-9.]+)<\/div><span class="quality">(?:SUB-ITA|)?(?P<quality>|[^<]+)?<\/span>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA)\])?<\/a>[^>]+>[^>]+>(?P<year>[^<]+)<\/span>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<plot>[^<]+)<div'
+                #patron = r'<div class="poster">\s*<a href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)" alt="[^"]+"><\/a>[^>]+>[^>]+>[^>]+>\s*(?P<rating>[0-9.]+)<\/div><span class="quality">(?:SUB-ITA|)?(?P<quality>|[^<]+)?<\/span>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA)\])?<\/a>[^>]+>[^>]+>(?P<year>[^<]+)<\/span>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<plot>[^<]+)<div'
+                patron = r'<div class="poster">\s?<a href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)" alt="[^"]+"><\/a>[^>]+>[^>]+>[^>]+>\s*(?P<rating>[0-9.]+)<\/div>(?:<span class="quality">(?:SUB-ITA|)?(?P<quality>|[^<]+)?<\/span>)?[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA)\])?<\/a>[^>]+>[^>]+>(?P<year>[^<]+)<\/span>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<plot>[^<]+)<div'
         else:
             # TVSHOW
             action = 'episodios'
@@ -226,7 +227,7 @@ def findvideos(item):
         patron = r'<div class="item"><a href="'+host+'/serietv/([^"\/]+)\/"><i class="icon-bars">'
         series = scrapertoolsV2.find_single_match(data, patron)
         titles = support.typo(series.upper().replace('-', ' '), 'bold color kod')
-        goseries = support.typo("Vai alla Serie:", ' bold color kod')
+        goseries = support.typo("Vai alla Serie:", ' bold')
         itemlist.append(
             Item(channel=item.channel,
                     title=goseries + titles,
@@ -237,6 +238,6 @@ def findvideos(item):
                     url=host+"/serietv/"+series,
                     action='episodios',
                     contentTitle=titles,
-                    plot = "Vai alla Serie " + titles + " con tutte le puntate",
+                    plot = "Vai alla Serie :" + titles + " con tutte le puntate",
                     ))
     return itemlist
