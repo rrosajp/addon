@@ -4,15 +4,24 @@
 # ------------------------------------------------------------
 """
 
-"""
-import re
+    Problemi noti che non superano il test del canale:
 
-from core import httptools, scrapertools, support
+
+    Avvisi:
+
+
+    Ulteriori info:
+
+"""
+
+import re
+from core import support, httptools, scrapertoolsV2
 from core.item import Item
 from platformcode import config
 
 __channel__ = 'italiaserie'
 host = config.get_channel_url(__channel__)
+headers = [['Referer', host]]
 
 list_servers = ['speedvideo']
 list_quality = []
@@ -23,7 +32,7 @@ def mainlist(item):
     support.log()
 
     tvshow = ['/category/serie-tv/',
-        ('Aggiornamenti', ['/ultimi-episodi/', 'peliculas', 'latest']),
+        ('Aggiornamenti', ['/ultimi-episodi/', 'peliculas', 'update']),
         ('Generi', ['', 'category', 'Serie-Tv per Genere'])
         ]
 
@@ -38,11 +47,28 @@ def peliculas(item):
     patron = r'<div class="post-thumb">\s*<a href="(?P<url>[^"]+)" '\
              'title="(?P<title>[^"]+)">\s*<img src="(?P<thumb>[^"]+)"[^>]+>'
 
-    if item.args == "latest":
+    if item.args == 'update':
         patron += r'.*?aj-eps">(?P<episode>.+?)[ ]?(?P<lang>Sub-Ita|Ita)</span>'
+        action = 'findvideos'
     patronNext = r'<a class="next page-numbers" href="(.*?)">'
 
 ##    debug = True
+    return locals()
+
+
+@support.scrape
+def episodios(item):
+    support.log()
+
+    patronBlock = r'</i> Stagione (?P<block>(?P<season>\d+)</div> '\
+                  '<div class="su-spoiler-content".*?)<div class="clearfix">'
+    patron = r'(?:(?P<season>\d+)?</div> <div class="su-spoiler-content"(:?.+?)?> )?'\
+             '<div class="su-link-ep">\s+<a.*?href="(?P<url>[^"]+)".*?strong>[ ]'\
+             '(?P<title>.+?)[ ](?P<episode>\d+-\d+|\d+)[ ](?:-\s+(?P<title2>.+?))?'\
+             '[ ]?(?:(?P<lang>Sub-ITA))?[ ]?</strong>'
+
+
+    #debug = True
     return locals()
 
 
@@ -56,24 +82,10 @@ def category(item):
     return locals()
 
 
-@support.scrape
-def episodios(item):
-    support.log()
-    pagination = 24
-
-    patronBlock = r'</i> Stagione (?P<block>(?P<season>\d+)</div> '\
-                  '<div class="su-spoiler-content".*?)<div class="clearfix">'
-    patron = r'(?:(?P<season>\d+)?</div> <div class="su-spoiler-content"(:?.+?)?> )?'\
-             '<div class="su-link-ep">\s+<a.*?href="(?P<url>[^"]+)".*?strong>[ ]'\
-             '(?P<title>.+?)[ ](?P<episode>\d+-\d+|\d+)[ ](?:-\s+(?P<title2>.+?))?'\
-             '[ ]?(?:(?P<lang>Sub-ITA))?[ ]?</strong>'
-
-    return locals()
-
-
 def search(item, texto):
     support.log("s=", texto)
     item.url = host + "/?s=" + texto
+    item.contentType = 'tvshow'
     try:
         return peliculas(item)
     # Continua la ricerca in caso di errore
@@ -92,7 +104,7 @@ def newest(categoria):
         if categoria == "series":
             item.url = host + "/ultimi-episodi/"
             item.action = "peliculas"
-            item.args = "latest"
+            item.args = "update"
             item.contentType = "episode"
             itemlist = peliculas(item)
 
@@ -111,4 +123,33 @@ def newest(categoria):
 
 def findvideos(item):
     support.log()
-    return support.server(item, data=item.url)
+
+    if item.args == 'update':
+        itemlist = []
+        item.infoLabels['mediatype'] = 'episode'
+
+        data = httptools.downloadpage(item.url, headers=headers).data
+        data = re.sub('\n|\t', ' ', data)
+        data = re.sub(r'>\s+<', '> <', data)
+        url_video = scrapertoolsV2.find_single_match(data, r'<a rel="[^"]+" target="[^"]+" act="[^"]+"\s+href="([^"]+)" class="[^"]+-link".+?\d+.+?</strong> </a>', -1)
+        url_serie = scrapertoolsV2.find_single_match(data, r'<link rel="canonical" href="([^"]+)" />')
+        goseries = support.typo("Vai alla Serie:", ' bold')
+        series = support.typo(item.contentSerieName, ' bold color kod')
+        itemlist = support.server(item, data=url_video)
+
+        itemlist.append(
+            Item(channel=item.channel,
+                    title=goseries + series,
+                    fulltitle=item.fulltitle,
+                    show=item.show,
+                    contentType='tvshow',
+                    contentSerieName=item.contentSerieName,
+                    url=url_serie,
+                    action='episodios',
+                    contentTitle=item.contentSerieName,
+                    plot = goseries + series + "con tutte le puntate",
+                    ))
+
+        return itemlist
+    else:
+        return support.server(item, data=item.url)
