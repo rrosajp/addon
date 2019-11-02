@@ -218,6 +218,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             scraped[kk] = val
 
         if scraped['season']:
+            stagione = scraped['season']
             episode = scraped['season'] +'x'+ scraped['episode']
         elif stagione:
             episode = stagione +'x'+ scraped['episode']
@@ -236,7 +237,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
         # make formatted Title [longtitle]
         s = ' - '
-        title = episode + (s if episode and title else '') + title 
+        title = episode + (s if episode and title else '') + title
         longtitle = title + (s if title and title2 else '') + title2
         longtitle = typo(longtitle, 'bold')
         longtitle += typo(quality, '_ [] color kod') if quality else ''
@@ -400,7 +401,7 @@ def scrape(func):
 
         if 'itemlistHook' in args:
             itemlist = args['itemlistHook'](itemlist)
-        
+
         if (pagination and len(matches) <= pag * pagination) or not pagination: # next page with pagination
             if patronNext and inspect.stack()[1][3] != 'newest':
                 nextPage(itemlist, item, data, patronNext, function)
