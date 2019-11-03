@@ -28,7 +28,6 @@ def findhost():
     data = httptools.downloadpage('https://serietvonline.me/').data
     host = scrapertoolsV2.find_single_match(data, r'<a class="pure-button pure-button-primary" title=\'serie tv online\' href="([^"]+)">')
     headers = [['Referer', host]]
-findhost()
 
 list_servers = ['akvideo', 'wstream', 'backin', 'vidtome', 'nowvideo']
 list_quality = ['default']
@@ -37,6 +36,7 @@ list_quality = ['default']
 @support.menu
 def mainlist(item):
     support.log()
+    findhost()
 
     film = ['/ultimi-film-aggiunti/',
             ('Lista', ['/lista-film/', 'peliculas', 'lista'])
@@ -61,6 +61,7 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     support.log()
+    #findhost()
 
     blacklist = ['DMCA', 'Contatti', 'Attenzione NON FARTI OSCURARE', 'Lista Ccartoni Animati e Anime']
     patronBlock = r'<h1>.+?</h1>(?P<block>.*?)<div class="footer_c">'
@@ -86,6 +87,11 @@ def peliculas(item):
 ##                item.action = 'episodios'
 ##            return item
 
+    elif item.contentType == 'episode':
+        pagination = 35
+        action = 'findvideos'
+        patron = r'<td><a href="(?P<url>[^"]+)"(?:[^>]+)?>\s?(?P<title>[^<]+)(?P<episode>[\d\-x]+)?(?P<title2>[^<]+)?<'
+        
     elif item.contentType == 'tvshow':
         # SEZIONE Serie TV- Anime - Documentari
         pagination = 35
@@ -94,9 +100,6 @@ def peliculas(item):
             patron = r'<div class="movie">[^>]+>.+?src="(?P<thumb>[^"]+)" alt="[^"]+".+?href="(?P<url>[^"]+)">[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[ ](?P<rating>\d+.\d+|\d+)<[^>]+>[^>]+><h2>(?P<title>[^"]+)</h2>[ ]?(?:<span class="year">(?P<year>\d+|\-\d+))?<'
         else:
             patron = r'(?:<td>)?<a href="(?P<url>[^"]+)"(?:[^>]+)?>\s?(?P<title>[^<]+)(?P<episode>[\d\-x]+)?(?P<title2>[^<]+)?<'
-            if item.args == 'update':
-                action = 'findvideos'
-                patron = r'<td><a href="(?P<url>[^"]+)"(?:[^>]+)?>\s?(?P<title>[^<]+)(?P<episode>[\d\-x]+)?(?P<title2>[^<]+)?<'
 
     else:
         # SEZIONE FILM
@@ -129,6 +132,7 @@ def peliculas(item):
 @support.scrape
 def episodios(item):
     support.log()
+    #findhost()
 
     action = 'findvideos'
     patronBlock = r'<table>(?P<block>.*?)<\/table>'
@@ -140,6 +144,7 @@ def episodios(item):
 
 def search(item, text):
     support.log("CERCA :" ,text, item)
+    findhost()
     item.url = "%s/?s=%s" % (host, text)
 
     try:
@@ -154,6 +159,7 @@ def search(item, text):
 
 def newest(categoria):
     support.log(categoria)
+    findhost()
     itemlist = []
     item = Item()
 
@@ -162,7 +168,7 @@ def newest(categoria):
         item.url = host + '/ultimi-film-aggiunti/'
     elif categoria == 'series':
         item.args = 'update'
-        item.contentType = 'tvshow'
+        item.contentType = 'episode'
         item.url = host +'/ultimi-episodi-aggiunti/'
     try:
         item.action = 'peliculas'

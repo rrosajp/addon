@@ -27,14 +27,12 @@ def findhost():
     host = scrapertoolsV2.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
     headers = [['Referer', host]]
 
-findhost()
-
 list_servers = ['verystream','openload','rapidvideo','streamango']
 list_quality = ['default']
 
 @support.menu
 def mainlist(item):
-
+    findhost()
     film = [
         ('Al Cinema', ['/cinema/', 'peliculas', 'pellicola']),
         ('Ultimi Aggiornati-Aggiunti', ['','peliculas', 'update']),
@@ -49,6 +47,7 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     support.log('peliculas',item)
+    findhost()
 ##    deflang = 'ITA'
     action="findvideos"
 
@@ -73,7 +72,7 @@ def peliculas(item):
 @support.scrape
 def genres(item):
     support.log('genres',item)
-
+    
     if item.args != 'orderalf': action = "peliculas"
     else: action = 'orderalf'
 
@@ -94,7 +93,7 @@ def genres(item):
 @support.scrape
 def orderalf(item):
     support.log('orderalf',item)
-
+    
     action= 'findvideos'
     patron = r'<td class="mlnh-thumb"><a href="(?P<url>[^"]+)".*?src="(?P<thumb>[^"]+)"'\
              '.+?[^>]+>[^>]+ [^>]+[^>]+ [^>]+>(?P<title>[^<]+).*?[^>]+>(?P<year>\d{4})<'\
@@ -106,7 +105,8 @@ def orderalf(item):
 
 def search(item, text):
     support.log(item, text)
-
+    findhost()
+    
     itemlist = []
     text = text.replace(" ", "+")
     item.url = host + "/index.php?do=search&story=%s&subaction=search" % (text)
@@ -122,6 +122,7 @@ def search(item, text):
 
 def newest(categoria):
     support.log(categoria)
+    findhost()    
     itemlist = []
     item = Item()
     try:
