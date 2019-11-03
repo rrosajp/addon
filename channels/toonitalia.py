@@ -48,11 +48,10 @@ def newest(categoria):
     support.log(categoria)
     item = support.Item()
     try:
-        if categoria == 'anime':
-            item.contentType = 'tvshow'
-            item.url= host
-            item.args= 'new'
-            return peliculas(item)
+        item.contentType = 'tvshow'
+        item.url= host
+        item.args= 'new'
+        return peliculas(item)
     # Continua la ricerca in caso di errore
     except:
         import sys
