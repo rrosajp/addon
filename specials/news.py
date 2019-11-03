@@ -392,7 +392,7 @@ def get_newest(channel_id, categoria):
 
 
 def get_title(item):
-    support.log("ITEM NEWEST ->", item)
+    #support.log("ITEM NEWEST ->", item)
     # item.contentSerieName c'è anche se è un film
     if item.contentSerieName and item.contentType != 'movie':  # Si es una serie
         title = item.contentSerieName
@@ -671,7 +671,7 @@ def cb_custom_button(item, dict_values):
         dict_values[v] = not value
 
     if config.set_setting("custom_button_value_news", not value, item.channel) == True:
-        return {"label": "Ninguno"}
+        return {"label": config.get_localized_string(59992)}
     else:
-        return {"label": "Todos"}
+        return {"label": config.get_localized_string(59991)}
 

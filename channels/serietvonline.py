@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per serietvonline
+# Canale per serietvonline.py
 # ----------------------------------------------------------
 """
 
@@ -191,7 +191,7 @@ def findvideos(item):
             data = httptools.downloadpage(item.url, headers=headers).data
             data = re.sub('\n|\t', ' ', data)
             data = re.sub(r'>\s+<', '> <', data)
-            support.log("DATA - HTML:\n", data)
+            #support.log("DATA - HTML:\n", data)
             url_video = scrapertoolsV2.find_single_match(data, r'<tr><td>(.+?)</td><tr>', -1)
             url_serie = scrapertoolsV2.find_single_match(data, r'<link rel="canonical" href="([^"]+)"\s?/>')
             goseries = support.typo("Vai alla Serie:", ' bold')
