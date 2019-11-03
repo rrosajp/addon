@@ -80,6 +80,15 @@ def check_addon_init():
             logger.info('aggiornando a ' + commitJson['sha'])
             alreadyApplied = True
 
+            # major update
+            if len(commitJson['files']) > 50:
+                localCommitFile.close()
+                c['sha'] = updateFromZip('Aggiornamento in corso...')
+                localCommitFile = open(addonDir + trackingFile, 'w')  # il file di tracking viene eliminato, lo ricreo
+                changelog += commitJson['commit']['message'] + " | "
+                nCommitApplied += 3  # il messaggio sarà lungo, probabilmente, il tempo di vis. è maggiorato
+                break
+
             for file in commitJson['files']:
                 if file["filename"] == trackingFile:  # il file di tracking non si modifica
                     continue
@@ -215,12 +224,13 @@ def getSha(path):
     f.seek(0)
     return githash.blob_hash(f, size).hexdigest()
 
+
 def getShaStr(str):
     return githash.blob_hash(StringIO(str), len(str)).hexdigest()
 
 
-def updateFromZip():
-    dp = platformtools.dialog_progress_bg('Kodi on Demand', 'Installazione in corso...')
+def updateFromZip(message='Installazione in corso...'):
+    dp = platformtools.dialog_progress_bg('Kodi on Demand', message)
     dp.update(0)
 
     remotefilename = 'https://github.com/' + user + "/" + repo + "/archive/" + branch + ".zip"
@@ -278,12 +288,32 @@ def remove(file):
             logger.info('File ' + file + ' NON eliminato')
 
 
+def onerror(func, path, exc_info):
+    """
+    Error handler for ``shutil.rmtree``.
+
+    If the error is due to an access error (read only file)
+    it attempts to add write permission and then retries.
+
+    If the error is for another reason it re-raises the error.
+
+    Usage : ``shutil.rmtree(path, onerror=onerror)``
+    """
+    import stat
+    if not os.access(path, os.W_OK):
+        # Is the error an access error ?
+        os.chmod(path, stat.S_IWUSR)
+        func(path)
+    else:
+        raise
+
 def removeTree(dir):
     if os.path.isdir(dir):
         try:
-            shutil.rmtree(dir)
-        except:
+            shutil.rmtree(dir, ignore_errors=False, onerror=onerror)
+        except Exception as e:
             logger.info('Cartella ' + dir + ' NON eliminata')
+            logger.error(e)
 
 
 def rename(dir1, dir2):
