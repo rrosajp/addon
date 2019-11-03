@@ -47,7 +47,7 @@ def mainlist(item):
 ##
 ##    action = 'episodios'
 ##    block = r'(?P<block>.*?)<div\s+class="btn btn-lg btn-default btn-load-other-series">'
-##    
+##
 ##    if item.args == 'ined':
 ##        deflang = 'SUB-ITA'
 ##        patronBlock = r'<span\s+class="label label-default label-title-typology">'+block
@@ -68,7 +68,7 @@ def mainlist(item):
 ##    elif item.args == 'classic':
 ##        patronBlock = r'<h2 class="title-typology  styck-top" meta-class="title-serie-classiche">'+block
 ##        patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
-##        pagination = 25        
+##        pagination = 25
 ##    else:
 ##        patronBlock = r'<div\s+class="container container-title-serie-new container-scheda" meta-slug="new">'+block
 ##        patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
@@ -84,13 +84,13 @@ def peliculas(item):
 
     action = 'episodios'
     blacklist = ['DMCA']
-    
+
     if item.args == 'genres' or item.args == 'search':
-        patronBlock = r'<h2 style="color: white !important" class="title-typology">(?P<block>.+?)<div class="container-fluid whitebg" style="">'
+        patronBlock = r'<h2 style="color:\s?white !important;?" class="title-typology">(?P<block>.+?)<div class="container-fluid whitebg" style="">'
         patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)</p>'
         patronNext = r'rel="next" href="([^"]+)">'
         item.contentType = 'tvshow'
-##    elif item.args == 'search':      
+##    elif item.args == 'search':
 ##        patronBlock = r'<h2 style="color:\s?white !important.?" class="title-typology">(?P<block>.*?)<div class="container-fluid whitebg" style="">'
 ##        patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)</p>'
     else:
@@ -106,21 +106,23 @@ def peliculas(item):
             patronBlock = r'<div\s+class="container-fluid greybg title-serie-lastep title-last-ep fixed-title-wrapper containerBottomBarTitle">'+end_block
             patron = r'<a(?: rel="[^"]+")? href="(?P<url>[^"]+)"(?: class="[^"]+")?>[ ]<img class="[^"]+"[ ]title="[^"]+"[ ]alt="[^"]+"[ ](?:|meta-)?src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?:\d+.\d+)[ ]\((?P<lang>[a-zA-Z\-]+)[^<]+<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)<'
         elif item.args == 'nolost':
-            patronBlock = r'<h2 class="title-typology styck-top" meta-class="title-serie-danonperd">'+end_block        
+            patronBlock = r'<h2 class="title-typology styck-top" meta-class="title-serie-danonperd">'+end_block
 ##            pagination = 25
         elif item.args == 'classic':
             patronBlock = r'<h2 class="title-typology  styck-top" meta-class="title-serie-classiche">'+end_block
 ##            patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
 ##            pagination = 25
 ##        elif item.args == 'anime':
-##            
+##
         else:
             patronBlock = r'<div\s+class="container container-title-serie-new container-scheda" meta-slug="new">'+end_block
 ##            patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
 ##            pagination = 25
-    #support.regexDbg(item, patron, headers)
+    #support.regexDbg(item, patronBlock, headers)
     #debug = True
     return locals()
+
+
 @support.scrape
 def episodios(item):
     log()
@@ -132,7 +134,7 @@ def episodios(item):
     def itemHook(item):
         item.title = item.title.replace(item.fulltitle, '').replace('-','',1)
         return item
-    
+
     #debug = True
     return locals()
 
@@ -173,9 +175,6 @@ def newest(categoria):
             item.url = "%s/lista-serie-tv" % host
             item.action = "peliculas"
             itemlist = peliculas(item)
-
-##            if itemlist[-1].action == "peliculas":
-##                itemlist.pop()
 
     # Continua la ricerca in caso di errore
     except:
