@@ -5,14 +5,14 @@ import os
 import shutil
 from cStringIO import StringIO
 
-from core import httptools, filetools, downloadtools
-from core.ziptools import ziptools
+from core import httptools, filetools
 from platformcode import logger, platformtools
 import json
 import xbmc
 import re
 import xbmcaddon
 from lib import githash
+import urllib
 
 addon = xbmcaddon.Addon('plugin.video.kod')
 
@@ -21,7 +21,7 @@ _hdr_pat = re.compile("^@@ -(\d+),?(\d+)? \+(\d+),?(\d+)? @@.*")
 branch = 'stable'
 user = 'kodiondemand'
 repo = 'addon'
-addonDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'
+addonDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/') + '/'
 maxPage = 5  # le api restituiscono 30 commit per volta, quindi se si è rimasti troppo indietro c'è bisogno di andare avanti con le pagine
 trackingFile = "last_commit.txt"
 
@@ -80,6 +80,15 @@ def check_addon_init():
             logger.info('aggiornando a ' + commitJson['sha'])
             alreadyApplied = True
 
+            # major update
+            if len(commitJson['files']) > 50:
+                localCommitFile.close()
+                c['sha'] = updateFromZip('Aggiornamento in corso...')
+                localCommitFile = open(addonDir + trackingFile, 'w')  # il file di tracking viene eliminato, lo ricreo
+                changelog += commitJson['commit']['message'] + " | "
+                nCommitApplied += 3  # il messaggio sarà lungo, probabilmente, il tempo di vis. è maggiorato
+                break
+
             for file in commitJson['files']:
                 if file["filename"] == trackingFile:  # il file di tracking non si modifica
                     continue
@@ -109,15 +118,12 @@ def check_addon_init():
                                     alreadyApplied = False
                                 else:  # nel caso ci siano stati problemi
                                     logger.info('lo sha non corrisponde, scarico il file')
-                                    remove(addonDir + file["filename"])
-                                    downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'],
-                                                               silent=True, continuar=True, resumir=False)
+                                    localFile.close()
+                                    urllib.urlretrieve(file['raw_url'], os.path.join(addonDir, file['filename']))
                         else:  # è un file NON testuale, lo devo scaricare
                             # se non è già applicato
                             if not (filetools.isfile(addonDir + file['filename']) and getSha(addonDir + file['filename']) == file['sha']):
-                                remove(addonDir + file["filename"])
-                                downloadtools.downloadfile(file['raw_url'], addonDir + file['filename'], silent=True,
-                                                           continuar=True, resumir=False)
+                                urllib.urlretrieve(file['raw_url'], os.path.join(addonDir, file['filename']))
                                 alreadyApplied = False
                     elif file['status'] == 'removed':
                         remove(addonDir+file["filename"])
@@ -210,15 +216,21 @@ def apply_patch(s,patch,revert=False):
 
 
 def getSha(path):
-    f = open(path).read()
-    return githash.blob_hash(path, len(f)).hexdigest()
+    try:
+        f = open(path, 'rb')
+    except:
+        return ''
+    size = len(f.read())
+    f.seek(0)
+    return githash.blob_hash(f, size).hexdigest()
+
 
 def getShaStr(str):
     return githash.blob_hash(StringIO(str), len(str)).hexdigest()
 
 
-def updateFromZip():
-    dp = platformtools.dialog_progress_bg('Kodi on Demand', 'Installazione in corso...')
+def updateFromZip(message='Installazione in corso...'):
+    dp = platformtools.dialog_progress_bg('Kodi on Demand', message)
     dp.update(0)
 
     remotefilename = 'https://github.com/' + user + "/" + repo + "/archive/" + branch + ".zip"
@@ -232,7 +244,6 @@ def updateFromZip():
     remove(localfilename)
     removeTree(destpathname + "addon-" + branch)
 
-    import urllib
     urllib.urlretrieve(remotefilename, localfilename,
                        lambda nb, bs, fs, url=remotefilename: _pbhook(nb, bs, fs, url, dp))
 
@@ -243,17 +254,19 @@ def updateFromZip():
     try:
         hash = fixZipGetHash(localfilename)
         import zipfile
-        with zipfile.ZipFile(localfilename, "r") as zip_ref:
+        with zipfile.ZipFile(io.FileIO(localfilename), "r") as zip_ref:
             zip_ref.extractall(destpathname)
     except Exception as e:
         logger.info('Non sono riuscito ad estrarre il file zip')
         logger.info(e)
+        dp.close()
         return False
 
     dp.update(95)
 
     # puliamo tutto
     removeTree(addonDir)
+    xbmc.sleep(1000)
 
     rename(destpathname + "addon-" + branch, addonDir)
 
@@ -269,34 +282,45 @@ def updateFromZip():
 
 def remove(file):
     if os.path.isfile(file):
-        removed = False
-        while not removed:
-            try:
-                os.remove(file)
-                removed = True
-            except:
-                logger.info('File ' + file + ' NON eliminato')
+        try:
+            os.remove(file)
+        except:
+            logger.info('File ' + file + ' NON eliminato')
 
+
+def onerror(func, path, exc_info):
+    """
+    Error handler for ``shutil.rmtree``.
+
+    If the error is due to an access error (read only file)
+    it attempts to add write permission and then retries.
+
+    If the error is for another reason it re-raises the error.
+
+    Usage : ``shutil.rmtree(path, onerror=onerror)``
+    """
+    import stat
+    if not os.access(path, os.W_OK):
+        # Is the error an access error ?
+        os.chmod(path, stat.S_IWUSR)
+        func(path)
+    else:
+        raise
 
 def removeTree(dir):
     if os.path.isdir(dir):
-        removed = False
-        while not removed:
-            try:
-                shutil.rmtree(dir)
-                removed = True
-            except:
-                logger.info('Cartella ' + dir + ' NON eliminato')
+        try:
+            shutil.rmtree(dir, ignore_errors=False, onerror=onerror)
+        except Exception as e:
+            logger.info('Cartella ' + dir + ' NON eliminata')
+            logger.error(e)
 
 
 def rename(dir1, dir2):
-    renamed = False
-    while not renamed:
-        try:
-            filetools.rename(dir1, dir2)
-            renamed = True
-        except:
-            logger.info('cartella ' + dir1 + ' NON rinominata')
+    try:
+        filetools.rename(dir1, dir2)
+    except:
+        logger.info('cartella ' + dir1 + ' NON rinominata')
 
 
 # https://stackoverflow.com/questions/3083235/unzipping-file-results-in-badzipfile-file-is-not-a-zip-file
@@ -326,14 +350,3 @@ def _pbhook(numblocks, blocksize, filesize, url, dp):
     except:
         percent = 90
         dp.update(percent)
-
-
-def remove(file):
-    if os.path.isfile(file):
-        removed = False
-        while not removed:
-            try:
-                os.remove(file)
-                removed = True
-            except:
-                logger.info('File ' + file + ' NON eliminato')
