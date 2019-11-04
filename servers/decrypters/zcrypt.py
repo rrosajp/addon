@@ -47,7 +47,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                     data, status = unshortenit.unshorten(url)
                     logger.info("Data - Status zcrypt xshield.net: [%s] [%s] " %(data, status)) 
                 elif 'vcrypt.net' in url:
-                    if 'myfoldersakstream.php': continue #'very' in url or 
+                    if 'myfoldersakstream.php' in url:
+                        continue #'very' in url or 
                     else:                                
                         from lib import unshortenit
                         data, status = unshortenit.unshorten(url)
