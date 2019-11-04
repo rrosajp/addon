@@ -256,7 +256,7 @@ def setting_channel_old(item):
             continue
 
         # No incluir si el canal es en un idioma filtrado
-        if channel_language != "all" and channel_language not in channel_parameters["language"] \
+        if channel_language != "all" and channel_language not in str(channel_parameters["language"]) \
                 and "*" not in channel_parameters["language"]:
             continue
 
@@ -524,7 +524,7 @@ def do_search(item, categories=None):
                 continue
 
             # No busca si el canal es en un idioma filtrado
-            if channel_language != "all" and channel_language not in channel_parameters["language"] \
+            if channel_language != "all" and channel_language not in str(channel_parameters["language"]) \
                     and "*" not in channel_parameters["language"]:
                 logger.info("%s -idioma no válido-" % basename_without_extension)
                 continue

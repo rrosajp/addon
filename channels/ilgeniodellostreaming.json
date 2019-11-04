@@ -3,9 +3,9 @@
     "name": "IlGenioDelloStreaming",
     "active": true,
     "adult": false,
-    "language": ["ita", "vos"],
-    "thumbnail": "https://i.imgur.com/Nsa81r0.png",
-    "banner": "https://i.imgur.com/Nsa81r0.png",
+    "language": ["ita", "sub-ita"],
+    "thumbnail": "ilgeniodellostreaming.png",
+    "banner": "ilgeniodellostreaming.png",
     "categories": ["movie", "tvshow", "anime", "vos"],
     "settings": []
 }

@@ -26,7 +26,7 @@ def findhost():
     host = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
     headers = [['Referer', host]]
 
-findhost()
+
 
 list_servers = ['verystream', 'wstream', 'speedvideo', 'flashx', 'nowvideo', 'streamango', 'deltabit', 'openload']
 list_quality = ['default']
@@ -34,13 +34,12 @@ list_quality = ['default']
 @support.menu
 def mainlist(item):
     support.log()
+    findhost()
 
     tvshow = [''
         ]
-
     anime = ['/category/anime-cartoni-animati/'
         ]
-
     mix = [
         (support.typo('Aggiornamenti Serie-Anime', 'bullet bold'), ['/aggiornamento-episodi/', 'peliculas', 'newest']),
         (support.typo('Archivio Serie-Anime', 'bullet bold'), ['/category/serie-tv-archive/', 'peliculas'])
@@ -53,7 +52,7 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     support.log()
-
+    #findhost()
     action = 'episodios'
     if item.args == 'newest':
         #patron = r'<span class="serieTitle" style="font-size:20px">(?P<title>.*?).[^–][\s]?<a href="(?P<url>[^"]+)"\s+target="_blank">(?P<episode>\d+x\d+-\d+|\d+x\d+) (?P<title2>.*?)[ ]?(?:|\((?P<lang>SUB ITA)\))?</a>'
@@ -62,13 +61,14 @@ def peliculas(item):
     else:
         patron = r'<div class="post-thumb">.*?\s<img src="(?P<thumb>[^"]+)".*?><a href="(?P<url>[^"]+)"[^>]+>(?P<title>.+?)\s?(?: Serie Tv)?\s?\(?(?P<year>\d{4})?\)?<\/a><\/h2>'
         patronNext='a class="next page-numbers" href="?([^>"]+)">Avanti &raquo;</a>'
-    
+
     #debug = True
     return locals()
 
 @support.scrape
 def episodios(item):
     support.log("episodios: %s" % item)
+    #findhost()
 
     action = 'findvideos'
     item.contentType = 'tvshow'
@@ -76,7 +76,8 @@ def episodios(item):
     data1 = pagina(item.url)
     data1 = re.sub('\n|\t', ' ', data1)
     data = re.sub(r'>\s+<', '> <', data1)
-    patronBlock = r'(?P<block>STAGIONE\s\d+ (.+?)?(?:\()?(?P<lang>ITA|SUB ITA)(?:\))?.*?)</div></div>'
+    #patronBlock = r'(?P<block>STAGIONE\s\d+ (.+?)?(?:\()?(?P<lang>ITA|SUB ITA)(?:\))?.*?)</div></div>'
+    patronBlock = r'</span>(?P<block>[a-zA-Z\s]+\d+(.+?)?(?:\()?(?P<lang>ITA|SUB ITA)(?:\))?.*?)</div></div>'
     #patron = r'(?:\s|\Wn)?(?:<strong>|)?(?P<episode>\d+&#\d+;\d+-\d+|\d+&#\d+;\d+)(?:</strong>|)?(?P<title>.+?)(?:–|-.+?-|â.+?â|â|.)?<a (?P<url>.*?)<br />'
     patron = r'(?:\s|\Wn)?(?:<strong>|)?(?P<episode>\d+&#\d+;\d+-\d+|\d+&#\d+;\d+)(?:</strong>|)?(?P<title>.+?)(?:â|-.+?-|Ã¢ÂÂ.+?Ã¢ÂÂ|Ã¢ÂÂ|.)?(?:<a (?P<url>.*?))?<br />'
 
@@ -91,6 +92,7 @@ def episodios(item):
 
 def pagina(url):
     support.log(url)
+    #findhost()
 
     data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
     #support.log("DATA ----###----> ", data)
@@ -110,6 +112,7 @@ def pagina(url):
 # ===========  def ricerca  =============
 def search(item, texto):
     support.log()
+    findhost()
     item.url = "%s/?s=%s" % (host, texto)
     item.contentType = 'tvshow'
 
@@ -127,6 +130,7 @@ def search(item, texto):
 
 def newest(categoria):
     support.log()
+    findhost()
     itemlist = []
     item = Item()
     item.contentType = 'tvshow'

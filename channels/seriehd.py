@@ -7,22 +7,18 @@
 from core import scrapertoolsV2, httptools, support
 from core.item import Item
 
-# impostati dinamicamente da findhost()
 host = ''
 headers = ''
 
 def findhost():
+    global host, headers
     data= httptools.downloadpage('https://seriehd.nuovo.link/').data
     global host, headers
     host = scrapertoolsV2.find_single_match(data, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
     headers = [['Referer', host]]
-    return host
-
-findhost()
 
 list_servers = ['verystream', 'openload', 'streamango', 'thevideome']
 list_quality = ['1080p', '720p', '480p', '360']
-
 
 @support.menu
 def mainlist(item):
@@ -33,33 +29,9 @@ def mainlist(item):
     return locals()
 
 
-def search(item, texto):
-    support.log(texto)
-
-    item.contentType = 'tvshow'
-    item.url = host + "/?s=" + texto
-    try:
-        return peliculas(item)
-
-    # Continua la ricerca in caso di errore .
-    except:
-        import sys
-        for line in sys.exc_info():
-            support.logger.error("%s" % line)
-        return []
-
-
-@support.scrape
-def genre(item):
-    patronMenu = '<a href="(?P<url>[^"]+)">(?P<title>[^<]+)</a>'
-    blacklist = ['Serie TV','Serie TV Americane','Serie TV Italiane','altadefinizione']
-    patronBlock = '<ul class="sub-menu">(?P<block>.*)</ul>'
-    action = 'peliculas'
-    return locals()
-
-
 @support.scrape
 def peliculas(item):
+    #findhost()
     patron = r'<h2>(?P<title>.*?)</h2>\s*<img src="(?P<thumb>[^"]+)" alt="[^"]*" />\s*<A HREF="(?P<url>[^"]+)">.*?<span class="year">(?:(?P<year>[0-9]{4}))?.*?<span class="calidad">(?:(?P<quality>[A-Z]+))?.*?</span>'
     patronNext=r'<span class="current">\d+</span><a rel="nofollow" class="page larger" href="([^"]+)">\d+</a>'
     action='episodios'
@@ -68,6 +40,7 @@ def peliculas(item):
 
 @support.scrape
 def episodios(item):
+    #findhost()
     data =''
     url = support.match(item, patronBlock=r'<iframe width=".+?" height=".+?" src="([^"]+)" allowfullscreen frameborder="0">')[1]
     seasons = support.match(item, r'<a href="([^"]+)">(\d+)<', r'<h3>STAGIONE</h3><ul>(.*?)</ul>', headers, url)[0]
@@ -82,8 +55,35 @@ def episodios(item):
     action = 'findvideos'
     return locals()
 
+
+@support.scrape
+def genre(item):
+    #findhost()
+    patronMenu = '<a href="(?P<url>[^"]+)">(?P<title>[^<]+)</a>'
+    blacklist = ['Serie TV','Serie TV Americane','Serie TV Italiane','altadefinizione']
+    patronBlock = '<ul class="sub-menu">(?P<block>.*)</ul>'
+    action = 'peliculas'
+    return locals()
+
+
+def search(item, texto):
+    support.log(texto)
+    findhost()
+
+    item.contentType = 'tvshow'
+    item.url = host + "/?s=" + texto
+    try:
+        return peliculas(item)
+    # Continua la ricerca in caso di errore .
+    except:
+        import sys
+        for line in sys.exc_info():
+            support.logger.error("%s" % line)
+        return []
+
 def newest(categoria):
     support.log(categoria)
+    findhost()
     itemlist = []
     item = support.Item()
     try:

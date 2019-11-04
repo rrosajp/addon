@@ -32,7 +32,7 @@ def findhost():
     headers = [['Referer', host]]
     if host.endswith('/'):
         host = host[:-1]
-findhost()
+
 
 list_servers = ['supervideo', 'streamcherry','rapidvideo', 'streamango', 'openload']
 list_quality = ['default', 'HD', '3D', '4K', 'DVD', 'SD']
@@ -40,7 +40,7 @@ list_quality = ['default', 'HD', '3D', '4K', 'DVD', 'SD']
 @support.menu
 def mainlist(item):
     support.log(item)
-
+    findhost()
     film = ['',
         ('Al Cinema', ['/category/in-sala/', 'peliculas', '']),
         ('Novità', ['/category/nuove-uscite/', 'peliculas', '']),
@@ -55,7 +55,8 @@ def mainlist(item):
 def peliculas(item):
     support.log(item)
     #support.dbg() # decommentare per attivare web_pdb
-
+    #findhost()
+    
     blacklist = ['']
     if item.args != 'search':
         patron = r'<div class="col-mt-5 postsh">[^<>]+<div class="poster-media-card">[^<>]+<a href="(?P<url>[^"]+)" title="(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA)\])?".*?<img(?:.+?)?src="(?P<thumb>[^"]+)"'
@@ -66,6 +67,7 @@ def peliculas(item):
 
     patronNext = '<a href="([^"]+)"\s+?><i class="glyphicon glyphicon-chevron-right"'
 
+    #support.regexDbg(item, patronBlock, headers)
     #debug = True
     return locals()
 
@@ -86,6 +88,7 @@ def genres(item):
 
 def search(item, text):
     support.log('search', item)
+    findhost()
     itemlist = []
     text = text.replace(' ', '+')
     item.args = 'search'
@@ -101,8 +104,10 @@ def search(item, text):
 
 def newest(categoria):
     support.log('newest ->', categoria)
+    findhost()
     itemlist = []
     item = Item()
+    
     try:
         if categoria == 'peliculas':
             item.url = host
