@@ -12,8 +12,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     encontrados = {
         'https://vcrypt.net/images/logo', 'https://vcrypt.net/css/out',
         'https://vcrypt.net/images/favicon', 'https://vcrypt.net/css/open',
-        'http://linkup.pro/js/jquery', 'https://linkup.pro/js/jquery',
-        'http://www.rapidcrypt.net/open'
+        'http://linkup.pro/js/jquery', 'https://linkup.pro/js/jquery'#,
+        #'http://www.rapidcrypt.net/open'
     }
     devuelve = []
 
@@ -84,6 +84,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
     for url in matches:
         if url not in encontrados:
+            if 'https://rapidcrypt.net/open/' in url:
+                continue            
             logger.info("  url=" + url)
             encontrados.add(url)
 
@@ -96,5 +98,3 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     ret = page_url+" "+str(devuelve) if devuelve else page_url
     logger.info(" RET=" + str(ret))
     return ret
-
-
