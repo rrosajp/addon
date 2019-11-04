@@ -4,8 +4,8 @@
     "language": ["ita"],
     "active": true,
     "adult": false,
-    "thumbnail": "https://www.popcornstream.best/wp-content/uploads/2019/09/PopLogo40.png",
-    "banner": "https://www.popcornstream.info/media/PopcornStream820x428.png",
+    "thumbnail": "popcornstream.png",
+    "banner": "popcornstream.png",
     "categories": ["movie","tvshow","anime"],
     "settings": []
 }
