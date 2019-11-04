@@ -23,7 +23,7 @@ def get_addon_version(with_fix=True):
     Devuelve el número de versión del addon, y opcionalmente número de fix si lo hay
     '''
     if with_fix:
-        return __settings__.getAddonInfo('version') + get_addon_version_fix()
+        return __settings__.getAddonInfo('version') + " " + get_addon_version_fix()
     else:
         return __settings__.getAddonInfo('version')
 
