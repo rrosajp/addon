@@ -705,7 +705,7 @@ def do_channels_search(item):
             continue
 
         # No busca si el canal es en un idioma filtrado
-        if channel_language != "all" and channel_parameters["language"] != channel_language:
+        if channel_language != "all" and channel_language not in str(channel_parameters["language"]):
             continue
 
         # No busca si es un canal excluido de la busqueda global

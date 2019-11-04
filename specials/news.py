@@ -149,7 +149,7 @@ def get_channels_list():
             continue
 
         # No incluir si el canal es en un idioma filtrado
-        if channel_language != "all" and channel_language not in channel_parameters["language"] \
+        if channel_language != "all" and channel_language not in str(channel_parameters["language"]) \
                 and "*" not in channel_parameters["language"]:
             continue
 
@@ -624,7 +624,7 @@ def setting_channel(item):
             continue
 
         # No incluir si el canal es en un idioma filtrado
-        if channel_language != "all" and channel_language not in channel_parameters["language"] \
+        if channel_language != "all" and channel_language not in str(channel_parameters["language"]) \
                 and "*" not in channel_parameters["language"]:
             continue
 
