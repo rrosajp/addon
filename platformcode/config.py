@@ -20,15 +20,12 @@ def get_addon_core():
 
 def get_addon_version(with_fix=True):
     '''
-    Trova la versione dell'addon, senza usare le funzioni di kodi perchè non si aggiornano fino al riavvio
+    Devuelve el número de versión del addon, y opcionalmente número de fix si lo hay
     '''
-    info = open(os.path.join(get_runtime_path(), 'addon.xml')).read()
-    ver = re.search('plugin.video.kod.*?version="([^"]+)"', info).group(1)
-
     if with_fix:
-        return ver + " " + get_addon_version_fix()
+        return __settings__.getAddonInfo('version') + get_addon_version_fix()
     else:
-        return ver
+        return __settings__.getAddonInfo('version')
 
 
 def get_addon_version_fix():
