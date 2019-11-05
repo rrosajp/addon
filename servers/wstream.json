@@ -7,7 +7,7 @@
     "find_videos": {
         "patterns": [
             {    
-                "pattern":"wstream.video\/(api\/vcmod\/fastredirect\/streaming.php\\?id=624173)",
+                "pattern":"wstream.video\/(api\/vcmod\/fastredirect\/streaming.php\\?id=[0-9a-zA-Z]+)",
                 "url": "http:\/\/wstream.video\/\\1"
             },
             {
