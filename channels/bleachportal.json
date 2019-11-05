@@ -1,22 +1,15 @@
 {
 	"id": "bleachportal",
 	"name": "BleachPortal",
-	"language": ["ita"],
+	"language": ["sub-ita"],
 	"active": true,
-    "adult": false,
-    "fanart": "http://i39.tinypic.com/35ibvcx.jpg",
-	"thumbnail": "http://www.bleachportal.it/images/index_r1_c1.jpg",
-	"banner": "http://cgi.di.uoa.gr/~std05181/images/bleach.jpg",
+	"deprecated": true,
+	"adult": false,
+	"fanart": "https://www.thetvdb.com/banners/fanart/original/74796-29.jpg",
+	"thumbnail": "bleachportal.png",
+	"banner": "bleachportal.png",
 	"categories": ["anime"],
-	"settings": [
-		{
-            "id": "include_in_global_search",
-            "type": "bool",
-            "label": "Incluir en busqueda global",
-            "default": false,
-            "enabled": false,
-            "visible": false
-		}
-    ]
+	"not_active":["include_in_newests", "include_in_global_search"],
+	"settings": []
 }
 

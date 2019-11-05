@@ -11,6 +11,7 @@ from core import scrapertools, httptools
 from core.item import Item
 from platformcode import logger
 from platformcode import config
+from core import support
 
 host = "http://www.bleachportal.it"
 
@@ -19,17 +20,19 @@ def mainlist(item):
     logger.info("[BleachPortal.py]==> mainlist")
     itemlist = [Item(channel=item.channel,
                      action="episodi",
-                     title="[COLOR azure] Bleach [/COLOR] - [COLOR deepskyblue]Lista Episodi[/COLOR]",
+                     title= support.typo('Bleach','bold'),
                      url=host + "/streaming/bleach/stream_bleach.htm",
-                     thumbnail="http://i45.tinypic.com/286xp3m.jpg",
-                     fanart="http://i40.tinypic.com/5jsinb.jpg",
+                     thumbnail="https://www.thetvdb.com/banners/posters/74796-14.jpg",
+                     banner="https://www.thetvdb.com/banners/graphical/74796-g6.jpg",
+                     fanart="https://www.thetvdb.com/banners/fanart/original/74796-30.jpg",
                      extra="bleach"),
                 Item(channel=item.channel,
                      action="episodi",
-                     title="[COLOR azure] D.Gray Man [/COLOR] - [COLOR deepskyblue]Lista Episodi[/COLOR]",
+                     title=support.typo('D.Gray Man','bold'),
                      url=host + "/streaming/d.gray-man/stream_dgray-man.htm",
-                     thumbnail="http://i59.tinypic.com/9is3tf.jpg",
-                     fanart="http://wallpapercraft.net/wp-content/uploads/2016/11/Cool-D-Gray-Man-Background.jpg",
+                     thumbnail="https://www.thetvdb.com/banners/posters/79635-1.jpg",
+                     banner="https://www.thetvdb.com/banners/graphical/79635-g4.jpg",
+                     fanart="https://www.thetvdb.com/banners/fanart/original/79635-6.jpg",
                      extra="dgrayman")]
 
     return itemlist
@@ -40,7 +43,7 @@ def episodi(item):
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
-    patron = '<td>?[<span\s|<width="\d+%"\s]+?class="[^"]+">\D+([\d\-]+)\s?<[^<]+<[^<]+<[^<]+<[^<]+<.*?\s+?.*?<span style="[^"]+">([^<]+).*?\s?.*?<a href="\.*(/?[^"]+)">'
+    patron = r'<td>?[<span\s|<width="\d+%"\s]+?class="[^"]+">\D+([\d\-]+)\s?<[^<]+<[^<]+<[^<]+<[^<]+<.*?\s+?.*?<span style="[^"]+">([^<]+).*?\s?.*?<a href="\.*(/?[^"]+)">'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     animetitle = "Bleach" if item.extra == "bleach" else "D.Gray Man"
@@ -49,19 +52,19 @@ def episodi(item):
         itemlist.append(
             Item(channel=item.channel,
                  action="findvideos",
-                 title="[COLOR azure]%s Ep: [COLOR deepskyblue]%s[/COLOR][/COLOR]" % (animetitle, scrapednumber),
+                 title=support.typo("%s Episodio %s" % (animetitle, scrapednumber),'bold'),
                  url=item.url.replace("stream_bleach.htm",scrapedurl) if "stream_bleach.htm" in item.url else item.url.replace("stream_dgray-man.htm", scrapedurl),
                  plot=scrapedtitle,
                  extra=item.extra,
                  thumbnail=item.thumbnail,
                  fanart=item.fanart,
-                 fulltitle="[COLOR red]%s Ep: %s[/COLOR] | [COLOR deepskyblue]%s[/COLOR]" % (animetitle, scrapednumber, scrapedtitle)))
+                 fulltitle="%s Ep: %s | %s" % (animetitle, scrapednumber, scrapedtitle)))
 
     if item.extra == "bleach":
         itemlist.append(
             Item(channel=item.channel,
                  action="oav",
-                 title="[B][COLOR azure] OAV e Movies [/COLOR][/B]",
+                 title=support.typo("OAV e Movies",'bold color kod'),
                  url=item.url.replace("stream_bleach.htm", "stream_bleach_movie_oav.htm"),
                  extra=item.extra,
                  thumbnail=item.thumbnail,
@@ -75,19 +78,19 @@ def oav(item):
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
-    patron = '<td>?[<span\s|<width="\d+%"\s]+?class="[^"]+">-\s+(.*?)<[^<]+<[^<]+<[^<]+<[^<]+<.*?\s+?.*?<span style="[^"]+">([^<]+).*?\s?.*?<a href="\.*(/?[^"]+)">'
+    patron = r'<td>?[<span\s|<width="\d+%"\s]+?class="[^"]+">-\s+(.*?)<[^<]+<[^<]+<[^<]+<[^<]+<.*?\s+?.*?<span style="[^"]+">([^<]+).*?\s?.*?<a href="\.*(/?[^"]+)">'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for scrapednumber, scrapedtitle, scrapedurl in matches:
         itemlist.append(
             Item(channel=item.channel,
                  action="findvideos",
-                 title="[COLOR deepskyblue] " + scrapednumber + " [/COLOR]",
+                 title=support.typo(scrapednumber, 'bold'),
                  url=item.url.replace("stream_bleach_movie_oav.htm", scrapedurl),
                  plot=scrapedtitle,
                  extra=item.extra,
                  thumbnail=item.thumbnail,
-                 fulltitle="[COLOR red]" + scrapednumber + "[/COLOR] | [COLOR deepskyblue]" + scrapedtitle + "[/COLOR]"))
+                 fulltitle=scrapednumber + " | " + scrapedtitle))
 
     return list(reversed(itemlist))
 
@@ -109,7 +112,7 @@ def findvideos(item):
     itemlist.append(
         Item(channel=item.channel,
              action="play",
-             title="[[COLOR orange]Diretto[/COLOR]] [B]%s[/B]" % item.title,
+             title="Diretto %s" % item.title,
              url=item.url.replace(item.url.split("/")[-1], "/" + video),
              thumbnail=item.thumbnail,
              fulltitle=item.fulltitle))
