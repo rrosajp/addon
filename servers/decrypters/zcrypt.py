@@ -12,8 +12,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     encontrados = {
         'https://vcrypt.net/images/logo', 'https://vcrypt.net/css/out',
         'https://vcrypt.net/images/favicon', 'https://vcrypt.net/css/open',
-        'http://linkup.pro/js/jquery', 'https://linkup.pro/js/jquery',
-        'http://www.rapidcrypt.net/open'
+        'http://linkup.pro/js/jquery', 'https://linkup.pro/js/jquery'#,
+        #'http://www.rapidcrypt.net/open'
     }
     devuelve = []
 
@@ -47,13 +47,18 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                     data, status = unshortenit.unshorten(url)
                     logger.info("Data - Status zcrypt xshield.net: [%s] [%s] " %(data, status)) 
                 elif 'vcrypt.net' in url:
-                    from lib import unshortenit
-                    data, status = unshortenit.unshorten(url)
-                    logger.info("Data - Status zcrypt vcrypt.net: [%s] [%s] " %(data, status)) 
+                    if 'myfoldersakstream.php' in url:
+                        continue #'very' in url or 
+                    else:                                
+                        from lib import unshortenit
+                        data, status = unshortenit.unshorten(url)
+                        logger.info("Data - Status zcrypt vcrypt.net: [%s] [%s] " %(data, status)) 
                 elif 'linkup' in url or 'bit.ly' in url:
-                    idata = httptools.downloadpage(url).data
-                    data = scrapertoolsV2.find_single_match(idata, "<iframe[^<>]*src=\\'([^'>]*)\\'[^<>]*>")
-                    #fix by greko inizio
+                    if '/olink/' in url: continue
+                    else:
+                        idata = httptools.downloadpage(url).data
+                        data = scrapertoolsV2.find_single_match(idata, "<iframe[^<>]*src=\\'([^'>]*)\\'[^<>]*>")
+                        #fix by greko inizio
                     if not data:
                         data = scrapertoolsV2.find_single_match(idata, 'action="(?:[^/]+.*?/[^/]+/([a-zA-Z0-9_]+))">')
                     from lib import unshortenit
@@ -84,6 +89,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
     for url in matches:
         if url not in encontrados:
+            if 'https://rapidcrypt.net/open/' in url:
+                continue            
             logger.info("  url=" + url)
             encontrados.add(url)
 
@@ -96,5 +103,3 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     ret = page_url+" "+str(devuelve) if devuelve else page_url
     logger.info(" RET=" + str(ret))
     return ret
-
-
