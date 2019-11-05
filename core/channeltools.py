@@ -36,7 +36,7 @@ def get_channel_parameters(channel_name):
             # logger.debug(channel_parameters)
             if channel_parameters:
                 # cambios de nombres y valores por defecto
-                channel_parameters["title"] = channel_parameters.pop("name")
+                channel_parameters["title"] = channel_parameters.pop("name") + (' [DEPRECATED]' if channel_parameters.has_key('deprecated') and channel_parameters['deprecated'] else '')
                 channel_parameters["channel"] = channel_parameters.pop("id")
 
                 # si no existe el key se declaran valor por defecto para que no de fallos en las funciones que lo llaman
