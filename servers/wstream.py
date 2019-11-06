@@ -51,8 +51,9 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
         return video_urls
     else:
-        page_urls = scrapertools.find_multiple_matches(data, '''<a href=(?:"|')([^"']+)(?:"|')''')
+        page_urls = scrapertools.find_multiple_matches(data, '''<input type='hidden' id='videox' name='videox' value='([^']+)'>''')
         for page_url in page_urls:
+            page_url = 'https://wstream.video/video5rqlew27k/'+page_url
             if '404 Not Found' not in httptools.downloadpage(page_url, headers=headers).data.replace('https', 'http'):
                 return get_video_url(page_url)
 
