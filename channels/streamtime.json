@@ -2,7 +2,7 @@
 	"id": "streamtime",
 	"name": "StreamTime",
 	"language": ["ita"],
-	"active": true,
+	"active": false,
 	"adult": false,
 	"thumbnail": "",
 	"banner": "streamtime.png",
