@@ -46,7 +46,7 @@ def mainlist(item):
             ('Aggiornamenti', ['/ultimi-episodi-aggiunti/', 'peliculas', 'update']),
             ('Tutte', ['/lista-serie-tv/', 'peliculas', 'qualcosa']),
             ('Italiane', ['/lista-serie-tv-italiane/', 'peliculas', 'qualcosa']),
-            ('Anni 50-60-70-80-90', ['/lista-serie-tv-anni-60-70-80/', 'peliculas', 'qualcosa']),
+            ('Anni 50-60-70-80', ['/lista-serie-tv-anni-60-70-80/', 'peliculas', 'qualcosa']),
             ('HD', ['/lista-serie-tv-in-altadefinizione/', 'peliculas', 'qualcosa'])
         ]
 
@@ -63,7 +63,7 @@ def peliculas(item):
     support.log()
     #findhost()
 
-    blacklist = ['DMCA', 'Contatti', 'Attenzione NON FARTI OSCURARE', 'Lista Ccartoni Animati e Anime']
+    blacklist = ['DMCA', 'Contatti', 'Attenzione NON FARTI OSCURARE', 'Lista Cartoni Animati e Anime']
     patronBlock = r'<h1>.+?</h1>(?P<block>.*?)<div class="footer_c">'
     patronNext = r'<div class="siguiente"><a href="([^"]+)" >'
 
@@ -111,7 +111,7 @@ def peliculas(item):
 
         else:
             #patronBlock = r'<h1>Ultimi film aggiunti</h1>(?P<block>.*?)<div class="footer_c">'
-            patron = r'<tr><td><a href="(?P<url>[^"]+)"(?:|.+?)?>(?:&nbsp;&nbsp;)?[ ]?(?P<title>.*?)[ ]?(?:HD)?[ ]?(?P<year>\d+)?(?: | HD | Streaming | MD(?: iSTANCE)? )?</a>'
+            patron = r'<tr><td><a href="(?P<url>[^"]+)"(?:|.+?)?>(?:&nbsp;&nbsp;)?[ ]?(?P<title>.*?)[ ]?(?P<quality>HD)?[ ]?(?P<year>\d+)?(?: | HD | Streaming | MD(?: iSTANCE)? )?</a>'
 
     def itemHook(item):
         if 'film' in item.url:
