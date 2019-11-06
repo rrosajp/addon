@@ -912,7 +912,8 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
             videoitem.server = findS[2]
             videoitem.title = findS[0]
             videoitem.url = findS[1]
-        item.title = item.contentTitle if config.get_localized_string(30161) in item.title else item.title
+        item.title = item.contentTitle if item.contentType == 'movie' or (
+                    config.get_localized_string(30161) in item.title) else item.title
         videoitem.title = item.title + (typo(videoitem.title, '_ color kod []') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
