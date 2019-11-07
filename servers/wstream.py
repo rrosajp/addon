@@ -22,6 +22,11 @@ def test_video_exists(page_url):
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     logger.info("[wstream.py] url=" + page_url)
     video_urls = []
+
+    if '/streaming.php' in page_url:
+        code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers['location'].split('/')[-1]
+        page_url = 'https://wstream.video/video.php?file_code=' + code
+
     code = page_url.split('=')[-1]
     post = urllib.urlencode({
         'videox': code
