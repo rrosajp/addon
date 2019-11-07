@@ -142,7 +142,10 @@ def episodios(item):
                 title = match[0]+'x'+match[1] + ' - ' + item.fulltitle
                 make_item = True
             elif int(key['season_id']) == int(season_id):
-                title = 'Episodio ' + key['number'] + ' - ' + key['title'].encode('utf8'),
+                try:
+                    title = 'Episodio ' + key['number'] + ' - ' + key['title'].encode('utf8')
+                except:
+                    title = 'Episodio ' + key['number'] + ' - ' + key['title']
                 make_item = True
             else:
                 make_item = False
