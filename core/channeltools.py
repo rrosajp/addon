@@ -36,7 +36,7 @@ def get_channel_parameters(channel_name):
             # logger.debug(channel_parameters)
             if channel_parameters:
                 # cambios de nombres y valores por defecto
-                channel_parameters["title"] = channel_parameters.pop("name")
+                channel_parameters["title"] = channel_parameters.pop("name") + (' [DEPRECATED]' if channel_parameters.has_key('deprecated') and channel_parameters['deprecated'] else '')
                 channel_parameters["channel"] = channel_parameters.pop("id")
 
                 # si no existe el key se declaran valor por defecto para que no de fallos en las funciones que lo llaman
@@ -375,8 +375,6 @@ def set_channel_setting(name, value, channel):
         except EnvironmentError:
             logger.error("ERROR al leer el archivo: %s" % file_settings)
 
-    dict_settings[name] = value
-
     # delete unused Settings
     def_keys = []
     del_keys = []
@@ -388,10 +386,11 @@ def set_channel_setting(name, value, channel):
     for key in del_keys:
         del dict_settings[key]
 
+    dict_settings[name] = value
+    
     # comprobamos si existe dict_file y es un diccionario, sino lo creamos
     if dict_file is None or not dict_file:
         dict_file = {}
-
 
     dict_file['settings'] = dict_settings
 

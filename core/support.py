@@ -218,6 +218,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             scraped[kk] = val
 
         if scraped['season']:
+            stagione = scraped['season']
             episode = scraped['season'] +'x'+ scraped['episode']
         elif stagione:
             episode = stagione +'x'+ scraped['episode']
@@ -236,7 +237,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
         # make formatted Title [longtitle]
         s = ' - '
-        title = episode + (s if episode and title else '') + title 
+        title = episode + (s if episode and title else '') + title
         longtitle = title + (s if title and title2 else '') + title2
         longtitle = typo(longtitle, 'bold')
         longtitle += typo(quality, '_ [] color kod') if quality else ''
@@ -400,7 +401,7 @@ def scrape(func):
 
         if 'itemlistHook' in args:
             itemlist = args['itemlistHook'](itemlist)
-        
+
         if (pagination and len(matches) <= pag * pagination) or not pagination: # next page with pagination
             if patronNext and inspect.stack()[1][3] != 'newest':
                 nextPage(itemlist, item, data, patronNext, function)
@@ -682,7 +683,7 @@ def typo(string, typography=''):
 
     kod_color = '0xFF65B3DA' #'0xFF0081C2'
 
-    string = str(string)
+    string = str(string.encode('utf8'))
     # Check if the typographic attributes are in the string or outside
     if typography:
         string = string + ' ' + typography
@@ -910,7 +911,9 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
                 continue
             videoitem.server = findS[2]
             videoitem.title = findS[0]
-        item.title = item.contentTitle if config.get_localized_string(30161) in item.title else item.title
+            videoitem.url = findS[1]
+        item.title = item.contentTitle.strip() if item.contentType == 'movie' or (
+                    config.get_localized_string(30161) in item.title) else item.title
         videoitem.title = item.title + (typo(videoitem.title, '_ color kod []') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show

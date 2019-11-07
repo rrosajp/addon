@@ -133,7 +133,7 @@ def episodios(item): # Questa def. deve sempre essere nominata episodios
                                url=item.url,
                                show=item.fulltitle,
                                contentType='movie'))
-    debug = True
+    #debug = True
     return locals()
 
 @support.scrape
@@ -157,7 +157,7 @@ def select(item):
         return episodios(Item(channel=item.channel,
                               title=item.title,
                               fulltitle=item.fulltitle,
-                              contentSerieName = fulltitle,
+                              contentSerieName = item.fulltitle,
                               url=item.url,
                               extra='serie',
                               contentType='episode'))

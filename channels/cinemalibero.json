@@ -4,8 +4,8 @@
 	"language": ["ita"],
 	"active": true,
 	"adult": false,
-	"thumbnail": "https://www.cinemalibero.center/wp-content/themes/Cinemalibero%202.0/images/logo02.png",
-	"banner": "https://www.cinemalibero.center/wp-content/themes/Cinemalibero%202.0/images/logo02.png",
+	"thumbnail": "cinemalibero.png",
+	"banner": "cinemalibero.png",
 	"categories": ["movie","tvshow","anime"],
 	"not_active": ["include_in_newest"],
     "settings": []

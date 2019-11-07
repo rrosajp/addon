@@ -17,13 +17,22 @@ def test_video_exists(page_url):
         return False, "[wstream.py] Il File Non esiste"
     return True, ""
 
+
 # Returns an array of possible video url's from the page_url
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
-    # import web_pdb; web_pdb.set_trace()
     logger.info("[wstream.py] url=" + page_url)
     video_urls = []
 
-    data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True).data.replace('https','http')
+    if '/streaming.php' in page_url:
+        code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers['location'].split('/')[-1]
+        page_url = 'https://wstream.video/video.php?file_code=' + code
+
+    code = page_url.split('=')[-1]
+    post = urllib.urlencode({
+        'videox': code
+    })
+
+    data = httptools.downloadpage(page_url, headers=headers, post=post, follow_redirects=True).data.replace('https','http')
     logger.info("[wstream.py] data=" + data)
     vid = scrapertools.find_multiple_matches(data, 'download_video.*?>.*?<.*?<td>([^\,,\s]+)')
     headers.append(['Referer', page_url])
@@ -33,48 +42,19 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         data = jsunpack.unpack(post_data)
     logger.info("[wstream.py] data=" + data)
     block = scrapertools.find_single_match(data, 'sources:\s*\[[^\]]+\]')
-    if block:
-        data = block
+    data = block
 
-        media_urls = scrapertools.find_multiple_matches(data, '(http.*?\.mp4)')
-        _headers = urllib.urlencode(dict(headers))
-        i = 0
+    media_urls = scrapertools.find_multiple_matches(data, '(http.*?\.mp4)')
+    _headers = urllib.urlencode(dict(headers))
+    i = 0
 
-        for media_url in media_urls:
-            video_urls.append([vid[i] if vid else 'video' + " mp4 [wstream] ", media_url + '|' + _headers])
-            i = i + 1
+    for media_url in media_urls:
+        video_urls.append([vid[i] if vid else 'video' + " mp4 [wstream] ", media_url + '|' + _headers])
+        i = i + 1
 
-        for video_url in video_urls:
-            logger.info("[wstream.py] %s - %s" % (video_url[0], video_url[1]))
+    for video_url in video_urls:
+        logger.info("[wstream.py] %s - %s" % (video_url[0], video_url[1]))
 
-        logger.info(video_urls)
+    logger.info(video_urls)
 
-        return video_urls
-    else:
-        page_urls = scrapertools.find_multiple_matches(data, '''<a href=(?:"|')([^"']+)(?:"|')''')
-        for page_url in page_urls:
-            if '404 Not Found' not in httptools.downloadpage(page_url, headers=headers).data.replace('https', 'http'):
-                return get_video_url(page_url)
-
-
-
-def find_videos(data):
-    encontrados = set()
-    devuelve = []
-
-    patronvideos = r"wstream.video/(?:embed-|videos/|video/)?([a-z0-9A-Z]+)"
-    logger.info("[wstream.py] find_videos #" + patronvideos + "#")
-    matches = re.compile(patronvideos, re.DOTALL).findall(data)
-
-    for match in matches:
-        titulo = "[wstream]"
-        url = 'http://wstream.video/%s' % match
-
-        if url not in encontrados:
-            logger.info("  url=" + url)
-            devuelve.append([titulo, url, 'wstream'])
-            encontrados.add(url)
-        else:
-            logger.info("  url duplicada=" + url)
-
-    return devuelve
+    return video_urls

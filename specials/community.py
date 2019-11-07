@@ -444,7 +444,7 @@ def get_seasons(item):
     if inspect.stack()[1][3] in ['add_tvshow', "get_seasons"] or show_seasons == False:
         it = []
         for item in itemlist:
-            it += episodios(item)
+            if os.path.isfile(item.url): it += episodios(item)
         itemlist = it
 
         if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest']:
@@ -471,6 +471,7 @@ def get_seasons(item):
 
 
 def episodios(item):
+    # support.dbg()
     support.log()
     itm = item
 
@@ -489,8 +490,13 @@ def episodios(item):
         if pagination and (pag - 1) * pagination > i: continue  # pagination
         if pagination and i >= pag * pagination: break          # pagination
         match = []
-        if episode.has_key('number'): match = support.match(episode['number'], r'(?P<season>\d+)x(?P<episode>\d+)')[0][0]
-        if not match and episode.has_key('title'): match = support.match(episode['title'], r'(?P<season>\d+)x(?P<episode>\d+)')[0][0]
+        if episode.has_key('number'):
+            match = support.match(episode['number'], r'(?P<season>\d+)x(?P<episode>\d+)')[0]
+            if match:
+                match = match[0]
+        if not match and episode.has_key('title'):
+            match = support.match(episode['title'], r'(?P<season>\d+)x(?P<episode>\d+)')[0]
+            if match: match = match[0]
         if match:
             episode_number = match[1]
             ep = int(match[1]) + 1
@@ -505,27 +511,27 @@ def episodios(item):
                 episode_number = str(ep).zfill(2)
                 ep += 1
 
-            infoLabels['season'] = season_number
-            infoLabels['episode'] = episode_number
+        infoLabels['season'] = season_number
+        infoLabels['episode'] = episode_number
 
-            plot = episode['plot'] if episode.has_key('plot') else item.plot
-            thumbnail = episode['poster'] if episode.has_key('poster') else episode['thumbnail'] if episode.has_key('thumbnail') else item.thumbnail
+        plot = episode['plot'] if episode.has_key('plot') else item.plot
+        thumbnail = episode['poster'] if episode.has_key('poster') else episode['thumbnail'] if episode.has_key('thumbnail') else item.thumbnail
 
-            title = ' - ' + episode['title'] if episode.has_key('title') else ''
-            title = '%sx%s%s' % (season_number, episode_number, title)
-            if season_number == item.filter or not item.filterseason:
-                itemlist.append(Item(channel= item.channel,
-                                    title= format_title(title),
-                                    fulltitle = item.fulltitle,
-                                    show = item.show,
-                                    url= episode,
-                                    action= 'findvideos',
-                                    plot= plot,
-                                    thumbnail= thumbnail,
-                                    contentSeason= season_number,
-                                    contentEpisode= episode_number,
-                                    infoLabels= infoLabels,
-                                    contentType= 'episode'))
+        title = ' - ' + episode['title'] if episode.has_key('title') else ''
+        title = '%sx%s%s' % (season_number, episode_number, title)
+        if season_number == item.filter or not item.filterseason:
+            itemlist.append(Item(channel= item.channel,
+                                title= format_title(title),
+                                fulltitle = item.fulltitle,
+                                show = item.show,
+                                url= episode,
+                                action= 'findvideos',
+                                plot= plot,
+                                thumbnail= thumbnail,
+                                contentSeason= season_number,
+                                contentEpisode= episode_number,
+                                infoLabels= infoLabels,
+                                contentType= 'episode'))
 
 
     if show_seasons == True and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes'] and not item.filterseason:

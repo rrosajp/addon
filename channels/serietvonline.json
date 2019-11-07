@@ -4,33 +4,9 @@
     "active": true,
     "adult": false,
     "language": ["ita"],
-    "thumbnail": "https:\/\/serietvonline.com\/wp-content\/uploads\/2016\/08\/logo2016-1.png",
-    "bannermenu": "https:\/\/serietvonline.com\/wp-content\/uploads\/2016\/08\/logo2016-1.png",
-    "categories": ["anime","tvshow","movie", "documentary"],
-    "settings": [
-        {
-            "id": "include_in_newest_series",
-            "type": "bool",
-            "label": "Includi in Novità - Serie TV",
-            "default": false,
-            "enabled": false,
-            "visible": false
-        },
-        {
-            "id": "include_in_newest_anime",
-            "type": "bool",
-            "label": "Includi in Novità - Anime",
-            "default": false,
-            "enabled": false,
-            "visible": false
-        },
-        {
-            "id": "include_in_newest_italiano",
-            "type": "bool",
-            "label": "Includi in Novità - Italiano",
-            "default": false,
-            "enabled": false,
-            "visible": false
-        }
-    ]
+    "thumbnail": "serietvonline.png",
+    "bannermenu": "serietvonline.png",
+    "categories": ["anime","tvshow","movie","documentary"],
+    "not_active": ["include_in_newest_anime"],
+    "settings": []
 }

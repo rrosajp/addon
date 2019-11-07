@@ -4,8 +4,8 @@
     "active": true,
     "adult": false,
     "language": ["ita"],
-    "thumbnail": "https:\/\/mondoserietv.com\/wp-content\/uploads\/2018\/04\/logo.png",
-    "bannermenu": "https:\/\/mondoserietv.com\/wp-content\/uploads\/2018\/04\/logo.png",
+    "thumbnail": "mondoserietv.png",
+    "bannermenu": "mondoserietv.png",
     "categories": ["movie","anime","tvshow","documentary"],
     "not_active":["include_in_newest_anime","include_in_newest_documentary"],
     "settings": []

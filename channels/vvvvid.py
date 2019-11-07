@@ -137,12 +137,15 @@ def episodios(item):
         episodes.append(episode['episodes'])
     for episode in episodes:
         for key in episode:
-            if 'stagione' in key['title'].lower():
-                match = support.match(key['title'].encode('ascii', 'replace'), r'[Ss]tagione\s*(\d+) - [Ee]pisodio\s*(\d+)')[0][0]
+            if 'stagione' in key['title'].encode('utf8').lower():
+                match = support.match(key['title'].encode('utf8'), r'[Ss]tagione\s*(\d+) - [Ee]pisodio\s*(\d+)')[0][0]
                 title = match[0]+'x'+match[1] + ' - ' + item.fulltitle
                 make_item = True
             elif int(key['season_id']) == int(season_id):
-                title = 'Episodio ' + key['number'] + ' - ' + key['title'].encode('ascii', 'replace'),
+                try:
+                    title = 'Episodio ' + key['number'] + ' - ' + key['title'].encode('utf8')
+                except:
+                    title = 'Episodio ' + key['number'] + ' - ' + key['title']
                 make_item = True
             else:
                 make_item = False
@@ -193,21 +196,21 @@ def make_itemlist(itemlist, item, data):
     search = item.search if item.search else ''
     infoLabels = {}
     for key in data['data']:
-        if search.lower() in key['title'].lower():
+        if search.lower() in key['title'].encode('utf8').lower():
             infoLabels['year'] = key['date_published']
             infoLabels['title'] = infoLabels['tvshowtitle'] = key['title']
-            support.log(infoLabels)
+            title = key['title'].encode('utf8')
             itemlist.append(
                 Item(
                     channel = item.channel,
-                    title = support.typo(key['title'], 'bold'),
-                    fulltitle= key['title'],
-                    show= key['title'],
+                    title = support.typo(title, 'bold'),
+                    fulltitle= title,
+                    show= title,
                     url= host + str(key['show_id']) + '/seasons/',
                     action= 'findvideos' if item.contentType == 'movie' else 'episodios',
                     contentType = item.contentType,
                     contentSerieName= key['title'] if item.contentType != 'movie' else '',
-                    contentTitle= key['title'] if item.contentType == 'movie' else '',
+                    contentTitle= title if item.contentType == 'movie' else '',
                     infoLabels=infoLabels
             ))
     return itemlist

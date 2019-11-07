@@ -20,8 +20,6 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     itemlist = []
 
     logger.info(page_url)
-    page_url = 'https://hdload.space/getHost/' + scrapertoolsV2.find_single_match(page_url, 'https://hdload\.space/public/dist/index\.html\?id=([a-z0-9]+)')
-    logger.info(page_url)
     data = httptools.downloadpage(page_url, post='').data
     logger.info(data)
     url = base64.b64decode(data)

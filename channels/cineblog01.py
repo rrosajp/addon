@@ -200,7 +200,7 @@ def findvideos(item):
 def findvid_serie(item):
     def load_vid_series(html, item, itemlist, blktxt):
         logger.info('HTML' + html)
-        patron = '<a href="([^"]+)"[^=]+="_blank"[^>]+>(.*?)</a>'
+        patron = r'<a href="([^"]+)"[^=]+="_blank"[^>]+>(?!<!--)(.*?)</a>'
         # Estrae i contenuti
         matches = re.compile(patron, re.DOTALL).finditer(html)
         for match in matches:

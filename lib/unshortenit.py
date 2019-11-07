@@ -469,47 +469,51 @@ class UnshortenIt(object):
 
 
     def _unshorten_vcrypt(self, uri):
-        r = None
-        import base64, pyaes
+        try:
+            r = None
+            import base64, pyaes
 
-        def decrypt(str):
-            str = str.replace("_ppl_", "+").replace("_eqq_", "=").replace("_sll_", "/")
-            iv = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
-            key = "naphajU2usWUswec"
-            decoded = base64.b64decode(str)
-            decoded = decoded + '\0' * (len(decoded) % 16)
-            crypt_object = pyaes.AESModeOfOperationCBC(key, iv)
-            decrypted = ''
-            for p in range(0, len(decoded), 16):
-                decrypted += crypt_object.decrypt(decoded[p:p + 16]).replace('\0', '')
-            return decrypted
-        if 'shield' in uri.split('/')[-2]:
-            uri = decrypt(uri.split('/')[-1])
-        else:
-            import datetime, hashlib
-            ip = urllib.urlopen('http://ip.42.pl/raw').read()
-            day = datetime.date.today().strftime('%Y%m%d')
-            headers = {
-                "Cookie": hashlib.md5(ip+day).hexdigest() + "=1"
-            }
-            uri = uri.replace('sb/', 'sb1/')
-            uri = uri.replace('akv/', 'akv1/')
-            uri = uri.replace('wss/', 'wss1/')
-            uri = uri.replace('wsd/', 'wsd1/')
-            r = httptools.downloadpage(uri, timeout=self._timeout, headers=headers, follow_redirects=False)
-            if 'Wait 1 hour' in r.data:
-                uri = ''
-                logger.info('IP bannato da vcrypt, aspetta un ora')
-            else:
-                uri = r.headers['location']
-
-        if "4snip" in uri:
-            if 'out_generator' in uri:
-                uri = re.findall('url=(.*)$', uri)[0]
-            elif '/decode/' in uri:
+            def decrypt(str):
+                str = str.replace("_ppl_", "+").replace("_eqq_", "=").replace("_sll_", "/")
+                iv = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+                key = "naphajU2usWUswec"
+                decoded = base64.b64decode(str)
+                decoded = decoded + '\0' * (len(decoded) % 16)
+                crypt_object = pyaes.AESModeOfOperationCBC(key, iv)
+                decrypted = ''
+                for p in range(0, len(decoded), 16):
+                    decrypted += crypt_object.decrypt(decoded[p:p + 16]).replace('\0', '')
+                return decrypted
+            if 'shield' in uri.split('/')[-2]:
                 uri = decrypt(uri.split('/')[-1])
+            else:
+                import datetime, hashlib
+                ip = urllib.urlopen('http://ip.42.pl/raw').read()
+                day = datetime.date.today().strftime('%Y%m%d')
+                headers = {
+                    "Cookie": hashlib.md5(ip+day).hexdigest() + "=1"
+                }
+                uri = uri.replace('sb/', 'sb1/')
+                uri = uri.replace('akv/', 'akv1/')
+                uri = uri.replace('wss/', 'wss1/')
+                uri = uri.replace('wsd/', 'wsd1/')
+                r = httptools.downloadpage(uri, timeout=self._timeout, headers=headers, follow_redirects=False)
+                if 'Wait 1 hour' in r.data:
+                    uri = ''
+                    logger.info('IP bannato da vcrypt, aspetta un ora')
+                else:
+                    uri = r.headers['location']
 
-        return uri, r.code if r else 200
+            if "4snip" in uri:
+                if 'out_generator' in uri:
+                    uri = re.findall('url=(.*)$', uri)[0]
+                elif '/decode/' in uri:
+                    uri = decrypt(uri.split('/')[-1])
+
+            return uri, r.code if r else 200
+        except Exception as e:
+            return uri, str(e)
+            
 
 def unwrap_30x_only(uri, timeout=10):
     unshortener = UnshortenIt()
