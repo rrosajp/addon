@@ -18,7 +18,7 @@ headers = [['Referer', host]]
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
-list_servers = ['gounlimited', 'verystream', 'streamango', 'openload']
+list_servers = ['gounlimited', 'rapidgator', 'uploadedto', 'vidtome']
 list_quality = ['default']
 
 @support.menu
@@ -107,9 +107,8 @@ def lista_serie(item):
             matches.append(serie.split('||'))
     else:
         # Extrae las entradas
-        patron = r'<li class="cat-item cat-item-\d+"><a href="([^"]+)" >([^<]+)</a>'
+        patron = r'<li class="cat-item cat-item-\d+"><a href="([^"]+)"\s?>([^<]+)</a>'
         matches = support.match(item, patron, headers=headers)[0]
-
     for i, (scrapedurl, scrapedtitle) in enumerate(matches):
         scrapedplot = ""
         scrapedthumbnail = ""
@@ -147,6 +146,7 @@ def episodios(item, itemlist=[]):
     log()
     patron = r'<div class="post-meta">\s*<a href="([^"]+)"\s*title="([^"]+)"\s*class=".*?"></a>.*?'
     patron += r'<p><a href="([^"]+)">'
+
 
     matches, data = support.match(item, patron, headers=headers)
 
@@ -261,7 +261,7 @@ def peliculas_tv(item):
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
     # Paginazione
-    patron = r'<strong class="on">\d+</strong>\s<a href="([^<]+)">\d+</a>'
+    patron = r'<strong class="on">\d+</strong>\s?<a href="([^<]+)">\d+</a>'
     support.nextPage(itemlist, item, data, patron)
 
     return itemlist
@@ -333,9 +333,8 @@ def list_az(item):
     itemlist = []
 
     alphabet = dict()
-    patron = '<li class="cat-item cat-item-\d+"><a href="([^"]+)" >([^<]+)</a>'
+    patron = '<li class="cat-item cat-item-\d+"><a href="([^"]+)"\s?>([^<]+)</a>'
     matches = support.match(item, patron, headers=headers)[0]
-
     for i, (scrapedurl, scrapedtitle) in enumerate(matches):
         letter = scrapedtitle[0].upper()
         if letter not in alphabet:
