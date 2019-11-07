@@ -30,6 +30,7 @@ def mainlist(item):
         ('Serie TV bold',[ '', 'lista_serie', '', 'tvshow']),
         ('Per Lettera', ['', 'list_az', 'serie', 'tvshow'])
     ]
+    cerca = [(support.typo('Cerca...', 'bold'),[ '', 'search', '', 'tvshow'])]
 ##    support.aplay(item, itemlist, list_servers, list_quality)
 ##    support.channel_config(item, itemlist)
 
@@ -297,9 +298,9 @@ def search(item, texto):
     log(texto)
     itemlist = []
 
-    patron = '<li class="cat-item cat-item-\d+"><a href="([^"]+)" >([^<]+)</a>'
+    patron = '<li class="cat-item cat-item-\d+"><a href="([^"]+)"\s?>([^<]+)</a>'
     matches = support.match(item, patron, headers=headers)[0]
-
+    support.regexDbg(item, patron, headers)
     for i, (scrapedurl, scrapedtitle) in enumerate(matches):
         if texto.upper() in scrapedtitle.upper():
             scrapedthumbnail = ""
