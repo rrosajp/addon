@@ -682,8 +682,8 @@ def menu(func):
 def typo(string, typography=''):
 
     kod_color = '0xFF65B3DA' #'0xFF0081C2'
-
-    string = str(string.encode('utf8'))
+    try: string = str(string)
+    except: string = str(string.encode('utf8'))
     # Check if the typographic attributes are in the string or outside
     if typography:
         string = string + ' ' + typography
