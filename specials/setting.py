@@ -25,7 +25,7 @@ def mainlist(item):
     else:
         autostart_mode = config.get_localized_string(70708)
     itemlist.append(Item(channel=CHANNELNAME, title=autostart_mode + " " + config.get_localized_string(70706), action="autostart", folder=False, thumbnail=get_thumb("setting_0.png")))
-    
+
     #itemlist.append(Item(channel=CHANNELNAME, title="", action="", folder=False, thumbnail=get_thumb("setting_0.png")))
 
     itemlist.append(Item(channel=CHANNELNAME, title=config.get_localized_string(60536) + ":", text_bold=True, action="", folder=False,
@@ -340,8 +340,8 @@ def submenu_tools(item):
 
 
 def check_quickfixes(item):
-    logger.info()    
-    
+    logger.info()
+
     if not config.dev_mode():
         from platformcode import updater
         return updater.check_addon_init()
@@ -351,7 +351,7 @@ def check_quickfixes(item):
 
 def update_quasar(item):
     logger.info()
-    
+
     from platformcode import custom_code, platformtools
     stat = False
     stat = custom_code.update_external_addon("quasar")
@@ -359,8 +359,8 @@ def update_quasar(item):
         platformtools.dialog_notification("Actualización Quasar", "Realizada con éxito")
     else:
         platformtools.dialog_notification("Actualización Quasar", "Ha fallado. Consulte el log")
-    
-    
+
+
 def conf_tools(item):
     logger.info()
 
@@ -368,7 +368,7 @@ def conf_tools(item):
     if item.extra == "channels_onoff":
         if config.get_platform(True)['num_version'] >= 17.0: # A partir de Kodi 16 se puede usar multiselect, y de 17 con preselect
             return channels_onoff(item)
-        
+
         import channelselector
         from core import channeltools
 
@@ -686,6 +686,7 @@ def channel_status(item, dict_values):
 def overwrite_tools(item):
     import videolibrary_service
     from core import videolibrarytools
+    import os
 
     seleccion = platformtools.dialog_yesno(config.get_localized_string(60581),
                                            config.get_localized_string(60582),
@@ -712,7 +713,9 @@ def overwrite_tools(item):
                 continue
 
             # Eliminamos la carpeta con la serie ...
-            filetools.rmdirtree(path)
+            if tvshow_file.endswith('.strm') or tvshow_file.endswith('.json') or tvshow_file.endswith('.nfo'):
+                os.remove(os.path.join(path, tvshow_file))
+            # filetools.rmdirtree(path)
 
             # ... y la volvemos a añadir
             videolibrary_service.update(path, p_dialog, i, t, serie, 3)

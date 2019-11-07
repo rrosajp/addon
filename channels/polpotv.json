@@ -1,0 +1,13 @@
+{
+	"id": "polpotv",
+	"name": "PolpoTV",
+	"language": ["ita"],
+	"active": true,
+	"adult": false,
+	"thumbnail": "polpotv.png",
+	"banner": "polpotv.png",
+	"categories": ["movie"],
+	"not_active":[],
+	"default_off":["include_in_newest"],
+	"settings": []
+}

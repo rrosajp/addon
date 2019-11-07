@@ -85,7 +85,7 @@ def get_start_page():
         config.get_localized_string(59976): 'latino',
         config.get_localized_string(70171): 'torrent',
     }
-    category = dictCategory[config.get_localized_string(config.get_setting("category"))]
+    category = dictCategory[config.get_setting("category")]
 
     custom_start= config.get_setting("custom_start")
     #if category != 'definido':
@@ -103,6 +103,10 @@ def open_menu(item):
     main = Main('side_menu.xml', config.get_runtime_path())
     main.doModal()
     del main
+
+def open_shortcut_menu(item):
+    from platformcode import keymaptools
+    keymaptools.open_shortcut_menu()
 
 
 class Main(xbmcgui.WindowXMLDialog):

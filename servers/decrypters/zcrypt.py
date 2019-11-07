@@ -12,15 +12,16 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     encontrados = {
         'https://vcrypt.net/images/logo', 'https://vcrypt.net/css/out',
         'https://vcrypt.net/images/favicon', 'https://vcrypt.net/css/open',
-        'http://linkup.pro/js/jquery', 'https://linkup.pro/js/jquery',
-        'http://www.rapidcrypt.net/open'
+        'http://linkup.pro/js/jquery', 'https://linkup.pro/js/jquery'#,
+        #'http://www.rapidcrypt.net/open'
     }
     devuelve = []
 
     patronvideos = [
         r'(https?://(gestyy|rapidteria|sprysphere)\.com/[a-zA-Z0-9]+)',
         r'(https?://(?:www\.)?(vcrypt|linkup)\.[^/]+/[^/]+/[a-zA-Z0-9_]+)',
-        r'(https?://(?:www\.)?(bit)\.ly/[a-zA-Z0-9]+)',        
+        r'(https?://(?:www\.)?(bit)\.ly/[a-zA-Z0-9]+)',
+        r'(https?://(?:www\.)?(xshield)\.[^/]+/[^/]+/[^/]+/[a-zA-Z0-9_\.]+)'
     ]
 
     for patron in patronvideos:
@@ -41,15 +42,24 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                         replace_headers=True,
                         headers={'User-Agent': 'curl/7.59.0'})
                     data = resp.headers.get("location", "")
-                elif 'vcrypt.net' in url:
+                elif 'xshield' in url:
                     from lib import unshortenit
                     data, status = unshortenit.unshorten(url)
-                    logger.info("Data - Status zcrypt vcrypt.net: [%s] [%s] " %(data, status)) 
+                    logger.info("Data - Status zcrypt xshield.net: [%s] [%s] " %(data, status)) 
+                elif 'vcrypt.net' in url:
+                    if 'myfoldersakstream.php' in url or '/verys/' in url:
+                        continue
+                    else:                                
+                        from lib import unshortenit
+                        data, status = unshortenit.unshorten(url)
+                        logger.info("Data - Status zcrypt vcrypt.net: [%s] [%s] " %(data, status)) 
                 elif 'linkup' in url or 'bit.ly' in url:
-                    idata = httptools.downloadpage(url).data
-                    data = scrapertoolsV2.find_single_match(idata, "<iframe[^<>]*src=\\'([^'>]*)\\'[^<>]*>")
-                    #fix by greko inizio
-                    if not data:  
+                    if '/olink/' in url: continue
+                    else:
+                        idata = httptools.downloadpage(url).data
+                        data = scrapertoolsV2.find_single_match(idata, "<iframe[^<>]*src=\\'([^'>]*)\\'[^<>]*>")
+                        #fix by greko inizio
+                    if not data:
                         data = scrapertoolsV2.find_single_match(idata, 'action="(?:[^/]+.*?/[^/]+/([a-zA-Z0-9_]+))">')
                     from lib import unshortenit
                     data, status = unshortenit.unshorten(url)
@@ -79,6 +89,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
     for url in matches:
         if url not in encontrados:
+            if 'https://rapidcrypt.net/open/' in url or 'https://rapidcrypt.net/verys/' in url:
+                continue            
             logger.info("  url=" + url)
             encontrados.add(url)
 
@@ -91,5 +103,3 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     ret = page_url+" "+str(devuelve) if devuelve else page_url
     logger.info(" RET=" + str(ret))
     return ret
-
-

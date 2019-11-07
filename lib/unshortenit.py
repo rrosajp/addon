@@ -35,7 +35,7 @@ class UnshortenIt(object):
     _anonymz_regex = r'anonymz\.com'
     _shrink_service_regex = r'shrink-service\.it'
     _rapidcrypt_regex = r'rapidcrypt\.net'
-    _cryptmango_regex = r'cryptmango'
+    _cryptmango_regex = r'cryptmango|xshield\.net'
     _vcrypt_regex = r'vcrypt\.net'
 
     _maxretries = 5
@@ -467,6 +467,7 @@ class UnshortenIt(object):
         except Exception as e:
             return uri, str(e)
 
+
     def _unshorten_vcrypt(self, uri):
         try:
             r = None
@@ -492,22 +493,27 @@ class UnshortenIt(object):
                 headers = {
                     "Cookie": hashlib.md5(ip+day).hexdigest() + "=1"
                 }
-                uri = uri.replace('sb/','sb1/')
-                uri = uri.replace('akv/','akv1/')
-                uri = uri.replace('wss/','wss1/')
-                uri = uri.replace('wsd/','wsd1/')
+                uri = uri.replace('sb/', 'sb1/')
+                uri = uri.replace('akv/', 'akv1/')
+                uri = uri.replace('wss/', 'wss1/')
+                uri = uri.replace('wsd/', 'wsd1/')
                 r = httptools.downloadpage(uri, timeout=self._timeout, headers=headers, follow_redirects=False)
-                uri = r.headers['location']
+                if 'Wait 1 hour' in r.data:
+                    uri = ''
+                    logger.info('IP bannato da vcrypt, aspetta un ora')
+                else:
+                    uri = r.headers['location']
 
             if "4snip" in uri:
                 if 'out_generator' in uri:
                     uri = re.findall('url=(.*)$', uri)[0]
-                else:
-                    uri = decrypt(uri)
+                elif '/decode/' in uri:
+                    uri = decrypt(uri.split('/')[-1])
 
             return uri, r.code if r else 200
         except Exception as e:
             return uri, str(e)
+            
 
 def unwrap_30x_only(uri, timeout=10):
     unshortener = UnshortenIt()

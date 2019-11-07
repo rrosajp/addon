@@ -37,6 +37,8 @@ def start():
     from specials.checkhost import test_conn
     import threading
     threading.Thread(target=test_conn, args=(True, True, True, [], [], True)).start()
+    # check_adsl = test_conn(is_exit = True, check_dns = True, view_msg = True,
+    #           lst_urls = [], lst_site_check_dns = [], in_addon = True)
 
 
 def run(item=None):
@@ -58,10 +60,12 @@ def run(item=None):
                         config.get_localized_string(70018): 'infantiles',
                         config.get_localized_string(60513): 'documentales',
                         config.get_localized_string(70013): 'terror',
-                        config.get_localized_string(30124): 'castellano',
+                        config.get_localized_string(70014): 'castellano',
                         config.get_localized_string(59976): 'latino',
                         config.get_localized_string(70171): 'torrent',
                     }
+                    if not config.get_setting("category") in dictCategory.keys():
+                        config.set_setting('category', config.get_localized_string(70137))
                     category = dictCategory[config.get_setting("category")]
                     item = Item(channel="news", action="novedades", extra=category, mode = 'silent')
                 else:
@@ -129,7 +133,9 @@ def run(item=None):
             from core import tmdb
             if tmdb.drop_bd():
                 platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60011), time=2000, sound=False)
-
+        elif item.action == "itemInfo":
+            import base64
+            platformtools.dialog_textviewer('Item info', item.parent)
         # Action in certain channel specified in "action" and "channel" parameters
         else:
             # Entry point for a channel is the "mainlist" action, so here we check parental control
@@ -151,11 +157,17 @@ def run(item=None):
             # Checks if channel exists
             if os.path.isfile(os.path.join(config.get_runtime_path(), 'channels', item.channel + ".py")):
                 CHANNELS = 'channels'
+            elif os.path.isfile(os.path.join(config.get_runtime_path(), 'channels', 'porn', item.channel + ".py")):
+                CHANNELS = 'channels.porn'
             else:
                 CHANNELS ='specials'
-            channel_file = os.path.join(config.get_runtime_path(), CHANNELS, item.channel + ".py")            
-                
-            logger.info("channel_file= " + channel_file)
+
+            if CHANNELS != 'channels.porn':
+                channel_file = os.path.join(config.get_runtime_path(), CHANNELS, item.channel + ".py")
+            else:
+                channel_file = os.path.join(config.get_runtime_path(), 'channels', 'porn', item.channel + ".py")
+
+            logger.info("channel_file= " + channel_file + ' - ' + CHANNELS +' - ' + item.channel)
 
             channel = None
 
@@ -163,7 +175,8 @@ def run(item=None):
                 try:
                     channel = __import__(CHANNELS + item.channel, None, None, [CHANNELS + item.channel])
                 except ImportError:
-                    importer = "import " + CHANNELS + "." + item.channel + " as channel"
+                    importer = "import " + CHANNELS + "." + item.channel + " as channel "
+
                     exec(importer)
 
             logger.info("Running channel %s | %s" % (channel.__name__, channel.__file__))
@@ -260,13 +273,17 @@ def run(item=None):
                         from specials import search
                         search.save_search(tecleado)
 
-                    itemlist = channel.search(item, tecleado)
+                    if 'search' in dir(channel):
+                        itemlist = channel.search(item, tecleado)
+                    else:
+                        from core import support
+                        itemlist = support.search(channel, item, tecleado)
                 else:
                     return
 
                 platformtools.render_items(itemlist, item)
 
-            # For all other actions            
+            # For all other actions
             else:
                 # import web_pdb; web_pdb.set_trace()
                 logger.info("Executing channel '%s' method" % item.action)
@@ -420,7 +437,7 @@ def play_from_library(item):
     import xbmcplugin
     import xbmc
     from time import sleep
-    
+
     # Intentamos reproducir una imagen (esto no hace nada y ademas no da error)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True,
                               xbmcgui.ListItem(
@@ -498,6 +515,7 @@ def play_from_library(item):
                     return
                 else:
                     item = videolibrary.play(itemlist[seleccion])[0]
+                    item.play_from = 'window'
                     platformtools.play_video(item)
 
                 from specials import autoplay

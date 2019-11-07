@@ -1,35 +1,40 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per Streaming Altadefinizione
+# Canale per Popcorn Stream
 # ------------------------------------------------------------
 
-from core import support
+from core import support, httptools
 from core.item import Item
-from specials import autoplay
 from platformcode import config
 
-__channel__ = "streamingaltadefinizione"
-host = config.get_channel_url(__channel__)
+# __channel__ = "streamingaltadefinizione"
+# host = config.get_channel_url(__channel__)
 
+host = headers = ''
 list_servers = ['verystream', 'openload', 'wstream']
 list_quality = ['1080p', 'HD', 'DVDRIP', 'SD', 'CAM']
 
+def findhost():
+    global host, headers
+    permUrl = httptools.downloadpage('https://www.popcornstream.info', follow_redirects=False).headers
+    if 'google' in permUrl['location']:
+        if host[:4] != 'http':
+            host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+        else:
+            host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    else:
+        host = permUrl['location']
+    headers = [['Referer', host]]
+
+@support.menu
 def mainlist(item):
-    support.log()
-    itemlist = []
+    findhost()
+    film = ["/film/"]
+    anime = ["/genere/anime/"]
+    tvshow = ["/serietv/"]
+    top = [('Generi',['', 'generos'])]
 
-    support.menu(itemlist, 'Film', 'peliculas', host + "/film/")
-    support.menu(itemlist, 'Film Anime', 'peliculas', host + "/genere/anime/")
-    support.menu(itemlist, 'Film per genere', 'generos', host)
-    support.menu(itemlist, 'Serie TV', 'peliculas', host + "/serietv/", contentType='tvshow')
-    support.menu(itemlist, 'Anime', 'peliculas', host + "/genere/anime/", contentType='tvshow')
-    support.menu(itemlist, 'Cerca film', 'search', host)
-    support.menu(itemlist, 'Cerca serie tv', 'search', host, contentType='tvshow')
-
-    autoplay.init(item.channel, list_servers, list_quality)
-    autoplay.show_option(item.channel, itemlist)
-
-    return itemlist
+    return locals()
 
 
 def search(item, text):
@@ -39,38 +44,39 @@ def search(item, text):
     return support.dooplay_search(item)
 
 
+@support.scrape
 def generos(item):
-    patron = '<a href="([^"#]+)">([a-zA-Z]+)'
-    return support.scrape(item, patron, ['url', 'title'], patron_block='<a href="#">Genere</a><ul class="sub-menu">.*?</ul>', action='peliculas')
+    patron = '<a href="(?P<url>[^"#]+)">(?P<title>[a-zA-Z]+)'
+    patronBlock='<a href="#">Genere</a><ul class="sub-menu">(?P<block>.*?)</ul>'
+    action='peliculas'
+
+    return locals()
 
 
 def peliculas(item):
-    support.log("[streamingaltadefinizione.py] video")
-
-    return support.dooplay_films(item)
+    findhost()
+    return support.dooplay_peliculas(item, True if "/genere/" in item.url else False)
 
 
 def episodios(item):
+    findhost()
     return support.dooplay_get_episodes(item)
 
 
 def findvideos(item):
+    findhost()
     itemlist = []
     for link in support.dooplay_get_links(item, host):
-        server = link['server'][:link['server'].find(".")]
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="play",
-                 title=server + " [COLOR blue][" + link['title'] + "][/COLOR]",
-                 url=link['url'],
-                 server=server,
-                 fulltitle=item.fulltitle,
-                 thumbnail=item.thumbnail,
-                 show=item.show,
-                 quality=link['title'],
-                 contentType=item.contentType,
-                 folder=False))
+        if link['title'] != 'Guarda il trailer':
+            itemlist.append(
+                Item(channel=item.channel,
+                     action="play",
+                     url=link['url'],
+                     fulltitle=item.fulltitle,
+                     thumbnail=item.thumbnail,
+                     show=item.show,
+                     quality=link['title'],
+                     contentType=item.contentType,
+                     folder=False))
 
-    autoplay.start(itemlist, item)
-
-    return itemlist
+    return support.server(item, itemlist=itemlist)

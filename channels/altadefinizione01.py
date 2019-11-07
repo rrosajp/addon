@@ -2,61 +2,127 @@
 # ------------------------------------------------------------
 # Canale per altadefinizione01
 # ------------------------------------------------------------
+"""
+    
+    Eccezioni note che non superano il test del canale:
 
-from core import servertools, httptools, tmdb, scrapertoolsV2, support
+    Avvisi:
+        - L'url si prende da questo file.
+        - è presente nelle novità-> Film.
+
+    Ulteriori info:
+
+"""
+from core import scrapertoolsV2, httptools, support
 from core.item import Item
-from platformcode import logger, config
-from specials import autoplay
+from platformcode import config, logger
 
-#URL che reindirizza sempre al dominio corrente
-#host = "https://altadefinizione01.to"
+#impostati dinamicamente da findhost()
+host = ""
+headers = ""
 
-__channel__ = "altadefinizione01"
-host = config.get_channel_url(__channel__)
+def findhost():
+    global host, headers
+    data = httptools.downloadpage('https://altadefinizione01-nuovo.link/').data
+    host = scrapertoolsV2.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    headers = [['Referer', host]]
 
-IDIOMAS = {'Italiano': 'IT'}
-list_language = IDIOMAS.values()
-list_servers = ['openload', 'streamango', 'rapidvideo', 'streamcherry', 'megadrive']
+list_servers = ['verystream','openload','rapidvideo','streamango']
 list_quality = ['default']
 
-checklinks = config.get_setting('checklinks', 'altadefinizione01')
-checklinks_number = config.get_setting('checklinks_number', 'altadefinizione01')
-
-headers = [['Referer', host]]
-blacklist_categorie = ['Altadefinizione01', 'Altadefinizione.to']
-
-
+@support.menu
 def mainlist(item):
-    support.log()
+    findhost()
+    film = [
+        ('Al Cinema', ['/cinema/', 'peliculas', 'pellicola']),
+        ('Ultimi Aggiornati-Aggiunti', ['','peliculas', 'update']),
+        ('Generi', ['', 'genres', 'genres']),
+        ('Lettera', ['/catalog/a/', 'genres', 'orderalf']),
+        ('Anni', ['', 'genres', 'years']),
+        ('Sub-ITA', ['/sub-ita/', 'peliculas', 'pellicola'])
+    ]
 
-    itemlist =[]
+    return locals()
 
-    support.menu(itemlist, 'Al Cinema','peliculas',host+'/cinema/')
-    support.menu(itemlist, 'Ultimi Film Inseriti','peliculas',host)
-    support.menu(itemlist, 'Film Sub-ITA','peliculas',host+'/sub-ita/')
-    support.menu(itemlist, 'Film Ordine Alfabetico ','AZlist',host+'/catalog/')
-    support.menu(itemlist, 'Categorie Film','categories',host)
-    support.menu(itemlist, 'Cerca...','search')
+@support.scrape
+def peliculas(item):
+    support.log('peliculas',item)
+    findhost()
+##    deflang = 'ITA'
+    action="findvideos"
+
+    patron = r'<div class="cover boxcaption"> <h2>.<a href="(?P<url>[^"]+)">.*?<.*?src="(?P<thumb>[^"]+)"'\
+         '.+?[^>]+>[^>]+<div class="trdublaj"> (?P<quality>[A-Z/]+)<[^>]+>(?:.[^>]+>(?P<lang>.*?)<[^>]+>).*?'\
+         '<p class="h4">(?P<title>.*?)</p>[^>]+> [^>]+> [^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> [^>]+> '\
+         '[^>]+>[^>]+>(?P<year>\d{4})[^>]+>[^>]+> [^>]+>[^>]+>(?P<duration>\d+).+?>.*?<p>(?P<plot>[^<]+)<'
+
+    if item.args == "search":
+        patronBlock = r'</script> <div class="boxgrid caption">(?P<block>.*)<div id="right_bar">'
+        
+    elif item.args == 'update':
+        patronBlock = r'<div class="widget-title">Ultimi Film Aggiunti/Aggiornati</div>(?P<block>.*?)<div id="alt_menu">'
+        patron = r'style="background-image:url\((?P<thumb>[^\)]+).+?<p class="h4">(?P<title>.*?)</p>[^>]+> [^>]+> [^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> [^>]+> [^>]+>[^>]+>(?P<year>\d{4})[^>]+>[^>]+> [^>]+>[^>]+>(?P<duration>\d+).+?>.*?(?:>Film (?P<lang>Sub ITA)</a></p> )?<p>(?P<plot>[^<]+)<.*?href="(?P<url>[^"]+)'
+    else:
+        patronBlock = r'<div class="cover_kapsul ml-mask">(?P<block>.*)<div class="page_nav">'
+
+    patronNext =  '<span>\d</span> <a href="([^"]+)">'
+##    debug = True
+    return locals()
+
+@support.scrape
+def genres(item):
+    support.log('genres',item)
     
-    autoplay.init(item.channel, list_servers, list_quality)
-    autoplay.show_option(item.channel, itemlist)
+    if item.args != 'orderalf': action = "peliculas"
+    else: action = 'orderalf'
 
-    return itemlist
+    blacklist = ['Altadefinizione01']
+    if item.args == 'genres':
+        patronBlock = r'<ul class="kategori_list">(?P<block>.*?)<div class="tab-pane fade" id="wtab2">'
+        patron = '<li><a href="(?P<url>[^"]+)">(?P<title>.*?)</a>'
+    elif item.args == 'years':
+        patronBlock = r'<ul class="anno_list">(?P<block>.*?)</a></li> </ul> </div>'
+        patron = '<li><a href="(?P<url>[^"]+)">(?P<title>.*?)</a>'
+    elif item.args == 'orderalf':
+        patronBlock = r'<div class="movies-letter">(?P<block>.*?)<div class="clearfix">'
+        patron = '<a title=.*?href="(?P<url>[^"]+)"><span>(?P<title>.*?)</span>'
+
+    #debug = True
+    return locals()
+
+@support.scrape
+def orderalf(item):
+    support.log('orderalf',item)
+    
+    action= 'findvideos'
+    patron = r'<td class="mlnh-thumb"><a href="(?P<url>[^"]+)".*?src="(?P<thumb>[^"]+)"'\
+             '.+?[^>]+>[^>]+ [^>]+[^>]+ [^>]+>(?P<title>[^<]+).*?[^>]+>(?P<year>\d{4})<'\
+             '[^>]+>[^>]+>(?P<quality>[A-Z]+)[^>]+> <td class="mlnh-5">(?P<lang>.*?)</td>'
+    patronNext =  r'<span>[^<]+</span>[^<]+<a href="(.*?)">'
+
+    return locals()
 
 
-def categories(item):
-    support.log(item)
-    itemlist = support.scrape(item,'<li><a href="([^"]+)">(.*?)</a></li>',['url','title'],headers,'Altadefinizione01',patron_block='<ul class="kategori_list">(.*?)</ul>',action='peliculas')
-    return support.thumb(itemlist)
-
-def AZlist(item):
-    support.log()
-    return support.scrape(item,r'<a title="([^"]+)" href="([^"]+)"',['title','url'],headers,patron_block=r'<div class="movies-letter">(.*?)<\/div>',action='peliculas_list')
-
+def search(item, text):
+    support.log(item, text)
+    findhost()
+    
+    itemlist = []
+    text = text.replace(" ", "+")
+    item.url = host + "/index.php?do=search&story=%s&subaction=search" % (text)
+    item.args = "search"
+    try:
+        return peliculas(item)
+    # Cattura la eccezione così non interrompe la ricerca globle se il canale si rompe!
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("search except: %s" % line)
+        return []
 
 def newest(categoria):
-    # import web_pdb; web_pdb.set_trace()
     support.log(categoria)
+    findhost()    
     itemlist = []
     item = Item()
     try:
@@ -64,10 +130,9 @@ def newest(categoria):
             item.url = host
             item.action = "peliculas"
             itemlist = peliculas(item)
-
             if itemlist[-1].action == "peliculas":
                 itemlist.pop()
-    # Continua la ricerca in caso di errore 
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
@@ -76,75 +141,6 @@ def newest(categoria):
 
     return itemlist
 
-
-def search(item, texto):
-    support.log(texto)
-    item.url = "%s/index.php?do=search&story=%s&subaction=search" % (
-        host, texto)
-    try:
-        return peliculas(item)
-    # Continua la ricerca in caso di errore 
-    except:
-        import sys
-        for line in sys.exc_info():
-            logger.error("%s" % line)
-        return []
-
-
-def peliculas(item):
-    support.log()
-    itemlist = []
-
-    data = httptools.downloadpage(item.url, headers=headers).data
-    patron = r'<div class="cover_kapsul ml-mask".*?<a href="(.*?)">(.*?)<\/a>.*?<img .*?src="(.*?)".*?<div class="trdublaj">(.*?)<\/div>.(<div class="sub_ita">(.*?)<\/div>|())'
-    matches = scrapertoolsV2.find_multiple_matches(data, patron)
-    
-    for scrapedurl, scrapedtitle, scrapedthumbnail, scrapedquality, subDiv, subText, empty in matches:
-        info = scrapertoolsV2.find_multiple_matches(data, r'<span class="ml-label">([0-9]+)+<\/span>.*?<span class="ml-label">(.*?)<\/span>.*?<p class="ml-cat".*?<p>(.*?)<\/p>.*?<a href="(.*?)" class="ml-watch">')
-        infoLabels = {}
-        for infoLabels['year'], duration, scrapedplot, checkUrl in info:
-            if checkUrl == scrapedurl:
-                break
-
-        infoLabels['duration'] = int(duration.replace(' min', '')) * 60  # calcolo la durata in secondi
-        scrapedthumbnail = host + scrapedthumbnail
-        scrapedtitle = scrapertoolsV2.decodeHtmlentities(scrapedtitle)
-        fulltitle = scrapedtitle
-        if subDiv:
-            fulltitle += support.typo(subText + ' _ () color limegreen')
-        fulltitle += support.typo(scrapedquality.strip()+ ' _ [] color kod')
-
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="findvideos",
-                 contentType=item.contenType,
-                 contentTitle=scrapedtitle,
-                 contentQuality=scrapedquality.strip(),
-                 plot=scrapedplot,
-                 title=fulltitle,
-                 fulltitle=scrapedtitle,
-                 show=scrapedtitle,
-                 url=scrapedurl,
-                 infoLabels=infoLabels,
-                 thumbnail=scrapedthumbnail))
-
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-    support.nextPage(itemlist,item,data,'<span>[^<]+</span>[^<]+<a href="(.*?)">')
-
-    return itemlist
-
-def peliculas_list(item):
-    support.log()
-    item.fulltitle = ''
-    block = r'<tbody>(.*)<\/tbody>'
-    patron = r'<a href="([^"]+)" title="([^"]+)".*?> <img.*?src="([^"]+)".*?<td class="mlnh-3">([0-9]{4}).*?mlnh-4">([A-Z]+)'
-    return support.scrape(item,patron, ['url', 'title', 'thumb', 'year', 'quality'], patron_block=block)
-
-
-
 def findvideos(item):
-    support.log()
-    
-    itemlist = support.server(item, headers=headers)
-
-    return itemlist
+    support.log('findvideos', item)
+    return support.server(item, headers=headers)

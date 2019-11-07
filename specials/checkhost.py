@@ -13,10 +13,11 @@ addonname = addon.getAddonInfo('name')
 addonid = addon.getAddonInfo('id')
 
 LIST_SITE = ['https://www.google.com', 'https://www.google.it',
-                'http://www.ansa.it/', 'https://www.debian.org/']
+                'http://www.ansa.it/']#, 'https://www.debian.org/']
 
 # lista di siti che non verranno raggiunti con i DNS del gestore
-LST_SITE_CHCK_DNS = ['https://www.italia-film.pw', 'https://casacinema.space']
+LST_SITE_CHCK_DNS = ['https://www.italia-film.pw', 'https://casacinema.space',
+                     'https://documentari-streaming-da.com']
 
 
 class Kdicc():
@@ -67,7 +68,9 @@ class Kdicc():
         http_errr = 0
         for rslt in r:
             xbmc.log("check_Adsl rslt: %s" % rslt['code'], level=xbmc.LOGNOTICE)
-            if rslt['code'] == '111' or '[Errno -3]' in str(rslt['code']):
+            # Errno -2 potrebbe essere mancanza di connessione adsl o sito non raggiungibile....
+            # anche nei casi in cui ci sia il cambio gestore.
+            if rslt['code'] == '111' or '[Errno -3]' in str(rslt['code']) or 'Errno -2' in str(rslt['code']):
                 http_errr +=1
 
         if len(LIST_SITE) == http_errr:
@@ -133,11 +136,12 @@ class Kdicc():
                 # gli errori vengono inglobati in code = '111' in quanto in quel momento
                 # non vengono raggiunti per una qualsiasi causa
                 if '[Errno 111]' in str(conn_errr) or 'Errno 10060' in str(conn_errr) \
-                    or 'Errno 10061' in str(conn_errr) \
-                    or '[Errno 110]' in str(conn_errr) \
+                     or 'Errno 10061' in str(conn_errr) \
+                     or '[Errno 110]' in str(conn_errr) \
                      or 'ConnectTimeoutError' in str(conn_errr) \
                      or 'Errno 11002' in str(conn_errr) or 'ReadTimeout' in str(conn_errr) \
-                     or 'Errno 11001' in str(conn_errr): # questo errore è anche nel code: -2
+                     or 'Errno 11001' in str(conn_errr) \
+                     or 'Errno -2' in str(conn_errr): # questo errore è anche nel code: -2
                     rslt['code'] = '111'
                     rslt['url'] = str(sito)
                     rslt['http_err'] = 'Connection error'
@@ -172,6 +176,8 @@ class Kdicc():
                 # per siti irraggiungibili senza DNS corretti
                 #[Errno 111] Connection refused
                 rslt['code'] = 111
+            except:
+                rslt['code'] = 'Connection error'
         return rslt
 
     def view_Advise(self, txt = '' ):
@@ -220,6 +226,10 @@ def test_conn(is_exit, check_dns, view_msg,
             if view_msg == True:
                 ktest.view_Advise(config.get_localized_string(70722))
 
+    xbmc.log("############ Inizio Check DNS ############", level=xbmc.LOGNOTICE)
+    xbmc.log("IP: %s" %  (ktest.ip_addr), level=xbmc.LOGNOTICE)
+    xbmc.log("DNS: %s" %  (ktest.dns), level=xbmc.LOGNOTICE)
+    xbmc.log("############ Fine Check DNS ############", level=xbmc.LOGNOTICE)
     if ktest.check_Ip() and ktest.check_Adsl() and ktest.check_Dns():
         return True
     else:

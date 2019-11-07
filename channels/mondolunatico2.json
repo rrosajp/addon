@@ -6,7 +6,7 @@
   "adult": false, 
   "thumbnail": "mondolunatico2.png", 
   "banner": "mondolunatico2.png", 
-  "categories": ["tvshow", "movie", "vosi", "anime"],
+  "categories": ["tvshow", "movie", "vos", "anime"],
   "settings": [
 		{
 		  "id": "include_in_global_search",

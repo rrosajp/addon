@@ -2,6 +2,12 @@
 # ------------------------------------------------------------
 # Canale per Filmsenzalimiti
 # ------------------------------------------------------------
+"""
+    Trasformate le sole def per support.menu e support.scrape
+    da non inviare nel test.
+    Test solo a trasformazione completa
+
+"""
 import re
 
 from core import scrapertools, servertools, httptools, support
@@ -109,18 +115,19 @@ def sottomenu(item):
 
     return itemlist
 
-
+@support.scrape
 def video(item):
     logger.info('[filmsenzalimiti.py] video')
     itemlist = []
 
-    patron = '<div class="col-mt-5 postsh">.*?<a href="([^"]+)" title="([^"]+)">.*?<span class="rating-number">(.*?)<.*?<img src="([^"]+)"'
+    patron = '<div class="col-mt-5 postsh">.*?<a href="(?P<url>[^"]+)" '\
+             'title="(?P<title>[^"]+)">.*?<span class="rating-number">(?P<rating>.*?)<.*?<img src="(?P<thumb>[^"]+)"'
     patronNext = '<a href="([^"]+)"><i class="glyphicon glyphicon-chevron-right"'
 
-    support.scrape(item, itemlist, patron, ['url', 'title', 'rating', 'thumb'], patronNext=patronNext)
+##    support.scrape(item, itemlist, patron, ['url', 'title', 'rating', 'thumb'], patronNext=patronNext)
 
-    return itemlist
-
+##    return itemlist
+    return locals()
 def cerca(item):
     logger.info('[filmsenzalimiti.py] cerca')
     itemlist = []

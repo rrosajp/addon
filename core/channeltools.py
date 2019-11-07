@@ -12,6 +12,8 @@ from platformcode import config, logger
 DEFAULT_UPDATE_URL = "/channels/"
 dict_channels_parameters = dict()
 
+remote_path = 'https://raw.githubusercontent.com/kodiondemand/media/master/'
+
 
 def is_adult(channel_name):
     logger.info("channel_name=" + channel_name)
@@ -34,13 +36,18 @@ def get_channel_parameters(channel_name):
             # logger.debug(channel_parameters)
             if channel_parameters:
                 # cambios de nombres y valores por defecto
-                channel_parameters["title"] = channel_parameters.pop("name")
+                channel_parameters["title"] = channel_parameters.pop("name") + (' [DEPRECATED]' if channel_parameters.has_key('deprecated') and channel_parameters['deprecated'] else '')
                 channel_parameters["channel"] = channel_parameters.pop("id")
 
                 # si no existe el key se declaran valor por defecto para que no de fallos en las funciones que lo llaman
-                channel_parameters["update_url"] = channel_parameters.get("update_url", DEFAULT_UPDATE_URL)
-                channel_parameters["language"] = channel_parameters.get("language", ["all"])
                 channel_parameters["adult"] = channel_parameters.get("adult", False)
+                logger.info(channel_parameters["adult"])
+                if channel_parameters["adult"]:
+                    channel_parameters["update_url"] = channel_parameters.get("update_url", DEFAULT_UPDATE_URL+'porn/')
+                else:
+                    channel_parameters["update_url"] = channel_parameters.get("update_url", DEFAULT_UPDATE_URL)
+                channel_parameters["language"] = channel_parameters.get("language", ["all"])
+##                channel_parameters["adult"] = channel_parameters.get("adult", False)
                 channel_parameters["active"] = channel_parameters.get("active", False)
                 channel_parameters["include_in_global_search"] = channel_parameters.get("include_in_global_search", False)
                 channel_parameters["categories"] = channel_parameters.get("categories", list())
@@ -51,14 +58,11 @@ def get_channel_parameters(channel_name):
 
                 # Imagenes: se admiten url y archivos locales dentro de "resources/images"
                 if channel_parameters.get("thumbnail") and "://" not in channel_parameters["thumbnail"]:
-                    channel_parameters["thumbnail"] = os.path.join(config.get_runtime_path(), "resources", "media",
-                                                                   "channels", "thumb", channel_parameters["thumbnail"])
+                    channel_parameters["thumbnail"] = os.path.join(remote_path, 'resources', "thumb", channel_parameters["thumbnail"])
                 if channel_parameters.get("banner") and "://" not in channel_parameters["banner"]:
-                    channel_parameters["banner"] = os.path.join(config.get_runtime_path(), "resources", "media",
-                                                                "channels", "banner", channel_parameters["banner"])
+                    channel_parameters["banner"] = os.path.join(remote_path, 'resources', "banner", channel_parameters["banner"])
                 if channel_parameters.get("fanart") and "://" not in channel_parameters["fanart"]:
-                    channel_parameters["fanart"] = os.path.join(config.get_runtime_path(), "resources", "media",
-                                                                "channels", "fanart", channel_parameters["fanart"])
+                    channel_parameters["fanart"] = os.path.join(remote_path, 'resources', "fanart", channel_parameters["fanart"])
 
                 # Obtenemos si el canal tiene opciones de configuración
                 channel_parameters["has_settings"] = False
@@ -79,7 +83,7 @@ def get_channel_parameters(channel_name):
                     #             break
                     #     if found:
                     #         break
-
+                    channel_parameters['settings'] = get_default_settings(channel_name)
                     for s in channel_parameters['settings']:
                         if 'id' in s:
                             if s['id'] == "include_in_global_search":
@@ -133,11 +137,14 @@ def get_channel_json(channel_name):
     try:
         channel_path = filetools.join(config.get_runtime_path(), "channels", channel_name + ".json")
         if not os.path.isfile(channel_path):
-            channel_path = filetools.join(config.get_runtime_path(), "specials", channel_name + ".json")
+            channel_path = filetools.join(config.get_runtime_path(), 'channels', "porn", channel_name + ".json")
             if not os.path.isfile(channel_path):
-                channel_path = filetools.join(config.get_runtime_path(), "servers", channel_name + ".json")
+                channel_path = filetools.join(config.get_runtime_path(), "specials", channel_name + ".json")
                 if not os.path.isfile(channel_path):
-                    channel_path = filetools.join(config.get_runtime_path(), "servers", "debriders", channel_name + ".json")
+                    channel_path = filetools.join(config.get_runtime_path(), "servers", channel_name + ".json")
+                    if not os.path.isfile(channel_path):
+                        channel_path = filetools.join(config.get_runtime_path(), "servers", "debriders", channel_name + ".json")
+
         if filetools.isfile(channel_path):
             # logger.info("channel_data=" + channel_path)
             channel_json = jsontools.load(filetools.read(channel_path))
@@ -155,7 +162,8 @@ def get_channel_controls_settings(channel_name):
     # logger.info("channel_name=" + channel_name)
     dict_settings = {}
     # import web_pdb; web_pdb.set_trace()
-    list_controls = get_channel_json(channel_name).get('settings', list())
+    # list_controls = get_channel_json(channel_name).get('settings', list())
+    list_controls = get_default_settings(channel_name)
 
     for c in list_controls:
         if 'id' not in c or 'type' not in c or 'default' not in c:
@@ -166,6 +174,108 @@ def get_channel_controls_settings(channel_name):
         dict_settings[c['id']] = c['default']
 
     return list_controls, dict_settings
+
+def get_lang(channel_name):
+    channel = __import__('channels.%s' % channel_name, fromlist=["channels.%s" % channel_name])
+    list_language = [config.get_localized_string(70522)]
+    if hasattr(channel, 'list_language'):
+        for language in channel.list_language:
+            list_language.append(language)
+        logger.info(list_language)
+    else:
+        sub = False
+        langs = []
+        language = get_channel_json(channel_name).get('language', list())
+        for lang in language:
+            if 'vos' not in lang:
+                langs.append(lang.upper())
+            else:
+                sub = True
+        if sub == True:
+            for lang in langs:
+                list_language.append(lang)
+                list_language.append('Sub-' + lang)
+        else:
+            for lang in langs:
+                list_language.append(lang)
+    return list_language
+
+def get_default_settings(channel_name):
+    import filetools, inspect
+
+    # Check if it is a real channel
+    try:
+        channel = __import__('channels.%s' % channel_name, fromlist=["channels.%s" % channel_name])
+    except:
+        return get_channel_json(channel_name).get('settings', list())
+
+    list_language = get_lang(channel_name)
+
+    # Check if the automatic renumbering function exists
+    renumber = False
+    if 'episodios' in dir(channel):
+        from core import scrapertoolsV2
+        if scrapertoolsV2.find_single_match(inspect.getsource(channel), r'(anime\s*=\s*True)') \
+            or scrapertoolsV2.find_single_match(inspect.getsource(channel), r'(autorenumber\()'):
+            renumber = True
+
+    #  Collects configurations
+    channel_language = categories = get_channel_json(channel_name).get('language', list())
+    channel_controls = get_channel_json(channel_name).get('settings', list())
+    default_path = filetools.join(config.get_runtime_path(), 'default_channel_settings' + '.json')
+    default_controls = jsontools.load(filetools.read(default_path)).get('settings', list())
+    default_controls_renumber = jsontools.load(filetools.read(default_path)).get('renumber', list())
+    categories = get_channel_json(channel_name).get('categories', list())
+    not_active = get_channel_json(channel_name).get('not_active', list())
+    default_off = get_channel_json(channel_name).get('default_off', list())
+
+    # Apply default configurations if they do not exist
+    for control in default_controls:
+        if control['id'] not in str(channel_controls):
+            if 'include_in_newest' in control['id'] and 'include_in_newest' not in not_active and control['id'] not in not_active:
+                label = control['id'].split('_')
+                label = label[-1]
+                if label == 'peliculas':
+                    if 'movie' in categories:
+                        control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30122)
+                        control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_peliculas' in default_off) else True
+                        channel_controls.append(control)
+                    else: pass
+                elif label == 'series':
+                    if 'tvshow' in categories:
+                        control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30123)
+                        control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_series' in default_off) else True
+                        channel_controls.append(control)
+                    else: pass
+                elif label == 'anime':
+                    if 'anime' in categories:
+                        control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30124)
+                        control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_anime' in default_off) else True
+                        channel_controls.append(control)
+                    else: pass
+
+                else:
+                    control['label'] = config.get_localized_string(70727) + ' - ' + label.capitalize()
+                    control['default'] = control['default'] if control['id'] not in default_off else False
+                    channel_controls.append(control)
+
+            # elif control['id'] == 'filter_languages':
+            #     if len(channel_language) > 1:
+            #         control['lvalues'] = list_language
+            #         channel_controls.append(control)
+            #     else: pass
+
+            elif control['id'] not in not_active and 'include_in_newest' not in control['id']:
+                if type(control['default']) == bool:
+                    control['default'] = control['default'] if control['id'] not in default_off else False
+                channel_controls.append(control)
+
+    if renumber:
+        for control in default_controls_renumber:
+            if control['id'] not in str(channel_controls):
+                channel_controls.append(control)
+            else: pass
+    return channel_controls
 
 
 def get_channel_setting(name, channel, default=None):
@@ -253,6 +363,7 @@ def set_channel_setting(name, value, channel):
 
     file_settings = os.path.join(config.get_data_path(), "settings_channels", channel + "_data.json")
     dict_settings = {}
+    def_settings = get_default_settings(channel)
 
     dict_file = None
 
@@ -264,8 +375,19 @@ def set_channel_setting(name, value, channel):
         except EnvironmentError:
             logger.error("ERROR al leer el archivo: %s" % file_settings)
 
-    dict_settings[name] = value
+    # delete unused Settings
+    def_keys = []
+    del_keys = []
+    for key in def_settings:
+        def_keys.append(key['id'])
+    for key in dict_settings:
+        if key not in def_keys:
+            del_keys.append(key)
+    for key in del_keys:
+        del dict_settings[key]
 
+    dict_settings[name] = value
+    
     # comprobamos si existe dict_file y es un diccionario, sino lo creamos
     if dict_file is None or not dict_file:
         dict_file = {}

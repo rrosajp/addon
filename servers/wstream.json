@@ -6,13 +6,21 @@
     "thumbnail": "http:\/\/media.tvalacarta.info\/servers\/server_wstream.png",
     "find_videos": {
         "patterns": [
-            {
-                "pattern": "wstream\\.video/video\\.php\\?file_code=([a-z0-9A-Z]+)",
-                "url": "http:\/\/wstream.video\/\\1"
+            {    
+                "pattern":"wstream.video\/(api\/vcmod\/fastredirect\/streaming.php\\?id=[0-9a-zA-Z]+)",
+                "url": "https://wstream.video/video.php?file_code=\\1"
             },
             {
-                "pattern": "wstream\\.video/(?:embed-|videos/|video/|videow/|videoj/)?([a-z0-9A-Z]+)",
-                "url": "http:\/\/wstream.video\/\\1"
+                "pattern": "wstream\\.video/video\\.php\\?file_code=([a-z0-9A-Z]+)",
+                "url": "https://wstream.video/video.php?file_code=\\1"
+            },
+            {
+                "pattern": "wstream\\.video\/(?:embed-|videos/|video/|videow/|videoj/)([a-z0-9A-Z]+)",
+                "url": "https://wstream.video/video.php?file_code=\\1"
+            },
+            {
+                "pattern": "wstream\\.video\/(?!api/)([a-z0-9A-Z]+)",
+                "url": "https://wstream.video/video.php?file_code=\\1"
             }
         ],
         "ignore_urls": [        ]

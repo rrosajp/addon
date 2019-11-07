@@ -49,7 +49,7 @@ def mainlist(item):
                                   "action": "delFavourite",
                                   "channel": "favorites",
                                   "from_title": item.title},
-                                 {"title": "Renombrar",
+                                 {"title": config.get_localized_string(70278), # Rename
                                   "action": "renameFavourite",
                                   "channel": "favorites",
                                   "from_title": item.title}

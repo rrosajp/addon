@@ -1,57 +1,11 @@
 {
-	"id": "eurostreaming",
-	"name": "Eurostreaming",
+    "id": "eurostreaming",
+    "name": "Eurostreaming",
     "active": true,
-	"adult": false,
-	"language": ["ita"],
-    "thumbnail": "https://eurostreaming.cafe/wp-content/uploads/2017/08/logocafe.png",
-    "bannermenu": "https://eurostreaming.cafe/wp-content/uploads/2017/08/logocafe.png",
-	"categories": ["tvshow","anime","vosi"],
-  "settings": [
-    {
-    "id": "channel_host",
-    "type": "text",
-    "label": "Host del canale",
-    "default": "https://eurostreaming.cafe",
-    "enabled": true,
-    "visible": true
-    },   
-      {
-      "id": "include_in_global_search",
-      "type": "bool",
-      "label": "Includi ricerca globale",
-      "default": true,
-      "enabled": true,
-      "visible": true
-    },
-    {
-    "id": "include_in_newest_series",
-    "type": "bool",
-    "label": "Includi in novità - Serie TV",
-    "default": true,
-	 "enabled": true,
-    "visible": true
-    },
-    {
-    "id": "include_in_newest_italiano",
-    "type": "bool",
-    "label": "Includi in Novità - Italiano",
-    "default": true,
-    "enabled": true,
-    "visible": true
-    },
-    {
-      "id": "filter_languages",
-      "type": "list",
-      "label": "Mostra link in lingua...",
-      "default": 0,
-      "enabled": true,
-      "visible": true,
-      "lvalues": [
-        "Non filtrare",
-        "ITA",
-        "vosi"
-      ]
-    }
-	  ]
+    "adult": false,
+    "language": ["ita","sub-ita"],
+    "thumbnail": "eurostreaming.png",
+    "banner": "eurostreaming.png",
+    "categories": ["tvshow","anime","vos"],
+    "settings": []
 }

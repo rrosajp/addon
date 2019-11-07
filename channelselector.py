@@ -16,6 +16,10 @@ def getmainlist(view="thumb_"):
     logger.info()
     itemlist = list()
 
+    if config.dev_mode():
+        itemlist.append(Item(title="Redirect", channel="checkhost", action="check_channels",
+                            thumbnail='',
+                            category=config.get_localized_string(30119), viewmode="thumbnails"))
     # Añade los canales que forman el menú principal
     if addon.getSetting('enable_news_menu') == "true":
         itemlist.append(Item(title=config.get_localized_string(30130), channel="news", action="mainlist",
@@ -38,7 +42,7 @@ def getmainlist(view="thumb_"):
 
     if addon.getSetting('enable_onair_menu') == "true":
         itemlist.append(Item(channel="filmontv", action="mainlist", title=config.get_localized_string(50001),
-                            thumbnail=get_thumb("on_the_air.png"), viewmode="thumbnails"))  
+                            thumbnail=get_thumb("on_the_air.png"), viewmode="thumbnails"))
 
     if addon.getSetting('enable_link_menu') == "true":
         itemlist.append(Item(title=config.get_localized_string(70527), channel="kodfavorites", action="mainlist",
@@ -102,7 +106,7 @@ def getchanneltypes(view="thumb_"):
 
     # itemlist.append(Item(title='Oggi in TV', channel="filmontv", action="mainlist", view=view,
     #                      category=title, channel_type="all", thumbnail=get_thumb("on_the_air.png", view),
-    #                      viewmode="thumbnails")) 
+    #                      viewmode="thumbnails"))
 
 
 
@@ -113,7 +117,7 @@ def getchanneltypes(view="thumb_"):
 
 
 def filterchannels(category, view="thumb_"):
-    logger.info()
+    logger.info('Filterchannl'+category)
 
     channelslist = []
 
@@ -124,8 +128,11 @@ def filterchannels(category, view="thumb_"):
         appenddisabledchannels = True
 
     # Lee la lista de canales
-    channel_path = os.path.join(config.get_runtime_path(), "channels", '*.json')
-    logger.info("channel_path=%s" % channel_path)
+    if category != 'adult':
+        channel_path = os.path.join(config.get_runtime_path(), 'channels', '*.json')
+    else:
+        channel_path = os.path.join(config.get_runtime_path(), 'channels', 'porn', '*.json')
+    logger.info("channel_path = %s" % channel_path)
 
     channel_files = glob.glob(channel_path)
     logger.info("channel_files encontrados %s" % (len(channel_files)))
@@ -135,7 +142,7 @@ def filterchannels(category, view="thumb_"):
     logger.info("channel_language=%s" % channel_language)
 
     for channel_path in channel_files:
-        logger.info("channel=%s" % channel_path)
+        logger.info("channel in for = %s" % channel_path)
 
         channel = os.path.basename(channel_path).replace(".json", "")
 
@@ -185,8 +192,15 @@ def filterchannels(category, view="thumb_"):
             # Se muestran todos los canales si se elige "all" en el filtrado de idioma
             # Se muestran sólo los idiomas filtrados, cast o lat
             # Los canales de adultos se mostrarán siempre que estén activos
-            if channel_language != "all" and channel_language not in channel_parameters["language"] \
-                    and "*" not in channel_parameters["language"]:
+
+            # for channel_language_list in channel_language_list:
+            #     if c in channel_parameters["language"]:
+            #         L = True
+            #     else:
+            #         L = False
+            # logger.info('CCLANG= ' + channel_language + ' ' + str(channel_language_list))
+            if channel_language != "all" and "*" not in channel_parameters["language"] \
+                 and channel_language not in str(channel_parameters["language"]):
                 continue
 
             # Se salta el canal si está en una categoria filtrado
@@ -248,21 +262,16 @@ def get_thumb(thumb_name, view="thumb_", auto=False):
         thumbnail = ''
 
         thumb_name = unify.set_genre(unify.simplify(thumb_name))
-        
 
         if thumb_name in thumb_dict:
             thumbnail = thumb_dict[thumb_name]
         return thumbnail
-       
+
     else:
         icon_pack_name = config.get_setting('icon_set', default="default")
-        resource_path = os.path.join(config.get_runtime_path(), "resources", "media", "themes")
-        media_path = os.path.join(resource_path, icon_pack_name)
+        media_path = os.path.join("https://raw.githubusercontent.com/kodiondemand/media/master/themes/", icon_pack_name)
 
-        if os.path.isdir(media_path) == False:
-            media_path = os.path.join("https://raw.githubusercontent.com/kodiondemand/media/master/themes/", icon_pack_name)
-
-        elif config.get_setting('enable_custom_theme') and config.get_setting('custom_theme') and os.path.isfile(config.get_setting('custom_theme') + view + thumb_name):
+        if config.get_setting('enable_custom_theme') and config.get_setting('custom_theme') and os.path.isfile(config.get_setting('custom_theme') + view + thumb_name):
             media_path = config.get_setting('custom_theme')
 
         return os.path.join(media_path, view + thumb_name)
@@ -276,12 +285,14 @@ def set_channel_info(parameters):
     content = ''
     langs = parameters['language']
     lang_dict = {'ita':'Italiano',
-                 '*':'Italiano, VOSI, VO'}
+                 'sub-ita':'Sottotitolato in Italiano',
+                 '*':'Italiano, Sottotitolato in Italiano'}
+
     for lang in langs:
-        if 'vos' in parameters['categories']:
-            lang = '*'
-        if 'vosi' in parameters['categories']:
-            lang = 'ita'
+        # if 'vos' in parameters['categories']:
+        #     lang = '*'
+        # if 'sub-ita' in parameters['categories']:
+        #     lang = 'ita'
 
         if lang in lang_dict:
             if language != '' and language != '*' and not parameters['adult']:
@@ -304,102 +315,118 @@ def set_channel_info(parameters):
 
 
 def auto_filter(auto_lang=False):
-    import xbmc, xbmcaddon
-
-    addon = xbmcaddon.Addon('metadata.themoviedb.org')
-    def_lang = addon.getSetting('language')
-    lang = 'all'
-
-    lang_dict = {'ita':'it'}
-  
     if config.get_setting("channel_language") == 'auto' or auto_lang == True:
-        for langs, variant in lang_dict.items():
-            if def_lang in variant:
-                lang = langs
-                
+        lang = config.get_localized_string(20001)
+
     else:
         lang = config.get_setting("channel_language", default="all")
 
     return lang
 
+    # import xbmc, xbmcaddon
 
-def thumb(itemlist=[]):
+    # addon = xbmcaddon.Addon('metadata.themoviedb.org')
+    # def_lang = addon.getSetting('language')
+    # lang = 'all'
+    # lang_list = ['all']
+
+    # lang_dict = {'it':'ita'}
+    # lang_list_dict = {'it':['ita','vosi']}
+
+    # if config.get_setting("channel_language") == 'auto' or auto_lang == True:
+    #     lang = lang_dict[def_lang]
+    #     lang_list = lang_list_dict[def_lang]
+
+    # else:
+    #     lang = config.get_setting("channel_language", default="all")
+    #     lang_list = lang_list_dict[def_lang]
+
+    # return lang, lang_list
+
+
+def thumb(itemlist=[], genre=False):
     if itemlist:
         import re
 
         icon_dict = {'channels_movie':['film'],
                      'channels_tvshow':['serie','tv','episodi','episodio'],
-                     'channels_documentary':['documentari','documentario'],
+                     'channels_documentary':['documentari','documentario', 'documentary'],
                      'channels_all':['tutti'],
-                     'news':['novità', "novita'", 'aggiornamenti'],
+                     'news':['novità', "novita'", 'aggiornamenti', 'nuovi', 'nuove'],
                      'now_playing':['cinema', 'in sala'],
                      'channels_anime':['anime'],
                      'genres':['genere', 'generi', 'categorie', 'categoria'],
-                     'channels_animation': ['animazione', 'cartoni'],
-                     'channels_adventure': ['avventura'],
-                     'channels_action':['azione', 'arti marziali'],
+                     'channels_animation': ['animazione', 'cartoni', 'cartoon', 'animation'],
+                     'channels_action':['azione', 'arti marziali', 'action'],
+                     'channels_adventure': ['avventura', 'adventure'],
                      'channels_biographical':['biografico'],
-                     'channels_comedy':['comico','commedia', 'demenziale'],
-                     'channels_adult':['erotico', 'hentai'],
-                     'channels_drama':['drammatico'],
-                     'channels_syfy':['fantascienza'],
-                     'channels_fantasy':['fantasy'],
-                     'channels_crime':['gangster','poliziesco'],
+                     'channels_comedy':['comico','commedia', 'demenziale', 'comedy'],
+                     'channels_adult':['erotico', 'hentai', 'harem', 'ecchi'],
+                     'channels_drama':['drammatico', 'drama'],
+                     'channels_syfy':['fantascienza', 'science fiction'],
+                     'channels_fantasy':['fantasy', 'magia'],
+                     'channels_crime':['gangster','poliziesco', 'crime', 'crimine'],
                      'channels_grotesque':['grottesco'],
-                     'channels_war':['guerra'],
-                     'channels_children':['bambini'],
+                     'channels_war':['guerra', 'war'],
+                     'channels_children':['bambini', 'kids'],
                      'horror':['horror'],
-                     'lucky': ['fortunato'], 
-                     'channels_musical':['musical', 'musica'],
-                     'channels_mistery':['mistero', 'giallo'],
+                     'lucky': ['fortunato'],
+                     'channels_musical':['musical', 'musica', 'music'],
+                     'channels_mistery':['mistero', 'giallo', 'mystery'],
                      'channels_noir':['noir'],
                      'popular' : ['popolari','popolare', 'più visti'],
-                     'channels_thriller':['thriller'],
-                     'top_rated' : ['fortunato'],
+                     'thriller':['thriller'],
+                     'top_rated' : ['fortunato', 'votati'],
+                     'on_the_air' : ['corso', 'onda'],
                      'channels_western':['western'],
                      'channels_vos':['sub','sub-ita'],
-                     'channels_romance':['romantico','sentimentale'],
-                     'channels_family':['famiglia','famiglie'],
-                     'channels_historical':['storico'],
+                     'channels_romance':['romantico','sentimentale', 'romance'],
+                     'channels_family':['famiglia','famiglie', 'family'],
+                     'channels_historical':['storico', 'history'],
                      'autoplay':[config.get_localized_string(60071)]
-                    }    
+                    }
 
         suffix_dict = {'_hd':['hd','altadefinizione','alta definizione'],
                        '_4k':['4K'],
                        '_az':['lettera','lista','alfabetico','a-z'],
-                       '_year':['anno'],
+                       '_year':['anno', 'anni'],
                        '_genre':['genere', 'generi', 'categorie', 'categoria']}
 
         search = ['cerca']
 
         search_suffix ={'_movie':['film'],
                         '_tvshow':['serie','tv']}
+
         for item in itemlist:
 
-            # Check if item has args propriety
-            if item.args: item.title = item.title + ' || ' + str(item.args)
+            if genre == False:
 
-            for thumb, titles in icon_dict.items():
-                if any( word in item.title.lower() for word in search):
-                    thumb = 'search'
-                    for suffix, titles in search_suffix.items():
-                        if any( word in item.title.lower() for word in titles ): 
-                            thumb = thumb + suffix
-                    item.thumbnail = get_thumb(thumb + '.png')
-                elif any( word in item.title.lower() for word in titles ):
-                    if thumb == 'channels_movie' or thumb == 'channels_tvshow':
-                        for suffix, titles in suffix_dict.items():
+                for thumb, titles in icon_dict.items():
+                    if any( word in item.title.lower() for word in search):
+                        thumb = 'search'
+                        for suffix, titles in search_suffix.items():
                             if any( word in item.title.lower() for word in titles ):
                                 thumb = thumb + suffix
-                    item.thumbnail = get_thumb(thumb + '.png')
-                else:
-                    thumb = item.thumbnails
+                        item.thumbnail = get_thumb(thumb + '.png')
+                    elif any( word in item.title.lower() for word in titles ):
+                        if thumb == 'channels_movie' or thumb == 'channels_tvshow':
+                            for suffix, titles in suffix_dict.items():
+                                if any( word in item.title.lower() for word in titles ):
+                                    thumb = thumb + suffix
+                            item.thumbnail = get_thumb(thumb + '.png')
+                        else: item.thumbnail = get_thumb(thumb + '.png')
+                    else:
+                        thumb = item.thumbnails
 
-                if item.thumbnail != '':
-                    break
+            else:
+                for thumb, titles in icon_dict.items():
+                    if any(word in item.title.lower() for word in titles ):
+                        item.thumbnail = get_thumb(thumb + '.png')
+                    else:
+                        thumb = item.thumbnails
 
-            # Remove args from title
-            if item.args: item.title = item.title.replace(' || ' + str(item.args), '')
+
+            item.title = re.sub(r'\s*\{[^\}]+\}','',item.title)
         return itemlist
     else:
         return get_thumb('next.png')

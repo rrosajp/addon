@@ -15,6 +15,7 @@ from core import tmdb
 from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
+from core.support import typo
 
 addon = xbmcaddon.Addon('metadata.themoviedb.org')
 def_lang = addon.getSetting('language')
@@ -255,7 +256,7 @@ def setting_channel_old(item):
             continue
 
         # No incluir si el canal es en un idioma filtrado
-        if channel_language != "all" and channel_language not in channel_parameters["language"] \
+        if channel_language != "all" and channel_language not in str(channel_parameters["language"]) \
                 and "*" not in channel_parameters["language"]:
             continue
 
@@ -523,7 +524,7 @@ def do_search(item, categories=None):
                 continue
 
             # No busca si el canal es en un idioma filtrado
-            if channel_language != "all" and channel_language not in channel_parameters["language"] \
+            if channel_language != "all" and channel_language not in str(channel_parameters["language"]) \
                     and "*" not in channel_parameters["language"]:
                 logger.info("%s -idioma no válido-" % basename_without_extension)
                 continue
@@ -628,7 +629,7 @@ def do_search(item, categories=None):
                                                 channel="search", action="show_result", adult=element["adult"]))
     title = config.get_localized_string(59972) % (
     tecleado, total, time.time() - start_time)
-    itemlist.insert(0, Item(title=title, text_color='yellow'))
+    itemlist.insert(0, Item(title=typo(title, 'bold color kod')))
     progreso.close()
     #Para opcion Buscar en otros canales
     if item.contextual == True:
@@ -645,7 +646,7 @@ def exact_results(results, wanted):
         if item.action=='':
             channel=item.from_channel
         if item.action != '' and item.contentTitle==wanted:
-            item.title = '%s [%s]' % (item.title, channel)
+            item.title = typo(item.title,'bold') + typo(channel,'_ [] color kod bold') #'%s [%s]' % (item.title, channel)
             itemlist.append(item)
 
     return itemlist
@@ -702,7 +703,7 @@ def discover_list(item):
             title = unify.normalize(elem['name']).capitalize()
             tvshow = True
 
-        new_item = Item(channel='search', title=title, infoLabels=elem, action='do_search', extra=title,
+        new_item = Item(channel='search', title=typo(title, 'bold'), infoLabels=elem, action='do_search', extra=title,
                         category=config.get_localized_string(70695), context ='')
 
         if tvshow:
@@ -719,7 +720,7 @@ def discover_list(item):
         #if not 'similar' in item.list_type:
         #    itemlist.append(item.clone(title='Pagina Siguente', page=next_page))
         #else:
-        itemlist.append(Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70065),
+        itemlist.append(Item(channel=item.channel, action='discover_list', title=typo(config.get_localized_string(30992), 'color kod bold'),
                              search_type=item.search_type, list_type=item.list_type, type=item.type, page=next_page))
 
     return itemlist

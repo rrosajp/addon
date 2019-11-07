@@ -20,15 +20,12 @@ def get_addon_core():
 
 def get_addon_version(with_fix=True):
     '''
-    Trova la versione dell'addon, senza usare le funzioni di kodi perchè non si aggiornano fino al riavvio
+    Devuelve el número de versión del addon, y opcionalmente número de fix si lo hay
     '''
-    info = open(os.path.join(get_runtime_path(), 'addon.xml')).read()
-    ver = re.search('plugin.video.kod.*?version="([^"]+)"', info).group(1)
-
     if with_fix:
-        return ver + " " + get_addon_version_fix()
+        return __settings__.getAddonInfo('version') + " " + get_addon_version_fix()
     else:
-        return ver
+        return __settings__.getAddonInfo('version')
 
 
 def get_addon_version_fix():
@@ -94,31 +91,15 @@ def get_videolibrary_support():
     return True
 
 def get_channel_url(name):
-    def json():
-        try:
-            try:
-                import json
-            except:
-                import simplejson as json
-            ROOT_DIR = xbmc.translatePath(__settings__.getAddonInfo('Path'))
-            LOCAL_FILE = os.path.join(ROOT_DIR, "channels.json")
-            with open(LOCAL_FILE) as f:
-                data = json.load(f)
-                if data[name] is not None:
-                    return data[name]
-                else:
-                    return get_setting("channel_host", name)
-        except:
-            return get_setting("channel_host", name)
-
-    if __settings__.getSetting("use_custom_url") == "true":
-        host = get_setting("channel_host", name)
-        if host:
-            return host
-        else:
-            return json()
-    else:
-        return json()
+    try:
+        import json
+    except:
+        import simplejson as json
+    ROOT_DIR = xbmc.translatePath(__settings__.getAddonInfo('Path'))
+    LOCAL_FILE = os.path.join(ROOT_DIR, "channels.json")
+    with open(LOCAL_FILE) as f:
+        data = json.load(f)
+        return data[name]
 
 def get_system_platform():
     """ fonction: pour recuperer la platform que xbmc tourne """
@@ -366,7 +347,7 @@ def get_localized_string(code):
 def get_localized_category(categ):
     categories = {'movie': get_localized_string(30122), 'tvshow': get_localized_string(30123),
                   'anime': get_localized_string(30124), 'documentary': get_localized_string(30125),
-                  'vos': get_localized_string(30136), 'vosi': get_localized_string(70566), 'adult': get_localized_string(30126),
+                  'vos': get_localized_string(30136), 'sub-ita': get_localized_string(70566), 'adult': get_localized_string(30126),
                   'direct': get_localized_string(30137), 'torrent': get_localized_string(70015)}
     return categories[categ] if categ in categories else categ
 

@@ -318,7 +318,7 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
                         video_urls.extend(response)
                     except:
                         logger.error("Error al obtener la url en modo free")
-                        error_messages.append("Se ha producido un error en %s" % server_name)
+                        error_messages.append(config.get_localized_string(60006) % server_name)
                         import traceback
                         logger.error(traceback.format_exc())
 
@@ -458,8 +458,7 @@ def get_server_parameters(server):
 
             # Imagenes: se admiten url y archivos locales dentro de "resources/images"
             if dict_server.get("thumbnail") and "://" not in dict_server["thumbnail"]:
-                dict_server["thumbnail"] = os.path.join(config.get_runtime_path(), "resources", "media",
-                                                        "servers", dict_server["thumbnail"])
+                dict_server["thumbnail"] = os.path.join("https://raw.githubusercontent.com/kodiondemand/media/master/resources/servers", dict_server["thumbnail"])
             for k in ['premium', 'id']:
                 dict_server[k] = dict_server.get(k, list())
 

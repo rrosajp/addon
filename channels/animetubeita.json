@@ -1,36 +1,11 @@
 {
     "id": "animetubeita",
-    "name": "Animetubeita",
+    "name": "AnimeTubeITA",
     "active": true,
     "adult": false,
-    "language": ["ita"],
-    "thumbnail": "http:\/\/i.imgur.com\/rQPx1iQ.png",
-    "bannermenu": "http:\/\/i.imgur.com\/rQPx1iQ.png",
-    "categories": ["anime"],
-    "settings": [
-        {
-            "id": "include_in_global_search",
-            "type": "bool",
-            "label": "Includi ricerca globale",
-            "default": false,
-            "enabled": false,
-            "visible": false
-        },
-        {
-            "id": "include_in_newest_anime",
-            "type": "bool",
-            "label": "Includi in Novità - Anime",
-            "default": false,
-            "enabled": false,
-            "visible": false
-        },
-        {
-            "id": "include_in_newest_italiano",
-            "type": "bool",
-            "label": "Includi in Novità - Italiano",
-            "default": true,
-            "enabled": true,
-            "visible": true
-        }
-    ]
+    "language": ["sub-ita"],
+    "thumbnail": "animetubeita.png",
+    "bannermenu": "animetubeita.png",
+    "categories": ["anime","vos"],
+    "settings": []
 }

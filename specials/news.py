@@ -12,7 +12,7 @@ from threading import Thread
 from channelselector import get_thumb, auto_filter
 from core import channeltools
 from core import jsontools
-from core import scrapertools
+from core import scrapertools, support
 from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
@@ -28,8 +28,8 @@ perfil = [['0xFF0B7B92', '0xFF89FDFB', '0xFFACD5D4'],
           ['0xFFA5DEE5', '0xFFE0F9B5', '0xFFFEFDCA'],
           ['0xFFF23557', '0xFF22B2DA', '0xFFF0D43A']]
 
-#color1, color2, color3 = ["white", "white", "white"]
-color1, color2, color3 = perfil[__perfil__]
+color1, color2, color3 = ["red", "0xFF65B3DA", "yellow"]
+# color1, color2, color3 = perfil[__perfil__]
 
 list_newest = []
 list_newest_tourl = []
@@ -124,9 +124,11 @@ def set_category_context(item):
 
 def get_channels_list():
     logger.info()
+##    import web_pdb; web_pdb.set_trace()
+##    list_canales = {'peliculas': [], '4k': [], 'terror': [], 'infantiles': [], 'series': [], 'anime': [],
+##                    'castellano': [], 'latino':[], 'italiano':[], 'torrent':[], 'documentales': []}
+    list_canales = {'peliculas': [], 'series': [],'anime': [], 'italiano':[], 'documentales': []}
 
-    list_canales = {'peliculas': [], '4k': [], 'terror': [], 'infantiles': [], 'series': [], 'anime': [],
-                    'castellano': [], 'latino':[], 'italiano':[], 'torrent':[], 'documentales': []}
     any_active = False
     # Rellenar listas de canales disponibles
     channels_path = os.path.join(config.get_runtime_path(), "channels", '*.json')
@@ -147,7 +149,7 @@ def get_channels_list():
             continue
 
         # No incluir si el canal es en un idioma filtrado
-        if channel_language != "all" and channel_language not in channel_parameters["language"] \
+        if channel_language != "all" and channel_language not in str(channel_parameters["language"]) \
                 and "*" not in channel_parameters["language"]:
             continue
 
@@ -390,16 +392,20 @@ def get_newest(channel_id, categoria):
 
 
 def get_title(item):
-    if item.contentSerieName:  # Si es una serie
+    #support.log("ITEM NEWEST ->", item)
+    # item.contentSerieName c'è anche se è un film
+    if item.contentSerieName and item.contentType != 'movie':  # Si es una serie
         title = item.contentSerieName
+        #title = re.compile("\[.*?\]", re.DOTALL).sub("", item.contentSerieName)
         if not scrapertools.get_season_and_episode(title) and item.contentEpisodeNumber:
+            # contentSeason non c'è in support
             if not item.contentSeason:
                 item.contentSeason = '1'
-            title = "%s - %sx%s" % (title, item.contentSeason, str(item.contentEpisodeNumber).zfill(2))
-            #4l3x87 - fix to add Sub-ITA in newest
-            if item.contentLanguage:
-                title+=" "+item.contentLanguage
-
+            title = "%sx%s - %s" % (item.contentSeason, str(item.contentEpisodeNumber).zfill(2), title)
+        else:
+            seas = scrapertools.get_season_and_episode(item.title)
+            if seas:
+                title = "%s - %s" % (seas, title)
 
     elif item.contentTitle:  # Si es una pelicula con el canal adaptado
         title = item.contentTitle
@@ -413,6 +419,24 @@ def get_title(item):
     title = re.compile("\[/*B\]", re.DOTALL).sub("", title)
     title = re.compile("\[/*I\]", re.DOTALL).sub("", title)
 
+
+    title = '[B]'+title+'[/B]'
+
+    if item.contentLanguage == '':
+        pass
+    elif type(item.contentLanguage) == list and len(item.contentLanguage) ==1:
+        title += support.typo(item.contentLanguage[0], '_ [] color kod')
+    elif type(item.contentLanguage) != '':
+          title += support.typo(item.contentLanguage, '_ [] color kod')
+    elif type(item.contentLanguage) == list:
+        title += item.contentLanguage
+
+    if item.quality:
+        title += support.typo(item.quality, '_ [] color kod')
+
+    season_ = support.typo(config.get_localized_string(70736), '_ [] color white bold') if (type(item.args) != bool and 'season_completed' in item.news and not item.episode) else ''
+    if season_:
+        title += season_
     return title
 
 
@@ -421,8 +445,11 @@ def no_group(list_result_canal):
     global channels_id_name
 
     for i in list_result_canal:
-        i.title = get_title(i) + " [" + channels_id_name[i.channel] + "]"
-        i.text_color = color3
+        #support.log("NO GROUP i -> ", i)
+        canale = channels_id_name[i.channel]
+        canale = canale # per differenziarlo dal colore delle altre voci
+        i.title = get_title(i) + " [" + canale + "]"
+#        i.text_color = color3
 
         itemlist.append(i.clone())
 
@@ -447,12 +474,12 @@ def group_by_channel(list_result_canal):
         itemlist.append(Item(channel="news", title=channels_id_name[c] + ':', text_color=color1, text_bold=True))
 
         for i in dict_canales[c]:
-            if i.contentQuality:
-                i.title += ' (%s)' % i.contentQuality
-            if i.language:
-                i.title += ' [%s]' % i.language
-            i.title = '    %s' % i.title
-            i.text_color = color3
+##            if i.contentQuality:
+##                i.title += ' (%s)' % i.contentQuality
+##            if i.contentLanguage:
+##                i.title += ' [%s]' % i.contentLanguage
+##            i.title = '    %s' % i.title
+####            i.text_color = color3
             itemlist.append(i.clone())
 
     return itemlist
@@ -503,7 +530,7 @@ def group_by_content(list_result_canal):
         else:
             new_item = v[0].clone(title=title)
 
-        new_item.text_color = color3
+##        new_item.text_color = color3
         list_result.append(new_item)
 
     return sorted(list_result, key=lambda it: it.title.lower())
@@ -519,11 +546,11 @@ def show_channels(item):
         new_item = Item()
         new_item = new_item.fromurl(i)
         # logger.debug(new_item.tostring())
-        if new_item.contentQuality:
-            new_item.title += ' (%s)' % new_item.contentQuality
-        if new_item.language:
-            new_item.title += ' [%s]' % new_item.language
-        new_item.title += ' (%s)' % channels_id_name[new_item.channel]
+##        if new_item.contentQuality:
+##            new_item.title += ' (%s)' % new_item.contentQuality
+##        if new_item.language:
+##            new_item.title += ' [%s]' % new_item.language
+##        new_item.title += ' (%s)' % channels_id_name[new_item.channel]
         new_item.text_color = color1
 
         itemlist.append(new_item.clone())
@@ -581,7 +608,7 @@ def setting_channel(item):
     channel_language = config.get_setting("channel_language", default="auto")
     if channel_language == 'auto':
         channel_language = auto_filter()
-    
+
 
     list_controls = []
     for infile in sorted(glob.glob(channels_path)):
@@ -597,7 +624,7 @@ def setting_channel(item):
             continue
 
         # No incluir si el canal es en un idioma filtrado
-        if channel_language != "all" and channel_language not in channel_parameters["language"] \
+        if channel_language != "all" and channel_language not in str(channel_parameters["language"]) \
                 and "*" not in channel_parameters["language"]:
             continue
 
@@ -644,7 +671,7 @@ def cb_custom_button(item, dict_values):
         dict_values[v] = not value
 
     if config.set_setting("custom_button_value_news", not value, item.channel) == True:
-        return {"label": "Ninguno"}
+        return {"label": config.get_localized_string(59992)}
     else:
-        return {"label": "Todos"}
+        return {"label": config.get_localized_string(59991)}
 

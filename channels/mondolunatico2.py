@@ -2,6 +2,31 @@
 # ------------------------------------------------------------
 # Canale per MondoLunatico 2.0
 # ------------------------------------------------------------
+"""
+    WARNING:
+    questo sito è una kakatura di kazz...incredibile!!!
+    Per renderlo compatibile con support ci vuole MOLTA PAZIENZA!!!
+
+    Problemi noti che non superano il test del canale:
+        Nelle pagine dei "FILM", film e serie nel sito sono mischiate,
+        I titoli quindi non saranno nello stesso numero nelle pagine del canale.
+        Alcuni Titoli sono pagine informative e NON devono apparire nel CANALE!!!
+        Controllare:
+            -che nelle varie sezioni dei FILM appaiano solo FILM, stessa cosa per le serie.
+            -che effettivamente vengano tagliati solo gli avvisi.
+
+        Nella TOP FILM non ci sono le voci lingua, anno ( quindi niente TMDB o vari ) e qualità
+        Nella pagina delle serie potreste trovare solo il titolo senza stagione ed episodio
+        Nel menu contestuale potreste non trovare le voci:
+        -"Aggiungi in Videoteca"
+        -"Scarica" di qualunque tipo: stagione, serie, etc...
+
+    AVVISO:
+        i link 1fichier hanno bisogno dei DNS modificati
+        il server woof potrebbe rispondere con "connettore assente"
+        I titoli nella sezione SUB-ITA che non riportano Sub-ITA sono in lingua originale senza sottotitoli
+
+"""
 
 import re
 import urlparse
@@ -13,7 +38,7 @@ from channelselector import thumb
 from specials import autoplay, filtertools
 from core import scrapertools, httptools, tmdb, servertools, support, scrapertoolsV2
 from core.item import Item
-from platformcode import logger, config, platformtools
+from platformcode import config, platformtools #,logger
 
 __channel__ = "mondolunatico2"
 host = config.get_channel_url(__channel__)
@@ -22,178 +47,98 @@ headers = [['Referer', host]]
 list_servers = ['verystream', 'wstream', 'openload', 'streamango']
 list_quality = ['HD', 'default']
 
+@support.menu
 def mainlist(item):
+    support.log()
 
-    # Main options
-    itemlist = []
-    support.menu(itemlist, 'Novità bold', 'carousel', host, contentType='movie', args='movies')
-    support.menu(itemlist, 'Sub ITA bold', 'carousel_subita', host, contentType='movie', args='movies')
-    support.menu(itemlist, 'Ultime Richieste Inserite bold', 'carousel_request', host, contentType='movie', args='movies')
-    support.menu(itemlist, 'Film Nelle Sale bold', 'carousel_cinema', host, contentType='movie', args='movies')
-    support.menu(itemlist, 'Film Ultimi Inseriti submenu', 'carousel_last', host, contentType='movie', args='movies')
-    support.menu(itemlist, 'Film Top ImDb submenu', 'top_imdb', host + '/top-imdb/', contentType='movie', args='movies')
-    support.menu(itemlist, 'Serie TV', 'carousel_episodes', host, contentType='episode', args='tvshows')
-    support.menu(itemlist, 'Serie TV Top ImDb submenu', 'top_serie', host + '/top-imdb/', contentType='episode', args='tvshows')
-    support.menu(itemlist, '[COLOR blue]Cerca...[/COLOR] bold', 'search', host)
-    autoplay.init(item.channel, list_servers, list_quality)
-    autoplay.show_option(item.channel, itemlist)
+    top = [('Film', ['/genre/film-aggiornati/', 'peliculas', 'movies']),
+           ('Al Cinema', ['/genre/al-cinema/', 'peliculas', 'cinema']),
+           ('Ultimi Aggiunti', ['/movies/', 'peliculas', 'latest']),
+           ('Ultime Richieste', ['/genre/richieste/', 'peliculas', 'request']),
+           ('Top ImDb', ['/top-imdb/', 'peliculas', 'top']),
+           ('Sub-ITA', ['/genre/subita/', 'peliculas', 'sub']),
+           ('Serie TV', ['/tvshows/', 'peliculas', '', 'tvshow']),
+           ('Top ImDb', ['/top-imdb/', 'peliculas', 'top', 'tvshow']),
+           ('Search...',['', 'search', 'search'])
+        ]
 
-    return itemlist
+    return locals()
 
-# ---------------------------------------------------------------------------------------------------------------------------------------------
 
-def carousel(item, regex=r'<h2>Ultime Richieste Inserite</h2>(.*?)<header>', contentType="movie"):
-    logger.info("[mondolunatico2.py] carousel")
-    itemlist = []
+@support.scrape
+def peliculas(item):
+    support.log()
 
-    data = httptools.downloadpage(item.url, headers=headers).data
+    action = 'findvideos'
+    blacklist = ['Avviso Agli Utenti',]
 
-    block = scrapertools.find_single_match(data,regex)
+    if item.args != 'search':
+        if item.contentType == 'movie':
+            action = 'findvideos'
+            patron = r'class="item movies"><div class="poster"><img src="(?P<thumb>[^"]+)"'\
+                         '[^>]+>(?:<div class="rating">)?[^>]+>.+?(?P<rating>\d+.\d+|\d+)'\
+                         '[^>]+>[^>]+>[^>]+>(:?(?P<lang>SubITA)?|(?P<quality>[^<]+)?)?'\
+                         '<.+?href="(?P<url>[^"]+)">[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>'\
+                         '[^>]+>(?P<title>.+?)</a>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>'\
+                         '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<year>\d+)</span>'\
+                         '[^>]+>(?P<duration>\d+)?.+?<[^>]+>(?:[^>]+>[^>]+>[^>]+>[^>]+>)(?P<plot>.+?)<'
+            if item.args == 'movies':
+                patronBlock = r'<h1>\*Film Aggiornati</h1>(?P<block>.*?)<div class="pagination">'
+            elif item.args == 'cinema':
+                patronBlock = r'<h1>\*Al Cinema</h1>(?P<block>.*?)<div class="pagination">'
+            elif item.args == 'latest':
+                patronBlock = r'<h1>Film</h1>(?P<block>.*?)<div class="pagination">'
+            elif item.args == 'request':
+                patronBlock = r'<h1>\*Richieste</h1>(?P<block>.*?)<div class="pagination">'
+            elif item.args == 'sub':
+                patronBlock = r'<h1>\*SubITA</h1>(?P<block>.*?)<div class="pagination">'
+            elif item.args == 'top':
+                patronBlock = r'<h3>Film</h3>(?P<block>.*?)<div class="top-imdb-list tright">'
+                patron = r'<div class="image"><div class="[^"]+"><a href="(?P<url>[^"]+)"'\
+                         '[^"]+"(?P<thumb>[^"]+)"[^"]+alt="(?P<title>[^"]+)">[^>]+>[^>]+>'\
+                         '[^>]+>[^>]+>[^>]+>[^>]+>(?P<rating>[^<]+)<'
+                pagination = 25
+        else:
+            action = 'episodios'
+            if item.args == 'top':
+                patronBlock = r'<h3>TVShows</h3>(?P<block>.*?)<h2 class="widget-title">'
+                patron = r'<div class="image"><div class="[^"]+"><a href="(?P<url>[^"]+)"'\
+                         '[^"]+"(?P<thumb>[^"]+)"[^"]+alt="(?P<title>[^"]+)">[^>]+>[^>]+>'\
+                         '[^>]+>[^>]+>[^>]+>[^>]+>(?P<rating>[^<]+)<'
+            else:
+                patronBlock = r'<h1>Serie T[v|V]</h1>(?P<block>.*?)<div class="pagination">'
+                patron = r'class="item tvshows">[^>]+>.+?src="(?P<thumb>[^"]+)".+?>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+><a href="(?P<url>[^"]+)">[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)</h4>[^>]+>[^>]+> (?:<span class="imdb">IMDb: (?P<rating>\d+.\d+|\d+|N\/A)(?:</span>)?[^>]+>(?P<year>\d+))?<[^>]+>[^>]+>[^>]+>(?:[^>]+>[^>]+>(?P<plot>[^<]+)<)'
+    else:
+        patronBlock = r'<h1>Results found\:.+?</h1>(?P<block>.*?)<div class="sidebar scrolling">'
+        patron = r'<div class="result-item">[^>]+>[^>]+>[^>]+>.+?href="(?P<url>[^"]+)">.+?src="(?P<thumb>[^"]+)" alt="(?P<title>[^"]+)"[^>]+>[^>]+>(?P<type>[^>]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>IMDb (?P<rating>\d+.\d+|\d+)[^>]+>[^>]+>(?P<year>\d+)<[^>]+>[^>]+>[^>]+>[^>]+>(:?[^>]+>[^>]+>)?(?P<plot>[^<]+)<'
 
-    patron = r'<article id.*?src="([^"]+).*?alt="([^"]+).*?href="([^"]+).*?,.([^<]+)'
-    matches = re.compile(patron, re.DOTALL).findall(block)
+        type_content_dict={'movie': ['film'], 'tvshow': ['tv']}
+        type_action_dict={'findvideos': ['film'], 'episodios': ['tv']}
 
-    for scrapedthumbnail, scrapedtitle, scrapedurl, year in matches:
-        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
-        scrapedtitle = re.sub(r'[0-9]{4}', "", scrapedtitle)
-        itemlist.append(
-            Item(channel=__channel__,
-                 action="findvideos",
-                 contentType=contentType,
-                 title=scrapedtitle + " " + "[COLOR orange][" + year + "][/COLOR]",
-                 fulltitle=scrapedtitle,
-                 url=scrapedurl,
-                 show=scrapedtitle,
-                 args=item.args,
-                 infoLabels={'year': year},
-                 thumbnail=scrapedthumbnail))
+    patronNext = r'<span class="current">.*?href="([^"]+)" class="inactive">'
 
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+##    debug = True
+    return locals()
 
-    return itemlist
-
-# ---------------------------------------------------------------------------------------------------------------------------------------------
-def carousel_subita(item):
-    return carousel(item, regex=r'<h2>Film SubITA</h2>(.*?)<header>', contentType="movie")
-# ---------------------------------------------------------------------------------------------------------------------------------------------
-def carousel_request(item):
-    return carousel(item, regex=r'<h2>Ultime Richieste Inserite</h2>(.*?)<header>', contentType="movie")
-# ---------------------------------------------------------------------------------------------------------------------------------------------
-def carousel_cinema(item):
-    return carousel(item, regex=r'<h2>Nelle Sale</h2>(.*?)<header>', contentType="movie")
-# ---------------------------------------------------------------------------------------------------------------------------------------------
-def carousel_last(item):
-    return carousel(item, regex=r'<h2>Ultimi Film Inseriti</h2>(.*?)<header>', contentType="movie")
-# ---------------------------------------------------------------------------------------------------------------------------------------------
-def carousel_episodes(item):
-    return carousel(item, regex=r'<h2>Serie TV</h2>(.*?)<header>', contentType="episode")
-# ---------------------------------------------------------------------------------------------------------------------------------------------
-
-def top_imdb(item, contentType='movie', regex=r'<h1.*?TOP IMDb.*?<h3>(.*?)<h3>'):
-    logger.info("[mondolunatico2.py] top_imdb")
-    itemlist = []
-
-    minpage = 20
-    p = 1
-    if '{}' in item.url:
-        item.url, p = item.url.split('{}')
-        p = int(p)
-
-    data = httptools.downloadpage(item.url, headers=headers).data
-
-    block = scrapertools.find_single_match(data, regex)
-
-    patron = r"<div class='image'><div class='[^']+'><a href='([^']+)'[^']+'([^']+)'[^']+'([^']+)"
-    matches = re.compile(patron, re.DOTALL).findall(block)
-
-    for i, (scrapedurl, scrapedthumbnail, scrapedtitle) in enumerate(matches):
-        if (p - 1) * minpage > i: continue
-        if i >= p * minpage: break
-        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
-        scrapedtitle = re.sub(r'[0-9]{4}', "", scrapedtitle)
-        scrapedthumbnail = scrapedthumbnail.replace ("-90x135","").replace("/w92/", "/w600_and_h900_bestv2/")
-        itemlist.append(
-            Item(channel=__channel__,
-                 action="findvideos" if "movie" in contentType else "episodios",
-                 contentType=item.contentType,
-                 contentTitle=scrapedtitle,
-                 title=scrapedtitle,
-                 fulltitle=scrapedtitle,
-                 url=scrapedurl,
-                 show=scrapedtitle,
-                 thumbnail=scrapedthumbnail,
-                 args=item.args))
-
-    if len(matches) >= p * minpage:
-        thumbnail = thumb(itemlist=[])
-        scrapedurl = item.url + '{}' + str(p + 1)
-        itemlist.append(
-            Item(channel=__channel__,
-                 contentType=item.contentType,
-                 action="top_imdb",
-                 title="[COLOR blue][B]Successivo >[/B][/COLOR]",
-                 thumbnail=thumbnail,
-                 url=scrapedurl))
-
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-
-    return itemlist
-
-# ---------------------------------------------------------------------------------------------------------------------------------------------
-def top_serie(item):
-    return top_imdb(item, contentType='episode', regex=r'<h3>TVShows</h3>(.*?)<div class="sidebar scrolling">')
-# ---------------------------------------------------------------------------------------------------------------------------------------------
 
 def search(item, texto):
-    logger.info("[mondolunatico2.py] " + item.url + " search " + texto)
+    support.log('s-> '+texto)
+
     item.url = host + "/?s=" + texto
 
     try:
         return peliculas(item)
-
     except:
         import sys
         for line in sys.exc_info():
             logger.error("%s" % line)
             return []
 
-# ---------------------------------------------------------------------------------------------------------------------------------------------
-
-def peliculas(item):
-    logger.info("[mondolunatico2.py] peliculas")
-    itemlist = []
-
-    data = httptools.downloadpage(item.url, headers=headers).data
-
-    patron = r'<div class="result-item">.*?<a href="([^"]+).*?src="([^"]+).*?alt="([^"]+).*?span class="([^"]+).*?<span class="year">([^<]+).*?<p>([^<]+)'
-    matches = re.compile(patron, re.DOTALL).findall(data)
-
-    for scrapedurl, scrapedthumbnail, scrapedtitle, args, year, scrapedplot in matches:
-        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
-        scrapedtitle = re.sub(r'[0-9]{4}', "", scrapedtitle)
-        type = "[COLOR aqua][Serie][/COLOR]" if "tvshows" in item.args else "[COLOR aqua][Film][/COLOR]"
-        itemlist.append(
-            Item(channel=__channel__,
-                 action="episodios" if "tvshows" in item.args else "findvideos",
-                 contentType="episode" if "tvshows" in item.args else "movie",
-                 title=scrapedtitle + " " + "[COLOR orange][" + year + "][/COLOR]" + " " + type,
-                 fulltitle=scrapedtitle,
-                 thumbnail=scrapedthumbnail,
-                 url=scrapedurl,
-                 show=scrapedtitle,
-                 args=args,
-                 infoLabels={'year':year},
-                 plot=scrapedplot))
-
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-    return itemlist
-
-# ---------------------------------------------------------------------------------------------------------------------------------------------
 
 def findvideos(item):
-    logger.info("[mondolunatico2.py] findvideos")
+    support.log()
 
-    if item.args == "tvshows":
+    if item.contentType == "tvshow":
         ret=support.dooplay_get_links(item, host)
 
         if ret == []:
@@ -202,16 +147,16 @@ def findvideos(item):
             item.url = ret[0]["url"]
             return videoplayer(item)
 
-    if item.args == "movies" or "movie":
+    #if item.args == "movies" or "movie":
+    if item.contentType == 'movie':
         return videoplayer(item)
 
     else:
         return halfplayer(item)
 
-# ---------------------------------------------------------------------------------------------------------------------------------------------
 
 def episodios(item):
-    logger.info("[mondolunatico2.py] episodios")
+    support.log()
     itemlist = []
 
     data = httptools.downloadpage(item.url, headers=headers).data
@@ -265,7 +210,7 @@ def episodios(item):
 # ---------------------------------------------------------------------------------------------------------------------------------------------
 
 def player(item):
-    logger.info ("[mondolunatico2.py] player")
+    support.log()
 
     data = httptools.downloadpage(item.url, headers=headers).data
 
@@ -326,6 +271,7 @@ def player(item):
 # ---------------------------------------------------------------------------------------------------------------------------------------------
 
 def player_list(item):
+    support.log()
     itemlist = []
 
     # Scarico la pagina
@@ -364,7 +310,7 @@ def player_list(item):
 # ---------------------------------------------------------------------------------------------------------------------------------------------
 
 def dooplayer(item):
-    logger.info ("[mondolunatico2.py] dooplayer")
+    support.log()
     itemlist = []
 
     url = item.url
@@ -410,6 +356,7 @@ def dooplayer(item):
 # ---------------------------------------------------------------------------------------------------------------------------------------------
 
 def keeplink(item):
+    support.log()
     itemlist = []
 
     # Scarico la pagina
@@ -445,7 +392,7 @@ def keeplink(item):
 # ---------------------------------------------------------------------------------------------------------------------------------------------
 
 def videoplayer(item):
-    logger.info("[mondolunatico2.py] videoplayer")
+    support.log()
     itemlist = []
 
     for link in support.dooplay_get_links(item, host):
@@ -475,7 +422,7 @@ def videoplayer(item):
 # ---------------------------------------------------------------------------------------------------------------------------------------------
 
 def halfplayer(item):
-    logger.info("[mondolunatico2.py] halfplayer")
+    support.log()
 
     url=item.url
 

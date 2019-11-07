@@ -84,17 +84,31 @@ class Client(object):
 
     def get_files(self):
         files = []
+        enc_url = None
         if self.files:
             for file in self.files:
                 n = file.name.encode("utf8")
                 u = "http://" + self.ip + ":" + str(self.port) + "/" + urllib.quote(n)
                 s = file.size
                 file_id = file.file_id
+                enc_url = file.url
                 files.append({"name":n,"url":u,"size":s, "id": file_id})
+        if len(self.files) == 1:
+            try:
+                code = httptools.downloadpage(enc_url, only_headers=True).code
+                if code > 300:
+                    return code
+                else:
+                    return files
+
+            except:
+                print(traceback.format_exc())
+                pass
+
         return files
 
     def add_url(self, url):
-        url = url.split("/#")[1]
+        url = url.split("#")[1]
         id_video = None
         if "|" in url:
             url, id_video = url.split("|")
@@ -135,7 +149,8 @@ class Client(object):
     def api_req(self, req, get=""):
         seqno = random.randint(0, 0xFFFFFFFF)
         url = 'https://g.api.mega.co.nz/cs?id=%d%s' % (seqno, get)
-        return json.loads(self.post(url, json.dumps([req])))[0]
+        page = httptools.downloadpage(url, post=json.dumps([req])).data
+        return json.loads(page)[0]
 
     def base64urldecode(self,data):
       data += '=='[(2 - len(data) * 3) % 4:]
@@ -165,12 +180,11 @@ class Client(object):
 
     def aes_cbc_decrypt(self, data, key):
       try:
+          from Cryptodome.Cipher import AES
+          decryptor = AES.new(key, AES.MODE_CBC, '\0' * 16)
+      except:
           from Crypto.Cipher import AES
           decryptor = AES.new(key, AES.MODE_CBC, '\0' * 16)
-          #decryptor = aes.AESModeOfOperationCBC(key, iv='\0' * 16)
-      except:
-          import jscrypto
-          decryptor = jscrypto.new(key, jscrypto.MODE_CBC, '\0' * 16)
       return decryptor.decrypt(data)
 
     def aes_cbc_decrypt_a32(self,data, key):
@@ -178,20 +192,6 @@ class Client(object):
 
     def decrypt_key(self,a, key):
       return sum((self.aes_cbc_decrypt_a32(a[i:i+4], key) for i in xrange(0, len(a), 4)), ())
-
-    def post(self, url, data):
-      return httptools.downloadpage(url, data).data
-      import ssl
-      from functools import wraps
-      def sslwrap(func):
-          @wraps(func)
-          def bar(*args, **kw):
-              kw['ssl_version'] = ssl.PROTOCOL_TLSv1
-              return func(*args, **kw)
-          return bar
-
-      ssl.wrap_socket = sslwrap(ssl.wrap_socket)
-      return urllib.urlopen(url, data).read()
 
     def dec_attr(self, attr, key):
       attr = self.aes_cbc_decrypt(attr, self.a32_to_str(key)).rstrip('\0')

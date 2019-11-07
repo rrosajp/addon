@@ -3,35 +3,10 @@
     "name": "AnimeSubIta",
     "active": true,
     "adult": false,
-    "language": ["ita"],
+    "language": ["sub-ita"],
     "thumbnail": "animesubita.png",
     "bannermenu": "animesubita.png",
-    "categories": ["anime"],
-    "settings": [
-        {
-            "id": "include_in_global_search",
-            "type": "bool",
-            "label": "Includi ricerca globale",
-            "default": true,
-            "enabled": true,
-            "visible": true
-        },
-        {
-            "id": "include_in_newest_anime",
-            "type": "bool",
-            "label": "Includi in Novità - Anime",
-            "default": true,
-            "enabled": true,
-            "visible": true
-        },
-        {
-            "id": "include_in_newest_italiano",
-            "type": "bool",
-            "label": "Includi in Novità - Italiano",
-            "default": true,
-            "enabled": true,
-            "visible": true
-        }
-    ]
+    "categories": ["anime", "vos", "movie"],
+    "settings": []
 }
 
