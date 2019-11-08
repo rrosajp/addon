@@ -130,6 +130,7 @@ def episodios(item):
     else: patronBlock= r'server  active(?P<block>.*?)server  hidden '
     patron = r'<li><a [^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+" href="(?P<url>[^"]+)"[^>]+>(?P<episode>[^<]+)<'
     def itemHook(item):
+        item.number = support.re.sub(r'\[[^\]]+\]', '', item.title)
         item.title += support.typo(item.fulltitle,'-- bold')
         return item
     action='findvideos'
@@ -144,9 +145,8 @@ def findvideos(item):
     videoData = ''
 
     for serverid in matches:
-        number = support.scrapertoolsV2.find_single_match(item.title,r'(\d+) -')
         block = support.scrapertoolsV2.find_multiple_matches(data,'data-id="' + serverid + '">(.*?)<div class="server')
-        ID = support.scrapertoolsV2.find_single_match(str(block),r'<a data-id="([^"]+)" data-base="' + (number if number else '1') + '"')
+        ID = support.scrapertoolsV2.find_single_match(str(block),r'<a data-id="([^"]+)" data-base="' + (item.number if item.number else '1') + '"')
         support.log('ID= ',serverid)
         if id:
             if serverid == '26':
