@@ -57,7 +57,7 @@ def show_channels(item):
 
     for key, channel in json['channels'].items():
         # Find File Path
-        if 'http' in channel['path']: file_path = requests.get(channel['path']).url
+        if 'http' in channel['path']: file_path = httptools.downloadpage(channel['path'],follow_redirects=True).url
         else: file_path = channel['path']
 
         # make relative path
