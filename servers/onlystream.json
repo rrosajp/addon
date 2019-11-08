@@ -4,7 +4,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "onlystream.tv/([0-9a-zA-Z]+)",
+        "pattern": "onlystream.tv/(?:e/)?([0-9a-zA-Z]+)",
         "url": "https://onlystream.tv/\\1"
       }
     ]
