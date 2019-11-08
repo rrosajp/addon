@@ -109,7 +109,7 @@ def peliculas(item):
 def episodios(item): # Questa def. deve sempre essere nominata episodios
     support.log()
 
-    if item.extra == 'serie':
+    if item.extra == 'serie' or item.contentType == 'tvshow':
         support.log("Serie :", item)
         patron = r'(?P<episode>\d+(?:&#215;|×)?\d+\-\d+|\d+(?:&#215;|×)\d+)[;]?[ ]?(?:(?P<title>[^<]+)(?P<url>.*?)|(\2[ ])(?:<(\3.*?)))(?:</a><br />|</a></p>)'
         patronBlock = r'<p><strong>(?P<block>(?:.+?[Ss]tagione.+?(?P<lang>iTA|ITA|Sub-ITA|Sub-iTA))?(?:|.+?|</strong>)(/?:</span>)?</p>.*?</p>)'
