@@ -77,7 +77,7 @@ def manual_renumeration(item, modify=False):
     log()
     _list = []
     if item.from_channel: item.channel = item.from_channel
-    title = item.show if item.show else item.fulltitle
+    title = item.fulltitle.rstrip()
 
     dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
     if not dict_series.has_key(title): dict_series[title] = {}
@@ -168,7 +168,7 @@ def semiautomatic_config_item(item):
     tvdb.find_and_set_infoLabels(item)
     item.channel = item.from_channel
     dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
-    title = item.show if item.show else item.fulltitle
+    title = item.fulltitle.rstrip()
 
     # Trova l'ID della serie
     while not item.infoLabels['tvdb_id']:
@@ -241,25 +241,25 @@ def semiautomatic_config_item(item):
 
     else:
         message = config.get_localized_string(60444)
-        heading = item.show.strip()
+        heading = item.fulltitle.strip()
         platformtools.dialog_notification(heading, message)
 
 
 def config_item(item, itemlist=[], typography='', active=False):
     log()
     # Configurazione Automatica, Tenta la numerazione Automatica degli episodi
-    title = item.show if item.show else item.fulltitle
+    title = item.fulltitle.rstrip()
 
     dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
-    try: ID = dict_series[item.show.rstrip()][TAG_ID]
+    try: ID = dict_series[item.fulltitle.rstrip()][TAG_ID]
     except: ID = ''
 
     # Pulizia del Titolo
     if any( word in title.lower() for word in ['specials', 'speciali']):
-        item.show = re.sub(r'\sspecials|\sspeciali', '', item.show.lower())
+        item.fulltitle = re.sub(r'\sspecials|\sspeciali', '', item.fulltitle.lower())
         tvdb.find_and_set_infoLabels(item)
     elif not item.infoLabels['tvdb_id']:
-            item.show = title.rstrip('123456789 ')
+            item.fulltitle = title.rstrip('123456789 ')
             tvdb.find_and_set_infoLabels(item)
 
     if not ID and active:
@@ -298,7 +298,8 @@ def renumber(itemlist, item='', typography=''):
     if item:
         item.channel = item.from_channel if item.from_channel else item.channel
         # Controlla se la Serie è già stata rinumerata
-        TITLE = item.show.rstrip() if item.show else item.contentTitle
+        TITLE = item.fulltitle.rstrip()
+        log(item)
 
         if inspect.stack()[2][3] == 'find_episodes':
             return itemlist
@@ -331,7 +332,7 @@ def renumber(itemlist, item='', typography=''):
 
     else:
         for item in itemlist:
-            TITLE = item.show.rstrip()
+            TITLE =item.fulltitle.rstrip()
             if dict_series.has_key(TITLE) and dict_series[TITLE].has_key(TAG_ID):
                 ID = dict_series[TITLE][TAG_ID]
                 exist = True
@@ -341,10 +342,10 @@ def renumber(itemlist, item='', typography=''):
             if item.contentType != 'movie':
                 if item.context:
                     context2 = item.context
-                    item.show = TITLE
+                    item.show = item.fulltitle = TITLE
                     item.context = context(exist) + context2
                 else:
-                    item.show = TITLE
+                    item.show = item.fulltitle = TITLE
                     item.context = context(exist)
 
 def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE, TYPE):
@@ -487,7 +488,7 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
                     else:
                         try: EpisodeDict[str(episode)] = str(complete[regular[number+2][2]][0])
                         except: EpisodeDict[str(episode)] = '0x0'
-                elif number <= len(regular) and regular.has_key(number):
+                elif number <= len(regular) and number in regular:
                     EpisodeDict[str(episode)] = str(regular[number][0])
                 else:
                     try: EpisodeDict[str(episode)] = str(complete[regular[number+2][2]][0])
@@ -534,7 +535,7 @@ def error(itemlist):
 def check(item):
     try:
         dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
-        TITLE = item.show.rstrip()
+        TITLE = item.fulltitle.rstrip()
         dict_series[TITLE][TAG_ID]
         dict_series[TITLE][TAG_EPISODE]
         exist = True
