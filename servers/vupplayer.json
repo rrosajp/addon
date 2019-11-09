@@ -4,14 +4,14 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "gounlimited.to/(?:embed-|)([a-z0-9]+)(?:.html|)",
-        "url": "https://gounlimited.to/\\1.html"
+        "pattern": "vup.to/(?:embed-)?([a-z0-9]+).html",
+        "url": "https://vup.to/\\1.html"
       }
     ]
   },
   "free": true,
-  "id": "gounlimited",
-  "name": "Go Unlimited",
+  "id": "vupplayer",
+  "name": "VUP Player",
   "settings": [
     {
       "default": false,
@@ -38,5 +38,5 @@
       "visible": false
     }
   ],
-  "thumbnail": "server_gounlimited.png"
+  "thumbnail": "server_vupplayer.png"
 }

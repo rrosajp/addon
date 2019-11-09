@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import re
 from core import httptools
 from core import scrapertoolsV2
 from platformcode import config, logger
@@ -22,9 +22,11 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
     # streaming url
     data = httptools.downloadpage(page_url).data
-    jsCode = scrapertoolsV2.find_single_match(data, '<script>\r\nMDCore\.ref = "[a-z0-9]+";\r\n(.*?)\r\n</script>')
+    data = re.sub(r'\n|\t|\r', ' ', data)
+    data = re.sub(r'>\s\s*<', '><', data)
+    jsCode = scrapertoolsV2.find_single_match(data, r'<script>\s*MDCore\.ref = "[a-z0-9]+"; (.*?) </script>')
     jsUnpacked = jsunpack.unpack(jsCode)
-    url = "https://" + scrapertoolsV2.find_single_match(jsUnpacked, 'MDCore\.vsrc="//([^"]+)')
+    url = "https://" + scrapertoolsV2.find_single_match(jsUnpacked, r'MDCore\.vsrc="//([^"]+)')
 
     itemlist.append([".mp4 [MixDrop]", url])
 
