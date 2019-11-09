@@ -168,7 +168,7 @@ def semiautomatic_config_item(item):
     tvdb.find_and_set_infoLabels(item)
     item.channel = item.from_channel
     dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
-    title = item.show
+    title = item.show if item.show else item.fulltitle
 
     # Trova l'ID della serie
     while not item.infoLabels['tvdb_id']:
@@ -248,7 +248,7 @@ def semiautomatic_config_item(item):
 def config_item(item, itemlist=[], typography='', active=False):
     log()
     # Configurazione Automatica, Tenta la numerazione Automatica degli episodi
-    title = item.fulltitle
+    title = item.show if item.show else item.fulltitle
 
     dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
     try: ID = dict_series[item.show.rstrip()][TAG_ID]
@@ -298,18 +298,18 @@ def renumber(itemlist, item='', typography=''):
     if item:
         item.channel = item.from_channel if item.from_channel else item.channel
         # Controlla se la Serie è già stata rinumerata
-        TITLE = item.fulltitle.rstrip() if item.fulltitle else item.contentTitle
-       
+        TITLE = item.show.rstrip() if item.show else item.contentTitle
+
         if inspect.stack()[2][3] == 'find_episodes':
             return itemlist
-        
+
         elif dict_series.has_key(TITLE) and dict_series[TITLE].has_key(TAG_ID):
             ID = dict_series[TITLE][TAG_ID]
             EPISODE = dict_series[TITLE][TAG_EPISODE]
 
             if dict_series[TITLE].has_key(TAG_SEASON): SEASON = dict_series[TITLE][TAG_SEASON]
             else: SEASON = ''
-            
+
             if dict_series[TITLE].has_key(TAG_MODE): MODE = dict_series[TITLE][TAG_MODE]
             else: MODE = False
 
@@ -348,7 +348,7 @@ def renumber(itemlist, item='', typography=''):
                     item.context = context(exist)
 
 def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE, TITLE, TYPE):
-    
+
     # Se ID è 0 salta la rinumerazione
     if ID == '0':
         return itemlist
@@ -370,7 +370,7 @@ def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, 
         # Controlla che la lista egli Episodi sia della stessa lunghezza di Itemlist
         if EpisodeDict == 'none':
             return error(itemlist)
-        if TYPE == 'manual' and len(EpisodeDict) < len(itemlist): 
+        if TYPE == 'manual' and len(EpisodeDict) < len(itemlist):
             EpisodeDict = manual_renumeration(item, True)
         if len(EpisodeDict) >= len(itemlist) and EpisodeDict.has_key(scrapertoolsV2.find_single_match(itemlist[0].title, r'\d+')):
             for item in itemlist:
@@ -534,7 +534,7 @@ def error(itemlist):
 def check(item):
     try:
         dict_series = jsontools.get_node_from_file(item.channel, TAG_TVSHOW_RENUMERATE)
-        TITLE = item.fulltitle.rstrip()
+        TITLE = item.show.rstrip()
         dict_series[TITLE][TAG_ID]
         dict_series[TITLE][TAG_EPISODE]
         exist = True
