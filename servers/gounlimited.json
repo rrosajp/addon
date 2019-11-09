@@ -4,14 +4,14 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "https://gounlimited.to/(?:embed-|)([a-z0-9]+)(?:.html|)",
-        "url": "https://gounlimited.to/embed-\\1.html"
+        "pattern": "gounlimited.to/(?:embed-|)([a-z0-9]+)(?:.html|)",
+        "url": "https://gounlimited.to/\\1.html"
       }
     ]
   },
   "free": true,
   "id": "gounlimited",
-  "name": "gounlimited",
+  "name": "Go Unlimited",
   "settings": [
     {
       "default": false,
@@ -38,5 +38,5 @@
       "visible": false
     }
   ],
-  "thumbnail": "https://s31.postimg.cc/bsiaj2q2j/goo.png"
+  "thumbnail": "server_gounlimited.png"
 }
