@@ -20,7 +20,7 @@ list_quality = ['1080p','720p','480p','360p']
 @support.menu
 def mainlist(item):
     menu = [
-        ('Ultimi Film aggiunti', ['/api/movies?order[lastReleaseAt]=desc', 'peliculas', '']),
+        ('Ultimi Film aggiunti', ['/api/movies?order[releaseDate]=desc&lastReleaseAt[null]=false', 'peliculas', '']),
         ('Generi', ['/api/genres', 'search_movie_by_genre', '']),
         ('Anni {film}', ['', 'search_movie_by_year', '']),
         ('Cerca Film... bold', ['', 'search', ''])
@@ -32,7 +32,7 @@ def newest(categoria):
     item = Item()
     if categoria == 'peliculas':
         item.contentType = 'movie'
-        item.url = host + '/api/movies?order[lastReleaseAt]=desc'
+        item.url = host + '/api/movies?order[releaseDate]=desc&lastReleaseAt[null]=false'
     return peliculas(item)
 
 def peliculas(item):
