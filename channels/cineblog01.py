@@ -41,13 +41,14 @@ def mainlist(item):
         ('HD', ['', 'menu', 'Film HD Streaming']),
         ('Generi', ['', 'menu', 'Film per Genere']),
         ('Anni', ['', 'menu', 'Film per Anno']),
-        ('Ultimi aggiunti', ['/lista-film-ultimi-100-film-aggiunti/', 'newest'])
+        ('Ultimi Aggiornati',['/lista-film-ultimi-100-film-aggiornati/', 'peliculas', 'newest']),
+        ('Ultimi Aggiunti', ['/lista-film-ultimi-100-film-aggiunti/', 'peliculas', 'newest'])
     ]
     tvshow = ['/serietv/',
         ('Per Lettera', ['/serietv/', 'menu', 'Serie-Tv per Lettera']),
         ('Per Genere', ['/serietv/', 'menu', 'Serie-Tv per Genere']),
         ('Per anno', ['/serietv/', 'menu', 'Serie-Tv per Anno']),
-        ('Aggiornamento quotidiano', ['/serietv/aggiornamento-quotidiano-serie-tv/', 'newest'])
+        ('Ultime Aggiornate', ['/serietv/', 'peliculas', 'newest'])
     ]
 
     return locals()
@@ -63,34 +64,55 @@ def menu(item):
     return locals()
 
 
-@support.scrape
+# @support.scrape
+# def newest(categoria):
+#     findhost()
+#     # debug = True
+#     patron = r'<a href="?(?P<url>[^">]+)"?>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N|SUB-ITA)\])?\s*(?:\[(?P<quality>HD|SD|HD/3D)\])?\s*\((?P<year>[0-9]{4})\)<\/a>'
+
+#     if type(categoria) != Item:
+#         item = Item()
+#     else:
+#         item = categoria
+#         categoria = 'series' if item.contentType != 'movie' else 'movie'
+#     pagination = 20
+
+#     if categoria == 'series':
+#         item.contentType = 'tvshow'
+#         action = 'episodios'
+#         item.url = host + 'serietv/aggiornamento-quotidiano-serie-tv/'
+#         patronBlock = r'<article class="sequex-post-content">(?P<block>.*?)</article>'
+#         patron = '<a href="(?P<url>[^"]+)".*?>(?P<title>[^<([|]+).*?(?P<lang>ITA|SUB-ITA)?</a'
+#     else:
+#         item.contentType = 'movie'
+#         item.url = host + '/lista-film-ultimi-100-film-aggiunti/'
+#         patronBlock = r'Ultimi 100 film aggiunti:(?P<block>.*?)<\/td>'
+#     # else:
+#     #     patronBlock = r'Ultimi 100 film Aggiornati:(?P<block>.*?)<\/td>'
+#     #     item = categoria
+
+#     return locals()
+
+
 def newest(categoria):
+    support.log(categoria)
     findhost()
-    # debug = True
-    patron = r'<a href="?(?P<url>[^">]+)"?>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N|SUB-ITA)\])?\s*(?:\[(?P<quality>HD|SD|HD/3D)\])?\s*\((?P<year>[0-9]{4})\)<\/a>'
-
-    if type(categoria) != Item:
-        item = Item()
-    else:
-        item = categoria
-        categoria = 'series' if item.contentType != 'movie' else 'movie'
-    pagination = 20
-
-    if categoria == 'series':
-        item.contentType = 'tvshow'
-        action = 'episodios'
-        item.url = host + 'serietv/aggiornamento-quotidiano-serie-tv/'
-        patronBlock = r'<article class="sequex-post-content">(?P<block>.*?)</article>'
-        patron = '<a href="(?P<url>[^"]+)".*?>(?P<title>[^<([|]+).*?(?P<lang>ITA|SUB-ITA)?</a'
-    else:
-        item.contentType = 'movie'
-        item.url = host + '/lista-film-ultimi-100-film-aggiunti/'
-        patronBlock = r'Ultimi 100 film aggiunti:(?P<block>.*?)<\/td>'
-    # else:
-    #     patronBlock = r'Ultimi 100 film Aggiornati:(?P<block>.*?)<\/td>'
-    #     item = categoria
-
-    return locals()
+    item = support.Item()
+    try:
+        if categoria == "series":
+            item.contentType = 'tvshow'
+            item.url = host + '/serietv/' # aggiornamento-quotidiano-serie-tv/'
+        else:
+            item.contentType = 'movie'
+            item.url = host + '/lista-film-ultimi-100-film-aggiunti/'
+        item.args = "newest"
+        return peliculas(item)
+    # Continua la ricerca in caso di errore
+    except:
+        import sys
+        for line in sys.exc_info():
+            support.logger.error("{0}".format(line))
+        return []
 
 
 def search(item, text):
@@ -115,7 +137,16 @@ def peliculas(item):
                  'Aggiornamento Quotidiano Serie TV', 'OSCAR 2019 ▶ CB01.UNO: Vota il tuo film preferito! 🎬',
                  'Openload: la situazione. Benvenuto Verystream', 'Openload: lo volete ancora?']
 
-    if '/serietv/' not in item.url:
+    if 'newest' in item.args:
+        if '/serietv/' not in item.url:
+            pagination = ''
+            patronBlock = r'Ultimi 100 film [^:]+:(?P<block>.*?)<\/td>'
+            patron = r'<a href="?(?P<url>[^">]+)"?>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N|SUB-ITA)\])?\s*(?:\[(?P<quality>HD|SD|HD/3D)\])?\s*\((?P<year>[0-9]{4})\)<\/a>'
+            action = 'findvideos'
+        else:
+            patronBlock = r'Ultime SerieTv aggiornate(?P<block>.*?)Lista'
+            patron = r'src="(?P<thumb>[^"]+)" alt="(?P<title>.*?)(?: &#8211; \d+&#215;\d+)?(?:"| &#8211; )(?:(?P<lang>Sub-ITA|ITA))?[^>]*>[^>]+>[^>]+><a href="(?P<url>[^"]+)".*?<div class="rpwe-summary">.*?\((?P<year>\d{4})[^\)]*\) (?P<plot>[^<]+)<'
+    elif '/serietv/' not in item.url:
         patron = r'<div class="?card-image"?>.*?<img src="?(?P<thumb>[^" ]+)"? alt.*?<a href="?(?P<url>[^" >]+)(?:\/|")>(?P<title>[^<[(]+)(?:\[(?P<quality>[A-Za-z0-9/-]+)])? (?:\((?P<year>[0-9]{4})\))?.*?<strong>(?P<genre>[^<>&–]+).*?DURATA (?P<duration>[0-9]+).*?<br(?: /)?>(?P<plot>[^<>]+)'
         action = 'findvideos'
     else:
@@ -125,7 +156,7 @@ def peliculas(item):
 
     # patronBlock=[r'<div class="?sequex-page-left"?>(?P<block>.*?)<aside class="?sequex-page-right"?>',
     #                                           '<div class="?card-image"?>.*?(?=<div class="?card-image"?>|<div class="?rating"?>)']
-    patronNext='<a class="?page-link"? href="?([^>]+)"?><i class="fa fa-angle-right">'
+    if 'newest' not in item.args: patronNext='<a class="?page-link"? href="?([^>]+)"?><i class="fa fa-angle-right">'
 
     return locals()
 
