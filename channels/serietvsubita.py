@@ -300,7 +300,6 @@ def search(item, texto):
 
     patron = '<li class="cat-item cat-item-\d+"><a href="([^"]+)"\s?>([^<]+)</a>'
     matches = support.match(item, patron, headers=headers)[0]
-    support.regexDbg(item, patron, headers)
     for i, (scrapedurl, scrapedtitle) in enumerate(matches):
         if texto.upper() in scrapedtitle.upper():
             scrapedthumbnail = ""
