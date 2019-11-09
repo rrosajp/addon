@@ -19,8 +19,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     logger.info("url=" + page_url)
     video_urls = []
     data = httptools.downloadpage(page_url).data
-    enc_data = scrapertools.find_single_match(data, "type='text/javascript'>(.*?)</script>")
-    dec_data = jsunpack.unpack(enc_data)
+    # enc_data = scrapertools.find_single_match(data, "type='text/javascript'>(.*?)</script>")
+    # dec_data = jsunpack.unpack(enc_data)
     sources = scrapertools.find_single_match(data, "<source(.*?)</source")
     patron = 'src="([^"]+)'
     matches = scrapertools.find_multiple_matches(sources, patron)
