@@ -379,7 +379,8 @@ def set_channel_setting(name, value, channel):
     def_keys = []
     del_keys = []
     for key in def_settings:
-        def_keys.append(key['id'])
+##        def_keys.append(key['id'])
+        def_keys.append(channel)
     for key in dict_settings:
         if key not in def_keys:
             del_keys.append(key)
