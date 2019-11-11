@@ -336,6 +336,7 @@ def get_channel_setting(name, channel, default=None):
 
 
 def set_channel_setting(name, value, channel):
+    import filetools
     """
     Fija el valor de configuracion del parametro indicado.
 
@@ -375,19 +376,21 @@ def set_channel_setting(name, value, channel):
         except EnvironmentError:
             logger.error("ERROR al leer el archivo: %s" % file_settings)
 
-    # delete unused Settings
-    def_keys = []
-    del_keys = []
-    for key in def_settings:
-        def_keys.append(key['id'])
-    for key in dict_settings:
-        if key not in def_keys:
-            del_keys.append(key)
-    for key in del_keys:
-        del dict_settings[key]
+    if os.path.isfile(filetools.join(config.get_runtime_path(), "channels", channel + ".json")):
+
+        # delete unused Settings
+        def_keys = []
+        del_keys = []
+        for key in def_settings:
+            def_keys.append(key['id'])
+        for key in dict_settings:
+            if key not in def_keys:
+                del_keys.append(key)
+        for key in del_keys:
+            del dict_settings[key]
 
     dict_settings[name] = value
-    
+
     # comprobamos si existe dict_file y es un diccionario, sino lo creamos
     if dict_file is None or not dict_file:
         dict_file = {}
