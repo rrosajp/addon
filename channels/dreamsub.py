@@ -261,7 +261,7 @@ def findvideos(item):
 
             data = httptools.downloadpage(url).data
             #host_video = scrapertoolsV2.find_single_match(data, r'var thisPageUrl = "(http[s]\:\/\/[^\/]+).+?"')
-            host_video = scrapertoolsV2.find_single_match(data, r'let thisPageUrl = "(http[s]\:\/\/[^\/]+).+?"')
+            host_video = scrapertoolsV2.find_single_match(data, r'(?:let|var) thisPageUrl = "(http[s]\:\/\/[^\/]+).+?"')
             link = scrapertoolsV2.find_single_match(data, r'<video src="([^"]+)"')
             video_urls = host_video+link
 
@@ -274,7 +274,7 @@ def findvideos(item):
                          title=title_show,
                          fulltitle=item.fulltitle,
                          show=item.fulltitle,
-                         url='https://cdn5.dreamsub.stream'+video_urls,
+                         url=link if 'http' in link else video_urls,
                          infoLabels = item.infoLabels,
                          thumbnail=item.thumbnail,
                          contentSerieName= item.fulltitle,
