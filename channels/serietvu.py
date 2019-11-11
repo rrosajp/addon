@@ -26,7 +26,7 @@ def mainlist(item):
     log()
     
     tvshow = ['/category/serie-tv',
-              ('Novità', ['/ultimi-episodi/', 'peliculas', 'update']),
+              ('Aggiornamenti Serie', ['/ultimi-episodi/', 'peliculas', 'update']),
               ('Generi', ['', 'genres', 'genres'])
     ]
 
