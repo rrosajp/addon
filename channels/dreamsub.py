@@ -274,7 +274,7 @@ def findvideos(item):
                          title=title_show,
                          fulltitle=item.fulltitle,
                          show=item.fulltitle,
-                         url=video_urls,
+                         url='https://cdn5.dreamsub.stream'+video_urls,
                          infoLabels = item.infoLabels,
                          thumbnail=item.thumbnail,
                          contentSerieName= item.fulltitle,
