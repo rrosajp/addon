@@ -121,22 +121,23 @@ def findvideos(item):
         data = re.sub(r'>\s+<', '> <', data)
         url_video = scrapertoolsV2.find_single_match(data, r'<div class="item"> <a data-id="[^"]+" data-href="([^"]+)" data-original="[^"]+"[^>]+> <div> <div class="title">Episodio \d+', -1)
         url_serie = scrapertoolsV2.find_single_match(data, r'<link rel="canonical" href="([^"]+)"\s?/>')
-        goseries = support.typo("Vai alla Serie:" + item.contentSerieName, ' bold')
+        goseries = support.typo(">> Vai alla Serie:" + item.contentSerieName, ' bold')
         series = support.typo(item.contentSerieName, ' bold color kod')
 
         itemlist = support.server(item, data=url_video)
 
         itemlist.append(
             Item(channel=item.channel,
-                    title=goseries + series,
-                    fulltitle=item.fulltitle,
-                    show=item.show,
-                    contentType='tvshow',
-                    contentSerieName=item.contentSerieName,
-                    url=url_serie,
-                    action='episodios',
-                    contentTitle=item.contentSerieName,
-                    plot = goseries + series + "con tutte le puntate",
-                    ))
+                 title=goseries + series,
+                 fulltitle=item.fulltitle,
+                 show=item.show,
+                 contentType='tvshow',
+                 contentSerieName=item.contentSerieName,
+                 url=url_serie,
+                 action='episodios',
+                 contentTitle=item.contentSerieName,
+                 plot = goseries + series + "con tutte le puntate",
+                 thumbnail = support.thumb(thumb='channels_tvshow.png')
+                ))
 
         return itemlist
