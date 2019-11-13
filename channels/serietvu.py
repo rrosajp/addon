@@ -25,7 +25,7 @@ list_quality = ['default']
 def mainlist(item):
 
     tvshow = ['/category/serie-tv',
-              ('Aggiornamenti Serie', ['/ultimi-episodi/', 'peliculas', 'update']),
+              ('Ultimi episodi', ['/ultimi-episodi/', 'peliculas', 'update']),
               ('Generi', ['', 'genres', 'genres'])
     ]
 
@@ -121,7 +121,7 @@ def findvideos(item):
         data = re.sub(r'>\s+<', '> <', data)
         url_video = scrapertoolsV2.find_single_match(data, r'<div class="item"> <a data-id="[^"]+" data-href="([^"]+)" data-original="[^"]+"[^>]+> <div> <div class="title">Episodio \d+', -1)
         url_serie = scrapertoolsV2.find_single_match(data, r'<link rel="canonical" href="([^"]+)"\s?/>')
-        goseries = support.typo(">> Vai alla Serie:" + item.contentSerieName, ' bold')
+        goseries = support.typo(">> Vai alla Serie:", ' bold')
         series = support.typo(item.contentSerieName, ' bold color kod')
 
         itemlist = support.server(item, data=url_video)
