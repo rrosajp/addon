@@ -56,7 +56,7 @@ def peliculas(item):
         patronBlock = r'<ul class="posts">(?P<block>.*)<div class="clear">'
         patron = r'<li>\s?<a href="(?P<url>[^"]+)" data-thumbnail="(?P<thumb>[^"]+)">.*?<div class="title">(?P<title>.+?)(?:\s\[(?P<quality>HD)\])?<\/div>[^>]+>(?:[\dx]+)\s?(?:[ ]\((?P<lang>[a-zA-Z\-]+)\))?.+?</div>'
         pagination = ''
-        
+
     if item.args == 'search':
         action = 'select'
     elif item.contentType == 'tvshow':
@@ -79,10 +79,9 @@ def episodios(item):
     data = httptools.downloadpage(item.url, headers=headers).data
     data = re.sub('\n|\t', ' ', data)
     data = re.sub(r'>\s+<', '> <', data)
-
     if 'accordion-item' in data:
         #patronBlock = r'<span class="season(?:|-title)">(?P<season>\d+)[^>]+>[^>]+>\s+?[^>]+>[^>]+>.+?(?:STAGIONE|Stagione).+?\s(?P<lang>[a-zA-Z\-]+).+?</span>(?P<block>.*?)<div id="disqus_thread">'
-        patronBlock = r'<span class="season(?:|-title)">(?P<season>\d+)[^>]+>[^>]+>\s+?[^>]+>[^>]+>.+?(?:STAGIONE|Stagione).+?\s(?P<lang>[a-zA-Z\-]+)</span>(?P<block>.*?)\s*(?:<li class="s_title">|<div id="disqus_thread">)'
+        patronBlock = r'<span class="season(?:|-title)">(?P<season>\d+)[^>]+>[^>]+>[^>]+>[^>]+>.+?(?:STAGIONE|Stagione)[ -]+(?P<lang>[a-zA-Z\-]+)</span>(?P<block>.*?)\s*(?:<li class="s_title">|<div id="disqus_thread">)'
         patron = r'<img src="(?P<thumb>[^"]+)">.*?<li class="season-no">(?P<episode>.*?)<\/li>(?P<url>.*?javascript:;">(?P<title>[^<]+)<.+?)<\/table>'
     else:
         patronBlock = r'<div id="info" class="pad">(?P<block>.*?)<div id="disqus_thread">'
