@@ -95,6 +95,7 @@ def peliculas(item):
     anime=True
 
     if item.args == 'updated':
+        item.contentType='episode'
         patron=r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?[^>]+>[^>]+>\s*<div class="ep">[^\d]+(?P<episode>\d+)[^<]*</div>'
         action='findvideos'
     else:
@@ -145,6 +146,7 @@ def findvideos(item):
     videoData = ''
 
     for serverid in matches:
+        if not item.number: item.number = support.scrapertoolsV2.find_single_match(item.title,r'(\d+) -')
         block = support.scrapertoolsV2.find_multiple_matches(data,'data-id="' + serverid + '">(.*?)<div class="server')
         ID = support.scrapertoolsV2.find_single_match(str(block),r'<a data-id="([^"]+)" data-base="' + (item.number if item.number else '1') + '"')
         support.log('ID= ',serverid)
