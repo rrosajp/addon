@@ -4,18 +4,14 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "clipwatching.com/(e.*?.html)",
-        "url": "http://clipwatching.com/\\1"
-      },
-      {
-        "pattern": "clipwatching.com/(\\w+)",
+        "pattern": "clipwatching.com/(?:embed-)?([a-zA-Z0-9]+).html",
         "url": "http://clipwatching.com/embed-\\1.html"
       }
     ]
   },
   "free": true,
   "id": "clipwatching",
-  "name": "clipwatching",
+  "name": "ClipWatching",
   "settings": [
     {
       "default": false,
@@ -42,5 +38,5 @@
       "visible": false
     }
   ],
-  "thumbnail": "https://s17.postimg.cc/e6kcan0vj/clipwatching1.png"
+  "thumbnail": "server_clipwatching.png"
 }
