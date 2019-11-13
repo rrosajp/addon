@@ -144,7 +144,7 @@ def findvideos(item):
     itemlist = []
     matches, data = support.match(item, r'class="tab.*?data-name="([0-9]+)">', headers=headers)
     videoData = ''
-
+ 
     for serverid in matches:
         if not item.number: item.number = support.scrapertoolsV2.find_single_match(item.title,r'(\d+) -')
         block = support.scrapertoolsV2.find_multiple_matches(data,'data-id="' + serverid + '">(.*?)<div class="server')
@@ -156,29 +156,32 @@ def findvideos(item):
                 for url in matches:
                         videoData += '\n' + url
             else:
-                dataJson = support.httptools.downloadpage('%s/ajax/episode/info?id=%s&server=%s&ts=%s' % (host, ID, serverid, int(time.time())), headers=[['x-requested-with', 'XMLHttpRequest']]).data
-                json = jsontools.load(dataJson)
-                support.log(json)
-                if 'keepsetsu' in json['grabber']:
-                    matches = support.match(item, r'<iframe\s*src="([^"]+)"', url=json['grabber'])[0]
-                    for url in matches:
-                        videoData += '\n' + url
-                else:
-                    videoData += '\n' + json['grabber']
+                try:
+                    dataJson = support.httptools.downloadpage('%s/ajax/episode/info?id=%s&server=%s&ts=%s' % (host, ID, serverid, int(time.time())), headers=[['x-requested-with', 'XMLHttpRequest']]).data
+                    json = jsontools.load(dataJson)
+                    support.log(json)
+                    if 'keepsetsu' in json['grabber']:
+                        matches = support.match(item, r'<iframe\s*src="([^"]+)"', url=json['grabber'])[0]
+                        for url in matches:
+                            videoData += '\n' + url
+                    else:
+                        videoData += '\n' + json['grabber']
 
-                if serverid == '28':
-                    itemlist.append(
-                        support.Item(
-                            channel=item.channel,
-                            action="play",
-                            title='diretto',
-                            quality='',
-                            url=json['grabber'],
-                            server='directo',
-                            fulltitle=item.fulltitle,
-                            show=item.show,
-                            contentType=item.contentType,
-                            folder=False))
+                    if serverid == '28':
+                        itemlist.append(
+                            support.Item(
+                                channel=item.channel,
+                                action="play",
+                                title='diretto',
+                                quality='',
+                                url=json['grabber'],
+                                server='directo',
+                                fulltitle=item.fulltitle,
+                                show=item.show,
+                                contentType=item.contentType,
+                                folder=False))
+                except:
+                    pass
 
     return support.server(item, videoData, itemlist)
 
