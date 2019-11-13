@@ -7,7 +7,7 @@
         <setting id="checklinks" type="bool" label="30020" default="false"/>
         <setting id="checklinks_number" type="enum" values="5|10|15|20" label="30021" default="0" visible="eq(-1,true)"/>
         <setting id="thumbnail_type" type="enum" lvalues="30011|30012|30200" label="30010" default="2"/>
-        <setting id="channel_language" type="labelenum" values="auto|all|ita" label="30019" default="auto"/>
+        <setting id="channel_language" type="labelenum" values="auto|all|ita" label="30019" default="all"/>
         <setting id="trakt_sync" type="bool" label="70109" default="false"/>
         <setting id="forceview" type="bool" label="30043" default="false"/>
         <setting id="faster_item_serialization" type="bool" label="30300" default="false"/>
