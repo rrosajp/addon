@@ -32,13 +32,13 @@ list_quality = ['HD', 'SD']
 def mainlist(item):
 
     film = ['/category/film/',
-        ('Generi', ['/category/film/', 'genres', 'lettersF'])
-        ]
+            ('Generi', ['/category/film/', 'genres', 'lettersF'])
+           ]
 
     tvshow = ['/category/serie-tv/',
               ('Aggiornamenti', ['/aggiornamenti-serie-tv/', 'peliculas', 'newest']),
               ('Per Lettera', ['/category/serie-tv/', 'genres', 'lettersS'])
-        ]
+             ]
 
     search = ''
     return locals()
@@ -56,7 +56,7 @@ def peliculas(item):
         patronBlock = r'<ul class="posts">(?P<block>.*)<div class="clear">'
         patron = r'<li>\s?<a href="(?P<url>[^"]+)" data-thumbnail="(?P<thumb>[^"]+)">.*?<div class="title">(?P<title>.+?)(?:\s\[(?P<quality>HD)\])?<\/div>[^>]+>(?:[\dx]+)\s?(?:[ ]\((?P<lang>[a-zA-Z\-]+)\))?.+?</div>'
         pagination = ''
-        
+
     if item.args == 'search':
         action = 'select'
     elif item.contentType == 'tvshow':
@@ -69,33 +69,34 @@ def peliculas(item):
     def itemHook(item):
         item.title = item.title.replace(r'-', ' ')
         return item
-    #debug = True
+
     return locals()
 
 @support.scrape
 def episodios(item):
-    support.log()
 
     data = httptools.downloadpage(item.url, headers=headers).data
     data = re.sub('\n|\t', ' ', data)
     data = re.sub(r'>\s+<', '> <', data)
-
+    support.log('SERIES DATA= ',data)
     if 'accordion-item' in data:
-        #patronBlock = r'<span class="season(?:|-title)">(?P<season>\d+)[^>]+>[^>]+>\s+?[^>]+>[^>]+>.+?(?:STAGIONE|Stagione).+?\s(?P<lang>[a-zA-Z\-]+).+?</span>(?P<block>.*?)<div id="disqus_thread">'
-        patronBlock = r'<span class="season(?:|-title)">(?P<season>\d+)[^>]+>[^>]+>\s+?[^>]+>[^>]+>.+?(?:STAGIONE|Stagione).+?\s(?P<lang>[a-zA-Z\-]+)</span>(?P<block>.*?)\s*(?:<li class="s_title">|<div id="disqus_thread">)'
+        patronBlock = r'<span class="season[^>]*>(?P<season>\d+)[^>]+>[^>]+>[^>]+>[^>]+>\D*(?:STAGIONE|Stagione)[ -]+(?P<lang>[a-zA-Z\- ]+)[^<]*</span>(?P<block>.*?)<div id="(?:season|disqus)'
         patron = r'<img src="(?P<thumb>[^"]+)">.*?<li class="season-no">(?P<episode>.*?)<\/li>(?P<url>.*?javascript:;">(?P<title>[^<]+)<.+?)<\/table>'
     else:
-        patronBlock = r'<div id="info" class="pad">(?P<block>.*?)<div id="disqus_thread">'
-        patron = r'<strong>(?P<lang>.*?)<\/strong>.*?<p>(?P<season>.*?)<span'
-
-    #debug = True
+        # patronBlock = r'<div id="info" class="pad">(?P<block>.*?)<div id="disqus_thread">'
+        # deflang='Sub-ITA'
+        patronBlock = r'(?:STAGIONE|Stagione)(?:<[^>]+>)?\s*(?:(?P<lang>[A-Za-z- ]+))?(?P<block>.*?)(?:&nbsp;|<strong>|<div class="addtoany)'
+        patron = r'(?:/>|p>)\s*(?P<season>\d+)(?:&#215;|×|x)(?P<episode>\d+)[^<]+(?P<url>.*?)(?:<br|</p)'
+    def itemHook(item):
+        item.title.replace('&#215;','x')
+        if not item.contentLanguage:
+            item.contentLanguage = 'ITA'
+            return item
     return locals()
 
 
 @support.scrape
 def genres(item):
-    support.log()
-    itemlist = []
 
     if item.args == 'lettersF':
         item.contentType = 'movie'
@@ -104,31 +105,24 @@ def genres(item):
 
     action = 'peliculas'
     patronBlock = r'<select class="cats">(?P<block>.*?)<\/select>'
-    patron = r'<option data-src="(?P<url>[^"]+)">(?P<title>.*?)<\/option>'
+    patronMenu = r'<option data-src="(?P<url>[^"]+)">(?P<title>.*?)<\/option>'
 
     return locals()
 
+
 def select(item):
     support.log()
-
 
     data = httptools.downloadpage(item.url, headers=headers).data
     patronBlock = scrapertoolsV2.find_single_match(data, r'class="taxonomy category" ><span property="name">(.*?)</span></a><meta property="position" content="2">')
     if patronBlock.lower() != 'film':
         support.log('select = ### è una serie ###')
-        return episodios(Item(channel=item.channel,
-                              title=item.title,
-                              fulltitle=item.fulltitle,
-                              contentSerieName = item.fulltitle,
-                              url=item.url,
-                              contentType='tvshow'))
+        item.contentType='tvshow'
+        return episodios(item)
     else:
         support.log('select = ### è un movie ###')
-        return findvideos(Item(channel=item.channel,
-                              title=item.title,
-                              fulltitle=item.fulltitle,
-                              url=item.url,
-                              contentType='movie'))
+        item.contentType='movie'
+        return findvideos(item)
 
 
 def search(item, texto):
@@ -163,9 +157,6 @@ def newest(categoria):
             item.args = "newest"
             item.contentType = 'tvshow'
             itemlist = peliculas(item)
-
-##        if itemlist[-1].action == "peliculas":
-##            itemlist.pop()
 
     # Continua la ricerca in caso di errore
     except:

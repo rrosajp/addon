@@ -269,7 +269,7 @@ def get_thumb(thumb_name, view="thumb_", auto=False):
 
     else:
         icon_pack_name = config.get_setting('icon_set', default="default")
-        media_path = os.path.join("https://raw.githubusercontent.com/kodiondemand/media/master/themes/", icon_pack_name)
+        media_path = os.path.join("https://raw.githubusercontent.com/kodiondemand/media/master/themes", icon_pack_name)
 
         if config.get_setting('enable_custom_theme') and config.get_setting('custom_theme') and os.path.isfile(config.get_setting('custom_theme') + view + thumb_name):
             media_path = config.get_setting('custom_theme')
@@ -344,7 +344,7 @@ def auto_filter(auto_lang=False):
     # return lang, lang_list
 
 
-def thumb(itemlist=[], genre=False):
+def thumb(itemlist=[], genre=False, thumb=''):
     if itemlist:
         import re
 
@@ -428,5 +428,7 @@ def thumb(itemlist=[], genre=False):
 
             item.title = re.sub(r'\s*\{[^\}]+\}','',item.title)
         return itemlist
+    elif thumb:
+        return get_thumb(thumb)
     else:
         return get_thumb('next.png')

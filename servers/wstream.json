@@ -1,9 +1,9 @@
 {
     "id": "wstream",
-    "name": "wstream",
+    "name": "Wstream",
     "active": true,
     "free": true,
-    "thumbnail": "http:\/\/media.tvalacarta.info\/servers\/server_wstream.png",
+    "thumbnail": "server_wstream.png",
     "find_videos": {
         "patterns": [
             {
@@ -23,7 +23,7 @@
                 "url": "https://wstream.video/video.php?file_code=\\1"
             },
             {
-                "pattern": "wstream\\.video/(?!api/|stream/)([a-z0-9A-Z]+)",
+                "pattern": "wstream\\.video/(?!api/|stream/|embed-)([a-z0-9A-Z]+)",
                 "url": "https://wstream.video/video.php?file_code=\\1"
             }
         ],

@@ -781,32 +781,34 @@ def download(itemlist, item, typography='', function_level=1, function=''):
     if itemlist and item.contentChannel != 'videolibrary':
         itemlist.append(
             Item(channel='downloads',
-                from_channel=item.channel,
-                title=title,
-                fulltitle=item.fulltitle,
-                show=item.fulltitle,
-                contentType=item.contentType,
-                contentSerieName=contentSerieName,
-                url=item.url,
-                action='save_download',
-                from_action=from_action,
-                contentTitle=contentTitle,
-                path=item.path
+                 from_channel=item.channel,
+                 title=title,
+                 fulltitle=item.fulltitle,
+                 show=item.fulltitle,
+                 contentType=item.contentType,
+                 contentSerieName=contentSerieName,
+                 url=item.url,
+                 action='save_download',
+                 from_action=from_action,
+                 contentTitle=contentTitle,
+                 path=item.path,
+                 thumbnail=thumb(thumb='downloads.png')
             ))
         if from_action == 'episodios':
             itemlist.append(
                 Item(channel='downloads',
-                    from_channel=item.channel,
-                    title=typo(config.get_localized_string(60357),typography),
-                    fulltitle=item.fulltitle,
-                    show=item.fulltitle,
-                    contentType=item.contentType,
-                    contentSerieName=contentSerieName,
-                    url=item.url,
-                    action='save_download',
-                    from_action=from_action,
-                    contentTitle=contentTitle,
-                    download='season'
+                     from_channel=item.channel,
+                     title=typo(config.get_localized_string(60357),typography),
+                     fulltitle=item.fulltitle,
+                     show=item.fulltitle,
+                     contentType=item.contentType,
+                     contentSerieName=contentSerieName,
+                     url=item.url,
+                     action='save_download',
+                     from_action=from_action,
+                     contentTitle=contentTitle,
+                     download='season',
+                     thumbnail=thumb(thumb='downloads.png')
                 ))
 
     return itemlist
