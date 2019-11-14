@@ -107,15 +107,20 @@ def episodios(item):
 
 def findvideos(item):
     support.log()
-    url = support.match(item, r'<a href="([^"]+)"><div class="downloadestreaming">',headers=headers)[0]
-    if url: item.url = url[0]
-    return support.server(item)
-
-
-
-
-
-
-
-
-
+    itemlist = []
+    urls = support.match(item, r'<a href="([^"]+)"><div class="downloadestreaming">', headers=headers)[0]
+    if urls:
+        links = support.match(item, r'(?:<source type="[^"]+"\s*src=|file:\s*)"([^"]+)"', url=urls[0], headers=headers)[0]
+        for link in links:
+            itemlist.append(
+                support.Item(channel=item.channel,
+                            action="play",
+                            title='Diretto',
+                            quality='',
+                            url=link,
+                            server='directo',
+                            fulltitle=item.fulltitle,
+                            show=item.show,
+                            contentType=item.contentType,
+                            folder=False))
+    return support.server(item, itemlist=itemlist)
