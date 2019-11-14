@@ -35,6 +35,11 @@
       {
         "pattern": "so\\.addVariable\\(\\’file\\’,\\’(http\\://peliculasid[^\\']+)",
         "url": "\\1"
+      },
+      {
+        "pattern": "https://www.animeunityserver43.cloud([[A-Za-z0-9-_\/]+).mp4",
+        "url": "https://www.animeunityserver43.cloud\\1.mp4"
+
       }
     ]
   },
