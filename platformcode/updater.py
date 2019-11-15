@@ -234,7 +234,7 @@ def updateFromZip(message='Installazione in corso...'):
     dp.update(0)
 
     remotefilename = 'https://github.com/' + user + "/" + repo + "/archive/" + branch + ".zip"
-    localfilename = (xbmc.translatePath("special://home/addons/") + "plugin.video.kod.update.zip").encode('utf-8')
+    localfilename = os.path.join(xbmc.translatePath("special://home/addons/"), "plugin.video.kod.update.zip").encode('utf-8')
     destpathname = xbmc.translatePath("special://home/addons/")
 
     logger.info("remotefilename=%s" % remotefilename)
@@ -244,25 +244,48 @@ def updateFromZip(message='Installazione in corso...'):
     remove(localfilename)
     removeTree(destpathname + "addon-" + branch)
 
-    urllib.urlretrieve(remotefilename, localfilename,
-                       lambda nb, bs, fs, url=remotefilename: _pbhook(nb, bs, fs, url, dp))
+    try:
+        urllib.urlretrieve(remotefilename, localfilename,
+                           lambda nb, bs, fs, url=remotefilename: _pbhook(nb, bs, fs, url, dp))
+    except Exception as e:
+        platformtools.dialog_ok('Kodi on Demand', 'Non riesco a scaricare il file d\'installazione da github, questo è probabilmente dovuto ad una mancanza di connessione (o qualcosa impedisce di raggiungere github).\n'
+                                                  'Controlla bene e quando hai risolto riapri KoD.')
+        logger.info('Non sono riuscito a scaricare il file zip')
+        logger.info(e)
+        dp.close()
+        return False
 
     # Lo descomprime
     logger.info("decompressione...")
     logger.info("destpathname=%s" % destpathname)
 
+    if os.path.isfile(localfilename):
+        logger.info('il file esiste')
+
+    import zipfile
     try:
         hash = fixZipGetHash(localfilename)
-        import zipfile
-        with zipfile.ZipFile(io.FileIO(localfilename), "r") as zip_ref:
-            zip_ref.extractall(destpathname)
+        logger.info(hash)
+
+        with zipfile.ZipFile(fOpen(localfilename, 'rb')) as zip:
+            size = sum([zinfo.file_size for zinfo in zip.filelist])
+            cur_size = 0
+            for member in zip.infolist():
+                zip.extract(member, destpathname)
+                cur_size += member.file_size
+                dp.update(80 + cur_size * 19 / size)
+
     except Exception as e:
         logger.info('Non sono riuscito ad estrarre il file zip')
-        logger.info(e)
+        logger.error(e)
+        import traceback
+        logger.error(traceback.print_exc())
         dp.close()
+        remove(localfilename)
+
         return False
 
-    dp.update(95)
+    dp.update(99)
 
     # puliamo tutto
     removeTree(addonDir)
@@ -325,22 +348,30 @@ def rename(dir1, dir2):
 
 # https://stackoverflow.com/questions/3083235/unzipping-file-results-in-badzipfile-file-is-not-a-zip-file
 def fixZipGetHash(zipFile):
-    f = io.FileIO(zipFile, 'r+b')
-    data = f.read()
-    pos = data.find(b'\x50\x4b\x05\x06')  # End of central directory signature
     hash = ''
-    if pos > 0:
-        f.seek(pos + 20)  # +20: see secion V.I in 'ZIP format' link above.
-        hash = f.read()[2:]
-        f.seek(pos + 20)
-        f.truncate()
-        f.write(
-            b'\x00\x00')  # Zip file comment length: 0 byte length; tell zip applications to stop reading.
-        f.seek(0)
-
-    f.close()
+    with fOpen(zipFile, 'r+b') as f:
+        data = f.read()
+        pos = data.find(b'\x50\x4b\x05\x06')  # End of central directory signature
+        if pos > 0:
+            f.seek(pos + 20)  # +20: see secion V.I in 'ZIP format' link above.
+            hash = f.read()[2:]
+            f.seek(pos + 20)
+            f.truncate()
+            f.write(
+                b'\x00\x00')  # Zip file comment length: 0 byte length; tell zip applications to stop reading.
 
     return str(hash)
+
+def fOpen(file, mode = 'r'):
+    # per android è necessario, su kodi 18, usare FileIO
+    # https://forum.kodi.tv/showthread.php?tid=330124
+    # per xbox invece, è necessario usare open perchè _io è rotto :(
+    # https://github.com/jellyfin/jellyfin-kodi/issues/115#issuecomment-538811017
+    if xbmc.getCondVisibility('system.platform.linux') and xbmc.getCondVisibility('system.platform.android'):
+        logger.info('android, uso FileIO per leggere')
+        return io.FileIO(file, mode)
+    else:
+        return open(file, mode)
 
 
 def _pbhook(numblocks, blocksize, filesize, url, dp):
