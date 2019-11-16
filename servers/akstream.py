@@ -41,5 +41,4 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
     for video_url in video_urls:
         logger.info(" %s - %s" % (video_url[0], video_url[1]))
-
-    return video_urls
+    return sorted(video_urls, key=lambda x: x[0].split('x')[1])
