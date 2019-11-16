@@ -26,4 +26,5 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     for url, quality in sources:
         quality = 'auto' if not quality else quality
         video_urls.append(['.' + url.split('.')[-1] + ' [' + quality + '] [Onlystream]', url])
+    video_urls.sort(key=lambda x: x[0].split()[1])
     return video_urls

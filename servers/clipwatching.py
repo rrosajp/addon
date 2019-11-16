@@ -30,4 +30,5 @@ def get_video_url(page_url, user="", password="", video_password=""):
         logger.info(label)
         if ".jpg" not in video:
             video_urls.append(['%s [%sp] [ClipWatching]' % (Type, label), video])
+    video_urls.sort(key=lambda x: x[0].split()[1])
     return video_urls
