@@ -58,6 +58,7 @@ def mainlist(item):
 
 
 def genres_menu(item):
+    from channelselector import thumb
 
     itemlist = []
 
@@ -69,7 +70,7 @@ def genres_menu(item):
     for key, value in genres[item.type].items():
         itemlist.append(item.clone(title=value, action='discover_list', search_type='discover',
                                    list_type=key, page='1'))
-    return sorted(itemlist, key=lambda it: it.title)
+    return thumb(sorted(itemlist, key=lambda it: it.title), genre=True)
 
 def sub_menu(item):
     logger.info()
