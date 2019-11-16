@@ -402,16 +402,16 @@ def thumb(itemlist=[], genre=False, thumb=''):
             if genre == False:
 
                 for thumb, titles in icon_dict.items():
-                    if any( word in item.title.lower() for word in search):
+                    if any( word in item.title.lower().split() for word in search):
                         thumb = 'search'
                         for suffix, titles in search_suffix.items():
-                            if any( word in item.title.lower() for word in titles ):
+                            if any( word in item.title.lower().split() for word in titles ):
                                 thumb = thumb + suffix
                         item.thumbnail = get_thumb(thumb + '.png')
-                    elif any( word in item.title.lower() for word in titles ):
+                    elif any( word in item.title.lower().split() for word in titles ):
                         if thumb == 'channels_movie' or thumb == 'channels_tvshow':
                             for suffix, titles in suffix_dict.items():
-                                if any( word in item.title.lower() for word in titles ):
+                                if any( word in item.title.lower().split() for word in titles ):
                                     thumb = thumb + suffix
                             item.thumbnail = get_thumb(thumb + '.png')
                         else: item.thumbnail = get_thumb(thumb + '.png')
@@ -420,7 +420,7 @@ def thumb(itemlist=[], genre=False, thumb=''):
 
             else:
                 for thumb, titles in icon_dict.items():
-                    if any(word in item.title.lower() for word in titles ):
+                    if any(word in item.title.lower().split() for word in titles ):
                         item.thumbnail = get_thumb(thumb + '.png')
                     else:
                         thumb = item.thumbnails
