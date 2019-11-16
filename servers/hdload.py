@@ -10,7 +10,7 @@ def test_video_exists(page_url):
 
     data = httptools.downloadpage(page_url, cookies=False).data
     if 'Not found id' in data:
-        return False, config.get_localized_string(70449) % "hdload"
+        return False, config.get_localized_string(70449) % "HDLoad"
 
     return True, ""
 
@@ -24,6 +24,6 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     logger.info(data)
     url = base64.b64decode(data)
 
-    itemlist.append([".mp4 [hdload]", url])
+    itemlist.append([".mp4 [HDLoad]", url])
 
     return itemlist

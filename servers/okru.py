@@ -4,7 +4,7 @@ import re
 
 from core import httptools
 from core import scrapertools
-from platformcode import logger
+from platformcode import logger, config
 
 
 def test_video_exists(page_url):
@@ -12,9 +12,9 @@ def test_video_exists(page_url):
 
     data = httptools.downloadpage(page_url).data
     if "copyrightsRestricted" in data or "COPYRIGHTS_RESTRICTED" in data:
-        return False, "[Okru] El archivo ha sido eliminado por violación del copyright"
+        return False, config.get_localized_string(70449) % "OKru"
     elif "notFound" in data:
-        return False, "[Okru] El archivo no existe o ha sido eliminado"
+        return False, config.get_localized_string(70449) % "OKru"
 
     return True, ""
 
@@ -28,6 +28,6 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     # URL del vídeo
     for type, url in re.findall(r'\{"name":"([^"]+)","url":"([^"]+)"', data, re.DOTALL):
         url = url.replace("%3B", ";").replace("u0026", "&")
-        video_urls.append([type + " [okru]", url])
+        video_urls.append([type + " [OKru]", url])
 
     return video_urls

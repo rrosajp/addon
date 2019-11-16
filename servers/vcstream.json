@@ -15,7 +15,7 @@
   },
   "free": true,
   "id": "vcstream",
-  "name": "vcstream",
+  "name": "Vidcloud",
   "settings": [
     {
       "default": false,
@@ -42,5 +42,5 @@
       "visible": false
     }
   ],
-  "thumbnail": "http://i.imgur.com/l45Tk0G.png"
+  "thumbnail": "server_vidcloud.png"
 }

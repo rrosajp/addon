@@ -12,7 +12,7 @@ def test_video_exists(page_url):
     if "Page not found" in data or "File was deleted" in data:
         return False, "[vidoza] El archivo no existe o ha sido borrado"
     elif "processing" in data:
-        return False, "[vidoza] El vídeo se está procesando"
+        return False, config.get_localized_string(70449) % "Vidoza"
 
     return True, ""
 
@@ -22,7 +22,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     data = httptools.downloadpage(page_url).data
     video_urls = []
 
-    s = scrapertools.find_single_match(data, 'sourcesCode\s*:\s*(\[\{.*?\}\])')
+    s = scrapertools.find_single_match(data, r'sourcesCode\s*:\s*(\[\{.*?\}\])')
     s = s.replace('src:', '"src":').replace('file:', '"file":').replace('type:', '"type":').replace('label:', '"label":').replace('res:', '"res":')
     try:
         data = jsontools.load(s)
@@ -34,8 +34,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                 if 'res' in enlace: tit += '[%s]' % enlace['res']
                 if tit == '' and 'type' in enlace: tit = enlace['type']
                 if tit == '': tit = '.mp4'
-                
-                video_urls.append(["%s [vidoza]" % tit, url])
+
+                video_urls.append(["%s [Vidoza]" % tit, url])
     except:
         logger.debug('No se detecta json %s' % s)
         pass
