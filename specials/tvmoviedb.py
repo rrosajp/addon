@@ -21,17 +21,6 @@ from platformcode import platformtools
 addon = xbmcaddon.Addon('metadata.themoviedb.org')
 def_lang = addon.getSetting('language')
 
-__perfil__ = config.get_setting('perfil', "tvmoviedb")
-
-# Fijar perfil de color
-perfil = [['0xFFFFE6CC', '0xFFFFCE9C', '0xFF994D00', '0xFFFE2E2E', '0xFF088A08', '0xFFFFD700'],
-          ['0xFFA5F6AF', '0xFF5FDA6D', '0xFF11811E', '0xFFFE2E2E', '0xFF088A08', '0xFFFFD700'],
-          ['0xFF58D3F7', '0xFF2E9AFE', '0xFF2E64FE', '0xFFFE2E2E', '0xFF088A08', '0xFFFFD700']]
-if __perfil__ < 3:
-    color1, color2, color3, color4, color5, color6 = perfil[__perfil__]
-else:
-    color1 = color2 = color3 = color4 = color5 = color6 = ""
-
 langs = ['auto', 'de', 'fr', 'pt', 'it', 'es-MX', 'ca', 'en', 'es']
 langt = langs[config.get_setting('tmdb', "tvmoviedb")]
 if langt == 'auto':
@@ -447,13 +436,13 @@ def listado_tmdb(item):
 
                 if not 'person' in item.search["url"] or 'tv_credits' in item.search["url"]:
                     if new_item.infoLabels['year']:
-                        new_item.title = "%s  (%s) [COLOR %s]%s[/COLOR]" \
-                                         % (new_item.contentTitle, new_item.infoLabels['year'], color6,
-                                            str(new_item.infoLabels['rating']).replace("0.0", ""))
+                        new_item.title = "%s %s %s" \
+                                         % (typo(new_item.contentTitle,'bold'), typo(new_item.infoLabels['year'],'() bold'),
+                                            typo(str(new_item.infoLabels['rating']).replace("0.0", ""),'color kod bold'))
                     else:
-                        new_item.title = "%s  [COLOR %s]%s[/COLOR]" \
-                                         % (new_item.contentTitle, color6,
-                                            new_item.infoLabels['rating'].replace("0.0", ""))
+                        new_item.title = "%s %s" \
+                                         % (typo(new_item.contentTitle,'bold'),
+                                            typo(new_item.infoLabels['rating'].replace("0.0", ""),'color kod bold'))
                 else:
                     # Si es una búsqueda de personas se incluye en el título y fanart una película por la que es conocido
                     known_for = ob_tmdb.results[i].get("known_for")
@@ -928,7 +917,7 @@ def listado_imdb(item):
             datos = datos.strip()
             if datos:
                 new_item.infoLabels['plot'] = scrapertools.htmlclean(datos)
-            new_item.title = title.strip() + '   [COLOR %s](%s)[/COLOR]' % (color6, movie.strip())
+            new_item.title = title.strip() + '   (%s)' % (movie.strip())
             new_item.infoLabels['imdb_id'] = imdb_id
             new_item.search = {'url': 'find/%s' % imdb_id, 'external_source': 'imdb_id', 'language': langt}
             itemlist.append(new_item)
@@ -1210,7 +1199,7 @@ def listado_fa(item):
                 if not new_item.thumbnail.startswith("http"):
                     new_item.thumbnail = "http://m.filmaffinity.com" + new_item.thumbnail
 
-                new_item.title = "   " + title + "  (%s) [COLOR %s]%s[/COLOR]" % (year, color6, rating)
+                new_item.title = "   " + title + "  (%s) %s" % (year, rating)
                 new_item.infoLabels['year'] = year
                 votaciones.append([rating, votos])
                 if rating:
@@ -1239,8 +1228,8 @@ def listado_fa(item):
             if not new_item.thumbnail.startswith("http"):
                 new_item.thumbnail = "http://m.filmaffinity.com" + new_item.thumbnail
 
-            new_item.title = title.replace("(Serie de TV)", "").replace("(TV)", "") + "  (%s) [COLOR %s]%s[/COLOR]" \
-                                                                                      % (year, color6, rating)
+            new_item.title = title.replace("(Serie de TV)", "").replace("(TV)", "") + "  (%s) %s" \
+                                                                                      % (year, rating)
             new_item.contentTitle = re.sub(r'(?i)\(serie de tv\)|\(tv\)|\(c\)', '', title)
             if re.search(r'(?i)serie de tv|\(tv\)', title):
                 new_item.contentType = "tvshow"
@@ -1295,7 +1284,7 @@ def indices_fa(item):
                 new_item.url = url.replace("www.filmaffinity.com", "m.filmaffinity.com")
 
             new_item.thumbnail = thumbnail.replace("mmed", "large")
-            new_item.title = title.strip() + "  [COLOR %s](%s)[/COLOR]" % (color6, info)
+            new_item.title = title.strip() + "  (%s)" % (info)
             itemlist.append(new_item)
 
         next_page = scrapertools.find_single_match(data, '<a href="([^"]+)">&gt;&gt;')
@@ -1791,8 +1780,8 @@ def acciones_fa(item):
                 if re.search(r'(?i)serie de tv|\(tv\)', title):
                     new_item.contentType = "tvshow"
                     new_item.extra = "tv"
-                new_item.title = title.strip() + "  (%s) [COLOR %s]%s[/COLOR]/[COLOR %s]%s[/COLOR]" % (
-                year, color6, rating, color4, mivoto)
+                new_item.title = title.strip() + "  (%s) %s/]%s" % (
+                year, rating, mivoto)
                 new_item.contentTitle = title.strip()
                 itemlist.append(new_item)
     elif item.accion == "listas":
@@ -1809,7 +1798,7 @@ def acciones_fa(item):
                 new_item.url = "http://m.filmaffinity.com%s&orderby=%s" % (url, orderby)
             else:
                 new_item.url = "%s&orderby=%s" % (url, orderby)
-            new_item.title = title + "  [COLOR %s](%s)[/COLOR]" % (color6, content)
+            new_item.title = title + "  (%s)" % (content)
             if imgs:
                 imagenes = scrapertools.find_multiple_matches(imgs, 'data-src="([^"]+)"')
                 from random import randint
@@ -1830,7 +1819,7 @@ def acciones_fa(item):
                 new_item.title = "[COLOR %s]%s[/COLOR] %s" % ("green", u"\u0474".encode('utf-8'), title)
                 new_item.accion = "removeMovieFromList"
             else:
-                new_item.title = "[COLOR %s]%s[/COLOR] %s" % (color4, u"\u04FE".encode('utf-8'), title)
+                new_item.title = "%s %s" % ( u"\u04FE".encode('utf-8'), title)
                 new_item.accion = "addMovieToList"
             itemlist.append(new_item)
         new_item = item.clone(action="newlist", title=config.get_localized_string(70333), )
@@ -2479,7 +2468,7 @@ def detalles_mal(item):
 
     score = scrapertools.find_single_match(data, 'id="myinfo_score".*?selected" value="(\d+)"')
     if score != "0":
-        score = "[COLOR %s]Puntuado:%s" % (color4, score)
+        score = "Puntuado:%s" % (score)
     else:
         score = "Votar"
     if item.login and "Add to My List</span>" in data and config.is_xbmc():
@@ -2492,7 +2481,7 @@ def detalles_mal(item):
         try:
             estado = status[estado]
             itemlist.append(
-                item.clone(title=config.get_localized_string(70322) % (color6, estado, score),
+                item.clone(title=config.get_localized_string(70322) % (estado, score),
                            action="menu_mal",
                            contentTitle=title_mal))
         except:
@@ -2585,9 +2574,9 @@ def videos_mal(item):
             new_item = item.clone(url=url, thumbnail=thumb, action="play", )
             new_item.title = epi + " - " + title.strip()
             if "icon-pay" in info:
-                new_item.title += "  [COLOR %s](Crunchyroll Premium)[/COLOR]" % color6
+                new_item.title += "  (Crunchyroll Premium)"
             if "icon-banned-youtube" in thumb:
-                new_item.title += config.get_localized_string(70360) % color4
+                new_item.title += config.get_localized_string(70360)
             itemlist.append(new_item)
 
         next_page = scrapertools.find_single_match(data, '<a href="([^"]+)" class="link-blue-box">More')
@@ -2700,7 +2689,7 @@ def season_mal(item):
                     title = scrapedtitle + "   %ss (%s)" % (epis, year)
                 infoLabels = {}
                 if score != "N/A":
-                    title += "  [COLOR %s]%s[COLOR]" % (color6, score)
+                    title += "  %s" % (score)
                     infoLabels["rating"] = float(score)
                 infoLabels["plot"] = scrapertools.htmlclean(plot)
                 infoLabels["year"] = year
@@ -2735,7 +2724,7 @@ def season_mal(item):
                 title = scrapedtitle + "   %ss (%s)" % (epis, year)
             infoLabels = {}
             if score != "N/A":
-                title += "  [COLOR %s]%s[COLOR]" % (color6, score)
+                title += "  %s" % (score)
                 infoLabels["rating"] = float(score)
             infoLabels["plot"] = scrapertools.htmlclean(plot)
             infoLabels["year"] = year
@@ -2866,7 +2855,7 @@ def detail_staff(item):
                 url = "https://myanimelist.net%s" % url
                 thumb = thumb.replace("r/46x64/", "")
                 rol = scrapertools.htmlclean(rol)
-                titulo = "%s   [COLOR %s][%s][/COLOR]" % (title, color6, rol)
+                titulo = "%s   [%s]" % (title, rol)
                 itemlist.append(Item(channel=item.channel, action="detalles_mal", url=url,
                                      thumbnail=thumb, fanart=default_fan, title=titulo, contentTitle=title))
 
@@ -2924,7 +2913,7 @@ def busqueda_mal(item):
             title += "  %s eps" % epis
         if rating != "0.00" and rating != "N/A":
             infolabels["rating"] = float(rating)
-            title += "  [COLOR %s]%s[/COLOR]" % (color6, rating)
+            title += "  %s" % (rating)
         itemlist.append(Item(channel=item.channel, title=title, action="detalles_mal", url=url, show=show,
                              thumbnail=thumb, infoLabels=infolabels, contentTitle=contentitle,
                              contentType=contentType, tipo=tipo.lower(), extra=extra))
@@ -2968,9 +2957,9 @@ def info_anidb(item, itemlist, url):
     infoLabels["votes"] = scrapertools.find_single_match(data, 'itemprop="ratingCount">(.*?)</span>')
     thumbnail = scrapertools.find_single_match(data, '<div class="image">.*?src="([^"]+)"')
     if infoLabels:
-        title = config.get_localized_string(70376) % (color6, rating)
+        title = config.get_localized_string(70376) % (rating)
         if re.search(r'(?:subtitle|audio) | language: spanish"', data):
-            title += config.get_localized_string(70377) % color3
+            title += config.get_localized_string(70377)
         itemlist.append(Item(channel=item.channel, title=title, infoLabels=infoLabels, action="",
                              thumbnail=thumbnail, ))
 
@@ -2988,7 +2977,7 @@ def info_anidb(item, itemlist, url):
                 title += "  [%s]" % abrev
             estado = estado.replace("complete", config.get_localized_string(70378)).replace("finished", config.get_localized_string(70379)) \
                 .replace("stalled", config.get_localized_string(70380)).replace("dropped", config.get_localized_string(70381))
-            title += " [COLOR %s](%s)[/COLOR] %s/%s  [%s]" % (color6, estado, epis, epi_total, source)
+            title += " (%s) %s/%s  [%s]" % (estado, epis, epi_total, source)
             itemlist.append(Item(channel=item.channel, title=title, infoLabels=infoLabels, action="",
                                  thumbnail=thumbnail, ))
 
@@ -3093,7 +3082,7 @@ def musica_anime(item):
         if not animes.get(anime):
             animes[anime] = []
             animes[anime].append(
-                Item(channel=item.channel, action=action, title="[COLOR %s][%s][/COLOR]" % (color6, anime.capitalize()),
+                Item(channel=item.channel, action=action, title="[%s]" % (anime.capitalize()),
                      url="",
                      number="0", thumbnail=item.thumbnail, fanart=item.fanart))
         title = "%s - %s" % (number, song)
@@ -3190,14 +3179,14 @@ def items_mal(item):
             title = "[F]"
         else:
             title = "[P]"
-        title += " %s [COLOR %s][%s/%s][/COLOR] (%s)" % (
-        d["anime_title"], color6, d["num_watched_episodes"], d["anime_num_episodes"], d["anime_media_type_string"])
+        title += typo(" %s [%s/%s] (%s)" % (
+        d["anime_title"], d["num_watched_episodes"], d["anime_num_episodes"], d["anime_media_type_string"]),'bold')
         title = title.replace("\\", "")
         contentTitle = d["anime_title"].replace("\\", "")
         thumbnail = d["anime_image_path"].replace("\\", "").replace("r/96x136/", "").replace(".jpg", "l.jpg")
         url = "https://myanimelist.net" + d["anime_url"].replace("\\", "")
         if d["score"] != 0:
-            title += " [COLOR %s]Punt:%s[/COLOR]" % (color4, d["score"])
+            title += typo(" Punt:%s" % (d["score"]),'color kod bold')
         if title.count("(TV)") == 2:
             title = title.replace("] (TV)", "]")
         elif title.count("(Movie)") == 2:
@@ -3231,7 +3220,7 @@ def menu_mal(item):
             title_estado = config.get_localized_string(70388)
             estado = "1"
         else:
-            title_estado = config.get_localized_string(70389) % (color6, status[estado])
+            title_estado = typo(config.get_localized_string(70389) % (status[estado]), 'bold')
     except:
         title_estado = config.get_localized_string(70388)
 
@@ -3247,12 +3236,12 @@ def menu_mal(item):
     for key, value in status.items():
         if not value in title_estado:
             itemlist.append(
-                item.clone(title=config.get_localized_string(70391) % value, action="addlist_mal", value=key,
+                item.clone(title=typo(config.get_localized_string(70391) % value, 'bold'), action="addlist_mal", value=key,
                            estado=value))
 
     for i in range(10, 0, -1):
         if i != int(score):
-            itemlist.append(item.clone(title=config.get_localized_string(70392) % (color6, i), action="addlist_mal",
+            itemlist.append(item.clone(title=typo(config.get_localized_string(70392) % (i), 'bold'), action="addlist_mal",
                                        value=estado, estado=status[estado], score=i))
     return itemlist
 

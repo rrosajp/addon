@@ -52,7 +52,6 @@
       "id": "imdb",
       "type": "list",
       "label": "@70427",
-      "color": "0xFFE0F04B",
       "default": 0,
       "enabled": true,
       "visible": true,
@@ -79,7 +78,6 @@
       "id": "filmaff",
       "type": "list",
       "label": "@70428",
-      "color": "0xFF25AA48",
       "default": 0,
       "enabled": true,
       "visible": true,
@@ -97,7 +95,6 @@
       "id": "usuariofa",
       "type": "text",
       "label": "@70435",
-      "color": "0xFFd50b0b",
       "default": "",
       "enabled": true,
       "visible": true
@@ -106,7 +103,6 @@
       "id": "passfa",
       "type": "text",
       "label": "@70436",
-      "color": "0xFFd50b0b",
       "default": "",
       "enabled": "!eq(-1,'')",
       "hidden": true,
@@ -116,7 +112,6 @@
       "id": "orderfa",
       "type": "list",
       "label": "@70437",
-      "color": "0xFF25AA48",
       "default": 0,
       "enabled": "!eq(-1,'')",
       "visible": true,
@@ -139,7 +134,6 @@
       "id": "usuariomal",
       "type": "text",
       "label": "@70441",
-      "color": "0xFF25AA48",
       "default": "",
       "enabled": true,
       "visible": true
@@ -148,7 +142,6 @@
       "id": "passmal",
       "type": "text",
       "label": "@70442",
-      "color": "0xFF25AA48",
       "default": "",
       "enabled": "!eq(-1,'')",
       "hidden": true,
@@ -158,24 +151,9 @@
       "id": "adult_mal",
       "type": "bool",
       "label": "@70443",
-      "color": "0xFFd50b0b",
       "default": false,
       "enabled": true,
       "visible": true
-    },
-    {
-      "id": "perfil",
-      "type": "list",
-      "label": "@60666",
-      "default": 2,
-      "enabled": true,
-      "visible": true,
-      "lvalues": [
-        "@70444",
-        "@70445",
-        "@70446",
-        "@59992"
-      ]
     }
   ]
 }

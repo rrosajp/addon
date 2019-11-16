@@ -4015,7 +4015,7 @@ msgid "[MAL] Add to your lists/%s"
 msgstr ""
 
 msgctxt "#70322"
-msgid "[MAL] in your list of [COLOR %s]%s[/COLOR] Do you want to change?/%s"
+msgid "[MAL] in your list of %s Do you want to change?/%s"
 msgstr ""
 
 msgctxt "#70323"
@@ -4167,7 +4167,7 @@ msgid "Recommendations MyAnimeList"
 msgstr ""
 
 msgctxt "#70360"
-msgid "  [COLOR %s][Without subs in castellan][/COLOR]"
+msgid "  [Without subs in castellan]"
 msgstr ""
 
 msgctxt "#70361"
@@ -4231,11 +4231,11 @@ msgid "Staff in animes:"
 msgstr ""
 
 msgctxt "#70376"
-msgid "Info in AniDB   [COLOR %s]%s[/COLOR]"
+msgid "Info in AniDB %s"
 msgstr ""
 
 msgctxt "#70377"
-msgid "  - [COLOR %s]Fansubs in spanish:[/COLOR]"
+msgid "  - Fansubs in spanish:"
 msgstr ""
 
 msgctxt "#70378"
@@ -4287,7 +4287,7 @@ msgid ". Available actions:"
 msgstr ""
 
 msgctxt "#70389"
-msgid ". In your list [COLOR %s]%s[/COLOR]"
+msgid ". In your list %s"
 msgstr ""
 
 msgctxt "#70390"
@@ -4299,7 +4299,7 @@ msgid "Add to list %s"
 msgstr ""
 
 msgctxt "#70392"
-msgid "Rate with a [COLOR %s]%s[/ COLOR]"
+msgid "Rate with a %s"
 msgstr ""
 
 msgctxt "#70394"
