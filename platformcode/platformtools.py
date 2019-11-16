@@ -622,7 +622,7 @@ def set_context_commands(item, parent_item):
                                                                     download='season').tourl())))
 
             # Descargar episodio
-            elif item.contentType == 'episode' and item.action in ["findvideos"]:
+            elif item.contentType == 'episode' and item.action in ["findvideos", "play"]:
                 item.contentType == "episode"
                 context_commands.append((config.get_localized_string(60356), "XBMC.RunPlugin(%s?%s)" %
                                             (sys.argv[0], item.clone(channel="downloads", action="save_download",

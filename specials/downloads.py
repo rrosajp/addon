@@ -463,11 +463,11 @@ def sort_method(item):
 
     order_list_calidad = ["BLURAY", "FULLHD", "HD", "480P", "360P", "240P"]
     order_list_calidad = quality_orders[int(config.get_setting("quality", "downloads"))]
-    match_list_calidad = {"BLURAY": ["BR", "BLURAY"],
+    match_list_calidad = {"BLURAY": ["BR", "BLURAY", '4K'],
                           "FULLHD": ["FULLHD", "FULL HD", "1080", "HD1080", "HD 1080", "1080p"],
                           "HD": ["HD", "HD REAL", "HD 720", "720", "HDTV", "720p"],
-                          "480P": ["SD", "480P", '480'],
-                          "360P": ["360P", "360"],
+                          "480P": ["SD", "480P", '480', 'NORMAL'],
+                          "360P": ["360P", "360", 'MOBILE'],
                           "240P": ["240P", "240"]}
 
     value = (get_match_list(item.title, match_list_idimas, order_list_idiomas, ignorecase=True, only_ascii=True).index, \
@@ -626,8 +626,9 @@ def download_from_best_server(item):
 
     progreso.update(100, config.get_localized_string(70183), config.get_localized_string(70181) % len(play_items),
                     config.get_localized_string(70182))
-
-    play_items.sort(key=sort_method)
+                    
+    if config.get_setting("server_reorder", "downloads") == 1:
+        play_items.sort(key=sort_method)
 
     if progreso.iscanceled():
         return {"downloadStatus": STATUS_CODES.canceled}

@@ -17,8 +17,11 @@ def test_video_exists(page_url):
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     logger.info("url=" + page_url)
     video_urls = []
-    
+    quality ={'MOBILE':1,
+              'NORMAL':2,
+              'HD':3}
     data = httptools.downloadpage(page_url).data
+    logger.info('SPEEDVIDEO DATA '+ data)
 
     media_urls = scrapertools.find_multiple_matches(data, r"file:[^']'([^']+)',\s*label:[^\"]\"([^\"]+)\"")
     logger.info("speed video - media urls: %s " % media_urls)
@@ -26,9 +29,10 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         media_url = httptools.downloadpage(media_url, only_headers=True, follow_redirects=False).headers.get("location", "")
 
         if media_url:
-            video_urls.append([label + " " + media_url.rsplit('.', 1)[1] + ' [speedvideo]', media_url])
+            video_urls.append([media_url.split('.')[-1] + ' - ' + label + ' - ' + ' [Speedvideo]', media_url])
     logger.info("speed video - media urls: %s " % video_urls)
-    return video_urls
+
+    return sorted(video_urls, key=lambda x: quality[x[0].split(' - ')[1]])
 
 
 ##,
