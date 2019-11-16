@@ -3,9 +3,8 @@
 # Canale per 'cinemaLibero'
 # ------------------------------------------------------------
 """
-    Questi sono commenti per i beta-tester.
 
-    25 titoli per le novità di qualsiasi sezione.
+    25 titoli per le novità
 
     NON CONTROLLARE LE SEZIONE SPORT - ANIME, HANNO PROBLEMI!!!
     è stata eliminata dall'elenco ma i titoli possono apparire nella ricerca o tra le novità
@@ -31,7 +30,6 @@ headers = [['Referer', host]]
 
 @support.menu
 def mainlist(item):
-    support.log()
 
     film = ['/category/film/',
             ('Novità', ['', 'peliculas', 'update']),
@@ -55,8 +53,6 @@ def mainlist(item):
 
 @support.scrape
 def peliculas(item):
-    support.log()
-    #debug = True
 
     data = httptools.downloadpage(item.url, headers=headers).data
     data = re.sub('\n|\t', ' ', data)
@@ -91,25 +87,21 @@ def peliculas(item):
 
         dataBlock = httptools.downloadpage(item.url, headers=headers).data
         genere = scrapertoolsV2.find_single_match(dataBlock, r'rel="category tag">([a-zA-Z0-9]+).+?<')
-        support.log('GENERE :', genere)
 
         if genere.lower() in str(GENERI).lower():
-            support.log("E' un film: ", genere, ' -> ' , GENERI)
             item.contentType = 'movie'
             action = 'findvideos'
             if item.args == 'update':
                 item.title = item.title.replace('-',' ')
         elif genere.lower() == 'serie':
-            support.log("E' una serie: ", genere)
             item.action = 'episodios'
             item.contentType = 'tvshow'
         elif genere.lower() == 'anime':
-            support.log("E' una anime: ", genere)
             blockAnime = scrapertoolsV2.find_single_match(dataBlock, r'<div id="container" class="container">(.+?)<div style="margin-left')
             if 'stagione'  in blockAnime.lower() or 'episodio' in blockAnime.lower() or 'saga' in blockAnime.lower():
                 anime = True
                 item.action = 'episodios'
-                item.contentType = 'tvshow'                          
+                item.contentType = 'tvshow'
             else:
                 item.contentType = 'movie'
                 item.action = 'findvideos'
@@ -121,12 +113,11 @@ def peliculas(item):
         return item
 
     patronNext = r'<a class="next page-numbers".*?href="([^"]+)">'
-    debug = True
+    #debug = True
     return locals()
 
 @support.scrape
 def episodios(item):
-    support.log()
 
     if item.args == 'anime':
         support.log("Anime :", item)
@@ -145,9 +136,9 @@ def episodios(item):
     #debug = True
     return locals()
 
+
 @support.scrape
 def genres(item):
-    support.log()
 
     action='peliculas'
     patron_block=r'<div id="bordobar" class="dropdown-menu(?P<block>.*?)</li>'
@@ -200,5 +191,4 @@ def findvideos(item):
     if item.contentType == 'movie' and item.args != 'anime':
         return support.server(item)
     else:
-        support.log("Anime: ", item.url)
         return support.server(item, data= item.url)
