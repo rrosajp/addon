@@ -162,7 +162,7 @@ def findvideos(item):
         if item.contentType == 'movie':
             download.url = downPrefix + id
         else:
-            download.url = downPrefix + id + 'S' + season + '-' + episode
+            download.url = downPrefix + id + '-S' + season + '-' + episode
         itemlist.append(download)
     else:
         # google drive...
