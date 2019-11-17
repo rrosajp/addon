@@ -126,7 +126,7 @@ def episodios(item):
                      show=item.show,
                      quality=item.quality,
                      contentType='episode',
-                     folder=False,
+                     folder=True,
                      args={'id': id, 'season': season, 'episode': episode}))
 
     support.videolibrary(itemlist, item)
