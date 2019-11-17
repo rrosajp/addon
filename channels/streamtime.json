@@ -5,7 +5,7 @@
 	"active": true,
 	"adult": false,
 	"thumbnail": "streamtime.png",
-	"banner": "",
+	"banner": "streamtime.png",
 	"categories": ["tvshow", "movie"],
 	"settings": []
 }

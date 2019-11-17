@@ -26,17 +26,18 @@ def mainlist(item):
 
 @support.scrape
 def peliculas(item):
-    patron = """tgme_widget_message_photo_wrap blured.*?image:url\("(?P<thumbnail>[^"]+).*?//telegram\.org/img/emoji/40/(?:F09F8EAC|F09F8EA5)\.png"\)">.*?</i>\s?(?:<b>)?(?P<title>[^<]+).*?(?:Audio(?:</b>)?: (?P<lang>.*?<br>))?.*?Anno(?:</b>)?: (?P<year>[0-9]{4}).*?(?:<b>Stream</b>|Risoluzione|<b>Tipo</b>|Tipo|Stream): (?P<quality>[^<]+).*?tgme_widget_message_inline_button url_button" href="(?P<url>[^"]+)"""
+    patron = """tgme_widget_message_photo_wrap.*?image:url\("(?P<thumbnail>[^"]+).*?//telegram\.org/img/emoji/40/(?:F09F8EAC|F09F8EA5)\.png"\)">.*?</i>\s?(?:<b>)?(?P<title>[^<]+).*?(?:Audio(?:</b>)?: (?P<lang>.*?<br>))?.*?Anno(?:</b>)?: (?P<year>[0-9]{4}).*?(?:<b>Stream</b>|Risoluzione|<b>Tipo</b>|Tipo|Stream): (?P<quality>[^<]+).*?tgme_widget_message_inline_button url_button" href="(?P<url>[^"]+)"""
     def itemlistHook(itemlist):
         retItemlist = []
         # filtro per tipo
         for i in itemlist:
-            if item.contentType == 'movie':
-                if '/Film/' in i.url or 'Stream-' in i.url:
-                    retItemlist.append(i)
-            else:
-                if '/SerieTv/' in i.url:
-                    retItemlist.append(i)
+            if '/Film/' in i.url or 'Stream-' in i.url:
+                i.contentType = 'movie'
+            if '/SerieTv/' in i.url:
+                i.contentType = 'tvshow'
+                i.action = 'episodios'
+            if item.contentType == i.contentType or item.contentType == 'list':  # list = ricerca globale quando c'è un solo tipo di risultato
+                retItemlist.append(i)
         # rimuovo duplicati
         if item.contentType != 'movie' and not item.cercaSerie:
             nonDupl = []
@@ -60,10 +61,10 @@ def peliculas(item):
             return itemlist
 
     # necessario per togliere html vario dal titolo (operazione fatta solo su fulltitle)
-    def itemHook(item):
-        item.contentTitle = item.fulltitle
-        item.show = item.fulltitle
-        return item
+    # def itemHook(item):
+    #     item.contentTitle = item.fulltitle
+    #     item.show = item.fulltitle
+    #     return item
 
     if item.contentType == 'tvshow':
         action = 'episodios'
@@ -97,12 +98,15 @@ def newest(categoria):
 def episodios(item):
     url = item.url
     item.cercaSerie = True
-    itemlist = search(item, item.fulltitle)
+    itemlist = search(item, item.fulltitle.replace("'", ""))
     stagioni = {}
 
     for i in itemlist[:-1]:
         spl1 = i.url.split('-')
-        st = spl1[-2]
+        if len(spl1) > 3:
+            st = spl1[1] + '-' + spl1[2]
+        else:
+            st = spl1[-2]
         nEp = int(spl1[-1])
         if st not in stagioni.keys():
             stagioni[st] = nEp
@@ -110,12 +114,14 @@ def episodios(item):
             stagioni[st] = nEp
 
     itemlist = []
-    domain, id, season, episode = scrapertoolsV2.find_single_match(url, r'(https?://[a-z0-9.-]+).*?/([^-/]+)-S([0-9]+)-([0-9]+)$')
-    for st in stagioni.keys():
+    domain, id = scrapertoolsV2.find_single_match(url, r'(https?://[a-z0-9.-]+)/[^/]+/([^-/]+)')
+    for st in sorted(stagioni.keys()):
         season = st[1:]
         episode = stagioni[st]
         for n in range(1, int(episode)):
             url = domain + '/play_s.php?s=' + id + '-S' + season + '&e=' + str(n)
+            if '-' in season:  # vedi https://stpgs.ml/SerieTv/Atypical-S01-8-8.html
+                season = season.split('-')[0]
             itemlist.append(
                 Item(channel=item.channel,
                      action="findvideos",
