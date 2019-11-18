@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per vedohd
+# Canale per netfreex
 # ------------------------------------------------------------
 
-from core import scrapertoolsV2, httptools, support
+from core import support
 from core.item import Item
 from platformcode import logger, config
-from specials import autoplay
 
 __channel__ = "netfreex"
 host = config.get_channel_url(__channel__)
