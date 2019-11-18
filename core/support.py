@@ -107,35 +107,36 @@ def search(channel, item, texto):
 
 
 def dbg():
-    import web_pdb;
-    if not web_pdb.WebPdb.active_instance:
-        import webbrowser
-        webbrowser.open('http://127.0.0.1:5555')
-    web_pdb.set_trace()
-
+    if config.dev_mode():
+        import web_pdb;
+        if not web_pdb.WebPdb.active_instance:
+            import webbrowser
+            webbrowser.open('http://127.0.0.1:5555')
+        web_pdb.set_trace()
 
 
 def regexDbg(item, patron, headers, data=''):
-    import json, urllib2, webbrowser
-    url = 'https://regex101.com'
+    if config.dev_mode():
+        import json, urllib2, webbrowser
+        url = 'https://regex101.com'
 
-    if not data:
-        html = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
-        html = re.sub('\n|\t', ' ', html)
-    else:
-        html = data
-    headers = {'content-type': 'application/json'}
-    data = {
-        'regex': patron,
-        'flags': 'gm',
-        'testString': html,
-        'delimiter': '"""',
-        'flavor': 'python'
-    }
-    r = urllib2.Request(url + '/api/regex', json.dumps(data, encoding='latin1'), headers=headers)
-    r = urllib2.urlopen(r).read()
-    permaLink = json.loads(r)['permalinkFragment']
-    webbrowser.open(url + "/r/" + permaLink)
+        if not data:
+            html = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
+            html = re.sub('\n|\t', ' ', html)
+        else:
+            html = data
+        headers = {'content-type': 'application/json'}
+        data = {
+            'regex': patron,
+            'flags': 'gm',
+            'testString': html,
+            'delimiter': '"""',
+            'flavor': 'python'
+        }
+        r = urllib2.Request(url + '/api/regex', json.dumps(data, encoding='latin1'), headers=headers)
+        r = urllib2.urlopen(r).read()
+        permaLink = json.loads(r)['permalinkFragment']
+        webbrowser.open(url + "/r/" + permaLink)
 
 
 def scrape2(item, patron = '', listGroups = [], headers="", blacklist="", data="", patronBlock="",
