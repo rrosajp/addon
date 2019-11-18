@@ -713,42 +713,42 @@ def typo(string, typography=''):
     # If there are no attributes, it applies the default ones
     attribute = ['[]','()','{}','submenu','color','bold','italic','_','--','[B]','[I]','[COLOR]']
 
-    movie_word_list = ['film', 'serie', 'tv', 'anime', 'cinema', 'sala']
-    search_word_list = ['cerca']
-    categories_word_list = ['genere', 'categoria', 'categorie', 'ordine', 'lettera', 'anno', 'alfabetico', 'a-z', 'menu']
+    # movie_word_list = ['film', 'serie', 'tv', 'anime', 'cinema', 'sala']
+    # search_word_list = ['cerca']
+    # categories_word_list = ['genere', 'categoria', 'categorie', 'ordine', 'lettera', 'anno', 'alfabetico', 'a-z', 'menu']
 
-    if not any(word in string for word in attribute):
-        if any(word in string.lower() for word in search_word_list):
-            string = '[COLOR '+ kod_color +']' + string + '[/COLOR]'
-        elif any(word in string.lower() for word in categories_word_list):
-            string = ' > ' + string
-        elif any(word in string.lower() for word in movie_word_list):
-            string = '[B]' + string + '[/B]'
+    # if not any(word in string for word in attribute):
+    #     if any(word in string.lower() for word in search_word_list):
+    #         string = '[COLOR '+ kod_color +']' + string + '[/COLOR]'
+        # elif any(word in string.lower() for word in categories_word_list):
+        #     string = ' > ' + string
+        # elif any(word in string.lower() for word in movie_word_list):
+        #     string = '[B]' + string + '[/B]'
 
     # Otherwise it uses the typographical attributes of the string
-    else:
-        if '[]' in string:
-            string = '[' + re.sub(r'\s\[\]','',string) + ']'
-        if '()' in string:
-            string = '(' + re.sub(r'\s\(\)','',string) + ')'
-        if '{}' in string:
-            string = '{' + re.sub(r'\s\{\}','',string) + '}'
-        if 'submenu' in string:
-            string = u"\u2022\u2022 ".encode('utf-8') + re.sub(r'\ssubmenu','',string)
-        if 'color' in string:
-            color = scrapertoolsV2.find_single_match(string,'color ([a-z]+)')
-            if color == 'kod' or '': color = kod_color
-            string = '[COLOR '+ color +']' + re.sub(r'\scolor\s([a-z]+)','',string) + '[/COLOR]'
-        if 'bold' in string:
-            string = '[B]' + re.sub(r'\sbold','',string) + '[/B]'
-        if 'italic' in string:
-            string = '[I]' + re.sub(r'\sitalic','',string) + '[/I]'
-        if '_' in string:
-            string = ' ' + re.sub(r'\s_','',string)
-        if '--' in string:
-            string = ' - ' + re.sub(r'\s--','',string)
-        if 'bullet' in string:
-            string = '[B]' + u"\u2022".encode('utf-8') + '[/B] ' + re.sub(r'\sbullet','',string)
+    # else:
+    if '[]' in string:
+        string = '[' + re.sub(r'\s\[\]','',string) + ']'
+    if '()' in string:
+        string = '(' + re.sub(r'\s\(\)','',string) + ')'
+    if '{}' in string:
+        string = '{' + re.sub(r'\s\{\}','',string) + '}'
+    if 'submenu' in string:
+        string = u"\u2022\u2022 ".encode('utf-8') + re.sub(r'\ssubmenu','',string)
+    if 'color' in string:
+        color = scrapertoolsV2.find_single_match(string,'color ([a-z]+)')
+        if color == 'kod' or '': color = kod_color
+        string = '[COLOR '+ color +']' + re.sub(r'\scolor\s([a-z]+)','',string) + '[/COLOR]'
+    if 'bold' in string:
+        string = '[B]' + re.sub(r'\sbold','',string) + '[/B]'
+    if 'italic' in string:
+        string = '[I]' + re.sub(r'\sitalic','',string) + '[/I]'
+    if '_' in string:
+        string = ' ' + re.sub(r'\s_','',string)
+    if '--' in string:
+        string = ' - ' + re.sub(r'\s--','',string)
+    if 'bullet' in string:
+        string = '[B]' + u"\u2022".encode('utf-8') + '[/B] ' + re.sub(r'\sbullet','',string)
 
     return string
 

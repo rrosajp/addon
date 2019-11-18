@@ -28,7 +28,6 @@ FOLDER_TVSHOWS = config.get_setting("folder_tvshows")
 TITLE_FILE = "[COLOR %s][%i%%][/COLOR] %s"
 TITLE_TVSHOW = "[COLOR %s][%i%%][/COLOR] %s [%s]"
 
-
 def mainlist(item):
     logger.info()
     itemlist = []
@@ -626,7 +625,7 @@ def download_from_best_server(item):
 
     progreso.update(100, config.get_localized_string(70183), config.get_localized_string(70181) % len(play_items),
                     config.get_localized_string(70182))
-                    
+
     if config.get_setting("server_reorder", "downloads") == 1:
         play_items.sort(key=sort_method)
 
@@ -634,7 +633,18 @@ def download_from_best_server(item):
         return {"downloadStatus": STATUS_CODES.canceled}
 
     progreso.close()
+    # if not config.get_setting("server_speed", "downloads"):
+    #     select = platformtools.dialog_select(config.get_localized_string(70192), [s.title for s in play_items])
 
+    #     play_items[select] = item.clone(**play_items[select].__dict__)
+    #     play_items[select].contentAction = play_items[select].action
+    #     play_items[select].infoLabels = item.infoLabels
+    #     result = download_from_server(play_items[select])
+
+    #     if progreso.iscanceled():
+    #         result["downloadStatus"] = STATUS_CODES.canceled
+
+    # else:
     # Recorremos el listado de servers, hasta encontrar uno que funcione
     for play_item in play_items:
         play_item = item.clone(**play_item.__dict__)
@@ -710,7 +720,6 @@ def start_download(item):
     # No tenemos server, necesitamos buscar el mejor
     else:
         ret = download_from_best_server(item)
-        update_json(item.path, ret)
         return ret["downloadStatus"]
 
 
@@ -830,7 +839,7 @@ def save_download(item):
     item.contentAction = item.from_action if item.from_action else item.action
 
     if item.contentType in ["tvshow", "episode", "season"]:
-        if 'download' in item and config.get_setting('show_seasons',item.channel) == False:
+        if ('download' in item and item.channel != 'community') or (item.channel == 'community' and config.get_setting('show_seasons',item.channel) == False):
             heading = config.get_localized_string(70594) # <- Enter the season number
             item.dlseason = platformtools.dialog_numeric(0, heading, '')
             if item.dlseason:

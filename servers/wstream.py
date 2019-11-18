@@ -24,10 +24,13 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
     if '/streaming.php' in page_url:
         code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers['location'].split('/')[-1]
+        logger.info('WCODE='+code)
         page_url = 'https://wstream.video/video.php?file_code=' + code
 
     code = page_url.split('=')[-1]
-    post = urllib.urlencode({'videox': code})
+    data = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).data
+    ID = scrapertools.find_single_match(data, r'''input\D*id=(?:'|")([^'"]+)(?:'|")''')
+    post = urllib.urlencode({ID: code})
 
     data = httptools.downloadpage(page_url, headers=headers, post=post, follow_redirects=True).data
     headers.append(['Referer', page_url])
