@@ -32,19 +32,20 @@ list_quality = ['default']
 def mainlist(item):
 
     Tvshow = [
-        ('Aggiornamenti', ['', 'peliculas', '', 'tvshow']),
-        ('Per Lettera', ['/elenco-serie-tv/', 'genres', 'genres'])
+        ('Aggiornamenti', ['', 'peliculas', '', 'update']),
+        ('Per Lettera {TV}', ['/elenco-serie-tv/', 'genres', 'genres']),
+        ('Cerca... {TV} bold', ['','search'])
     ]
 
-    search = ''
-    
+    # search = ''
+
     return locals()
 
 
 @support.scrape
 def peliculas(item):
     support.log(item)
-    #support.dbg()
+    # support.dbg()
     deflang = 'Sub-ITA'
 
     action = 'findvideos'
@@ -55,10 +56,10 @@ def peliculas(item):
         action = 'episodios'
     elif item.args == 'search':
         patronBlock = r'</h1> </header>(?P<block>.*?)</main>'
-        patron = r'(?:<img src="(?P<thumb>[^"]+)"[^>]+>)?[^>]+>[^>]+>[^>]+>[^>]+>[^>]+><a href="(?P<url>[^"]+)"[^>]+>(?:(?P<title>.+?)[ ](?P<episode>[\d&#;\d]+\d+|\d+..\d+)(?: \([a-zA-Z\s]+\) )(?:s\d+e\d+)?[ ]?(?:[&#\d;|.{3}]+)(?P<title2>[^&#\d;|^.{3}]+)(?:|.+?))<'
+        patronMenu = r'(?:<img src="(?P<thumb>[^"]+)"[^>]+>)?[^>]+>[^>]+>[^>]+>[^>]+>[^>]+><a href="(?P<url>[^"]+)"[^>]+>(?:(?P<title>.+?)[ ](?P<episode>[\d&#;\d]+\d+|\d+..\d+)(?: \([a-zA-Z\s]+\) )(?:s\d+e\d+)?[ ]?(?:[&#\d;|.{3}]+)(?P<title2>[^&#\d;|^.{3}]+)(?:|.+?))<'
     else:
         patron = r'<div class="featured-thumb"> <a href="(?P<url>[^"]+)" title="(?:(?P<title>.+?)[ ]?(?P<episode>\d+&#215;\d+).+?&#8220;(?P<title2>.+?)&#8221;).+?">'
-        patronBlock = r'<main id="main" class="site-main" role="main">(?P<block>.*?)<nav class="navigation pagination" role="navigation">'
+        patronBlock = r'<main id="main"[^>]+>(?P<block>.*?)<div id="secondary'
 
     patronNext = '<a class="next page-numbers" href="(.*?)">Successivi'
 
