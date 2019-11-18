@@ -530,6 +530,15 @@ def dooplay_search_vars(item, blacklist):
 
     return locals()
 
+
+def dooplay_menu(item, type):
+    patron = '<a href="(?P<url>[^"#]+)"(?: title="[^"]+")?>(?P<title>[a-zA-Z0-9]+)'
+    patronBlock = '<nav class="' + item.args + '">(?P<block>.*?)</nav>'
+    action = 'peliculas'
+
+    return locals()
+
+
 def swzz_get_url(item):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:59.0) Gecko/20100101 Firefox/59.0'}
 
@@ -905,6 +914,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
     verifiedItemlist = []
     for videoitem in itemlist:
         if not videoitem.server:
+            videoitem.url = unshortenit.unshorten(videoitem.url)[0]
             findS = servertools.findvideos(videoitem.url)
             if findS:
                 findS = findS[0]
