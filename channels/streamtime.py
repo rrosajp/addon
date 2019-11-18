@@ -164,12 +164,12 @@ def findvideos(item):
                  thumbnail=item.thumbnail,
                  quality=item.quality,
                  contentType=item.contentType))
-        download = itemlist[0].clone()
-        if item.contentType == 'movie':
-            download.url = downPrefix + id
-        else:
-            download.url = downPrefix + id + '-S' + season + '-' + episode
-        itemlist.append(download)
+        # download = itemlist[0].clone()
+        # if item.contentType == 'movie':
+        #     download.url = downPrefix + id
+        # else:
+        #     download.url = downPrefix + id + '-S' + season + '-' + episode
+        # itemlist.append(download)
     else:
         # google drive...
         pass
