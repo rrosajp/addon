@@ -5668,3 +5668,7 @@ msgstr ""
 msgctxt "#70737"
 msgid "[B]SIDE MENU[/B]"
 msgstr ""
+
+msgctxt "#70738"
+msgid "Ready channels %d/%d"
+msgstr ""
