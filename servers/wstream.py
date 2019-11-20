@@ -48,9 +48,9 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         for key in keys:
             video_urls.append(['%s [%sp]' % (key['type'].replace('video/',''), key['label']), key['src'].replace('https','http') + '|' + _headers])
     else:
-        media_urls = scrapertools.find_multiple_matches(data, '(http.*?\.mp4)')
+        media_urls = scrapertools.find_multiple_matches(data, r'(http.*?\.mp4)')
 
         for media_url in media_urls:
             video_urls.append(['video' + " mp4 [wstream] ", media_url + '|' + _headers])
-
+    video_urls.sort(key=lambda x: x[0])
     return video_urls

@@ -13,7 +13,7 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url).data
     if "We're Sorry" in data:
-        return False, config.get_localized_string(70292) % "vcstream"
+        return False, config.get_localized_string(70292) % "Vidcloud"
 
     return True, ""
 
@@ -50,7 +50,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             ext = "mp4"
             if "m3u8" in media_url:
                 ext = "m3u8"
-            video_urls.append(["%s [vcstream]" % ext, media_url])
+            video_urls.append(["%s [Vidcloud" % ext, media_url])
 
     for video_url in video_urls:
         logger.info("%s - %s" % (video_url[0], video_url[1]))

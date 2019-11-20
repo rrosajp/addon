@@ -11,7 +11,7 @@
   },
   "free": true,
   "id": "speedvideo",
-  "name": "speedvideo",
+  "name": "Speedvideo",
   "settings": [
     {
       "default": false,
@@ -37,5 +37,6 @@
       "type": "list",
       "visible": false
     }
-  ]
+  ],
+  "thumbnail": "server_speedvideo.png"
 }

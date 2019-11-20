@@ -11,7 +11,7 @@
   },
   "free": true,
   "id": "cloudvideo",
-  "name": "cloudvideo",
+  "name": "CloudVideo",
   "settings": [
     {
       "default": false,
@@ -38,5 +38,5 @@
       "visible": false
     }
   ],
-  "thumbnail": "https://cloudvideo.tv/static/img/logo5.png"
+  "thumbnail": "server_cloudvideo.png"
 }

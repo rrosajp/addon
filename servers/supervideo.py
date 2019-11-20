@@ -6,7 +6,7 @@ from lib import jsunpack
 from platformcode import config, logger
 import ast
 
-
+ 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
 
@@ -21,6 +21,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     logger.info("url=" + page_url)
     video_urls = []
     data = httptools.downloadpage(page_url).data
+    logger.info('SUPER DATA= '+data)
     code_data = scrapertoolsV2.find_single_match(data, "<script type='text/javascript'>(eval.*)")
     if code_data:
         code = jsunpack.unpack(code_data)
@@ -34,7 +35,12 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             quality = 'auto' if n==0 else lQuality[n-1]
             video_urls.append(['.' + source.split('.')[-1] + '(' + quality + ') [SuperVideo]', source])
     else:
-        matches = scrapertoolsV2.find_multiple_matches(data, r'src:\s*"([^"]+)",\s*type:\s*"[^"]+"\s*, res:\s(\d+)')
+        logger.info('ELSE!')
+        matches = scrapertoolsV2.find_multiple_matches(data, r'src:\s*"([^"]+)",\s*type:\s*"[^"]+"(?:\s*, res:\s(\d+))?')
         for url, quality in matches:
-            video_urls.append(['mp4 [' + quality + ']', url])
+            if url.split('.')[-1] != 'm3u8':
+                video_urls.append([url.split('.')[-1] + ' [' + quality + ']', url])
+            else:
+                video_urls.append([url.split('.')[-1], url])
+    video_urls.sort(key=lambda x: x[0].split()[-1])
     return video_urls

@@ -13,7 +13,7 @@ def test_video_exists(page_url):
     return True, ""
     data = httptools.downloadpage(page_url).data
     if "File was deleted" in data or "Page Cannot Be Found" in data:
-        return False, config.get_localized_string(70449) % "Akstream"
+        return False, config.get_localized_string(70449) % "Akvideo"
     return True, ""
 
 
@@ -36,10 +36,9 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     i = 0
     for media_url in matches:
         # URL del vídeo
-        video_urls.append([vres[i] + " mp4 [Akstream] ", media_url + '|' + _headers])
+        video_urls.append([vres[i] + " mp4 [Akvideo] ", media_url + '|' + _headers])
         i = i + 1
 
     for video_url in video_urls:
         logger.info(" %s - %s" % (video_url[0], video_url[1]))
-
-    return video_urls
+    return sorted(video_urls, key=lambda x: x[0].split('x')[1])

@@ -15,7 +15,7 @@
   },
   "free": true,
   "id": "akstream",
-  "name": "akstream",
+  "name": "Akvideo",
   "settings": [
     {
       "default": false,
@@ -41,5 +41,6 @@
       "type": "list",
       "visible": false
     }
-  ]
+  ],
+  "thumbnail": "server_akvideo.png"
 }
