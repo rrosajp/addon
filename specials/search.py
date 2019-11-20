@@ -18,7 +18,8 @@ from platformcode import config, logger
 from platformcode import platformtools
 from core.support import typo
 import cPickle, shutil
-global_lock = threading.Lock()
+from multiprocessing import Process
+multi = 'process'
 
 addon = xbmcaddon.Addon('metadata.themoviedb.org')
 def_lang = addon.getSetting('language')
@@ -573,10 +574,15 @@ def do_search(item, categories=None):
                 logger.info("Búsqueda cancelada")
                 return itemlist
             if multithread:
-                t = Thread(target=channel_search, args=[search_results, channel_parameters, tecleado],
-                           name=channel_parameters["title"])
-                t.setDaemon(True)
-                t.start()
+                if multi == 'threads':
+                    t = Thread(target=channel_search, args=[search_results, channel_parameters, tecleado],
+                               name=channel_parameters["title"])
+                    t.setDaemon(True)
+                    t.start()
+                else:
+                    t = Process(target=channel_search, args=[search_results, channel_parameters, tecleado],
+                               name=channel_parameters["title"])
+                    t.start()
                 threads.append(t)
             # Modo single Thread
             else:
@@ -606,19 +612,26 @@ def search_progress(threads):
     import math
     progreso = platformtools.dialog_progress_bg(config.get_localized_string(20000), "")
 
-    pendent = [a for a in threads if a.isAlive()]
+    if multi == 'threads':
+        pendent = [a for a in threads if a.isAlive()]
+    else:
+        pendent = [a for a in threads if a.is_alive()]
+
     if len(pendent) > 0: t = float(100) / len(pendent)
     while len(pendent) > 0:
         index = (len(threads) - len(pendent)) + 1
         percentage = int(math.ceil(index * t))
 
-        list_pendent_names = [a.getName() for a in pendent]
+        list_pendent_names = ['test' for a in pendent]
         mensaje = config.get_localized_string(70282) % (", ".join(list_pendent_names))
         progreso.update(percentage,
                         config.get_localized_string(60521) % (len(threads) - len(pendent) + 1, len(threads)),
                         mensaje)
         time.sleep(0.5)
-        pendent = [a for a in threads if a.isAlive()]
+        if multi == 'threads':
+            pendent = [a for a in threads if a.isAlive()]
+        else:
+            pendent = [a for a in threads if a.is_alive()]
     progreso.close()
     with open(os.path.join(res_dir, 'done'), 'w') as f:
         f.write('1')
