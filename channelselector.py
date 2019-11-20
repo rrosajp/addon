@@ -274,7 +274,10 @@ def get_thumb(thumb_name, view="thumb_", auto=False):
         if config.get_setting('enable_custom_theme') and config.get_setting('custom_theme') and os.path.isfile(config.get_setting('custom_theme') + view + thumb_name):
             media_path = config.get_setting('custom_theme')
 
-        return os.path.join(media_path, view + thumb_name)
+        thumbnail = os.path.join(media_path, view + thumb_name)
+        if 'http' in thumbnail:
+            thumbnail = thumbnail.replace('\\','/')
+        return thumbnail
 
 
 def set_channel_info(parameters):
