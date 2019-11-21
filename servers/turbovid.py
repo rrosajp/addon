@@ -11,12 +11,12 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url).data
     if "Not Found" in data or "File Does not Exist" in data:
-        return False, "[turbovid.me] El fichero no existe o ha sido borrado"
+        return False, config.get_localized_string(70449) % "Turbovid"
     return True, ""
 
 
-def get_video_url(page_url, premium=False, user="", password="", video_password="", server='turbovid'):
-    
+def get_video_url(page_url, premium=False, user="", password="", video_password="", server='Turbovid'):
+
     logger.info("(turbovid page_url='%s')" % page_url)
     video_urls = []
     data = httptools.downloadpage(page_url).data
@@ -28,8 +28,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     time.sleep(6)
     data = httptools.downloadpage(page_url_post, post=post).data
     logger.info("(data page_url='%s')" % data)
-    sources = scrapertools.find_single_match(data, 'sources: \[([^\]]+)\]')
-    
+    sources = scrapertools.find_single_match(data, r'sources: \[([^\]]+)\]')
+
     for media_url in scrapertools.find_multiple_matches(sources, '"([^"]+)"'):
         media_url = media_url.replace('https:', 'http:')
         ext = scrapertools.get_filename_from_url(media_url)[-4:]
