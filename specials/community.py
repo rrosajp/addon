@@ -70,6 +70,7 @@ def show_channels(item):
         json_url = jsontools.load(file_url)
 
         thumbnail = relative('thumbnail', json_url, path)
+        if not thumbnail: thumbnail = item.thumbnail
         fanart = relative('fanart', json_url, path)
         plot = json_url['plot'] if json_url.has_key('plot') else ''
 
@@ -444,7 +445,7 @@ def get_seasons(item):
     if inspect.stack()[1][3] in ['add_tvshow', "get_seasons"] or show_seasons == False:
         it = []
         for item in itemlist:
-            if os.path.isfile(item.url): it += episodios(item)
+            if os.path.isfile(item.url) or requests.head(item.url): it += episodios(item)
         itemlist = it
 
         if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest']:
@@ -471,7 +472,6 @@ def get_seasons(item):
 
 
 def episodios(item):
-    # support.dbg()
     support.log()
     itm = item
 
@@ -623,8 +623,8 @@ def add_channel(item):
         platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(70682))
         return
     channel_to_add['channel_name'] = json_file['channel_name']
-    channel_to_add['thumbnail'] = json_file['thumbnail']
-    channel_to_add['fanart'] = json_file['fanart']
+    if json_file.has_key('thumbnail'): channel_to_add['thumbnail'] = json_file['thumbnail']
+    if json_file.has_key('fanart'): channel_to_add['fanart'] = json_file['fanart']
     path = os.path.join(config.get_data_path(), 'community_channels.json')
 
     community_json = open(path, "r")
