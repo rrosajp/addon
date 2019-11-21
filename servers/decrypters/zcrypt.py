@@ -49,7 +49,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                 elif 'vcrypt.net' in url:
                     if 'myfoldersakstream.php' in url or '/verys/' in url:
                         continue
-                    else:                                
+                    else:
                         from lib import unshortenit
                         data, status = unshortenit.unshorten(url)
                         logger.info("Data - Status zcrypt vcrypt.net: [%s] [%s] " %(data, status)) 
@@ -63,9 +63,10 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                         data = scrapertoolsV2.find_single_match(idata, 'action="(?:[^/]+.*?/[^/]+/([a-zA-Z0-9_]+))">')
                     from lib import unshortenit
                     data, status = unshortenit.unshorten(url)
-                    logger.info("Data - Status zcrypt linkup : [%s] [%s] " %(data, status))
+                    # logger.info("Data - Status zcrypt linkup : [%s] [%s] " %(data, status))
+                    data = httptools.downloadpage(data, follow_redirect=True).url
                     if '/speedx/' in data: # aggiunto per server speedvideo
-                       data = data.replace('http://linkup.pro/speedx', 'http://speedvideo.net')
+                        data = data.replace('http://linkup.pro/speedx', 'http://speedvideo.net')
                     # fix by greko fine
                 else:
                     data = ""
@@ -90,7 +91,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     for url in matches:
         if url not in encontrados:
             if 'https://rapidcrypt.net/open/' in url or 'https://rapidcrypt.net/verys/' in url:
-                continue            
+                continue
             logger.info("  url=" + url)
             encontrados.add(url)
 

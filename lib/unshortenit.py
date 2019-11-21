@@ -37,6 +37,7 @@ class UnshortenIt(object):
     _rapidcrypt_regex = r'rapidcrypt\.net'
     _cryptmango_regex = r'cryptmango|xshield\.net'
     _vcrypt_regex = r'vcrypt\.net'
+    _linkup_regex = r'linkup\.pro'
 
     _maxretries = 5
 
@@ -78,6 +79,8 @@ class UnshortenIt(object):
             return self._unshorten_cryptmango(uri)
         if re.search(self._vcrypt_regex, uri, re.IGNORECASE):
             return self._unshorten_vcrypt(uri)
+        if re.search(self._linkup_regex, uri, re.IGNORECASE):
+            return self._unshorten_linkup(uri)
 
         return uri, 0
 
@@ -513,7 +516,15 @@ class UnshortenIt(object):
             return uri, r.code if r else 200
         except Exception as e:
             return uri, str(e)
-            
+
+
+    def _unshorten_linkup(self, uri):
+        try:
+            r = httptools.downloadpage(uri, follow_redirect=True, timeout=self._timeout, cookies=False)
+            return r.url, r.code
+
+        except Exception as e:
+            return uri, str(e)
 
 def unwrap_30x_only(uri, timeout=10):
     unshortener = UnshortenIt()
