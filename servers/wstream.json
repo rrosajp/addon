@@ -7,7 +7,7 @@
     "find_videos": {
         "patterns": [
             {
-                "pattern": "wstream\\.video/?.*?(?<!api)(?:=|/)([a-z0-9A-Z]+)(?:[^/_.a-z0-9A-Z]|$)",
+                "pattern": "wstream\\.video.*?(?<!api)(?:=|/)(?:embed-)?([a-z0-9A-Z]+)(?:[^/_.a-z0-9A-Z]|$)",
                 "url": "https://wstream.video/video.php?file_code=\\1"
             }
         ],
