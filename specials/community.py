@@ -19,7 +19,7 @@ show_seasons = config.get_setting('show_seasons','community')
 
 list_data = {}
 
-list_servers = ['directo', 'akvideo', 'verystream', 'openload']
+list_servers = ['directo', 'akvideo', 'wstream']
 list_quality = ['SD', '720', '1080', '4k']
 
 tmdb_api = 'a1ab8b8669da03637a4b98fa39c39228'
@@ -577,10 +577,10 @@ def findvideos(item):
     if 'links' in item.url:
         for url in item.url['links']:
             quality, language, plot, poster = set_extra_values(url, item.path)
-            title = ''
+            title = item.fulltitle
             title = set_title(title, language, quality)
 
-            itemlist.append(Item(channel=item.channel, title=format_title('%s'+title), url=url['url'], action='play', quality=quality,
+            itemlist.append(Item(channel=item.channel, title=format_title(typo('%s','color kod') + ' - ' + title), url=url['url'], action='play', quality=quality,
                                 language=language, infoLabels = item.infoLabels))
 
         itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
