@@ -577,7 +577,7 @@ def findvideos(item):
     if 'links' in item.url:
         for url in item.url['links']:
             quality, language, plot, poster = set_extra_values(url, item.path)
-            title = item.fulltitle
+            title = item.fulltitle + (' - '+url['title'] if url.has_key('title') else '')
             title = set_title(title, language, quality)
 
             itemlist.append(Item(channel=item.channel, title=format_title(typo('%s','color kod') + ' - ' + title), url=url['url'], action='play', quality=quality,
