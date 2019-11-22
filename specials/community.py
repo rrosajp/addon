@@ -99,12 +99,13 @@ def show_menu(item):
     if item.menu:
         menu = item.menu
         item.menu = None
-        itemlist.append(item)
+        if item.url: itemlist.append(item)
         for key in menu:
             if key != 'search':
                 if type(menu[key]) == dict:
                     title = menu[key]['title'] if menu[key].has_key('title') else item.title
                     thumbnail = relative('thumbnail', menu[key], item.path)
+                    url = relative('url', menu[key], item.path) if menu[key].has_key('url') else ''
                     plot = menu[key]['plot'] if menu[key].has_key('plot') else ''
                 else:
                     title = menu[key]
@@ -112,13 +113,13 @@ def show_menu(item):
                     plot = ''
 
                 itemlist.append(Item(channel=item.channel,
-                                    title=typo(title,'submenu'),
-                                    url=item.url,
+                                    title=typo(title,'submenu' if not url else 'bold'),
+                                    url=url if url else item.url,
                                     path=item.path,
                                     thumbnail=thumbnail,
                                     plot=plot,
-                                    action='submenu',
-                                    filterkey=key))
+                                    action='submenu' if not url else 'show_menu',
+                                    filterkey=key if not url else '' ))
 
         if menu.has_key('search'):
             itemlist.append(Item(channel=item.channel,
