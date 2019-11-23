@@ -229,6 +229,7 @@ def submenu(item):
     filter_list.sort()
 
     for filter in filter_list:
+        thumbnail = ''
         if item.filterkey in ['director','actors']:
             load_info = load_json('http://api.themoviedb.org/3/search/person/?api_key=' + tmdb_api + '&language=' + lang + '&query=' + filter)
             if load_info:
@@ -768,7 +769,7 @@ def relative(key, json, path):
         if key == 'thumbnail':
             ret = json[key] if ':/' in json[key] else path + json[key] if '/' in json[key] else get_thumb(json[key]) if json[key] else ''
         else:
-            ret = json[key] if ':/' in json[key] else path + json[key] if '/' in json[key]  else ''
+            ret = json[key] if ':/' in json[key] else path + json[key] if '/' in json[key] else ''
     else:
         ret = ''
     return ret
