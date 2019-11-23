@@ -5672,3 +5672,11 @@ msgstr ""
 msgctxt "#70738"
 msgid "Ready channels %d/%d"
 msgstr ""
+
+msgctxt "#70739"
+msgid "Open link in browser"
+msgstr ""
+
+msgctxt "#70740"
+msgid "Your system does not have a web browser, so here's the short link you can open in another device:\n%s"
+msgstr ""

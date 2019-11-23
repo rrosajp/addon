@@ -136,6 +136,13 @@ def run(item=None):
         elif item.action == "itemInfo":
             import base64
             platformtools.dialog_textviewer('Item info', item.parent)
+        elif item.action == "open_browser":
+            try:
+                import webbrowser
+                webbrowser.open(item.url)
+            except:
+                short = urllib2.urlopen('https://u.nu/api.php?action=shorturl&format=simple&url=' + item.url).read()
+                platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(70740) % short)
         # Action in certain channel specified in "action" and "channel" parameters
         else:
             # Entry point for a channel is the "mainlist" action, so here we check parental control

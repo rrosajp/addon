@@ -538,7 +538,9 @@ def set_context_commands(item, parent_item):
                 and parent_item.action != "mainlist":
             context_commands.append((config.get_localized_string(60349), "XBMC.Container.Refresh (%s?%s)" %
                                      (sys.argv[0], Item(channel=item.channel, action="mainlist").tourl())))
-
+            context_commands.insert(2, (config.get_localized_string(70739),
+                                        "XBMC.Container.Update (%s?%s)" % (sys.argv[0], Item(action="open_browser",
+                                                                                             url=item.url).tourl())))
         # Añadir a Favoritos
         if num_version_xbmc < 17.0 and \
                 ((item.channel not in ["favorites", "videolibrary", "help", ""]

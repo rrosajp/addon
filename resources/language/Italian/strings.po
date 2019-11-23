@@ -5676,3 +5676,11 @@ msgstr "[B]MENU LATERALE[/B]"
 msgctxt "#70738"
 msgid "Ready channels %d/%d"
 msgstr "Canali pronti %d/%d"
+
+msgctxt "#70739"
+msgid "Open link in browser"
+msgstr "Apri link nel browser"
+
+msgctxt "#70740"
+msgid "Your system does not have a web browser, so here's the short link you can open in another device:\n%s"
+msgstr "Il tuo sistema non ha un browser, quindi ecco un link corto che puoi aprire in un altro dispositivo\n%s"
