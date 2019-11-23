@@ -22,11 +22,11 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     logger.info("[Wstream] url=" + page_url)
     video_urls = []
 
-    if '/streaming.php' in page_url:
-        code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers['location'].split('/')[-1]
+    if '/streaming.php' in page_url or 'html' in page_url:
+        code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers['location'].split('/')[-1].replace('.html','')
         logger.info('WCODE='+code)
         page_url = 'https://wstream.video/video.php?file_code=' + code
-
+    
     code = page_url.split('=')[-1]
     data = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).data
     ID = scrapertools.find_single_match(data, r'''input\D*id=(?:'|")([^'"]+)(?:'|")''')
