@@ -50,6 +50,9 @@ def mainlist(item):
         ('Per anno', ['/serietv/', 'menu', 'Serie-Tv per Anno']),
         ('Ultime Aggiornate', ['/serietv/', 'peliculas', 'newest'])
     ]
+    docu = [('Documentari bullet bold', ['/category/documentario/', 'peliculas']),
+            ('HD submenu', ['category/hd-alta-definizione/documentario-hd/', 'peliculas'])
+    ]
 
     return locals()
 
