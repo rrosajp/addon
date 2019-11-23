@@ -955,14 +955,16 @@ def get_dialogo_opciones(item, default_action, strm, autoplay):
         if not autoplay:
             if item.server != "":
                 if "<br/>" in motivo:
-                    dialog_ok(config.get_localized_string(60362), motivo.split("<br/>")[0], motivo.split("<br/>")[1],
-                              item.url)
+                    ret = dialog_yesno(config.get_localized_string(60362), motivo.split("<br/>")[0], motivo.split("<br/>")[1],
+                              item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
                 else:
-                    dialog_ok(config.get_localized_string(60362), motivo, item.url)
+                    ret = dialog_yesno(config.get_localized_string(60362), motivo, item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
             else:
-                dialog_ok(config.get_localized_string(60362), config.get_localized_string(60363),
-                          config.get_localized_string(60364), item.url)
-
+                ret = dialog_yesno(config.get_localized_string(60362), config.get_localized_string(60363),
+                          config.get_localized_string(60364), item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
+            if ret:
+                xbmc.executebuiltin("XBMC.Container.Update (%s?%s)" % (sys.argv[0], Item(action="open_browser",
+                                                                                             url=item.url).tourl()))
             if item.channel == "favorites":
                 # "Quitar de favoritos"
                 opciones.append(config.get_localized_string(30154))
