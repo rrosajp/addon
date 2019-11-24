@@ -588,7 +588,6 @@ def do_search(item, categories=None):
             logger.error(traceback.format_exc())
             continue
 
-    item.page = 0
     progreso.close()
     if multithread:
         Thread(target=search_progress, args=[threads]).start()
@@ -641,36 +640,27 @@ def search_wait_page():
 
 def show_list(item, itemlist, categories, result_mode, tecleado, start_time=None):
     search_wait_page()
-    page = item.page
+
     total = 0
     search_results = {}
-    pageDir = os.path.join(res_dir, 'page' + str(page))
-    oldPage = False
-    if os.path.exists(pageDir):  # this is an already viewed page
-        new = os.listdir(pageDir)
-        oldPage = True
-    else:
-        os.makedirs(pageDir)
-        new = [f for f in os.listdir(res_dir) if not 'page' in f and f not in ('writing', 'done')]
-
-    for f in new[:res_per_page]:
-        f = os.path.join(pageDir if oldPage else res_dir, f)
-
-        with open(f, 'rb') as file:
-            channel_results = cPickle.load(file)
-            # [channel_parameters, {"item: item1, "result": result1}, {"item: item2, "result": result2}, ..]
-        # os.remove(f)
-        if not oldPage:
-            shutil.move(f, pageDir)
-        channel_parameters = channel_results[0]
-        search_results[channel_parameters['title']] = []
-        for el in channel_results[1:]:
-            item = el["item"]
-            result = el["result"]
-            search_results[channel_parameters['title']].append({"item": item,
-                                                                "itemlist": result,
-                                                                "thumbnail": channel_parameters["thumbnail"],
-                                                                "adult": channel_parameters["adult"]})
+    for f in os.listdir(res_dir)[:res_per_page]:
+        if f == 'done':
+            continue
+        f = os.path.join(res_dir, f)
+        if os.path.isfile(f):
+            with open(f, 'rb') as file:
+                channel_results = cPickle.load(file)
+                # [channel_parameters, {"item: item1, "result": result1}, {"item: item2, "result": result2}, ..]
+            os.remove(f)
+            channel_parameters = channel_results[0]
+            search_results[channel_parameters['title']] = []
+            for el in channel_results[1:]:
+                item = el["item"]
+                result = el["result"]
+                search_results[channel_parameters['title']].append({"item": item,
+                                             "itemlist": result,
+                                             "thumbnail": channel_parameters["thumbnail"],
+                                             "adult": channel_parameters["adult"]})
 
     for channel in sorted(search_results.keys()):
         for element in search_results[channel]:
@@ -687,8 +677,7 @@ def show_list(item, itemlist, categories, result_mode, tecleado, start_time=None
                 title = re.sub("\[/COLOR]", "", title)
                 plot = config.get_localized_string(60491) + '\n'
                 for i in element["itemlist"]:
-                    if type(i) == Item:
-                        plot += i.title + '\n'
+                    plot += i.title + '\n'
                 itemlist.append(Item(title=title, channel="search", action="show_result", url=element["item"].url,
                                      extra=element["item"].extra, folder=True, adult=element["adult"],
                                      thumbnail=element["thumbnail"], contentPlot=plot,
@@ -708,20 +697,11 @@ def show_list(item, itemlist, categories, result_mode, tecleado, start_time=None
     title = config.get_localized_string(59972) % (
         tecleado, total, time.time() - start_time)
     itemlist.insert(0, Item(title=typo(title, 'bold color kod')))
-    maxPage = page
-    for d in os.listdir(res_dir):
-        p = scrapertools.find_single_match(d, 'page([0-9])')
-        if p and int(p) > maxPage:
-            maxPage = int(p)
-    isLast = maxPage == page
-    # from core import support
-    # support.dbg()
-
-    if not os.path.isfile(os.path.join(res_dir, 'done')) or (len(new) > res_per_page or not isLast):
+    if not os.path.isfile(os.path.join(res_dir, 'done')):
         itemlist.append(Item(title=typo(config.get_localized_string(30992), 'color kod bold'), channel='search', action='update_list', args={"start_time": start_time,
-                                                                                                                                             "tecleado": tecleado,
-                                                                                                                                             "categories": categories
-                                                                                                                                             }, page=page+1))
+                                                                                             "tecleado": tecleado,
+                                                                                             "categories": categories
+                                                                                             }))
     # Para opcion Buscar en otros canales
     if item.contextual == True:
         return exact_results(itemlist, tecleado)
