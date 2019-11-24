@@ -602,7 +602,7 @@ def set_context_commands(item, parent_item):
         if (item.channel != "downloads" and item.channel != "videolibrary" and downloadenabled != "false" and not config.get_localized_string(70585) in str(item.context))\
             or (item.channel != "downloads" and item.channel != "videolibrary" and downloadenabled != "false" and config.get_localized_string(70585) in str(item.context) and config.get_localized_string(70714) in str(item.context)):
             # Descargar pelicula
-            if item.contentType == "movie":
+            if item.contentType == "movie" and item.action in ['findvideos', "play"]:
                 context_commands.append((config.get_localized_string(60354), "XBMC.RunPlugin(%s?%s)" %
                                          (sys.argv[0], item.clone(channel="downloads", action="save_download",
                                                                   from_channel=item.channel, from_action=item.action)
