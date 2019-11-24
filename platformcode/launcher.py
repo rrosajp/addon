@@ -139,7 +139,10 @@ def run(item=None):
         elif item.action == "open_browser":
             try:
                 import webbrowser
-                webbrowser.open(item.url)
+                if not webbrowser.open(item.url):
+                    # might not be android, but its in try except, at least we try
+                    import xbmc
+                    xbmc.executebuiltin('StartAndroidActivity("", "android.intent.action.VIEW", "", "%s")' % (item.url))
             except:
                 short = urllib2.urlopen('https://u.nu/api.php?action=shorturl&format=simple&url=' + item.url).read()
                 platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(70740) % short)
