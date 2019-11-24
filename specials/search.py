@@ -438,8 +438,9 @@ def channel_search(search_results, channel_parameters, tecleado):
             if len(result):
                 if not channel_parameters["title"].capitalize() in search_results:
                     search_results[channel_parameters["title"].capitalize()] = []
-                search_results[channel_parameters["title"].capitalize()].append({"item": item,
+                search_results[channel_parameters['title']].append({"item": item,
                                                                     "itemlist": result,
+                                                                    "thumbnail": channel_parameters["thumbnail"],
                                                                     "adult": channel_parameters["adult"]})
 
     except:
@@ -613,8 +614,12 @@ def do_search(item, categories=None):
                 title += " (%s)" % len(element["itemlist"])
                 title = re.sub("\[COLOR [^\]]+\]", "", title)
                 title = re.sub("\[/COLOR]", "", title)
+                plot = config.get_localized_string(60491) + '\n'
+                for i in element["itemlist"]:
+                    if type(i) == Item:
+                        plot += i.title + '\n'
                 itemlist.append(Item(title=title, channel="search", action="show_result", url=element["item"].url,
-                                     extra=element["item"].extra, folder=True, adult=element["adult"],
+                                     extra=element["item"].extra, folder=True, adult=element["adult"], plot=plot, thumbnail=element["thumbnail"],
                                      from_action="search", from_channel=element["item"].channel, tecleado=tecleado))
             # todos los resultados juntos, en la misma lista
             else:
