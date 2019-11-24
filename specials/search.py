@@ -5,9 +5,8 @@ import os
 import re
 import time
 from threading import Thread
-import threading
 
-import xbmcaddon, xbmc
+import xbmcaddon
 
 from channelselector import get_thumb, auto_filter
 from core import channeltools
@@ -17,8 +16,6 @@ from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
 from core.support import typo
-import cPickle, shutil
-global_lock = threading.Lock()
 
 addon = xbmcaddon.Addon('metadata.themoviedb.org')
 def_lang = addon.getSetting('language')
@@ -26,10 +23,6 @@ def_lang = addon.getSetting('language')
 link_list = []
 max_links = 30
 
-add_id = xbmcaddon.Addon().getAddonInfo('id')
-res_dir = os.path.join(xbmc.translatePath("special://profile/addon_data/" + add_id), 'search_result/')
-res_write_dir = os.path.join(res_dir, 'writing/')
-res_per_page = 5
 
 def mainlist(item):
     logger.info()
@@ -438,17 +431,17 @@ def channel_search(search_results, channel_parameters, tecleado):
         if not search_items:
             search_items = [Item(channel=channel_parameters["channel"], action="search")]
 
-        list_res = [channel_parameters]
-
         for item in search_items:
             result = module.search(item.clone(), tecleado)
+            if result is None:
+                result = []
             if len(result):
-                list_res.append({"item": item, "result": result})
-        if len(list_res) > 1:
-            path = os.path.join(res_write_dir, channel_parameters["channel"] + '.pkl')
-            with open(path, 'wb') as f:
-                cPickle.dump(list_res, f)
-            shutil.move(path, os.path.join(res_dir, channel_parameters["channel"] + '.pkl'))
+                if not channel_parameters["title"].capitalize() in search_results:
+                    search_results[channel_parameters["title"].capitalize()] = []
+                search_results[channel_parameters["title"].capitalize()].append({"item": item,
+                                                                    "itemlist": result,
+                                                                    "adult": channel_parameters["adult"]})
+
     except:
         logger.error("No se puede buscar en: %s" % channel_parameters["title"])
         import traceback
@@ -458,9 +451,6 @@ def channel_search(search_results, channel_parameters, tecleado):
 # Esta es la función que realmente realiza la búsqueda
 def do_search(item, categories=None):
     logger.info("blaa categorias %s" % categories)
-    # delete all precedent search files
-    shutil.rmtree(res_dir, ignore_errors=True)
-    os.makedirs(res_write_dir)
 
     if item.contextual==True:
         categories = ["Películas"]
@@ -494,6 +484,7 @@ def do_search(item, categories=None):
     time.sleep(0.5)
     progreso = platformtools.dialog_progress(config.get_localized_string(30993) % tecleado, "")
     channel_files = sorted(glob.glob(channels_path), key=lambda x: os.path.basename(x))
+    import math
 
     threads = []
     search_results = {}
@@ -588,80 +579,27 @@ def do_search(item, categories=None):
             logger.error(traceback.format_exc())
             continue
 
-    progreso.close()
-    if multithread:
-        Thread(target=search_progress, args=[threads]).start()
-
-    search_wait_page()
-
-    return show_list(item, itemlist, categories, result_mode, tecleado, start_time)
-
-
-def search_progress(threads):
     # Modo Multi Thread
     # Usando isAlive() no es necesario try-except,
     # ya que esta funcion (a diferencia de is_alive())
     # es compatible tanto con versiones antiguas de python como nuevas
-    import math
-    progreso = platformtools.dialog_progress_bg(config.get_localized_string(20000), "")
-
-    pendent = [a for a in threads if a.isAlive()]
-    if len(pendent) > 0: t = float(100) / len(pendent)
-    while len(pendent) > 0:
-        index = (len(threads) - len(pendent)) + 1
-        percentage = int(math.ceil(index * t))
-
-        list_pendent_names = [a.getName() for a in pendent]
-        mensaje = config.get_localized_string(70282) % (", ".join(list_pendent_names))
-        progreso.update(percentage,
-                        config.get_localized_string(60521) % (len(threads) - len(pendent) + 1, len(threads)),
-                        mensaje)
-        time.sleep(0.5)
+    if multithread:
         pendent = [a for a in threads if a.isAlive()]
-    progreso.close()
-    with open(os.path.join(res_dir, 'done'), 'w') as f:
-        f.write('1')
+        if len(pendent) > 0: t = float(100) / len(pendent)
+        while len(pendent) > 0:
+            index = (len(threads) - len(pendent)) + 1
+            percentage = int(math.ceil(index * t))
 
-
-def search_wait_page():
-    n = len(os.listdir(res_dir)) - 1
-    if n <= res_per_page:  # if not even show progress
-        progreso = platformtools.dialog_progress(config.get_localized_string(70738) % (0, res_per_page), "")
-        while n <= res_per_page and not os.path.isfile(os.path.join(res_dir, 'done')):
-            progreso.update(n * 100 / res_per_page,
-                            config.get_localized_string(70738) % (n, res_per_page), "")
-            n = len(os.listdir(res_dir)) - 1
+            list_pendent_names = [a.getName() for a in pendent]
+            mensaje = config.get_localized_string(70282) % (", ".join(list_pendent_names))
+            progreso.update(percentage, config.get_localized_string(60521) % (len(threads) - len(pendent) + 1, len(threads)),
+                            mensaje)
             if progreso.iscanceled():
                 logger.info("Búsqueda cancelada")
                 break
             time.sleep(0.5)
-        progreso.close()
-
-
-def show_list(item, itemlist, categories, result_mode, tecleado, start_time=None):
-    search_wait_page()
-
+            pendent = [a for a in threads if a.isAlive()]
     total = 0
-    search_results = {}
-    for f in os.listdir(res_dir)[:res_per_page]:
-        if f == 'done':
-            continue
-        f = os.path.join(res_dir, f)
-        if os.path.isfile(f):
-            with open(f, 'rb') as file:
-                channel_results = cPickle.load(file)
-                # [channel_parameters, {"item: item1, "result": result1}, {"item: item2, "result": result2}, ..]
-            os.remove(f)
-            channel_parameters = channel_results[0]
-            search_results[channel_parameters['title']] = []
-            for el in channel_results[1:]:
-                item = el["item"]
-                result = el["result"]
-                search_results[channel_parameters['title']].append({"item": item,
-                                             "itemlist": result,
-                                             "thumbnail": channel_parameters["thumbnail"],
-                                             "adult": channel_parameters["adult"]})
-
     for channel in sorted(search_results.keys()):
         for element in search_results[channel]:
             total += len(element["itemlist"])
@@ -675,12 +613,8 @@ def show_list(item, itemlist, categories, result_mode, tecleado, start_time=None
                 title += " (%s)" % len(element["itemlist"])
                 title = re.sub("\[COLOR [^\]]+\]", "", title)
                 title = re.sub("\[/COLOR]", "", title)
-                plot = config.get_localized_string(60491) + '\n'
-                for i in element["itemlist"]:
-                    plot += i.title + '\n'
                 itemlist.append(Item(title=title, channel="search", action="show_result", url=element["item"].url,
                                      extra=element["item"].extra, folder=True, adult=element["adult"],
-                                     thumbnail=element["thumbnail"], contentPlot=plot,
                                      from_action="search", from_channel=element["item"].channel, tecleado=tecleado))
             # todos los resultados juntos, en la misma lista
             else:
@@ -695,32 +629,19 @@ def show_list(item, itemlist, categories, result_mode, tecleado, start_time=None
                         itemlist.append(i.clone(title=title, from_action=i.action, from_channel=i.channel,
                                                 channel="search", action="show_result", adult=element["adult"]))
     title = config.get_localized_string(59972) % (
-        tecleado, total, time.time() - start_time)
+    tecleado, total, time.time() - start_time)
     itemlist.insert(0, Item(title=typo(title, 'bold color kod')))
-    if not os.path.isfile(os.path.join(res_dir, 'done')):
-        itemlist.append(Item(title=typo(config.get_localized_string(30992), 'color kod bold'), channel='search', action='update_list', args={"start_time": start_time,
-                                                                                             "tecleado": tecleado,
-                                                                                             "categories": categories
-                                                                                             }))
-    # Para opcion Buscar en otros canales
+    progreso.close()
+    #Para opcion Buscar en otros canales
     if item.contextual == True:
         return exact_results(itemlist, tecleado)
     else:
         return itemlist
 
 
-def update_list(item):
-    itemlist = []
-    categories = item.args["categories"]
-    tecleado = item.args["tecleado"]
-    result_mode = config.get_setting("result_mode", "search")
-
-    return show_list(item, itemlist, categories, result_mode, tecleado, start_time=item.args["start_time"])
-
-
 def exact_results(results, wanted):
     logger.info()
-    itemlist = []
+    itemlist =[]
 
     for item in results:
         if item.action=='':
