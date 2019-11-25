@@ -5680,3 +5680,19 @@ msgstr ""
 msgctxt "#70740"
 msgid "Your system does not have a web browser, so here's the short link you can open in another device:\n%s"
 msgstr ""
+
+msgctxt "#707401"
+msgid "Enable Check DNS"
+msgstr ""
+
+msgctxt "#707402"
+msgid "Connection or DNS problems"
+msgstr ""
+
+msgctxt "#707403"
+msgid "Reminder Activation"
+msgstr ""
+
+msgctxt "#707404"
+msgid "By deactivating the DNS check, you have activated a reminder that it will appear at the top right."
+msgstr ""

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import xbmc, xbmcgui
 import xbmcaddon
 import json
@@ -12,13 +13,12 @@ addon = xbmcaddon.Addon()
 addonname = addon.getAddonInfo('name')
 addonid = addon.getAddonInfo('id')
 
-LIST_SITE = ['https://www.google.com', 'https://www.google.it',
-                'http://www.ansa.it/']#, 'https://www.debian.org/']
+LIST_SITE = ['https://www.google.com', 'https://www.google.it', 'http://www.ansa.it/']
 
 # lista di siti che non verranno raggiunti con i DNS del gestore
-LST_SITE_CHCK_DNS = ['https://www.italia-film.pw', 'https://casacinema.space',
-                     'https://documentari-streaming-da.com']
 
+LST_SITE_CHCK_DNS = ['https://casacinema.space', 'https://www.cb01.uno/']
+                     #'https://www.italia-film.pw', 'https://documentari-streaming-da.com',] # tolti
 
 class Kdicc():
 
@@ -34,18 +34,13 @@ class Kdicc():
         self.view_msg = view_msg
         self.lst_site_check_dns = lst_site_check_dns
         self.urls = []
-##        self.in_addon = in_addon
-##        self.server_dns = xbmc.getInfoLabel('Network.DHCPAddress') # stringa vuota...
-##        self.gateway = xbmc.getInfoLabel('Network.GatewayAddress')
-##        self.subnet = xbmc.getInfoLabel('Network.SubnetMask')
-
 
     def check_Ip(self):
         """
             controllo l'ip
             se ip_addr = 127.0.0.1 o ip_addr = '' allora il device non
             e' connesso al modem/router
-            
+
             check the ip
             if ip_addr = 127.0.0.1 or ip_addr = '' then the device does not
             is connected to the modem/router
@@ -168,7 +163,7 @@ class Kdicc():
                     rslt['redirect'] = code.previous['-x-permanent-redirect-url']
                     rslt['status'] = code.status
                 else:
-                    rslt['code'] = code.status                    
+                    rslt['code'] = code.status
             except httplib2.ServerNotFoundError as msg:
                 # sia per mancanza di ADSL che per i siti non esistenti
                 rslt['code'] = -2
@@ -192,18 +187,21 @@ class Kdicc():
         else:
             txt += '\nIP: %s' % self.ip_addr
 
-##        if self.in_addon == False and self.view_msg == True:
         dialog = xbmcgui.Dialog()
-        dialog.textviewer(addonname, txt)
-
+        if config.get_setting('checkdns'):
+            risposta= dialog.yesno(addonname, txt, nolabel='Disattiva', yeslabel='Ricordami')
+            if risposta == False:
+                config.set_setting('checkdns', False)
+                dialog.textviewer(addonname+ ' '+config.get_localized_string(707403), config.get_localized_string(707404))
+        else:
+            txt = config.get_localized_string(707402)
+            dialog.notification(addonname, txt, xbmcgui.NOTIFICATION_INFO, 5000)
 """
     def richiamato in launcher.py
 """
 def test_conn(is_exit, check_dns, view_msg,
               lst_urls, lst_site_check_dns, in_addon):
-    # debug
-    # import web_pdb; web_pdb.set_trace()
-    
+
     ktest = Kdicc(is_exit, check_dns, view_msg, lst_urls, lst_site_check_dns, in_addon)
     # se non ha l'ip lo comunico all'utente
     if not ktest.check_Ip():
@@ -214,7 +212,7 @@ def test_conn(is_exit, check_dns, view_msg,
             ktest.view_Advise(config.get_localized_string(70720))
         if ktest.is_exit == True:
             exit()
-    # se non ha connessione ADSL lo comunico all'utente    
+    # se non ha connessione ADSL lo comunico all'utente
     elif not ktest.check_Adsl():
         if view_msg == True:
             ktest.view_Advise(config.get_localized_string(70721))
@@ -227,8 +225,8 @@ def test_conn(is_exit, check_dns, view_msg,
                 ktest.view_Advise(config.get_localized_string(70722))
 
     xbmc.log("############ Inizio Check DNS ############", level=xbmc.LOGNOTICE)
-    xbmc.log("IP: %s" %  (ktest.ip_addr), level=xbmc.LOGNOTICE)
-    xbmc.log("DNS: %s" %  (ktest.dns), level=xbmc.LOGNOTICE)
+    xbmc.log("## IP: %s" %  (ktest.ip_addr), level=xbmc.LOGNOTICE)
+    xbmc.log("## DNS: %s" %  (ktest.dns), level=xbmc.LOGNOTICE)
     xbmc.log("############ Fine Check DNS ############", level=xbmc.LOGNOTICE)
     if ktest.check_Ip() and ktest.check_Adsl() and ktest.check_Dns():
         return True
@@ -241,30 +239,28 @@ def check_channels(inutile=''):
     leggo gli host dei canali dal file channels.json
     li controllo
     scrivo il file channels-test.json
-    con i codici di errore e i nuovi url in caso di redirect
+    con il codice di errore e il nuovio url in caso di redirect
 
     gli url DEVONO avere http(s)
 
-    Durante il controllo degli url vengono rieffettuati
+    Durante il controllo degli urls vengono rieffettuati
     i controlli di ip, asdl e dns.
     Questo perchè può succedere che in un qualsiasi momento
-    la connessione può avere problemi.
-    Nel caso accada un problema, il controllo e relativa scrittura del file viene interrotto
-    con messaggio di avvertimento
-
-    """    
+    la connessione possa avere problemi. Nel caso accada, il controllo e
+    relativa scrittura del file viene interrotto con messaggio di avvertimento
+    """
     logger.info()
 
     folderJson = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('path')).decode('utf-8')
-    fileJson = 'channels.json'    
+    fileJson = 'channels.json'
 
     with open(folderJson+'/'+fileJson) as f:
         data = json.load(f)
 
     risultato = {}
-    
+
     for chann, host in sorted(data.items()):
-        
+
         ris = []
         # per avere un'idea della tempistica
         # utile solo se si controllano tutti i canali
@@ -294,13 +290,14 @@ def check_channels(inutile=''):
             risultato[chann] = host
 
         logger.info("check #### FINE #### rslt :%s  " % (rslt))
-        
+
     fileJson_test = 'channels-test.json'
     # scrivo il file aggiornato
     with open(folderJson+'/'+fileJson_test, 'w') as f:
         data = json.dump(risultato, f, sort_keys=True, indent=4)
         logger.info(data)
 
+    # per il futuro
     # codice per l'invio del file su git!!!
 
     # 1. Bottone OKNO richiesta se vuole inviare file
