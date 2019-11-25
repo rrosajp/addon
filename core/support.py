@@ -438,7 +438,7 @@ def scrape(func):
             if config.get_setting('downloadenabled') and (function == 'episodios' or function == 'findvideos'):
                 download(itemlist, item, function=function)
 
-        if 'patronMenu' in args:
+        if 'patronMenu' in args and itemlist:
             itemlist = thumb(itemlist, genre=True)
 
         if 'fullItemlistHook' in args:
