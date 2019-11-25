@@ -5684,3 +5684,19 @@ msgstr "Apri nel browser"
 msgctxt "#70740"
 msgid "Your system does not have a web browser, so here's the short link you can open in another device:\n%s"
 msgstr "Il tuo sistema non ha un browser, quindi ecco un link corto che puoi aprire in un altro dispositivo\n%s"
+
+msgctxt "#707401"
+msgid "Enable Check DNS"
+msgstr "Abilita Check DNS"
+
+msgctxt "#707402"
+msgid "Connection or DNS problems"
+msgstr "Problema di connessione o DNS"
+
+msgctxt "#707403"
+msgid "Reminder Activation"
+msgstr "Attivazione Promemoria..."
+
+msgctxt "#707404"
+msgid "By deactivating the DNS check, you have activated a reminder that it will appear at the top right."
+msgstr "Disattivando il check DNS, hai attivato un promemoria\nche apparirà in alto a dx"
