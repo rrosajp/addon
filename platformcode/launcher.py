@@ -137,15 +137,16 @@ def run(item=None):
             import base64
             platformtools.dialog_textviewer('Item info', item.parent)
         elif item.action == "open_browser":
-            try:
-                import webbrowser
-                if not webbrowser.open(item.url):
-                    # might not be android, but its in try except, at least we try
-                    import xbmc
+            import webbrowser
+            if not webbrowser.open(item.url):
+                import xbmc
+                if xbmc.getCondVisibility('system.platform.linux') and xbmc.getCondVisibility('system.platform.android'):  # android
                     xbmc.executebuiltin('StartAndroidActivity("", "android.intent.action.VIEW", "", "%s")' % (item.url))
-            except:
-                short = urllib2.urlopen('https://u.nu/api.php?action=shorturl&format=simple&url=' + item.url).read()
-                platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(70740) % short)
+                else:
+                    short = urllib2.urlopen(
+                        'https://u.nu/api.php?action=shorturl&format=simple&url=' + item.url).read()
+                    platformtools.dialog_ok(config.get_localized_string(20000),
+                                            config.get_localized_string(70740) % short)
         # Action in certain channel specified in "action" and "channel" parameters
         else:
             # Entry point for a channel is the "mainlist" action, so here we check parental control
