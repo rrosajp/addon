@@ -64,26 +64,32 @@ def show_channels(item):
         path = os.path.dirname(os.path.abspath(file_path))
         if 'http' in path: path = path[path.find('http'):].replace('\\','/').replace(':/','://')
         if file_path.startswith('http'): file_url = httptools.downloadpage(file_path, follow_redirects=True).data
-        else: file_url = open(file_path, "r").read()
+        elif os.path.isfile(file_path): file_url = open(file_path, "r").read()
+        else:
+            support.log('KEY=',key)
+            item.channel_id = key
+            remove_channel(item)
+            file_url=''
 
         # load json
-        json_url = jsontools.load(file_url)
+        if file_url:
+            json_url = jsontools.load(file_url)
 
-        thumbnail = relative('thumbnail', json_url, path)
-        if not thumbnail: thumbnail = item.thumbnail
-        fanart = relative('fanart', json_url, path)
-        plot = json_url['plot'] if json_url.has_key('plot') else ''
+            thumbnail = relative('thumbnail', json_url, path)
+            if not thumbnail: thumbnail = item.thumbnail
+            fanart = relative('fanart', json_url, path)
+            plot = json_url['plot'] if json_url.has_key('plot') else ''
 
-        itemlist.append(Item(channel=item.channel,
-                             title=typo(channel['channel_name'],'bold'),
-                             url=file_path,
-                             thumbnail=thumbnail,
-                             fanart=fanart,
-                             plot=plot,
-                             action='show_menu',
-                             channel_id = key,
-                             context=context,
-                             path=path))
+            itemlist.append(Item(channel=item.channel,
+                                title=typo(channel['channel_name'],'bold'),
+                                url=file_path,
+                                thumbnail=thumbnail,
+                                fanart=fanart,
+                                plot=plot,
+                                action='show_menu',
+                                channel_id = key,
+                                context=context,
+                                path=path))
 
     autoplay.show_option(item.channel, itemlist)
     support.channel_config(item, itemlist)
