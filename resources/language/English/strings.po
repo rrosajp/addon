@@ -1495,11 +1495,11 @@ msgid "Go to the Main Menu"
 msgstr ""
 
 msgctxt "#60350"
-msgid "[COLOR yellow]Search in other channels[/COLOR]"
-msgstr "[COLOR yellow]Search in other channels[/COLOR]"
+msgid "Search in other channels"
+msgstr "Search in other channels"
 
 msgctxt "#60351"
-msgid "[COLOR 0xffccff00]Set as Homepage[/COLOR]"
+msgid "Set as Homepage"
 msgstr ""
 
 msgctxt "#60352"
@@ -1627,11 +1627,11 @@ msgid "AutoPlay"
 msgstr ""
 
 msgctxt "#60392"
-msgid "\n\n\nTotal Reset of the addon %s.\n\n[COLOR red]Attention This function completely resets the addon.[/COLOR]"
+msgid "\n\n\nTotal Reset of the addon %s.\n\nAttention This function completely resets the addon."
 msgstr ""
 
 msgctxt "#60393"
-msgid "[COLOR red]Reset %s[/COLOR]"
+msgid "Reset %s"
 msgstr ""
 
 msgctxt "#60394"
@@ -1679,19 +1679,19 @@ msgid "Choose cache setting"
 msgstr ""
 
 msgctxt "#60405"
-msgid "\n[COLOR orange]Cache Set for 512 Mega RAM[/COLOR]"
+msgid "\nCache Set for 512 Mega RAM"
 msgstr ""
 
 msgctxt "#60406"
-msgid "\n[COLOR orange]Cache Set for 1 Gb RAM[/COLOR]"
+msgid "\nCache Set for 1 Gb RAM"
 msgstr ""
 
 msgctxt "#60407"
-msgid "\n[COLOR orange]Cache Set for 2 Gb RAM[/COLOR]"
+msgid "\nCache Set for 2 Gb RAM"
 msgstr ""
 
 msgctxt "#60408"
-msgid "\n[COLOR orange]Cache Set higher than 2 Gb of RAM[/COLOR]"
+msgid "\nCache Set higher than 2 Gb of RAM"
 msgstr ""
 
 msgctxt "#60409"
@@ -1711,15 +1711,15 @@ msgid "Choose channels to include"
 msgstr ""
 
 msgctxt "#60413"
-msgid "[COLOR yellow]New Movie Search...[/COLOR]"
+msgid "New Movie Search..."
 msgstr ""
 
 msgctxt "#60414"
-msgid "[COLOR yellow]New search tv series...[/COLOR]"
+msgid "New search tv series..."
 msgstr ""
 
 msgctxt "#60415"
-msgid "[COLOR green]Other settings[/COLOR]"
+msgid "Other settings"
 msgstr ""
 
 msgctxt "#60416"
@@ -1727,7 +1727,7 @@ msgid "Delete saved searches"
 msgstr ""
 
 msgctxt "#60417"
-msgid "[COLOR red]Delete search history[/COLOR]"
+msgid "Delete search history"
 msgstr ""
 
 msgctxt "#60418"
@@ -1775,7 +1775,7 @@ msgid "FILTER: Delete '%s'"
 msgstr ""
 
 msgctxt "#60429"
-msgid "[COLOR %s]Filter configuration for TV series...[/COLOR]"
+msgid "Filter configuration for TV series..."
 msgstr ""
 
 msgctxt "#60430"
@@ -1795,7 +1795,7 @@ msgid " (disabled)"
 msgstr ""
 
 msgctxt "#60434"
-msgid "Configure [COLOR %s][%s][/COLOR]%s"
+msgid "Configure [%s]%s"
 msgstr ""
 
 msgctxt "#60435"
@@ -1823,7 +1823,7 @@ msgid "Permitted quality"
 msgstr ""
 
 msgctxt "#60441"
-msgid "Filter links for: [COLOR %s]%s[/COLOR]"
+msgid "Filter links for: %s"
 msgstr ""
 
 msgctxt "#60442"
@@ -1831,7 +1831,7 @@ msgid "Are you sure you want to delete the filter?"
 msgstr ""
 
 msgctxt "#60443"
-msgid "Click 'Yes' to remove the filter from [COLOR %s]%s[/COLOR], click 'No' or close the window to do nothing."
+msgid "Click 'Yes' to remove the filter from %s, click 'No' or close the window to do nothing."
 msgstr ""
 
 msgctxt "#60444"
@@ -1963,7 +1963,7 @@ msgid "Filmaffinity recording......."
 msgstr ""
 
 msgctxt "#60476"
-msgid "[COLOR yellow][B]There is no information about this movie...[/B][/COLOR]"
+msgid "[B]There is no information about this movie...[/B]"
 msgstr ""
 
 msgctxt "#60477"
@@ -1971,11 +1971,11 @@ msgid "Important recommendations......."
 msgstr ""
 
 msgctxt "#60478"
-msgid "[COLOR aquamarine][B]Completated %s[/B][/COLOR]"
+msgid "[B]Completated %s[/B]"
 msgstr ""
 
 msgctxt "#60479"
-msgid "[COLOR aquamarine][B]In progress %s[/B][/COLOR]"
+msgid "[B]In progress %s[/B]"
 msgstr ""
 
 msgctxt "#60480"
@@ -1995,11 +1995,11 @@ msgid "Picture collection on FANART.TV"
 msgstr ""
 
 msgctxt "#60484"
-msgid "[COLOR red][B]Update Kodi to its latest version[/B][/COLOR]"
+msgid "[B]Update Kodi to its latest version[/B]"
 msgstr ""
 
 msgctxt "#60485"
-msgid "[COLOR skyblue]for detailed info[/COLOR]"
+msgid "for detailed info"
 msgstr ""
 
 msgctxt "#60486"
@@ -2015,31 +2015,31 @@ msgid "No information..."
 msgstr ""
 
 msgctxt "#60489"
-msgid "[COLOR limegreen][B]Production company: [/B][/COLOR]"
+msgid "[B]Production company: [/B]"
 msgstr ""
 
 msgctxt "#60490"
-msgid "[COLOR limegreen][B]Country: [/B][/COLOR]"
+msgid "[B]Country: [/B]"
 msgstr ""
 
 msgctxt "#60491"
-msgid "[COLOR limegreen][B]Preview: [/B][/COLOR]"
+msgid "[B]Preview: [/B]"
 msgstr ""
 
 msgctxt "#60492"
-msgid "[COLOR limegreen][B]Seasons/Episodes: [/B][/COLOR]"
+msgid "[B]Seasons/Episodes: [/B]"
 msgstr ""
 
 msgctxt "#60493"
-msgid "[COLOR orange][B]Is there the tv series you're looking for?[/B][/COLOR]"
+msgid "[B]Is there the tv series you're looking for?[/B]"
 msgstr ""
 
 msgctxt "#60494"
-msgid "[COLOR orange][B]Is there the movie you are looking for?[/B][/COLOR]"
+msgid "[B]Is there the movie you are looking for?[/B]"
 msgstr ""
 
 msgctxt "#60495"
-msgid "[COLOR tomato][B]Close[/B][/COLOR]"
+msgid "[B]Close[/B]"
 msgstr ""
 
 msgctxt "#60496"
@@ -2051,7 +2051,7 @@ msgid "Wait........"
 msgstr ""
 
 msgctxt "#60498"
-msgid "[COLOR orange][B]Select...[/B][/COLOR]"
+msgid "[B]Select...[/B]"
 msgstr ""
 
 msgctxt "#60499"
@@ -2063,7 +2063,7 @@ msgid "Nothing to play"
 msgstr ""
 
 msgctxt "#60501"
-msgid "[COLOR orange][B]Department[/B][/COLOR]"
+msgid "[B]Department[/B]"
 msgstr ""
 
 msgctxt "#60502"
@@ -2079,19 +2079,19 @@ msgid "No information"
 msgstr ""
 
 msgctxt "#60505"
-msgid "[COLOR rosybrown]Uploading filmography...[/COLOR]"
+msgid "Uploading filmography..."
 msgstr ""
 
 msgctxt "#60506"
-msgid "[COLOR plum]Picture collection...[/COLOR]"
+msgid "Picture collection..."
 msgstr ""
 
 msgctxt "#60507"
-msgid "[COLOR crimson][B]Error[/B][/COLOR]"
+msgid "[B]Error[/B]"
 msgstr ""
 
 msgctxt "#60508"
-msgid "[COLOR tomato]Video not available[/COLOR]"
+msgid "Video not available"
 msgstr ""
 
 msgctxt "#60509"
@@ -2287,7 +2287,7 @@ msgid "Saving configuration...%s"
 msgstr ""
 
 msgctxt "#60560"
-msgid " - [COLOR red] CORRECTED!![/COLOR]"
+msgid " -  CORRECTED!!"
 msgstr ""
 
 msgctxt "#60561"
@@ -2331,7 +2331,7 @@ msgid " | Error Detail: %s"
 msgstr ""
 
 msgctxt "#60571"
-msgid " - [COLOR red] Default settings cannot be loaded![/COLOR]"
+msgid " -  Default settings cannot be loaded!"
 msgstr ""
 
 msgctxt "#60572"
@@ -2411,7 +2411,7 @@ msgid "All channels"
 msgstr ""
 
 msgctxt "#60595"
-msgid " [COLOR grey](Default disabled)[/COLOR]"
+msgid " (Default disabled)"
 msgstr ""
 
 msgctxt "#60596"
@@ -2839,7 +2839,7 @@ msgid "Documentary"
 msgstr ""
 
 msgctxt "#70020"
-msgid "[COLOR yellow]Search similar[/COLOR]"
+msgid "Search similar"
 msgstr ""
 
 msgctxt "#70021"
@@ -3751,7 +3751,7 @@ msgid "Check the log in %s for more details."
 msgstr ""
 
 msgctxt "#70252"
-msgid "[COLOR mediumturquoise][B]Duration: %s minutes[/B][/COLOR]"
+msgid "[B]Duration: %s minutes[/B]"
 msgstr ""
 
 msgctxt "#70253"
@@ -4727,7 +4727,7 @@ msgid "Genre: "
 msgstr ""
 
 msgctxt "#70500"
-msgid "Notification([COLOR red][B]Update Kodi to its latest version[/B][/COLOR], [COLOR skyblue]for best info[/COLOR],8000, 'http://i.imgur.com/mHgwcn3.png')"
+msgid "Notification([B]Update Kodi to its latest version[/B], for best info,8000, 'http://i.imgur.com/mHgwcn3.png')"
 msgstr ""
 
 msgctxt "#70501"
@@ -4783,11 +4783,11 @@ msgid "Manual Search in Jayhap"
 msgstr ""
 
 msgctxt "#70515"
-msgid "[COLOR aquamarine][B]Completed %s[/B][/COLOR]"
+msgid "[B]Completed %s[/B]"
 msgstr ""
 
 msgctxt "#70516"
-msgid "[COLOR aquamarine][B]In progress %s[/B][/COLOR]"
+msgid "[B]In progress %s[/B]"
 msgstr ""
 
 msgctxt "#70517"
@@ -5127,7 +5127,7 @@ msgid "Update from the Internet:"
 msgstr ""
 
 msgctxt "#70602"
-msgid "The first season that is added always starts in \"0 \" episodes, the second season that is added starts in the total number of episodes of the first season, the third season will be the sum of the episodes of the previous seasons and so on.\n [COLOR blue] \nSerial example divided into several seasons: \n\nFairy Tail: \n - SEASON 1: EPISODE 48 -> [season 1, episode: 0] \n - SEASON 2: EPISODE 48 - -> [season 2, episode: 48] \n - SEASON 3: EPISODE 54 -> [season 3, episode: 96 ([48 = season2] + [48 = season1])] \n - SEASON 4: EPISODE 175 -> [season 4: episode: 150 ([54 = season3] + [48 = season2] + [48 = season3])] [/COLOR] \n [COLOR green] \nExample of a series that continues in the season of the original: \n \nFate / Zero 2nd Season: \n - SEASON 1: EPISODE 12 -> [season 1, episode: 13] [/COLOR] \n [COLOR blue] \nExample example which is the second Season of the original: \n \nFate / kaleid liner Prism☆Illya 2wei!: \n - SEASON 1: EPISODE 12 -> [season 2, episode: 0] [/COLOR] \n"
+msgid "The first season that is added always starts in \"0 \" episodes, the second season that is added starts in the total number of episodes of the first season, the third season will be the sum of the episodes of the previous seasons and so on.\n  \nSerial example divided into several seasons: \n\nFairy Tail: \n - SEASON 1: EPISODE 48 -> [season 1, episode: 0] \n - SEASON 2: EPISODE 48 - -> [season 2, episode: 48] \n - SEASON 3: EPISODE 54 -> [season 3, episode: 96 ([48 = season2] + [48 = season1])] \n - SEASON 4: EPISODE 175 -> [season 4: episode: 150 ([54 = season3] + [48 = season2] + [48 = season3])]  \n  \nExample of a series that continues in the season of the original: \n \nFate / Zero 2nd Season: \n - SEASON 1: EPISODE 12 -> [season 1, episode: 13]  \n  \nExample example which is the second Season of the original: \n \nFate / kaleid liner Prism☆Illya 2wei!: \n - SEASON 1: EPISODE 12 -> [season 2, episode: 0]  \n"
 msgstr ""
 
 msgctxt "#70603"

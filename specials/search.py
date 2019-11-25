@@ -612,13 +612,12 @@ def do_search(item, categories=None):
             if result_mode == 0:
                 if len(search_results[channel]) > 1:
                     title += " -%s" % element["item"].title.strip()
-                title += " (%s)" % len(element["itemlist"])
-                title = re.sub("\[COLOR [^\]]+\]", "", title)
-                title = re.sub("\[/COLOR]", "", title)
-                plot = config.get_localized_string(60491) + '\n'
+                title = re.sub(r"\[[^\]]+\]|•", "", title)
+                title = typo(title,'bold') + typo("%02d" % len(element["itemlist"]),'_ [] color kod bold')
+                plot = config.get_localized_string(60491) + '\n' + typo('','submenu')+ '\n'
                 for i in element["itemlist"]:
                     if type(i) == Item:
-                        plot += i.title + '\n'
+                        plot += re.sub(r'\[(?:/)?B\]','', i.title) + '\n'
                 itemlist.append(Item(title=title, channel="search", action="show_result", url=element["item"].url,
                                      extra=element["item"].extra, folder=True, adult=element["adult"], plot=plot,
                                      thumbnail=element["thumbnail"], itemlist=[e.tourl() for e in element["itemlist"]],
@@ -706,7 +705,7 @@ def discover_list(item):
         elem['tmdb_id']=elem['id']
         if 'title' in elem:
             title = unify.normalize(elem['title']).capitalize()
-            elem['year'] = scrapertools.find_single_match(elem['release_date'], '(\d{4})-\d+-\d+')
+            elem['year'] = scrapertools.find_single_match(elem['release_date'], r'(\d{4})-\d+-\d+')
         else:
             title = unify.normalize(elem['name']).capitalize()
             tvshow = True
