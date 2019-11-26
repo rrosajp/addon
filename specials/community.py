@@ -19,7 +19,7 @@ show_seasons = config.get_setting('show_seasons','community')
 
 list_data = {}
 
-list_servers = ['directo', 'akvideo', 'verystream', 'openload']
+list_servers = ['directo', 'akvideo', 'wstream']
 list_quality = ['SD', '720', '1080', '4k']
 
 tmdb_api = 'a1ab8b8669da03637a4b98fa39c39228'
@@ -64,31 +64,36 @@ def show_channels(item):
         path = os.path.dirname(os.path.abspath(file_path))
         if 'http' in path: path = path[path.find('http'):].replace('\\','/').replace(':/','://')
         if file_path.startswith('http'): file_url = httptools.downloadpage(file_path, follow_redirects=True).data
-        else: file_url = open(file_path, "r").read()
+        elif os.path.isfile(file_path): file_url = open(file_path, "r").read()
+        else:
+            support.log('KEY=',key)
+            item.channel_id = key
+            remove_channel(item)
+            file_url=''
 
         # load json
-        json_url = jsontools.load(file_url)
+        if file_url:
+            json_url = jsontools.load(file_url)
 
-        thumbnail = relative('thumbnail', json_url, path)
-        if not thumbnail: thumbnail = item.thumbnail
-        fanart = relative('fanart', json_url, path)
-        plot = json_url['plot'] if json_url.has_key('plot') else ''
+            thumbnail = relative('thumbnail', json_url, path)
+            if not thumbnail: thumbnail = item.thumbnail
+            fanart = relative('fanart', json_url, path)
+            plot = json_url['plot'] if json_url.has_key('plot') else ''
 
-        itemlist.append(Item(channel=item.channel,
-                             title=typo(channel['channel_name'],'bold'),
-                             url=file_path,
-                             thumbnail=thumbnail,
-                             fanart=fanart,
-                             plot=plot,
-                             action='show_menu',
-                             channel_id = key,
-                             context=context,
-                             path=path))
+            itemlist.append(Item(channel=item.channel,
+                                title=typo(channel['channel_name'],'bold'),
+                                url=file_path,
+                                thumbnail=thumbnail,
+                                fanart=fanart,
+                                plot=plot,
+                                action='show_menu',
+                                channel_id = key,
+                                context=context,
+                                path=path))
 
     autoplay.show_option(item.channel, itemlist)
     support.channel_config(item, itemlist)
     return itemlist
-
 
 def show_menu(item):
     global list_data
@@ -99,12 +104,14 @@ def show_menu(item):
     if item.menu:
         menu = item.menu
         item.menu = None
-        itemlist.append(item)
+        if item.url: itemlist.append(item)
         for key in menu:
+            support.log("KEY= ",key)
             if key != 'search':
                 if type(menu[key]) == dict:
                     title = menu[key]['title'] if menu[key].has_key('title') else item.title
                     thumbnail = relative('thumbnail', menu[key], item.path)
+                    url = relative('url', menu[key], item.path) if menu[key].has_key('url') else ''
                     plot = menu[key]['plot'] if menu[key].has_key('plot') else ''
                 else:
                     title = menu[key]
@@ -112,13 +119,13 @@ def show_menu(item):
                     plot = ''
 
                 itemlist.append(Item(channel=item.channel,
-                                    title=typo(title,'submenu'),
-                                    url=item.url,
+                                    title=typo(title,'submenu' if not url else 'bold'),
+                                    url=url if url else item.url,
                                     path=item.path,
                                     thumbnail=thumbnail,
                                     plot=plot,
-                                    action='submenu',
-                                    filterkey=key))
+                                    action='submenu' if not url else 'show_menu',
+                                    filterkey=key if not url else '' ))
 
         if menu.has_key('search'):
             itemlist.append(Item(channel=item.channel,
@@ -131,54 +138,76 @@ def show_menu(item):
 
     else:
         json_data = load_json(item)
+        for key in json_data:
+            if key == 'menu':
+                for option in json_data['menu']:
+                    thumbnail = relative('thumbnail', option, item.path)
+                    fanart = relative('fanart', option, item.path)
+                    plot = option['plot'] if option.has_key('plot') else item.plot
+                    url = relative('link', option, item.path)
+                    submenu = option['submenu'] if option.has_key('submenu') else []
+                    level2 = option['level2'] if option.has_key('level2') else []
+                    itemlist.append(Item(channel=item.channel,
+                                        title=format_title(option['title']),
+                                        fulltitle=option['title'],
+                                        thumbnail=thumbnail,
+                                        fanart=fanart,
+                                        plot=plot,
+                                        action='show_menu',
+                                        url=url,
+                                        path=item.path,
+                                        menu=level2))
 
-        if "menu" in json_data:
-            for option in json_data['menu']:
-                thumbnail = relative('thumbnail', option, item.path)
-                fanart = relative('fanart', option, item.path)
-                plot = option['plot'] if option.has_key('plot') else item.plot
-                url = relative('link', option, item.path)
-                submenu = option['submenu'] if option.has_key('submenu') else []
-                level2 = option['level2'] if option.has_key('level2') else []
-                itemlist.append(Item(channel=item.channel,
-                                     title=format_title(option['title']),
-                                     fulltitle=option['title'],
-                                     thumbnail=thumbnail,
-                                     fanart=fanart,
-                                     plot=plot,
-                                     action='show_menu',
-                                     url=url,
-                                     path=item.path,
-                                     menu=level2))
+                    if submenu:
+                        for key in submenu:
+                            if key != 'search':
+                                if type(submenu[key]) == dict:
+                                    title = submenu[key]['title'] if submenu[key].has_key('title') else item.title
+                                    thumbnail = relative('thumbnail', submenu[key], item.path)
+                                    plot = submenu[key]['plot'] if submenu[key].has_key('plot') else ''
+                                else:
+                                    title = submenu[key]
+                                    thumbnail = item.thumbnail
+                                    plot = ''
 
-                if submenu:
-                    for key in submenu:
-                        if key != 'search':
-                            if type(submenu[key]) == dict:
-                                title = submenu[key]['title'] if submenu[key].has_key('title') else item.title
-                                thumbnail = relative('thumbnail', submenu[key], item.path)
-                                plot = submenu[key]['plot'] if submenu[key].has_key('plot') else ''
-                            else:
-                                title = submenu[key]
-                                thumbnail = item.thumbnail
-                                plot = ''
-
+                                itemlist.append(Item(channel=item.channel,
+                                                    title=typo(title,'submenu'),
+                                                    url=url,
+                                                    path=item.path,
+                                                    thumbnail=thumbnail,
+                                                    plot=plot,
+                                                    action='submenu',
+                                                    filterkey=key))
+                        if submenu.has_key('search'):
                             itemlist.append(Item(channel=item.channel,
-                                                title=typo(title,'submenu'),
+                                                title=typo('Cerca ' + option['title'] +'...','color kod bold'),
+                                                thumbnail=get_thumb('search.png'),
+                                                action='search',
                                                 url=url,
-                                                path=item.path,
-                                                thumbnail=thumbnail,
-                                                plot=plot,
-                                                action='submenu',
-                                                filterkey=key))
-                    if submenu.has_key('search'):
-                        itemlist.append(Item(channel=item.channel,
-                                            title=typo('Cerca ' + option['title'] +'...','color kod bold'),
-                                            thumbnail=get_thumb('search.png'),
-                                            action='search',
-                                            url=url,
-                                            path=item.path))
-            # add Search
+                                                path=item.path))
+
+            elif 'list' in key:
+                # select type of list
+                item.url = { key: json_data[key]}
+                support.log(item.url)
+                if key == "movies_list":
+                    item.media_type = 'movies_list'
+                    item.contentType = 'movie'
+                    item.action = 'findvideos'
+                elif key == "tvshows_list":
+                    item.media_type = 'tvshows_list'
+                    item.contentType = 'tvshow'
+                    item.action = 'get_season'
+                elif key == "episodes_list":
+                    item.media_type = 'episodes_list'
+                    item.contentType = 'episode'
+                    item.action = 'episodios'
+                elif key == "generic_list":
+                    item.media_type= 'generic_list'
+                itemlist += list_all(item)
+        
+        # add Search
+        if 'channel_name' in json_data:
             itemlist.append(Item(channel=item.channel,
                                 title=typo('Cerca nel Canale...','color kod bold'),
                                 thumbnail=get_thumb('search.png'),
@@ -186,22 +215,7 @@ def show_menu(item):
                                 url=item.url,
                                 path=item.path))
 
-            return itemlist
-
-        # select type of list
-        if json_data.has_key("movies_list"):
-            item.media_type = 'movies_list'
-            item.contentType = 'movie'
-        elif json_data.has_key("tvshows_list"):
-            item.media_type = 'tvshows_list'
-            item.contentType = 'tvshow'
-        elif json_data.has_key("episodes_list"):
-            item.media_type = 'episodes_list'
-            item.contentType = 'episode'
-        elif json_data.has_key("generic_list"):
-            item.media_type= 'generic_list'
-
-    return list_all(item)
+    return itemlist
 
 
 def submenu(item):
@@ -263,7 +277,10 @@ def list_all(item):
 
     itemlist = []
     media_type = item.media_type
-    json_data = load_json(item)
+    if type(item.url) == dict:
+        json_data = item.url
+    else:
+        json_data = load_json(item)
     contentTitle = contentSerieName = ''
     infoLabels = item.infoLabels if item.infoLabels else {}
 
@@ -578,10 +595,10 @@ def findvideos(item):
     if 'links' in item.url:
         for url in item.url['links']:
             quality, language, plot, poster = set_extra_values(url, item.path)
-            title = ''
+            title = item.fulltitle + (' - '+url['title'] if url.has_key('title') else '')
             title = set_title(title, language, quality)
 
-            itemlist.append(Item(channel=item.channel, title=format_title('%s'+title), url=url['url'], action='play', quality=quality,
+            itemlist.append(Item(channel=item.channel, title=format_title(typo('%s','color kod') + ' - ' + title), url=url['url'], action='play', quality=quality,
                                 language=language, infoLabels = item.infoLabels))
 
         itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())

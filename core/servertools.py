@@ -109,7 +109,7 @@ def get_servers_itemlist(itemlist, fnc=None, sort=False):
     for item in itemlist:
         # Asignamos "directo" en caso de que el server no se encuentre en pelisalcarta
         if not item.server and item.url:
-            item.server = "directo"
+            item.server = config.get_localized_string(30137)
 
         if fnc:
             item.title = fnc(item)
