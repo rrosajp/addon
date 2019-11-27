@@ -199,11 +199,9 @@ def findvideos(item):
     if item.contentType != 'movie':
         return support.server(item, item.url)
     else:
-        block = r'<div class="col-md-10">(.+?)<div class="swappable" id="links">'
-        patron = r'SRC="([^"]+)"'
-        links = re.findall(patron, block, re.IGNORECASE)
-        if "#" in links:
-            links = link.replace('#', 'speedvideo.net')
+        links = str(support.match(item, r'SRC="([^"]+)"', patronBlock=r'<div class="col-md-10">(.+?)<div class="swappable" id="links">')[0])
+        if links:
+            links = links.replace('#', 'speedvideo.net')
             return support.server(item, links)
         else:
             return support.server(item)

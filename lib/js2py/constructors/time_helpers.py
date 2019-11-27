@@ -4,7 +4,7 @@ import datetime
 import warnings
 
 try:
-    from tzlocal import get_localzone
+    from lib.tzlocal import get_localzone
     LOCAL_ZONE = get_localzone()
 except:  # except all problems...
     warnings.warn(
