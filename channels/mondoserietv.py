@@ -41,6 +41,7 @@ def search(item, text):
         action = 'findvideos'
     else:
         action = 'episodios'
+        item.contentType = 'tvshow'
     try:
         search = text
         data = support.match(item, headers=headers)[1]
