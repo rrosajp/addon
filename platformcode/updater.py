@@ -70,6 +70,7 @@ def check_addon_init():
 
     if pos > 0:
         changelog = ''
+        poFilesChanged = False
         nCommitApplied = 0
         for c in reversed(commits[:pos]):
             commit = httptools.downloadpage(c['url']).data
@@ -94,6 +95,8 @@ def check_addon_init():
                     continue
                 else:
                     logger.info(file["filename"])
+                    if 'resources/language' in file["filename"]:
+                        poFilesChanged = True
                     if file['status'] == 'modified' or file['status'] == 'added':
                         if 'patch' in file:
                             text = ""
@@ -149,6 +152,8 @@ def check_addon_init():
         localCommitFile.writelines(c['sha'])
         localCommitFile.close()
         xbmc.executebuiltin("UpdateLocalAddons")
+        if poFilesChanged:
+            refreshLang()
     else:
         logger.info('Nessun nuovo aggiornamento')
 
@@ -300,7 +305,20 @@ def updateFromZip(message='Installazione in corso...'):
     dp.close()
     xbmc.executebuiltin("UpdateLocalAddons")
 
+    refreshLang()
+
     return hash
+
+
+def refreshLang():
+    from platformcode import config
+    language = config.get_localized_string(20001)
+    if language == 'eng':
+        xbmc.executebuiltin("SetGUILanguage(resource.language.it_it)")
+        xbmc.executebuiltin("SetGUILanguage(resource.language.en_en)")
+    else:
+        xbmc.executebuiltin("SetGUILanguage(resource.language.en_en)")
+        xbmc.executebuiltin("SetGUILanguage(resource.language.it_it)")
 
 
 def remove(file):
