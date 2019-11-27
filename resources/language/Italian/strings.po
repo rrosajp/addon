@@ -407,7 +407,7 @@ msgstr "Saghe"
 
 msgctxt "#50001"
 msgid "On Air"
-msgstr "TEEEEEST"
+msgstr "Adesso in Onda"
 
 msgctxt "#50002"
 msgid "Latest News"
