@@ -428,7 +428,9 @@ def downloadpage(url, **opt):
 
         """
     load_cookies()
-    import requests
+    #import requests
+    ### Raggiunge i siti con i DNS dopati... ###
+    from specials import resolverdns
     from lib import cloudscraper
 
     # Headers by default, if nothing is specified
