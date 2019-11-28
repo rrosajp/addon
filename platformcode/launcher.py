@@ -357,9 +357,14 @@ def run(item=None):
             log_message = ""
 
         if canal:
-            if platformtools.dialog_yesno(config.get_localized_string(60087) % canal, config.get_localized_string(60014),
-                    log_message, nolabel='ok', yeslabel=config.get_localized_string(70739)):
-                run(Item(action="open_browser", url=item.url))
+            if item.url:
+                if platformtools.dialog_yesno(config.get_localized_string(60087) % canal, config.get_localized_string(60014),
+                        log_message, nolabel='ok', yeslabel=config.get_localized_string(70739)):
+                    run(Item(action="open_browser", url=item.url))
+            else:
+                platformtools.dialog_ok(config.get_localized_string(60087) % canal,
+                                           config.get_localized_string(60014),
+                                           log_message)
         else:
             platformtools.dialog_ok(
                 config.get_localized_string(60038),
