@@ -23,7 +23,7 @@ import dns.name
 import socket
 import requests
 
-res = dns.resolver.Resolver(configure=False)
+res = dns.resolver.Resolver(configure=True)
 
 res.nameservers = ['1.1.1.1', '2606:4700:4700::1111',
                    '1.0.0.1', '2606:4700:4700::1001' ]

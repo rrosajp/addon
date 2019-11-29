@@ -384,9 +384,6 @@ def proxy_post_processing(url, proxy_data, response, opt):
 
 def downloadpage(url, **opt):
     logger.info()
-
-
-
     """
        Open a url and return the data obtained
 
@@ -428,9 +425,7 @@ def downloadpage(url, **opt):
 
         """
     load_cookies()
-    #import requests
-    ### Raggiunge i siti con i DNS dopati... ###
-    from specials import resolverdns
+    import requests
     from lib import cloudscraper
 
     # Headers by default, if nothing is specified

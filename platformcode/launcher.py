@@ -7,6 +7,7 @@ import os
 import sys
 
 import updater
+from specials import resolverdns
 import urllib2
 
 from core import channeltools
@@ -34,9 +35,9 @@ def start():
     # se lo ha: non lo fa entrare nell'addon
     # se ha problemi di DNS avvia ma lascia entrare
     # se tutto ok: entra nell'addon
-##    from specials.checkhost import test_conn
-##    import threading
-##    threading.Thread(target=test_conn, args=(True, True, True, [], [], True)).start()
+    from specials.checkhost import test_conn
+    import threading
+    threading.Thread(target=test_conn, args=(True, True, True, [], [], True)).start()
     # check_adsl = test_conn(is_exit = True, check_dns = True, view_msg = True,
     #           lst_urls = [], lst_site_check_dns = [], in_addon = True)
 
