@@ -107,35 +107,36 @@ def search(channel, item, texto):
 
 
 def dbg():
-    import web_pdb;
-    if not web_pdb.WebPdb.active_instance:
-        import webbrowser
-        webbrowser.open('http://127.0.0.1:5555')
-    web_pdb.set_trace()
-
+    if config.dev_mode():
+        import web_pdb;
+        if not web_pdb.WebPdb.active_instance:
+            import webbrowser
+            webbrowser.open('http://127.0.0.1:5555')
+        web_pdb.set_trace()
 
 
 def regexDbg(item, patron, headers, data=''):
-    import json, urllib2, webbrowser
-    url = 'https://regex101.com'
+    if config.dev_mode():
+        import json, urllib2, webbrowser
+        url = 'https://regex101.com'
 
-    if not data:
-        html = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
-        html = re.sub('\n|\t', ' ', html)
-    else:
-        html = data
-    headers = {'content-type': 'application/json'}
-    data = {
-        'regex': patron,
-        'flags': 'gm',
-        'testString': html,
-        'delimiter': '"""',
-        'flavor': 'python'
-    }
-    r = urllib2.Request(url + '/api/regex', json.dumps(data, encoding='latin1'), headers=headers)
-    r = urllib2.urlopen(r).read()
-    permaLink = json.loads(r)['permalinkFragment']
-    webbrowser.open(url + "/r/" + permaLink)
+        if not data:
+            html = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
+            html = re.sub('\n|\t', ' ', html)
+        else:
+            html = data
+        headers = {'content-type': 'application/json'}
+        data = {
+            'regex': patron,
+            'flags': 'gm',
+            'testString': html,
+            'delimiter': '"""',
+            'flavor': 'python'
+        }
+        r = urllib2.Request(url + '/api/regex', json.dumps(data, encoding='latin1'), headers=headers)
+        r = urllib2.urlopen(r).read()
+        permaLink = json.loads(r)['permalinkFragment']
+        webbrowser.open(url + "/r/" + permaLink)
 
 
 def scrape2(item, patron = '', listGroups = [], headers="", blacklist="", data="", patronBlock="",
@@ -437,7 +438,7 @@ def scrape(func):
             if config.get_setting('downloadenabled') and (function == 'episodios' or function == 'findvideos'):
                 download(itemlist, item, function=function)
 
-        if 'patronMenu' in args:
+        if 'patronMenu' in args and itemlist:
             itemlist = thumb(itemlist, genre=True)
 
         if 'fullItemlistHook' in args:
@@ -529,6 +530,15 @@ def dooplay_search_vars(item, blacklist):
     patronNext = '<a class="arrow_pag" href="([^"]+)"><i id="nextpagination"'
 
     return locals()
+
+
+def dooplay_menu(item, type):
+    patron = '<a href="(?P<url>[^"#]+)"(?: title="[^"]+")?>(?P<title>[a-zA-Z0-9]+)'
+    patronBlock = '<nav class="' + item.args + '">(?P<block>.*?)</nav>'
+    action = 'peliculas'
+
+    return locals()
+
 
 def swzz_get_url(item):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:59.0) Gecko/20100101 Firefox/59.0'}
@@ -703,42 +713,42 @@ def typo(string, typography=''):
     # If there are no attributes, it applies the default ones
     attribute = ['[]','()','{}','submenu','color','bold','italic','_','--','[B]','[I]','[COLOR]']
 
-    movie_word_list = ['film', 'serie', 'tv', 'anime', 'cinema', 'sala']
-    search_word_list = ['cerca']
-    categories_word_list = ['genere', 'categoria', 'categorie', 'ordine', 'lettera', 'anno', 'alfabetico', 'a-z', 'menu']
+    # movie_word_list = ['film', 'serie', 'tv', 'anime', 'cinema', 'sala']
+    # search_word_list = ['cerca']
+    # categories_word_list = ['genere', 'categoria', 'categorie', 'ordine', 'lettera', 'anno', 'alfabetico', 'a-z', 'menu']
 
-    if not any(word in string for word in attribute):
-        if any(word in string.lower() for word in search_word_list):
-            string = '[COLOR '+ kod_color +']' + string + '[/COLOR]'
-        elif any(word in string.lower() for word in categories_word_list):
-            string = ' > ' + string
-        elif any(word in string.lower() for word in movie_word_list):
-            string = '[B]' + string + '[/B]'
+    # if not any(word in string for word in attribute):
+    #     if any(word in string.lower() for word in search_word_list):
+    #         string = '[COLOR '+ kod_color +']' + string + '[/COLOR]'
+        # elif any(word in string.lower() for word in categories_word_list):
+        #     string = ' > ' + string
+        # elif any(word in string.lower() for word in movie_word_list):
+        #     string = '[B]' + string + '[/B]'
 
     # Otherwise it uses the typographical attributes of the string
-    else:
-        if '[]' in string:
-            string = '[' + re.sub(r'\s\[\]','',string) + ']'
-        if '()' in string:
-            string = '(' + re.sub(r'\s\(\)','',string) + ')'
-        if '{}' in string:
-            string = '{' + re.sub(r'\s\{\}','',string) + '}'
-        if 'submenu' in string:
-            string = u"\u2022\u2022 ".encode('utf-8') + re.sub(r'\ssubmenu','',string)
-        if 'color' in string:
-            color = scrapertoolsV2.find_single_match(string,'color ([a-z]+)')
-            if color == 'kod' or '': color = kod_color
-            string = '[COLOR '+ color +']' + re.sub(r'\scolor\s([a-z]+)','',string) + '[/COLOR]'
-        if 'bold' in string:
-            string = '[B]' + re.sub(r'\sbold','',string) + '[/B]'
-        if 'italic' in string:
-            string = '[I]' + re.sub(r'\sitalic','',string) + '[/I]'
-        if '_' in string:
-            string = ' ' + re.sub(r'\s_','',string)
-        if '--' in string:
-            string = ' - ' + re.sub(r'\s--','',string)
-        if 'bullet' in string:
-            string = '[B]' + u"\u2022".encode('utf-8') + '[/B] ' + re.sub(r'\sbullet','',string)
+    # else:
+    if '[]' in string:
+        string = '[' + re.sub(r'\s\[\]','',string) + ']'
+    if '()' in string:
+        string = '(' + re.sub(r'\s\(\)','',string) + ')'
+    if '{}' in string:
+        string = '{' + re.sub(r'\s\{\}','',string) + '}'
+    if 'submenu' in string:
+        string = u"\u2022\u2022 ".encode('utf-8') + re.sub(r'\ssubmenu','',string)
+    if 'color' in string:
+        color = scrapertoolsV2.find_single_match(string,'color ([a-z]+)')
+        if color == 'kod' or '': color = kod_color
+        string = '[COLOR '+ color +']' + re.sub(r'\scolor\s([a-z]+)','',string) + '[/COLOR]'
+    if 'bold' in string:
+        string = '[B]' + re.sub(r'\sbold','',string) + '[/B]'
+    if 'italic' in string:
+        string = '[I]' + re.sub(r'\sitalic','',string) + '[/I]'
+    if '_' in string:
+        string = ' ' + re.sub(r'\s_','',string)
+    if '--' in string:
+        string = ' - ' + re.sub(r'\s--','',string)
+    if 'bullet' in string:
+        string = '[B]' + u"\u2022".encode('utf-8') + '[/B] ' + re.sub(r'\sbullet','',string)
 
     return string
 
@@ -915,6 +925,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
     verifiedItemlist = []
     for videoitem in itemlist:
         if not videoitem.server:
+            videoitem.url = unshortenit.unshorten(videoitem.url)[0]
             findS = servertools.findvideos(videoitem.url)
             if findS:
                 findS = findS[0]

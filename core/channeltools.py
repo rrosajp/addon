@@ -364,7 +364,7 @@ def set_channel_setting(name, value, channel):
 
     file_settings = os.path.join(config.get_data_path(), "settings_channels", channel + "_data.json")
     dict_settings = {}
-    def_settings = get_default_settings(channel)
+    if channel not in ['trakt']: def_settings = get_default_settings(channel)
 
     dict_file = None
 

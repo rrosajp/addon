@@ -367,9 +367,6 @@ def proxy_post_processing(url, proxy_data, response, opt):
 
 def downloadpage(url, **opt):
     logger.info()
-
-
-
     """
        Open a url and return the data obtained
 
@@ -441,7 +438,7 @@ def downloadpage(url, **opt):
         opt['proxy_retries_counter'] += 1
 
         session = cloudscraper.create_scraper()
-        session.verify = False
+        # session.verify = False
         if opt.get('cookies', True):
             session.cookies = cj
         session.headers.update(req_headers)

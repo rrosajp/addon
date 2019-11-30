@@ -73,11 +73,7 @@ def findvideos(item):
 
 @support.scrape
 def menu(item):
-    patron = '<a href="(?P<url>[^"#]+)"(?: title="[^"]+")?>(?P<title>[a-zA-Z0-9]+)'
-    patronBlock = '<nav class="' + item.args + '">(?P<block>.*?)</nav>'
-    action = 'peliculas'
-
-    return locals()
+    return support.dooplay_menu(item, item.args)
 
 
 def play(item):

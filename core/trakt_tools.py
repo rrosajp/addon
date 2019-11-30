@@ -3,19 +3,14 @@
 # -*- Created for Alfa-addon -*-
 # -*- By the Alfa Develop Group -*
 
-import os
+import os, xbmc
+from core import httptools, jsontools
+from core.item import Item
+from platformcode import config, logger
 from threading import Thread
 
-import xbmc
-
-from core import httptools
-from core import jsontools
-from core.item import Item
-from platformcode import config
-from platformcode import logger
-
-client_id = "c40ba210716aee87f6a9ddcafafc56246909e5377b623b72c15909024448e89d"
-client_secret = "999164f25832341f0214453bb11c915adb18e9490d6b5e9a707963a5a1bee43e"
+client_id = "404dac2771a60701f1b4e2ec0e9515ece058ec47a66cffce1480aaa022e0aee9"
+client_secret = " ad7c56c19f8a633441b3011a7b228c74977deb2eb2749fb5b022f2dc0c96473a"
 
 
 def auth_trakt():
@@ -29,7 +24,7 @@ def auth_trakt():
         post = jsontools.dump(post)
         # Se solicita url y código de verificación para conceder permiso a la app
         url = "http://api-v2launch.trakt.tv/oauth/device/code"
-        data = httptools.downloadpage(url, post=post, headers=headers, replace_headers=True).data
+        data = httptools.downloadpage(url, post=post, headers=headers).data
         data = jsontools.load(data)
         item.verify_url = data["verification_url"]
         item.user_code = data["user_code"]
@@ -63,12 +58,12 @@ def token_trakt(item):
             post = {'refresh_token': refresh, 'client_id': client_id, 'client_secret': client_secret,
                     'redirect_uri': 'urn:ietf:wg:oauth:2.0:oob', 'grant_type': 'refresh_token'}
             post = jsontools.dump(post)
-            data = httptools.downloadpage(url, post, headers, replace_headers=True).data
+            data = httptools.downloadpage(url, post=post, headers=headers).data
             data = jsontools.load(data)
         elif item.action == "token_trakt":
             url = "http://api-v2launch.trakt.tv/oauth/device/token"
             post = "code=%s&client_id=%s&client_secret=%s" % (item.device_code, client_id, client_secret)
-            data = httptools.downloadpage(url, post, headers, replace_headers=True).data
+            data = httptools.downloadpage(url, post=post, headers=headers).data
             data = jsontools.load(data)
         else:
             import time
@@ -89,7 +84,7 @@ def token_trakt(item):
                     url = "http://api-v2launch.trakt.tv/oauth/device/token"
                     post = {'code': item.device_code, 'client_id': client_id, 'client_secret': client_secret}
                     post = jsontools.dump(post)
-                    data = httptools.downloadpage(url, post, headers, replace_headers=True).data
+                    data = httptools.downloadpage(url, post=post, headers=headers).data
                     data = jsontools.load(data)
                     if "access_token" in data:
                         # Código introducido, salimos del bucle
@@ -169,7 +164,7 @@ def get_trakt_watched(id_type, mediatype, update=False):
                     if token_auth:
                         headers.append(['Authorization', "Bearer %s" % token_auth])
                         url = "https://api.trakt.tv/sync/watched/%s" % mediatype
-                        data = httptools.downloadpage(url, headers=headers, replace_headers=True).data
+                        data = httptools.downloadpage(url, headers=headers).data
                         watched_dict = jsontools.load(data)
 
                         if mediatype == 'shows':
@@ -214,7 +209,7 @@ def trakt_check(itemlist):
                 if not synced:
                     get_sync_from_file()
                     synced = True
-                
+
                 mediatype = 'movies'
                 id_type = 'tmdb'
 

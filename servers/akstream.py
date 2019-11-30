@@ -24,13 +24,15 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     data = httptools.downloadpage(page_url).data.replace('https','http')
 
     vres = scrapertools.find_multiple_matches(data, 'nowrap[^>]+>([^,]+)')
-    data_pack = scrapertools.find_single_match(data, "(eval.function.p,a,c,k,e,.*?)\s*</script>")
+    data_pack = scrapertools.find_single_match(data, "</div>\n\s*<script[^>]+>(eval.function.p,a,c,k,e,.*?)\s*</script>")
     if data_pack != "":
         from lib import jsunpack
         data = jsunpack.unpack(data_pack)
 
     # URL
+    # logger.info(data)
     matches = scrapertools.find_multiple_matches(data, '(http.*?\.mp4)')
+    # logger.info(str(matches))
     _headers = urllib.urlencode(httptools.default_headers)
 
     i = 0

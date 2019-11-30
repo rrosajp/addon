@@ -7,6 +7,7 @@ import os
 import sys
 
 import updater
+from specials import resolverdns
 import urllib2
 
 from core import channeltools
@@ -136,6 +137,17 @@ def run(item=None):
         elif item.action == "itemInfo":
             import base64
             platformtools.dialog_textviewer('Item info', item.parent)
+        elif item.action == "open_browser":
+            import webbrowser
+            if not webbrowser.open(item.url):
+                import xbmc
+                if xbmc.getCondVisibility('system.platform.linux') and xbmc.getCondVisibility('system.platform.android'):  # android
+                    xbmc.executebuiltin('StartAndroidActivity("", "android.intent.action.VIEW", "", "%s")' % (item.url))
+                else:
+                    short = urllib2.urlopen(
+                        'https://u.nu/api.php?action=shorturl&format=simple&url=' + item.url).read()
+                    platformtools.dialog_ok(config.get_localized_string(20000),
+                                            config.get_localized_string(70740) % short)
         # Action in certain channel specified in "action" and "channel" parameters
         else:
             # Entry point for a channel is the "mainlist" action, so here we check parental control
@@ -346,10 +358,14 @@ def run(item=None):
             log_message = ""
 
         if canal:
-            platformtools.dialog_ok(
-                config.get_localized_string(60087) %canal,
-                config.get_localized_string(60014),
-                log_message)
+            if item.url:
+                if platformtools.dialog_yesno(config.get_localized_string(60087) % canal, config.get_localized_string(60014),
+                        log_message, nolabel='ok', yeslabel=config.get_localized_string(70739)):
+                    run(Item(action="open_browser", url=item.url))
+            else:
+                platformtools.dialog_ok(config.get_localized_string(60087) % canal,
+                                           config.get_localized_string(60014),
+                                           log_message)
         else:
             platformtools.dialog_ok(
                 config.get_localized_string(60038),

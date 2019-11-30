@@ -538,7 +538,9 @@ def set_context_commands(item, parent_item):
                 and parent_item.action != "mainlist":
             context_commands.append((config.get_localized_string(60349), "XBMC.Container.Refresh (%s?%s)" %
                                      (sys.argv[0], Item(channel=item.channel, action="mainlist").tourl())))
-
+            context_commands.insert(2, (config.get_localized_string(70739),
+                                        "XBMC.Container.Update (%s?%s)" % (sys.argv[0], Item(action="open_browser",
+                                                                                             url=item.url).tourl())))
         # Añadir a Favoritos
         if num_version_xbmc < 17.0 and \
                 ((item.channel not in ["favorites", "videolibrary", "help", ""]
@@ -600,7 +602,7 @@ def set_context_commands(item, parent_item):
         if (item.channel != "downloads" and item.channel != "videolibrary" and downloadenabled != "false" and not config.get_localized_string(70585) in str(item.context))\
             or (item.channel != "downloads" and item.channel != "videolibrary" and downloadenabled != "false" and config.get_localized_string(70585) in str(item.context) and config.get_localized_string(70714) in str(item.context)):
             # Descargar pelicula
-            if item.contentType == "movie":
+            if item.contentType == "movie" and item.action in ['findvideos', "play"]:
                 context_commands.append((config.get_localized_string(60354), "XBMC.RunPlugin(%s?%s)" %
                                          (sys.argv[0], item.clone(channel="downloads", action="save_download",
                                                                   from_channel=item.channel, from_action=item.action)
@@ -953,14 +955,16 @@ def get_dialogo_opciones(item, default_action, strm, autoplay):
         if not autoplay:
             if item.server != "":
                 if "<br/>" in motivo:
-                    dialog_ok(config.get_localized_string(60362), motivo.split("<br/>")[0], motivo.split("<br/>")[1],
-                              item.url)
+                    ret = dialog_yesno(config.get_localized_string(60362), motivo.split("<br/>")[0], motivo.split("<br/>")[1],
+                              item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
                 else:
-                    dialog_ok(config.get_localized_string(60362), motivo, item.url)
+                    ret = dialog_yesno(config.get_localized_string(60362), motivo, item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
             else:
-                dialog_ok(config.get_localized_string(60362), config.get_localized_string(60363),
-                          config.get_localized_string(60364), item.url)
-
+                ret = dialog_yesno(config.get_localized_string(60362), config.get_localized_string(60363),
+                          config.get_localized_string(60364), item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
+            if ret:
+                xbmc.executebuiltin("XBMC.Container.Update (%s?%s)" % (sys.argv[0], Item(action="open_browser",
+                                                                                             url=item.url).tourl()))
             if item.channel == "favorites":
                 # "Quitar de favoritos"
                 opciones.append(config.get_localized_string(30154))

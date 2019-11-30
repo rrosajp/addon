@@ -1,4 +1,4 @@
-<addon id="plugin.video.kod" name="Kodi on Demand" provider-name="KOD Team" version="0.5">
+<addon id="plugin.video.kod" name="Kodi on Demand" provider-name="KOD Team" version="0.5.1">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.libtorrent" optional="true"/>
@@ -19,12 +19,10 @@
       <screenshot>resources/media/themes/ss/2.png</screenshot>
       <screenshot>resources/media/themes/ss/3.png</screenshot>
     </assets>
-      <news>-Ridefinito il modo in cui vengono scritti i canali, per assicurare migliore stabilità, debuggabilità e coerenza
-          -Riscritti di conseguenza molti canali, corregendo di fatto moltissimi problemi che avete segnalato
-          -Quando aggiungi in videoteca da fonti in più lingue (ita/sub ita) o più qualità, ti viene chiesto quale tipo di fonte vuoi.
-          -Per gli amanti degli anime, aggiunto VVVVID (senza bisogno di account!)
-          -Aggiunti i server supervideo e hdload, fixato wstream
-          -migliorie varie</news>
+      <news>-override DNS di default
+          -nuovi canali: streamtime e netfreex
+          -fixato cloudflare
+          -aggiunta opzione &quot;apri nel browser&quot;</news>
     <description lang="it">Naviga velocemente sul web e guarda i contenuti presenti</description>
     <disclaimer>[COLOR red]The owners and submitters to this addon do not host or distribute any of the content displayed by these addons nor do they have any affiliation with the content providers.[/COLOR]
     [COLOR yellow]Kodi © is a registered trademark of the XBMC Foundation. We are not connected to or in any other way affiliated with Kodi, Team Kodi, or the XBMC Foundation. Furthermore, any software, addons, or products offered by us will receive no support in official Kodi channels, including the Kodi forums and various social networks.[/COLOR]</disclaimer>

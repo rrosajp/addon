@@ -400,16 +400,17 @@ def show_result(item):
     if item.__dict__.has_key('tecleado'):
         tecleado = item.__dict__.pop('tecleado')
 
-    try:
-        channel = __import__('channels.%s' % item.channel, fromlist=["channels.%s" % item.channel])
-    except:
-        import traceback
-        logger.error(traceback.format_exc())
-        return []
+    # try:
+    #     channel = __import__('channels.%s' % item.channel, fromlist=["channels.%s" % item.channel])
+    # except:
+    #     import traceback
+    #     logger.error(traceback.format_exc())
+    #     return []
 
     if tecleado:
         # Mostrar resultados: agrupados por canales
-        return channel.search(item, tecleado)
+        return [Item().fromurl(i) for i in item.itemlist]
+        # return channel.search(item, tecleado)
     else:
         # Mostrar resultados: todos juntos
         if item.infoPlus:                       #Si viene de una ventana de InfoPlus, hay que salir de esta forma...
@@ -438,8 +439,9 @@ def channel_search(search_results, channel_parameters, tecleado):
             if len(result):
                 if not channel_parameters["title"].capitalize() in search_results:
                     search_results[channel_parameters["title"].capitalize()] = []
-                search_results[channel_parameters["title"].capitalize()].append({"item": item,
+                search_results[channel_parameters['title'].capitalize()].append({"item": item,
                                                                     "itemlist": result,
+                                                                    "thumbnail": channel_parameters["thumbnail"],
                                                                     "adult": channel_parameters["adult"]})
 
     except:
@@ -610,11 +612,15 @@ def do_search(item, categories=None):
             if result_mode == 0:
                 if len(search_results[channel]) > 1:
                     title += " -%s" % element["item"].title.strip()
-                title += " (%s)" % len(element["itemlist"])
-                title = re.sub("\[COLOR [^\]]+\]", "", title)
-                title = re.sub("\[/COLOR]", "", title)
+                title = re.sub(r"\[[^\]]+\]|•", "", title)
+                title = typo(title,'bold') + typo("%02d" % len(element["itemlist"]),'_ [] color kod bold')
+                plot = config.get_localized_string(60491) + '\n' + typo('','submenu')+ '\n'
+                for i in element["itemlist"]:
+                    if type(i) == Item:
+                        plot += re.sub(r'\[(?:/)?B\]','', i.title) + '\n'
                 itemlist.append(Item(title=title, channel="search", action="show_result", url=element["item"].url,
-                                     extra=element["item"].extra, folder=True, adult=element["adult"],
+                                     extra=element["item"].extra, folder=True, adult=element["adult"], plot=plot,
+                                     thumbnail=element["thumbnail"], itemlist=[e.tourl() for e in element["itemlist"]],
                                      from_action="search", from_channel=element["item"].channel, tecleado=tecleado))
             # todos los resultados juntos, en la misma lista
             else:
@@ -699,7 +705,7 @@ def discover_list(item):
         elem['tmdb_id']=elem['id']
         if 'title' in elem:
             title = unify.normalize(elem['title']).capitalize()
-            elem['year'] = scrapertools.find_single_match(elem['release_date'], '(\d{4})-\d+-\d+')
+            elem['year'] = scrapertools.find_single_match(elem['release_date'], r'(\d{4})-\d+-\d+')
         else:
             title = unify.normalize(elem['name']).capitalize()
             tvshow = True
