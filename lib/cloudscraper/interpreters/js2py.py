@@ -15,9 +15,12 @@ class ChallengeInterpreter(JavaScriptInterpreter):
         super(ChallengeInterpreter, self).__init__('js2py')
 
     def eval(self, jsEnv, js):
-        if js2py.eval_js('(+(+!+[]+[+!+[]]+(!![]+[])[!+[]+!+[]+!+[]]+[!+[]+!+[]]+[+[]])+[])[+!+[]]') == '1':
-            logging.warning('WARNING - Please upgrade your js2py https://github.com/PiotrDabkowski/Js2Py, applying work around for the meantime.')
-            js = jsunfuck(js)
+        ### blocca lo script
+
+        # from core.support import dbg; dbg()
+        # if js2py.eval_js('(+(+!+[]+[+!+[]]+(!![]+[])[!+[]+!+[]+!+[]]+[!+[]+!+[]]+[+[]])+[])[+!+[]]') == '1':
+        #     logging.warning('WARNING - Please upgrade your js2py https://github.com/PiotrDabkowski/Js2Py, applying work around for the meantime.')
+        #     js = jsunfuck(js)
 
         def atob(s):
             return base64.b64decode('{}'.format(s)).decode('utf-8')

@@ -54,6 +54,11 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                         data, status = unshortenit.unshorten(url)
                         logger.info("Data - Status zcrypt vcrypt.net: [%s] [%s] " %(data, status)) 
                 elif 'linkup' in url or 'bit.ly' in url:
+                    logger.info("DATA LINK {}".format(url))
+                    if '/tv/' in url:
+                        url = url.replace('/tv/','/tva/')
+                    elif 'delta' in url:
+                         url = url.replace('/delta/','/adelta/')
                     if '/olink/' in url: continue
                     else:
                         idata = httptools.downloadpage(url).data
@@ -67,7 +72,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                     data = httptools.downloadpage(data, follow_redirect=True).url
                     if '/speedx/' in data: # aggiunto per server speedvideo
                         data = data.replace('http://linkup.pro/speedx', 'http://speedvideo.net')
-                    # fix by greko fine
+                    # fix by greko fine                    
                 else:
                     data = ""
                     while host in url:

@@ -178,6 +178,26 @@ class CloudScraper(Session):
         return resp
 
     ##########################################################################################################################################################
+    # ------------------------------------------------------------------------------- #
+    # check if the response contains a valid Cloudflare reCaptcha challenge
+    # ------------------------------------------------------------------------------- #
+
+    @staticmethod
+    def is_reCaptcha_Challenge(resp):
+        try:
+            return (
+                resp.headers.get('Server', '').startswith('cloudflare')
+                and resp.status_code == 403
+                and re.search(
+                    r'action="/.*?__cf_chl_captcha_tk__=\S+".*?data\-sitekey=.*?',
+                    resp.text,
+                    re.M | re.DOTALL
+                )
+            )
+        except AttributeError:
+            pass
+
+        return False
 
     @staticmethod
     def isChallengeRequest(resp):
@@ -193,61 +213,177 @@ class CloudScraper(Session):
 
         return False
 
+
+    # ------------------------------------------------------------------------------- #
+    # Try to solve cloudflare javascript challenge.
+    # ------------------------------------------------------------------------------- #
+
+    @staticmethod
+    def IUAM_Challenge_Response(body, domain, interpreter):
+        try:
+            challengeUUID = re.search(
+                r'__cf_chl_jschl_tk__=(?P<challengeUUID>\S+)"',
+                body, re.M | re.DOTALL
+            ).groupdict().get('challengeUUID')
+            params = OrderedDict(re.findall(r'name="(r|jschl_vc|pass)"\svalue="(.*?)"', body))
+        except AttributeError:
+            sys.tracebacklimit = 0
+            raise RuntimeError("Cloudflare IUAM detected, unfortunately we can't extract the parameters correctly.")
+
+        try:
+            params['jschl_answer'] = JavaScriptInterpreter.dynamicImport(
+                interpreter
+            ).solveChallenge(body, domain)
+        except Exception as e:
+            raise RuntimeError(
+                'Unable to parse Cloudflare anti-bots page: {}'.format(
+                    getattr(e, 'message', e)
+                )
+            )
+
+        return {
+            'url': 'https://{}/'.format(domain),
+            'params': {'__cf_chl_jschl_tk__': challengeUUID},
+            'data': params
+        }
+
+    @staticmethod
+    def reCaptcha_Challenge_Response(provider, provider_params, body, url):
+        try:
+            params = re.search(
+                r'(name="r"\svalue="(?P<r>\S+)"|).*?__cf_chl_captcha_tk__=(?P<challengeUUID>\S+)".*?'
+                r'data-ray="(?P<data_ray>\S+)".*?data-sitekey="(?P<site_key>\S+)"',
+                body, re.M | re.DOTALL
+            ).groupdict()
+        except (AttributeError):
+            sys.tracebacklimit = 0
+            raise RuntimeError(
+                "Cloudflare reCaptcha detected, unfortunately we can't extract the parameters correctly."
+            )
+
+        return {
+            'url': url,
+            'params': {'__cf_chl_captcha_tk__': params.get('challengeUUID')},
+            'data': OrderedDict([
+                ('r', ''),
+                ('id', params.get('data_ray')),
+                (
+                    'g-recaptcha-response',
+                    reCaptcha.dynamicImport(
+                        provider.lower()
+                    ).solveCaptcha(url, params.get('site_key'), provider_params)
+                )
+            ])
+        }
+
     ##########################################################################################################################################################
 
     def sendChallengeResponse(self, resp, **original_kwargs):
-        body = resp.text
+        if self.is_reCaptcha_Challenge(resp):
+            # ------------------------------------------------------------------------------- #
+            # double down on the request as some websites are only checking
+            # if cfuid is populated before issuing reCaptcha.
+            # ------------------------------------------------------------------------------- #
 
-        parsed_url = urlparse(resp.url)
-        domain = parsed_url.netloc
+            resp = self.decodeBrotli(
+                super(CloudScraper, self).request(resp.request.method, resp.url, **kwargs)
+            )
 
-        params = OrderedDict()
+            if not self.is_reCaptcha_Challenge(resp):
+                return resp
 
-        s = re.search(r'name="s"\svalue="(?P<s_value>[^"]+)', body)
-        if s:
-            params['s'] = s.group('s_value')
+            # ------------------------------------------------------------------------------- #
+            # if no reCaptcha provider raise a runtime error.
+            # ------------------------------------------------------------------------------- #
 
-        if b'/cdn-cgi/l/chk_captcha' in resp.content:
             if not self.recaptcha or not isinstance(self.recaptcha, dict) or not self.recaptcha.get('provider'):
                 sys.tracebacklimit = 0
-                raise RuntimeError("Cloudflare reCaptcha detected, unfortunately you haven't loaded an anti reCaptcha provider correctly via the 'recaptcha' parameter.")
+                raise RuntimeError(
+                    "Cloudflare reCaptcha detected, unfortunately you haven't loaded an anti reCaptcha provider "
+                    "correctly via the 'recaptcha' parameter."
+                )
 
-            submit_url = '{}://{}/cdn-cgi/l/chk_captcha'.format(parsed_url.scheme, domain)
+            # ------------------------------------------------------------------------------- #
+            # if provider is return_response, return the response without doing anything.
+            # ------------------------------------------------------------------------------- #
+
+            if self.recaptcha.get('provider') == 'return_response':
+                return resp
+
             self.recaptcha['proxies'] = self.proxies
-            params['g-recaptcha-response'] = reCaptcha.dynamicImport(self.recaptcha.get('provider').lower()).solveCaptcha(resp, self.recaptcha)
+            submit_url = self.reCaptcha_Challenge_Response(
+                self.recaptcha.get('provider'),
+                self.recaptcha,
+                resp.text,
+                resp.url
+            )
         else:
+            # ------------------------------------------------------------------------------- #
             # Cloudflare requires a delay before solving the challenge
+            # ------------------------------------------------------------------------------- #
+
             if not self.delay:
                 try:
-                    delay = float(re.search(r'submit\(\);\r?\n\s*},\s*([0-9]+)', body).group(1)) / float(1000)
+                    delay = float(
+                        re.search(
+                            r'submit\(\);\r?\n\s*},\s*([0-9]+)',
+                            resp.text
+                        ).group(1)
+                    ) / float(1000)
                     if isinstance(delay, (int, float)):
                         self.delay = delay
-                except:  # noqa
-                    pass
+                except (AttributeError, ValueError):
+                    sys.tracebacklimit = 0
+                    raise RuntimeError("Cloudflare IUAM possibility malformed, issue extracing delay value.")
 
             sleep(self.delay)
-            submit_url = '{}://{}/cdn-cgi/l/chk_jschl'.format(parsed_url.scheme, domain)
-            try:
-                params.update(
-                    [
-                        ('jschl_vc', re.search(r'name="jschl_vc" value="(\w+)"', body).group(1)),
-                        ('pass', re.search(r'name="pass" value="(.+?)"', body).group(1)),
-                        ('jschl_answer', JavaScriptInterpreter.dynamicImport(self.interpreter).solveChallenge(body, domain))
-                    ]
-                )
-            except Exception as e:
-                raise ValueError('Unable to parse Cloudflare anti-bots page: {} {}'.format(e.message, BUG_REPORT))
 
-        # Requests transforms any request into a GET after a redirect,
-        # so the redirect has to be handled manually here to allow for
-        # performing other types of requests even as the first request.
+            # ------------------------------------------------------------------------------- #
 
-        cloudflare_kwargs = deepcopy(original_kwargs)
-        cloudflare_kwargs.setdefault('params', params)
-        cloudflare_kwargs['allow_redirects'] = False
-        self.request(resp.request.method, submit_url, **cloudflare_kwargs)
+            submit_url = self.IUAM_Challenge_Response(
+                resp.text,
+                urlparse(resp.url).netloc,
+                self.interpreter
+            )
 
-        return self.request(resp.request.method, resp.url, **original_kwargs)
+        # ------------------------------------------------------------------------------- #
+        # Send the Challenge Response back to Cloudflare
+        # ------------------------------------------------------------------------------- #
+
+        if submit_url:
+            def updateAttr(obj, name, newValue):
+                try:
+                    obj[name].update(newValue)
+                    return obj[name]
+                except (AttributeError, KeyError):
+                    obj[name] = {}
+                    obj[name].update(newValue)
+                    return obj[name]
+
+            cloudflare_kwargs = deepcopy(kwargs)
+            cloudflare_kwargs['allow_redirects'] = False
+            cloudflare_kwargs['params'] = updateAttr(cloudflare_kwargs, 'params', submit_url['params'])
+            cloudflare_kwargs['data'] = updateAttr(cloudflare_kwargs, 'data', submit_url['data'])
+            cloudflare_kwargs['headers'] = updateAttr(cloudflare_kwargs, 'headers', {'Referer': resp.url})
+
+            self.request(
+                'POST',
+                submit_url['url'],
+                **cloudflare_kwargs
+            )
+
+        # ------------------------------------------------------------------------------- #
+        # Request the original query request and return it
+        # ------------------------------------------------------------------------------- #
+
+        return self.request(resp.request.method, resp.url, **kwargs)
+
+        # ------------------------------------------------------------------------------- #
+        # Request the original query request and return it
+        # ------------------------------------------------------------------------------- #
+
+        return self.request(resp.request.method, resp.url, **kwargs)
+    # ------------------------------------------------------------------------------- #
 
     ##########################################################################################################################################################
 

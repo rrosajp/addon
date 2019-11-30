@@ -367,9 +367,6 @@ def proxy_post_processing(url, proxy_data, response, opt):
 
 def downloadpage(url, **opt):
     logger.info()
-
-
-
     """
        Open a url and return the data obtained
 

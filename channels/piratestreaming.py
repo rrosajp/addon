@@ -227,7 +227,7 @@ def findvideos(item):
     if urls:
         for url in urls:
             url, c = unshortenit.unshorten(url)
-            data += url + '\n'
+            data += url.encode('utf8') + '\n'
 
     itemlist += servertools.find_video_items(data=data)
 

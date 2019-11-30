@@ -7,6 +7,7 @@ import os
 import sys
 
 import updater
+from specials import resolverdns
 import urllib2
 
 from core import channeltools
