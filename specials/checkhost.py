@@ -13,12 +13,12 @@ addon = xbmcaddon.Addon()
 addonname = addon.getAddonInfo('name')
 addonid = addon.getAddonInfo('id')
 
-LIST_SITE = ['https://www.google.com', 'https://www.google.it', 'http://www.ansa.it/']
+LIST_SITE = ['http://www.ansa.it/', 'https://www.google.it']#, 'https://www.google.com']
 
 # lista di siti che non verranno raggiunti con i DNS del gestore
 
-LST_SITE_CHCK_DNS = ['https://casacinema.space', 'https://www.cb01.uno/']
-                     #'https://www.italia-film.pw', 'https://documentari-streaming-da.com',] # tolti
+LST_SITE_CHCK_DNS = ['https://casacinema.space', 'https://documentari-streaming-da.com']
+                     #'https://www.italia-film.pw', 'https://www.cb01.uno/',] # tolti
 
 class Kdicc():
 
