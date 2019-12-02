@@ -228,6 +228,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             episode = ''
         else:
             episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
+            second_episode = scrapertoolsV2.find_single_match(episode,'x\d+x(\d+)')
+            if second_episode: episode = re.sub(r'(\d+x\d+)x\d+',r'\1-', episode) + second_episode.zfill(2)
 
         #episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
         title = cleantitle(scraped['title']) if scraped['title'] else ''
