@@ -1,10 +1,14 @@
 import base64
+import logging
 import subprocess
-import sys
 
 from . import JavaScriptInterpreter
 
-# ------------------------------------------------------------------------------- #
+##########################################################################################################################################################
+
+BUG_REPORT = 'Cloudflare may have changed their technique, or there may be a bug in the script.'
+
+##########################################################################################################################################################
 
 
 class ChallengeInterpreter(JavaScriptInterpreter):
@@ -33,10 +37,10 @@ class ChallengeInterpreter(JavaScriptInterpreter):
                 )
             raise
         except Exception:
-            sys.tracebacklimit = 0
-            raise RuntimeError('Error executing Cloudflare IUAM Javascript in nodejs')
+            logging.error('Error executing Cloudflare IUAM Javascript. %s' % BUG_REPORT)
+            raise
 
+        pass
 
-# ------------------------------------------------------------------------------- #
 
 ChallengeInterpreter()
