@@ -5,7 +5,6 @@ import re
 from .translators.friendly_nodes import REGEXP_CONVERTER
 from .utils.injector import fix_js_args
 from types import FunctionType, ModuleType, GeneratorType, BuiltinFunctionType, MethodType, BuiltinMethodType
-from math import floor, log10
 import traceback
 try:
     import numpy
@@ -604,7 +603,15 @@ class PyJs(object):
         elif typ == 'Boolean':
             return Js('true') if self.value else Js('false')
         elif typ == 'Number':  #or self.Class=='Number':
-            return Js(unicode(js_dtoa(self.value)))
+            if self.is_nan():
+                return Js('NaN')
+            elif self.is_infinity():
+                sign = '-' if self.value < 0 else ''
+                return Js(sign + 'Infinity')
+            elif isinstance(self.value,
+                            long) or self.value.is_integer():  # dont print .0
+                return Js(unicode(int(self.value)))
+            return Js(unicode(self.value))  # accurate enough
         elif typ == 'String':
             return self
         else:  #object
@@ -1039,7 +1046,7 @@ def PyJsComma(a, b):
     return b
 
 
-from .internals.simplex import JsException as PyJsException, js_dtoa
+from .internals.simplex import JsException as PyJsException
 import pyjsparser
 pyjsparser.parser.ENABLE_JS2PY_ERRORS = lambda msg: MakeError('SyntaxError', msg)
 

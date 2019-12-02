@@ -6,6 +6,8 @@ if six.PY3:
     xrange = range
     unicode = str
 
+# todo fix apply and bind
+
 
 class FunctionPrototype:
     def toString():
@@ -39,7 +41,6 @@ class FunctionPrototype:
         return this.call(obj, args)
 
     def bind(thisArg):
-        arguments_ = arguments
         target = this
         if not target.is_callable():
             raise this.MakeError(
@@ -47,5 +48,5 @@ class FunctionPrototype:
         if len(arguments) <= 1:
             args = ()
         else:
-            args = tuple([arguments_[e] for e in xrange(1, len(arguments_))])
+            args = tuple([arguments[e] for e in xrange(1, len(arguments))])
         return this.PyJsBoundFunction(target, thisArg, args)
