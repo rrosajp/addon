@@ -106,15 +106,15 @@ def findvideos(item):
         data = httptools.downloadpage(item.url, headers=headers).data
         json_object = jsontools.load(data)
         for video in json_object['hydra:member'][0]['playlist']['videos']:
-            data = httptools.downloadpage(video['src'], headers={'Origin': host},follow_redirects=None).data
-            patron = 'href="([^"]+)"'
-            video_link = scrapertools.find_single_match(data, patron)
+            # data = httptools.downloadpage(video['src'], headers={'Origin': host},follow_redirects=None).data
+            # patron = 'href="([^"]+)"'
+            # video_link = scrapertools.find_single_match(data, patron)
             itemlist.append(
                 Item(
                     channel=item.channel,
                     action="play",
                     thumbnail=item.thumbnail,
-                    url=video_link,
+                    url=video['src'],
                     server='directo',
                     quality=str(video['size'])+ 'p',
                     folder=False))
