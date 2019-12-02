@@ -9,8 +9,8 @@ from core.item import Item
 from platformcode import config, logger
 from threading import Thread
 
-client_id = "404dac2771a60701f1b4e2ec0e9515ece058ec47a66cffce1480aaa022e0aee9"
-client_secret = " ad7c56c19f8a633441b3011a7b228c74977deb2eb2749fb5b022f2dc0c96473a"
+client_id = "502bd1660b833c1ae69828163c0848e84e9850061e5529f30930e7356cae73b1"
+client_secret = "1d30d5b24acf223a5e1ab6c61d08b69992d98ed5b0c7e26b052b5e6a592035a4"
 
 
 def auth_trakt():
