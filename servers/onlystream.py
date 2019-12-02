@@ -21,8 +21,11 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     logger.info("url=" + page_url)
     video_urls = []
     data = httptools.downloadpage(page_url).data
+    # logger.info(data)
     block = scrapertoolsV2.find_single_match(data, r'sources: \[([^\]]+)\]')
     sources = scrapertoolsV2.find_multiple_matches(block, r'file:\s*"([^"]+)"(?:,label:\s*"([^"]+)")?')
+    if not sources:
+        sources = scrapertoolsV2.find_multiple_matches(data, r'src:\s*"([^"]+)",\s*type:\s*"[^"]+",[^,]+,\s*label:\s*"([^"]+)"')
     for url, quality in sources:
         quality = 'auto' if not quality else quality
         video_urls.append(['.' + url.split('.')[-1] + ' [' + quality + '] [Onlystream]', url])
