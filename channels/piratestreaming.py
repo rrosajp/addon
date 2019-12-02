@@ -43,6 +43,33 @@ def search(item, texto):
         return []
 
 
+def newest(categoria):
+    support.log(categoria)
+    itemlist = []
+    item = support.Item()
+    try:
+        if categoria == "peliculas":
+            item.url = host + '/category/films'
+            item.contentType = 'movies'
+            return peliculas(item)
+        if categoria == "series":
+            item.url = host + '/category/serie'
+            item.contentType = 'tvshow'
+            return peliculas(item)
+        if categoria == "anime":
+            item.url = host + '/category/anime-cartoni-animati'
+            item.contentType = 'tvshow'
+            return peliculas(item)
+    # Continua la ricerca in caso di errore
+    except:
+        import sys
+        for line in sys.exc_info():
+            support.logger.error("{0}".format(line))
+        return []
+
+    return itemlist
+
+
 @support.scrape
 def peliculas(item):
     patron = r'data-placement="bottom" title="(?P<title>[^"]+)" alt=[^=]+="(?P<url>[^"]+)"> <img class="[^"]+" title="[^"]+" alt="[^"]+" src="(?P<thumb>[^"]+)"'
@@ -58,12 +85,13 @@ def peliculas(item):
 
 @support.scrape
 def episodios(item):
-    if item.data:
-        data = item.data
-    title = item.title
-    patron = r'link-episode">\s*(?P<title>\d+.\d+)[^>]+<\/span>\s*(?P<url>.*?)</div>'
+    if item.data: data = item.data
+    # debug= True
+    title = item.fulltitle
+    patron = r'link-episode">(?:\s*<strong>)?\s*(?P<episode>\d+.\d+(?:.\d+)?)(?:[^\(]+\((?P<lang>[?P<lang>A-Za-z-]+)[^>]+>)?(?:\s*(?P<title>.*?)  )[^>]+<\/span>\s*(?P<url>.*?)</div>'
     def itemHook(item):
-        item.title += support.typo(' - ', 'bold') + title
+        if 'Episodio' in item.title:
+            item.title = support.re.sub(r'Episodio [0-9.-]+', title, item.title)
         return item
     return locals()
 
