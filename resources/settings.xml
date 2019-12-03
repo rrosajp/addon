@@ -127,7 +127,7 @@
     <category label="DNS">
         <setting id="checkdns" type="bool" label="707401" default="true" visible="true"/>        
         <setting id="resolver_dns" type="bool" label="707405" default="True"/>
-        <setting id="resolver_dns_service" type="labelenum" values="Cloudflare|Google|OpenDns" label="707406" default="Cloudflare" visible="eq(-1,true)" option="hidden" enable="eq(-1,true)"/>
+        <setting id="resolver_dns_service" type="enum" values="Cloudflare|Google|OpenDns Home ip(v4)|OpenDns Family Shield ip(v4)|OpenDns ip(v6)" label="707406" default="1" visible="eq(-1,true)" option="hidden" enable="eq(-1,true)"/>
         <setting label="707407" visible="eq(-2,true)" option="hidden" enable="eq(-2,true)"/>
     </category>      
     <!-- Other -->
