@@ -9,6 +9,9 @@ import sys
 
 import xbmc
 from platformcode import config, logger
+import platform
+info = 'OS NAME= '+ str(os.name) + ' ' + str(platform.system()) + ' ' + str(platform.release()) + ' | KODI VER.= ' + str(config.get_platform(True)['num_version'])
+xbmc.log(info, xbmc.LOGNOTICE)
 
 
 logger.info("init...")
