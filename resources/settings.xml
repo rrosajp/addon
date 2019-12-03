@@ -123,13 +123,24 @@
                  values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
                  default="white" visible="eq(-17,true)+eq(-18,true)"/> -->
     </category>
-    <!-- Scelgo i DNS da utilizzare-->    
+    <!-- Scelgo i DNS da utilizzare -->   
     <category label="DNS">
-        <setting id="checkdns" type="bool" label="707401" default="true" visible="true"/>        
-        <setting id="resolver_dns" type="bool" label="707405" default="True"/>
-        <setting id="resolver_dns_service" type="enum" values="Cloudflare|Google|OpenDns Home ip(v4)|OpenDns Family Shield ip(v4)|OpenDns ip(v6)" label="707406" default="1" visible="eq(-1,true)" option="hidden" enable="eq(-1,true)"/>
-        <setting label="707407" visible="eq(-2,true)" option="hidden" enable="eq(-2,true)"/>
-    </category>      
+        <setting id="checkdns" type="bool" label="707401" default="true" visible="true"/>
+        <setting type="lsep"/>
+        <setting label="707415" visible="true" enable="true"/>
+        <setting id="resolver_dns" type="bool" label="707406" default="true" enable="true" visible="true"/>
+        <setting id="resolver_dns_service" type="enum" values="Cloudflare|Google|OpenDns Home ip(v4)|OpenDns Family Shield ip(v4)|OpenDns ip(v6)" label="707407" default="0" visible="eq(-1,true)" enable="eq(-1,true)"/>
+        <setting label="707408" visible="eq(-2,true)" enable="eq(-2,true)"/>
+
+        <setting id="resolver_dns_custom" type="bool" label="707409" default="false" enable="eq(-3,false)" visible="true"/>
+        <setting id="resolver_dns_custom1" type="ipaddress" visible="eq(-1,true)" label="707410" default="1.1.1.1"/>
+        <setting id="resolver_dns_custom2" type="ipaddress" visible="eq(-2,true)" label="707411" default="1.0.0.1"/>
+        
+        <setting label="707405" visible="true" enable="true"/>
+        <setting label="707412" visible="true" enable="true"/>
+        <setting label="707413" visible="true" enable="true"/>
+        <setting label="707414" visible="true" enable="true"/>
+    </category>
     <!-- Other -->
     <category label="70149">
         <setting label="70150" type="lsep"/>

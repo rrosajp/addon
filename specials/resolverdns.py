@@ -39,6 +39,7 @@ if active_dns == True:
         res.nameservers = ['1.1.1.1', '2606:4700:4700::1111',
                        '1.0.0.1', '2606:4700:4700::1001']
 
+    if config.get_setting('nameservers_dns_custom') and not config.get_setting('resolver_dns'):
+        res.nameservers = [config.get_setting('resolver_dns_custom1'),config.get_setting('resolver_dns_custom2')]
+
     override_system_resolver(res)
-
-
