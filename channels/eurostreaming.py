@@ -103,7 +103,7 @@ def pagina(url):
         data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
 
     elif 'clicca qui</span>' in data.lower():
-        item.url = scrapertoolsV2.find_single_match(data, '<h2 style="text-align: center;"><a href="([^"]+)">')
+        url = scrapertoolsV2.find_single_match(data, '<h2 style="text-align: center;"><a href="([^"]+)">')
         # Carica la pagina
         data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
 

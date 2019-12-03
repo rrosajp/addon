@@ -60,7 +60,10 @@ def peliculas(item):
     GENERI = scrapertoolsV2.find_multiple_matches(data, r'<a class="dropdown-item" href="[^"]+" title="([A-z]+)"')
 
     patronBlock = r'<div class="container">.*?class="col-md-12[^"]*?">(?P<block>.*?)<div class=(?:"container"|"bg-dark ")>'
-    if item.contentType == 'movie':
+    if item.args == 'newest':
+        patron = r'<div class="col-lg-3">[^>]+>[^>]+>\s<a href="(?P<url>[^"]+)".+?url\((?P<thumb>[^\)]+)\)">[^>]+>(?P<title>[^<]+)<[^>]+>[^>]+>(?:[^>]+>)?\s?(?P<rating>[\d\.]+)?[^>]+>.+?(?:[ ]\((?P<year>\d{4})\))?<[^>]+>[^>]+>(.?[\d\-x]+\s\(?(?P<lang>[sSuUbBiItTaA\-]+)?\)?\s?(?P<quality>[\w]+)?[|]?\s?(?:[fFiInNeE]+)?\s?\(?(?P<lang2>[sSuUbBiItTaA\-]+)?\)?)?'
+        pagination = 25    
+    elif item.contentType == 'movie':
         patron = r'<a href="(?P<url>[^"]+)" title="(?P<title>.+?)(?:[ ]\[(?P<lang>[sSuUbB\-iItTaA]+)\])?(?:[ ]\((?P<year>\d{4})\))?"\salt="[^"]+"\sclass="[^"]+"(?: style="background-image: url\((?P<thumb>.+?)\)">)?<div class="voto">[^>]+>[^>]+>.(?P<rating>[\d\.a-zA-Z\/]+)?[^>]+>[^>]+>[^>]+>(?:<div class="genere">(?P<quality>[^<]+)</div>)?'
         if item.args == 'update':
             patronBlock = r'<section id="slider">(?P<block>.*?)</section>'
@@ -76,8 +79,9 @@ def peliculas(item):
             pagination = 25
     else:
         #search
-        patron = r'<div class="col-lg-3">[^>]+>[^>]+>\s<a href="(?P<url>[^"]+)".+?url\((?P<thumb>[^\)]+)\)">[^>]+>(?P<title>[^<]+)<[^>]+>[^>]+>(?:[^>]+>)?\s?(?P<rating>[\d\.]+)?[^>]+>.+?(?:[ ]\((?P<year>\d{4})\))?<[^>]+>[^>]+>(.?[\d\-x]+\s\(?(?P<lang>[sSuUbBiItTaA\-]+)?\)?\s?(?P<quality>[\w]+)?[|]?\s?(?:[fFiInNeE]+)?\s?\(?(?P<lang2>[sSuUbBiItTaA\-]+)?\)?)?'
-        pagination = 25
+        patron = r'<div class="col-lg-3">[^>]+>[^>]+>\s<a href="(?P<url>[^"]+)".+?url\((?P<thumb>[^\)]+)\)">[^>]+>[^>]+>[^>]+>(?:[^>]+>)?\s?(?P<rating>[\d\.]+)?[^>]+>(?P<title>.+?)(?:[ ]\((?P<year>\d{4})\))?<[^>]+>[^>]+>(.?[\d\-x]+\s\(?(?P<lang>[sSuUbBiItTaA\-]+)?\)?\s?(?P<quality>[\w]+)?[|]?\s?(?:[fFiInNeE]+)?\s?\(?(?P<lang2>[sSuUbBiItTaA\-]+)?\)?)?'
+        
+
 
     def itemHook(item):
         if item.lang2:
@@ -150,6 +154,7 @@ def genres(item):
 
 def search(item, texto):
     support.log(item.url,texto)
+    text = texto.replace(' ', '+')
     item.url = host + "/?s=" + texto
     item.contentType = 'episode'
     item.args = 'search'
@@ -166,6 +171,7 @@ def newest(categoria):
     support.log('newest ->', categoria)
     itemlist = []
     item = Item()
+    item.args = 'newest'
     try:
         if categoria == 'peliculas':
             item.url = host+'/category/film/'
