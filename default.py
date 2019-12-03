@@ -10,8 +10,8 @@ import sys
 import xbmc
 from platformcode import config, logger
 import platform
-android = 'ANDROID' if 'ANDROID_STORAGE ' in os.environ else ''
-info = 'OS NAME= '+ android + str(os.name) + ' ' + str(platform.system()) + ' ' + str(platform.release()) + ' | KODI VER.= ' + str(config.get_platform(True)['num_version'])
+android = 'ANDROID ' if 'ANDROID_STORAGE' in os.environ else ''
+xbmc.log(str(os.environ), xbmc.LOGNOTICE)
 xbmc.log(info, xbmc.LOGNOTICE)
 
 
