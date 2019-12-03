@@ -5696,3 +5696,15 @@ msgstr ""
 msgctxt "#707404"
 msgid "By deactivating the DNS check, you have activated a reminder that it will appear at the top right."
 msgstr ""
+
+msgctxt "#707405"
+msgid "Activate DNS"
+msgstr ""
+
+msgctxt "#707406"
+msgid "Choose the DNS provider"
+msgstr ""
+
+msgctxt "#707407"
+msgid "Choose your preferred DNS provider and restart KODI!"
+msgstr ""

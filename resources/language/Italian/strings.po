@@ -5700,3 +5700,15 @@ msgstr "Attivazione Promemoria..."
 msgctxt "#707404"
 msgid "By deactivating the DNS check, you have activated a reminder that it will appear at the top right."
 msgstr "Disattivando il check DNS, hai attivato un promemoria\nche apparirà in alto a dx"
+
+msgctxt "#707405"
+msgid "Activate DNS"
+msgstr "Attiva DNS"
+
+msgctxt "#707406"
+msgid "Choose the DNS provider"
+msgstr "Scegli il fornitore DNS"
+
+msgctxt "#707407"
+msgid "Choose your preferred DNS provider and restart KODI!"
+msgstr "Scegli il tuo provider per i DNS che preferisci e riavvia KODI!"
