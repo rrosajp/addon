@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from js2py import js2py
+import js2py
 import logging
 import base64
 

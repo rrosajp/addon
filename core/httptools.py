@@ -409,8 +409,7 @@ def downloadpage(url, **opt):
         """
     load_cookies()
     import requests
-    if ('Linux' in os.name and 'ANDROID_STORAGE' not in os.environ and config.get_platform(True)['num_version'] > 18.2) \
-        or ('nt' in os.name and 'ProfileDrive' in os.environ and 'LogDrive' in os.environ):
+    if 'Linux' in os.name and 'ANDROID_STORAGE' not in os.environ and config.get_platform(True)['num_version'] > 18.2:
         from lib.cloudscraper import cloudscraper
     else:
         from lib.cloudscraper import cloudscraper_mod as cloudscraper
