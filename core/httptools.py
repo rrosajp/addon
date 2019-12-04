@@ -409,10 +409,7 @@ def downloadpage(url, **opt):
         """
     load_cookies()
     import requests
-    if 'Linux' in os.environ['OS'] and 'ANDROID_STORAGE' not in os.environ and config.get_platform(True)['num_version'] > 18.2:
-        from lib.cloudscraper import cloudscraper
-    else:
-        from lib.cloudscraper import cloudscraper_mod as cloudscraper
+    from lib import cloudscraper
 
     # Headers by default, if nothing is specified
     req_headers = default_headers.copy()
