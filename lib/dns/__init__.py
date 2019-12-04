@@ -15,6 +15,9 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
 # OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+# PROJECT URL
+# https://github.com/rthalley/dnspython
+
 """dnspython DNS toolkit"""
 
 __all__ = [
