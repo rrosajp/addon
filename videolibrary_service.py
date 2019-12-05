@@ -368,10 +368,6 @@ if __name__ == "__main__":
     # modo adulto:
     # sistema actual 0: Nunca, 1:Siempre, 2:Solo hasta que se reinicie Kodi
     # si es == 2 lo desactivamos.
-    if config.get_platform(True)['num_version'] >= 17.0:
-        from lib.alfaresolver import updated, update_now
-        if not updated():
-            update_now()
     if config.get_setting("adult_mode") == 2:
         config.set_setting("adult_mode", 0)
 

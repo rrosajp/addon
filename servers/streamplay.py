@@ -37,8 +37,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
     url = scrapertools.find_single_match(unpacked, '(http[^,]+\.mp4)')
 
-    from lib import alfaresolver
-    itemlist.append([".mp4" + " [streamplay]", alfaresolver.decode_video_url(url, data)])
+    itemlist.append([".mp4" + " [streamplay]", url])
 
     itemlist.sort(key=lambda x: x[0], reverse=True)
 
