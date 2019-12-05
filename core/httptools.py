@@ -232,7 +232,6 @@ def show_infobox(info_dict):
     return
 
 def check_proxy(url, **opt):
-
     proxy_data = dict()
     proxy_data['dict'] = {}
     proxy = opt.get('proxy', True)
@@ -444,11 +443,12 @@ def downloadpage(url, **opt):
         session.headers.update(req_headers)
 
         # Prepare the url in case you need a proxy, or if proxies are sent from the channel
-        url, proxy_data, opt = check_proxy(url, **opt)
-        if opt.get('proxies', None) is not None:
-            session.proxies = opt['proxies']
-        elif proxy_data.get('dict', {}):
-            session.proxies = proxy_data['dict']
+        # url, proxy_data, opt = check_proxy(url, **opt)
+        # if opt.get('proxies', None) is not None:
+        #     session.proxies = opt['proxies']
+        # elif proxy_data.get('dict', {}):
+        #     session.proxies = proxy_data['dict']
+        proxy_data = {}
 
         inicio = time.time()
 
@@ -550,21 +550,21 @@ def downloadpage(url, **opt):
         if opt.get('cookies', True):
             save_cookies(alfa_s=opt.get('alfa_s', False))
 
-        is_channel = inspect.getmodule(inspect.currentframe().f_back)
-        is_channel = scrapertoolsV2.find_single_match(str(is_channel), "<module '(channels).*?'")
-        if is_channel and isinstance(response_code, int):
-            if not opt.get('ignore_response_code', False) and not proxy_data.get('stat', ''):
-                if response_code > 399:
-                    show_infobox(info_dict)
-                    raise WebErrorException(urlparse.urlparse(url)[1])
+        # is_channel = inspect.getmodule(inspect.currentframe().f_back)
+        # is_channel = scrapertoolsV2.find_single_match(str(is_channel), "<module '(channels).*?'")
+        # if is_channel and isinstance(response_code, int):
+        #     if not opt.get('ignore_response_code', False) and not proxy_data.get('stat', ''):
+        #         if response_code > 399:
+        #             show_infobox(info_dict)
+        #             raise WebErrorException(urlparse.urlparse(url)[1])
 
         if not 'api.themoviedb' in url and not opt.get('alfa_s', False):
             show_infobox(info_dict)
 
         # If there is a proxy error, refresh the list and retry the number indicated in proxy_retries
-        response['data'], response['sucess'], url, opt = proxy_post_processing(url, proxy_data, response, opt)
-        if opt.get('out_break', False):
-            break
+        # response['data'], response['sucess'], url, opt = proxy_post_processing(url, proxy_data, response, opt)
+        # if opt.get('out_break', False):
+        #     break
 
     return type('HTTPResponse', (), response)
 

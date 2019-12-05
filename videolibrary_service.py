@@ -388,8 +388,8 @@ if __name__ == "__main__":
     custom_code.init()
 
     # Identifica la dirección Proxy y la lista de alternativas
-    from core import proxytools
-    proxytools.get_proxy_list()
+    # from core import proxytools
+    # proxytools.get_proxy_list()
     if not config.get_setting("update", "videolibrary") == 2:
         check_for_update(overwrite=False)
     
