@@ -448,7 +448,7 @@ def downloadpage(url, **opt):
         #     session.proxies = opt['proxies']
         # elif proxy_data.get('dict', {}):
         #     session.proxies = proxy_data['dict']
-        proxy_data = {}
+        proxy_data = {'dict': {}}
 
         inicio = time.time()
 
