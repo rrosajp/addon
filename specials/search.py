@@ -577,7 +577,7 @@ def do_search(item, categories=None):
             # Modo single Thread
             else:
                 logger.info("Intentado búsqueda en %s de %s " % (basename_without_extension, tecleado))
-                channel_search(search_results, channel_parameters, tecleado)
+                channel_search(search_results, channel_parameters, tecleado, session)
         except:
             logger.error("No se puede buscar en: %s" % channel_parameters["title"])
             import traceback
