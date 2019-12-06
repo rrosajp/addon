@@ -11,6 +11,7 @@ try:
 except ImportError:
     import urllib, urlparse, cookielib
 
+
 import inspect, os, time, json
 from threading import Lock
 from core.jsontools import to_utf8
@@ -408,7 +409,10 @@ def downloadpage(url, **opt):
         """
     load_cookies()
     if not opt.get('session', False):
-        from lib import cloudscraper
+        if 'Linux' in os.environ['OS'] and 'ANDROID_STORAGE' not in os.environ and config.get_platform(True)['num_version'] > 18.2:
+            from lib.cloudscraper import cloudscraper
+        else:
+            from lib.cloudscraper import cloudscraper_mod as cloudscraper
 
     # Headers by default, if nothing is specified
     req_headers = default_headers.copy()
@@ -512,8 +516,8 @@ def downloadpage(url, **opt):
                                       timeout=opt['timeout'])
 
             except Exception as e:
+                import requests
                 if not opt.get('ignore_response_code', False) and not proxy_data.get('stat', ''):
-                    import requests
                     req = requests.Response()
                     response['data'] = ''
                     response['sucess'] = False
