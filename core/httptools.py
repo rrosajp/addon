@@ -409,7 +409,7 @@ def downloadpage(url, **opt):
         """
     load_cookies()
 
-    if scrapertoolsV2.get_domain_from_url(url) in ['seriehd.moda', 'wstream.video', 'www.guardaserie.media']:  # cloudflare urls
+    if scrapertoolsV2.get_domain_from_url(url) in ['www.seriehd.moda', 'wstream.video', 'www.guardaserie.media']:  # cloudflare urls
         if opt.get('session', False):
             session = opt['session']  # same session to speed up search
         else:
