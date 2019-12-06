@@ -424,7 +424,7 @@ def show_result(item):
             return getattr(channel, item.action)(item)
 
 
-def channel_search(search_results, channel_parameters, tecleado):
+def channel_search(search_results, channel_parameters, tecleado, session):
     try:
         exec("from channels import " + channel_parameters["channel"] + " as module")
         mainlist = module.mainlist(Item(channel=channel_parameters["channel"]))
@@ -433,6 +433,7 @@ def channel_search(search_results, channel_parameters, tecleado):
             search_items = [Item(channel=channel_parameters["channel"], action="search")]
 
         for item in search_items:
+            item.session = session
             result = module.search(item.clone(), tecleado)
             if result is None:
                 result = []
@@ -548,6 +549,8 @@ def do_search(item, categories=None):
             logger.error(traceback.format_exc())
             continue
 
+    from lib import cloudscraper
+    session = cloudscraper.create_scraper()
 
     for index, infile in enumerate(list_channels_search):
         try:
@@ -566,7 +569,7 @@ def do_search(item, categories=None):
                 logger.info("Búsqueda cancelada")
                 return itemlist
             if multithread:
-                t = Thread(target=channel_search, args=[search_results, channel_parameters, tecleado],
+                t = Thread(target=channel_search, args=[search_results, channel_parameters, tecleado, session],
                            name=channel_parameters["title"])
                 t.setDaemon(True)
                 t.start()

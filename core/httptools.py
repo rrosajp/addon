@@ -407,8 +407,8 @@ def downloadpage(url, **opt):
 
         """
     load_cookies()
-    import requests
-    from lib import cloudscraper
+    if not opt.get('session', False):
+        from lib import cloudscraper
 
     # Headers by default, if nothing is specified
     req_headers = default_headers.copy()
@@ -435,8 +435,10 @@ def downloadpage(url, **opt):
         files = {}
         file_name = ''
         opt['proxy_retries_counter'] += 1
-
-        session = cloudscraper.create_scraper()
+        if not opt.get('session', False):
+            session = cloudscraper.create_scraper()
+        else:
+            session = opt['session']
         # session.verify = False
         if opt.get('cookies', True):
             session.cookies = cj
@@ -511,6 +513,7 @@ def downloadpage(url, **opt):
 
             except Exception as e:
                 if not opt.get('ignore_response_code', False) and not proxy_data.get('stat', ''):
+                    import requests
                     req = requests.Response()
                     response['data'] = ''
                     response['sucess'] = False
