@@ -549,10 +549,7 @@ def do_search(item, categories=None):
             logger.error(traceback.format_exc())
             continue
 
-    if 'Linux' in os.environ['OS'] and 'ANDROID_STORAGE' not in os.environ and config.get_platform(True)['num_version'] > 18.2:
-        from lib.cloudscraper import cloudscraper
-    else:
-        from lib.cloudscraper import cloudscraper_mod as cloudscraper
+    from lib import cloudscraper
     session = cloudscraper.create_scraper()
 
     for index, infile in enumerate(list_channels_search):

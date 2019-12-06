@@ -408,11 +408,16 @@ def downloadpage(url, **opt):
 
         """
     load_cookies()
-    if not opt.get('session', False):
-        if 'Linux' in os.environ['OS'] and 'ANDROID_STORAGE' not in os.environ and config.get_platform(True)['num_version'] > 18.2:
-            from lib.cloudscraper import cloudscraper
+
+    if scrapertoolsV2.get_domain_from_url(url) in ['seriehd.moda', 'wstream.video', 'www.guardaserie.media']:  # cloudflare urls
+        if opt.get('session', False):
+            session = opt['session']  # same session to speed up search
         else:
-            from lib.cloudscraper import cloudscraper_mod as cloudscraper
+            from lib import cloudscraper
+            session = cloudscraper.create_scraper()
+    else:
+        from lib import requests
+        session = requests.session()
 
     # Headers by default, if nothing is specified
     req_headers = default_headers.copy()
@@ -439,10 +444,7 @@ def downloadpage(url, **opt):
         files = {}
         file_name = ''
         opt['proxy_retries_counter'] += 1
-        if not opt.get('session', False):
-            session = cloudscraper.create_scraper()
-        else:
-            session = opt['session']
+
         # session.verify = False
         if opt.get('cookies', True):
             session.cookies = cj
@@ -516,7 +518,7 @@ def downloadpage(url, **opt):
                                       timeout=opt['timeout'])
 
             except Exception as e:
-                import requests
+                from lib import requests
                 if not opt.get('ignore_response_code', False) and not proxy_data.get('stat', ''):
                     req = requests.Response()
                     response['data'] = ''

@@ -360,7 +360,7 @@ def callCloudflare():
 
 
 if __name__ == "__main__":
-    threading.Thread(target=callCloudflare())
+    # threading.Thread(target=callCloudflare())
     # Se ejecuta en cada inicio
     import xbmc
     import time
