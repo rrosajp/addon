@@ -16,15 +16,16 @@ from platformcode import config, unify
 from lib.unshortenit import unshorten_only
 from lib import unshortenit
 
-host = ''
+host = 'https://www.tantifilm.eu'
 headers = ''
 def findhost():
-    global host, headers
-    permUrl = httptools.downloadpage('https://www.tantifilm.info/', follow_redirects=False).data
-    host = scrapertoolsV2.find_single_match(permUrl, r'<h2 style="text-align: center;"><a href="([^"]+)">Il nuovo indirizzo di Tantifilm è:</a></h2>')
-    if host.endswith('/'):
-        host = host[:-1]
-    headers = [['Referer', host]]
+    pass
+    # global host, headers
+    # permUrl = httptools.downloadpage('https://www.tantifilm.info/', follow_redirects=False).data
+    # host = scrapertoolsV2.find_single_match(permUrl, r'<h2 style="text-align: center;"><a href="([^"]+)">Il nuovo indirizzo di Tantifilm è:</a></h2>')
+    # if host.endswith('/'):
+    #     host = host[:-1]
+    # headers = [['Referer', host]]
 
 list_servers = ['verystream', 'openload', 'streamango', 'vidlox', 'youtube']
 list_quality = ['default']

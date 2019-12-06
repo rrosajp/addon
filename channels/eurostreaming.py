@@ -17,14 +17,15 @@ from core.item import Item
 from platformcode import config
 
 #impostati dinamicamente da findhost()
-host = ""
+host = "https://eurostreaming.pink"
 headers = ""
 
 def findhost():
-    global host, headers
-    permUrl = httptools.downloadpage('https://eurostreaming.link/', follow_redirects=False).headers
-    host = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-    headers = [['Referer', host]]
+    pass
+    # global host, headers
+    # permUrl = httptools.downloadpage('https://eurostreaming.link/', follow_redirects=False).headers
+    # host = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    # headers = [['Referer', host]]
 
 
 

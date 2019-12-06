@@ -22,16 +22,17 @@ from core import support
 from core import scrapertoolsV2, httptools
 from core.item import Item
 
-host = ""
+host = "https://casacinema.stream"
 headers = ""
 
 def findhost():
-    global host, headers
-    data = httptools.downloadpage('https://casacinema.nuovo.link').data
-    host = scrapertoolsV2.find_single_match(data, r'<div class="elementor-widget-container"><div class="elementor-button-wrapper"> <a href="([^"]+)"')
-    headers = [['Referer', host]]
-    if host.endswith('/'):
-        host = host[:-1]
+    pass
+    # global host, headers
+    # data = httptools.downloadpage('https://casacinema.nuovo.link').data
+    # host = scrapertoolsV2.find_single_match(data, r'<div class="elementor-widget-container"><div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    # headers = [['Referer', host]]
+    # if host.endswith('/'):
+    #     host = host[:-1]
 
 
 list_servers = ['supervideo', 'streamcherry','rapidvideo', 'streamango', 'openload']
