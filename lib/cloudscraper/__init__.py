@@ -85,7 +85,7 @@ class CloudScraper(Session):
         self.debug = kwargs.pop('debug', False)
         self.delay = kwargs.pop('delay', None)
         self.cipherSuite = kwargs.pop('cipherSuite', None)
-        self.interpreter = kwargs.pop('interpreter', 'native')
+        self.interpreter = kwargs.pop('interpreter', 'js2py')
         self.recaptcha = kwargs.pop('recaptcha', {})
         self.allow_brotli = kwargs.pop(
             'allow_brotli',
