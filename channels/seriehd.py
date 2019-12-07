@@ -7,15 +7,16 @@
 from core import scrapertoolsV2, httptools, support
 from core.item import Item
 
-host = ''
+host = 'https://www.seriehd.moda'
 headers = ''
 
 def findhost():
-    global host, headers
-    data= httptools.downloadpage('https://seriehd.nuovo.link/').data
-    global host, headers
-    host = scrapertoolsV2.find_single_match(data, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
-    headers = [['Referer', host]]
+    pass
+    # global host, headers
+    # data= httptools.downloadpage('https://seriehd.nuovo.link/').data
+    # global host, headers
+    # host = scrapertoolsV2.find_single_match(data, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    # headers = [['Referer', host]]
 
 list_servers = ['verystream', 'openload', 'streamango', 'thevideome']
 list_quality = ['1080p', '720p', '480p', '360']

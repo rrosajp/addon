@@ -42,5 +42,6 @@
       "visible": false
     }
   ],
-  "thumbnail": "server_akvideo.png"
+  "thumbnail": "server_akvideo.png",
+  "cloudflare": true
 }

@@ -42,5 +42,6 @@
             "type": "list",
             "visible": false
         }
-    ]
+    ],
+    "cloudflare": true
 }

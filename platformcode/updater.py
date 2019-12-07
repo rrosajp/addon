@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
-import hashlib
 import io
 import os
 import shutil
 from cStringIO import StringIO
 
-from core import httptools, filetools
+from core import filetools
 from platformcode import logger, platformtools
 import json
 import xbmc
 import re
 import xbmcaddon
 from lib import githash
-import urllib
+try:
+    import urllib.request as urllib
+except ImportError:
+    import urllib
 
 addon = xbmcaddon.Addon('plugin.video.kod')
 
@@ -30,13 +32,15 @@ def loadCommits(page=1):
     apiLink = 'https://api.github.com/repos/' + user + '/' + repo + '/commits?sha=' + branch + "&page=" + str(page)
     logger.info(apiLink)
     # riprova ogni secondo finchè non riesce (ad esempio per mancanza di connessione)
-    while True:
+    for n in xrange(10):
         try:
-            commitsLink = httptools.downloadpage(apiLink).data
+            commitsLink = urllib.urlopen(apiLink).read()
             ret = json.loads(commitsLink)
             break
         except:
             xbmc.sleep(1000)
+    else:
+        platformtools.dialog_notification('Kodi on Demand', 'impossibile controllare gli aggiornamenti')
 
     return ret
 
@@ -73,7 +77,7 @@ def check_addon_init():
         poFilesChanged = False
         nCommitApplied = 0
         for c in reversed(commits[:pos]):
-            commit = httptools.downloadpage(c['url']).data
+            commit = urllib.urlopen(c['url']).read()
             commitJson = json.loads(commit)
             # evitiamo di applicare i merge commit
             if 'Merge' in commitJson['commit']['message']:

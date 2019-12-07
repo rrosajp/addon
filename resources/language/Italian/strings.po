@@ -5685,6 +5685,7 @@ msgctxt "#70740"
 msgid "Your system does not have a web browser, so here's the short link you can open in another device:\n%s"
 msgstr "Il tuo sistema non ha un browser, quindi ecco un link corto che puoi aprire in un altro dispositivo\n%s"
 
+# DNS start
 msgctxt "#707401"
 msgid "Enable Check DNS"
 msgstr "Abilita Check DNS"
@@ -5700,3 +5701,48 @@ msgstr "Attivazione Promemoria..."
 msgctxt "#707404"
 msgid "By deactivating the DNS check, you have activated a reminder that it will appear at the top right."
 msgstr "Disattivando il check DNS, hai attivato un promemoria\nche apparirà in alto a dx"
+
+msgctxt "#707405"
+msgid "If you disable 'Enable DNS' you will use the dns set in your modem or device."
+msgstr "Se disattivi Attiva DNS userai i dns impostati nel modem o nel dispositivo in uso."
+
+msgctxt "#707412"
+msgid "If you want to insert YOUR DNS that do not appear in the list, run in order:"
+msgstr "Se vuoi inserire TUOI DNS che non compaiono nell'elenco, esegui in ordine:"
+
+msgctxt "#707413"
+msgid "'Enable DNS' -> OFF - 'Enter your DNS' -> ON"
+msgstr "Attiva DNS -> OFF - Inserisci i tuoi DNS -> ON"
+
+msgctxt "#707414"
+msgid "Note: If 'Activate DNS' and 'Insert your DNS' are both ON, the former will prevail."
+msgstr "N.B: Se Attiva DNS e Inserisci i tuoi DNS sono entrambi a ON, prevarranno i primi."
+
+msgctxt "#707415"
+msgid "For any change to the DNS you MUST restart KODI!"
+msgstr "Per ogni modifica sui DNS DEVI riavviare KODI!"
+
+msgctxt "#707406"
+msgid "Activate DNS"
+msgstr "Attiva DNS"
+
+msgctxt "#707407"
+msgid "Choose the DNS provider"
+msgstr "Scegli il fornitore DNS"
+
+msgctxt "#707408"
+msgid "Choose your preferred DNS provider and restart KODI!"
+msgstr "Scegli il tuo provider per i DNS che preferisci."
+
+msgctxt "#707409"
+msgid "Insert your DNS"
+msgstr "Inserisci i tuoi DNS"
+
+msgctxt "#707410"
+msgid "DNS1"
+msgstr "DNS1"
+
+msgctxt "#707411"
+msgid "DNS2"
+msgstr "DNS2"
+# DNS end

@@ -25,5 +25,6 @@
 		  "enabled": false,
 		  "visible": false
 		}
-    ]
+    ],
+	"cloudflare": true
 }

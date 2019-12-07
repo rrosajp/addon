@@ -22,14 +22,15 @@ from core.item import Item
 
 __channel__ = "serietvonline"
 
-host = ""
+host = "https://serietvonline.monster"
 headers = ""
 
 def findhost():
-    global host, headers
-    data = httptools.downloadpage('https://serietvonline.me/').data
-    host = scrapertoolsV2.find_single_match(data, r'<a class="pure-button pure-button-primary" title=\'serie tv online\' href="([^"]+)">')
-    headers = [['Referer', host]]
+    pass
+    # global host, headers
+    # data = httptools.downloadpage('https://serietvonline.me/').data
+    # host = scrapertoolsV2.find_single_match(data, r'<a class="pure-button pure-button-primary" title=\'serie tv online\' href="([^"]+)">')
+    # headers = [['Referer', host]]
 
 list_servers = ['akvideo', 'wstream', 'backin', 'vidtome', 'nowvideo']
 list_quality = ['default']

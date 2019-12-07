@@ -11,6 +11,7 @@ try:
 except ImportError:
     import urllib, urlparse, cookielib
 
+
 import inspect, os, time, json
 from threading import Lock
 from core.jsontools import to_utf8
@@ -232,7 +233,6 @@ def show_infobox(info_dict):
     return
 
 def check_proxy(url, **opt):
-
     proxy_data = dict()
     proxy_data['dict'] = {}
     proxy = opt.get('proxy', True)
@@ -408,8 +408,16 @@ def downloadpage(url, **opt):
 
         """
     load_cookies()
-    import requests
-    from lib import cloudscraper
+
+    if scrapertoolsV2.get_domain_from_url(url) in ['www.seriehd.moda', 'wstream.video', 'www.guardaserie.media', 'akvideo.stream','www.piratestreaming.top']:  # cloudflare urls
+        if opt.get('session', False):
+            session = opt['session']  # same session to speed up search
+        else:
+            from lib import cloudscraper
+            session = cloudscraper.create_scraper()
+    else:
+        from lib import requests
+        session = requests.session()
 
     # Headers by default, if nothing is specified
     req_headers = default_headers.copy()
@@ -437,18 +445,18 @@ def downloadpage(url, **opt):
         file_name = ''
         opt['proxy_retries_counter'] += 1
 
-        session = cloudscraper.create_scraper()
         # session.verify = False
         if opt.get('cookies', True):
             session.cookies = cj
         session.headers.update(req_headers)
 
         # Prepare the url in case you need a proxy, or if proxies are sent from the channel
-        url, proxy_data, opt = check_proxy(url, **opt)
-        if opt.get('proxies', None) is not None:
-            session.proxies = opt['proxies']
-        elif proxy_data.get('dict', {}):
-            session.proxies = proxy_data['dict']
+        # url, proxy_data, opt = check_proxy(url, **opt)
+        # if opt.get('proxies', None) is not None:
+        #     session.proxies = opt['proxies']
+        # elif proxy_data.get('dict', {}):
+        #     session.proxies = proxy_data['dict']
+        proxy_data = {'dict': {}}
 
         inicio = time.time()
 
@@ -510,6 +518,7 @@ def downloadpage(url, **opt):
                                       timeout=opt['timeout'])
 
             except Exception as e:
+                from lib import requests
                 if not opt.get('ignore_response_code', False) and not proxy_data.get('stat', ''):
                     req = requests.Response()
                     response['data'] = ''
@@ -550,21 +559,21 @@ def downloadpage(url, **opt):
         if opt.get('cookies', True):
             save_cookies(alfa_s=opt.get('alfa_s', False))
 
-        is_channel = inspect.getmodule(inspect.currentframe().f_back)
-        is_channel = scrapertoolsV2.find_single_match(str(is_channel), "<module '(channels).*?'")
-        if is_channel and isinstance(response_code, int):
-            if not opt.get('ignore_response_code', False) and not proxy_data.get('stat', ''):
-                if response_code > 399:
-                    show_infobox(info_dict)
-                    raise WebErrorException(urlparse.urlparse(url)[1])
+        # is_channel = inspect.getmodule(inspect.currentframe().f_back)
+        # is_channel = scrapertoolsV2.find_single_match(str(is_channel), "<module '(channels).*?'")
+        # if is_channel and isinstance(response_code, int):
+        #     if not opt.get('ignore_response_code', False) and not proxy_data.get('stat', ''):
+        #         if response_code > 399:
+        #             show_infobox(info_dict)
+        #             raise WebErrorException(urlparse.urlparse(url)[1])
 
         if not 'api.themoviedb' in url and not opt.get('alfa_s', False):
             show_infobox(info_dict)
 
         # If there is a proxy error, refresh the list and retry the number indicated in proxy_retries
-        response['data'], response['sucess'], url, opt = proxy_post_processing(url, proxy_data, response, opt)
-        if opt.get('out_break', False):
-            break
+        # response['data'], response['sucess'], url, opt = proxy_post_processing(url, proxy_data, response, opt)
+        # if opt.get('out_break', False):
+        #     break
 
     return type('HTTPResponse', (), response)
 

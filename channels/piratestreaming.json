@@ -7,5 +7,6 @@
     "thumbnail": "piratestreaming.png",
     "bannermenu": "piratestreaming.png",
     "categories": ["anime","movie","tvshow"],
-    "settings": []
+    "settings": [],
+    "cloudflare": true
 }

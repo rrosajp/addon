@@ -11,21 +11,22 @@ from lib import unshortenit
 from platformcode import logger, config
 
 #impostati dinamicamente da findhost()
-host = ""
+host = "https://cb01.cx"
 headers = ""
 
 
 def findhost():
-    global host, headers
-    permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
-    if 'google' in permUrl['location']:
-        if host[:4] != 'http':
-            host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-        else:
-            host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-    else:
-        host = permUrl['location']
-    headers = [['Referer', host]]
+    pass
+    # global host, headers
+    # permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
+    # if 'google' in permUrl['location']:
+    #     if host[:4] != 'http':
+    #         host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    #     else:
+    #         host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    # else:
+    #     host = permUrl['location']
+    # headers = [['Referer', host]]
 
 list_servers = ['verystream', 'openload', 'streamango', 'wstream']
 list_quality = ['HD', 'SD', 'default']

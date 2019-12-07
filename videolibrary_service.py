@@ -5,8 +5,7 @@
 
 import datetime, imp, math, threading, traceback, sys, glob
 
-
-
+import channelselector
 from platformcode import config
 try:
     import xbmc, os
@@ -333,7 +332,35 @@ def monitor_update():
 #                             config.set_setting(name=data[channel_file], value="value", channel=channel_file)
 #                     except: pass #channel not in json
 
+# always bypass al websites that use cloudflare at startup, so there's no need to wait 5 seconds when opened
+def callCloudflare():
+    from core import httptools, support
+    import json
+    channels_path = os.path.join(config.get_runtime_path(), "channels", '*.json')
+    channel_files = [os.path.splitext(os.path.basename(c))[0] for c in glob.glob(channels_path)]
+    for channel_name in channel_files:
+        channel_parameters = channeltools.get_channel_parameters(channel_name)
+        if 'cloudflare' in channel_parameters and channel_parameters["cloudflare"]:
+            channel = __import__('channels.%s' % channel_name, fromlist=["channels.%s" % channel_name])
+            try:
+                channel.findhost()
+            except:
+                pass
+            httptools.downloadpage(channel.host)
+
+    servers_path = os.path.join(config.get_runtime_path(), "servers", '*.json')
+    servers_files = glob.glob(servers_path)
+    for server in servers_files:
+        with open(server) as server:
+            server_parameters = json.load(server)
+        if 'cloudflare' in server_parameters and server_parameters["cloudflare"]:
+            patternUrl = server_parameters["find_videos"]["patterns"][0]["url"]
+            url = '/'.join(patternUrl.split('/')[:3])
+            httptools.downloadpage(url)
+
+
 if __name__ == "__main__":
+    # threading.Thread(target=callCloudflare())
     # Se ejecuta en cada inicio
     import xbmc
     import time
@@ -341,10 +368,6 @@ if __name__ == "__main__":
     # modo adulto:
     # sistema actual 0: Nunca, 1:Siempre, 2:Solo hasta que se reinicie Kodi
     # si es == 2 lo desactivamos.
-    if config.get_platform(True)['num_version'] >= 17.0:
-        from lib.alfaresolver import updated, update_now
-        if not updated():
-            update_now()
     if config.get_setting("adult_mode") == 2:
         config.set_setting("adult_mode", 0)
 
@@ -365,8 +388,8 @@ if __name__ == "__main__":
     custom_code.init()
 
     # Identifica la dirección Proxy y la lista de alternativas
-    from core import proxytools
-    proxytools.get_proxy_list()
+    # from core import proxytools
+    # proxytools.get_proxy_list()
     if not config.get_setting("update", "videolibrary") == 2:
         check_for_update(overwrite=False)
     

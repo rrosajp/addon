@@ -18,14 +18,15 @@ from core.item import Item
 from platformcode import config, logger
 
 #impostati dinamicamente da findhost()
-host = ""
+host = "https://www.altadefinizione01.cc"
 headers = ""
 
 def findhost():
-    global host, headers
-    data = httptools.downloadpage('https://altadefinizione01-nuovo.link/').data
-    host = scrapertoolsV2.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
-    headers = [['Referer', host]]
+    pass
+    # global host, headers
+    # data = httptools.downloadpage('https://altadefinizione01-nuovo.link/').data
+    # host = scrapertoolsV2.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    # headers = [['Referer', host]]
 
 list_servers = ['verystream','openload','rapidvideo','streamango']
 list_quality = ['default']
