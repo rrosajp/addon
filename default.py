@@ -23,7 +23,7 @@ if os.path.isfile(os.path.join(config.get_data_path(), 'alfa_db.sqlite')) == Tru
     os.rename(os.path.join(config.get_data_path(), 'alfa_db.sqlite'), os.path.join(config.get_data_path(), 'kod_db.sqlite'))
 
 librerias = xbmc.translatePath(os.path.join(config.get_runtime_path(), 'lib'))
-sys.path.append(librerias)
+sys.path.insert(0, librerias)
 
 
 from platformcode import launcher
