@@ -5681,8 +5681,9 @@ msgctxt "#70740"
 msgid "Your system does not have a web browser, so here's the short link you can open in another device:\n%s"
 msgstr ""
 
+# DNS start [ settings and declaration ]
 msgctxt "#707401"
-msgid "Enable Check DNS"
+msgid "Enable DNS Check Alert"
 msgstr ""
 
 msgctxt "#707402"
@@ -5690,54 +5691,54 @@ msgid "Connection or DNS problems"
 msgstr ""
 
 msgctxt "#707403"
-msgid "Reminder Activation"
+msgid "Disable alert"
 msgstr ""
 
 msgctxt "#707404"
-msgid "By deactivating the DNS check, you have activated a reminder that it will appear at the top right."
+msgid "Remind me"
 msgstr ""
 
 msgctxt "#707405"
-msgid "If you disable 'Enable DNS' you will use the dns set in your modem or device."
-msgstr ""
-
-msgctxt "#707412"
-msgid "If you want to insert YOUR DNS that do not appear in the list, run in order:"
-msgstr ""
-
-msgctxt "#707413"
-msgid "'Enable DNS' -> OFF - 'Enter your DNS' -> ON"
-msgstr ""
-
-msgctxt "#707414"
-msgid "Note: If 'Activate DNS' and 'Insert your DNS' are both ON, the former will prevail."
-msgstr ""
-
-msgctxt "#707415"
-msgid "For any change to the DNS you MUST restart KODI!"
+msgid "Notice Activation"
 msgstr ""
 
 msgctxt "#707406"
-msgid "Activate DNS"
+msgid "By disabling the alert, you have activated a notice\nthat will appear at the top right in case of problems"
 msgstr ""
 
 msgctxt "#707407"
-msgid "Choose the DNS provider"
+msgid "For any change to the DNS you MUST restart KODI!"
 msgstr ""
 
 msgctxt "#707408"
-msgid "Choose your preferred DNS provider and restart KODI!"
+msgid "Activate DNS"
 msgstr ""
 
 msgctxt "#707409"
-msgid "Insert your DNS"
+msgid "Choose the DNS provider"
 msgstr ""
 
 msgctxt "#707410"
+msgid "DNS supplier."
+msgstr ""
+
+msgctxt "#707411"
+msgid "Insert your DNS"
+msgstr ""
+
+msgctxt "#707412"
 msgid "DNS1"
 msgstr ""
 
-msgctxt "#7074011"
+msgctxt "#707413"
 msgid "DNS2"
 msgstr ""
-# DNS end
+
+msgctxt "#707414"
+msgid "You are using the DNS set on your device or modem"
+msgstr ""
+
+msgctxt "#707415"
+msgid "You have not selected any choice, the cloudflare DNS will be used."
+msgstr ""
+# end DNS

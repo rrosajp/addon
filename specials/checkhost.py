@@ -34,6 +34,7 @@ class Kdicc():
         self.view_msg = view_msg
         self.lst_site_check_dns = lst_site_check_dns
         self.urls = []
+        logger.info("check #### INIZIO INIT#### ")
 
     def check_Ip(self):
         """
@@ -189,13 +190,13 @@ class Kdicc():
 
         dialog = xbmcgui.Dialog()
         if config.get_setting('checkdns'):
-            risposta= dialog.yesno(addonname, txt, nolabel='Disattiva', yeslabel='Ricordami')
+            risposta= dialog.yesno(addonname, txt, nolabel=config.get_localized_string(707403), yeslabel=config.get_localized_string(707404))
             if risposta == False:
                 config.set_setting('checkdns', False)
-                dialog.textviewer(addonname+ ' '+config.get_localized_string(707403), config.get_localized_string(707404))
+                dialog.textviewer(addonname+' '+config.get_localized_string(707405), config.get_localized_string(707406))
         else:
             txt = config.get_localized_string(707402)
-            dialog.notification(addonname, txt, xbmcgui.NOTIFICATION_INFO, 5000)
+            dialog.notification(addonname, txt, xbmcgui.NOTIFICATION_INFO, 10000)
 """
     def richiamato in launcher.py
 """
