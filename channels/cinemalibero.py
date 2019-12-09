@@ -116,7 +116,7 @@ def peliculas(item):
         return item
 
     patronNext = r'<a class="next page-numbers".*?href="([^"]+)">'
-    debug = True
+    #debug = True
     return locals()
 
 @support.scrape
