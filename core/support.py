@@ -381,7 +381,6 @@ def scrape(func):
             data = re.sub('\n|\t', ' ', data)
             data = re.sub(r'>\s+<', '> <', data)
             # replace all ' with " and eliminate newline, so we don't need to worry about
-            log('DATA =', data)
 
         if patronBlock:
             blocks = scrapertoolsV2.find_multiple_matches_groups(data, patronBlock)
@@ -395,7 +394,6 @@ def scrape(func):
                     if 'quality' in bl and bl['quality']:
                         it.quality = bl['quality'].strip()
                         it.title = it.title + typo(bl['quality'].strip(), '_ [] color kod')
-                log('BLOCK ', '=', block)
                 itemlist.extend(blockItemlist)
                 matches.extend(blockMatches)
         elif patron:
