@@ -26,7 +26,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     data = re.sub(r'>\s\s*<', '><', data)
     jsCode = scrapertoolsV2.find_single_match(data, r'<script>\s*MDCore\.ref = "[a-z0-9]+"; (.*?) </script>')
     jsUnpacked = jsunpack.unpack(jsCode)
-    url = "https://" + scrapertoolsV2.find_single_match(jsUnpacked, r'MDCore\.vsrc="//([^"]+)')
+    url = "https://" + scrapertoolsV2.find_single_match(jsUnpacked, r'MDCore\.vsr(?:c)?="//([^"]+)')
 
     itemlist.append([".mp4 [MixDrop]", url])
 

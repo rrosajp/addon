@@ -116,6 +116,7 @@ def show_menu(item):
                     title = menu[key]
                     thumbnail = item.thumbnail
                     plot = ''
+                    url = ''
 
                 itemlist.append(Item(channel=item.channel,
                                      title=typo(title,'submenu' if not url else 'bold'),
@@ -243,16 +244,16 @@ def submenu(item):
 
     for filter in filter_list:
         thumbnail = ''
+        plot = ''
         if item.filterkey in ['director','actors']:
             load_info = load_json('http://api.themoviedb.org/3/search/person/?api_key=' + tmdb_api + '&language=' + lang + '&query=' + filter)
-            if load_info:
-                id = str(load_info['results'][0]['id'])
+            id = str(load_info['results'][0]['id']) if load_info.has_key('results') else ''
             if id:
-                info = load_json('http://api.themoviedb.org/3/person/'+ id + '?api_key=' + tmdb_api + '&language=' + lang)
-            if not info['biography']:
-                bio = load_json('http://api.themoviedb.org/3/person/'+ id + '?api_key=' + tmdb_api + '&language=en')['biography']
-            thumbnail = 'https://image.tmdb.org/t/p/w600_and_h900_bestv2' + info['profile_path'] if info['profile_path'] else item.thumbnail
-            plot += info['biography'] if info['biography'] else bio if bio else ''
+                info = load_json('http://api.themoviedb.org/3/person/'+ id + '?api_key=' + tmdb_api + '&language=' + lang) if id else ''
+                if info.has_key('biography') and not info['biography']:
+                    bio = load_json('http://api.themoviedb.org/3/person/'+ id + '?api_key=' + tmdb_api + '&language=en')['biography']
+                thumbnail = 'https://image.tmdb.org/t/p/w600_and_h900_bestv2' + info['profile_path'] if info['profile_path'] else item.thumbnail
+                plot += info['biography'] if info['biography'] else bio if bio else ''
 
         itemlist.append(Item(channel=item.channel,
                              title=typo(filter, 'bold'),
