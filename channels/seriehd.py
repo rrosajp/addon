@@ -25,14 +25,15 @@ list_quality = ['1080p', '720p', '480p', '360']
 def mainlist(item):
     findhost()
     tvshow = [('Genere', ['', 'genre']),
-              ('Americane', ['serie-tv-streaming/serie-tv-americane', 'peliculas']),
-              ('Italiane', ['serie-tv-streaming/serie-tv-italiane', 'peliculas']),]
+              ('Americane', ['/serie-tv-streaming/serie-tv-americane', 'peliculas']),
+              ('Italiane', ['/serie-tv-streaming/serie-tv-italiane', 'peliculas']),]
     return locals()
 
 
 @support.scrape
 def peliculas(item):
     #findhost()
+    # debug=True
     patron = r'<h2>(?P<title>.*?)</h2>\s*<img src="(?P<thumb>[^"]+)" alt="[^"]*" />\s*<A HREF="(?P<url>[^"]+)">.*?<span class="year">(?:(?P<year>[0-9]{4}))?.*?<span class="calidad">(?:(?P<quality>[A-Z]+))?.*?</span>'
     patronNext=r'<span class="current">\d+</span><a rel="nofollow" class="page larger" href="([^"]+)">\d+</a>'
     action='episodios'

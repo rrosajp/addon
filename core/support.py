@@ -357,6 +357,8 @@ def scrape(func):
         search = args['search'] if 'search' in args else ''
         blacklist = args['blacklist'] if 'blacklist' in args else []
         data = args['data'] if 'data' in args else ''
+        if not data and item.preloadedData:
+            data = item.preloadedData
         patron = args['patron'] if 'patron' in args else args['patronMenu'] if 'patronMenu' in args else ''
         if 'headers' in args:
             headers = args['headers']
