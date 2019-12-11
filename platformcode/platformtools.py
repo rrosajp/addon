@@ -214,7 +214,7 @@ def render_items(itemlist, parent_item):
         #if not genre or (genre and valid_genre):
         # Creamos el listitem
         #listitem = xbmcgui.ListItem(item.title, iconImage=icon_image, thumbnailImage=unify.thumbnail_type(item))
-        listitem = xbmcgui.ListItem(item.title, iconImage=icon_image, thumbnailImage=item.thumbnail, offscreen=True)
+        listitem = xbmcgui.ListItem(item.title, iconImage=icon_image, thumbnailImage=item.thumbnail)
         # Ponemos el fanart
         if item.fanart:
             fanart = item.fanart
