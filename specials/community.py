@@ -98,7 +98,6 @@ def show_menu(item):
     global list_data
     itemlist = []
     support.log()
-
     # If Second Level Menu
     if item.menu:
         menu = item.menu
@@ -333,7 +332,7 @@ def list_all(item):
             if inspect.stack()[1][3] != 'get_newest':
                 itemlist.append(
                     Item(channel=item.channel,
-                         action = item.action,
+                         action = 'list_all',
                          contentType=contentType,
                          title=typo(config.get_localized_string(30992), 'color kod bold'),
                          fulltitle= item.fulltitle,
@@ -342,6 +341,7 @@ def list_all(item):
                          args=item.args,
                          page=pag + 1,
                          path=item.path,
+                         media_type=item.media_type,
                          thumbnail=support.thumb()))
 
         if not 'generic_list' in json_data:
@@ -419,7 +419,7 @@ def list_filtered(item):
             if inspect.stack()[1][3] != 'get_newest':
                 itemlist.append(
                     Item(channel=item.channel,
-                         action = item.action,
+                         action = 'list_filtered',
                          contentType=contentType,
                          title=typo(config.get_localized_string(30992), 'color kod bold'),
                          fulltitle= item.fulltitle,
@@ -428,6 +428,7 @@ def list_filtered(item):
                          args=item.args,
                          page=pag + 1,
                          path=item.path,
+                         media_type=item.media_type,
                          thumbnail=support.thumb()))
 
         if not 'generic_list' in json_data:
@@ -580,7 +581,7 @@ def episodios(item):
         if inspect.stack()[1][3] != 'get_newest':
             itemlist.append(
                 Item(channel=item.channel,
-                     action = item.action,
+                     action = 'episodios',
                      contentType='episode',
                      title=typo(config.get_localized_string(30992), 'color kod bold'),
                      fulltitle= item.fulltitle,
@@ -588,6 +589,7 @@ def episodios(item):
                      url=item.url,
                      args=item.args,
                      page=pag + 1,
+                     media_type=item.media_type,
                      thumbnail=support.thumb(),
                      path=item.path))
 
@@ -737,10 +739,11 @@ def search(item, text):
 
 
 def load_links(item, itemlist, json_data, text):
-    support.log()
+    support.log(json_data)
 
     def links(item, itemlist, json_data, text):
         support.log()
+        # support.dbg()
         if "movies_list" in json_data: media_type= 'movies_list'
         elif "tvshows_list" in json_data: media_type = 'tvshows_list'
         elif "episodes_list" in json_data: media_type = 'episodes_list'
