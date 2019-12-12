@@ -6,7 +6,6 @@
 import os
 import sys
 
-import updater
 from specials import resolverdns
 import urllib2
 
@@ -19,6 +18,7 @@ from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
 from platformcode.logger import WebErrorException
+
 
 
 def start():
