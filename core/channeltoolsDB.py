@@ -22,7 +22,7 @@ def filter(category, language='all', adult=False):
             if channel[col] and col in ['categories', 'language']:
                 el[col] = channel[col].split(',')
             elif col == 'thumbnail':  # remote thumbnail
-                el[col] = os.path.join(thumb_path, 'resources', "thumb", channel[col])
+                el[col] = channel[col] if channel[col].startswith('http') else os.path.join(thumb_path, 'resources', "thumb", channel[col])
             elif channel[col]:
                 el[col] = channel[col]
             else:
