@@ -3,7 +3,7 @@
 import glob
 import os
 
-from core import channeltoolsDB as channeltools
+from core import channeltools
 from core.item import Item
 from platformcode.unify import thumb_dict
 from platformcode import config, logger, unify
@@ -121,24 +121,111 @@ def filterchannels(category, view="thumb_"):
 
     channelslist = []
 
+    # Si category = "allchannelstatus" es que estamos activando/desactivando canales
+    appenddisabledchannels = False
+    if category == "allchannelstatus":
+        category = "all"
+        appenddisabledchannels = True
+
+    # Lee la lista de canales
+    if category != 'adult':
+        channel_path = os.path.join(config.get_runtime_path(), 'channels', '*.json')
+    else:
+        channel_path = os.path.join(config.get_runtime_path(), 'channels', 'porn', '*.json')
+    logger.info("channel_path = %s" % channel_path)
+
+    channel_files = glob.glob(channel_path)
+    logger.info("channel_files encontrados %s" % (len(channel_files)))
+
+    # channel_language = config.get_setting("channel_language", default="all")
     channel_language = auto_filter()
     logger.info("channel_language=%s" % channel_language)
 
-    for channel_parameters in channeltools.filter(category, channel_language, config.get_setting("adult_mode")):
-        context = []
-        # Si prefiere el banner y el canal lo tiene, cambia ahora de idea
-        if view == "banner_" and "banner" in channel_parameters:
-            channel_parameters["thumbnail"] = channel_parameters["banner"]
-        # if channel_parameters["has_settings"]:
-        #     context.append(
-        #         {"title": config.get_localized_string(70525), "channel": "setting", "action": "channel_config",
-        #          "config": channel_parameters["channel"]})
+    for channel_path in channel_files:
+        logger.info("channel in for = %s" % channel_path)
 
-        channel_info = set_channel_info(channel_parameters)
-        channelslist.append(Item(title=channel_parameters["name"], channel=channel_parameters["id"],
-                                 action="mainlist", thumbnail=get_thumb(channel_parameters["thumbnail"]), plot=channel_info,
-                                 category=channel_parameters["name"],
-                                 language=channel_parameters["language"], viewmode="list", context=context))
+        channel = os.path.basename(channel_path).replace(".json", "")
+
+        try:
+            channel_parameters = channeltools.get_channel_parameters(channel)
+
+            if channel_parameters["channel"] == 'community':
+                continue
+
+            # si el canal no es compatible, no se muestra
+            if not channel_parameters["compatible"]:
+                continue
+
+            # Si no es un canal lo saltamos
+            if not channel_parameters["channel"]:
+                continue
+            logger.info("channel_parameters=%s" % repr(channel_parameters))
+
+            # Si prefiere el banner y el canal lo tiene, cambia ahora de idea
+            if view == "banner_" and "banner" in channel_parameters:
+                channel_parameters["thumbnail"] = channel_parameters["banner"]
+
+            # si el canal está desactivado no se muestra el canal en la lista
+            if not channel_parameters["active"]:
+                continue
+
+            # Se salta el canal si no está activo y no estamos activando/desactivando los canales
+            channel_status = config.get_setting("enabled", channel_parameters["channel"])
+
+            if channel_status is None:
+                # si channel_status no existe es que NO HAY valor en _data.json.
+                # como hemos llegado hasta aquí (el canal está activo en channel.json), se devuelve True
+                channel_status = True
+
+            if not channel_status:
+                # si obtenemos el listado de canales desde "activar/desactivar canales", y el canal está desactivado
+                # lo mostramos, si estamos listando todos los canales desde el listado general y está desactivado,
+                # no se muestra
+                if not appenddisabledchannels:
+                    continue
+
+            # Se salta el canal para adultos si el modo adultos está desactivado
+            if channel_parameters["adult"] and config.get_setting("adult_mode") == 0:
+                continue
+
+            # Se salta el canal si está en un idioma filtrado
+            # Se muestran todos los canales si se elige "all" en el filtrado de idioma
+            # Se muestran sólo los idiomas filtrados, cast o lat
+            # Los canales de adultos se mostrarán siempre que estén activos
+
+            # for channel_language_list in channel_language_list:
+            #     if c in channel_parameters["language"]:
+            #         L = True
+            #     else:
+            #         L = False
+            # logger.info('CCLANG= ' + channel_language + ' ' + str(channel_language_list))
+            if channel_language != "all" and "*" not in channel_parameters["language"] \
+                 and channel_language not in str(channel_parameters["language"]):
+                continue
+
+            # Se salta el canal si está en una categoria filtrado
+            if category != "all" and category not in channel_parameters["categories"]:
+                continue
+
+            # Si tiene configuración añadimos un item en el contexto
+            context = []
+            if channel_parameters["has_settings"]:
+                context.append({"title": config.get_localized_string(70525), "channel": "setting", "action": "channel_config",
+                                "config": channel_parameters["channel"]})
+
+            channel_info = set_channel_info(channel_parameters)
+            # Si ha llegado hasta aquí, lo añade
+            channelslist.append(Item(title=channel_parameters["title"], channel=channel_parameters["channel"],
+                                     action="mainlist", thumbnail=channel_parameters["thumbnail"],
+                                     fanart=channel_parameters["fanart"], plot=channel_info, category=channel_parameters["title"],
+                                     language=channel_parameters["language"], viewmode="list", context=context))
+
+        except:
+            logger.error("Se ha producido un error al leer los datos del canal '%s'" % channel)
+            import traceback
+            logger.error(traceback.format_exc())
+
+    channelslist.sort(key=lambda item: item.title.lower().strip())
 
     if category == "all":
         channel_parameters = channeltools.get_channel_parameters('url')
