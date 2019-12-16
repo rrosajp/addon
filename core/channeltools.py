@@ -14,7 +14,6 @@ dict_channels_parameters = dict()
 
 remote_path = 'https://raw.githubusercontent.com/kodiondemand/media/master/'
 
-
 def is_adult(channel_name):
     logger.info("channel_name=" + channel_name)
     channel_parameters = get_channel_parameters(channel_name)
@@ -201,80 +200,68 @@ def get_lang(channel_name):
     return list_language
 
 def get_default_settings(channel_name):
-    import filetools, inspect
-    # Check if it is a real channel
-    try:
-        channel = __import__('channels.%s' % channel_name, fromlist=["channels.%s" % channel_name])
-    except:
-        return get_channel_json(channel_name).get('settings', list())
-
-    list_language = get_lang(channel_name)
-
-    # Check if the automatic renumbering function exists
-    renumber = False
-    if 'episodios' in dir(channel):
-        from core import scrapertoolsV2
-        if scrapertoolsV2.find_single_match(inspect.getsource(channel), r'(anime\s*=\s*True)') \
-            or scrapertoolsV2.find_single_match(inspect.getsource(channel), r'(autorenumber\()'):
-            renumber = True
-
+    import filetools
     default_path = filetools.join(config.get_runtime_path(), 'default_channel_settings' + '.json')
     default_file = jsontools.load(filetools.read(default_path))
-    default_controls = default_file['settings']
-    default_controls_renumber = default_file['renumber']
-    channel_json = get_channel_json(channel_name)
-    #  Collects configurations
-    channel_language = categories = channel_json['language']
-    channel_controls = channel_json['settings']
-    categories = channel_json['categories']
-    not_active = channel_json['not_active'] if channel_json.has_key('not_active') else []
-    default_off = channel_json['default_off'] if channel_json.has_key('default_off') else []
-    # Apply default configurations if they do not exist
-    for control in default_controls:
-        if control['id'] not in str(channel_controls):
-            if 'include_in_newest' in control['id'] and 'include_in_newest' not in not_active and control['id'] not in not_active:
-                label = control['id'].split('_')
-                label = label[-1]
-                if label == 'peliculas':
-                    if 'movie' in categories:
-                        control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30122)
-                        control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_peliculas' in default_off) else True
-                        channel_controls.append(control)
-                    else: pass
-                elif label == 'series':
-                    if 'tvshow' in categories:
-                        control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30123)
-                        control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_series' in default_off) else True
-                        channel_controls.append(control)
-                    else: pass
-                elif label == 'anime':
-                    if 'anime' in categories:
-                        control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30124)
-                        control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_anime' in default_off) else True
-                        channel_controls.append(control)
-                    else: pass
 
-                else:
-                    control['label'] = config.get_localized_string(70727) + ' - ' + label.capitalize()
-                    control['default'] = control['default'] if control['id'] not in default_off else False
+    channel_path = filetools.join(config.get_runtime_path(),'channels',channel_name + '.json')
+    adult_path = filetools.join(config.get_runtime_path(),'channels', 'porn', channel_name + '.json')
+
+    # from core.support import dbg; dbg()
+    if os.path.exists(channel_path) or os.path.exists(adult_path):
+        default_controls = default_file['settings']
+        default_controls_renumber = default_file['renumber']
+        channel_json = get_channel_json(channel_name)
+
+        #  Collects configurations
+        channel_language = channel_json['language']
+        channel_controls = channel_json['settings']
+        categories = channel_json['categories']
+        not_active = channel_json['not_active'] if channel_json.has_key('not_active') else []
+        default_off = channel_json['default_off'] if channel_json.has_key('default_off') else []
+
+        # Apply default configurations if they do not exist
+        for control in default_controls:
+            if control['id'] not in str(channel_controls):
+                if 'include_in_newest' in control['id'] and 'include_in_newest' not in not_active and control['id'] not in not_active:
+                    label = control['id'].split('_')
+                    label = label[-1]
+                    if label == 'peliculas':
+                        if 'movie' in categories:
+                            control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30122)
+                            control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_peliculas' in default_off) else True
+                            channel_controls.append(control)
+                        else: pass
+                    elif label == 'series':
+                        if 'tvshow' in categories:
+                            control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30123)
+                            control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_series' in default_off) else True
+                            channel_controls.append(control)
+                        else: pass
+                    elif label == 'anime':
+                        if 'anime' in categories:
+                            control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30124)
+                            control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_anime' in default_off) else True
+                            channel_controls.append(control)
+                        else: pass
+
+                    else:
+                        control['label'] = config.get_localized_string(70727) + ' - ' + label.capitalize()
+                        control['default'] = control['default'] if control['id'] not in default_off else False
+                        channel_controls.append(control)
+
+                elif control['id'] not in not_active and 'include_in_newest' not in control['id']:
+                    if type(control['default']) == bool:
+                        control['default'] = control['default'] if control['id'] not in default_off else False
                     channel_controls.append(control)
 
-            # elif control['id'] == 'filter_languages':
-            #     if len(channel_language) > 1:
-            #         control['lvalues'] = list_language
-            #         channel_controls.append(control)
-            #     else: pass
-
-            elif control['id'] not in not_active and 'include_in_newest' not in control['id']:
-                if type(control['default']) == bool:
-                    control['default'] = control['default'] if control['id'] not in default_off else False
-                channel_controls.append(control)
-
-    if renumber:
-        for control in default_controls_renumber:
-            if control['id'] not in str(channel_controls):
-                channel_controls.append(control)
-            else: pass
+        if 'anime' in categories:
+            for control in default_controls_renumber:
+                if control['id'] not in str(channel_controls):
+                    channel_controls.append(control)
+                else: pass
+    else:
+        return get_channel_json(channel_name).get('settings', list())
     return channel_controls
 
 
