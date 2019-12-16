@@ -75,30 +75,6 @@ def peliculas(item):
     if item.args != 'all' and item.args != 'search':
         action = 'findvideos' if item.extra == 'movie' else 'episodios'
         item.contentType = 'movie' if item.extra == 'movie' else 'tvshow'
-    else:
-        def itemHook(item):
-            item.action = 'episodios'
-            item.contentType = 'tvshow'
-            data = httptools.downloadpage(item.url, headers=headers).data
-            data = re.sub('\n|\t', ' ', data)
-            data = re.sub(r'>\s+<', '> <', data)
-            check = scrapertoolsV2.find_single_match(data, r'<div class="category-film">\s+<h3>\s+(.*?)\s+</h3>\s+</div>')
-            if 'sub' in check.lower():
-                item.contentLanguage = 'Sub-ITA'
-                item.title += support.typo('Sub-ITA', '_ [] color kod')
-            support.log("CHECK : ", check)
-            if 'anime' in check.lower():
-                support.log('select = ### è una anime ###')
-                item.action = 'episodios'
-                anime = True
-                args='anime'
-            elif 'serie' in check.lower():
-                pass
-            else:
-                support.log('select ELSE = ### è un film ###')
-                item.action = 'findvideos'
-                item.contentType='movie'
-            return item
 
     #debug = True
     return locals()
@@ -107,30 +83,38 @@ def peliculas(item):
 def episodios(item):
     log()
     findhost()
-
-    data_check = httptools.downloadpage(item.url, headers=headers).data
-    data_check = re.sub('\n|\t', ' ', data_check)
-    data_check = re.sub(r'>\s+<', '> <', data_check)
+    if not item.data:
+        data_check = httptools.downloadpage(item.url, headers=headers).data
+        data_check = re.sub('\n|\t', ' ', data_check)
+        data_check = re.sub(r'>\s+<', '> <', data_check)
+    else:
+        data_check = item.data
     patron_check = r'<iframe src="([^"]+)" scrolling="no" frameborder="0" width="626" height="550" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">'
     item.url = scrapertoolsV2.find_single_match(data_check, patron_check)
 
-    patronBlock = r'Episodio<\/a>.*?<ul class="nav navbar-nav">(?P<block>.*?)<\/ul>'
+    patronBlock = r'Stagioni<\/a>.*?<ul class="nav navbar-nav">(?P<block>.*?)<\/ul>'
     patron = r'<a href="(?P<url>[^"]+)"\s*>\s*<i[^>]+><\/i>\s*(?P<episode>\d+)<\/a>'
+    # debug = True
 
-    def itemHook(item):
-        item.contentType = 'tvshow'
-        url_season = item.url.rpartition('/')
-        support.log("ITEM URL: ", url_season[0])
-        seasons = support.match(item, r'<a href="([^"]+)"\s*>\s*<i[^>]+><\/i>\s*(\d+)<\/a>', r'Stagioni<\/a>.*?<ul class="nav navbar-nav">(.*?)<\/ul>', headers=headers, url=url_season[0])[0]
-        for season_url, season in seasons:
-            support.log("ITEM URL2: ", url_season[0],' - ', item.url)
-            if season_url[0] in item.url:
-                item.title = support.typo(season+'x'+unify.remove_format(item.title), 'bold')
-##                item.infoLabels['title'] = item.fulltitle if item.infoLabels['title'] == '' else item.infoLabels['title']
-##                item.infoLabels['tvshowtitle'] = item.fulltitle if item.infoLabels['tvshowtitle'] == '' else item.infoLabels['tvshowtitle']
-                break
+    def itemlistHook(itemlist):
+        retItemlist = []
+        for item in itemlist:
+            item.contentType = 'episode'
 
-        return item
+            season = unify.remove_format(item.title)
+            season_data = httptools.downloadpage(item.url).data
+            season_data = re.sub('\n|\t', ' ', season_data)
+            season_data = re.sub(r'>\s+<', '> <', season_data)
+            block = scrapertoolsV2.find_single_match(season_data, 'Episodi.*?<ul class="nav navbar-nav">(.*?)</ul>')
+            episodes = scrapertoolsV2.find_multiple_matches(block, '<a href="([^"]+)"\s*>\s*<i[^>]+><\/i>\s*(\d+)<\/a>')
+            for url, episode in episodes:
+                i = item.clone()
+                i.action = 'findvideos'
+                i.url = url
+                i.title = str(season) + 'x' + str(episode)
+                retItemlist.append(i)
+
+        return retItemlist
 
     #debug = True
     return locals()
@@ -262,7 +246,23 @@ def findvideos(item):
 ##        data = item.url
 ##    else:
 ##        data = httptools.downloadpage(item.url, headers=headers).data
-    data = item.url if item.contentType == "episode" else httptools.downloadpage(item.url, headers=headers).data
+    data = httptools.downloadpage(item.url, headers=headers).data
+
+    data = re.sub('\n|\t', ' ', data)
+    data = re.sub(r'>\s+<', '> <', data)
+    check = scrapertoolsV2.find_single_match(data, r'<div class="category-film">\s+<h3>\s+(.*?)\s+</h3>\s+</div>')
+    if 'sub' in check.lower():
+        item.contentLanguage = 'Sub-ITA'
+    support.log("CHECK : ", check)
+    if 'anime' in check.lower():
+        item.contentType = 'tvshow'
+        item.data = data
+        support.log('select = ### è una anime ###')
+        return episodios(item)
+    elif 'serie' in check.lower():
+        item.contentType = 'tvshow'
+        item.data = data
+        return episodios(item)
 
     if 'protectlink' in data:
         urls = scrapertoolsV2.find_multiple_matches(data, r'<iframe src="[^=]+=(.*?)"')
@@ -271,13 +271,13 @@ def findvideos(item):
             url = url.decode('base64')
             # tiro via l'ultimo carattere perchè non c'entra
             url, c = unshorten_only(url)
-            data += '\t' + url
-        support.log("SONO QUI: ", url)
-        if 'nodmca' in data:
-            page = httptools.downloadpage(url, headers=headers).data
-            url += isturl.add('\t' + scrapertoolsV2.find_single_match(page,'<meta name="og:url" content="([^=]+)">'))
-
-    return support.server(item, data=listurl)#, headers=headers)
+            if 'nodmca' in url:
+                page = httptools.downloadpage(url, headers=headers).data
+                url = '\t' + scrapertoolsV2.find_single_match(page,'<meta name="og:url" content="([^=]+)">')
+                if url:
+                    listurl.add(url)
+    support.dbg()
+    return support.server(item, data=listurl if listurl else data)#, headers=headers)
     # return itemlist
 
 ##def findvideos(item):

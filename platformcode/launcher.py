@@ -271,20 +271,11 @@ def run(item=None):
             elif item.action == "search":
                 logger.info("item.action=%s" % item.action.upper())
 
-                last_search = ""
-                last_search_active = config.get_setting("last_search", "search")
-                if last_search_active:
-                    try:
-                        current_saved_searches_list = list(config.get_setting("saved_searches_list", "search"))
-                        last_search = current_saved_searches_list[0]
-                    except:
-                        pass
+                last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
 
                 tecleado = platformtools.dialog_input(last_search)
                 if tecleado is not None:
-                    if last_search_active and not tecleado.startswith("http"):
-                        from specials import search
-                        search.save_search(tecleado)
+                    channeltools.set_channel_setting('Last_searched', tecleado, 'search')
 
                     if 'search' in dir(channel):
                         itemlist = channel.search(item, tecleado)
