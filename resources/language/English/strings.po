@@ -5681,6 +5681,18 @@ msgctxt "#70740"
 msgid "Your system does not have a web browser, so here's the short link you can open in another device:\n%s"
 msgstr ""
 
+msgctxt "#70741"
+msgid "Search %s"
+msgstr ""
+
+msgctxt "#70742"
+msgid "Movies by Year"
+msgstr ""
+
+msgctxt "#70743"
+msgid "Series by Year"
+msgstr ""
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS Check Alert"

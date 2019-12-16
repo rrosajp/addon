@@ -24,22 +24,22 @@ def mainlist(item):
 
     itemlist = list()
 
-    itemlist.append(Item(channel=item.channel, title='Búsqueda General', action='new_search', mode='all',
-                         thumbnail=get_thumb("search_generic.png")))
-
-    itemlist.append(Item(channel=item.channel, title='Buscar Película', action='new_search', mode='movie',
+    itemlist.append(Item(channel=item.channel, title=config.get_localized_string(30103), action='new_search', mode='all',
                          thumbnail=get_thumb("search.png")))
 
-    itemlist.append(Item(channel=item.channel, title='Buscar Serie', action='new_search', mode='tvshow',
+    itemlist.append(Item(channel=item.channel, title=config.get_localized_string(70741) % config.get_localized_string(30122), action='new_search', mode='movie',
+                         thumbnail=get_thumb("search_movie.png")))
+
+    itemlist.append(Item(channel=item.channel, title=config.get_localized_string(70741) % config.get_localized_string(30123), action='new_search', mode='tvshow',
                          thumbnail=get_thumb("search_tvshow.png")))
 
-    itemlist.append(Item(channel=item.channel, title='Buscar Actor/Actriz', action='new_search',
+    itemlist.append(Item(channel=item.channel, title=config.get_localized_string(70741) % config.get_localized_string(70314), action='new_search',
                          page=1, mode='person', thumbnail=get_thumb("search_star.png")))
 
-    itemlist.append(Item(channel=item.channel, title='Más opciones de búsqueda', action='sub_menu',
-                         thumbnail=get_thumb('search_more.png')))
+    itemlist.append(Item(channel=item.channel, title=config.get_localized_string(60420), action='sub_menu',
+                         thumbnail=get_thumb('search.png')))
 
-    itemlist.append(Item(channel=item.channel, title='Seleccionar canales para la búsqueda', action='opciones',
+    itemlist.append(Item(channel=item.channel, title=config.get_localized_string(59994), action='opciones',
                          thumbnail=get_thumb('setting_0.png')))
 
     itemlist = set_context(itemlist)
@@ -56,28 +56,28 @@ def sub_menu(item):
                          thumbnail=get_thumb("search.png")))
 
     itemlist.append(Item(channel=item.channel, action='genres_menu', title=config.get_localized_string(70306),
-                         mode='movie', thumbnail=get_thumb("genres.png")))
+                         mode='movie', thumbnail=get_thumb("channels_movie_genre.png")))
 
-    itemlist.append(Item(channel=item.channel, action='years_menu', title='Películas por Año',
-                         mode='movie', thumbnail=get_thumb("years.png")))
+    itemlist.append(Item(channel=item.channel, action='years_menu', title=config.get_localized_string(70742),
+                         mode='movie', thumbnail=get_thumb("channels_movie_year.png")))
 
     itemlist.append(Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70307),
                          search_type='list', list_type='movie/popular', mode='movie',
-                         thumbnail=get_thumb("popular.png")))
+                         thumbnail=get_thumb("channels_movie_popular.png")))
 
     itemlist.append(Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70308),
                          search_type='list', list_type='movie/top_rated', mode='movie',
-                         thumbnail=get_thumb("top_rated.png")))
+                         thumbnail=get_thumb("channels_movie_top.png")))
 
     itemlist.append(Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70309),
                          search_type='list', list_type='movie/now_playing', mode='movie',
-                         thumbnail=get_thumb("now_playing.png")))
+                         thumbnail=get_thumb("channels_movie_now_playing.png")))
 
     itemlist.append(Item(channel=item.channel, action='genres_menu', title=config.get_localized_string(70310),
-                         mode='tvshow', thumbnail=get_thumb("genres.png")))
+                         mode='tvshow', thumbnail=get_thumb("channels_tvshow_genre.png")))
 
-    itemlist.append(Item(channel=item.channel, action='years_menu', title='Series por Año',
-                         mode='tvshow', thumbnail=get_thumb("years.png")))
+    itemlist.append(Item(channel=item.channel, action='years_menu', title=config.get_localized_string(70743),
+                         mode='tvshow', thumbnail=get_thumb("channels_tvshow_year.png")))
 
     itemlist.append(Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70311),
                          search_type='list', list_type='tv/popular', mode='tvshow',
@@ -85,11 +85,11 @@ def sub_menu(item):
 
     itemlist.append(Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70312),
                          search_type='list', list_type='tv/on_the_air', mode='tvshow',
-                         thumbnail=get_thumb("on_the_air.png")))
+                         thumbnail=get_thumb("channels_tvshow_on_the_air.png")))
 
     itemlist.append(Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70313),
                          search_type='list', list_type='tv/top_rated', mode='tvshow',
-                         thumbnail=get_thumb("top_rated.png")))
+                         thumbnail=get_thumb("channels_tvshow_top.png")))
 
     itemlist = set_context(itemlist)
 

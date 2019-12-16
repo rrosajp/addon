@@ -3963,7 +3963,7 @@ msgstr "Film più valutati"
 
 msgctxt "#70309"
 msgid "Movies Now in Theatres "
-msgstr "[Film] Ora in sala"
+msgstr "Film Ora in sala"
 
 msgctxt "#70310"
 msgid "Series by Genre"
@@ -3975,7 +3975,7 @@ msgstr "Serie più popolari"
 
 msgctxt "#70312"
 msgid "Series in progress"
-msgstr "[Serie TV] In corso"
+msgstr "Serie TV In corso"
 
 msgctxt "#70313"
 msgid "Top rated Series"
@@ -5685,6 +5685,18 @@ msgctxt "#70740"
 msgid "Your system does not have a web browser, so here's the short link you can open in another device:\n%s"
 msgstr "Il tuo sistema non ha un browser, quindi ecco un link corto che puoi aprire in un altro dispositivo\n%s"
 
+msgctxt "#70741"
+msgid "Search %s"
+msgstr "Cerca %s"
+
+msgctxt "#70742"
+msgid "Movies by Year"
+msgstr "Film per Anno"
+
+msgctxt "#70743"
+msgid "Series by Year"
+msgstr "Serie per Anno"
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS Check Alert"
@@ -5745,4 +5757,5 @@ msgstr "Stai utilizzando i DNS impostati sul dispositivo o modem"
 msgctxt "#707415"
 msgid "You have not selected any choice, the cloudflare DNS will be used."
 msgstr "Non hai selezionato nessuna scelta!\nVerranno utilizzati i DNS di cloudflare."
+
 # end DNS
