@@ -5,6 +5,7 @@
 
 import os
 import sys
+from specials import resolverdns
 
 import xbmc
 from platformcode import config, logger
