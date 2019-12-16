@@ -202,7 +202,6 @@ def get_lang(channel_name):
 
 def get_default_settings(channel_name):
     import filetools, inspect
-
     # Check if it is a real channel
     try:
         channel = __import__('channels.%s' % channel_name, fromlist=["channels.%s" % channel_name])
@@ -219,16 +218,17 @@ def get_default_settings(channel_name):
             or scrapertoolsV2.find_single_match(inspect.getsource(channel), r'(autorenumber\()'):
             renumber = True
 
-    #  Collects configurations
-    channel_language = categories = get_channel_json(channel_name).get('language', list())
-    channel_controls = get_channel_json(channel_name).get('settings', list())
     default_path = filetools.join(config.get_runtime_path(), 'default_channel_settings' + '.json')
-    default_controls = jsontools.load(filetools.read(default_path)).get('settings', list())
-    default_controls_renumber = jsontools.load(filetools.read(default_path)).get('renumber', list())
-    categories = get_channel_json(channel_name).get('categories', list())
-    not_active = get_channel_json(channel_name).get('not_active', list())
-    default_off = get_channel_json(channel_name).get('default_off', list())
-
+    default_file = jsontools.load(filetools.read(default_path))
+    default_controls = default_file['settings']
+    default_controls_renumber = default_file['renumber']
+    channel_json = get_channel_json(channel_name)
+    #  Collects configurations
+    channel_language = categories = channel_json['language']
+    channel_controls = channel_json['settings']
+    categories = channel_json['categories']
+    not_active = channel_json['not_active'] if channel_json.has_key('not_active') else []
+    default_off = channel_json['default_off'] if channel_json.has_key('default_off') else []
     # Apply default configurations if they do not exist
     for control in default_controls:
         if control['id'] not in str(channel_controls):
