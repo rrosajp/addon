@@ -409,15 +409,21 @@ def downloadpage(url, **opt):
         """
     load_cookies()
 
-    if scrapertoolsV2.get_domain_from_url(url) in ['www.seriehd.moda', 'wstream.video', 'www.guardaserie.media', 'akvideo.stream','www.piratestreaming.top']:  # cloudflare urls
-        if opt.get('session', False):
+    # if scrapertoolsV2.get_domain_from_url(url) in ['www.seriehd.moda', 'wstream.video', 'www.guardaserie.media', 'akvideo.stream','www.piratestreaming.top']:  # cloudflare urls
+    #     if opt.get('session', False):
+    #         session = opt['session']  # same session to speed up search
+    #     else:
+    #         from lib import cloudscraper
+    #         session = cloudscraper.create_scraper()
+    # else:
+    #     from lib import requests
+    #     session = requests.session()
+
+    if opt.get('session', False):
             session = opt['session']  # same session to speed up search
-        else:
-            from lib import cloudscraper
-            session = cloudscraper.create_scraper()
     else:
-        from lib import requests
-        session = requests.session()
+        from lib import cloudscraper
+        session = cloudscraper.create_scraper()
 
     # Headers by default, if nothing is specified
     req_headers = default_headers.copy()
