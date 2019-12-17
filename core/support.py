@@ -369,6 +369,7 @@ def scrape(func):
         typeActionDict = args['typeActionDict'] if 'typeActionDict' in args else {}
         typeContentDict = args['typeContentDict'] if 'typeContentDict' in args else {}
         debug = args['debug'] if 'debug' in args else False
+        debugBlock = args['debugBlock'] if 'debugBlock' in args else False
         if 'pagination' in args and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
         lang = args['deflang'] if 'deflang' in args else ''
@@ -383,6 +384,8 @@ def scrape(func):
             # replace all ' with " and eliminate newline, so we don't need to worry about
 
         if patronBlock:
+            if debugBlock:
+                regexDbg(item, patronBlock, headers, data)
             blocks = scrapertoolsV2.find_multiple_matches_groups(data, patronBlock)
             block = ""
             for bl in blocks:
