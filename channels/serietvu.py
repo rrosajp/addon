@@ -34,7 +34,7 @@ def mainlist(item):
 
 @support.scrape
 def peliculas(item):
-    patronBlock = r'<div class="wrap">\s+<h.>.*?</h.>(?P<block>.*?)<footer>'
+    patronBlock = r'<div class="wrap">\s*<h.>.*?</h.>(?P<block>.*?)<footer>'
 
 
     if item.args != 'update':

@@ -7,7 +7,10 @@
 from core import scrapertoolsV2, httptools, support
 from core.item import Item
 
-host = 'https://www.seriehd.moda'
+__channel__ = 'seriehd'
+host = support.config.get_channel_url(__channel__)
+
+# host = 'https://www.seriehd.watch'
 headers = ''
 
 def findhost():
