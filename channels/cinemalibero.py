@@ -54,11 +54,6 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
 
-    data = httptools.downloadpage(item.url, headers=headers).data
-    data = re.sub('\n|\t', ' ', data)
-    data = re.sub(r'>\s+<', '> <', data)
-    GENERI = scrapertoolsV2.find_multiple_matches(data, r'<a class="dropdown-item" href="[^"]+" title="([A-z]+)"')
-
     patronBlock = r'<div class="container">.*?class="col-md-12[^"]*?">(?P<block>.*?)<div class=(?:"container"|"bg-dark ")>'
     if item.args == 'newest':
         patron = r'<div class="col-lg-3">[^>]+>[^>]+>\s<a href="(?P<url>[^"]+)".+?url\((?P<thumb>[^\)]+)\)">[^>]+>(?P<title>[^<]+)<[^>]+>[^>]+>(?:[^>]+>)?\s?(?P<rating>[\d\.]+)?[^>]+>.+?(?:[ ]\((?P<year>\d{4})\))?<[^>]+>[^>]+>(.?[\d\-x]+\s\(?(?P<lang>[sSuUbBiItTaA\-]+)?\)?\s?(?P<quality>[\w]+)?[|]?\s?(?:[fFiInNeE]+)?\s?\(?(?P<lang2>[sSuUbBiItTaA\-]+)?\)?)?'
@@ -87,31 +82,8 @@ def peliculas(item):
                 item.lang2 = 'ITA'
             item.contentLanguage = item.lang2
             item.title += support.typo(item.lang2, '_ [] color kod')
-
-        dataBlock = httptools.downloadpage(item.url, headers=headers).data
-        genere = scrapertoolsV2.find_single_match(dataBlock, r'rel="category tag">([a-zA-Z0-9]+).+?<')
-
-        if genere.lower() in str(GENERI).lower():
-            item.contentType = 'movie'
-            action = 'findvideos'
-            if item.args == 'update':
-                item.title = item.title.replace('-',' ')
-        elif genere.lower() == 'serie':
-            item.action = 'episodios'
-            item.contentType = 'tvshow'
-        elif genere.lower() == 'anime':
-            blockAnime = scrapertoolsV2.find_single_match(dataBlock, r'<div id="container" class="container">(.+?)<div style="margin-left')
-            if 'stagione'  in blockAnime.lower() or 'episodio' in blockAnime.lower() or 'saga' in blockAnime.lower():
-                anime = True
-                item.action = 'episodios'
-                item.contentType = 'tvshow'
-            else:
-                item.contentType = 'movie'
-                item.action = 'findvideos'
-                item.url = scrapertoolsV2.find_single_match(blockAnime, r'<span class="txt_dow">(?:.+?)?Streaming:(?:.+?)?</span>(.*?)<div style="margin-left:')
-        else:
-            # Tutto il resto!!
-            pass
+        if item.args == 'update':
+            item.title = item.title.replace('-', ' ')
 
         return item
 
@@ -121,7 +93,6 @@ def peliculas(item):
 
 @support.scrape
 def episodios(item):
-
     if item.args == 'anime':
         support.log("Anime :", item)
         blacklist = ['Clipwatching', 'Verystream', 'Easybytez', 'Flix555', 'Cloudvideo']
@@ -136,7 +107,6 @@ def episodios(item):
         item.contentType = 'tvshow'
         item.contentSerieName = item.fulltitle
 
-    #debug = True
     return locals()
 
 
@@ -193,6 +163,26 @@ def newest(categoria):
     return itemlist
 
 def findvideos(item):
+    dataBlock = httptools.downloadpage(item.url, headers=headers).data
+    genere = scrapertoolsV2.find_single_match(dataBlock, r'rel="category tag">([a-zA-Z0-9]+).+?<')
+
+    if genere.lower() == 'serie':
+        item.contentType = 'tvshow'
+        return episodios(item)
+    elif genere.lower() == 'anime':
+        blockAnime = scrapertoolsV2.find_single_match(dataBlock,
+                                                      r'<div id="container" class="container">(.+?)<div style="margin-left')
+        if 'stagione' in blockAnime.lower() or 'episodio' in blockAnime.lower() or 'saga' in blockAnime.lower():
+            item.contentType = 'tvshow'
+            item.args = 'anime'
+            return episodios(item)
+        else:
+            item.contentType = 'movie'
+            item.url = scrapertoolsV2.find_single_match(blockAnime,
+                                                        r'<span class="txt_dow">(?:.+?)?Streaming:(?:.+?)?</span>(.*?)<div style="margin-left:')
+    else:
+        item.contentType = 'movie'
+
     support.log('findvideos ->', item)
     if item.contentType == 'movie' and item.args != 'anime':
         return support.server(item)
