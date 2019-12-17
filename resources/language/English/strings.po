@@ -5693,6 +5693,14 @@ msgctxt "#70743"
 msgid "Series by Year"
 msgstr ""
 
+msgctxt "#70744"
+msgid "%s channels remaining"
+msgstr ""
+
+msgctxt "#70745"
+msgid "Enter another year..."
+msgstr ""
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS Check Alert"

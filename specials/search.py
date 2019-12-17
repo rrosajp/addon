@@ -17,7 +17,11 @@ from platformcode import logger
 from platformcode import config
 from platformcode import platformtools
 from platformcode import unify
+from core.support import typo
 
+import xbmcaddon
+addon = xbmcaddon.Addon('metadata.themoviedb.org')
+def_lang = addon.getSetting('language')
 
 def mainlist(item):
     logger.info()
@@ -51,9 +55,6 @@ def sub_menu(item):
     logger.info()
 
     itemlist = list()
-
-    itemlist.append(Item(channel="tvmoviedb", action="mainlist", title=config.get_localized_string(70274),
-                         thumbnail=get_thumb("search.png")))
 
     itemlist.append(Item(channel=item.channel, action='genres_menu', title=config.get_localized_string(70306),
                          mode='movie', thumbnail=get_thumb("channels_movie_genre.png")))
@@ -91,6 +92,9 @@ def sub_menu(item):
                          search_type='list', list_type='tv/top_rated', mode='tvshow',
                          thumbnail=get_thumb("channels_tvshow_top.png")))
 
+    itemlist.append(Item(channel="tvmoviedb", action="mainlist", title=config.get_localized_string(70274),
+                         thumbnail=get_thumb("search.png")))
+
     itemlist = set_context(itemlist)
 
     return itemlist
@@ -102,7 +106,7 @@ def new_search(item):
     itemlist = []
 
     last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
-    searched_text = platformtools.dialog_input(default=last_search, heading='Alfa (Busqueda)')
+    searched_text = platformtools.dialog_input(default=last_search, heading='')
 
     if not searched_text:
         return
@@ -173,7 +177,7 @@ def channel_search(item):
     searching += channel_list
     cnt = 0
 
-    progress = platformtools.dialog_progress('Buscando %s ...' % item.title, "Restan %s canales" % len(channel_list),
+    progress = platformtools.dialog_progress(config.get_localized_string(30993) % item.title, config.get_localized_string(70744) % len(channel_list),
                                              str(searching))
     config.set_setting('tmdb_active', False)
 
@@ -190,24 +194,24 @@ def channel_search(item):
                 break
             if finished in searching:
                 searching.remove(finished)
-                progress.update((cnt * 100) / len(channel_list), "Restan %s canales" % str(len(channel_list) - cnt),
+                progress.update((cnt * 100) / len(channel_list), config.get_localized_string(70744) % str(len(channel_list) - cnt),
                                 str(searching))
 
     progress.close()
 
     cnt = 0
-    progress = platformtools.dialog_progress('Buscando %s ...' % item.title, "Preparando Resultados",
-                                             'Por favor espere...')
+    progress = platformtools.dialog_progress(config.get_localized_string(30993) % item.title, config.get_localized_string(60295),
+                                             config.get_localized_string(60293))
 
     config.set_setting('tmdb_active', True)
 
     for key, value in ch_list.items():
         grouped = list()
         cnt += 1
-        progress.update((cnt * 100) / len(ch_list), "Preparando Resultados", 'Por favor espere...')
+        progress.update((cnt * 100) / len(ch_list), config.get_localized_string(60295), config.get_localized_string(60293))
         if len(value) <= max_results and item.mode != 'all':
             if len(value) == 1:
-                if not value[0].action or 'siguiente' in value[0].title.lower():
+                if not value[0].action or config.get_localized_string(70006).lower() in value[0].title.lower():
                     continue
             tmdb.set_infoLabels_itemlist(value, True, forced=True)
             for elem in value:
@@ -238,9 +242,9 @@ def channel_search(item):
         to_temp[key] = grouped
 
         if not config.get_setting('unify'):
-            title = '[COLOR yellow](%s) RESULTADOS EN[/COLOR] [%s]' % (len(grouped), key)
+            title = typo('%s %s' % (len(grouped), config.get_localized_string(70695)), 'bold') + typo(key,'_ [] color kod bold')
         else:
-            title = '[COLOR yellow](%s) RESULTADOS EN[/COLOR]' % (len(grouped))
+            title = typo('%s %s' % (len(grouped), config.get_localized_string(70695)), 'bold')
 
         ch_thumb = channeltools.get_channel_parameters(key)['thumbnail']
         results.append(Item(channel='search', title=title,
@@ -250,8 +254,9 @@ def channel_search(item):
 
     send_to_temp(to_temp)
     config.set_setting('tmdb_active', True)
-
-    logger.debug('Finalizada en %s segs (%s canales)' % (str(time.time() - start), str(len(channel_list))))
+    results_statistic = config.get_localized_string(59972) % (item.title, len(channel_list), time.time() - start)
+    results.insert(0, Item(title = typo(results_statistic,'color kod bold')))
+    logger.debug(results_statistic)
 
     return valid + results
 
@@ -282,7 +287,7 @@ def get_channel_results(ch, item):
     if len(results) < 0 and len(results) < max_results and item.mode != 'all':
 
         if len(results) == 1:
-            if not results[0].action or 'siguiente' in results[0].title.lower():
+            if not results[0].action or config.get_localized_string(30992).lower() in results[0].title.lower():
                 return [ch, []]
 
         results = get_info(results)
@@ -331,8 +336,7 @@ def opciones(item):
 def setting_channel_new(item):
     import xbmcgui
 
-    # Cargar lista de opciones (canales activos del usuario y que permitan búsqueda global)
-    # ------------------------
+    # Load list of options (active user channels that allow global search)
     lista = []
     ids = []
     lista_lang = []
@@ -344,7 +348,7 @@ def setting_channel_new(item):
 
         channel_parameters = channeltools.get_channel_parameters(channel.channel)
 
-        # No incluir si en la configuracion del canal no existe "include_in_global_search"
+        # Do not include if "include_in_global_search" does not exist in the channel configuration
         if not channel_parameters['include_in_global_search']:
             continue
 
@@ -358,37 +362,37 @@ def setting_channel_new(item):
         lista_lang.append(channel_parameters['language'])
         lista_ctgs.append(channel_parameters['categories'])
 
-    # Diálogo para pre-seleccionar
-    # ----------------------------
+    # Pre-select dialog
     preselecciones = [
-        'Buscar con la selección actual',
-        'Modificar selección actual',
-        'Modificar partiendo de Recomendados',
-        'Modificar partiendo de Frecuentes',
-        'Modificar partiendo de Todos',
-        'Modificar partiendo de Ninguno',
-        'Modificar partiendo de Castellano',
-        'Modificar partiendo de Latino'
+        config.get_localized_string(70570),
+        config.get_localized_string(70571),
+        # 'Modificar partiendo de Recomendados',
+        # 'Modificar partiendo de Frecuentes',
+        config.get_localized_string(70572),
+        config.get_localized_string(70573),
+        # 'Modificar partiendo de Castellano',
+        # 'Modificar partiendo de Latino'
     ]
-    presel_values = ['skip', 'actual', 'recom', 'freq', 'all', 'none', 'cast', 'lat']
+    # presel_values = ['skip', 'actual', 'recom', 'freq', 'all', 'none', 'cast', 'lat']
+    presel_values = ['skip', 'actual', 'all', 'none']
 
     categs = ['movie', 'tvshow', 'documentary', 'anime', 'vos', 'direct', 'torrent']
     if config.get_setting('adult_mode') > 0:
         categs.append('adult')
     for c in categs:
-        preselecciones.append('Modificar partiendo de %s' % config.get_localized_category(c))
+        preselecciones.append(config.get_localized_string(70577) + config.get_localized_category(c))
         presel_values.append(c)
 
     if item.action == 'setting_channel':  # Configuración de los canales incluídos en la búsqueda
         del preselecciones[0]
         del presel_values[0]
-    # else: # Llamada desde "buscar en otros canales" (se puede saltar la selección e ir directo a la búsqueda)
+    # else: # Call from "search on other channels" (you can skip the selection and go directly to the search)
 
     ret = platformtools.dialog_select(config.get_localized_string(59994), preselecciones)
     if ret == -1:
-        return False  # pedido cancel
+        return False  # order cancel
     if presel_values[ret] == 'skip':
-        return True  # continuar sin modificar
+        return True  # continue unmodified
     elif presel_values[ret] == 'none':
         preselect = []
     elif presel_values[ret] == 'all':
@@ -424,15 +428,13 @@ def setting_channel_new(item):
             if presel_values[ret] in ctgs:
                 preselect.append(i)
 
-    # Diálogo para seleccionar
-    # ------------------------
+    # Dialog to select
     ret = xbmcgui.Dialog().multiselect(config.get_localized_string(59994), lista, preselect=preselect, useDetails=True)
     if not ret:
-        return False  # pedido cancel
+        return False  # order cancel
     seleccionados = [ids[i] for i in ret]
 
-    # Guardar cambios en canales para la búsqueda
-    # -------------------------------------------
+    # Save changes to search channels
     for canal in ids:
         channel_status = config.get_setting('include_in_global_search', canal)
         # if not channel_status:
@@ -453,12 +455,12 @@ def genres_menu(item):
     genres = tmdb.get_genres(mode)
     for key, value in genres[mode].items():
         discovery = {'url': 'discover/%s' % mode, 'with_genres': key,
-                     'language': 'es', 'page': '1'}
+                     'language': def_lang, 'page': '1'}
 
-        itemlist.append(Item(channel=item.channel, title=value, page=1,
+        itemlist.append(Item(channel=item.channel, title=typo(value, 'bold'), page=1,
                              action='discover_list', discovery=discovery,
                              mode=item.mode))
-
+    channelselector.thumb(itemlist)
     return sorted(itemlist, key=lambda it: it.title)
 
 
@@ -469,9 +471,11 @@ def years_menu(item):
     mode = item.mode.replace('show', '')
 
     par_year = 'primary_release_year'
+    thumb = channelselector.get_thumb('channels_movie_year.png')
 
     if mode != 'movie':
         par_year = 'first_air_date_year'
+        thumb = channelselector.get_thumb('channels_tvshow_year.png')
 
     c_year = datetime.datetime.now().year + 1
     l_year = c_year - 31
@@ -479,12 +483,12 @@ def years_menu(item):
     for year in range(l_year, c_year):
         discovery = {'url': 'discover/%s' % mode, 'page': '1',
                      '%s' % par_year: '%s' % year,
-                     'sort_by': 'popularity.desc', 'language': 'es'}
+                     'sort_by': 'popularity.desc', 'language': def_lang}
 
-        itemlist.append(Item(channel=item.channel, title=str(year), action='discover_list',
-                             discovery=discovery, mode=item.mode, year_=str(year)))
+        itemlist.append(Item(channel=item.channel, title=typo(str(year), 'bold'), action='discover_list',
+                             discovery=discovery, mode=item.mode, year_=str(year), thumbnail=thumb))
     itemlist.reverse()
-    itemlist.append(Item(channel=item.channel, title='Introduzca otro año...', url='',
+    itemlist.append(Item(channel=item.channel, title=typo(config.get_localized_string(70745),'color kod bold'), url='',
                          action="year_cus", mode=item.mode, par_year=par_year))
 
     return itemlist
@@ -493,11 +497,11 @@ def years_menu(item):
 def year_cus(item):
     mode = item.mode.replace('show', '')
 
-    heading = 'Introduzca Año (4 digitos)'
+    heading = config.get_localized_string(70042)
     year = platformtools.dialog_numeric(0, heading, default="")
     item.discovery = {'url': 'discover/%s' % mode, 'page': '1',
                       '%s' % item.par_year: '%s' % year,
-                      'sort_by': 'popularity.desc', 'language': 'es'}
+                      'sort_by': 'popularity.desc', 'language': def_lang}
     item.action = "discover_list"
     if year and len(year) == 4:
         return discover_list(item)
@@ -506,7 +510,7 @@ def year_cus(item):
 def actor_list(item):
     itemlist = []
 
-    dict_ = {'url': 'search/person', 'language': 'es', 'query': item.searched_text, 'page': item.page}
+    dict_ = {'url': 'search/person', 'language': def_lang, 'query': item.searched_text, 'page': item.page}
 
     prof = {'Acting': 'Actor', 'Directing': 'Director', 'Production': 'Productor'}
     plot = ''
@@ -525,31 +529,31 @@ def actor_list(item):
 
         rol = elem.get('known_for_department', '')
         rol = prof.get(rol, rol)
-        genero = elem.get('gender', 0)
-        if genero == 1 and rol in prof:
-            rol += 'a'
-            rol = rol.replace('Actora', 'Actriz')
+        # genero = elem.get('gender', 0)
+        # if genero == 1 and rol in prof:
+        #     rol += 'a'
+        #     rol = rol.replace('Actora', 'Actriz')
 
         know_for = elem.get('known_for', '')
         cast_id = elem.get('id', '')
         if know_for:
             t_k = know_for[0].get('title', '')
             if t_k:
-                plot = '%s en [COLOR limegreen]%s[/COLOR] y otras' % (rol, t_k)
+                plot = '%s in %s' % (rol, t_k)
 
         thumbnail = 'http://image.tmdb.org/t/p/original%s' % elem.get('profile_path', '')
-        title = '%s [COLOR grey](%s)[/COLOR]' % (name, rol)
+        title = typo(name,'bold')+typo(rol,'_ [] color kod bold')
 
         discovery = {'url': 'person/%s/combined_credits' % cast_id, 'page': '1',
-                     'sort_by': 'primary_release_date.desc', 'language': 'es'}
+                     'sort_by': 'primary_release_date.desc', 'language': def_lang}
 
         itemlist.append(Item(channel=item.channel, title=title, action='discover_list', cast_='cast',
                              discovery=discovery, thumbnail=thumbnail, plot=plot, page=1))
 
     if len(results) > 19:
         next_ = item.page + 1
-        itemlist.append(Item(channel=item.channel, title="Pagina Siguiente >>", action='actor_list',
-                             page=next_, thumbnail=thumbnail, text_color='gold',
+        itemlist.append(Item(channel=item.channel, title=typo(config.get_localized_string(30992),'bold color kod'), action='actor_list',
+                             page=next_, thumbnail=thumbnail,
                              searched_text=item.searched_text))
     return itemlist
 
@@ -581,7 +585,7 @@ def discover_list(item):
             year = scrapertools.find_single_match(release, r'(\d{4})')
 
         if not item.cast_ or (item.cast_ and (int(year) <= int(datetime.datetime.today().year))):
-            new_item = Item(channel='search', title=title, infoLabels=elem,
+            new_item = Item(channel='search', title=typo(title, 'bold'), infoLabels=elem,
                             action='channel_search', text=title,
                             thumbnail=thumbnail, fanart=fanart,
                             context='', mode=mode,
@@ -639,7 +643,7 @@ def set_context(itemlist):
     logger.info()
 
     for elem in itemlist:
-        elem.context = [{"title": "Elegir canales",
+        elem.context = [{"title": config.get_localized_string(60412),
                          "action": "setting_channel_new",
                          "channel": "search"}]
 
@@ -682,7 +686,7 @@ def get_from_temp(item):
     results = results[prevp:nextp]
 
     if len(results) == n and len(old_results * item.page) != n:
-        results.append(Item(channel='search', title='[COLOR yellow]Pagina Siguiente >>[/COLOR]',
+        results.append(Item(channel='search', title=typo(config.get_localized_string(30992),'bold color kod'),
                             action='get_from_temp', from_channel=item.from_channel, page=item.page + 1))
 
     tmdb.set_infoLabels_itemlist(results, True)

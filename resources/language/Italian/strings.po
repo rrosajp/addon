@@ -5697,6 +5697,14 @@ msgctxt "#70743"
 msgid "Series by Year"
 msgstr "Serie per Anno"
 
+msgctxt "#70744"
+msgid "%s channels remaining"
+msgstr "%s canali restanti"
+
+msgctxt "#70745"
+msgid "Enter another year..."
+msgstr "Inserisci un altro anno..."
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS Check Alert"

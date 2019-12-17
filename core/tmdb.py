@@ -564,21 +564,19 @@ def completar_codigos(item):
 
 
 def discovery(item, dict_=False, cast=False):
-    if item.search_type == 'discover':
+    from core.item import Item
+
+    if dict_:
+        listado = Tmdb(discover = dict_, cast=cast)
+
+    elif item.search_type == 'discover':
         listado = Tmdb(discover={'url':'discover/%s' % item.type, 'with_genres':item.list_type, 'language':def_lang,
                                  'page':item.page})
-    if item.search_type == 'discover':
-        if dict_:
-            listado = Tmdb(discover=dict_, cast=cast)
 
-        elif item.search_type == 'discover':
-            listado = Tmdb(discover={'url': 'discover/%s' % item.type, 'with_genres': item.list_type, 'language': 'es',
-                                     'page': item.page})
     elif item.search_type == 'list':
         if item.page == '':
             item.page = '1'
-        listado = Tmdb(list={'url': item.list_type, 'language':def_lang, 'page':item.page})
-
+        listado = Tmdb(discover={'url': item.list_type, 'language':def_lang, 'page':item.page})
 
     return listado
 
