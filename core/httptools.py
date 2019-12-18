@@ -420,7 +420,8 @@ def downloadpage(url, **opt):
     #     session = requests.session()
 
     if opt.get('session', False):
-            session = opt['session']  # same session to speed up search
+        session = opt['session']  # same session to speed up search
+        logger.info('same session')
     else:
         from lib import cloudscraper
         session = cloudscraper.create_scraper()
