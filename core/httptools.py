@@ -419,12 +419,8 @@ def downloadpage(url, **opt):
     #     from lib import requests
     #     session = requests.session()
 
-    if opt.get('session', False):
-        session = opt['session']  # same session to speed up search
-        logger.info('same session')
-    else:
-        from lib import cloudscraper
-        session = cloudscraper.create_scraper()
+    from lib import cloudscraper
+    session = cloudscraper.create_scraper()
 
     # Headers by default, if nothing is specified
     req_headers = default_headers.copy()

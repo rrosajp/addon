@@ -174,9 +174,6 @@ def channel_search(item):
 
     channel_list = get_channels(item)
 
-    from lib import cloudscraper
-    session = cloudscraper.create_scraper()
-
     searching += channel_list
     cnt = 0
 
@@ -185,7 +182,7 @@ def channel_search(item):
     config.set_setting('tmdb_active', False)
 
     with futures.ThreadPoolExecutor() as executor:
-        c_results = [executor.submit(get_channel_results, ch, item, session) for ch in channel_list]
+        c_results = [executor.submit(get_channel_results, ch, item) for ch in channel_list]
 
         for res in futures.as_completed(c_results):
             cnt += 1
@@ -267,7 +264,7 @@ def channel_search(item):
     return valid + results
 
 
-def get_channel_results(ch, item, session):
+def get_channel_results(ch, item):
     max_results = 10
     results = list()
 
@@ -280,7 +277,6 @@ def get_channel_results(ch, item, session):
 
     if search_action:
         for search_ in search_action:
-            search_.session = session
             try:
                 results.extend(module.search(search_, item.text))
             except:
