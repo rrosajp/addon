@@ -239,7 +239,7 @@ def channel_search(item):
 
         if not grouped:
             continue
-        to_temp[key] = grouped
+        # to_temp[key] = grouped
 
         if not config.get_setting('unify'):
             title = typo('%s %s' % (len(grouped), config.get_localized_string(70695)), 'bold') + typo(key,'_ [] color kod bold')
@@ -251,11 +251,11 @@ def channel_search(item):
             plot += it.title +'\n'
         ch_thumb = channeltools.get_channel_parameters(key)['thumbnail']
         results.append(Item(channel='search', title=title,
-                            action='get_from_temp', thumbnail=ch_thumb, from_channel=key, plot=plot, page=1))
+                            action='get_from_temp', thumbnail=ch_thumb, itemlist=[ris.tourl() for ris in grouped], plot=plot, page=1))
 
     results = sorted(results, key=lambda it: it.from_channel)
 
-    send_to_temp(to_temp)
+    # send_to_temp(to_temp)
     config.set_setting('tmdb_active', True)
     results_statistic = config.get_localized_string(59972) % (item.title, res_count, time.time() - start)
     results.insert(0, Item(title = typo(results_statistic,'color kod bold')))
@@ -653,44 +653,19 @@ def set_context(itemlist):
     return itemlist
 
 
-def send_to_temp(to_temp):
-    logger.info()
-
-    temp_path = os.path.join(config.get_data_path(), 'temp_search.json')
-    temp = dict()
-
-    for key, value in to_temp.items():
-        new_list = list()
-        for elem in value:
-            new_list.append(elem.tourl())
-        temp[key] = new_list
-
-    with open(temp_path, "w") as temp_file:
-        json.dump(temp, temp_file)
-
-
 def get_from_temp(item):
     logger.info()
 
     n = 30
+    nTotal = len(item.itemlist)
     nextp = n * item.page
     prevp = n * (item.page - 1)
 
-    temp_path = os.path.join(config.get_data_path(), 'temp_search.json')
-    results = list()
+    results = [Item().fromurl(elem) for elem in item.itemlist[prevp:nextp]]
 
-    with open(temp_path, "r") as temp_list:
-        from_temp = json.load(temp_list)
-
-    for elem in from_temp[item.from_channel]:
-        results.append(Item().fromurl(elem))
-
-    old_results = results
-    results = results[prevp:nextp]
-
-    if len(results) == n and len(old_results * item.page) != n:
+    if nextp < nTotal:
         results.append(Item(channel='search', title=typo(config.get_localized_string(30992),'bold color kod'),
-                            action='get_from_temp', from_channel=item.from_channel, page=item.page + 1))
+                            action='get_from_temp', itemlist=item.itemlist, page=item.page + 1))
 
     tmdb.set_infoLabels_itemlist(results, True)
     for elem in results:
