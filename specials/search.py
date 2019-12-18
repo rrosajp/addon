@@ -273,7 +273,7 @@ def get_channel_results(ch, item):
     exec "from channels import " + ch_params["channel"] + " as module"
 
     mainlist = module.mainlist(Item(channel=ch_params["channel"]))
-    search_action = [elem for elem in mainlist if elem.action == "search"]
+    search_action = [elem for elem in mainlist if elem.action == "search" and (item.mode == 'all' or elem.contentType == item.mode)]
 
     if search_action:
         for search_ in search_action:
