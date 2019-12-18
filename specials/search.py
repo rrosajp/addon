@@ -204,7 +204,7 @@ def channel_search(item):
                                              config.get_localized_string(60293))
 
     config.set_setting('tmdb_active', True)
-
+    res_count = 0
     for key, value in ch_list.items():
         grouped = list()
         cnt += 1
@@ -245,16 +245,19 @@ def channel_search(item):
             title = typo('%s %s' % (len(grouped), config.get_localized_string(70695)), 'bold') + typo(key,'_ [] color kod bold')
         else:
             title = typo('%s %s' % (len(grouped), config.get_localized_string(70695)), 'bold')
-
+        res_count += len(grouped)
+        plot=''
+        for it in grouped:
+            plot += it.title +'\n'
         ch_thumb = channeltools.get_channel_parameters(key)['thumbnail']
         results.append(Item(channel='search', title=title,
-                            action='get_from_temp', thumbnail=ch_thumb, from_channel=key, page=1))
+                            action='get_from_temp', thumbnail=ch_thumb, from_channel=key, plot=plot, page=1))
 
     results = sorted(results, key=lambda it: it.from_channel)
 
     send_to_temp(to_temp)
     config.set_setting('tmdb_active', True)
-    results_statistic = config.get_localized_string(59972) % (item.title, len(channel_list), time.time() - start)
+    results_statistic = config.get_localized_string(59972) % (item.title, res_count, time.time() - start)
     results.insert(0, Item(title = typo(results_statistic,'color kod bold')))
     logger.debug(results_statistic)
 
