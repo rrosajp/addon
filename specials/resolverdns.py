@@ -2,10 +2,9 @@
 # -*- OVERRIDE RESOLVE DNS -*-
 
 from platformcode import config
-import xbmc
-
 
 if config.get_setting('resolver_dns'):
+    import xbmc
     from lib import dns
     from dns import resolver, name
     from dns.resolver import override_system_resolver
@@ -13,7 +12,7 @@ if config.get_setting('resolver_dns'):
 
     support.log("platform Android: {}".format(xbmc.getCondVisibility('System.Platform.Android')))
     if xbmc.getCondVisibility('System.Platform.Android') == True:
-        res = resolver.Resolver(filename='/system/etc/resolv.conf', configure=False)
+        res = resolver.Resolver(filename='/system/etc/resolv.conf', configure=True)
     else:
         res = resolver.Resolver(configure=True)
     #legge le impostazioni dalla configurazione e setta i relativi DNS
