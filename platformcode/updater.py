@@ -90,7 +90,7 @@ def check_addon_init():
                 localCommitFile.close()
                 c['sha'] = updateFromZip('Aggiornamento in corso...')
                 localCommitFile = open(addonDir + trackingFile, 'w')  # il file di tracking viene eliminato, lo ricreo
-                changelog += commitJson['commit']['message'] + " | "
+                changelog += commitJson['commit']['message'] + "\n"
                 nCommitApplied += 3  # il messaggio sarà lungo, probabilmente, il tempo di vis. è maggiorato
                 break
 
@@ -148,8 +148,7 @@ def check_addon_init():
                 changelog += commitJson['commit']['message'] + " | "
                 nCommitApplied += 1
         if addon.getSetting("addon_update_message"):
-            time = nCommitApplied * 2000 if nCommitApplied < 10 else 20000
-            platformtools.dialog_notification('Kodi on Demand', 'Aggiornamenti applicati:\n' + changelog[:-3], time)
+            platformtools.dialog_ok('Kodi on Demand', 'Aggiornamenti applicati:\n' + changelog[:-3])
 
         localCommitFile.seek(0)
         localCommitFile.truncate()
