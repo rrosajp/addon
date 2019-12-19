@@ -170,15 +170,16 @@ def channel_search(item):
     from lib import cloudscraper
     session = cloudscraper.create_scraper()
 
-    searching += channel_list
+    searching += [ch[0] for ch in channel_list]
+    searching_titles = [ch[1] for ch in channel_list]
     cnt = 0
 
     progress = platformtools.dialog_progress(config.get_localized_string(30993) % item.title, config.get_localized_string(70744) % len(channel_list),
-                                             str(searching))
+                                             str(searching_titles))
     config.set_setting('tmdb_active', False)
 
     with futures.ThreadPoolExecutor() as executor:
-        c_results = [executor.submit(get_channel_results, ch, item, session) for ch in channel_list]
+        c_results = [executor.submit(get_channel_results, ch[0], item, session) for ch in channel_list]
 
         for res in futures.as_completed(c_results):
             cnt += 1
@@ -189,9 +190,10 @@ def channel_search(item):
             if progress.iscanceled():
                 break
             if finished in searching:
+                searching_titles.remove(searching_titles[searching.index(finished)])
                 searching.remove(finished)
                 progress.update((cnt * 100) / len(channel_list), config.get_localized_string(70744) % str(len(channel_list) - cnt),
-                                str(searching))
+                                str(searching_titles))
 
     progress.close()
 
@@ -202,8 +204,12 @@ def channel_search(item):
     config.set_setting('tmdb_active', True)
     res_count = 0
     for key, value in ch_list.items():
-        ch_path = filetools.join(config.get_runtime_path(),'channels',key+'.json')
-        ch_name = jsontools.load(filetools.read(ch_path))['name']
+        for ch in channel_list:
+            if ch[0] == key:
+                ch_name = ch[1]
+                break
+        else:
+            ch_name = key
         grouped = list()
         cnt += 1
         progress.update((cnt * 100) / len(ch_list), config.get_localized_string(60295), config.get_localized_string(60293))
@@ -327,7 +333,7 @@ def get_channels(item):
 
         if item.mode == 'all' or (item.mode in list_cat):
             if config.get_setting("include_in_global_search", channel):
-                channels_list.append(channel)
+                channels_list.append((channel, ch_param.get('title', channel)))
 
     return channels_list
 
