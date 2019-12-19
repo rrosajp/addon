@@ -155,6 +155,7 @@ def channel_search(item):
 
     start = time.time()
     searching = list()
+    searching_titles = list()
     results = list()
     valid = list()
     ch_list = dict()
@@ -165,13 +166,13 @@ def channel_search(item):
 
     searched_id = item.infoLabels['tmdb_id']
 
-    channel_list = get_channels(item)
+    channel_list, channel_titles = get_channels(item)
 
     from lib import cloudscraper
     session = cloudscraper.create_scraper()
 
-    searching += [ch[0] for ch in channel_list]
-    searching_titles = [ch[1] for ch in channel_list]
+    searching += channel_list
+    searching_titles += channel_titles
     cnt = 0
 
     progress = platformtools.dialog_progress(config.get_localized_string(30993) % item.title, config.get_localized_string(70744) % len(channel_list),
@@ -179,7 +180,7 @@ def channel_search(item):
     config.set_setting('tmdb_active', False)
 
     with futures.ThreadPoolExecutor() as executor:
-        c_results = [executor.submit(get_channel_results, ch[0], item, session) for ch in channel_list]
+        c_results = [executor.submit(get_channel_results, ch, item, session) for ch in channel_list]
 
         for res in futures.as_completed(c_results):
             cnt += 1
@@ -204,12 +205,7 @@ def channel_search(item):
     config.set_setting('tmdb_active', True)
     res_count = 0
     for key, value in ch_list.items():
-        for ch in channel_list:
-            if ch[0] == key:
-                ch_name = ch[1]
-                break
-        else:
-            ch_name = key
+        ch_name = channel_titles[channel_list.index(key)]
         grouped = list()
         cnt += 1
         progress.update((cnt * 100) / len(ch_list), config.get_localized_string(60295), config.get_localized_string(60293))
@@ -315,6 +311,7 @@ def get_channels(item):
     logger.info()
 
     channels_list = list()
+    title_list = list()
     all_channels = channelselector.filterchannels('all')
 
     for ch in all_channels:
@@ -333,9 +330,10 @@ def get_channels(item):
 
         if item.mode == 'all' or (item.mode in list_cat):
             if config.get_setting("include_in_global_search", channel):
-                channels_list.append((channel, ch_param.get('title', channel)))
+                channels_list.append(channel)
+                title_list.append(ch_param.get('title', channel))
 
-    return channels_list
+    return channels_list, title_list
 
 
 def opciones(item):
