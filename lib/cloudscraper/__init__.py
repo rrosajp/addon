@@ -163,9 +163,7 @@ class CloudScraper(Session):
 
     def request(self, method, url, *args, **kwargs):
         # pylint: disable=E0203
-        from time import time
-        from platformcode import logger
-        start= time()
+
         if kwargs.get('proxies') and kwargs.get('proxies') != self.proxies:
             self.proxies = kwargs.get('proxies')
 
@@ -200,7 +198,6 @@ class CloudScraper(Session):
         else:
             if not resp.is_redirect and resp.status_code not in [429, 503]:
                 self._solveDepthCnt = 0
-        logger.debug('CF TIME= '+str(time()-start))
         return resp
 
     # ------------------------------------------------------------------------------- #

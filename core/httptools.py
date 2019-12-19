@@ -395,6 +395,8 @@ def downloadpage(url, **opt):
         @type ignore_response_code: bool
         @return: Result of the petition
         @rtype: HTTPResponse
+        @param use_requests: Use requests.session()
+        @type: bool
 
                 Parameter Type Description
                 -------------------------------------------------- -------------------------------------------------- ------------
@@ -422,6 +424,9 @@ def downloadpage(url, **opt):
     if opt.get('session', False):
         session = opt['session']  # same session to speed up search
         logger.info('same session')
+    elif opt.get('use_requests', False):
+        from lib import requests
+        session = requests.session()
     else:
         from lib import cloudscraper
         session = cloudscraper.create_scraper()
@@ -452,7 +457,8 @@ def downloadpage(url, **opt):
         file_name = ''
         opt['proxy_retries_counter'] += 1
 
-        # session.verify = False
+        session.verify = opt.get('verify', True)
+
         if opt.get('cookies', True):
             session.cookies = cj
         session.headers.update(req_headers)
