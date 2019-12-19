@@ -145,10 +145,10 @@ def check_addon_init():
                             filetools.move(addonDir + file['previous_filename'], addonDir + file['filename'])
                             alreadyApplied = False
             if not alreadyApplied:  # non mando notifica se già applicata (es. scaricato zip da github)
-                changelog += commitJson['commit']['message'] + " | "
+                changelog += commitJson['commit']['message'] + "\n"
                 nCommitApplied += 1
         if addon.getSetting("addon_update_message"):
-            platformtools.dialog_ok('Kodi on Demand', 'Aggiornamenti applicati:\n' + changelog[:-3])
+            platformtools.dialog_ok('Kodi on Demand', 'Aggiornamenti applicati:\n' + changelog)
 
         localCommitFile.seek(0)
         localCommitFile.truncate()
