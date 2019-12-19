@@ -3,20 +3,12 @@
 # -*- Created for Alfa-addon -*-
 # -*- By the Alfa Develop Group -*-
 
-import os
-import json
-import time
+import os, json, time, inspect, channelselector
 from lib.concurrent import futures
 from core.item import Item
-from core import tmdb
-from core import scrapertools
-from core import channeltools
-import channelselector
+from core import tmdb, scrapertools, channeltools, filetools, jsontools
 from channelselector import get_thumb
-from platformcode import logger
-from platformcode import config
-from platformcode import platformtools
-from platformcode import unify
+from platformcode import logger, config, platformtools, unify
 from core.support import typo
 
 import xbmcaddon
@@ -28,7 +20,7 @@ def mainlist(item):
 
     itemlist = list()
 
-    itemlist.append(Item(channel=item.channel, title=config.get_localized_string(30103), action='new_search', mode='all',
+    itemlist.append(Item(channel=item.channel, title=config.get_localized_string(70276), action='new_search', mode='all',
                          thumbnail=get_thumb("search.png")))
 
     itemlist.append(Item(channel=item.channel, title=config.get_localized_string(70741) % config.get_localized_string(30122), action='new_search', mode='movie',
@@ -159,7 +151,7 @@ def new_search(item):
 
 
 def channel_search(item):
-    logger.info()
+    logger.info(item)
 
     start = time.time()
     searching = list()
@@ -209,6 +201,8 @@ def channel_search(item):
     config.set_setting('tmdb_active', True)
     res_count = 0
     for key, value in ch_list.items():
+        ch_path = filetools.join(config.get_runtime_path(),'channels',key+'.json')
+        ch_name = jsontools.load(filetools.read(ch_path))['name']
         grouped = list()
         cnt += 1
         progress.update((cnt * 100) / len(ch_list), config.get_localized_string(60295), config.get_localized_string(60293))
@@ -245,7 +239,7 @@ def channel_search(item):
         to_temp[key] = grouped
 
         if not config.get_setting('unify'):
-            title = typo('%s %s' % (len(grouped), config.get_localized_string(70695)), 'bold') + typo(key,'_ [] color kod bold')
+            title = typo(ch_name,'bold') + typo(str(len(grouped)), '_ [] color kod bold')
         else:
             title = typo('%s %s' % (len(grouped), config.get_localized_string(70695)), 'bold')
         res_count += len(grouped)
@@ -260,9 +254,10 @@ def channel_search(item):
 
     send_to_temp(to_temp)
     config.set_setting('tmdb_active', True)
-    results_statistic = config.get_localized_string(59972) % (item.title, res_count, time.time() - start)
-    results.insert(0, Item(title = typo(results_statistic,'color kod bold')))
-    logger.debug(results_statistic)
+    if item.mode == 'all':
+        results_statistic = config.get_localized_string(59972) % (item.title, res_count, time.time() - start)
+        results.insert(0, Item(title = typo(results_statistic,'color kod bold')))
+    # logger.debug(results_statistic)
 
     return valid + results
 
