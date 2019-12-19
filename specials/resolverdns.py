@@ -12,7 +12,8 @@ if config.get_setting('resolver_dns'):
 
     support.log("platform Android: {}".format(xbmc.getCondVisibility('System.Platform.Android')))
     if xbmc.getCondVisibility('System.Platform.Android') == True:
-        res = resolver.Resolver(filename='/system/etc/resolv.conf', configure=True)
+        #res = resolver.Resolver(filename='/system/etc/resolv.conf', configure=True)
+        res = resolver.Resolver(filename='/system/etc/dhcpcd/dhcpcd-hooks/20-dns.conf', configure=True)
     else:
         res = resolver.Resolver(configure=True)
     #legge le impostazioni dalla configurazione e setta i relativi DNS
