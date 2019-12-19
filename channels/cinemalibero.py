@@ -163,26 +163,6 @@ def newest(categoria):
     return itemlist
 
 def findvideos(item):
-    dataBlock = httptools.downloadpage(item.url, headers=headers).data
-    genere = scrapertoolsV2.find_single_match(dataBlock, r'rel="category tag">([a-zA-Z0-9]+).+?<')
-
-    if genere.lower() == 'serie':
-        item.contentType = 'tvshow'
-        return episodios(item)
-    elif genere.lower() == 'anime':
-        blockAnime = scrapertoolsV2.find_single_match(dataBlock,
-                                                      r'<div id="container" class="container">(.+?)<div style="margin-left')
-        if 'stagione' in blockAnime.lower() or 'episodio' in blockAnime.lower() or 'saga' in blockAnime.lower():
-            item.contentType = 'tvshow'
-            item.args = 'anime'
-            return episodios(item)
-        else:
-            item.contentType = 'movie'
-            item.url = scrapertoolsV2.find_single_match(blockAnime,
-                                                        r'<span class="txt_dow">(?:.+?)?Streaming:(?:.+?)?</span>(.*?)<div style="margin-left:')
-    else:
-        item.contentType = 'movie'
-
     support.log('findvideos ->', item)
     if item.contentType == 'movie' and item.args != 'anime':
         return support.server(item)
