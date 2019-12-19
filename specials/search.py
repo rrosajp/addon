@@ -158,9 +158,10 @@ def channel_search(item):
     results = list()
     valid = list()
     ch_list = dict()
-    to_temp = dict()
     mode = item.mode
     max_results = 10
+    if item.infoLabels['title']:
+        item.text = item.infoLabels['title']
 
     searched_id = item.infoLabels['tmdb_id']
 
