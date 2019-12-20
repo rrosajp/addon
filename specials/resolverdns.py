@@ -4,13 +4,18 @@
 from platformcode import config
 
 if config.get_setting('resolver_dns'):
+    import xbmc
     from lib import dns
     from dns import resolver, name
     from dns.resolver import override_system_resolver
     from core import support
 
-    res = resolver.Resolver(configure=True)
-
+    support.log("platform Android: {}".format(xbmc.getCondVisibility('System.Platform.Android')))
+    if xbmc.getCondVisibility('System.Platform.Android') == True:
+        res = resolver.Resolver(filename='/system/etc/resolv.conf', configure=True)
+        #res = resolver.Resolver(filename='/system/etc/dhcpcd/dhcpcd-hooks/20-dns.conf', configure=True)
+    else:
+        res = resolver.Resolver(configure=True)
     #legge le impostazioni dalla configurazione e setta i relativi DNS
     if config.get_setting('resolver_dns_custom') and not config.get_setting('resolver_dns_service_choose'):
         res.nameservers = [config.get_setting('resolver_dns_custom1'),config.get_setting('resolver_dns_custom2')]
