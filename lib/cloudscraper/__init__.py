@@ -1,3 +1,4 @@
+# https://github.com/VeNoMouS/cloudscraper
 import logging
 import re
 import sys
@@ -37,7 +38,7 @@ except ImportError:
 
 # ------------------------------------------------------------------------------- #
 
-__version__ = '1.2.15'
+__version__ = '1.2.16'
 
 # ------------------------------------------------------------------------------- #
 
@@ -85,7 +86,7 @@ class CloudScraper(Session):
         self.debug = kwargs.pop('debug', False)
         self.delay = kwargs.pop('delay', None)
         self.cipherSuite = kwargs.pop('cipherSuite', None)
-        self.interpreter = kwargs.pop('interpreter', 'js2py')
+        self.interpreter = kwargs.pop('interpreter', 'native')
         self.recaptcha = kwargs.pop('recaptcha', {})
         self.allow_brotli = kwargs.pop(
             'allow_brotli',
@@ -162,6 +163,7 @@ class CloudScraper(Session):
 
     def request(self, method, url, *args, **kwargs):
         # pylint: disable=E0203
+
         if kwargs.get('proxies') and kwargs.get('proxies') != self.proxies:
             self.proxies = kwargs.get('proxies')
 
@@ -194,9 +196,8 @@ class CloudScraper(Session):
 
             resp = self.Challenge_Response(resp, **kwargs)
         else:
-            if resp.status_code not in [302, 429, 503]:
+            if not resp.is_redirect and resp.status_code not in [429, 503]:
                 self._solveDepthCnt = 0
-
         return resp
 
     # ------------------------------------------------------------------------------- #
@@ -452,9 +453,7 @@ class CloudScraper(Session):
             cloudflare_kwargs['headers'] = updateAttr(
                 cloudflare_kwargs,
                 'headers',
-                {
-                    'Referer': resp.url
-                }
+                {'Referer': resp.url}
             )
 
             ret = self.request(
@@ -463,11 +462,16 @@ class CloudScraper(Session):
                 **cloudflare_kwargs
             )
 
-            if ret.status_code != 302:
+            # ------------------------------------------------------------------------------- #
+            # Return response if Cloudflare is doing content pass through instead of 3xx
+            # ------------------------------------------------------------------------------- #
+
+            if not ret.is_redirect:
                 return ret
 
         # ------------------------------------------------------------------------------- #
-        # We shouldn't be here.... Re-request the original query and process again....
+        # Cloudflare is doing http 3xx instead of pass through again....
+        # Re-request the original query and/or process again....
         # ------------------------------------------------------------------------------- #
 
         return self.request(resp.request.method, resp.url, **kwargs)

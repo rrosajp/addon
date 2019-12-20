@@ -4,6 +4,7 @@ import copy
 import re
 import sqlite3
 import time
+import urllib
 
 import xbmcaddon
 
@@ -156,9 +157,11 @@ def cache_response(fn):
                 result = fn(*args)
             else:
 
-                conn = sqlite3.connect(fname)
+                conn = sqlite3.connect(fname, timeout=15)
                 c = conn.cursor()
-                url_base64 = base64.b64encode(args[0])
+                url = re.sub('&year=-', '', args[0])
+                logger.error('la url %s' % url)
+                url_base64 = base64.b64encode(url)
                 c.execute("SELECT response, added FROM tmdb_cache WHERE url=?", (url_base64,))
                 row = c.fetchone()
 
@@ -189,7 +192,7 @@ def cache_response(fn):
     return wrapper
 
 
-def set_infoLabels(source, seekTmdb=True, idioma_busqueda=def_lang):
+def set_infoLabels(source, seekTmdb=True, idioma_busqueda=def_lang, forced=False):
     """
     Dependiendo del tipo de dato de source obtiene y fija (item.infoLabels) los datos extras de una o varias series,
     capitulos o peliculas.
@@ -205,6 +208,9 @@ def set_infoLabels(source, seekTmdb=True, idioma_busqueda=def_lang):
     @rtype: int, list
     """
 
+    if not config.get_setting('tmdb_active') and not forced:
+        return
+
     start_time = time.time()
     if type(source) == list:
         ret = set_infoLabels_itemlist(source, seekTmdb, idioma_busqueda)
@@ -215,7 +221,7 @@ def set_infoLabels(source, seekTmdb=True, idioma_busqueda=def_lang):
     return ret
 
 
-def set_infoLabels_itemlist(item_list, seekTmdb=False, idioma_busqueda=def_lang):
+def set_infoLabels_itemlist(item_list, seekTmdb=False, idioma_busqueda=def_lang, forced=False):
     """
     De manera concurrente, obtiene los datos de los items incluidos en la lista item_list.
 
@@ -236,6 +242,8 @@ def set_infoLabels_itemlist(item_list, seekTmdb=False, idioma_busqueda=def_lang)
         negativo en caso contrario.
     @rtype: list
     """
+    if not config.get_setting('tmdb_active') and not forced:
+        return
     import threading
 
     threads_num = config.get_setting("tmdb_threads", default=20)
@@ -555,20 +563,22 @@ def completar_codigos(item):
             item.infoLabels['url_scraper'].append(url_scraper)
 
 
-def discovery(item):
-    if item.search_type == 'discover':
+def discovery(item, dict_=False, cast=False):
+    from core.item import Item
+
+    if dict_:
+        listado = Tmdb(discover = dict_, cast=cast)
+
+    elif item.search_type == 'discover':
         listado = Tmdb(discover={'url':'discover/%s' % item.type, 'with_genres':item.list_type, 'language':def_lang,
                                  'page':item.page})
 
     elif item.search_type == 'list':
         if item.page == '':
             item.page = '1'
-        listado = Tmdb(list={'url': item.list_type, 'language':def_lang, 'page':item.page})
+        listado = Tmdb(discover={'url': item.list_type, 'language':def_lang, 'page':item.page})
 
-    logger.debug(listado.get_list_resultados())
-    result = listado.get_list_resultados()
-
-    return result
+    return listado
 
 def get_genres(type):
     lang = def_lang
@@ -788,6 +798,7 @@ class Tmdb(object):
     def __init__(self, **kwargs):
         self.page = kwargs.get('page', 1)
         self.index_results = 0
+        self.cast = kwargs.get('cast', False)
         self.results = []
         self.result = ResultDictDefault()
         self.total_pages = 0
@@ -804,7 +815,6 @@ class Tmdb(object):
         self.busqueda_year = kwargs.get('year', '')
         self.busqueda_filtro = kwargs.get('filtro', {})
         self.discover = kwargs.get('discover', {})
-        self.list = kwargs.get('list', {})
 
         # Reellenar diccionario de generos si es necesario
         if (self.busqueda_tipo == 'movie' or self.busqueda_tipo == "tv") and \
@@ -836,9 +846,6 @@ class Tmdb(object):
         elif self.discover:
             self.__discover()
 
-        elif self.list:
-            self.__list()
-
         else:
             logger.debug("Creado objeto vacio")
 
@@ -847,20 +854,19 @@ class Tmdb(object):
     def get_json(url):
 
         try:
-            result = httptools.downloadpage(url, cookies=False)
+            result = httptools.downloadpage(url, cookies=False, ignore_response_code=True)
 
             res_headers = result.headers
-            # logger.debug("res_headers es %s" % res_headers)
             dict_data = jsontools.load(result.data)
-            # logger.debug("result_data es %s" % dict_data)
+            #logger.debug("result_data es %s" % dict_data)
 
             if "status_code" in dict_data:
-                logger.debug("\nError de tmdb: %s %s" % (dict_data["status_code"], dict_data["status_message"]))
+                #logger.debug("\nError de tmdb: %s %s" % (dict_data["status_code"], dict_data["status_message"]))
 
                 if dict_data["status_code"] == 25:
                     while "status_code" in dict_data and dict_data["status_code"] == 25:
                         wait = int(res_headers['retry-after'])
-                        logger.debug("Limite alcanzado, esperamos para volver a llamar en ...%s" % wait)
+                        #logger.error("Limite alcanzado, esperamos para volver a llamar en ...%s" % wait)
                         time.sleep(wait)
                         # logger.debug("RE Llamada #%s" % d)
                         result = httptools.downloadpage(url, cookies=False)
@@ -941,6 +947,8 @@ class Tmdb(object):
         self.result = ResultDictDefault()
         results = []
         total_results = 0
+        text_simple = self.busqueda_texto.lower()
+        text_quote = urllib.quote(text_simple)
         total_pages = 0
         buscando = ""
 
@@ -948,7 +956,7 @@ class Tmdb(object):
             # http://api.themoviedb.org/3/search/movie?api_key=a1ab8b8669da03637a4b98fa39c39228&query=superman&language=es
             # &include_adult=false&page=1
             url = ('http://api.themoviedb.org/3/search/%s?api_key=a1ab8b8669da03637a4b98fa39c39228&query=%s&language=%s'
-                   '&include_adult=%s&page=%s' % (self.busqueda_tipo, self.busqueda_texto.replace(' ', '%20'),
+                   '&include_adult=%s&page=%s' % (self.busqueda_tipo, text_quote.replace(' ', '%20'),
                                                   self.busqueda_idioma, self.busqueda_include_adult, page))
 
             if self.busqueda_year:
@@ -993,64 +1001,6 @@ class Tmdb(object):
             logger.error(msg)
             return 0
 
-    def __list(self, index_results=0):
-        self.result = ResultDictDefault()
-        results = []
-        total_results = 0
-        total_pages = 0
-
-        # Ejemplo self.discover: {'url': 'movie/', 'with_cast': '1'}
-        # url: Método de la api a ejecutar
-        # resto de claves: Parámetros de la búsqueda concatenados a la url
-        type_search = self.list.get('url', '')
-        if type_search:
-            params = []
-            for key, value in self.list.items():
-                if key != "url":
-                    params.append("&"+key + "=" + str(value))
-            # http://api.themoviedb.org/3/movie/popolar?api_key=a1ab8b8669da03637a4b98fa39c39228&&language=es
-            url = ('http://api.themoviedb.org/3/%s?api_key=a1ab8b8669da03637a4b98fa39c39228%s'
-                   % (type_search, ''.join(params)))
-
-            logger.info("[Tmdb.py] Buscando %s:\n%s" % (type_search, url))
-            resultado = self.get_json(url)
-
-            total_results = resultado.get("total_results", -1)
-            total_pages = resultado.get("total_pages", 1)
-
-            if total_results > 0:
-                results = resultado["results"]
-                if self.busqueda_filtro and results:
-                    # TODO documentar esta parte
-                    for key, value in dict(self.busqueda_filtro).items():
-                        for r in results[:]:
-                            if key not in r or r[key] != value:
-                                results.remove(r)
-                                total_results -= 1
-            elif total_results == -1:
-                results = resultado
-
-            if index_results >= len(results):
-                logger.error(
-                    "La busqueda de '%s' no dio %s resultados" % (type_search, index_results))
-                return 0
-
-        # Retornamos el numero de resultados de esta pagina
-        if results:
-            self.results = results
-            self.total_results = total_results
-            self.total_pages = total_pages
-            if total_results > 0:
-                self.result = ResultDictDefault(self.results[index_results])
-            else:
-                self.result = results
-            return len(self.results)
-        else:
-            # No hay resultados de la busqueda
-            logger.error("La busqueda de '%s' no dio resultados" % type_search)
-            return 0
-
-
 
     def __discover(self, index_results=0):
         self.result = ResultDictDefault()
@@ -1077,8 +1027,12 @@ class Tmdb(object):
             total_results = resultado.get("total_results", -1)
             total_pages = resultado.get("total_pages", 1)
 
-            if total_results > 0:
-                results = resultado["results"]
+            if total_results > 0 or self.cast:
+                if self.cast:
+                    results = resultado[self.cast]
+                    total_results = len(results)
+                else:
+                    results = resultado["results"]
                 if self.busqueda_filtro and results:
                     # TODO documentar esta parte
                     for key, value in dict(self.busqueda_filtro).items():
@@ -1101,6 +1055,7 @@ class Tmdb(object):
             self.total_pages = total_pages
             if total_results > 0:
                 self.result = ResultDictDefault(self.results[index_results])
+
             else:
                 self.result = results
             return len(self.results)
@@ -1147,8 +1102,10 @@ class Tmdb(object):
 
                         result['thumbnail'] = self.get_poster(size="w300")
                         result['fanart'] = self.get_backdrop()
+
                         res.append(result)
                         cr += 1
+
                         if cr >= num_result:
                             return res
                 except:
@@ -1370,7 +1327,7 @@ class Tmdb(object):
                 msg += "\nError de tmdb: %s %s" % (
                 self.temporada[numtemporada]["status_code"], self.temporada[numtemporada]["status_message"])
                 logger.debug(msg)
-                self.temporada[numtemporada] = {"episodes": {}}
+                self.temporada[numtemporada] = {}
 
         return self.temporada[numtemporada]
 

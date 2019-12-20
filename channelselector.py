@@ -36,9 +36,7 @@ def getmainlist(view="thumb_"):
     if addon.getSetting('enable_search_menu') == "true":
         itemlist.append(Item(title=config.get_localized_string(30103), channel="search", path='special', action="mainlist",
                             thumbnail=get_thumb("search.png", view),
-                            category=config.get_localized_string(30119), viewmode="list",
-                            context=[{"title": config.get_localized_string(70286), "channel": "search", "action": "opciones",
-                                    "goto": True}]))
+                            category=config.get_localized_string(30119), viewmode="list"))
 
     if addon.getSetting('enable_onair_menu') == "true":
         itemlist.append(Item(channel="filmontv", action="mainlist", title=config.get_localized_string(50001),
@@ -274,7 +272,10 @@ def get_thumb(thumb_name, view="thumb_", auto=False):
         if config.get_setting('enable_custom_theme') and config.get_setting('custom_theme') and os.path.isfile(config.get_setting('custom_theme') + view + thumb_name):
             media_path = config.get_setting('custom_theme')
 
-        thumbnail = os.path.join(media_path, view + thumb_name)
+        if thumb_name.startswith('http'):
+            thumbnail = thumb_name
+        else:
+            thumbnail = os.path.join(media_path, view + thumb_name)
         if 'http' in thumbnail:
             thumbnail = thumbnail.replace('\\','/')
         return thumbnail

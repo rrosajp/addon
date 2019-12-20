@@ -2715,7 +2715,7 @@ msgid "Global Search"
 msgstr ""
 
 msgctxt "#60673"
-msgid "MultiThread Search"
+msgid "Number of Search Threads"
 msgstr ""
 
 msgctxt "#60674"
@@ -3839,7 +3839,7 @@ msgid "Add Torrent channels in search"
 msgstr ""
 
 msgctxt "#70276"
-msgid "Search by title"
+msgid "Search by Title"
 msgstr ""
 
 msgctxt "#70277"
@@ -5679,6 +5679,26 @@ msgstr ""
 
 msgctxt "#70740"
 msgid "Your system does not have a web browser, so here's the short link you can open in another device:\n%s"
+msgstr ""
+
+msgctxt "#70741"
+msgid "Search %s"
+msgstr ""
+
+msgctxt "#70742"
+msgid "Movies by Year"
+msgstr ""
+
+msgctxt "#70743"
+msgid "Series by Year"
+msgstr ""
+
+msgctxt "#70744"
+msgid "%s channels remaining"
+msgstr ""
+
+msgctxt "#70745"
+msgid "Enter another year..."
 msgstr ""
 
 # DNS start [ settings and declaration ]

@@ -97,6 +97,7 @@ def show_channels(item):
 def show_menu(item):
     global list_data
     itemlist = []
+    add_search = True
     support.log()
     # If Second Level Menu
     if item.menu:
@@ -127,11 +128,16 @@ def show_menu(item):
                                      filterkey=key if not url else '' ))
 
         if menu.has_key('search'):
+            if type(menu['search']) == dict and menu['search'].has_key('url'):
+                url = relative('url', menu['search'], item.path)
+            else:
+                url = ''
             itemlist.append(Item(channel=item.channel,
                                  title=typo('Cerca ' + item.fulltitle +'...','color kod bold'),
                                  thumbnail=get_thumb('search.png'),
                                  action='search',
                                  url=item.url,
+                                 custom_url=url,
                                  path=item.path))
         return itemlist
 
@@ -146,16 +152,28 @@ def show_menu(item):
                     url = relative('link', option, item.path)
                     submenu = option['submenu'] if option.has_key('submenu') else []
                     level2 = option['level2'] if option.has_key('level2') else []
-                    itemlist.append(Item(channel=item.channel,
-                                         title=format_title(option['title']),
-                                         fulltitle=option['title'],
-                                         thumbnail=thumbnail,
-                                         fanart=fanart,
-                                         plot=plot,
-                                         action='show_menu',
-                                         url=url,
-                                         path=item.path,
-                                         menu=level2))
+                    if option.has_key('title'):
+                        itemlist.append(Item(channel=item.channel,
+                                            title=format_title(option['title']),
+                                            fulltitle=option['title'],
+                                            thumbnail=thumbnail,
+                                            fanart=fanart,
+                                            plot=plot,
+                                            action='show_menu',
+                                            url=url,
+                                            path=item.path,
+                                            menu=level2))
+                    if option.has_key('search'):
+                        menu = json_data['menu']
+                        if type(option['search']) == dict and option['search'].has_key('url'):
+                            url = relative('url', option['search'], item.path)
+                            itemlist.append(Item(channel=item.channel,
+                                                 title=typo('Cerca nel Canale...','color kod bold'),
+                                                 thumbnail=get_thumb('search.png'),
+                                                 action='search',
+                                                 url=url,
+                                                 path=item.path))
+                            add_search = False
 
                     if submenu:
                         for key in submenu:
@@ -177,6 +195,10 @@ def show_menu(item):
                                                      action='submenu',
                                                      filterkey=key))
                         if submenu.has_key('search'):
+                            if type(submenu['search']) == dict and submenu['search'].has_key('url'):
+                                url = relative('url', submenu['search'], item.path)
+                            else:
+                                url = ''
                             itemlist.append(Item(channel=item.channel,
                                                  title=typo('Cerca ' + option['title'] +'...','color kod bold'),
                                                  thumbnail=get_thumb('search.png'),
@@ -205,13 +227,13 @@ def show_menu(item):
                 itemlist += list_all(item)
 
         # add Search
-        if 'channel_name' in json_data:
+        if 'channel_name' in json_data and add_search:
             itemlist.append(Item(channel=item.channel,
-                                title=typo('Cerca nel Canale...','color kod bold'),
-                                thumbnail=get_thumb('search.png'),
-                                action='search',
-                                url=item.url,
-                                path=item.path))
+                                 title=typo('Cerca nel Canale...','color kod bold'),
+                                 thumbnail=get_thumb('search.png'),
+                                 action='search',
+                                 url=item.url,
+                                 path=item.path))
 
     return itemlist
 
@@ -245,6 +267,7 @@ def submenu(item):
         thumbnail = ''
         plot = ''
         if item.filterkey in ['director','actors']:
+            tmdb.set_infoLabels(itemlist, seekTmdb=True)
             load_info = load_json('http://api.themoviedb.org/3/search/person/?api_key=' + tmdb_api + '&language=' + lang + '&query=' + filter)
             id = str(load_info['results'][0]['id']) if load_info.has_key('results') else ''
             if id:
@@ -655,7 +678,9 @@ def add_channel(item):
 
     community_json = open(path, "r")
     community_json = jsontools.load(community_json.read())
-    id = len(community_json['channels']) + 1
+    id = 1
+    while community_json['channels'].has_key(str(id)):
+        id +=1
     community_json['channels'][id]=(channel_to_add)
 
     with open(path, "w") as file:
@@ -732,6 +757,8 @@ def format_title(title):
 
 def search(item, text):
     support.log('Search ', text)
+    if item.custom_url:
+        item.url=item.custom_url + text
     itemlist = []
     json_data = load_json(item)
 
@@ -782,8 +809,9 @@ def load_links(item, itemlist, json_data, text):
 
     if json_data.has_key('menu'):
         for option in json_data['menu']:
-            json_data = load_json(option['link'] if option['link'].startswith('http') else item.path+option['link'])
-            load_links(item, itemlist, json_data, text)
+            if option.has_key('link'):
+                json_data = load_json(option['link'] if option['link'].startswith('http') else item.path+option['link'])
+                load_links(item, itemlist, json_data, text)
     else:
         links(item, itemlist, json_data, text)
 
