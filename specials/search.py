@@ -11,6 +11,9 @@ from channelselector import get_thumb
 from platformcode import logger, config, platformtools, unify
 from core.support import typo
 
+import gc
+gc.disable()
+
 import xbmcaddon
 addon = xbmcaddon.Addon('metadata.themoviedb.org')
 def_lang = addon.getSetting('language')
@@ -36,6 +39,9 @@ def mainlist(item):
                          thumbnail=get_thumb('search.png')))
 
     itemlist.append(Item(channel=item.channel, title=config.get_localized_string(59994), action='opciones',
+                         thumbnail=get_thumb('setting_0.png')))
+
+    itemlist.append(Item(channel=item.channel, title=config.get_localized_string(60415), action='settings',
                          thumbnail=get_thumb('setting_0.png')))
 
     itemlist = set_context(itemlist)
@@ -179,7 +185,7 @@ def channel_search(item):
                                              str(searching_titles))
     config.set_setting('tmdb_active', False)
 
-    with futures.ThreadPoolExecutor() as executor:
+    with futures.ThreadPoolExecutor(max_workers=set_workers()) as executor:
         c_results = [executor.submit(get_channel_results, ch, item, session) for ch in channel_list]
 
         for res in futures.as_completed(c_results):
@@ -339,6 +345,13 @@ def get_channels(item):
 def opciones(item):
     return setting_channel_new(item)
 
+def settings(item):
+    return platformtools.show_channel_settings(caption=config.get_localized_string(59993))
+
+def set_workers():
+    list_mode=[None,1,2,4,6,8,16,24,32,64]
+    index = config.get_setting('thread_number', 'search')
+    return list_mode[index]
 
 def setting_channel_new(item):
     import xbmcgui
@@ -652,6 +665,9 @@ def set_context(itemlist):
     for elem in itemlist:
         elem.context = [{"title": config.get_localized_string(60412),
                          "action": "setting_channel_new",
+                         "channel": "search"},
+                        {"title": config.get_localized_string(60415),
+                         "action": "settings",
                          "channel": "search"}]
 
     return itemlist

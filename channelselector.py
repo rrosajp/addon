@@ -36,9 +36,7 @@ def getmainlist(view="thumb_"):
     if addon.getSetting('enable_search_menu') == "true":
         itemlist.append(Item(title=config.get_localized_string(30103), channel="search", path='special', action="mainlist",
                             thumbnail=get_thumb("search.png", view),
-                            category=config.get_localized_string(30119), viewmode="list",
-                            context=[{"title": config.get_localized_string(70286), "channel": "search", "action": "opciones",
-                                    "goto": True}]))
+                            category=config.get_localized_string(30119), viewmode="list"))
 
     if addon.getSetting('enable_onair_menu') == "true":
         itemlist.append(Item(channel="filmontv", action="mainlist", title=config.get_localized_string(50001),
