@@ -2714,8 +2714,8 @@ msgid "Global Search"
 msgstr "Ricerca globale"
 
 msgctxt "#60673"
-msgid "MultiThread Search"
-msgstr "Ricerca MultiThread"
+msgid "Number of Search Threads"
+msgstr "Numero di Threads di Ricerca"
 
 msgctxt "#60674"
 msgid "Show Results:"

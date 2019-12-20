@@ -165,7 +165,6 @@ def scrapeLang(scraped, lang, longtitle):
 
     if not language: language = lang
     if language: longtitle += typo(language, '_ [] color kod')
-
     return language, longtitle
 
 def cleantitle(title):
@@ -221,8 +220,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         if scraped['season']:
             stagione = scraped['season']
             episode = scraped['season'] +'x'+ scraped['episode']
-        elif stagione:
-            episode = stagione +'x'+ scraped['episode']
+        elif item.season:
+            episode = item.season +'x'+ scraped['episode']
         elif item.contentType == 'tvshow' and (scraped['episode'] == '' and scraped['season'] == '' and stagione == ''):
             item.news = 'season_completed'
             episode = ''
@@ -389,6 +388,9 @@ def scrape(func):
             blocks = scrapertoolsV2.find_multiple_matches_groups(data, patronBlock)
             block = ""
             for bl in blocks:
+                # log(len(blocks),bl)
+                if 'season' in bl and bl['season']:
+                    item.season = bl['season']
                 blockItemlist, blockMatches = scrapeBlock(item, args, bl['block'], patron, headers, action, pagination, debug,
                                             typeContentDict, typeActionDict, blacklist, search, pag, function, lang)
                 for it in blockItemlist:
