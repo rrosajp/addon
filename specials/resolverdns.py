@@ -1,35 +1,77 @@
 # -*- coding: utf-8 -*-
-# -*- OVERRIDE RESOLVE DNS -*-
+import ssl
 
-from platformcode import config
+from requests_toolbelt.adapters import host_header_ssl
 
-if config.get_setting('resolver_dns'):
-    from lib import dns
-    from dns import resolver, name
-    from dns.resolver import override_system_resolver
-    from core import support
+from lib import requests, doh
+from platformcode import logger
+import re
 
-    res = resolver.Resolver(configure=True)
+class CustomSocket(ssl.SSLSocket):
+    def __init__(self, *args, **kwargs):
+        super(CustomSocket, self).__init__(*args, **kwargs)
 
-    #legge le impostazioni dalla configurazione e setta i relativi DNS
-    if config.get_setting('resolver_dns_custom') and not config.get_setting('resolver_dns_service_choose'):
-        res.nameservers = [config.get_setting('resolver_dns_custom1'),config.get_setting('resolver_dns_custom2')]
-    else:
-        nameservers_dns = config.get_setting('resolver_dns_service')
-        if nameservers_dns == 1:# 'Google'
-            res.nameservers = ['8.8.8.8', '2001:4860:4860::8888',
-                               '8.8.4.4', '2001:4860:4860::8844']
-        elif nameservers_dns == 2:#'OpenDns Home ip(v4)'
-            res.nameservers = ['208.67.222.222', '208.67.222.220']
-        elif nameservers_dns == 3:#'OpenDns Family Shield ip(v4)':
-            res.nameservers = ['208.67.222.123', '208.67.220.123']
-        elif nameservers_dns == 4:#'OpenDns ip(v6)'
-            #https://support.opendns.com/hc/en-us/articles/227986667-Does-OpenDNS-Support-IPv6-
-            res.nameservers = ['2620:119:35::35', '2620:119:53::53']
-        else:#if nameservers_dns == 0:#'Cloudflare'
-            res.nameservers = ['1.1.1.1', '2606:4700:4700::1111',
-                               '1.0.0.1', '2606:4700:4700::1001']
-    # log di verifica dei DNS impostati, d'aiuto quando gli utenti smanettano...
-    support.log("NAME SERVER: {}".format(res.nameservers))
+class CustomContext(ssl.SSLContext):
+    def __init__(self, protocol, hostname, *args, **kwargs):
+        self.hostname = hostname
+        super(CustomContext, self).__init__(protocol)
+    def wrap_socket(self, sock, server_side=False,
+                    do_handshake_on_connect=True,
+                    suppress_ragged_eofs=True,
+                    server_hostname=None):
+        return CustomSocket(sock=sock, server_side=server_side,
+                         do_handshake_on_connect=do_handshake_on_connect,
+                         suppress_ragged_eofs=suppress_ragged_eofs,
+                         server_hostname=self.hostname,
+                         _context=self)
 
-    override_system_resolver(res)
+class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
+
+    def __init__(self, hostname, *args, **kwargs):
+        self.ssl_context = kwargs.pop('ssl_context', None)
+        self.cipherSuite = kwargs.pop('cipherSuite', None)
+        self.hostname = hostname
+
+        if not self.ssl_context:
+            self.ssl_context = CustomContext(ssl.PROTOCOL_TLS, hostname)
+            self.ssl_context.set_ciphers(self.cipherSuite)
+
+        super(CipherSuiteAdapter, self).__init__(**kwargs)
+
+    # ------------------------------------------------------------------------------- #
+
+    def init_poolmanager(self, *args, **kwargs):
+        kwargs['ssl_context'] = self.ssl_context
+        return super(CipherSuiteAdapter, self).init_poolmanager(*args, **kwargs)
+
+    # ------------------------------------------------------------------------------- #
+
+    def proxy_manager_for(self, *args, **kwargs):
+        kwargs['ssl_context'] = self.ssl_context
+        return super(CipherSuiteAdapter, self).proxy_manager_for(*args, **kwargs)
+
+# ------------------------------------------------------------------------------- #
+
+class session(requests.Session):
+    def request(self, method, url,
+            params=None, data=None, headers=None, cookies=None, files=None,
+            auth=None, timeout=None, allow_redirects=True, proxies=None,
+            hooks=None, stream=None, verify=None, cert=None, json=None):
+        protocol, domain, port, resource = re.match('^(http[s]?:\/\/)?([^:\/\s]+)(?::([^\/]*))?([^\s]+)$', url, flags=re.IGNORECASE).groups()
+        self.mount('https://', CipherSuiteAdapter(domain, cipherSuite="ALL"))
+        try:
+            ip = doh.query(domain)
+            logger.info('Query DoH: ' + domain + ' = ' + str(ip))
+            url = protocol + ip[0] + (':' + port if port else '') + resource
+        except Exception:
+            logger.error('Failed to resolve hostname, fallback to normal dns')
+            import traceback
+            logger.error(traceback.print_exc())
+        if headers:
+            headers["Host"] = domain
+        else:
+            headers = {"Host": domain}
+        return super(session, self).request(method, url,
+                                        params, data, headers, cookies, files,
+                                        auth, timeout, allow_redirects, proxies,
+                                        hooks, stream, verify, cert, json)
