@@ -629,7 +629,7 @@ def menu(func):
         list_servers = func.__globals__['list_servers']
         list_quality = func.__globals__['list_quality']
         filename = func.__module__.split('.')[1]
-
+        global_search = False
         # listUrls = ['film', 'filmSub', 'tvshow', 'tvshowSub', 'anime', 'animeSub', 'search', 'top', 'topSub']
         listUrls = ['top', 'film', 'tvshow', 'anime', 'search']
         listUrls_extra = []
@@ -647,7 +647,7 @@ def menu(func):
             if name == 'anime': title = 'Anime'
 
             if name == 'search' and dictUrl[name] is not None:
-                menuItem(itemlist, filename, 'Cerca… bold', 'search', host + dictUrl['search'])
+                global_search = True
 
             # Make TOP MENU
             elif name == 'top' and dictUrl[name] is not None:
@@ -678,7 +678,7 @@ def menu(func):
                              args=var[2] if len(var) > 2 else '',
                              contentType= var[3] if len(var) > 3 else 'movie' if name == 'film' else 'tvshow',)
                 # add search menu for category
-                if 'search' not in args: menuItem(itemlist, filename, 'Cerca ' + title + '… submenu bold', 'search', host + url, contentType='movie' if name == 'film' else 'tvshow')
+                if 'search' not in args: menuItem(itemlist, filename, config.get_localized_string(70741) % title + ' … submenu bold', 'search', host + url, contentType='movie' if name == 'film' else 'tvshow')
 
         # Make EXTRA MENU (on bottom)
         for name, var in args.items():
@@ -693,6 +693,9 @@ def menu(func):
                              action = var[1] if len(var) > 1 else 'peliculas',
                              args=var[2] if len(var) > 2 else '',
                              contentType= var[3] if len(var) > 3 else 'movie',)
+
+        if global_search:
+            menuItem(itemlist, filename, config.get_localized_string(70741) % '… bold', 'search', host + dictUrl['search'])
 
 
         autoplay.init(item.channel, list_servers, list_quality)
