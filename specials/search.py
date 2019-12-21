@@ -271,7 +271,7 @@ def channel_search(item):
             ch_thumb = channeltools.get_channel_parameters(key)['thumbnail']
             results.append(Item(channel='search', title=title,
                                 action='get_from_temp', thumbnail=ch_thumb, itemlist=[ris.tourl() for ris in grouped], plot=plot, page=1))
-            results = sorted(results, key=lambda it: it.from_channel)
+
 
 
     # send_to_temp(to_temp)
@@ -279,7 +279,7 @@ def channel_search(item):
     if item.mode == 'all':
         if config.get_setting('result_mode', 'search') != 0:
             res_count = len(results)
-            results = sorted(results, key=lambda it: it.title)
+        results = sorted(results, key=lambda it: it.title)
         results_statistic = config.get_localized_string(59972) % (item.title, res_count, time.time() - start)
         results.insert(0, Item(title = typo(results_statistic,'color kod bold')))
     # logger.debug(results_statistic)
