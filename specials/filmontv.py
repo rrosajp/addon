@@ -102,10 +102,12 @@ def now_on_misc_film(item):
         infoLabels['title'] = "movie"
         itemlist.append(
             Item(channel=item.channel,
-                 action="do_search",
+                 action="new_search",
                  extra=urllib.quote_plus(scrapedtitle) + '{}' + 'movie',
                  title="[B]" + scrapedtitle + "[/B] - " + scrapedchannel,
                  fulltitle=scrapedtitle,
+                 mode='all',
+                 search_text=scrapedtitle,
                  url=scrapedurl,
                  thumbnail=scrapedthumbnail.replace("?width=320", "?width=640"),
                  contentTitle=scrapedtitle,
@@ -135,10 +137,12 @@ def now_on_misc(item):
         infoLabels['tvshowtitle'] = scrapedtitle
         itemlist.append(
             Item(channel=item.channel,
-                 action="do_search",
+                 action="new_search",
                  extra=urllib.quote_plus(scrapedtitle) + '{}' + 'tvshow',
                  title="[B]" + scrapedtitle + "[/B] - " + scrapedchannel,
                  fulltitle=scrapedtitle,
+                 mode='all',
+                 search_text=scrapedtitle,
                  url=scrapedurl,
                  thumbnail=scrapedthumbnail.replace("?width=320", "?width=640"),
                  contentTitle=scrapedtitle,
@@ -167,11 +171,13 @@ def now_on_tv(item):
         infoLabels["year"] = scrapedyear
         itemlist.append(
             Item(channel=item.channel,
-                 action="do_search",
+                 action="new_search",
                  extra=urllib.quote_plus(scrapedtitle) + '{}' + 'movie',
                  title="[B]" + scrapedtitle + "[/B] - " + scrapedchannel + " - " + scrapedduration,
                  fulltitle="[B]" + scrapedtitle + "[/B] - " + scrapedchannel+ " - " + scrapedduration,
                  url=scrapedurl,
+                 mode='all',
+                 search_text=scrapedtitle,
                  thumbnail=scrapedthumbnail.replace("?width=240", "?width=480"),
                  contentTitle=scrapedtitle,
                  contentType='movie',
@@ -199,11 +205,13 @@ def primafila(item):
         infoLabels["year"] = scrapedyear
         itemlist.append(
             Item(channel=item.channel,
-                 action="do_search",
+                 action="new_search",
                  extra=urllib.quote_plus(scrapedtitle) + '{}' + 'movie',
                  title=scrapedtitle,
                  fulltitle=scrapedtitle,
                  url=scrapedurl,
+                 mode='all',
+                 search_text=scrapedtitle,
                  thumbnail=scrapedthumbnail.replace("?width=240", "?width=480"),
                  contentTitle=scrapedtitle,
                  contentType='movie',
@@ -214,6 +222,6 @@ def primafila(item):
 
     return itemlist
 
-def do_search(item):
+def new_search(item):
     from specials import search
-    return search.do_search(item)
+    return search.new_search(item)
