@@ -2,18 +2,6 @@
 # ------------------------------------------------------------
 # Canale per 'cinemaLibero'
 # ------------------------------------------------------------
-"""
-
-    25 titoli per le novità
-
-    NON CONTROLLARE LE SEZIONE SPORT - ANIME, HANNO PROBLEMI!!!
-    è stata eliminata dall'elenco ma i titoli possono apparire nella ricerca o tra le novità
-    Non è errore se dà problemi!!! NON CONSIDERATELA!
-
-    Novità. Indicare in quale/i sezione/i è presente il canale:
-       - FILM - SERIE
-
-"""
 
 import re
 
@@ -33,16 +21,13 @@ def mainlist(item):
 
     film = ['/category/film/',
             ('Novità', ['', 'peliculas', 'update']),
-            ('Generi', ['', 'genres'])
-        ]
+            ('Generi', ['', 'genres'])]
 
-    tvshow = ['/category/serie-tv/'
-        ]
+    tvshow = ['/category/serie-tv/']
 
     anime = ['/category/anime-giapponesi/']
 
-##    Sport = [(support.typo('Sport', 'bullet bold'), ['/category/sport/', 'peliculas', 'sport', 'tvshow'])
-##        ]
+##    Sport = [(support.typo('Sport', 'bullet bold'), ['/category/sport/', 'peliculas', 'sport', 'tvshow'])]
     news = [('Ultimi episodi Serie/Anime', ['/aggiornamenti-serie-tv/', 'peliculas', 'update', 'tvshow'])]
 
     search = ''
@@ -63,11 +48,8 @@ def peliculas(item):
             patronBlock = r'<section id="slider">(?P<block>.*?)</section>'
             patron = r'<a href="(?P<url>(?:https:\/\/.+?\/(?P<title>[^\/]+[a-zA-Z0-9\-]+)(?P<year>\d{4})))/".+?url\((?P<thumb>[^\)]+)\)">'
     elif item.contentType == 'tvshow':
-        # patron = r'<a href="(?P<url>[^"]+)".+?url\((?P<thumb>[^\)]+)\)">[^>]+>[^>]+>[^>]+>(?:[^>]+>)?\s?(?P<rating>[\d\.]+)?[^>]+>(?P<title>.+?)(?:[ ]\((?P<year>\d{4})\))?<[^>]+>[^>]+>(.?[\d\-x]+\s\(?(?P<lang>[sSuUbBiItTaA\-]+)?\)?\s?(?P<quality>[\w]+)?[|]?\s?(?:[fFiInNeE]+)?\s?\(?(?P<lang2>[sSuUbBiItTaA\-]+)?\)?)?'
-        # if item.args == 'anime':
-        #     anime = True
-        #     patron = r'<div class="col-lg-3">[^>]+>[^>]+>\s<a href="(?P<url>[^"]+)".+?url\((?P<thumb>[^\)]+)\)">[^>]+>[^>]+>[^>]+>\s?(?P<rating>[\d\.]+)?[^>]+>[^>]+>(?P<title>.+?)\(?(?P<year>\d+)?\)?<[^>]+>[^>]+>(?:.+?[^fFiInNeE]+?\(?(?P<lang>[sSuUbBiItTaA]+)\)?.+?)<'
         if item.args == 'update':
+            debug = True
             patron = r'<a href="(?P<url>[^"]+)".+?url\((?P<thumb>.+?)\)">\s<div class="titolo">(?P<title>.+?)(?: &#8211; Serie TV)?(?:\([sSuUbBiItTaA\-]+\))?[ ]?(?P<year>\d{4})?</div>[ ]<div class="genere">(?:[\w]+?\.?\s?[\s|S]?[\dx\-S]+?\s\(?(?P<lang>[iItTaA]+|[sSuUbBiItTaA\-]+)\)?\s?(?P<quality>[HD]+)?|.+?\(?(?P<lang2>[sSuUbBiItTaA\-]+)?\)?</div>)'
             pagination = 25
         else:
@@ -77,7 +59,7 @@ def peliculas(item):
         patron = r'<div class="col-lg-3">[^>]+>[^>]+>\s<a href="(?P<url>[^"]+)".+?url\((?P<thumb>[^\)]+)\)">[^>]+>[^>]+>[^>]+>(?:[^>]+>)?\s?(?P<rating>[\d\.]+)?[^>]+>(?P<title>.+?)(?:[ ]\((?P<year>\d{4})\))?<[^>]+>[^>]+>(.?[\d\-x]+\s\(?(?P<lang>[sSuUbBiItTaA\-]+)?\)?\s?(?P<quality>[\w]+)?[|]?\s?(?:[fFiInNeE]+)?\s?\(?(?P<lang2>[sSuUbBiItTaA\-]+)?\)?)?'
 
     def itemHook(item):
-        if 'sub' in item.contentLanguage.lower():
+        if 'sub' in item.contentLanguage.lower() and not 'ita' in item.contentLanguage.lower():
             item.contentLanguage= 'Sub-ITA'
             item.title = re.sub('[Ss]ub(?:-)?', item.contentLanguage, item.title)
         if item.lang2:
@@ -91,30 +73,23 @@ def peliculas(item):
         return item
 
     patronNext = r'<a class="next page-numbers".*?href="([^"]+)">'
-    #debug = True
     return locals()
 
 @support.scrape
 def episodios(item):
     data=item.data
-    # debug = True
-    support.log('EPISODIOS DATA',data)
     if item.args == 'anime':
         support.log("Anime :", item)
         # blacklist = ['Clipwatching', 'Verystream', 'Easybytez', 'Flix555', 'Cloudvideo']
         patron = r'<a target=(?P<url>[^>]+>(?P<title>Episodio\s(?P<episode>\d+))(?::)?(?:(?P<title2>[^<]+))?.*?(?:<br|</p))'
         patronBlock = r'(?:Stagione (?P<season>\d+))?(?:</span><br />|</span></p>|strong></p>)(?P<block>.*?)(?:<div style="margin-left|<span class="txt_dow">)'
         item.contentType = 'tvshow'
-        # item.contentSerieName = item.fulltitle
     else:# item.extra == 'serie':
-        # debug = True
         support.log("Serie :", item)
         patron = r'(?P<episode>\d+(?:&#215;|×)?\d+\-\d+|\d+(?:&#215;|×)\d+)[;]?[ ]?(?:(?P<title>[^<]+)(?P<url>.*?)|(\2[ ])(?:<(\3.*?)))(?:</a><br />|</a></p>)'
         patronBlock = r'<p><strong>(?:.+?[Ss]tagione\s)?(?:(?P<lang>iTA|ITA|Sub-ITA|Sub-iTA))?.*?</strong>(?P<block>.+?)(?:</span|</p)'
         item.contentType = 'tvshow'
-        # item.contentSerieName = item.fulltitle
     def itemHook(item):
-        # support.dbg()
         if not scrapertoolsV2.find_single_match(item.title, r'(\d+x\d+)'):
             item.title = re.sub(r'(\d+) -', '1x\\1', item.title)
         return item
@@ -162,10 +137,6 @@ def newest(categoria):
             item.contentType = 'tvshow'
         item.action = 'peliculas'
         itemlist = peliculas(item)
-
-##        if itemlist[-1].action == 'peliculas':
-##            itemlist.pop()
-    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
@@ -175,40 +146,27 @@ def newest(categoria):
     return itemlist
 
 def check(item):
+    support.log()
     data = httptools.downloadpage(item.url, headers=headers).data
-    # support.log('cinemalibero DATA=',data)
     if data:
-        genere = scrapertoolsV2.find_single_match(data, r'rel="category tag">([a-zA-Z0-9]+).+?<')
         blockAnime = scrapertoolsV2.find_single_match(data, r'<div id="container" class="container">(.+?<div style="margin-left)')
-        support.log('GENRE',genere)
 
-        if blockAnime:
-            support.log('È un ANIME')
-            if 'episodio' in blockAnime.lower() or 'saga' in blockAnime.lower():
-                item.contentType = 'tvshow'
-                item.args = 'anime'
-                item.data = blockAnime
-                return episodios(item)
-            elif scrapertoolsV2.find_single_match(blockAnime,r'\d+(?:&#215;|×)?\d+\-\d+|\d+(?:&#215;|×)\d+'):
-                item.contentType = 'tvshow'
-                item.data = blockAnime
-                return episodios(item)
-            else:
-                support.log('È un ANIME FILM')
-                item.contentType = 'movie'
-                item.url = data
-                return findvideos(item)
-        if genere.lower() == 'serie':
+        if blockAnime and ('episodio' in blockAnime.lower() or 'saga' in blockAnime.lower()):
+            item.contentType = 'tvshow'
+            item.args = 'anime'
+            item.data = blockAnime
+            return episodios(item)
+
+        elif scrapertoolsV2.find_single_match(blockAnime,r'\d+(?:&#215;|×)?\d+\-\d+|\d+(?:&#215;|×)\d+'):
             item.contentType = 'tvshow'
             item.data = data
             return episodios(item)
         else:
-            support.log('È un FILM')
             item.contentType = 'movie'
             item.url = data
             return findvideos(item)
 
 def findvideos(item):
-    support.log('findvideos ->', item)
+    support.log()
     item.url = item.url.replace('http://rapidcrypt.net/verys/', '').replace('http://rapidcrypt.net/open/', '') #blocca la ricerca
     return support.server(item, data= item.url)
