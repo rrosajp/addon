@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import ssl
 
-from requests_toolbelt.adapters import host_header_ssl
+from lib.requests_toolbelt.adapters import host_header_ssl
 
 from lib import requests, doh
 from platformcode import logger
@@ -57,7 +57,7 @@ class session(requests.Session):
             params=None, data=None, headers=None, cookies=None, files=None,
             auth=None, timeout=None, allow_redirects=True, proxies=None,
             hooks=None, stream=None, verify=None, cert=None, json=None):
-        protocol, domain, port, resource = re.match('^(http[s]?:\/\/)?([^:\/\s]+)(?::([^\/]*))?([^\s]+)$', url, flags=re.IGNORECASE).groups()
+        protocol, domain, port, resource = re.match(r'^(http[s]?:\/\/)?([^:\/\s]+)(?::([^\/]*))?([^\s]*)$', url, flags=re.IGNORECASE).groups()
         self.mount('https://', CipherSuiteAdapter(domain, cipherSuite="ALL"))
         try:
             ip = doh.query(domain)
