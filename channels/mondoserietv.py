@@ -28,28 +28,24 @@ def mainlist(item):
 
     anime = ['/lista-cartoni-animati-e-anime']
 
-    docu = [('Documentari bullet bold',['/lista-documentari', 'peliculas', '', 'tvshow']),
-            ('Cerca Documentari... submenu bold', ['/lista-documentari', 'search', '', 'tvshow'])]
+    docu = [('Documentari bullet bold',['/lista-documentari', 'peliculas', '', 'tvshow'])]
+
+    search = ''
 
     return locals()
 
 
-@support.scrape
 def search(item, text):
     support.log(text)
     if item.contentType == 'movie' or item.extra == 'movie':
         action = 'findvideos'
     else:
         action = 'episodios'
+    item.args = 'search'
+    item.url = host + "/?s=" + text
     try:
-        search = text
-        data = support.match(item, headers=headers)[1]
-        if 'lcp_nextlink' in data:
-            data += support.match(item, url=support.scrapertoolsV2.find_single_match(data, r'href="([^"]+)" title="[^"]+" class="lcp_nextlink"'), headers=headers)[1]
-        patron = r'<li><a href="(?P<url>[^"]+)" title="(?P<title>.*?)(?:\s(?P<year>\d{4}))?"[^>]*>'
-        return locals()
-
-    # Continua la ricerca in caso di errore 
+        return peliculas(item)
+    # Continua la ricerca in caso di errore .
     except:
         import sys
         for line in sys.exc_info():
@@ -81,14 +77,26 @@ def newest(categoria):
 @support.scrape
 def peliculas(item):
     pagination = ''
+    anime = True
     patronNext = r'href="([^"]+)" title="[^"]+" class="lcp_nextlink"'
+    action = 'findvideos'
     if item.args == 'last':
         patronBlock = r'<table>(?P<block>.*?)</table>'
         patron = r'<tr><td><a href="(?P<url>[^"]+)">\s*[^>]+>(?P<title>.*?)(?:\s(?P<year>\d{4}))? (?:Streaming|</b>)'
     elif item.args == 'lastep':
         patronBlock = r'<table>(?P<block>.*?)</table>'
         patron = r'<td>\s*<a href="[^>]+>(?P<title>.*?)(?:\s(?P<year>\d{4}))?\s(?:(?P<episode>(?:\d+x\d+|\d+)))\s*(?P<title2>[^<]+)(?P<url>.*?)<tr>'
-        action = 'findvideos'
+    elif item.args == 'search':
+        patronBlock = r'<div class="peliculas">(?P<block>.*?)<div id="paginador"'
+        patron = r'class="item">\s*<a href="(?P<url>[^"]+)">\s*<div class="image">\s*<img src="(?P<thumb>[^"]+)" alt="(?P<title>.+?)(?:"| \d{4}).*?<span class="ttx">(?P<plot>[^<]+)<div class="degradado">[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>\s*(?:<span class="imdbs">(?P<rating>[^<]+))?(?:[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<year>\d+))?'
+        def itemHook(item):
+            if '/film/' in item.url:
+                item.contentType = 'movie'
+                item.action = 'findvideos'
+            else:
+                item.contentType = 'tvshow'
+                item.action = 'episodios'
+            return item
     else:
         patronBlock = r'<div class="entry-content pagess">(?P<block>.*?)</ul>'
         patron = r'<li><a href="(?P<url>[^"]+)" title="(?P<title>.*?)(?:\s(?P<year>\d{4}))?"[^>]*>'
