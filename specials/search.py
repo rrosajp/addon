@@ -244,7 +244,12 @@ def channel_search(item):
             if it in valid:
                 continue
             if mode == 'all' or (it.contentType and mode == it.contentType):
-                grouped.append(it)
+                if config.get_setting('result_mode', 'search') != 0:
+                    if config.get_localized_string(30992) not in it.title:
+                        it.title += typo(ch_name,'_ [] color kod bold')
+                        results.append(it)
+                else:
+                    grouped.append(it)
             elif (mode == 'movie' and it.contentTitle) or (mode == 'tvshow' and (it.contentSerieName or it.show)):
                 grouped.append(it)
             else:
@@ -253,28 +258,31 @@ def channel_search(item):
         if not grouped:
             continue
         # to_temp[key] = grouped
+        if config.get_setting('result_mode', 'search') == 0:
+            if not config.get_setting('unify'):
+                title = typo(ch_name,'bold') + typo(str(len(grouped)), '_ [] color kod bold')
+            else:
+                title = typo('%s %s' % (len(grouped), config.get_localized_string(70695)), 'bold')
+            res_count += len(grouped)
+            plot=''
 
-        if not config.get_setting('unify'):
-            title = typo(ch_name,'bold') + typo(str(len(grouped)), '_ [] color kod bold')
-        else:
-            title = typo('%s %s' % (len(grouped), config.get_localized_string(70695)), 'bold')
-        res_count += len(grouped)
-        plot=''
-        for it in grouped:
-            plot += it.title +'\n'
-        ch_thumb = channeltools.get_channel_parameters(key)['thumbnail']
-        results.append(Item(channel='search', title=title,
-                            action='get_from_temp', thumbnail=ch_thumb, itemlist=[ris.tourl() for ris in grouped], plot=plot, page=1))
+            for it in grouped:
+                plot += it.title +'\n'
+            ch_thumb = channeltools.get_channel_parameters(key)['thumbnail']
+            results.append(Item(channel='search', title=title,
+                                action='get_from_temp', thumbnail=ch_thumb, itemlist=[ris.tourl() for ris in grouped], plot=plot, page=1))
+            results = sorted(results, key=lambda it: it.from_channel)
 
-    results = sorted(results, key=lambda it: it.from_channel)
 
     # send_to_temp(to_temp)
     config.set_setting('tmdb_active', True)
     if item.mode == 'all':
+        if config.get_setting('result_mode', 'search') != 0:
+            res_count = len(results)
+            results = sorted(results, key=lambda it: it.title)
         results_statistic = config.get_localized_string(59972) % (item.title, res_count, time.time() - start)
         results.insert(0, Item(title = typo(results_statistic,'color kod bold')))
     # logger.debug(results_statistic)
-
     return valid + results
 
 
@@ -284,7 +292,7 @@ def get_channel_results(ch, item, session):
 
     ch_params = channeltools.get_channel_parameters(ch)
 
-    exec "from channels import " + ch_params["channel"] + " as module"
+    exec("from channels import " + ch_params["channel"] + " as module")
 
     mainlist = module.mainlist(Item(channel=ch_params["channel"]))
     search_action = [elem for elem in mainlist if elem.action == "search" and (item.mode == 'all' or elem.contentType == item.mode)]
@@ -735,5 +743,5 @@ def get_saved_searches():
         saved_searches_list = []
     else:
         saved_searches_list = list(current_saved_searches_list)
-    
+
     return saved_searches_list

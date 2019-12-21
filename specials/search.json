@@ -30,6 +30,15 @@
       ]
     },
     {
+      "id": "result_mode",
+      "type": "list",
+      "label": "@60657",
+      "default": 0,
+      "enabled": true,
+      "visible": true,
+      "lvalues": ["@60675","@60676"]
+    },
+    {
       "id": "thread_number",
       "type": "list",
       "label": "@60673",

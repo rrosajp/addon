@@ -270,9 +270,10 @@ def run(item=None):
             # Special action for searching, first asks for the words then call the "search" function
             elif item.action == "search":
                 logger.info("item.action=%s" % item.action.upper())
-
-                last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
-
+                if channeltools.get_channel_setting('last_search', 'search'):
+                    last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
+                else:
+                    last_search = ''
                 tecleado = platformtools.dialog_input(last_search)
                 if tecleado is not None:
                     channeltools.set_channel_setting('Last_searched', tecleado, 'search')
