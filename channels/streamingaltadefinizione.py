@@ -10,21 +10,23 @@ from platformcode import config
 # __channel__ = "streamingaltadefinizione"
 # host = config.get_channel_url(__channel__)
 
-host = headers = ''
+# host = headers = ''
+host = 'https://www.popcornstream.fun'
 list_servers = ['verystream', 'openload', 'wstream']
 list_quality = ['1080p', 'HD', 'DVDRIP', 'SD', 'CAM']
 
 def findhost():
-    global host, headers
-    permUrl = httptools.downloadpage('https://www.popcornstream.info', follow_redirects=False).headers
-    if 'google' in permUrl['location']:
-        if host[:4] != 'http':
-            host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-        else:
-            host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-    else:
-        host = permUrl['location']
-    headers = [['Referer', host]]
+    pass
+    # global host, headers
+    # permUrl = httptools.downloadpage('https://www.popcornstream.info', follow_redirects=False).headers
+    # if 'google' in permUrl['location']:
+    #     if host[:4] != 'http':
+    #         host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    #     else:
+    #         host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    # else:
+    #     host = permUrl['location']
+    # headers = [['Referer', host]]
 
 @support.menu
 def mainlist(item):

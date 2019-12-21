@@ -413,12 +413,12 @@ def downloadpage(url, **opt):
     from specials import resolverdns
     session = resolverdns.session()
 
-    if opt.get('session', False):
-        session = opt['session']  # same session to speed up search
-        logger.info('same session')
-    elif not opt.get('use_requests', True):
-        from lib import cloudscraper
-        session = cloudscraper.create_scraper()
+    # if opt.get('session', False):
+    #     session = opt['session']  # same session to speed up search
+    #     logger.info('same session')
+    # elif not opt.get('use_requests', True):
+    #     from lib import cloudscraper
+    #     session = cloudscraper.create_scraper()
 
     # Headers by default, if nothing is specified
     req_headers = default_headers.copy()
@@ -518,7 +518,6 @@ def downloadpage(url, **opt):
                     # Makes the request with GET method
                     req = session.get(url, allow_redirects=opt.get('follow_redirects', True),
                                       timeout=opt['timeout'])
-
             except Exception as e:
                 from lib import requests
                 if not opt.get('ignore_response_code', False) and not proxy_data.get('stat', ''):
