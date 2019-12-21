@@ -6,6 +6,7 @@ import requests, re
 from core import  support, tmdb
 from core.item import Item
 from specials import autorenumber
+from lib.concurrent import futures
 
 __channel__ = "vvvvid"
 host = support.config.get_channel_url(__channel__)
@@ -87,19 +88,28 @@ def newest(categoria):
         item.contentType = 'tvshow'
         item.url = host + 'anime/'
     return peliculas(item)
-        
+
+
+def dl_pages(name,item):
+    itemlist = []
+    url =  item.url + 'channel/10003/last/?filter=' + str(name)
+    json_file = current_session.get(url, headers=headers, params=payload).json()
+    if 'data' in json_file:
+        json_file = current_session.get(url, headers=headers, params=payload).json()
+        make_itemlist(itemlist, item, json_file)
+    return itemlist
 
 def peliculas(item):
     itemlist = []
     if not item.args:
         json_file = current_session.get(item.url + 'channels', headers=headers, params=payload).json()
         names = [i['filter'] for i in json_file['data'] if 'filter' in i][0]
-        for name in names:
-            url =  item.url + 'channel/10003/last/?filter=' + str(name)
-            json_file = current_session.get(url, headers=headers, params=payload).json()
-            if 'data' in json_file:
-                json_file = current_session.get(url, headers=headers, params=payload).json()
-                make_itemlist(itemlist, item, json_file)
+        with futures.ThreadPoolExecutor() as executor:
+            json_file = [executor.submit(dl_pages, name, item,) for name in names]
+            for res in futures.as_completed(json_file):
+                if res.result():
+                    itemlist += res.result()
+        itemlist = sorted(itemlist, key=lambda it: it.fulltitle)
 
     elif ('=' not in item.args) and ('=' not in item.url):
         json_file = current_session.get(item.url + item.args, headers=headers, params=payload).json()
