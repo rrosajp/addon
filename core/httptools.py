@@ -410,17 +410,20 @@ def downloadpage(url, **opt):
 
         """
     load_cookies()
-    from specials import resolverdns
-    session = resolverdns.session()
+    if config.get_setting('resolver_dns'):
+        from specials import resolverdns
+        session = resolverdns.session()
+    else:
+        if opt.get('session', False):
+            session = opt['session']  # same session to speed up search
+            logger.info('same session')
+        elif opt.get('use_requests', False):
+            from lib import requests
+            session = requests.session()
+        else:
+            from lib import cloudscraper
+            session = cloudscraper.create_scraper()
 
-    # if opt.get('session', False):
-    #     session = opt['session']  # same session to speed up search
-    #     logger.info('same session')
-    # elif not opt.get('use_requests', True):
-    #     from lib import cloudscraper
-    #     session = cloudscraper.create_scraper()
-
-    # Headers by default, if nothing is specified
     req_headers = default_headers.copy()
 
     # Headers passed as parameters
