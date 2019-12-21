@@ -707,20 +707,21 @@ def get_from_temp(item):
 
 
 def save_search(text):
-    saved_searches_limit = int((10, 20, 30, 40)[int(config.get_setting("saved_searches_limit", "search"))])
+    if text:
+        saved_searches_limit = int((10, 20, 30, 40)[int(config.get_setting("saved_searches_limit", "search"))])
 
-    current_saved_searches_list = config.get_setting("saved_searches_list", "search")
-    if current_saved_searches_list is None:
-        saved_searches_list = []
-    else:
-        saved_searches_list = list(current_saved_searches_list)
+        current_saved_searches_list = config.get_setting("saved_searches_list", "search")
+        if current_saved_searches_list is None:
+            saved_searches_list = []
+        else:
+            saved_searches_list = list(current_saved_searches_list)
 
-    if text in saved_searches_list:
-        saved_searches_list.remove(text)
+        if text in saved_searches_list:
+            saved_searches_list.remove(text)
 
-    saved_searches_list.insert(0, text)
+        saved_searches_list.insert(0, text)
 
-    config.set_setting("saved_searches_list", saved_searches_list[:saved_searches_limit], "search")
+        config.set_setting("saved_searches_list", saved_searches_list[:saved_searches_limit], "search")
 
 
 def clear_saved_searches(item):
