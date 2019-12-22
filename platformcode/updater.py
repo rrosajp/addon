@@ -41,6 +41,7 @@ def loadCommits(page=1):
             xbmc.sleep(1000)
     else:
         platformtools.dialog_notification('Kodi on Demand', 'impossibile controllare gli aggiornamenti')
+        ret = None
 
     return ret
 
@@ -50,6 +51,8 @@ def check_addon_init():
         return False
     logger.info('Cerco aggiornamenti..')
     commits = loadCommits()
+    if not commits:
+        return False
 
     try:
         localCommitFile = open(addonDir+trackingFile, 'r+')
