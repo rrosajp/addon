@@ -171,7 +171,8 @@ def show_menu(item):
                                                  title=typo('Cerca nel Canale...','color kod bold'),
                                                  thumbnail=get_thumb('search.png'),
                                                  action='search',
-                                                 url=url,
+                                                 url=item.url,
+                                                 custom_url=url,
                                                  path=item.path))
                             add_search = False
 
@@ -203,7 +204,8 @@ def show_menu(item):
                                                  title=typo('Cerca ' + option['title'] +'...','color kod bold'),
                                                  thumbnail=get_thumb('search.png'),
                                                  action='search',
-                                                 url=url,
+                                                 url=item.url,
+                                                 custom_url=url,
                                                  path=item.path))
 
             elif 'list' in key:
