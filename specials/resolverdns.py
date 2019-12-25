@@ -124,8 +124,9 @@ class session(requests.Session):
         url = protocol + ip + (':' + port if port else '') + resource
         try:
             ret = super(session, self).request(method, url, headers=headers, **kwargs)
-        except:
+        except Exception as e:
             logger.info('Request for ' + domain + ' with ip ' + ip + ' failed')
+            logger.info(e)
             tryFlush = True
         if (tryFlush or not ret) and not flushedDns:  # re-request ips and update cache
             logger.info('Flushing dns cache for ' + domain)
