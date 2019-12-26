@@ -21,9 +21,7 @@ from core import support
 from core.item import Item
 from platformcode import config
 
-__channel__ = 'altadefinizioneclick'
-
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 list_servers = ['verystream', 'rapidvideo', 'openload', 'streamango', 'vidoza',
                 'vidcloud', 'thevideo', 'okru', 'hdload', 'youtube']

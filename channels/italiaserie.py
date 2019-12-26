@@ -19,8 +19,7 @@ from core import support, httptools, scrapertoolsV2
 from core.item import Item
 from platformcode import config
 
-__channel__ = 'italiaserie'
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 
 list_servers = ['speedvideo']

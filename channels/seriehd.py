@@ -7,8 +7,7 @@
 from core import scrapertoolsV2, httptools, support
 from core.item import Item
 
-__channel__ = 'seriehd'
-host = support.config.get_channel_url(__channel__)
+host = support.config.get_channel_url()
 
 # host = 'https://www.seriehd.watch'
 headers = ''
@@ -26,7 +25,7 @@ list_quality = ['1080p', '720p', '480p', '360']
 
 @support.menu
 def mainlist(item):
-    findhost()
+
     tvshow = [('Genere', ['', 'genre']),
               ('Americane', ['/serie-tv-streaming/serie-tv-americane', 'peliculas']),
               ('Italiane', ['/serie-tv-streaming/serie-tv-italiane', 'peliculas']),]
@@ -73,7 +72,7 @@ def genre(item):
 
 def search(item, texto):
     support.log(texto)
-    findhost()
+
 
     item.contentType = 'tvshow'
     item.url = host + "/?s=" + texto
@@ -88,7 +87,7 @@ def search(item, texto):
 
 def newest(categoria):
     support.log(categoria)
-    findhost()
+
     itemlist = []
     item = support.Item()
     try:

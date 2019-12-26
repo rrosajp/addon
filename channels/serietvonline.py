@@ -39,7 +39,7 @@ list_quality = ['default']
 @support.menu
 def mainlist(item):
     support.log()
-    findhost()
+
 
     film = ['/ultimi-film-aggiunti/',
             ('Lista', ['/lista-film/', 'peliculas', 'lista'])
@@ -129,7 +129,7 @@ def episodios(item):
 
 def search(item, text):
     support.log("CERCA :" ,text, item)
-    findhost()
+
     item.url = "%s/?s=%s" % (host, text)
 
     try:
@@ -144,7 +144,7 @@ def search(item, text):
 
 def newest(categoria):
     support.log(categoria)
-    findhost()
+
     itemlist = []
     item = Item()
 

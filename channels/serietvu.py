@@ -13,8 +13,7 @@ from core.item import Item
 from core.support import log
 from platformcode import config
 
-__channel__ = 'serietvu'
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 
 list_servers = ['speedvideo']

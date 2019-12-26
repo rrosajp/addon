@@ -51,8 +51,7 @@ from core import scrapertoolsV2, httptools, servertools, tmdb
 from core.item import Item
 
 ##### fine import
-__channel__ = "dreamsub"
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 
 # server di esempio...

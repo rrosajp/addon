@@ -8,8 +8,7 @@ from core.item import Item
 from platformcode import logger, config
 from specials import autoplay
 
-__channel__ = "vedohd"
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = ""
 
 IDIOMAS = {'Italiano': 'IT'}

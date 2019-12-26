@@ -38,8 +38,7 @@ from core.support import log
 from core.item import Item
 from platformcode import config
 
-__channel__ = 'ilgeniodellostreaming'
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 
 list_servers = ['verystream', 'openload', 'streamango']
 list_quality = ['default']

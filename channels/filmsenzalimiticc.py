@@ -14,8 +14,7 @@ from platformcode import logger
 from specials import autoplay
 
 # Necessario per Autoplay
-__channel__ = 'filmsenzalimiticc'
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()

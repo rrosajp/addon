@@ -76,8 +76,7 @@ def findhost():
     # cancellare host non utilizzato
     host = scrapertoolsV2.find_single_match(permUrl, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
     headers = [['Referer', host]]
-
-findhost() # così le imposta una volta per tutte
+ # così le imposta una volta per tutte
 ### fine findhost
 
 # server di esempio...

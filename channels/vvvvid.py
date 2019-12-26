@@ -8,8 +8,7 @@ from core.item import Item
 from specials import autorenumber
 from lib.concurrent import futures
 
-__channel__ = "vvvvid"
-host = support.config.get_channel_url(__channel__)
+host = support.config.get_channel_url()
 
 # Creating persistent session
 current_session = requests.Session()

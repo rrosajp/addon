@@ -30,7 +30,7 @@ def findhost():
 
 @support.menu
 def mainlist(item):
-    findhost()
+
     film = ["/film/"]
     anime = ["/genere/anime/"]
     tvshow = ["/serietv/"]
@@ -56,17 +56,17 @@ def generos(item):
 
 
 def peliculas(item):
-    findhost()
+
     return support.dooplay_peliculas(item, True if "/genere/" in item.url else False)
 
 
 def episodios(item):
-    findhost()
+
     return support.dooplay_get_episodes(item)
 
 
 def findvideos(item):
-    findhost()
+
     itemlist = []
     for link in support.dooplay_get_links(item, host):
         if link['title'] != 'Guarda il trailer':

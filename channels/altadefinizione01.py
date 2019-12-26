@@ -33,7 +33,7 @@ list_quality = ['default']
 
 @support.menu
 def mainlist(item):
-    findhost()
+
     film = [
         ('Al Cinema', ['/cinema/', 'peliculas', 'pellicola']),
         ('Ultimi Aggiornati-Aggiunti', ['','peliculas', 'update']),
@@ -48,7 +48,7 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     support.log('peliculas',item)
-    findhost()
+
 ##    deflang = 'ITA'
     action="findvideos"
 
@@ -106,7 +106,7 @@ def orderalf(item):
 
 def search(item, text):
     support.log(item, text)
-    findhost()
+
     
     itemlist = []
     text = text.replace(" ", "+")
@@ -123,7 +123,7 @@ def search(item, text):
 
 def newest(categoria):
     support.log(categoria)
-    findhost()    
+
     itemlist = []
     item = Item()
     try:

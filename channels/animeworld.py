@@ -5,8 +5,7 @@
 
 from core import  support, jsontools
 
-__channel__ = "animeworld"
-host = support.config.get_channel_url(__channel__)
+host = support.config.get_channel_url()
 headers = [['Referer', host]]
 
 list_servers = ['animeworld', 'verystream', 'streamango', 'openload', 'directo']

@@ -34,7 +34,7 @@ list_quality = ['default']
 @support.menu
 def mainlist(item):
     log()
-    findhost()
+
 
     #top = [(support.typo('Novità Film/Serie/Anime/Altro', 'bold'),['/film/'])]
     top = [('Novità Film/Serie/Anime/Altro', ['/film/', 'peliculas', 'all'])]
@@ -62,7 +62,7 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     log()
-    findhost()
+
 
     if item.args == 'search':
         patron = r'<a href="(?P<url>[^"]+)" title="Permalink to\s(?P<title>[^"]+) \((?P<year>[^<]+)\).*?".*?<img[^s]+src="(?P<thumb>[^"]+)".*?<div class="calitate">\s*<p>(?P<quality>[^<]+)<\/p>'
@@ -82,7 +82,7 @@ def peliculas(item):
 @support.scrape
 def episodios(item):
     log()
-    findhost()
+
     if not item.data:
         data_check = httptools.downloadpage(item.url, headers=headers).data
         data_check = re.sub('\n|\t', ' ', data_check)
@@ -125,7 +125,7 @@ def player_or_not(item):
 
 def category(item):
     log()
-    findhost()
+
     blacklist = ['Serie TV Altadefinizione', 'HD AltaDefinizione', 'Al Cinema', 'Serie TV', 'Miniserie', 'Programmi Tv', 'Live', 'Trailers', 'Serie TV Aggiornate', 'Aggiornamenti', 'Featured']
     itemlist = support.scrape(item, '<li><a href="([^"]+)"><span></span>([^<]+)</a></li>', ['url', 'title'], headers, blacklist, patron_block='<ul class="table-list">(.*?)</ul>', action='peliculas')
     return support.thumb(itemlist)
@@ -163,7 +163,7 @@ def anime(item):
 
 def search(item, texto):
     log(texto)
-    findhost()
+
 
     item.url = host + "/?s=" + texto
     try:
@@ -276,7 +276,6 @@ def findvideos(item):
                 url = '\t' + scrapertoolsV2.find_single_match(page,'<meta name="og:url" content="([^=]+)">')
                 if url:
                     listurl.add(url)
-    support.dbg()
     return support.server(item, data=listurl if listurl else data)#, headers=headers)
     # return itemlist
 

@@ -35,7 +35,7 @@ list_quality = ['default']
 @support.menu
 def mainlist(item):
     support.log()
-    findhost()
+
 
     tvshow = [''
         ]
@@ -113,7 +113,7 @@ def pagina(url):
 # ===========  def ricerca  =============
 def search(item, texto):
     support.log()
-    findhost()
+
     item.url = "%s/?s=%s" % (host, texto)
     item.contentType = 'tvshow'
 
@@ -131,7 +131,7 @@ def search(item, texto):
 
 def newest(categoria):
     support.log()
-    findhost()
+
     itemlist = []
     item = Item()
     item.contentType = 'tvshow'

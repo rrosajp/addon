@@ -29,8 +29,7 @@ from core.item import Item
 
 
 ##### fine import
-__channel__ = "casacinema"
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 
 list_servers = ['verystream', 'openload', 'wstream', 'speedvideo']

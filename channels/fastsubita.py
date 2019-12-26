@@ -21,8 +21,7 @@ from core.item import Item
 from core.support import log
 from platformcode import config
 
-__channel__ = 'fastsubita'
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 list_servers = ['verystream', 'openload', 'speedvideo', 'wstream', 'flashx', 'vidoza', 'vidtome']
 list_quality = ['default']

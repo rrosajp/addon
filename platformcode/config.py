@@ -90,16 +90,24 @@ def is_xbmc():
 def get_videolibrary_support():
     return True
 
-def get_channel_url(name):
-    try:
-        import json
-    except:
-        import simplejson as json
-    ROOT_DIR = xbmc.translatePath(__settings__.getAddonInfo('Path'))
-    LOCAL_FILE = os.path.join(ROOT_DIR, "channels.json")
-    with open(LOCAL_FILE) as f:
-        data = json.load(f)
-        return data[name]
+def get_channel_url(findhostMethod=None):
+    from core import jsontools
+    import inspect
+
+    frame = inspect.stack()[1]
+    name = os.path.basename(frame[0].f_code.co_filename).replace('.py', '')
+    if findhostMethod:
+        url = jsontools.get_node_from_file(name, 'url')
+        if not url:
+            url = findhostMethod()
+            jsontools.update_node(url, name, 'url')
+        return url
+    else:
+        ROOT_DIR = xbmc.translatePath(__settings__.getAddonInfo('Path'))
+        LOCAL_FILE = os.path.join(ROOT_DIR, "channels.json")
+        with open(LOCAL_FILE) as f:
+            data = jsontools.load(f.read())
+            return data[name]
 
 def get_system_platform():
     """ fonction: pour recuperer la platform que xbmc tourne """

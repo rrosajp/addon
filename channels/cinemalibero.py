@@ -12,8 +12,7 @@ from platformcode import config
 list_servers = ['akstream', 'wstream', 'backin', 'clipwatching', 'cloudvideo', 'verystream', 'onlystream', 'mixdrop']
 list_quality = ['default']
 
-__channel__ = "cinemalibero"
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 
 @support.menu

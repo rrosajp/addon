@@ -6,8 +6,7 @@
 
 from core import support
 
-__channel__ = "cb01anime"
-host = support.config.get_channel_url(__channel__) + '/anime'
+host = support.config.get_channel_url() + '/anime'
 
 Blacklist = ['AVVISO IMPORTANTE – CB01.ROCKS', 'Lista Alfabetica Completa Anime/Cartoon', 'CB01.UNO ▶ TROVA L’INDIRIZZO UFFICIALE','Lista Richieste Up &amp; Re-Up']
 list_servers = ['verystream', 'openload', 'streamango', 'thevideome']

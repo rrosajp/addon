@@ -5,8 +5,7 @@
 
 from core import support
 
-__channel__ = "mondoserietv"
-host = support.config.get_channel_url(__channel__)
+host = support.config.get_channel_url()
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()

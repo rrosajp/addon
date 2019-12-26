@@ -22,18 +22,16 @@ from core import support
 from core import scrapertoolsV2, httptools
 from core.item import Item
 
-host = "https://casacinema.stream"
-headers = ""
 
 def findhost():
-    pass
-    # global host, headers
-    # data = httptools.downloadpage('https://casacinema.nuovo.link').data
-    # host = scrapertoolsV2.find_single_match(data, r'<div class="elementor-widget-container"><div class="elementor-button-wrapper"> <a href="([^"]+)"')
-    # headers = [['Referer', host]]
-    # if host.endswith('/'):
-    #     host = host[:-1]
+    data = httptools.downloadpage('https://casacinema.nuovo.link').data
+    host = scrapertoolsV2.find_single_match(data, r'<div class="elementor-widget-container"><div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    if host.endswith('/'):
+        host = host[:-1]
+    return host
 
+host = support.config.get_channel_url(findhost)
+headers = [['Referer', host]]
 
 list_servers = ['supervideo', 'streamcherry','rapidvideo', 'streamango', 'openload']
 list_quality = ['default', 'HD', '3D', '4K', 'DVD', 'SD']
@@ -41,7 +39,7 @@ list_quality = ['default', 'HD', '3D', '4K', 'DVD', 'SD']
 @support.menu
 def mainlist(item):
     support.log(item)
-    findhost()
+
     film = ['',
         ('Al Cinema', ['/category/in-sala/', 'peliculas', '']),
         ('Novità', ['/category/nuove-uscite/', 'peliculas', '']),
@@ -89,7 +87,7 @@ def genres(item):
 
 def search(item, text):
     support.log('search', item)
-    findhost()
+
     itemlist = []
     text = text.replace(' ', '+')
     item.args = 'search'
@@ -105,7 +103,7 @@ def search(item, text):
 
 def newest(categoria):
     support.log('newest ->', categoria)
-    findhost()
+
     itemlist = []
     item = Item()
     

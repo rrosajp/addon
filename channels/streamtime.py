@@ -9,8 +9,7 @@ Nota per i tester: questo non è un canale 'tradizionale', essendo un canale tel
 la lista delle pagine non sarà affatto 'uniforme' (a seconda di come viene presentata la preview)
 """
 
-__channel__ = "streamtime"
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', 'org.telegram.messenger']]
 list_servers = ['directo']
 list_quality = ['default']

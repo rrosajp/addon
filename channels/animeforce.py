@@ -6,8 +6,7 @@
 from servers.decrypters import adfly
 from core import support
 
-__channel__ = "animeforce"
-host = support.config.get_channel_url(__channel__)
+host = support.config.get_channel_url()
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()

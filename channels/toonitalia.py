@@ -5,8 +5,7 @@
 
 from core import support
 
-__channel__ = "toonitalia"
-host = support.config.get_channel_url(__channel__)
+host = support.config.get_channel_url()
 
 headers = [['Referer', host]]
 

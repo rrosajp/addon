@@ -10,8 +10,7 @@ from core import httptools, scrapertools, servertools, support
 from core.item import Item
 from platformcode import logger, config
 
-__channel__ = "documentaristreamingda"
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 
 list_servers = ['']
 list_quality = ['']

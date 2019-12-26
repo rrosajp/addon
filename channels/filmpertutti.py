@@ -22,8 +22,7 @@ from core.item import Item
 from platformcode import config
 
 
-__channel__ = 'filmpertutti'
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 list_servers = ['speedvideo', 'verystream', 'openload', 'streamango', 'wstream', 'akvideo']
 list_quality = ['HD', 'SD']

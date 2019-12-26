@@ -7,8 +7,7 @@
 from core import support
 from core.support import config, log
 
-__channel__ = "piratestreaming"
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 
 list_servers = ['mixdrop', 'speedvideo', 'gounlimited', 'onlystream', 'youtube']
 list_quality = ['default']

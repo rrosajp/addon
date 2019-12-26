@@ -7,8 +7,7 @@ from core import support
 from core.item import Item
 from platformcode import logger, config
 
-__channel__ = "netfreex"
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = ""
 
 IDIOMAS = {'Italiano': 'IT'}

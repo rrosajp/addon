@@ -10,23 +10,17 @@ from core.item import Item
 from lib import unshortenit
 from platformcode import logger, config
 
-#impostati dinamicamente da findhost()
-host = "https://cb01.cx"
-headers = ""
-
 
 def findhost():
-    pass
-    # global host, headers
-    # permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
-    # if 'google' in permUrl['location']:
-    #     if host[:4] != 'http':
-    #         host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-    #     else:
-    #         host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-    # else:
-    #     host = permUrl['location']
-    # headers = [['Referer', host]]
+    permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
+    if 'google' in permUrl['location']:
+        host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    else:
+        host = permUrl['location']
+    return host
+
+host = config.get_channel_url(findhost)
+headers = [['Referer', host]]
 
 list_servers = ['verystream', 'openload', 'streamango', 'wstream']
 list_quality = ['HD', 'SD', 'default']
@@ -37,7 +31,6 @@ checklinks_number = config.get_setting('checklinks_number', 'cineblog01')
 
 @support.menu
 def mainlist(item):
-    findhost()
     film = [
         ('HD', ['', 'menu', 'Film HD Streaming']),
         ('Generi', ['', 'menu', 'Film per Genere']),
@@ -60,7 +53,6 @@ def mainlist(item):
 
 @support.scrape
 def menu(item):
-    findhost()
     patronBlock = item.args + r'<span.*?><\/span>.*?<ul.*?>(?P<block>.*?)<\/ul>'
     patronMenu = r'href="?(?P<url>[^">]+)"?>(?P<title>.*?)<\/a>'
     action = 'peliculas'
@@ -70,7 +62,7 @@ def menu(item):
 
 # @support.scrape
 # def newest(categoria):
-#     findhost()
+#     
 #     # debug = True
 #     patron = r'<a href="?(?P<url>[^">]+)"?>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N|SUB-ITA)\])?\s*(?:\[(?P<quality>HD|SD|HD/3D)\])?\s*\((?P<year>[0-9]{4})\)<\/a>'
 
@@ -100,7 +92,7 @@ def menu(item):
 
 def newest(categoria):
     support.log(categoria)
-    findhost()
+    
     item = support.Item()
     try:
         if categoria == "series":
@@ -175,7 +167,7 @@ def episodios(item):
 
 
 def findvideos(item):
-    findhost()
+    
 
     if item.contentType == "episode":
         return findvid_serie(item)
