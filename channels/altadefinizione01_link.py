@@ -23,7 +23,7 @@ from platformcode import config, logger
 __channel__ = "altadefinizione01_link"
 
 # ======== def per utility INIZIO ============================
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 
 list_servers = ['supervideo', 'streamcherry','rapidvideo', 'streamango', 'openload']
