@@ -4,7 +4,7 @@
 # ------------------------------------------------------------
 
 
-from core import scrapertoolsV2, httptools, support
+from core import scrapertools, httptools, support
 from core.item import Item
 
 host = support.config.get_channel_url()
@@ -17,7 +17,7 @@ headers = [['Referer', host]]
     # global host, headers
     # data= httptools.downloadpage('https://seriehd.nuovo.link/').data
     # global host, headers
-    # host = scrapertoolsV2.find_single_match(data, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    # host = scrapertools.find_single_match(data, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
     # headers = [['Referer', host]]
 
 list_servers = ['verystream', 'openload', 'streamango', 'thevideome']

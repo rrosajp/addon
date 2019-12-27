@@ -1,25 +1,15 @@
 # -*- coding: utf-8 -*-
 # --------------------------------------------------------------------------------
-# Scraper tools for reading and processing web elements
+# Scraper tools v2 for reading and processing web elements
 # --------------------------------------------------------------------------------
 
 import re
 import time
 
-from core import httptools
+import urlparse
+
+from core.entities import html5
 from platformcode import logger
-
-
-def get_header_from_response(url, header_to_get="", post=None, headers=None):
-    header_to_get = header_to_get.lower()
-    response = httptools.downloadpage(url, post=post, headers=headers, only_headers=True)
-    return response.headers.get(header_to_get)
-
-
-def read_body_and_headers(url, post=None, headers=None, follow_redirects=False, timeout=None):
-    response = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects,
-                                      timeout=timeout)
-    return response.data, response.headers
 
 
 def printMatches(matches):
@@ -42,8 +32,37 @@ def find_multiple_matches(text, pattern):
     return re.findall(pattern, text, re.DOTALL)
 
 
-def entityunescape(cadena):
-    return unescape(cadena)
+def find_multiple_matches_groups(text, pattern):
+    r = re.compile(pattern)
+    return [m.groupdict() for m in r.finditer(text)]
+
+
+# Convierte los codigos html "&ntilde;" y lo reemplaza por "ñ" caracter unicode utf-8
+def decodeHtmlentities(data):
+    entity_re = re.compile("&(#?)(\d{1,5}|\w{1,8})(;?)")
+
+    def substitute_entity(match):
+        ent = match.group(2) + match.group(3)
+        res = ""
+        while not ent in html5 and not ent.endswith(";") and match.group(1) != "#":
+            # Excepción para cuando '&' se usa como argumento en la urls contenidas en los datos
+            try:
+                res = ent[-1] + res
+                ent = ent[:-1]
+            except:
+                break
+
+        if match.group(1) == "#":
+            ent = unichr(int(ent.replace(";", "")))
+            return ent.encode('utf-8')
+        else:
+            cp = html5.get(ent)
+            if cp:
+                return cp.decode("unicode-escape").encode('utf-8') + res
+            else:
+                return match.group()
+
+    return entity_re.subn(substitute_entity, data)[0]
 
 
 def unescape(text):
@@ -82,47 +101,6 @@ def unescape(text):
     return re.sub("&#?\w+;", fixup, text)
 
     # Convierte los codigos html "&ntilde;" y lo reemplaza por "ñ" caracter unicode utf-8
-
-
-def decodeHtmlentities(string):
-    string = entitiesfix(string)
-    entity_re = re.compile("&(#?)(\d{1,5}|\w{1,8});")
-
-    def substitute_entity(match):
-        from htmlentitydefs import name2codepoint as n2cp
-        ent = match.group(2)
-        if match.group(1) == "#":
-            return unichr(int(ent)).encode('utf-8')
-        else:
-            cp = n2cp.get(ent)
-
-            if cp:
-                return unichr(cp).encode('utf-8')
-            else:
-                return match.group()
-
-    return entity_re.subn(substitute_entity, string)[0]
-
-
-def entitiesfix(string):
-    # Las entidades comienzan siempre con el símbolo & , y terminan con un punto y coma ( ; ).
-    string = string.replace("&aacute", "&aacute;")
-    string = string.replace("&eacute", "&eacute;")
-    string = string.replace("&iacute", "&iacute;")
-    string = string.replace("&oacute", "&oacute;")
-    string = string.replace("&uacute", "&uacute;")
-    string = string.replace("&Aacute", "&Aacute;")
-    string = string.replace("&Eacute", "&Eacute;")
-    string = string.replace("&Iacute", "&Iacute;")
-    string = string.replace("&Oacute", "&Oacute;")
-    string = string.replace("&Uacute", "&Uacute;")
-    string = string.replace("&uuml", "&uuml;")
-    string = string.replace("&Uuml", "&Uuml;")
-    string = string.replace("&ntilde", "&ntilde;")
-    string = string.replace("&#191", "&#191;")
-    string = string.replace("&#161", "&#161;")
-    string = string.replace(";;", ";")
-    return string
 
 
 def htmlclean(cadena):
@@ -226,7 +204,7 @@ def htmlclean(cadena):
     cadena = re.compile("<link[^>]*>", re.DOTALL).sub("", cadena)
 
     cadena = cadena.replace("\t", "")
-    cadena = entityunescape(cadena)
+    # cadena = entityunescape(cadena)
     return cadena
 
 
@@ -314,8 +292,8 @@ def remove_show_from_title(title, show):
     return title
 
 
+# scrapertools.get_filename_from_url(media_url)[-4:]
 def get_filename_from_url(url):
-    import urlparse
     parsed_url = urlparse.urlparse(url)
     try:
         filename = parsed_url.path
@@ -332,19 +310,18 @@ def get_filename_from_url(url):
     return filename
 
 
-# def get_domain_from_url(url):
-#     import urlparse
-#     parsed_url = urlparse.urlparse(url)
-#     try:
-#         filename = parsed_url.netloc
-#     except:
-#         # Si falla es porque la implementación de parsed_url no reconoce los atributos como "path"
-#         if len(parsed_url) >= 4:
-#             filename = parsed_url[1]
-#         else:
-#             filename = ""
-#
-#     return filename
+def get_domain_from_url(url):
+    parsed_url = urlparse.urlparse(url)
+    try:
+        filename = parsed_url.netloc
+    except:
+        # Si falla es porque la implementación de parsed_url no reconoce los atributos como "path"
+        if len(parsed_url) >= 4:
+            filename = parsed_url[1]
+        else:
+            filename = ""
+
+    return filename
 
 
 def get_season_and_episode(title):
@@ -365,22 +342,15 @@ def get_season_and_episode(title):
     @return: Numero de temporada y episodio en formato "1x01" o cadena vacia si no se han encontrado
     """
     filename = ""
-    # 4l3x87 - fix for series example 9-1-1
-    # original_title = title
-    # title = title.replace('9-1-1','')
 
-    patrons = ["(\d+)\s*[x-]\s*(\d+)", "(\d+)\s*×\s*(\d+)", "(?:s|t)(\d+)e(\d+)",
-               "(?:season|temp|stagione\w*)\s*(\d+)\s*(?:capitulo|epi|episode|episodio\w*)\s*(\d+)"]
+    patrons = ["(\d+)x(\d+)", "(?:s|t)(\d+)e(\d+)",
+               "(?:season|temp\w*)\s*(\d+)\s*(?:capitulo|epi\w*)\s*(\d+)"]
 
     for patron in patrons:
         try:
             matches = re.compile(patron, re.I).search(title)
-
             if matches:
-                if len(matches.group(1)) == 1:
-                    filename = matches.group(1) + "x" + matches.group(2).zfill(2)
-                else:
-                    filename = matches.group(1).lstrip('0') + "x" + matches.group(2).zfill(2)
+                filename = matches.group(1) + "x" + matches.group(2).zfill(2)
                 break
         except:
             pass
@@ -388,3 +358,27 @@ def get_season_and_episode(title):
     logger.info("'" + title + "' -> '" + filename + "'")
 
     return filename
+
+
+def get_sha1(cadena):
+    try:
+        import hashlib
+        devuelve = hashlib.sha1(cadena).hexdigest()
+    except:
+        import sha
+        import binascii
+        devuelve = binascii.hexlify(sha.new(cadena).digest())
+
+    return devuelve
+
+
+def get_md5(cadena):
+    try:
+        import hashlib
+        devuelve = hashlib.md5(cadena).hexdigest()
+    except:
+        import md5
+        import binascii
+        devuelve = binascii.hexlify(md5.new(cadena).digest())
+
+    return devuelve

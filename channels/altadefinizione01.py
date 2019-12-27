@@ -13,7 +13,7 @@
     Ulteriori info:
 
 """
-from core import scrapertoolsV2, httptools, support
+from core import scrapertools, httptools, support
 from core.item import Item
 from platformcode import config, logger
 
@@ -21,7 +21,7 @@ from platformcode import config, logger
 
 def findhost():
     data = httptools.downloadpage('https://altadefinizione01-nuovo.link/').data
-    host = scrapertoolsV2.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    host = scrapertools.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
     return host
 
 

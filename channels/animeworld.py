@@ -145,9 +145,9 @@ def findvideos(item):
     videoData = ''
  
     for serverid in matches:
-        if not item.number: item.number = support.scrapertoolsV2.find_single_match(item.title,r'(\d+) -')
-        block = support.scrapertoolsV2.find_multiple_matches(data,'data-id="' + serverid + '">(.*?)<div class="server')
-        ID = support.scrapertoolsV2.find_single_match(str(block),r'<a data-id="([^"]+)" data-base="' + (item.number if item.number else '1') + '"')
+        if not item.number: item.number = support.scrapertools.find_single_match(item.title, r'(\d+) -')
+        block = support.scrapertools.find_multiple_matches(data, 'data-id="' + serverid + '">(.*?)<div class="server')
+        ID = support.scrapertools.find_single_match(str(block), r'<a data-id="([^"]+)" data-base="' + (item.number if item.number else '1') + '"')
         support.log('ID= ',serverid)
         if id:
             if serverid == '26':

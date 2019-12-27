@@ -15,7 +15,7 @@
 """
 
 import re
-from core import support, httptools, scrapertoolsV2
+from core import support, httptools, scrapertools
 from core.item import Item
 from platformcode import config
 
@@ -130,8 +130,8 @@ def findvideos(item):
         data = httptools.downloadpage(item.url, headers=headers).data
         data = re.sub('\n|\t', ' ', data)
         data = re.sub(r'>\s+<', '> <', data)
-        url_video = scrapertoolsV2.find_single_match(data, r'<a rel="[^"]+" target="[^"]+" act="[^"]+"\s+href="([^"]+)" class="[^"]+-link".+?\d+.+?</strong> </a>', -1)
-        url_serie = scrapertoolsV2.find_single_match(data, r'<link rel="canonical" href="([^"]+)" />')
+        url_video = scrapertools.find_single_match(data, r'<a rel="[^"]+" target="[^"]+" act="[^"]+"\s+href="([^"]+)" class="[^"]+-link".+?\d+.+?</strong> </a>', -1)
+        url_serie = scrapertools.find_single_match(data, r'<link rel="canonical" href="([^"]+)" />')
         goseries = support.typo("Vai alla Serie:", ' bold')
         series = support.typo(item.contentSerieName, ' bold color kod')
         itemlist = support.server(item, data=url_video)

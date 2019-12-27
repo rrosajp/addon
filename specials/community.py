@@ -3,7 +3,7 @@
 
 import re, os, inspect, requests, xbmc, xbmcaddon
 
-from core import httptools, scrapertoolsV2, servertools, jsontools, tmdb, support
+from core import httptools, scrapertools, servertools, jsontools, tmdb, support
 from core.item import Item
 from core.support import typo
 from channelselector import get_thumb
@@ -751,7 +751,7 @@ def set_title(title, language, quality):
 
 
 def format_title(title):
-    t = scrapertoolsV2.find_single_match(title, r'\{([^\}]+)\}')
+    t = scrapertools.find_single_match(title, r'\{([^\}]+)\}')
     if 'bold' not in t: t += ' bold'
     title = re.sub(r'(\{[^\}]+\})','',title)
     return typo(title,t)

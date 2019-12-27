@@ -5,7 +5,7 @@
 
 import re
 
-from core import scrapertoolsV2, httptools, servertools, tmdb, support
+from core import scrapertools, httptools, servertools, tmdb, support
 from core.item import Item
 from lib import unshortenit
 from platformcode import logger, config
@@ -173,7 +173,7 @@ def findvideos(item):
         return findvid_serie(item)
 
     def load_links(itemlist, re_txt, color, desc_txt, quality=""):
-        streaming = scrapertoolsV2.find_single_match(data, re_txt).replace('"', '')
+        streaming = scrapertools.find_single_match(data, re_txt).replace('"', '')
         support.log('STREAMING',streaming)
         support.log('STREAMING=', streaming)
         # patron = '<td><a.*?href=(.*?) (?:target|rel)[^>]+>([^<]+)<'
@@ -207,7 +207,7 @@ def findvideos(item):
     matches = re.compile(patronvideos, re.DOTALL).finditer(data)
     QualityStr = ""
     for match in matches:
-        QualityStr = scrapertoolsV2.decodeHtmlentities(match.group(1))[6:]
+        QualityStr = scrapertools.decodeHtmlentities(match.group(1))[6:]
 
     # Estrae i contenuti - Streaming
     load_links(itemlist, '<strong>Streamin?g:</strong>(.*?)cbtable', "orange", "Streaming", "SD")
@@ -307,12 +307,12 @@ def play(item):
         data = httptools.downloadpage(item.url).data
         if "window.location.href" in data:
             try:
-                data = scrapertoolsV2.find_single_match(data, 'window.location.href = "([^"]+)";')
+                data = scrapertools.find_single_match(data, 'window.location.href = "([^"]+)";')
             except IndexError:
                 data = httptools.downloadpage(item.url, only_headers=True, follow_redirects=False).headers.get("location", "")
             data, c = unshortenit.unwrap_30x_only(data)
         else:
-            data = scrapertoolsV2.find_single_match(data, r'<a href="([^"]+)".*?class="btn-wrapper">.*?licca.*?</a>')
+            data = scrapertools.find_single_match(data, r'<a href="([^"]+)".*?class="btn-wrapper">.*?licca.*?</a>')
         
         logger.debug("##### play go.php data ##\n%s\n##" % data)
     else:

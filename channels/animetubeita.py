@@ -118,8 +118,8 @@ def findvideos(item):
     headers['Referer'] =  item.url
     headers['Cookie'] = cookies[:-1]
 
-    url = support.scrapertoolsV2.find_single_match(data, """<source src="([^"]+)" type='video/mp4'>""")
-    if not url: url = support.scrapertoolsV2.find_single_match(data, 'file: "([^"]+)"')
+    url = support.scrapertools.find_single_match(data, """<source src="([^"]+)" type='video/mp4'>""")
+    if not url: url = support.scrapertools.find_single_match(data, 'file: "([^"]+)"')
     if url:
         url += '|' + urllib.urlencode(headers)
         itemlist.append(

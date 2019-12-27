@@ -33,7 +33,7 @@
 
 import re
 
-from core import scrapertoolsV2, httptools, support
+from core import scrapertools, httptools, support
 from core.support import log
 from core.item import Item
 from platformcode import config
@@ -216,7 +216,7 @@ def findvideos(item):
     matches, data = support.match(item, '<iframe class="metaframe rptss" src="([^"]+)"[^>]+>',headers=headers)
     for url in matches:
         html = httptools.downloadpage(url, headers=headers).data
-        data += str(scrapertoolsV2.find_multiple_matches(html, '<meta name="og:url" content="([^"]+)">'))
+        data += str(scrapertools.find_multiple_matches(html, '<meta name="og:url" content="([^"]+)">'))
 
     itemlist = support.server(item, data)
 
@@ -224,7 +224,7 @@ def findvideos(item):
 
         data = httptools.downloadpage(item.url).data
         patron = r'<div class="item"><a href="'+host+'/serietv/([^"\/]+)\/"><i class="icon-bars">'
-        series = scrapertoolsV2.find_single_match(data, patron)
+        series = scrapertools.find_single_match(data, patron)
         titles = support.typo(series.upper().replace('-', ' '), 'bold color kod')
         goseries = support.typo("Vai alla Serie:", ' bold')
         itemlist.append(

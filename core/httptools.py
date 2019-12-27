@@ -17,7 +17,7 @@ from threading import Lock
 from core.jsontools import to_utf8
 from platformcode import config, logger
 from platformcode.logger import WebErrorException
-from core import scrapertoolsV2
+from core import scrapertools
 
 # Get the addon version
 __version = config.get_addon_version()
@@ -48,7 +48,7 @@ def get_user_agent():
 
 def get_url_headers(url, forced=False):
     domain = urlparse.urlparse(url)[1]
-    sub_dom = scrapertoolsV2.find_single_match(domain, r'\.(.*?\.\w+)')
+    sub_dom = scrapertools.find_single_match(domain, r'\.(.*?\.\w+)')
     if sub_dom and not 'google' in url:
         domain = sub_dom
     domain_cookies = cj._cookies.get("." + domain, {}).get("/", {})
@@ -159,16 +159,16 @@ def channel_proxy_list(url, forced_proxy=None):
 
     if not url.endswith('/'):
         url += '/'
-    if scrapertoolsV2.find_single_match(url, r'(?:http.*\:)?\/\/(?:www\.)?([^\?|\/]+)(?:\?|\/)') \
+    if scrapertools.find_single_match(url, r'(?:http.*\:)?\/\/(?:www\.)?([^\?|\/]+)(?:\?|\/)') \
                 in proxy_channel_bloqued:
         if forced_proxy and forced_proxy not in ['Total', 'ProxyDirect', 'ProxyCF', 'ProxyWeb']:
-            if forced_proxy in proxy_channel_bloqued[scrapertoolsV2.find_single_match(url, r'(?:http.*\:)?\/\/(?:www\.)?([^\?|\/]+)(?:\?|\/)')]:
+            if forced_proxy in proxy_channel_bloqued[scrapertools.find_single_match(url, r'(?:http.*\:)?\/\/(?:www\.)?([^\?|\/]+)(?:\?|\/)')]:
                 return True
             else:
                 return False
         if forced_proxy:
             return True
-        if not 'OFF' in proxy_channel_bloqued[scrapertoolsV2.find_single_match(url, r'(?:http.*\:)?\/\/(?:www\.)?([^\?|\/]+)(?:\?|\/)')]:
+        if not 'OFF' in proxy_channel_bloqued[scrapertools.find_single_match(url, r'(?:http.*\:)?\/\/(?:www\.)?([^\?|\/]+)(?:\?|\/)')]:
             return True
 
     return False
@@ -248,7 +248,7 @@ def check_proxy(url, **opt):
             proxy_data['log'] = proxytools.get_proxy_addr(url, post=opt.get('post', None), forced_proxy=forced_proxy)
 
             if proxy_addr_forced and proxy_data['log']:
-                proxy_data['log'] = scrapertoolsV2.find_single_match(str(proxy_addr_forced), r"{'http.*':\s*'(.*?)'}")
+                proxy_data['log'] = scrapertools.find_single_match(str(proxy_addr_forced), r"{'http.*':\s*'(.*?)'}")
 
             if proxy and proxy_data['addr']:
                 if proxy_addr_forced: proxy_data['addr'] = proxy_addr_forced
@@ -564,7 +564,7 @@ def downloadpage(url, **opt):
             save_cookies(alfa_s=opt.get('alfa_s', False))
 
         # is_channel = inspect.getmodule(inspect.currentframe().f_back)
-        # is_channel = scrapertoolsV2.find_single_match(str(is_channel), "<module '(channels).*?'")
+        # is_channel = scrapertools.find_single_match(str(is_channel), "<module '(channels).*?'")
         # if is_channel and isinstance(response_code, int):
         #     if not opt.get('ignore_response_code', False) and not proxy_data.get('stat', ''):
         #         if response_code > 399:

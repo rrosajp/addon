@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from core import httptools, scrapertoolsV2
+from core import httptools, scrapertools
 from platformcode import config, logger
 import base64
 

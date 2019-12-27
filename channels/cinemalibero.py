@@ -5,7 +5,7 @@
 
 import re
 
-from core import httptools, support, scrapertoolsV2
+from core import httptools, support, scrapertools
 from core.item import Item
 from platformcode import config
 
@@ -89,7 +89,7 @@ def episodios(item):
         patronBlock = r'<p><strong>(?:.+?[Ss]tagione\s)?(?:(?P<lang>iTA|ITA|Sub-ITA|Sub-iTA))?.*?</strong>(?P<block>.+?)(?:</span|</p)'
         item.contentType = 'tvshow'
     def itemHook(item):
-        if not scrapertoolsV2.find_single_match(item.title, r'(\d+x\d+)'):
+        if not scrapertools.find_single_match(item.title, r'(\d+x\d+)'):
             item.title = re.sub(r'(\d+) -', '1x\\1', item.title)
         return item
 
@@ -148,7 +148,7 @@ def check(item):
     support.log()
     data = httptools.downloadpage(item.url, headers=headers).data
     if data:
-        blockAnime = scrapertoolsV2.find_single_match(data, r'<div id="container" class="container">(.+?<div style="margin-left)')
+        blockAnime = scrapertools.find_single_match(data, r'<div id="container" class="container">(.+?<div style="margin-left)')
 
         if blockAnime and ('episodio' in blockAnime.lower() or 'saga' in blockAnime.lower()):
             item.contentType = 'tvshow'
@@ -156,7 +156,7 @@ def check(item):
             item.data = blockAnime
             return episodios(item)
 
-        elif scrapertoolsV2.find_single_match(blockAnime,r'\d+(?:&#215;|×)?\d+\-\d+|\d+(?:&#215;|×)\d+'):
+        elif scrapertools.find_single_match(blockAnime, r'\d+(?:&#215;|×)?\d+\-\d+|\d+(?:&#215;|×)\d+'):
             item.contentType = 'tvshow'
             item.data = data
             return episodios(item)

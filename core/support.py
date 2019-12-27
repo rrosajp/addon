@@ -10,7 +10,7 @@ import urlparse
 import xbmcaddon
 
 from channelselector import thumb
-from core import httptools, scrapertoolsV2, servertools, tmdb, channeltools
+from core import httptools, scrapertools, servertools, tmdb, channeltools
 from core.item import Item
 from lib import unshortenit
 from platformcode import logger, config
@@ -21,7 +21,7 @@ def hdpass_get_servers(item):
     itemlist = []
     data = httptools.downloadpage(item.url).data.replace('\n', '')
     patron = r'<iframe(?: id="[^"]+")? width="[^"]+" height="[^"]+" src="([^"]+)"[^>]+><\/iframe>'
-    url = scrapertoolsV2.find_single_match(data, patron).replace("?alta", "")
+    url = scrapertools.find_single_match(data, patron).replace("?alta", "")
     url = url.replace("&download=1", "")
     if 'https' not in url:
         url = 'https:' + url
@@ -37,20 +37,20 @@ def hdpass_get_servers(item):
         patron_mir = '<div class="row mobileMirrs">(.*?)</div>'
         patron_media = r'<input type="hidden" name="urlEmbed" data-mirror="([^"]+)" id="urlEmbed"\s*value="([^"]+)"\s*/>'
 
-        res = scrapertoolsV2.find_single_match(data, patron_res)
+        res = scrapertools.find_single_match(data, patron_res)
 
         itemlist = []
 
-        for res_url, res_video in scrapertoolsV2.find_multiple_matches(res, '<option.*?value="([^"]+?)">([^<]+?)</option>'):
+        for res_url, res_video in scrapertools.find_multiple_matches(res, '<option.*?value="([^"]+?)">([^<]+?)</option>'):
 
             data = httptools.downloadpage(urlparse.urljoin(url, res_url)).data.replace('\n', '')
 
-            mir = scrapertoolsV2.find_single_match(data, patron_mir)
+            mir = scrapertools.find_single_match(data, patron_mir)
 
-            for mir_url, srv in scrapertoolsV2.find_multiple_matches(mir, '<option.*?value="([^"]+?)">([^<]+?)</value>'):
+            for mir_url, srv in scrapertools.find_multiple_matches(mir, '<option.*?value="([^"]+?)">([^<]+?)</value>'):
 
                 data = httptools.downloadpage(urlparse.urljoin(url, mir_url)).data.replace('\n', '')
-                for media_label, media_url in scrapertoolsV2.find_multiple_matches(data, patron_media):
+                for media_label, media_url in scrapertools.find_multiple_matches(data, patron_media):
                     itemlist.append(Item(channel=item.channel,
                                          action="play",
                                          fulltitle=item.fulltitle,
@@ -168,13 +168,13 @@ def scrapeLang(scraped, lang, longtitle):
     return language, longtitle
 
 def cleantitle(title):
-    cleantitle = scrapertoolsV2.htmlclean(scrapertoolsV2.decodeHtmlentities(title).replace('"', "'").replace('×', 'x').replace('–', '-')).strip()
+    cleantitle = scrapertools.htmlclean(scrapertools.decodeHtmlentities(title).replace('"', "'").replace('×', 'x').replace('–', '-')).strip()
     return cleantitle
 
 def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang):
     itemlist = []
     log("scrapeBlock qui", block, patron)
-    matches = scrapertoolsV2.find_multiple_matches_groups(block, patron)
+    matches = scrapertools.find_multiple_matches_groups(block, patron)
     log('MATCHES =', matches)
 
     if debug:
@@ -214,7 +214,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         for kk in known_keys:
             val = match[listGroups.index(kk)] if kk in listGroups else ''
             if val and (kk == "url" or kk == 'thumb') and 'http' not in val:
-                val = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
+                val = scrapertools.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
             scraped[kk] = val
 
         if scraped['season']:
@@ -227,7 +227,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             episode = ''
         else:
             episode = re.sub(r'\s-\s|-|x|&#8211|&#215;|×', 'x', scraped['episode']) if scraped['episode'] else ''
-            second_episode = scrapertoolsV2.find_single_match(episode,'x\d+x(\d+)')
+            second_episode = scrapertools.find_single_match(episode, 'x\d+x(\d+)')
             if second_episode: episode = re.sub(r'(\d+x\d+)x\d+',r'\1-', episode) + second_episode.zfill(2)
 
         #episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
@@ -257,18 +257,18 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             if scraped["plot"]:
                 infolabels['plot'] = plot
             if scraped['duration']:
-                matches = scrapertoolsV2.find_multiple_matches(scraped['duration'],
+                matches = scrapertools.find_multiple_matches(scraped['duration'],
                                                                r'([0-9])\s*?(?:[hH]|:|\.|,|\\|\/|\||\s)\s*?([0-9]+)')
                 for h, m in matches:
                     scraped['duration'] = int(h) * 60 + int(m)
                 if not matches:
-                    scraped['duration'] = scrapertoolsV2.find_single_match(scraped['duration'], r'(\d+)')
+                    scraped['duration'] = scrapertools.find_single_match(scraped['duration'], r'(\d+)')
                 infolabels['duration'] = int(scraped['duration']) * 60
             if scraped['genere']:
-                genres = scrapertoolsV2.find_multiple_matches(scraped['genere'], '[A-Za-z]+')
+                genres = scrapertools.find_multiple_matches(scraped['genere'], '[A-Za-z]+')
                 infolabels['genere'] = ", ".join(genres)
             if scraped["rating"]:
-                infolabels['rating'] = scrapertoolsV2.decodeHtmlentities(scraped["rating"])
+                infolabels['rating'] = scrapertools.decodeHtmlentities(scraped["rating"])
 
         AC = CT = ''
         if typeContentDict:
@@ -379,11 +379,11 @@ def scrape(func):
         if not data:
             page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True, session=item.session)
             # if url may be changed and channel has findhost to update
-            if (not page.data or scrapertoolsV2.get_domain_from_url(page.url) != scrapertoolsV2.get_domain_from_url(item.url)) and 'findhost' in func.__globals__:
+            if (not page.data or scrapertools.get_domain_from_url(page.url) != scrapertools.get_domain_from_url(item.url)) and 'findhost' in func.__globals__:
                 host = func.__globals__['findhost']()
                 from core import jsontools
                 jsontools.update_node(host, func.__module__.split('.')[-1], 'url')
-                item.url = item.url.replace(scrapertoolsV2.get_domain_from_url(item.url), scrapertoolsV2.get_domain_from_url(host))
+                item.url = item.url.replace(scrapertools.get_domain_from_url(item.url), scrapertools.get_domain_from_url(host))
                 page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True,
                                               session=item.session)
             data = page.data.replace("'", '"')
@@ -394,7 +394,7 @@ def scrape(func):
         if patronBlock:
             if debugBlock:
                 regexDbg(item, patronBlock, headers, data)
-            blocks = scrapertoolsV2.find_multiple_matches_groups(data, patronBlock)
+            blocks = scrapertools.find_multiple_matches_groups(data, patronBlock)
             block = ""
             for bl in blocks:
                 # log(len(blocks),bl)
@@ -443,7 +443,7 @@ def scrape(func):
         if anime:
             if function == 'episodios' or item.action == 'episodios': autorenumber.renumber(itemlist, item, 'bold')
             else: autorenumber.renumber(itemlist)
-        if anime and autorenumber.check(item) == False and not scrapertoolsV2.find_single_match(itemlist[0].title, r'(\d+.\d+)'):
+        if anime and autorenumber.check(item) == False and not scrapertools.find_single_match(itemlist[0].title, r'(\d+.\d+)'):
             pass
         else:
             if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
@@ -471,7 +471,7 @@ def dooplay_get_links(item, host):
 
     data = httptools.downloadpage(item.url).data.replace("'", '"')
     patron = r'<li id="player-option-[0-9]".*?data-type="([^"]+)" data-post="([^"]+)" data-nume="([^"]+)".*?<span class="title".*?>([^<>]+)</span>(?:<span class="server">([^<>]+))?'
-    matches = scrapertoolsV2.find_multiple_matches(data, patron)
+    matches = scrapertools.find_multiple_matches(data, patron)
 
     ret = []
 
@@ -483,7 +483,7 @@ def dooplay_get_links(item, host):
             "type": type
         })
         dataAdmin = httptools.downloadpage(host + '/wp-admin/admin-ajax.php', post=postData,headers={'Referer': item.url}).data
-        link = scrapertoolsV2.find_single_match(dataAdmin, "<iframe.*src='([^']+)'")
+        link = scrapertools.find_single_match(dataAdmin, "<iframe.*src='([^']+)'")
         ret.append({
             'url': link,
             'title': title,
@@ -560,25 +560,25 @@ def swzz_get_url(item):
     if "/link/" in item.url:
         data = httptools.downloadpage(item.url, headers=headers).data
         if "link =" in data:
-            data = scrapertoolsV2.find_single_match(data, 'link = "([^"]+)"')
+            data = scrapertools.find_single_match(data, 'link = "([^"]+)"')
             if 'http' not in data:
                 data = 'https:' + data
         else:
-            match = scrapertoolsV2.find_single_match(data, r'<meta name="og:url" content="([^"]+)"')
-            match = scrapertoolsV2.find_single_match(data, r'URL=([^"]+)">') if not match else match
+            match = scrapertools.find_single_match(data, r'<meta name="og:url" content="([^"]+)"')
+            match = scrapertools.find_single_match(data, r'URL=([^"]+)">') if not match else match
 
             if not match:
                 from lib import jsunpack
 
                 try:
-                    data = scrapertoolsV2.find_single_match(data.replace('\n', ''), r"(eval\s?\(function\(p,a,c,k,e,d.*?)</script>")
+                    data = scrapertools.find_single_match(data.replace('\n', ''), r"(eval\s?\(function\(p,a,c,k,e,d.*?)</script>")
                     data = jsunpack.unpack(data)
 
                     logger.debug("##### play /link/ unpack ##\n%s\n##" % data)
                 except:
                     logger.debug("##### The content is yet unpacked ##\n%s\n##" % data)
 
-                data = scrapertoolsV2.find_single_match(data, r'var link(?:\s)?=(?:\s)?"([^"]+)";')
+                data = scrapertools.find_single_match(data, r'var link(?:\s)?=(?:\s)?"([^"]+)";')
                 data, c = unshortenit.unwrap_30x_only(data)
             else:
                 data = match
@@ -753,7 +753,7 @@ def typo(string, typography=''):
     if 'submenu' in string:
         string = u"\u2022\u2022 ".encode('utf-8') + re.sub(r'\ssubmenu','',string)
     if 'color' in string:
-        color = scrapertoolsV2.find_single_match(string,'color ([a-z]+)')
+        color = scrapertools.find_single_match(string, 'color ([a-z]+)')
         if color == 'kod' or '': color = kod_color
         string = '[COLOR '+ color +']' + re.sub(r'\scolor\s([a-z]+)','',string) + '[/COLOR]'
     if 'bold' in string:
@@ -785,13 +785,13 @@ def match(item, patron='', patronBlock='', headers='', url='', post=''):
     log('DATA= ', data)
 
     if patronBlock:
-        block = scrapertoolsV2.find_single_match(data, patronBlock)
+        block = scrapertools.find_single_match(data, patronBlock)
         log('BLOCK= ',block)
     else:
         block = data
 
     if patron:
-        matches = scrapertoolsV2.find_multiple_matches(block, patron)
+        matches = scrapertools.find_multiple_matches(block, patron)
         log('MATCHES= ',matches)
 
     return matches, block
@@ -899,12 +899,12 @@ def nextPage(itemlist, item, data='', patron='', function_or_level=1, next_page=
     # If the call is direct, leave it blank
     action = inspect.stack()[function_or_level][3] if type(function_or_level) == int else function_or_level
     if next_page == '':
-        next_page = scrapertoolsV2.find_single_match(data, patron)
+        next_page = scrapertools.find_single_match(data, patron)
 
     if next_page != "":
         if resub: next_page = re.sub(resub[0], resub[1], next_page)
         if 'http' not in next_page:
-            next_page = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+') + next_page
+            next_page = scrapertools.find_single_match(item.url, 'https?://[a-z0-9.-]+') + next_page
         next_page = re.sub('&amp;', '&',next_page)
         log('NEXT= ', next_page)
         itemlist.append(

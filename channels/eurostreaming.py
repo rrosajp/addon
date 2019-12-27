@@ -12,7 +12,7 @@
        - serie, anime
 """
 import re
-from core import scrapertoolsV2, httptools, support
+from core import scrapertools, httptools, support
 from core.item import Item
 from platformcode import config
 
@@ -96,13 +96,13 @@ def pagina(url):
     data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
     #support.log("DATA ----###----> ", data)
     if 'clicca qui per aprire' in data.lower():
-        url = scrapertoolsV2.find_single_match(data, '"go_to":"([^"]+)"')
+        url = scrapertools.find_single_match(data, '"go_to":"([^"]+)"')
         url = url.replace("\\","")
         # Carica la pagina
         data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
 
     elif 'clicca qui</span>' in data.lower():
-        url = scrapertoolsV2.find_single_match(data, '<h2 style="text-align: center;"><a href="([^"]+)">')
+        url = scrapertools.find_single_match(data, '<h2 style="text-align: center;"><a href="([^"]+)">')
         # Carica la pagina
         data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
 

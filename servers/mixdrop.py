@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 from core import httptools
-from core import scrapertoolsV2
+from core import scrapertools
 from platformcode import config, logger
 from lib import jsunpack
 
@@ -24,9 +24,9 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     data = httptools.downloadpage(page_url).data
     data = re.sub(r'\n|\t|\r', ' ', data)
     data = re.sub(r'>\s\s*<', '><', data)
-    jsCode = scrapertoolsV2.find_single_match(data, r'<script>\s*MDCore\.ref = "[a-z0-9]+"; (.*?) </script>')
+    jsCode = scrapertools.find_single_match(data, r'<script>\s*MDCore\.ref = "[a-z0-9]+"; (.*?) </script>')
     jsUnpacked = jsunpack.unpack(jsCode)
-    url = "https://" + scrapertoolsV2.find_single_match(jsUnpacked, r'vsr[^=]*="(?:/)?(/[^"]+)')
+    url = "https://" + scrapertools.find_single_match(jsUnpacked, r'vsr[^=]*="(?:/)?(/[^"]+)')
 
     itemlist.append([".mp4 [MixDrop]", url])
 
@@ -38,7 +38,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     #     import simplejson as json
     # page_url = page_url.replace('/e/', '/f/') + '?download'
     # data = httptools.downloadpage(page_url).data
-    # csrf = scrapertoolsV2.find_single_match(data, '<meta name="csrf" content="([^"]+)">')
+    # csrf = scrapertools.find_single_match(data, '<meta name="csrf" content="([^"]+)">')
     # postData = {'csrf': csrf, 'a': 'genticket'}
     # resp = httptools.downloadpage(page_url, post=urllib.urlencode(postData)).data
     # resp = json.loads(resp)

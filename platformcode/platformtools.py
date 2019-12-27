@@ -20,7 +20,7 @@ import xbmcplugin
 
 from channelselector import get_thumb
 from core import channeltools
-from core import trakt_tools, scrapertoolsV2
+from core import trakt_tools, scrapertools
 from core.item import Item
 from platformcode import logger, keymaptools
 from platformcode import unify
@@ -799,7 +799,7 @@ def get_seleccion(default_action, opciones, seleccion, video_urls):
 
 
 def calcResolution(option):
-    match = scrapertoolsV2.find_single_match(option, '([0-9]{2,4})x([0-9]{2,4})')
+    match = scrapertools.find_single_match(option, '([0-9]{2,4})x([0-9]{2,4})')
     resolution = False
     if match:
         resolution = int(match[0])*int(match[1])

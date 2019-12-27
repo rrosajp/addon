@@ -16,14 +16,14 @@
                 - Prima fare la 'Rinumerazione' dal menu contestuale dal titolo della serie
 """
 import re
-from core import support, httptools, scrapertoolsV2
+from core import support, httptools, scrapertools
 from platformcode import config
 from core.item import Item
 
 
 def findhost():
     data = httptools.downloadpage('https://serietvonline.me/').data
-    host = scrapertoolsV2.find_single_match(data, r'<a class="pure-button pure-button-primary" title=\'serie tv online\' href="([^"]+)">')
+    host = scrapertools.find_single_match(data, r'<a class="pure-button pure-button-primary" title=\'serie tv online\' href="([^"]+)">')
     return host
 
 host = config.get_channel_url(findhost)
@@ -180,8 +180,8 @@ def findvideos(item):
             data = re.sub('\n|\t', ' ', data)
             data = re.sub(r'>\s+<', '> <', data)
             #support.log("DATA - HTML:\n", data)
-            url_video = scrapertoolsV2.find_single_match(data, r'<tr><td>(.+?)</td><tr>', -1)
-            url_serie = scrapertoolsV2.find_single_match(data, r'<link rel="canonical" href="([^"]+)"\s?/>')
+            url_video = scrapertools.find_single_match(data, r'<tr><td>(.+?)</td><tr>', -1)
+            url_serie = scrapertools.find_single_match(data, r'<link rel="canonical" href="([^"]+)"\s?/>')
             goseries = support.typo("Vai alla Serie:", ' bold')
             series = support.typo(item.contentSerieName, ' bold color kod')
             itemlist = support.server(item, data=url_video)

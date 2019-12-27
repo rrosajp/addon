@@ -17,7 +17,7 @@
 """
 import re
 
-from core import scrapertoolsV2, httptools, support
+from core import scrapertools, httptools, support
 from core.item import Item
 from platformcode import config
 
@@ -113,7 +113,7 @@ def select(item):
     support.log()
 
     data = httptools.downloadpage(item.url, headers=headers).data
-    patronBlock = scrapertoolsV2.find_single_match(data, r'class="taxonomy category" ><span property="name">(.*?)</span></a><meta property="position" content="2">')
+    patronBlock = scrapertools.find_single_match(data, r'class="taxonomy category" ><span property="name">(.*?)</span></a><meta property="position" content="2">')
     if patronBlock.lower() != 'film':
         support.log('select = ### è una serie ###')
         item.contentType='tvshow'

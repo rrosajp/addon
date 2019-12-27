@@ -24,7 +24,7 @@ from core import support
 from platformcode import config
 
 # in caso di necessità
-from core import scrapertoolsV2, httptools
+from core import scrapertools, httptools
 from core.item import Item
 
 
@@ -124,7 +124,7 @@ def select(item):
     data = re.sub('\n|\t', ' ', data)
     data = re.sub(r'>\s+<', '> <', data)
     if 'continua con il video' in data.lower():
-##    block = scrapertoolsV2.find_single_match(data, r'<div class="col-md-8 bg-white rounded-left p-5"><div>(.*?)<div style="margin-left: 0.5%; color: #FFF;">')
+##    block = scrapertools.find_single_match(data, r'<div class="col-md-8 bg-white rounded-left p-5"><div>(.*?)<div style="margin-left: 0.5%; color: #FFF;">')
 ##    if re.findall('rel="category tag">serie', data, re.IGNORECASE):
         support.log('select = ### è un film ###')
         return findvideos(Item(channel=item.channel,

@@ -2,7 +2,7 @@
 # Ringraziamo errmax e dr-z3r0
 import re
 
-from core import httptools, scrapertoolsV2
+from core import httptools, scrapertools
 from platformcode import logger
 from servers.decrypters import expurl
 
@@ -62,10 +62,10 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                     if '/olink/' in url: continue
                     else:
                         idata = httptools.downloadpage(url).data
-                        data = scrapertoolsV2.find_single_match(idata, "<iframe[^<>]*src=\\'([^'>]*)\\'[^<>]*>")
+                        data = scrapertools.find_single_match(idata, "<iframe[^<>]*src=\\'([^'>]*)\\'[^<>]*>")
                         #fix by greko inizio
                     if not data:
-                        data = scrapertoolsV2.find_single_match(idata, 'action="(?:[^/]+.*?/[^/]+/([a-zA-Z0-9_]+))">')
+                        data = scrapertools.find_single_match(idata, 'action="(?:[^/]+.*?/[^/]+/([a-zA-Z0-9_]+))">')
                     from lib import unshortenit
                     data, status = unshortenit.unshorten(url)
                     # logger.info("Data - Status zcrypt linkup : [%s] [%s] " %(data, status))

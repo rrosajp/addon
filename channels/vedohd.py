@@ -3,7 +3,7 @@
 # Canale per vedohd
 # ------------------------------------------------------------
 
-from core import scrapertoolsV2, httptools, support
+from core import scrapertools, httptools, support
 from core.item import Item
 from platformcode import logger, config
 from specials import autoplay
@@ -47,7 +47,7 @@ def findvideos(item):
     for link in support.dooplay_get_links(item, host):
         if link['title'] != 'Trailer':
             logger.info(link['title'])
-            server, quality = scrapertoolsV2.find_single_match(link['title'], '([^ ]+) ?(HD|3D)?')
+            server, quality = scrapertools.find_single_match(link['title'], '([^ ]+) ?(HD|3D)?')
             if quality:
                 title = server + " [COLOR blue][" + quality + "][/COLOR]"
             else:
