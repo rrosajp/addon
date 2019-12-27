@@ -8,6 +8,7 @@ from core.item import Item
 from specials import autorenumber
 from lib.concurrent import futures
 
+
 host = support.config.get_channel_url()
 
 # Creating persistent session
@@ -16,8 +17,12 @@ headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:62.0) Gecko/2010010
 
 # Getting conn_id token from vvvvid and creating payload
 login_page = host + '/user/login'
-conn_id = current_session.get(login_page, headers=headers).json()['data']['conn_id']
-payload = {'conn_id': conn_id}
+try:
+    conn_id = current_session.get(login_page, headers=headers).json()['data']['conn_id']
+    payload = {'conn_id': conn_id}
+except:
+    conn_id = ''
+
 
 main_host = host
 host += '/vvvvid/ondemand/'
@@ -26,52 +31,62 @@ list_quality = ['default']
 
 @support.menu
 def mainlist(item):
-    anime = ['anime/',
-             ('In Evidenza',['anime/', 'peliculas', 'channel/10005/last/']),
-             ('Popolari',['anime/', 'peliculas', 'channel/10002/last/']),
-             ('Nuove Uscite',['anime/', 'peliculas', 'channel/10007/last/']),
-             ('Generi',['anime/', 'peliculas', 'channel/10004/last/?category=']),
-             ('A-Z',['anime/', 'peliculas', 'channel/10003/last/?filter='])
-             ]
-    film =  ['film/',
-             ('In Evidenza',['film/', 'peliculas', 'channel/10005/last/']),
-             ('Popolari',['film/', 'peliculas', 'channel/10002/last/']),
-             ('Nuove Uscite',['film/', 'peliculas', 'channel/10007/last/']),
-             ('Generi',['film/', 'peliculas', 'channel/10004/last/?category=']),
-             ('A-Z',['film/', 'peliculas', 'channel/10003/last/?filter=']),
-             ]
-    tvshow = ['series/',
-             ('In Evidenza',['series/', 'peliculas', 'channel/10005/last/']),
-             ('Popolari',['series/', 'peliculas', 'channel/10002/last/']),
-             ('Nuove Uscite',['series/', 'peliculas', 'channel/10007/last/']),
-             ('Generi',['series/', 'peliculas', 'channel/10004/last/?category=']),
-             ('A-Z',['series/', 'peliculas', 'channel/10003/last/?filter='])
-             ]
-    show = [('Show bold {tv}',['show/', 'peliculas', 'channel/10005/last/', 'tvshow']),
-             ('In Evidenza submenu {tv}',['show/', 'peliculas', 'channel/10005/last/', 'tvshow']),
-             ('Popolari submenu {tv}',['show/', 'peliculas', 'channel/10002/last/', 'tvshow']),
-             ('Nuove Uscite submenu {tv}',['show/', 'peliculas', 'channel/10007/last/', 'tvshow']),
-             ('Generi submenu {tv}',['show/', 'peliculas', 'channel/10004/last/?category=', 'tvshow']),
-             ('A-Z submenu {tv}',['show/', 'peliculas', 'channel/10003/last/?filter=', 'tvshow']),
-             ('Cerca Show... bold submenu {tv}', ['show/', 'search', '', 'tvshow'])
-             ]
-    kids = [('Kids bold',['kids/', 'peliculas', 'channel/10005/last/', 'tvshow']),
-             ('In Evidenza submenu {kids}',['kids/', 'peliculas', 'channel/10005/last/', 'tvshow']),
-             ('Popolari submenu {kids}',['kids/', 'peliculas', 'channel/10002/last/', 'tvshow']),
-             ('Nuove Uscite submenu {kids}',['kids/', 'peliculas', 'channel/10007/last/', 'tvshow']),
-             ('Generi submenu {kids}',['kids/', 'peliculas', 'channel/10004/last/?category=', 'tvshow']),
-             ('A-Z submenu {kids}',['kids/', 'peliculas', 'channel/10003/last/?filter=', 'tvshow']),
-             ('Cerca Kids... bold submenu {kids}', ['kids/', 'search', '', 'tvshow'])
-             ]
+    if conn_id:
+        anime = ['anime/',
+                ('In Evidenza',['anime/', 'peliculas', 'channel/10005/last/']),
+                ('Popolari',['anime/', 'peliculas', 'channel/10002/last/']),
+                ('Nuove Uscite',['anime/', 'peliculas', 'channel/10007/last/']),
+                ('Generi',['anime/', 'peliculas', 'channel/10004/last/?category=']),
+                ('A-Z',['anime/', 'peliculas', 'channel/10003/last/?filter='])
+                ]
+        film =  ['film/',
+                ('In Evidenza',['film/', 'peliculas', 'channel/10005/last/']),
+                ('Popolari',['film/', 'peliculas', 'channel/10002/last/']),
+                ('Nuove Uscite',['film/', 'peliculas', 'channel/10007/last/']),
+                ('Generi',['film/', 'peliculas', 'channel/10004/last/?category=']),
+                ('A-Z',['film/', 'peliculas', 'channel/10003/last/?filter=']),
+                ]
+        tvshow = ['series/',
+                ('In Evidenza',['series/', 'peliculas', 'channel/10005/last/']),
+                ('Popolari',['series/', 'peliculas', 'channel/10002/last/']),
+                ('Nuove Uscite',['series/', 'peliculas', 'channel/10007/last/']),
+                ('Generi',['series/', 'peliculas', 'channel/10004/last/?category=']),
+                ('A-Z',['series/', 'peliculas', 'channel/10003/last/?filter='])
+                ]
+        show = [('Show bold {tv}',['show/', 'peliculas', 'channel/10005/last/', 'tvshow']),
+                ('In Evidenza submenu {tv}',['show/', 'peliculas', 'channel/10005/last/', 'tvshow']),
+                ('Popolari submenu {tv}',['show/', 'peliculas', 'channel/10002/last/', 'tvshow']),
+                ('Nuove Uscite submenu {tv}',['show/', 'peliculas', 'channel/10007/last/', 'tvshow']),
+                ('Generi submenu {tv}',['show/', 'peliculas', 'channel/10004/last/?category=', 'tvshow']),
+                ('A-Z submenu {tv}',['show/', 'peliculas', 'channel/10003/last/?filter=', 'tvshow']),
+                ('Cerca Show... bold submenu {tv}', ['show/', 'search', '', 'tvshow'])
+                ]
+        kids = [('Kids bold',['kids/', 'peliculas', 'channel/10005/last/', 'tvshow']),
+                ('In Evidenza submenu {kids}',['kids/', 'peliculas', 'channel/10005/last/', 'tvshow']),
+                ('Popolari submenu {kids}',['kids/', 'peliculas', 'channel/10002/last/', 'tvshow']),
+                ('Nuove Uscite submenu {kids}',['kids/', 'peliculas', 'channel/10007/last/', 'tvshow']),
+                ('Generi submenu {kids}',['kids/', 'peliculas', 'channel/10004/last/?category=', 'tvshow']),
+                ('A-Z submenu {kids}',['kids/', 'peliculas', 'channel/10003/last/?filter=', 'tvshow']),
+                ('Cerca Kids... bold submenu {kids}', ['kids/', 'search', '', 'tvshow'])
+                ]
+    else:
+        Top = [("Visibile solo dall'Italia bold",[])]
     return locals()
 
 def search(item, text):
     support.log(text)
     itemlist = []
-    if 'film' in item.url: item.contentType = 'movie'
-    else: item.contentType = 'tvshow'
-    item.search = text
-    itemlist = peliculas(item)
+    if conn_id:
+        if 'film' in item.url: item.contentType = 'movie'
+        else: item.contentType = 'tvshow'
+        item.search = text
+        try:
+            itemlist = peliculas(item)
+        except:
+            import sys
+            for line in sys.exc_info():
+                support.logger.error("%s" % line)
+            return []
     return itemlist
 
 def newest(categoria):
