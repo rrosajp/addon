@@ -8,12 +8,12 @@ from core import scrapertoolsV2, httptools, support
 from core.item import Item
 
 host = support.config.get_channel_url()
+headers = [['Referer', host]]
 
 # host = 'https://www.seriehd.watch'
-headers = ''
+# headers = ''
 
-def findhost():
-    pass
+# def findhost():
     # global host, headers
     # data= httptools.downloadpage('https://seriehd.nuovo.link/').data
     # global host, headers

@@ -20,17 +20,14 @@ from core import support, httptools, scrapertoolsV2
 from platformcode import config
 from core.item import Item
 
-__channel__ = "serietvonline"
-
-host = "https://serietvonline.monster"
-headers = ""
 
 def findhost():
-    pass
-    # global host, headers
-    # data = httptools.downloadpage('https://serietvonline.me/').data
-    # host = scrapertoolsV2.find_single_match(data, r'<a class="pure-button pure-button-primary" title=\'serie tv online\' href="([^"]+)">')
-    # headers = [['Referer', host]]
+    data = httptools.downloadpage('https://serietvonline.me/').data
+    host = scrapertoolsV2.find_single_match(data, r'<a class="pure-button pure-button-primary" title=\'serie tv online\' href="([^"]+)">')
+    return host
+
+host = config.get_channel_url(findhost)
+headers = [['Referer', host]]
 
 list_servers = ['akvideo', 'wstream', 'backin', 'vidtome', 'nowvideo']
 list_quality = ['default']
