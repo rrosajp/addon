@@ -15,6 +15,9 @@ try:
 except:
     import sqlite3 as sql
 
+db = os.path.join(config.get_data_path(), 'kod_db.sqlite')
+
+
 class CustomSocket(ssl.SSLSocket):
     def __init__(self, *args, **kwargs):
         super(CustomSocket, self).__init__(*args, **kwargs)
@@ -23,6 +26,7 @@ class CustomContext(ssl.SSLContext):
     def __init__(self, protocol, hostname, *args, **kwargs):
         self.hostname = hostname
         super(CustomContext, self).__init__(protocol)
+
     def wrap_socket(self, sock, server_side=False,
                     do_handshake_on_connect=True,
                     suppress_ragged_eofs=True,
@@ -32,6 +36,7 @@ class CustomContext(ssl.SSLContext):
                          suppress_ragged_eofs=suppress_ragged_eofs,
                          server_hostname=self.hostname,
                          _context=self)
+
 
 class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
 
@@ -46,21 +51,14 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
 
         super(CipherSuiteAdapter, self).__init__(**kwargs)
 
-    # ------------------------------------------------------------------------------- #
-
     def init_poolmanager(self, *args, **kwargs):
         kwargs['ssl_context'] = self.ssl_context
         return super(CipherSuiteAdapter, self).init_poolmanager(*args, **kwargs)
-
-    # ------------------------------------------------------------------------------- #
 
     def proxy_manager_for(self, *args, **kwargs):
         kwargs['ssl_context'] = self.ssl_context
         return super(CipherSuiteAdapter, self).proxy_manager_for(*args, **kwargs)
 
-# ------------------------------------------------------------------------------- #
-
-db = os.path.join(config.get_data_path(), 'kod_db.sqlite')
 
 class session(requests.Session):
     def __init__(self):
@@ -118,12 +116,22 @@ class session(requests.Session):
             headers["Host"] = domain
         else:
             headers = {"Host": domain}
-
         ret = None
         tryFlush = False
         url = protocol + ip + (':' + port if port else '') + resource
+
+        allow_redirects = kwargs.get('allow_redirects', True)
+        if 'allow_redirects' in kwargs:
+            del kwargs['allow_redirects']
         try:
-            ret = super(session, self).request(method, url, headers=headers, **kwargs)
+            ret = super(session, self).request(method, url, headers=headers, allow_redirects=False, **kwargs)
+            newUrl = ret.headers.get('Location', realUrl)
+            if allow_redirects:
+                redirectN = 0
+                while newUrl != realUrl and redirectN < self.max_redirects:
+                    ret = self.request(method, newUrl, headers=headers, **kwargs)
+                    newUrl = ret.headers.get('Location', realUrl)
+                    redirectN += 1
         except Exception as e:
             logger.info('Request for ' + domain + ' with ip ' + ip + ' failed')
             logger.info(e)
