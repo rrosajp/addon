@@ -132,6 +132,7 @@ class session(requests.Session):
                     ret = self.request(method, newUrl, headers=headers, **kwargs)
                     newUrl = ret.headers.get('Location', realUrl)
                     redirectN += 1
+            ret.url = newUrl
         except Exception as e:
             logger.info('Request for ' + domain + ' with ip ' + ip + ' failed')
             logger.info(e)
@@ -139,5 +140,6 @@ class session(requests.Session):
         if (tryFlush or not ret) and not flushedDns:  # re-request ips and update cache
             logger.info('Flushing dns cache for ' + domain)
             return self.flushDns(method, realUrl, domain, **kwargs)
+
         logger.info('tempo dns: ' + str(time.time()-t))
         return ret

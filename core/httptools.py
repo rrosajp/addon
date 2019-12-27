@@ -441,7 +441,7 @@ def downloadpage(url, **opt):
     opt['url_save'] = url
     opt['post_save'] = opt.get('post', None)
 
-    while opt['proxy_retries_counter'] <= opt.get('proxy_retries', 1):
+    while opt['proxy_retries_counter'] < opt.get('proxy_retries', 1):
         response = {}
         info_dict = []
         payload = dict()
