@@ -381,15 +381,11 @@ if __name__ == "__main__":
     if not config.dev_mode():
         from platformcode import updater
         updater.check_addon_init()
-        # get_channel_json()    -> disabilitato, lo si fa con l'updater
 
     # Copia Custom code a las carpetas de Alfa desde la zona de Userdata
     from platformcode import custom_code
     custom_code.init()
 
-    # Identifica la dirección Proxy y la lista de alternativas
-    # from core import proxytools
-    # proxytools.get_proxy_list()
     if not config.get_setting("update", "videolibrary") == 2:
         check_for_update(overwrite=False)
     
