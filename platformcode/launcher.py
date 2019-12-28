@@ -463,7 +463,7 @@ def play_from_library(item):
 
     window_type = config.get_setting("window_type", "videolibrary")
 
-    if autoplay.is_active(item.contentChannel):
+    if autoplay.is_active(item.contentChannel) and config.get_setting('autoplay_server_list'):
         itemlist = videolibrary.findvideos(item)
 
     # y volvemos a lanzar kodi
