@@ -991,15 +991,24 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
             checklinks_number = get_setting('checklinks_number')
         itemlist = servertools.check_list_links(itemlist, checklinks_number)
 
-    if AutoPlay == True and inspect.stack()[4][3] != 'start_download':
+    if AutoPlay == True and inspect.stack()[3][3] not in ['download_from_best_server', 'select_server']:
         autoplay.start(itemlist, item)
 
     if item.contentChannel != 'videolibrary': videolibrary(itemlist, item, function_level=3)
     if get_setting('downloadenabled') and down_load == True: download(itemlist, item, function_level=3)
-    return itemlist
+    VL = False
+    try:
+        if inspect.stack()[3][3] in ['download_from_best_server', 'select_server'] or \
+            inspect.stack()[4][3] == 'play_from_library' or \
+            inspect.stack()[5][3] == 'play_from_library':
+            VL = True
+    except:
+        pass
+    if not AP or VL:
+        return itemlist
 
 def filterLang(item, itemlist):
-    import channeltools
+    # import channeltools
     list_language = channeltools.get_lang(item.channel)
     if len(list_language) > 1:
         from specials import filtertools
