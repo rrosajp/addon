@@ -996,11 +996,16 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
 
     if item.contentChannel != 'videolibrary': videolibrary(itemlist, item, function_level=3)
     if get_setting('downloadenabled') and down_load == True: download(itemlist, item, function_level=3)
+
+    log('STACK=',inspect.stack()[3][1])
+    log('STACK=',inspect.stack()[4][1])
     VL = False
     try:
         if inspect.stack()[3][3] in ['download_from_best_server', 'select_server'] or \
             inspect.stack()[4][3] == 'play_from_library' or \
-            inspect.stack()[5][3] == 'play_from_library':
+            inspect.stack()[5][3] == 'play_from_library' or \
+            'videolibrary' in inspect.stack()[3][1] or \
+            'videolibrary' in inspect.stack()[4][1]:
             VL = True
     except:
         pass
