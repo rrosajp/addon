@@ -240,8 +240,35 @@ def show_menu(item):
     return itemlist
 
 
+def filter_thread(filter,item):
+    itemlist = []
+    thumbnail = ''
+    plot = ''
+    dict_ = {'url': 'search/person', 'language': lang, 'query': filter, 'page': 1}
+    tmdb_inf = tmdb.discovery(item, dict_=dict_)
+    results = tmdb_inf.results[0]
+    id = results['id']
+    if id:
+        thumbnail = 'http://image.tmdb.org/t/p/original' + results['profile_path'] if results['profile_path'] else item.thumbnail
+        json_file = httptools.downloadpage('http://api.themoviedb.org/3/person/'+ str(id) + '?api_key=' + tmdb_api + '&language=en', use_requests=True).data
+        plot += jsontools.load(json_file)['biography']
+
+    item = Item(channel=item.channel,
+                title=typo(filter, 'bold'),
+                url=item.url,
+                media_type=item.media_type,
+                action='list_filtered',
+                thumbnail=thumbnail,
+                plot=plot,
+                path=item.path,
+                filterkey=item.filterkey,
+                filter=filter)
+    return item
+
+
 def submenu(item):
     support.log()
+    from lib.concurrent import futures
 
     itemlist = []
     filter_list = []
@@ -262,33 +289,15 @@ def submenu(item):
                 for f in media[item.filterkey]:
                     if f not in filter_list:
                         filter_list.append(f)
+
     filter_list.sort()
-    support.log(filter_list)
 
-    for filter in filter_list:
-        thumbnail = ''
-        plot = ''
-        if item.filterkey in ['director','actors']:
-            tmdb.set_infoLabels(itemlist, seekTmdb=True)
-            load_info = load_json('http://api.themoviedb.org/3/search/person/?api_key=' + tmdb_api + '&language=' + lang + '&query=' + filter)
-            id = str(load_info['results'][0]['id']) if load_info.has_key('results') else ''
-            if id:
-                info = load_json('http://api.themoviedb.org/3/person/'+ id + '?api_key=' + tmdb_api + '&language=' + lang) if id else ''
-                if info.has_key('biography') and not info['biography']:
-                    bio = load_json('http://api.themoviedb.org/3/person/'+ id + '?api_key=' + tmdb_api + '&language=en')['biography']
-                thumbnail = 'https://image.tmdb.org/t/p/w600_and_h900_bestv2' + info['profile_path'] if info['profile_path'] else item.thumbnail
-                plot += info['biography'] if info['biography'] else bio if bio else ''
-
-        itemlist.append(Item(channel=item.channel,
-                             title=typo(filter, 'bold'),
-                             url=item.url,
-                             media_type=item.media_type,
-                             action='list_filtered',
-                             thumbnail=thumbnail,
-                             plot=plot,
-                             path=item.path,
-                             filterkey=item.filterkey,
-                             filter=filter))
+    with futures.ThreadPoolExecutor() as executor:
+        List = [executor.submit(filter_thread, filter, item) for filter in filter_list]
+        for res in futures.as_completed(List):
+            if res.result():
+                itemlist.append(res.result())
+    itemlist = sorted(itemlist, key=lambda it: it.title)
     return itemlist
 
 

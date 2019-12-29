@@ -5701,6 +5701,10 @@ msgctxt "#70745"
 msgid "Enter another year..."
 msgstr ""
 
+msgctxt "#70746"
+msgid "Hide server selection from Autoplay"
+msgstr ""
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS Check Alert"
