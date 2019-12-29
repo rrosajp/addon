@@ -5,28 +5,22 @@
 
 import re
 
-import urlparse
-
-from core import scrapertools, httptools, tmdb, support,servertools
+from core import scrapertools, httptools, tmdb, support
 from core.item import Item
 from core.support import menu, log
 from platformcode import logger
 from specials import autorenumber
 from platformcode import config, unify
 from lib.unshortenit import unshorten_only
-from lib import unshortenit
 
-host = 'https://www.tantifilm.eu'
-headers = ''
+
 def findhost():
-    pass
-    # global host, headers
-    # permUrl = httptools.downloadpage('https://www.tantifilm.info/', follow_redirects=False).data
-    # host = scrapertools.find_single_match(permUrl, r'<h2 style="text-align: center;"><a href="([^"]+)">Il nuovo indirizzo di Tantifilm è:</a></h2>')
-    # if host.endswith('/'):
-    #     host = host[:-1]
-    # headers = [['Referer', host]]
+    permUrl = httptools.downloadpage('https://www.tantifilm.info/', follow_redirects=False).data
+    host = 'https://' + scrapertools.find_single_match(permUrl, r'Ora siamo ([A-Za-z0-9./]+)')
+    return host
 
+host = config.get_channel_url(findhost)
+headers = [['Referer', host]]
 list_servers = ['verystream', 'openload', 'streamango', 'vidlox', 'youtube']
 list_quality = ['default']
 
@@ -118,10 +112,6 @@ def episodios(item):
 
     #debug = True
     return locals()
-
-def player_or_not(item):
-
-    return item
 
 def category(item):
     log()
@@ -274,9 +264,10 @@ def findvideos(item):
             if 'nodmca' in url:
                 page = httptools.downloadpage(url, headers=headers).data
                 url = '\t' + scrapertools.find_single_match(page, '<meta name="og:url" content="([^=]+)">')
-                if url:
-                    listurl.add(url)
-    return support.server(item, data=listurl if listurl else data)#, headers=headers)
+            if url:
+                listurl.add(url)
+    data += '\n'.join(listurl)
+    return support.server(item, data)#, headers=headers)
     # return itemlist
 
 ##def findvideos(item):

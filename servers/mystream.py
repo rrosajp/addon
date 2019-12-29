@@ -7,6 +7,7 @@ import re
 
 from core import httptools
 from core import scrapertools
+from lib import js2py
 from lib.aadecode import decode as aadecode
 from platformcode import logger
 
@@ -27,6 +28,11 @@ def get_video_url(page_url, premium = False, user = "", password = "", video_pas
     headers = {'referer': page_url}
     data = httptools.downloadpage(page_url, headers=headers).data
     data = re.sub(r'"|\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
+    for c in scrapertools.find_multiple_matches(data, '<script>(.*?)</script>'):
+        if 'function vv' in c:
+            vv = js2py.eval_js(c)
+        if 'key' in c:
+            key = js2py.eval_js(c)
     code = scrapertools.find_single_match(data, '(?s)<script>\s*ﾟωﾟ(.*?)</script>').strip()
     text_decode = aadecode(code)
     matches = scrapertools.find_multiple_matches(text_decode, "'src', '([^']+)'")
