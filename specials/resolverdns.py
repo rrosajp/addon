@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
 import ssl
+import urlparse
 
-import xbmc
-
-from core import jsontools
 from lib.requests_toolbelt.adapters import host_header_ssl
-
-from lib import requests, doh
+from lib import cloudscraper
+from lib import doh
 from platformcode import logger, config
 import re
+
 try:
     import _sqlite3 as sql
 except:
@@ -38,41 +37,32 @@ class CustomContext(ssl.SSLContext):
                          _context=self)
 
 
-class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
+class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter, cloudscraper.CipherSuiteAdapter):
 
     def __init__(self, hostname, *args, **kwargs):
-        self.ssl_context = kwargs.pop('ssl_context', None)
-        self.cipherSuite = kwargs.pop('cipherSuite', None)
+        self.cipherSuite = kwargs.get('cipherSuite', None)
         self.hostname = hostname
-
-        if not self.ssl_context:
-            self.ssl_context = CustomContext(ssl.PROTOCOL_TLS, hostname)
-            self.ssl_context.set_ciphers(self.cipherSuite)
-
-        super(CipherSuiteAdapter, self).__init__(**kwargs)
-
-    def init_poolmanager(self, *args, **kwargs):
+        self.ssl_context = CustomContext(ssl.PROTOCOL_TLS, hostname)
+        self.ssl_context.set_ciphers(self.cipherSuite)
+        self.ssl_context.options |= (ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1)
         kwargs['ssl_context'] = self.ssl_context
-        return super(CipherSuiteAdapter, self).init_poolmanager(*args, **kwargs)
 
-    def proxy_manager_for(self, *args, **kwargs):
-        kwargs['ssl_context'] = self.ssl_context
-        return super(CipherSuiteAdapter, self).proxy_manager_for(*args, **kwargs)
+        cloudscraper.CipherSuiteAdapter.__init__(self, *args, **kwargs)
 
 
-class session(requests.Session):
-    def __init__(self):
+
+class session(cloudscraper.CloudScraper):
+    def __init__(self, *args, **kwargs):
         self.conn = sql.connect(db)
         self.cur = self.conn.cursor()
-        super(session, self).__init__()
+        super(session, self).__init__(*args, **kwargs)
 
     def getIp(self, domain):
-        import time
-        t = time.time()
         ip = None
         try:
             self.cur.execute('select ip from dnscache where domain=?', (domain,))
             ip = self.cur.fetchall()[0][0]
+            logger.info('Cache DNS: ' + domain + ' = ' + str(ip))
         except:
             pass
         if not ip:  # not cached
@@ -84,8 +74,7 @@ class session(requests.Session):
                 logger.error('Failed to resolve hostname, fallback to normal dns')
                 import traceback
                 logger.error(traceback.print_exc())
-                ip = [domain]
-        logger.info('tempo getIP: ' + str(time.time()-t))
+                ip = domain
         return ip
 
     def writeToCache(self, domain, ip):
@@ -105,12 +94,11 @@ class session(requests.Session):
         return self.request(method, realUrl, flushedDns=True, **kwargs)
 
     def request(self, method, url, headers=None, flushedDns=False, **kwargs):
-        import time
-        t = time.time()
-        protocol, domain, port, resource = re.match(r'^(http[s]?:\/\/)?([^:\/\s]+)(?::([^\/]*))?([^\s]*)$', url, flags=re.IGNORECASE).groups()
-        self.mount('https://', CipherSuiteAdapter(domain, cipherSuite="ALL"))
-        realUrl = url
+        parse = urlparse.urlparse(url)
+        domain = headers['Host'] if headers and 'Host' in headers.keys() else parse.netloc
         ip = self.getIp(domain)
+        self.mount('https://', CipherSuiteAdapter(domain, cipherSuite=self.adapters['https://'].cipherSuite))
+        realUrl = url
 
         if headers:
             headers["Host"] = domain
@@ -118,14 +106,22 @@ class session(requests.Session):
             headers = {"Host": domain}
         ret = None
         tryFlush = False
-        url = protocol + ip + (':' + port if port else '') + resource
+
+        parse = list(parse)
+        parse[1] = ip
+        url = urlparse.urlunparse(parse)
 
         allow_redirects = kwargs.get('allow_redirects', True)
         if 'allow_redirects' in kwargs:
             del kwargs['allow_redirects']
         try:
             ret = super(session, self).request(method, url, headers=headers, allow_redirects=False, **kwargs)
-            newUrl = ret.headers.get('Location', realUrl)
+            newUrl = urlparse.urlparse(ret.headers.get('Location', realUrl))
+            if not newUrl.netloc and not newUrl.scheme:
+                newUrl = list(newUrl)
+                newUrl[0] = 'https://'
+                newUrl[1] = domain
+            newUrl = urlparse.urlunparse(newUrl)
             if allow_redirects:
                 redirectN = 0
                 while newUrl != realUrl and redirectN < self.max_redirects:
@@ -141,5 +137,4 @@ class session(requests.Session):
             logger.info('Flushing dns cache for ' + domain)
             return self.flushDns(method, realUrl, domain, **kwargs)
 
-        logger.info('tempo dns: ' + str(time.time()-t))
         return ret

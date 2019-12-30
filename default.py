@@ -8,8 +8,6 @@ import sys
 
 import xbmc
 from platformcode import config, logger
-import ssl
-logger.info(ssl.OPENSSL_VERSION)
 
 logger.info("init...")
 
