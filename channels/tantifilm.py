@@ -5,16 +5,13 @@
 
 import re
 
-import urlparse
-
-from core import scrapertoolsV2, httptools, tmdb, support,servertools
+from core import scrapertoolsV2, httptools, tmdb, support
 from core.item import Item
-from core.support import menu, log
+from core.support import log
 from platformcode import logger
 from specials import autorenumber
 from platformcode import config, unify
 from lib.unshortenit import unshorten_only
-from lib import unshortenit
 
 host = 'https://www.tantifilm.eu'
 headers = ''
@@ -274,10 +271,10 @@ def findvideos(item):
             if 'nodmca' in url:
                 page = httptools.downloadpage(url, headers=headers).data
                 url = '\t' + scrapertoolsV2.find_single_match(page,'<meta name="og:url" content="([^=]+)">')
-                if url:
-                    listurl.add(url)
-    support.dbg()
-    return support.server(item, data=listurl if listurl else data)#, headers=headers)
+        if url:
+            listurl.add(url)
+    data += '\n'.join(listurl)
+    return support.server(item, data)  # , headers=headers)
     # return itemlist
 
 ##def findvideos(item):
