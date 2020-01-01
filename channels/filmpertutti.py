@@ -169,6 +169,10 @@ def newest(categoria):
 
 def findvideos(item):
     if item.contentType == 'movie':
-        return support.server(item)
+        data = httptools.downloadpage(item.url).data
+        toUnshorten = scrapertools.find_multiple_matches(data, 'https?://buckler.link/[a-zA-Z0-9]+')
+        for link in toUnshorten:
+            data += '\n' + httptools.downloadpage(link, follow_redirects=False).headers["Location"]
+        return support.server(item, data=data)
     else:
         return support.server(item, item.url)
