@@ -446,8 +446,6 @@ def play_from_library(item):
     import xbmcplugin
     import xbmc
     from time import sleep
-    from specials import autoplay
-    from specials import videolibrary
 
     # Intentamos reproducir una imagen (esto no hace nada y ademas no da error)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True,
@@ -463,16 +461,14 @@ def play_from_library(item):
 
     window_type = config.get_setting("window_type", "videolibrary")
 
-    if autoplay.is_active(item.contentChannel) and config.get_setting('autoplay_server_list'):
-        itemlist = videolibrary.findvideos(item)
-
     # y volvemos a lanzar kodi
-    elif xbmc.getCondVisibility('Window.IsMedia') and not window_type == 1:
+    if xbmc.getCondVisibility('Window.IsMedia') and not window_type == 1:
         # Ventana convencional
         xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")
 
     else:
         # Ventana emergente
+        from specials import videolibrary
         p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(70004))
         p_dialog.update(0, '')
 
@@ -531,5 +527,16 @@ def play_from_library(item):
                     item.play_from = 'window'
                     platformtools.play_video(item)
 
+                from specials import autoplay
                 if (platformtools.is_playing() and item.action) or item.server == 'torrent' or autoplay.is_active(item.contentChannel):
                     break
+
+    # IF Autoplay and Hide Server
+    from core import jsontools
+    autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
+    channel_node = autoplay_node.get(item.channel, {})
+    settings_node = channel_node.get('settings', {})
+    AP = config.get_setting('autoplay') or settings_node['active']
+    APS = config.get_setting('autoplay_server_list')
+    if AP and APS:
+        xbmc.executebuiltin('Action(Back)')
