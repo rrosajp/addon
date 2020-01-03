@@ -10,17 +10,8 @@ from core.item import Item
 host = support.config.get_channel_url()
 headers = [['Referer', host]]
 
-# host = 'https://www.seriehd.watch'
-# headers = ''
 
-# def findhost():
-    # global host, headers
-    # data= httptools.downloadpage('https://seriehd.nuovo.link/').data
-    # global host, headers
-    # host = scrapertools.find_single_match(data, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
-    # headers = [['Referer', host]]
-
-list_servers = ['verystream', 'openload', 'streamango', 'thevideome']
+list_servers = ['mixdrop', 'vidoza', 'vcstream', 'gounlimited']
 list_quality = ['1080p', '720p', '480p', '360']
 
 @support.menu
@@ -34,8 +25,6 @@ def mainlist(item):
 
 @support.scrape
 def peliculas(item):
-    #findhost()
-    # debug=True
     patron = r'<h2>(?P<title>.*?)</h2>\s*<img src="(?P<thumb>[^"]+)" alt="[^"]*" />\s*<A HREF="(?P<url>[^"]+)">.*?<span class="year">(?:(?P<year>[0-9]{4}))?.*?<span class="calidad">(?:(?P<quality>[A-Z]+))?.*?</span>'
     patronNext=r'<span class="current">\d+</span><a rel="nofollow" class="page larger" href="([^"]+)">\d+</a>'
     action='episodios'
@@ -44,7 +33,6 @@ def peliculas(item):
 
 @support.scrape
 def episodios(item):
-    #findhost()
     data =''
     url = support.match(item, patronBlock=r'<iframe width=".+?" height=".+?" src="([^"]+)" allowfullscreen frameborder="0">')[1]
     seasons = support.match(item, r'<a href="([^"]+)">(\d+)<', r'<h3>STAGIONE</h3><ul>(.*?)</ul>', headers, url)[0]
@@ -62,7 +50,6 @@ def episodios(item):
 
 @support.scrape
 def genre(item):
-    #findhost()
     patronMenu = '<a href="(?P<url>[^"]+)">(?P<title>[^<]+)</a>'
     blacklist = ['Serie TV','Serie TV Americane','Serie TV Italiane','altadefinizione']
     patronBlock = '<ul class="sub-menu">(?P<block>.*)</ul>'
