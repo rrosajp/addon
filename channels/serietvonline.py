@@ -52,7 +52,7 @@ def mainlist(item):
 
     anime = ['/lista-cartoni-animati-e-anime/']
 
-    documentari = [('Documentari', ['/lista-documentari/' , 'peliculas' , 'doc', 'tvshow'])]
+    documentari = [('Documentari bullet bold', ['/lista-documentari/' , 'peliculas' , 'doc', 'tvshow'])]
 
     search = ''
 
