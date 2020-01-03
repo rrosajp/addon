@@ -497,7 +497,7 @@ def autoplay_config(item):
     allow_option = True
 
     active_settings = {"id": "active", "label": config.get_localized_string(60079),
-                       "color": "0xffffff99", "type": "bool", "default": False, "enabled": allow_option,
+                      "type": "bool", "default": False, "enabled": allow_option,
                        "visible": allow_option}
     list_controls.append(active_settings)
     dict_values['active'] = settings_node.get('active', False)
@@ -507,7 +507,7 @@ def autoplay_config(item):
     if not status_language:
         status_language = 0
 
-    set_language = {"id": "language", "label": config.get_localized_string(60080), "color": "0xffffff99",
+    set_language = {"id": "language", "label": config.get_localized_string(60080),
                     "type": "list", "default": 0, "enabled": "eq(-1,true)", "visible": True,
                     "lvalues": get_languages(item.from_channel)}
 
@@ -527,7 +527,7 @@ def autoplay_config(item):
     else:
         enabled = "eq(-3,true)"
 
-    custom_servers_settings = {"id": "custom_servers", "label": config.get_localized_string(60081), "color": "0xff66ffcc",
+    custom_servers_settings = {"id": "custom_servers", "label": config.get_localized_string(60081),
                                "type": "bool", "default": False, "enabled": enabled, "visible": True}
     list_controls.append(custom_servers_settings)
     if dict_values['active'] and enabled:
@@ -541,7 +541,7 @@ def autoplay_config(item):
         if default > len(server_list) - 1:
             default = 0
         set_servers = {"id": "server_%s" % num, "label": u"          \u2665" + config.get_localized_string(60082) % num,
-                       "color": "0xfffcab14", "type": "list", "default": default,
+                       "type": "list", "default": default,
                        "enabled": "eq(-%s,true)+eq(-%s,true)" % (pos1, num), "visible": True,
                        "lvalues": server_list}
         list_controls.append(set_servers)
@@ -558,7 +558,7 @@ def autoplay_config(item):
     else:
         enabled = "eq(-7,true)"
 
-    custom_quality_settings = {"id": "custom_quality", "label": config.get_localized_string(60083), "color": "0xff66ffcc",
+    custom_quality_settings = {"id": "custom_quality", "label": config.get_localized_string(60083),
                                "type": "bool", "default": False, "enabled": enabled, "visible": True}
     list_controls.append(custom_quality_settings)
     if dict_values['active'] and enabled:
@@ -573,7 +573,7 @@ def autoplay_config(item):
             default = 0
 
         set_quality = {"id": "quality_%s" % num, "label": u"          \u2665 Calidad Favorita %s" % num,
-                       "color": "0xfff442d9", "type": "list", "default": default,
+                       "type": "list", "default": default,
                        "enabled": "eq(-%s,true)+eq(-%s,true)" % (pos1, num), "visible": True,
                        "lvalues": quality_list}
         list_controls.append(set_quality)
@@ -584,16 +584,13 @@ def autoplay_config(item):
     # Plan B
     dict_values['plan_b'] = settings_node.get('plan_b', False)
     enabled = "eq(-4,true)|eq(-8,true)"
-    plan_b = {"id": "plan_b", "label": config.get_localized_string(70172),
-                       "color": "0xffffff99",
-                               "type": "bool", "default": False, "enabled": enabled, "visible": True}
+    plan_b = {"id": "plan_b", "label": config.get_localized_string(70172),"type": "bool", "default": False, "enabled": enabled, "visible": True}
     list_controls.append(plan_b)
 
 
     # Seccion Prioridades
     priority_list = [config.get_localized_string(70174), config.get_localized_string(70175)]
-    set_priority = {"id": "priority", "label": config.get_localized_string(60085),
-                    "color": "0xffffff99", "type": "list", "default": 0,
+    set_priority = {"id": "priority", "label": config.get_localized_string(60085), "type": "list", "default": 0,
                     "enabled": True, "visible": "eq(-5,true)+eq(-9,true)+eq(-12,true)", "lvalues": priority_list}
     list_controls.append(set_priority)
     dict_values["priority"] = settings_node.get("priority", 0)
