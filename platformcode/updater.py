@@ -46,7 +46,7 @@ def loadCommits(page=1):
     return ret
 
 
-def check_addon_init():
+def check():
     if not addon.getSetting('addon_update_enabled'):
         return False
     logger.info('Cerco aggiornamenti..')
@@ -164,6 +164,27 @@ def check_addon_init():
         logger.info('Nessun nuovo aggiornamento')
 
     return updated
+
+
+def timer():
+    import time
+    curTime = time.time()
+    file = "special://profile/addon_data/plugin.video.kod/updater_last_check.txt"
+    period = 10
+    checked = False
+    try:
+        with open(xbmc.translatePath(file), 'r') as fileC:
+                lastCheck = float(fileC.read())
+                if curTime - lastCheck > period:
+                    check()
+                    checked = True
+    except:
+        check()
+        checked = True
+    if checked:
+        with open(xbmc.translatePath(file), 'w') as fileC:
+            fileC.write(str(curTime))
+
 
 
 def calcCurrHash():

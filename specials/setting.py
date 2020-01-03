@@ -344,7 +344,7 @@ def check_quickfixes(item):
 
     if not config.dev_mode():
         from platformcode import updater
-        return updater.check_addon_init()
+        return updater.check()
     else:
         return False
 

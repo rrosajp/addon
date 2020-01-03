@@ -5,7 +5,6 @@
 
 import datetime, imp, math, threading, traceback, sys, glob
 
-import channelselector
 from platformcode import config
 try:
     import xbmc, os
@@ -23,7 +22,6 @@ from core import channeltools, filetools, videolibrarytools
 from platformcode import logger
 from platformcode import platformtools
 from specials import videolibrary
-from lib import generictools
 
 
 def update(path, p_dialog, i, t, serie, overwrite):
@@ -380,7 +378,7 @@ if __name__ == "__main__":
     # Verificar quick-fixes al abrirse Kodi, y dejarlo corriendo como Thread
     if not config.dev_mode():
         from platformcode import updater
-        updater.check_addon_init()
+        updater.check()
 
     # Copia Custom code a las carpetas de Alfa desde la zona de Userdata
     from platformcode import custom_code
