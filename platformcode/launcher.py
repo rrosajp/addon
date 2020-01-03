@@ -429,6 +429,7 @@ def limit_itemlist(itemlist):
 
 
 def play_from_library(item):
+    itemlist=[]
     """
         Los .strm al reproducirlos desde kodi, este espera que sea un archivo "reproducible" asi que no puede contener
         más items, como mucho se puede colocar un dialogo de seleccion.
@@ -446,6 +447,13 @@ def play_from_library(item):
     import xbmcplugin
     import xbmc
     from time import sleep
+
+    from core import jsontools
+    autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
+    channel_node = autoplay_node.get(item.channel, {})
+    settings_node = channel_node.get('settings', {})
+    AP = config.get_setting('autoplay') or settings_node['active']
+    APS = config.get_setting('autoplay_server_list')
 
     # Intentamos reproducir una imagen (esto no hace nada y ademas no da error)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True,
@@ -465,6 +473,13 @@ def play_from_library(item):
     if xbmc.getCondVisibility('Window.IsMedia') and not window_type == 1:
         # Ventana convencional
         xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")
+        if AP and APS:
+            while not platformtools.is_playing():
+                pass
+            while platformtools.is_playing():
+                pass
+            sleep(0.1)
+            xbmc.executebuiltin('Action(Back)')
 
     else:
         # Ventana emergente
@@ -493,9 +508,8 @@ def play_from_library(item):
             itemlist = reorder_itemlist(itemlist)
 
 
-        import time
         p_dialog.update(100, '')
-        time.sleep(0.5)
+        sleep(0.5)
         p_dialog.close()
 
 
@@ -530,13 +544,3 @@ def play_from_library(item):
                 from specials import autoplay
                 if (platformtools.is_playing() and item.action) or item.server == 'torrent' or autoplay.is_active(item.contentChannel):
                     break
-
-    # IF Autoplay and Hide Server
-    from core import jsontools
-    autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
-    channel_node = autoplay_node.get(item.channel, {})
-    settings_node = channel_node.get('settings', {})
-    AP = config.get_setting('autoplay') or settings_node['active']
-    APS = config.get_setting('autoplay_server_list')
-    if AP and APS:
-        xbmc.executebuiltin('Action(Back)')
