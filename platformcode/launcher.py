@@ -14,6 +14,7 @@ from core import scrapertools
 from core import servertools
 from core import trakt_tools
 from core import videolibrarytools
+from core import filetools
 from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
@@ -441,7 +442,7 @@ def play_from_library(item):
         @param item: elemento con información
     """
     logger.info()
-    #logger.debug("item: \n" + item.tostring('\n'))
+    logger.debug("item: \n" + item.tostring('\n'))
 
     import xbmcgui
     import xbmcplugin
@@ -468,6 +469,10 @@ def play_from_library(item):
     item.action = "findvideos"
 
     window_type = config.get_setting("window_type", "videolibrary")
+    episodes = scrapertools.find_single_match(item.strm_path, '(\d+)x(\d+)')
+    season = int(episodes[0])
+    episode = int(episodes[1])
+    path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"))
 
     # y volvemos a lanzar kodi
     if xbmc.getCondVisibility('Window.IsMedia') and not window_type == 1:
@@ -478,8 +483,9 @@ def play_from_library(item):
                 pass
             while platformtools.is_playing():
                 pass
-            sleep(0.1)
+            sleep(0.5)
             xbmc.executebuiltin('Action(Back)')
+
 
     else:
         # Ventana emergente
