@@ -160,6 +160,7 @@ def check():
         xbmc.executebuiltin("UpdateLocalAddons")
         if poFilesChanged:
             refreshLang()
+        updated = True
     else:
         logger.info('Nessun nuovo aggiornamento')
 
@@ -171,8 +172,10 @@ def timer(force=False):
     curTime = time.time()
     file = "special://profile/addon_data/plugin.video.kod/updater_last_check.txt"
     period = float(addon.getSetting('addon_update_timer')) * 3600
+    updated = False
+
     if force:
-        check()
+        updated = check()
         checked = True
     else:
         checked = False
@@ -180,14 +183,15 @@ def timer(force=False):
             with open(xbmc.translatePath(file), 'r') as fileC:
                     lastCheck = float(fileC.read())
                     if curTime - lastCheck > period:
-                        check()
+                        updated = check()
                         checked = True
         except:
-            check()
+            updated = check()
             checked = True
     if checked:
         with open(xbmc.translatePath(file), 'w') as fileC:
             fileC.write(str(curTime))
+    return updated
 
 
 

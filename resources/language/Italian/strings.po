@@ -5398,8 +5398,8 @@ msgid "Use the context menu to define one"
 msgstr "Usa il menù contestuale per aggiungerne una"
 
 msgctxt "#70667"
-msgid "Alpha is already updated"
-msgstr "Alpha è già aggiornato"
+msgid "KoD is already updated"
+msgstr "KoD è già aggiornato"
 
 msgctxt "#70668"
 msgid "There is no urgent update"

@@ -5398,7 +5398,7 @@ msgid "Use the context menu to define one"
 msgstr ""
 
 msgctxt "#70667"
-msgid "Alpha is already updated"
+msgid "KoD is already updated"
 msgstr ""
 
 msgctxt "#70668"
