@@ -166,21 +166,25 @@ def check():
     return updated
 
 
-def timer():
+def timer(force=False):
     import time
     curTime = time.time()
     file = "special://profile/addon_data/plugin.video.kod/updater_last_check.txt"
-    period = 10
-    checked = False
-    try:
-        with open(xbmc.translatePath(file), 'r') as fileC:
-                lastCheck = float(fileC.read())
-                if curTime - lastCheck > period:
-                    check()
-                    checked = True
-    except:
+    period = float(addon.getSetting('addon_update_timer')) * 3600
+    if force:
         check()
         checked = True
+    else:
+        checked = False
+        try:
+            with open(xbmc.translatePath(file), 'r') as fileC:
+                    lastCheck = float(fileC.read())
+                    if curTime - lastCheck > period:
+                        check()
+                        checked = True
+        except:
+            check()
+            checked = True
     if checked:
         with open(xbmc.translatePath(file), 'w') as fileC:
             fileC.write(str(curTime))

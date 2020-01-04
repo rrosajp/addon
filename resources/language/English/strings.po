@@ -5035,7 +5035,7 @@ msgid "To avoid waiting too long when a server does not respond:"
 msgstr ""
 
 msgctxt "#70579"
-msgid "Settings of urgent updates of KOD modules (Quick Fixes):"
+msgid "Settings of KoD updates:"
 msgstr ""
 
 msgctxt "#70580"
@@ -5043,11 +5043,11 @@ msgid "Timeout (maximum waiting time)"
 msgstr ""
 
 msgctxt "#70581"
-msgid "Check for updates when kodi starts"
+msgid "Check for updates"
 msgstr ""
 
 msgctxt "#70582"
-msgid "Do you want to see messages about the updates?"
+msgid "Do you want to be notified?"
 msgstr ""
 
 msgctxt "#70583"
@@ -5765,4 +5765,7 @@ msgstr ""
 msgctxt "#707415"
 msgid "You have not selected any choice, the cloudflare DNS will be used."
 msgstr ""
-# end DNS
+
+msgctxt "#707416"
+msgid "how often you want to check for updates? (hours)"
+msgstr ""

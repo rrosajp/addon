@@ -378,7 +378,7 @@ if __name__ == "__main__":
     # Verificar quick-fixes al abrirse Kodi, y dejarlo corriendo como Thread
     if not config.dev_mode():
         from platformcode import updater
-        updater.check()
+        updater.timer(True)
 
     # Copia Custom code a las carpetas de Alfa desde la zona de Userdata
     from platformcode import custom_code

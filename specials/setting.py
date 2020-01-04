@@ -311,11 +311,10 @@ def submenu_tools(item):
         itemlist.append(Item(channel='custom', action='mainlist', title='Custom Channel'))
 
 
-    #Disabilitato il menu degli aggiornamenti
-    #itemlist.append(Item(channel=CHANNELNAME, action="check_quickfixes", folder=False,
-    #                     title=config.get_localized_string(30001), plot="Versión actual: %s" % config.get_addon_version() ))
-    itemlist.append(Item(channel=CHANNELNAME, action="update_quasar", folder=False,
-                         title=config.get_localized_string(70569)))
+    itemlist.append(Item(channel=CHANNELNAME, action="check_quickfixes", folder=False,
+                        title=config.get_localized_string(30001), plot=config.get_addon_version(with_fix=True) ))
+    # itemlist.append(Item(channel=CHANNELNAME, action="update_quasar", folder=False,
+    #                      title=config.get_localized_string(70569)))
     itemlist.append(Item(channel=CHANNELNAME, action="", title="", folder=False,
                          thumbnail=get_thumb("setting_0.png")))
 
@@ -344,7 +343,7 @@ def check_quickfixes(item):
 
     if not config.dev_mode():
         from platformcode import updater
-        return updater.check()
+        return updater.timer(True)
     else:
         return False
 
