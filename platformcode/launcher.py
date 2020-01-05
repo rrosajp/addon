@@ -450,10 +450,8 @@ def play_from_library(item):
     from time import sleep, time
 
     from core import jsontools
-    autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
-    channel_node = autoplay_node.get(item.channel, {})
-    settings_node = channel_node.get('settings', {})
-    AP = config.get_setting('autoplay') or settings_node.has_key('active')
+    path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"))
+    AP = config.get_setting('autoplay')
     APS = config.get_setting('autoplay_server_list')
     NE = config.get_setting('autoplay_next')
 
@@ -473,7 +471,7 @@ def play_from_library(item):
     episodes = scrapertools.find_single_match(item.strm_path, '(\d+)x(\d+)')
     season = int(episodes[0])
     episode = int(episodes[1])
-    path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"))
+    
 
     # y volvemos a lanzar kodi
     if xbmc.getCondVisibility('Window.IsMedia') and not window_type == 1:
@@ -485,27 +483,27 @@ def play_from_library(item):
             while platformtools.is_playing():
                 pass
             sleep(0.5)
-            counter = time()
+            xbmc.executebuiltin('Action(Back)')
+            ep = '%dx%02d' % (season, episode)
+            next_ep = '%dx%02d' % (season, episode+1)
+            next_season = '%dx%02d' % (season+1, 1)
+            next_ep_path = item.strm_path.replace(ep,next_ep)
+            next_season_path = item.strm_path.replace(ep,next_ep)
             play_next = False
-            if platformtools.dialog_yesno('Prossimo Episodio?', '', nolabel="Sì", yeslabel="No", autoclose=5000) == 0:   
-                ep = '%dx%02d' % (season, episode)
-                next_ep = '%dx%02d' % (season, episode+1)
-                next_season = '%dx%02d' % (season+1, 1)
-                next_ep_path = item.strm_path.replace(ep,next_ep)
-                next_season_path = item.strm_path.replace(ep,next_ep)
-                if os.path.isfile(path+next_ep_path):
-                    item.contentEpisodeNumber = item.infoLabels['episode'] = episode+1
-                    item.contentTitle = item.infoLabels['title'] = next_ep
-                    item.strm_path = next_ep_path
-                    logger.info(str(item))
-                    play_from_library(item)
-                elif os.path.isfile(item.strm_path.replace(path+'%dx%2d' % (season, episode),'%dx%2d' % (season+1, 1))):
-                    item.contentSeason = item.infoLabels['season'] = season+1
-                    item.contentEpisodeNumber = item.infoLabels['episode'] = 1
-                    item.contentTitle = item.infoLabels['title'] = next_season
-                    item.strm_path = next_season_path
-                    logger.info(str(item))
-                    play_from_library(item)
+            if os.path.isfile(path+next_ep_path):
+                item.contentEpisodeNumber = item.infoLabels['episode'] = episode+1
+                item.contentTitle = item.infoLabels['title'] = next_ep
+                item.strm_path = next_ep_path
+                play_next = True
+            elif os.path.isfile(path+next_season_path):
+                item.contentSeason = item.infoLabels['season'] = season+1
+                item.contentEpisodeNumber = item.infoLabels['episode'] = 1
+                item.contentTitle = item.infoLabels['title'] = next_season
+                item.strm_path = next_season_path
+                play = True
+            
+            if play_next == True and platformtools.dialog_yesno('Prossimo Episodio?', item.contentTitle, nolabel="Sì", yeslabel="No", autoclose=5000) == 0:                
+                play_from_library(item)
 
         elif AP and APS:
             while not platformtools.is_playing():
