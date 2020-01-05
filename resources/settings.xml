@@ -5,6 +5,7 @@
         <setting id="player_mode" type="enum" values="Direct|SetResolvedUrl|Built-In|Download and Play" label="30044" default="1"/>
         <setting id="default_action" type="enum" lvalues="30006|30007|30008" label="30005" default="0"/>
         <setting id="autoplay" type="bool" label="70562" default="false" visible="true"/>
+        <setting id="autoplay_next" type="bool" label="Riproduci episodio successivo" default="false" visible="true"/>
         <setting id="autoplay_server_list" type="bool" label="70746" default="false" visible="true"/>
         <setting id="checklinks" type="bool" label="30020" default="false"/>
         <setting id="checklinks_number" type="enum" values="5|10|15|20" label="30021" default="0" visible="eq(-1,true)"/>
