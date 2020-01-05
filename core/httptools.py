@@ -251,19 +251,18 @@ def downloadpage(url, **opt):
 
         """
     load_cookies()
-    if config.get_setting('resolver_dns'):
+    if opt.get('session', False):
+        session = opt['session']  # same session to speed up search
+        logger.info('same session')
+    elif opt.get('use_requests', False):
+        from lib import requests
+        session = requests.session()
+    elif urlparse.urlparse(url).netloc in ['www.guardaserie.media']:
+        from lib import cloudscraper
+        session = cloudscraper.create_scraper()
+    elif config.get_setting('resolver_dns'):
         from specials import resolverdns
         session = resolverdns.session()
-    else:
-        if opt.get('session', False):
-            session = opt['session']  # same session to speed up search
-            logger.info('same session')
-        elif opt.get('use_requests', False):
-            from lib import requests
-            session = requests.session()
-        else:
-            from lib import cloudscraper
-            session = cloudscraper.create_scraper()
 
     req_headers = default_headers.copy()
 

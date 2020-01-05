@@ -4,10 +4,10 @@ import ssl
 import urlparse
 
 from lib.requests_toolbelt.adapters import host_header_ssl
-from lib import cloudscraper
+# from lib import cloudscraper
 from lib import doh
 from platformcode import logger, config
-import re
+import requests
 
 try:
     import _sqlite3 as sql
@@ -37,21 +37,29 @@ class CustomContext(ssl.SSLContext):
                          _context=self)
 
 
-class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter, cloudscraper.CipherSuiteAdapter):
+class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
 
     def __init__(self, hostname, *args, **kwargs):
-        self.cipherSuite = kwargs.get('cipherSuite', None)
+        self.ssl_context = kwargs.pop('ssl_context', None)
+        self.cipherSuite = kwargs.pop('cipherSuite', None)
         self.hostname = hostname
-        self.ssl_context = CustomContext(ssl.PROTOCOL_TLS, hostname)
-        self.ssl_context.set_ciphers(self.cipherSuite)
-        self.ssl_context.options |= (ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1)
+
+        if not self.ssl_context:
+            self.ssl_context = CustomContext(ssl.PROTOCOL_TLS, hostname)
+            self.ssl_context.set_ciphers(self.cipherSuite)
+
+        super(CipherSuiteAdapter, self).__init__(**kwargs)
+
+    def init_poolmanager(self, *args, **kwargs):
         kwargs['ssl_context'] = self.ssl_context
+        return super(CipherSuiteAdapter, self).init_poolmanager(*args, **kwargs)
 
-        cloudscraper.CipherSuiteAdapter.__init__(self, *args, **kwargs)
+    def proxy_manager_for(self, *args, **kwargs):
+        kwargs['ssl_context'] = self.ssl_context
+        return super(CipherSuiteAdapter, self).proxy_manager_for(*args, **kwargs)
 
 
-
-class session(cloudscraper.CloudScraper):
+class session(requests.Session):
     def __init__(self, *args, **kwargs):
         self.conn = sql.connect(db)
         self.cur = self.conn.cursor()
@@ -97,7 +105,7 @@ class session(cloudscraper.CloudScraper):
         parse = urlparse.urlparse(url)
         domain = headers['Host'] if headers and 'Host' in headers.keys() else parse.netloc
         ip = self.getIp(domain)
-        self.mount('https://', CipherSuiteAdapter(domain, cipherSuite=self.adapters['https://'].cipherSuite))
+        self.mount('https://', CipherSuiteAdapter(domain, cipherSuite='ALL'))
         realUrl = url
 
         if headers:

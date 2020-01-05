@@ -14,12 +14,10 @@
 import re
 from core import scrapertools, httptools, support
 from core.item import Item
-from platformcode import config
 
-#impostati dinamicamente da findhost()
 def findhost():
     permUrl = httptools.downloadpage('https://eurostreaming.link/', follow_redirects=False).headers
-    host = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
     return host
 
 host = support.config.get_channel_url(findhost)

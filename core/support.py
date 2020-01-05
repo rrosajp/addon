@@ -173,7 +173,7 @@ def cleantitle(title):
 
 def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang):
     itemlist = []
-    log("scrapeBlock qui", block, patron)
+    log("scrapeBlock qui")
     matches = scrapertools.find_multiple_matches_groups(block, patron)
     log('MATCHES =', matches)
 
