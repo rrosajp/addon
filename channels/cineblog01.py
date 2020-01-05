@@ -11,7 +11,7 @@ from lib import unshortenit
 from platformcode import logger, config
 
 #impostati dinamicamente da findhost()
-host = "https://cb01.cx"
+host = "https://cb01.nl"
 headers = ""
 
 
