@@ -123,7 +123,8 @@ def render_items(itemlist, parent_item):
     @type parent_item: item
     @param parent_item: elemento padre
     """
-    logger.info('INICIO render_items')
+    logger.info('START render_items')
+    from core import httptools
 
     # Si el itemlist no es un list salimos
     if not type(itemlist) == list:
@@ -152,7 +153,7 @@ def render_items(itemlist, parent_item):
 
     # Recorremos el itemlist
     for item in itemlist:
-        #logger.debug(item)
+        logger.debug(item)
         # Si el item no contiene categoria, le ponemos la del item padre
         if item.category == "":
             item.category = parent_item.category
@@ -195,7 +196,6 @@ def render_items(itemlist, parent_item):
                 item.title = '[I]%s[/I]' % item.title
 
         # Añade headers a las imagenes si estan en un servidor con cloudflare
-        from core import httptools
 
         if item.action == 'play':
             #### Compatibilidad con Kodi 18: evita que se quede la ruedecedita dando vueltas en enlaces Directos
@@ -304,7 +304,7 @@ def render_items(itemlist, parent_item):
     if parent_item.mode in ['silent', 'get_cached', 'set_cache', 'finish']:
         xbmc.executebuiltin("Container.SetViewMode(500)")
 
-    logger.info('FINAL render_items')
+    logger.info('END render_items')
 
 
 def get_viewmode_id(parent_item):
@@ -481,7 +481,6 @@ def set_context_commands(item, parent_item):
             else:
                 context_commands.append(
                     (command["title"], "XBMC.RunPlugin(%s?%s)" % (sys.argv[0], item.clone(**command).tourl())))
-
     # No añadir más opciones predefinidas si se está dentro de Alfavoritos
     if parent_item.channel == 'kodfavorites':
         return context_commands
@@ -652,7 +651,6 @@ def set_context_commands(item, parent_item):
         if item.action == "findvideos" or "buscar_trailer" in context:
             context_commands.append((config.get_localized_string(60359), "XBMC.RunPlugin(%s?%s)" % (sys.argv[0], item.clone(
                 channel="trailertools", action="buscartrailer", contextual=True).tourl())))
-
     # Añadir SuperFavourites al menu contextual (1.0.53 o superior necesario)
     sf_file_path = xbmc.translatePath("special://home/addons/plugin.program.super.favourites/LaunchSFMenu.py")
     check_sf = os.path.exists(sf_file_path)
@@ -662,16 +660,16 @@ def set_context_commands(item, parent_item):
 
     context_commands = sorted(context_commands, key=lambda comand: comand[0])
     # Menu Rapido
-    context_commands.insert(0, (config.get_localized_string(60360),
-                                            "XBMC.RunPlugin(%s?%s)" % (sys.argv[0], Item(channel='side_menu',
-                                                                                     action="open_shortcut_menu",
-                                                                                     parent=parent_item.tourl()).tourl(
-                                ))))
-    context_commands.insert(1, (config.get_localized_string(70737),
-                                "XBMC.Container.Update (%s?%s)" % (sys.argv[0], Item(channel='side_menu',
-                                                                                     action="open_menu",
-                                                                                     parent=parent_item.tourl()).tourl(
-                                ))))
+    # context_commands.insert(0, (config.get_localized_string(60360),
+    #                                         "XBMC.RunPlugin(%s?%s)" % (sys.argv[0], Item(channel='side_menu',
+    #                                                                                  action="open_shortcut_menu",
+    #                                                                                  parent=parent_item.tourl()).tourl(
+    #                             ))))
+    # context_commands.insert(1, (config.get_localized_string(70737),
+    #                             "XBMC.Container.Update (%s?%s)" % (sys.argv[0], Item(channel='side_menu',
+    #                                                                                  action="open_menu",
+    #                                                                                  parent=parent_item.tourl()).tourl(
+    #                             ))))
     if config.dev_mode():
         context_commands.insert(2, ("item info",
                                     "XBMC.Container.Update (%s?%s)" % (sys.argv[0], Item(action="itemInfo",
