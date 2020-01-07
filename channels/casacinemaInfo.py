@@ -23,14 +23,14 @@ from core import scrapertools, httptools
 from core.item import Item
 
 
-def findhost():
-    data = httptools.downloadpage('https://casacinema.nuovo.link').data
-    host = scrapertools.find_single_match(data, r'<div class="elementor-widget-container"><div class="elementor-button-wrapper"> <a href="([^"]+)"')
-    if host.endswith('/'):
-        host = host[:-1]
-    return host
+# def findhost():
+#     data = httptools.downloadpage('https://casacinema.nuovo.link').data
+#     host = scrapertools.find_single_match(data, r'<div class="elementor-widget-container"><div class="elementor-button-wrapper"> <a href="([^"]+)"')
+#     if host.endswith('/'):
+#         host = host[:-1]
+#     return host
 
-host = support.config.get_channel_url(findhost)
+host = support.config.get_channel_url()
 headers = [['Referer', host]]
 
 list_servers = ['supervideo', 'streamcherry','rapidvideo', 'streamango', 'openload']
@@ -67,7 +67,7 @@ def peliculas(item):
     patronNext = '<a href="([^"]+)"\s+?><i class="glyphicon glyphicon-chevron-right"'
 
     #support.regexDbg(item, patronBlock, headers)
-    #debug = True
+    # debug = True
     return locals()
 
 

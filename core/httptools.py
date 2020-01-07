@@ -251,7 +251,7 @@ def downloadpage(url, **opt):
 
         """
     load_cookies()
-    if urlparse.urlparse(url).netloc in ['www.guardaserie.media']:
+    if urlparse.urlparse(url).netloc in ['www.guardaserie.media', 'casacinema.space']:
         from lib import cloudscraper
         session = cloudscraper.create_scraper()
     elif opt.get('session', False):
