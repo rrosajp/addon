@@ -1,48 +1,33 @@
 # -*- coding: utf-8 -*-
-import re
+# --------------------------------------------------------
+# Conector Mixdrop By Alfa development Group
+# --------------------------------------------------------
+
 from core import httptools
 from core import scrapertools
-from platformcode import config, logger
 from lib import jsunpack
+from platformcode import logger, config
 
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
-
-    data = httptools.downloadpage(page_url, cookies=False).data
-    if 'WE ARE SORRY' in data:
+    global data
+    data = httptools.downloadpage(page_url).data
+    if "<h2>WE ARE SORRY</h2>" in data or '<title>404 Not Found</title>' in data:
         return False, config.get_localized_string(70449) % "MixDrop"
-
     return True, ""
 
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
-    logger.info()
-    itemlist = []
+    logger.info("url=" + page_url)
+    video_urls = []
+    ext = '.mp4'
 
-    # streaming url
-    data = httptools.downloadpage(page_url).data
-    data = re.sub(r'\n|\t|\r', ' ', data)
-    data = re.sub(r'>\s\s*<', '><', data)
-    jsCode = scrapertools.find_single_match(data, r'<script>\s*MDCore\.ref = "[a-z0-9]+"; (.*?) </script>')
-    jsUnpacked = jsunpack.unpack(jsCode)
-    url = "https://" + scrapertools.find_single_match(jsUnpacked, r'vsr[^=]*="(?:/)?(/[^"]+)')
+    packed = scrapertools.find_single_match(data, r'(eval.*?)</script>')
+    unpacked = jsunpack.unpack(packed)
+    media_url = scrapertools.find_single_match(unpacked, r'MDCore\.furl\s*=\s*"([^"]+)"')
+    if not media_url.startswith('http'):
+        media_url = 'http:%s' % media_url
+    video_urls.append(["%s [Mixdrop]" % ext, media_url])
 
-    itemlist.append([".mp4 [MixDrop]", url])
-
-    # download url
-    # import urllib
-    # try:
-    #     import json
-    # except:
-    #     import simplejson as json
-    # page_url = page_url.replace('/e/', '/f/') + '?download'
-    # data = httptools.downloadpage(page_url).data
-    # csrf = scrapertools.find_single_match(data, '<meta name="csrf" content="([^"]+)">')
-    # postData = {'csrf': csrf, 'a': 'genticket'}
-    # resp = httptools.downloadpage(page_url, post=urllib.urlencode(postData)).data
-    # resp = json.loads(resp)
-    # if resp['type'] == 'ok':
-    #     itemlist.append([".mp4 [MixDrop]", 'https:' + resp['url']])
-
-    return itemlist
+    return video_urls
