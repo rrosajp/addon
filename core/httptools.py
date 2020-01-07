@@ -356,7 +356,6 @@ def downloadpage(url, **opt):
         except Exception as e:
             from lib import requests
             if not opt.get('ignore_response_code', False) and not proxy_data.get('stat', ''):
-                req = requests.Response()
                 response['data'] = ''
                 response['sucess'] = False
                 info_dict.append(('Success', 'False'))

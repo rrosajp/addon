@@ -102,8 +102,14 @@ class session(requests.Session):
         return self.request(method, realUrl, flushedDns=True, **kwargs)
 
     def request(self, method, url, headers=None, flushedDns=False, **kwargs):
-        parse = urlparse.urlparse(url)
-        domain = parse.netloc
+        try:
+            parse = urlparse.urlparse(url)
+        except:
+            raise requests.exceptions.InvalidURL
+        if parse.netloc:
+            domain = parse.netloc
+        else:
+            raise requests.exceptions.URLRequired
         ip = self.getIp(domain)
         self.mount('https://', CipherSuiteAdapter(domain, cipherSuite='ALL'))
         realUrl = url
@@ -145,4 +151,6 @@ class session(requests.Session):
             logger.info('Flushing dns cache for ' + domain)
             return self.flushDns(method, realUrl, domain, **kwargs)
 
+        if not ret:
+            raise requests.exceptions.RequestException
         return ret

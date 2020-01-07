@@ -381,9 +381,11 @@ def scrape(func):
             # if url may be changed and channel has findhost to update
             if (not page.data or scrapertools.get_domain_from_url(page.url) != scrapertools.get_domain_from_url(item.url)) and 'findhost' in func.__globals__:
                 host = func.__globals__['findhost']()
+                parse = list(urlparse.urlparse(item.url))
                 from core import jsontools
                 jsontools.update_node(host, func.__module__.split('.')[-1], 'url')
-                item.url = item.url.replace(scrapertools.get_domain_from_url(item.url), scrapertools.get_domain_from_url(host))
+                parse[1] = scrapertools.get_domain_from_url(host)
+                item.url = urlparse.urlunparse(parse)
                 page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True,
                                               session=item.session)
             data = page.data.replace("'", '"')
