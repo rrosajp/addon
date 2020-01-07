@@ -5739,8 +5739,8 @@ msgid "For any change to the DNS you MUST restart KODI!"
 msgstr "Per ogni modifica sui DNS DEVI riavviare KODI!"
 
 msgctxt "#707408"
-msgid "Activate DNS"
-msgstr "Attiva DNS"
+msgid "Activate DNS override"
+msgstr "Attiva override DNS"
 
 msgctxt "#707409"
 msgid "Choose the DNS provider"
