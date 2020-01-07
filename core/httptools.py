@@ -254,21 +254,18 @@ def downloadpage(url, **opt):
     if urlparse.urlparse(url).netloc in ['www.guardaserie.media']:
         from lib import cloudscraper
         session = cloudscraper.create_scraper()
-        verify = True
     elif opt.get('session', False):
         session = opt['session']  # same session to speed up search
         logger.info('same session')
-        verify = False
     elif config.get_setting('resolver_dns') and not opt.get('use_requests', False):
         from specials import resolverdns
         session = resolverdns.session()
-        verify = False
     else:
         from lib import requests
         session = requests.session()
-        verify = False
 
     req_headers = default_headers.copy()
+    verify = opt.get('verify', True)
 
     # Headers passed as parameters
     if opt.get('headers', None) is not None:

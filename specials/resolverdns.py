@@ -103,7 +103,7 @@ class session(requests.Session):
 
     def request(self, method, url, headers=None, flushedDns=False, **kwargs):
         parse = urlparse.urlparse(url)
-        domain = headers['Host'] if headers and 'Host' in headers.keys() else parse.netloc
+        domain = parse.netloc
         ip = self.getIp(domain)
         self.mount('https://', CipherSuiteAdapter(domain, cipherSuite='ALL'))
         realUrl = url
