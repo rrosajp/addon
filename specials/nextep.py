@@ -7,6 +7,7 @@ from core import jsontools, filetools
 
 
 def afther_stop(item):
+    logger.info()
     condition = config.get_setting('next_ep')
 
     if condition == 1: # Hide servers afther stop video
