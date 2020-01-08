@@ -6,15 +6,11 @@
 
 from core import support
 
-__channel__ = "cb01anime"
-host = support.config.get_channel_url(__channel__) + '/anime'
+host = support.config.get_channel_url() + '/anime'
 
 Blacklist = ['AVVISO IMPORTANTE – CB01.ROCKS', 'Lista Alfabetica Completa Anime/Cartoon', 'CB01.UNO ▶ TROVA L’INDIRIZZO UFFICIALE','Lista Richieste Up &amp; Re-Up']
 list_servers = ['verystream', 'openload', 'streamango', 'thevideome']
 list_quality = ['1080p', '720p', '480p', '360']
-
-checklinks = support.config.get_setting('checklinks', __channel__)
-checklinks_number = support.config.get_setting('checklinks_number', __channel__)
 headers = [['Referer', host]]
 
 @support.menu

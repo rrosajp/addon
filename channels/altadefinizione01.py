@@ -13,27 +13,27 @@
     Ulteriori info:
 
 """
-from core import scrapertoolsV2, httptools, support
+from core import scrapertools, httptools, support
 from core.item import Item
 from platformcode import config, logger
 
 #impostati dinamicamente da findhost()
-host = "https://www.altadefinizione01.cc"
-headers = ""
 
 def findhost():
-    pass
-    # global host, headers
-    # data = httptools.downloadpage('https://altadefinizione01-nuovo.link/').data
-    # host = scrapertoolsV2.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
-    # headers = [['Referer', host]]
+    data = httptools.downloadpage('https://altadefinizione01-nuovo.link/').data
+    host = scrapertools.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    return host
+
+
+host = config.get_channel_url(findhost)
+headers = [['Referer', host]]
 
 list_servers = ['verystream','openload','rapidvideo','streamango']
 list_quality = ['default']
 
 @support.menu
 def mainlist(item):
-    findhost()
+
     film = [
         ('Al Cinema', ['/cinema/', 'peliculas', 'pellicola']),
         ('Ultimi Aggiornati-Aggiunti', ['','peliculas', 'update']),
@@ -48,7 +48,7 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     support.log('peliculas',item)
-    findhost()
+
 ##    deflang = 'ITA'
     action="findvideos"
 
@@ -106,7 +106,7 @@ def orderalf(item):
 
 def search(item, text):
     support.log(item, text)
-    findhost()
+
     
     itemlist = []
     text = text.replace(" ", "+")
@@ -123,7 +123,7 @@ def search(item, text):
 
 def newest(categoria):
     support.log(categoria)
-    findhost()    
+
     itemlist = []
     item = Item()
     try:

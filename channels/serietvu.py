@@ -8,13 +8,12 @@
 """
 import re
 
-from core import support, httptools, scrapertoolsV2
+from core import support, httptools, scrapertools
 from core.item import Item
 from core.support import log
 from platformcode import config
 
-__channel__ = 'serietvu'
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 
 list_servers = ['speedvideo']
@@ -119,8 +118,8 @@ def findvideos(item):
         data = httptools.downloadpage(item.url, headers=headers).data
         data = re.sub('\n|\t', ' ', data)
         data = re.sub(r'>\s+<', '> <', data)
-        url_video = scrapertoolsV2.find_single_match(data, r'<div class="item"> <a data-id="[^"]+" data-href="([^"]+)" data-original="[^"]+"[^>]+> <div> <div class="title">Episodio \d+', -1)
-        url_serie = scrapertoolsV2.find_single_match(data, r'<link rel="canonical" href="([^"]+)"\s?/>')
+        url_video = scrapertools.find_single_match(data, r'<div class="item"> <a data-id="[^"]+" data-href="([^"]+)" data-original="[^"]+"[^>]+> <div> <div class="title">Episodio \d+', -1)
+        url_serie = scrapertools.find_single_match(data, r'<link rel="canonical" href="([^"]+)"\s?/>')
         goseries = support.typo(">> Vai alla Serie:", ' bold')
         series = support.typo(item.contentSerieName, ' bold color kod')
 

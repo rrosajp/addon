@@ -19,8 +19,7 @@ from core.item import Item
 from platformcode import config
 from core.support import log
 
-__channel__ = 'guardaserieclick'
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 
 list_servers = ['speedvideo', 'openload']

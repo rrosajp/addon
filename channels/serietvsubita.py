@@ -12,8 +12,7 @@ from core.item import Item
 from core.support import log
 from platformcode import logger, config
 
-__channel__ = "serietvsubita"
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 
 IDIOMAS = {'Italiano': 'IT'}

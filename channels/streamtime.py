@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from core import support, httptools, scrapertoolsV2
+from core import support, httptools, scrapertools
 from core.item import Item
 from platformcode import config, logger
 
@@ -9,8 +9,7 @@ Nota per i tester: questo non è un canale 'tradizionale', essendo un canale tel
 la lista delle pagine non sarà affatto 'uniforme' (a seconda di come viene presentata la preview)
 """
 
-__channel__ = "streamtime"
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', 'org.telegram.messenger']]
 list_servers = ['directo']
 list_quality = ['default']
@@ -114,7 +113,7 @@ def episodios(item):
             stagioni[st] = nEp
 
     itemlist = []
-    domain, id = scrapertoolsV2.find_single_match(url, r'(https?://[a-z0-9.-]+)/[^/]+/([^-/]+)')
+    domain, id = scrapertools.find_single_match(url, r'(https?://[a-z0-9.-]+)/[^/]+/([^-/]+)')
     for st in sorted(stagioni.keys()):
         season = st[1:]
         episode = stagioni[st]
@@ -141,7 +140,7 @@ def episodios(item):
 
 def findvideos(item):
     # support.dbg()
-    domain = scrapertoolsV2.find_single_match(item.url, 'https?://[a-z0-9.-]+')
+    domain = scrapertools.find_single_match(item.url, 'https?://[a-z0-9.-]+')
     if item.contentType == 'movie':
         id = item.url.split('/')[-1]
         url = domain + '/play_f.php?f=' + id

@@ -15,8 +15,7 @@ from platformcode import logger, config
 from specials import autoplay
 from specials import renumbertools
 
-__channel__ = "animespace"
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 
 checklinks = config.get_setting('checklinks', 'animespace')
 checklinks_number = config.get_setting('checklinks_number', 'animespace')

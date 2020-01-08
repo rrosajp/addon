@@ -6,8 +6,7 @@
 from servers.decrypters import adfly
 from core import support
 
-__channel__ = "animeforce"
-host = support.config.get_channel_url(__channel__)
+host = support.config.get_channel_url()
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
@@ -82,8 +81,8 @@ def peliculas(item):
         if item.args == 'newest':
             url = support.match(item, '<a href="([^"]+)" title="[^"]+" target="[^"]+" class="btn', headers=headers)[0]
             item.url = url[0] if url else ''
-            delete = support.scrapertoolsV2.find_single_match(item.fulltitle, r'( Episodi.*)')
-            episode = support.scrapertoolsV2.find_single_match(item.title, r'Episodi(?:o)? (?:\d+÷)?(\d+)')
+            delete = support.scrapertools.find_single_match(item.fulltitle, r'( Episodi.*)')
+            episode = support.scrapertools.find_single_match(item.title, r'Episodi(?:o)? (?:\d+÷)?(\d+)')
             item.title = support.typo(episode + ' - ','bold') + item.title.replace(delete,'')
             item.fulltitle = item.show = item.title.replace(delete,'')
             item.episode = episode

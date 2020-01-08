@@ -12,20 +12,16 @@
        - serie, anime
 """
 import re
-from core import scrapertoolsV2, httptools, support
+from core import scrapertools, httptools, support
 from core.item import Item
-from platformcode import config
-
-#impostati dinamicamente da findhost()
-host = "https://eurostreaming.pink"
-headers = ""
 
 def findhost():
-    pass
-    # global host, headers
-    # permUrl = httptools.downloadpage('https://eurostreaming.link/', follow_redirects=False).headers
-    # host = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-    # headers = [['Referer', host]]
+    permUrl = httptools.downloadpage('https://eurostreaming.link/', follow_redirects=False).headers
+    host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    return host
+
+host = support.config.get_channel_url(findhost)
+headers = [['Referer', host]]
 
 
 
@@ -35,7 +31,7 @@ list_quality = ['default']
 @support.menu
 def mainlist(item):
     support.log()
-    findhost()
+
 
     tvshow = [''
         ]
@@ -98,13 +94,13 @@ def pagina(url):
     data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
     #support.log("DATA ----###----> ", data)
     if 'clicca qui per aprire' in data.lower():
-        url = scrapertoolsV2.find_single_match(data, '"go_to":"([^"]+)"')
+        url = scrapertools.find_single_match(data, '"go_to":"([^"]+)"')
         url = url.replace("\\","")
         # Carica la pagina
         data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
 
     elif 'clicca qui</span>' in data.lower():
-        url = scrapertoolsV2.find_single_match(data, '<h2 style="text-align: center;"><a href="([^"]+)">')
+        url = scrapertools.find_single_match(data, '<h2 style="text-align: center;"><a href="([^"]+)">')
         # Carica la pagina
         data = httptools.downloadpage(url, headers=headers).data.replace("'", '"')
 
@@ -113,7 +109,7 @@ def pagina(url):
 # ===========  def ricerca  =============
 def search(item, texto):
     support.log()
-    findhost()
+
     item.url = "%s/?s=%s" % (host, texto)
     item.contentType = 'tvshow'
 
@@ -131,7 +127,7 @@ def search(item, texto):
 
 def newest(categoria):
     support.log()
-    findhost()
+
     itemlist = []
     item = Item()
     item.contentType = 'tvshow'

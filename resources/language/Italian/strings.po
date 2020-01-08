@@ -5034,20 +5034,20 @@ msgid "To avoid waiting too long when a server does not respond:"
 msgstr "Per evitare di aspettare troppo a lungo quando un server non risponde:"
 
 msgctxt "#70579"
-msgid "Settings of urgent updates of KOD modules (Quick Fixes):"
-msgstr "Impostazioni per gli aggiornamenti urgenti dei moduli di KOD (Quick Fixes)"
+msgid "Settings of KoD updates:"
+msgstr "Impostazioni degli aggiornamenti di KoD"
 
 msgctxt "#70580"
 msgid "Timeout (maximum waiting time)"
 msgstr "Timeout (tempo massimo da aspettare)"
 
 msgctxt "#70581"
-msgid "Check for updates when kodi starts"
-msgstr "Controlla gli aggiornamenti all'apertura di kodi"
+msgid "Check for updates"
+msgstr "Controlla gli aggiornamenti"
 
 msgctxt "#70582"
-msgid "Do you want to see messages about the updates?"
-msgstr "Voi ricevere dei messaggi per quanto riguarda gli aggiornamenti?"
+msgid "Do you want to be notified?"
+msgstr "Voi essere notificato?"
 
 msgctxt "#70583"
 msgid "Management of updates of other addons related to KOD:"
@@ -5398,8 +5398,8 @@ msgid "Use the context menu to define one"
 msgstr "Usa il menù contestuale per aggiungerne una"
 
 msgctxt "#70667"
-msgid "Alpha is already updated"
-msgstr "Alpha è già aggiornato"
+msgid "KoD is already updated"
+msgstr "KoD è già aggiornato"
 
 msgctxt "#70668"
 msgid "There is no urgent update"
@@ -5705,6 +5705,10 @@ msgctxt "#70745"
 msgid "Enter another year..."
 msgstr "Inserisci un altro anno..."
 
+msgctxt "#70746"
+msgid "Hide server selection from Autoplay"
+msgstr "Nascondi la selezione del server da Autoplay"
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS Check Alert"
@@ -5735,8 +5739,8 @@ msgid "For any change to the DNS you MUST restart KODI!"
 msgstr "Per ogni modifica sui DNS DEVI riavviare KODI!"
 
 msgctxt "#707408"
-msgid "Activate DNS"
-msgstr "Attiva DNS"
+msgid "Activate DNS override"
+msgstr "Attiva override DNS"
 
 msgctxt "#707409"
 msgid "Choose the DNS provider"
@@ -5766,4 +5770,6 @@ msgctxt "#707415"
 msgid "You have not selected any choice, the cloudflare DNS will be used."
 msgstr "Non hai selezionato nessuna scelta!\nVerranno utilizzati i DNS di cloudflare."
 
-# end DNS
+msgctxt "#707416"
+msgid "how often you want to check for updates? (hours)"
+msgstr "Ogni quanto vuoi che vengano controllati? (ore)"

@@ -48,7 +48,7 @@ from core import support
 from platformcode import config
 
 # in caso di necessità
-#from core import scrapertoolsV2, httptools, servertools, tmdb
+#from core import scrapertools, httptools, servertools, tmdb
 from core.item import Item # per newest
 #from lib import unshortenit
 
@@ -74,10 +74,9 @@ def findhost():
     permUrl = httptools.downloadpage('INSERIRE-URL-QUI', follow_redirects=False).headers
     host = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
     # cancellare host non utilizzato
-    host = scrapertoolsV2.find_single_match(permUrl, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    host = scrapertools.find_single_match(permUrl, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
     headers = [['Referer', host]]
-
-findhost() # così le imposta una volta per tutte
+ # così le imposta una volta per tutte
 ### fine findhost
 
 # server di esempio...
@@ -221,7 +220,7 @@ def select(item):
     # pulizia di data, in caso commentare le prossime 2 righe
     data = re.sub('\n|\t', ' ', data)
     data = re.sub(r'>\s+<', '> <', data)
-    block = scrapertoolsV2.find_single_match(data, r'')
+    block = scrapertools.find_single_match(data, r'')
     if re.findall('', data, re.IGNORECASE):
         support.log('select = ### è una serie ###')
         return episodios(Item(channel=item.channel,

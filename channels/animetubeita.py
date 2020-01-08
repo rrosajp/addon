@@ -6,8 +6,7 @@ import re
 import urllib
 from core import support
 
-__channel__ = "animetubeita"
-host = support.config.get_channel_url(__channel__)
+host = support.config.get_channel_url()
 
 headers = {'Upgrade-Insecure-Requests': '1',
                'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0'}
@@ -119,8 +118,8 @@ def findvideos(item):
     headers['Referer'] =  item.url
     headers['Cookie'] = cookies[:-1]
 
-    url = support.scrapertoolsV2.find_single_match(data, """<source src="([^"]+)" type='video/mp4'>""")
-    if not url: url = support.scrapertoolsV2.find_single_match(data, 'file: "([^"]+)"')
+    url = support.scrapertools.find_single_match(data, """<source src="([^"]+)" type='video/mp4'>""")
+    if not url: url = support.scrapertools.find_single_match(data, 'file: "([^"]+)"')
     if url:
         url += '|' + urllib.urlencode(headers)
         itemlist.append(

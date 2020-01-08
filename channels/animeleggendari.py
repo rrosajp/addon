@@ -6,8 +6,7 @@
 from core import support
 from lib.js2py.host import jsfunctions
 
-__channel__ = "animeleggendari"
-host = support.config.get_channel_url(__channel__)
+host = support.config.get_channel_url()
 
 headers = [['User-Agent', 'Mozilla/50.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0'],
            ['Referer', host]]

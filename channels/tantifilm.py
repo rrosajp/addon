@@ -5,25 +5,22 @@
 
 import re
 
-from core import scrapertoolsV2, httptools, tmdb, support
+from core import scrapertools, httptools, tmdb, support
 from core.item import Item
-from core.support import log
+from core.support import menu, log
 from platformcode import logger
 from specials import autorenumber
 from platformcode import config, unify
 from lib.unshortenit import unshorten_only
 
-host = 'https://www.tantifilm.eu'
-headers = ''
-def findhost():
-    pass
-    # global host, headers
-    # permUrl = httptools.downloadpage('https://www.tantifilm.info/', follow_redirects=False).data
-    # host = scrapertoolsV2.find_single_match(permUrl, r'<h2 style="text-align: center;"><a href="([^"]+)">Il nuovo indirizzo di Tantifilm è:</a></h2>')
-    # if host.endswith('/'):
-    #     host = host[:-1]
-    # headers = [['Referer', host]]
 
+def findhost():
+    permUrl = httptools.downloadpage('https://www.tantifilm.info/', follow_redirects=False).data
+    host = 'https://' + scrapertools.find_single_match(permUrl, r'Ora siamo ([A-Za-z0-9./]+)')
+    return host
+
+host = config.get_channel_url(findhost)
+headers = [['Referer', host]]
 list_servers = ['verystream', 'openload', 'streamango', 'vidlox', 'youtube']
 list_quality = ['default']
 
@@ -31,7 +28,7 @@ list_quality = ['default']
 @support.menu
 def mainlist(item):
     log()
-    findhost()
+
 
     #top = [(support.typo('Novità Film/Serie/Anime/Altro', 'bold'),['/film/'])]
     top = [('Novità Film/Serie/Anime/Altro', ['/film/', 'peliculas', 'all'])]
@@ -59,7 +56,7 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     log()
-    findhost()
+
 
     if item.args == 'search':
         patron = r'<a href="(?P<url>[^"]+)" title="Permalink to\s(?P<title>[^"]+) \((?P<year>[^<]+)\).*?".*?<img[^s]+src="(?P<thumb>[^"]+)".*?<div class="calitate">\s*<p>(?P<quality>[^<]+)<\/p>'
@@ -79,7 +76,7 @@ def peliculas(item):
 @support.scrape
 def episodios(item):
     log()
-    findhost()
+
     if not item.data:
         data_check = httptools.downloadpage(item.url, headers=headers).data
         data_check = re.sub('\n|\t', ' ', data_check)
@@ -87,7 +84,7 @@ def episodios(item):
     else:
         data_check = item.data
     patron_check = r'<iframe src="([^"]+)" scrolling="no" frameborder="0" width="626" height="550" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">'
-    item.url = scrapertoolsV2.find_single_match(data_check, patron_check)
+    item.url = scrapertools.find_single_match(data_check, patron_check)
 
     patronBlock = r'Stagioni<\/a>.*?<ul class="nav navbar-nav">(?P<block>.*?)<\/ul>'
     patron = r'<a href="(?P<url>[^"]+)"\s*>\s*<i[^>]+><\/i>\s*(?P<episode>\d+)<\/a>'
@@ -102,8 +99,8 @@ def episodios(item):
             season_data = httptools.downloadpage(item.url).data
             season_data = re.sub('\n|\t', ' ', season_data)
             season_data = re.sub(r'>\s+<', '> <', season_data)
-            block = scrapertoolsV2.find_single_match(season_data, 'Episodi.*?<ul class="nav navbar-nav">(.*?)</ul>')
-            episodes = scrapertoolsV2.find_multiple_matches(block, '<a href="([^"]+)"\s*>\s*<i[^>]+><\/i>\s*(\d+)<\/a>')
+            block = scrapertools.find_single_match(season_data, 'Episodi.*?<ul class="nav navbar-nav">(.*?)</ul>')
+            episodes = scrapertools.find_multiple_matches(block, '<a href="([^"]+)"\s*>\s*<i[^>]+><\/i>\s*(\d+)<\/a>')
             for url, episode in episodes:
                 i = item.clone()
                 i.action = 'findvideos'
@@ -116,13 +113,9 @@ def episodios(item):
     #debug = True
     return locals()
 
-def player_or_not(item):
-
-    return item
-
 def category(item):
     log()
-    findhost()
+
     blacklist = ['Serie TV Altadefinizione', 'HD AltaDefinizione', 'Al Cinema', 'Serie TV', 'Miniserie', 'Programmi Tv', 'Live', 'Trailers', 'Serie TV Aggiornate', 'Aggiornamenti', 'Featured']
     itemlist = support.scrape(item, '<li><a href="([^"]+)"><span></span>([^<]+)</a></li>', ['url', 'title'], headers, blacklist, patron_block='<ul class="table-list">(.*?)</ul>', action='peliculas')
     return support.thumb(itemlist)
@@ -133,9 +126,9 @@ def anime(item):
 
     seasons = support.match(item, r'<div class="sp-body[^"]+">(.*?)<\/div>')[0]
     for season in seasons:
-        episodes = scrapertoolsV2.find_multiple_matches(season, r'<a.*?href="([^"]+)"[^>]+>([^<]+)<\/a>(.*?)<(:?br|\/p)')
+        episodes = scrapertools.find_multiple_matches(season, r'<a.*?href="([^"]+)"[^>]+>([^<]+)<\/a>(.*?)<(:?br|\/p)')
         for url, title, urls, none in episodes:
-            urls = scrapertoolsV2.find_multiple_matches(urls, '<a.*?href="([^"]+)"[^>]+>')
+            urls = scrapertools.find_multiple_matches(urls, '<a.*?href="([^"]+)"[^>]+>')
 
             for url2 in urls:
                 url += url2 + '\n'
@@ -160,7 +153,7 @@ def anime(item):
 
 def search(item, texto):
     log(texto)
-    findhost()
+
 
     item.url = host + "/?s=" + texto
     try:
@@ -189,8 +182,8 @@ def search(item, texto):
 ##    for url, title, year, thumb, quality in matches:
 ##        infoLabels = {}
 ##        infoLabels['year'] = year
-##        title = scrapertoolsV2.decodeHtmlentities(title)
-##        quality = scrapertoolsV2.decodeHtmlentities(quality)
+##        title = scrapertools.decodeHtmlentities(title)
+##        quality = scrapertools.decodeHtmlentities(quality)
 ##        longtitle = title + support.typo(quality,'_ [] color kod')
 ##        itemlist.append(
 ##            Item(channel=item.channel,
@@ -218,7 +211,7 @@ def newest(categoria):
     matches = support.match(item, r'mediaWrapAlt recomended_videos"[^>]+>\s*<a href="([^"]+)" title="([^"]+)" rel="bookmark">\s*<img[^s]+src="([^"]+)"[^>]+>')[0]
 
     for url, title, thumb in matches:
-        title = scrapertoolsV2.decodeHtmlentities(title).replace("Permalink to ", "").replace("streaming", "")
+        title = scrapertools.decodeHtmlentities(title).replace("Permalink to ", "").replace("streaming", "")
         title = re.sub(r'\s\(\d+\)','',title)
         itemlist.append(
             Item(channel=item.channel,
@@ -247,7 +240,7 @@ def findvideos(item):
 
     data = re.sub('\n|\t', ' ', data)
     data = re.sub(r'>\s+<', '> <', data)
-    check = scrapertoolsV2.find_single_match(data, r'<div class="category-film">\s+<h3>\s+(.*?)\s+</h3>\s+</div>')
+    check = scrapertools.find_single_match(data, r'<div class="category-film">\s+<h3>\s+(.*?)\s+</h3>\s+</div>')
     if 'sub' in check.lower():
         item.contentLanguage = 'Sub-ITA'
     support.log("CHECK : ", check)
@@ -262,7 +255,7 @@ def findvideos(item):
         return episodios(item)
 
     if 'protectlink' in data:
-        urls = scrapertoolsV2.find_multiple_matches(data, r'<iframe src="[^=]+=(.*?)"')
+        urls = scrapertools.find_multiple_matches(data, r'<iframe src="[^=]+=(.*?)"')
         support.log("SONO QUI: ", urls)
         for url in urls:
             url = url.decode('base64')
@@ -270,11 +263,11 @@ def findvideos(item):
             url, c = unshorten_only(url)
             if 'nodmca' in url:
                 page = httptools.downloadpage(url, headers=headers).data
-                url = '\t' + scrapertoolsV2.find_single_match(page,'<meta name="og:url" content="([^=]+)">')
-        if url:
-            listurl.add(url)
+                url = '\t' + scrapertools.find_single_match(page, '<meta name="og:url" content="([^=]+)">')
+            if url:
+                listurl.add(url)
     data += '\n'.join(listurl)
-    return support.server(item, data)  # , headers=headers)
+    return support.server(item, data)#, headers=headers)
     # return itemlist
 
 ##def findvideos(item):
@@ -284,7 +277,7 @@ def findvideos(item):
 ##    data = item.url if item.contentType == "episode" else httptools.downloadpage(item.url, headers=headers).data
 ##
 ##    if 'protectlink' in data:
-##        urls = scrapertoolsV2.find_multiple_matches(data, r'<iframe src="[^=]+=(.*?)"')
+##        urls = scrapertools.find_multiple_matches(data, r'<iframe src="[^=]+=(.*?)"')
 ##        for url in urls:
 ##            url = url.decode('base64')
 ##            data += '\t' + url

@@ -5,28 +5,22 @@
 
 import re
 
-from core import scrapertoolsV2, httptools, servertools, tmdb, support
+from core import scrapertools, httptools, servertools, tmdb, support
 from core.item import Item
 from lib import unshortenit
 from platformcode import logger, config
 
-#impostati dinamicamente da findhost()
-host = "https://cb01.nl"
-headers = ""
-
 
 def findhost():
-    pass
-    # global host, headers
-    # permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
-    # if 'google' in permUrl['location']:
-    #     if host[:4] != 'http':
-    #         host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-    #     else:
-    #         host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-    # else:
-    #     host = permUrl['location']
-    # headers = [['Referer', host]]
+    permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
+    if 'google' in permUrl['location']:
+        host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    else:
+        host = permUrl['location']
+    return host
+
+host = config.get_channel_url(findhost)
+headers = [['Referer', host]]
 
 list_servers = ['verystream', 'openload', 'streamango', 'wstream']
 list_quality = ['HD', 'SD', 'default']
@@ -37,7 +31,6 @@ checklinks_number = config.get_setting('checklinks_number', 'cineblog01')
 
 @support.menu
 def mainlist(item):
-    findhost()
     film = [
         ('HD', ['', 'menu', 'Film HD Streaming']),
         ('Generi', ['', 'menu', 'Film per Genere']),
@@ -60,7 +53,6 @@ def mainlist(item):
 
 @support.scrape
 def menu(item):
-    findhost()
     patronBlock = item.args + r'<span.*?><\/span>.*?<ul.*?>(?P<block>.*?)<\/ul>'
     patronMenu = r'href="?(?P<url>[^">]+)"?>(?P<title>.*?)<\/a>'
     action = 'peliculas'
@@ -70,7 +62,7 @@ def menu(item):
 
 # @support.scrape
 # def newest(categoria):
-#     findhost()
+#     
 #     # debug = True
 #     patron = r'<a href="?(?P<url>[^">]+)"?>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N|SUB-ITA)\])?\s*(?:\[(?P<quality>HD|SD|HD/3D)\])?\s*\((?P<year>[0-9]{4})\)<\/a>'
 
@@ -100,7 +92,7 @@ def menu(item):
 
 def newest(categoria):
     support.log(categoria)
-    findhost()
+    
     item = support.Item()
     try:
         if categoria == "series":
@@ -175,13 +167,13 @@ def episodios(item):
 
 
 def findvideos(item):
-    findhost()
+    
 
     if item.contentType == "episode":
         return findvid_serie(item)
 
     def load_links(itemlist, re_txt, color, desc_txt, quality=""):
-        streaming = scrapertoolsV2.find_single_match(data, re_txt).replace('"', '')
+        streaming = scrapertools.find_single_match(data, re_txt).replace('"', '')
         support.log('STREAMING',streaming)
         support.log('STREAMING=', streaming)
         # patron = '<td><a.*?href=(.*?) (?:target|rel)[^>]+>([^<]+)<'
@@ -215,7 +207,7 @@ def findvideos(item):
     matches = re.compile(patronvideos, re.DOTALL).finditer(data)
     QualityStr = ""
     for match in matches:
-        QualityStr = scrapertoolsV2.decodeHtmlentities(match.group(1))[6:]
+        QualityStr = scrapertools.decodeHtmlentities(match.group(1))[6:]
 
     # Estrae i contenuti - Streaming
     load_links(itemlist, '<strong>Streamin?g:</strong>(.*?)cbtable', "orange", "Streaming", "SD")
@@ -315,12 +307,12 @@ def play(item):
         data = httptools.downloadpage(item.url).data
         if "window.location.href" in data:
             try:
-                data = scrapertoolsV2.find_single_match(data, 'window.location.href = "([^"]+)";')
+                data = scrapertools.find_single_match(data, 'window.location.href = "([^"]+)";')
             except IndexError:
                 data = httptools.downloadpage(item.url, only_headers=True, follow_redirects=False).headers.get("location", "")
             data, c = unshortenit.unwrap_30x_only(data)
         else:
-            data = scrapertoolsV2.find_single_match(data, r'<a href="([^"]+)".*?class="btn-wrapper">.*?licca.*?</a>')
+            data = scrapertools.find_single_match(data, r'<a href="([^"]+)".*?class="btn-wrapper">.*?licca.*?</a>')
         
         logger.debug("##### play go.php data ##\n%s\n##" % data)
     else:

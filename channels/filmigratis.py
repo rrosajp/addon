@@ -17,8 +17,7 @@ from core import servertools, httptools, support
 from core.item import Item
 from platformcode import config
 
-__channel__ = 'filmigratis'
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 
 list_servers = ['verystream', 'openload', 'streamango', 'vidoza', 'okru']
 list_quality = ['1080p', '720p', '480p', '360']

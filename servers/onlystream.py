@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from core import httptools
-from core import scrapertoolsV2
+from core import scrapertools
 from lib import jsunpack
 from platformcode import config, logger
 import ast
@@ -22,10 +22,10 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     video_urls = []
     data = httptools.downloadpage(page_url).data
     # logger.info(data)
-    block = scrapertoolsV2.find_single_match(data, r'sources: \[([^\]]+)\]')
-    sources = scrapertoolsV2.find_multiple_matches(block, r'file:\s*"([^"]+)"(?:,label:\s*"([^"]+)")?')
+    block = scrapertools.find_single_match(data, r'sources: \[([^\]]+)\]')
+    sources = scrapertools.find_multiple_matches(block, r'file:\s*"([^"]+)"(?:,label:\s*"([^"]+)")?')
     if not sources:
-        sources = scrapertoolsV2.find_multiple_matches(data, r'src:\s*"([^"]+)",\s*type:\s*"[^"]+",[^,]+,\s*label:\s*"([^"]+)"')
+        sources = scrapertools.find_multiple_matches(data, r'src:\s*"([^"]+)",\s*type:\s*"[^"]+",[^,]+,\s*label:\s*"([^"]+)"')
     for url, quality in sources:
         quality = 'auto' if not quality else quality
         video_urls.append(['.' + url.split('.')[-1] + ' [' + quality + '] [Onlystream]', url])

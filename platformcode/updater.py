@@ -41,15 +41,18 @@ def loadCommits(page=1):
             xbmc.sleep(1000)
     else:
         platformtools.dialog_notification('Kodi on Demand', 'impossibile controllare gli aggiornamenti')
+        ret = None
 
     return ret
 
 
-def check_addon_init():
+def check():
     if not addon.getSetting('addon_update_enabled'):
         return False
     logger.info('Cerco aggiornamenti..')
     commits = loadCommits()
+    if not commits:
+        return False
 
     try:
         localCommitFile = open(addonDir+trackingFile, 'r+')
@@ -157,10 +160,39 @@ def check_addon_init():
         xbmc.executebuiltin("UpdateLocalAddons")
         if poFilesChanged:
             refreshLang()
+        updated = True
     else:
         logger.info('Nessun nuovo aggiornamento')
 
     return updated
+
+
+def timer(force=False):
+    import time
+    curTime = time.time()
+    file = "special://profile/addon_data/plugin.video.kod/updater_last_check.txt"
+    period = float(addon.getSetting('addon_update_timer')) * 3600
+    updated = False
+
+    if force:
+        updated = check()
+        checked = True
+    else:
+        checked = False
+        try:
+            with open(xbmc.translatePath(file), 'r') as fileC:
+                    lastCheck = float(fileC.read())
+                    if curTime - lastCheck > period:
+                        updated = check()
+                        checked = True
+        except:
+            updated = check()
+            checked = True
+    if checked:
+        with open(xbmc.translatePath(file), 'w') as fileC:
+            fileC.write(str(curTime))
+    return updated
+
 
 
 def calcCurrHash():

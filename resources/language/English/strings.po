@@ -5035,7 +5035,7 @@ msgid "To avoid waiting too long when a server does not respond:"
 msgstr ""
 
 msgctxt "#70579"
-msgid "Settings of urgent updates of KOD modules (Quick Fixes):"
+msgid "Settings of KoD updates:"
 msgstr ""
 
 msgctxt "#70580"
@@ -5043,11 +5043,11 @@ msgid "Timeout (maximum waiting time)"
 msgstr ""
 
 msgctxt "#70581"
-msgid "Check for updates when kodi starts"
+msgid "Check for updates"
 msgstr ""
 
 msgctxt "#70582"
-msgid "Do you want to see messages about the updates?"
+msgid "Do you want to be notified?"
 msgstr ""
 
 msgctxt "#70583"
@@ -5398,7 +5398,7 @@ msgid "Use the context menu to define one"
 msgstr ""
 
 msgctxt "#70667"
-msgid "Alpha is already updated"
+msgid "KoD is already updated"
 msgstr ""
 
 msgctxt "#70668"
@@ -5701,6 +5701,10 @@ msgctxt "#70745"
 msgid "Enter another year..."
 msgstr ""
 
+msgctxt "#70746"
+msgid "Hide server selection from Autoplay"
+msgstr ""
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS Check Alert"
@@ -5731,7 +5735,7 @@ msgid "For any change to the DNS you MUST restart KODI!"
 msgstr ""
 
 msgctxt "#707408"
-msgid "Activate DNS"
+msgid "Activate DNS override"
 msgstr ""
 
 msgctxt "#707409"
@@ -5761,4 +5765,7 @@ msgstr ""
 msgctxt "#707415"
 msgid "You have not selected any choice, the cloudflare DNS will be used."
 msgstr ""
-# end DNS
+
+msgctxt "#707416"
+msgid "how often you want to check for updates? (hours)"
+msgstr ""

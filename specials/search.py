@@ -181,8 +181,12 @@ def channel_search(item):
 
     channel_list, channel_titles = get_channels(item)
 
-    from lib import cloudscraper
-    session = cloudscraper.create_scraper()
+    if config.get_setting('resolver_dns'):
+        from specials import resolverdns
+        session = resolverdns.session()
+    else:
+        import requests
+        session = requests.Session()
 
     searching += channel_list
     searching_titles += channel_titles

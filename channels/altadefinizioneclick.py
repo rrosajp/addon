@@ -21,9 +21,12 @@ from core import support
 from core.item import Item
 from platformcode import config
 
-__channel__ = 'altadefinizioneclick'
+def findhost():
+    data = support.httptools.downloadpage('https://altadefinizione-nuovo.link/').data
+    host = support.scrapertools.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    return host
 
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url(findhost)
 headers = [['Referer', host]]
 list_servers = ['verystream', 'rapidvideo', 'openload', 'streamango', 'vidoza',
                 'vidcloud', 'thevideo', 'okru', 'hdload', 'youtube']

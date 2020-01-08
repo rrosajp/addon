@@ -47,12 +47,11 @@ import re
 
 from core import support
 from platformcode import config
-from core import scrapertoolsV2, httptools, servertools, tmdb
+from core import scrapertools, httptools, servertools, tmdb
 from core.item import Item
 
 ##### fine import
-__channel__ = "dreamsub"
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 
 # server di esempio...
@@ -229,8 +228,8 @@ def findvideos(item):
     data = re.sub(r'>\s\s*<', '><', data)
     patronBlock = r'LINK STREAMING(?P<block>.*?)LINK DOWNLOAD'
     patron = r'href="(.+?)"'
-    block = scrapertoolsV2.find_single_match(data, patronBlock)
-    urls = scrapertoolsV2.find_multiple_matches(block, patron)
+    block = scrapertools.find_single_match(data, patronBlock)
+    urls = scrapertools.find_multiple_matches(block, patron)
     #support.regexDbg(item, patron, headers, data=data)
 
     for url in urls:
@@ -242,7 +241,7 @@ def findvideos(item):
             lang = 'ITA'
 
         if 'keepem.online' in data:
-            urls = scrapertoolsV2.find_multiple_matches(data, r'(https://keepem\.online/f/[^"]+)"')
+            urls = scrapertools.find_multiple_matches(data, r'(https://keepem\.online/f/[^"]+)"')
             for url in urls:
                 url = httptools.downloadpage(url).url
                 itemlist += servertools.find_video_items(data=url)
@@ -255,14 +254,14 @@ def findvideos(item):
 
             data = httptools.downloadpage(data).data
             support.log("LINK-DATA2 :", data)
-            video_urls = scrapertoolsV2.find_single_match(data, r'<meta name="description" content="([^"]+)"')
+            video_urls = scrapertools.find_single_match(data, r'<meta name="description" content="([^"]+)"')
 
         else:
 
             data = httptools.downloadpage(url).data
-            #host_video = scrapertoolsV2.find_single_match(data, r'var thisPageUrl = "(http[s]\:\/\/[^\/]+).+?"')
-            host_video = scrapertoolsV2.find_single_match(data, r'(?:let|var) thisPageUrl = "(http[s]\:\/\/[^\/]+).+?"')
-            link = scrapertoolsV2.find_single_match(data, r'<video src="([^"]+)"')
+            #host_video = scrapertools.find_single_match(data, r'var thisPageUrl = "(http[s]\:\/\/[^\/]+).+?"')
+            host_video = scrapertools.find_single_match(data, r'(?:let|var) thisPageUrl = "(http[s]\:\/\/[^\/]+).+?"')
+            link = scrapertools.find_single_match(data, r'<video src="([^"]+)"')
             video_urls = host_video+link
 
         title_show =  support.typo(titles,'_ bold') + support.typo(lang,'_ [] color kod')

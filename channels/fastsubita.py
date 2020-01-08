@@ -16,13 +16,12 @@
         - SOLO SUB-ITA
 
 """
-from core import support, httptools, scrapertoolsV2
+from core import support, httptools, scrapertools
 from core.item import Item
 from core.support import log
 from platformcode import config
 
-__channel__ = 'fastsubita'
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 list_servers = ['verystream', 'openload', 'speedvideo', 'wstream', 'flashx', 'vidoza', 'vidtome']
 list_quality = ['default']
@@ -159,7 +158,7 @@ def findvideos(item):
 
     data = httptools.downloadpage(item.url).data
     patron = r'>Posted in <a href="https?://fastsubita.com/serietv/([^/]+)/(?:[^"]+)?"'
-    series = scrapertoolsV2.find_single_match(data, patron)
+    series = scrapertools.find_single_match(data, patron)
     titles = support.typo(series.upper().replace('-', ' '), 'bold color kod')
     goseries = support.typo("Vai alla Serie:", ' bold color kod')
     itemlist.append(

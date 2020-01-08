@@ -5,13 +5,15 @@
         <setting id="player_mode" type="enum" values="Direct|SetResolvedUrl|Built-In|Download and Play" label="30044" default="1"/>
         <setting id="default_action" type="enum" lvalues="30006|30007|30008" label="30005" default="0"/>
         <setting id="autoplay" type="bool" label="70562" default="false" visible="true"/>
+<!--        <setting id="autoplay_next" type="bool" label="Riproduci episodio successivo" default="false" visible="true"/>-->
+        <setting id="autoplay_server_list" type="bool" label="70746" default="false" visible="true"/>
         <setting id="checklinks" type="bool" label="30020" default="false"/>
         <setting id="checklinks_number" type="enum" values="5|10|15|20" label="30021" default="0" visible="eq(-1,true)"/>
         <setting id="thumbnail_type" type="enum" lvalues="30011|30012|30200" label="30010" default="2"/>
         <setting id="channel_language" type="labelenum" values="auto|all|ita" label="30019" default="all"/>
         <setting id="trakt_sync" type="bool" label="70109" default="false"/>
         <setting id="forceview" type="bool" label="30043" default="false"/>
-        <setting id="faster_item_serialization" type="bool" label="30300" default="false"/>
+        <setting id="resolver_dns" type="bool" label="707408" default="true" enable="true" visible="true"/>
         <setting id="debug" type="bool" label="30003" default="false"/>
         <setting label="70169" type="lsep"/>
         <setting id="resolve_priority" type="enum" label="70110" lvalues="70164|70165|70166" default="0"/>
@@ -123,26 +125,6 @@
                  values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
                  default="white" visible="eq(-17,true)+eq(-18,true)"/> -->
     </category>
-    <!--  DNS  -->   
-    <category label="DNS">
-        <setting id="checkdns" type="bool" label="707401" default="true" visible="true"/>
-        <setting label="707406" visible="eq(-1,false)" enable="true"/>
-        
-        <setting type="lsep"/>
-        <!-- avviso riavvio -->
-        <setting label="707407" visible="true" enable="true"/>
-        <!-- attivazione dns KOD -->
-        <setting id="resolver_dns" type="bool" label="707408" default="true" enable="true" visible="true"/>
-        <setting label="707414" visible="!eq(-1,true)" enable="true"/>
-        <!-- fornitori dns -->
-        <setting id="resolver_dns_service_choose" type="bool" label="707409" default="true" enable="eq(-2,true)" visible="true"/>        
-        <setting id="resolver_dns_service" type="enum" values="Cloudflare|Google|OpenDns Home ip(v4)|OpenDns Family Shield ip(v4)|OpenDns ip(v6)" label="707410" default="0" visible="eq(-3,true)+eq(-1,true)" enable="true"/>
-        <!-- custom dns -->
-        <setting id="resolver_dns_custom" type="bool" label="707411" default="true" enable="eq(-4,true)+eq(-2,false)" visible="true"/>
-        <setting id="resolver_dns_custom1" type="ipaddress" visible="eq(-1,true)+eq(-5,true)+eq(-3,false)" label="707412" default="1.1.1.1"/>
-        <setting id="resolver_dns_custom2" type="ipaddress" visible="eq(-2,true)+eq(-6,true)+eq(-4,false)" label="707413" default="1.0.0.1"/>
-        <setting label="707415" visible="eq(-7,true)+eq(-5,false)+eq(-3,false)" enable="true"/>
-    </category>
     <!-- Other -->
     <category label="70149">
         <setting label="70150" type="lsep"/>
@@ -169,6 +151,7 @@
         <setting label="70579" type="lsep"/>
         <setting id="addon_update_enabled" type="bool" label="70581" default="true"/>
         <setting id="addon_update_message" type="bool" label="70582" default="true"/>
+        <setting id="addon_update_timer" type="labelenum" values="0.5|1|2|4|8|24" label="707416" default="1"/>
 
         <setting label="Lista activa" type="text" id="lista_activa" default="kodfavorites-default.json" visible="false"/>
 

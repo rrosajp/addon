@@ -33,7 +33,7 @@ except:
     xbmcgui = None
 import xbmc
 import re, base64, json, os, inspect
-from core import jsontools, tvdb, scrapertoolsV2
+from core import jsontools, tvdb, scrapertools
 from core.support import typo, log, dbg
 from platformcode import config, platformtools,  logger
 from platformcode.config import get_setting
@@ -118,7 +118,7 @@ def manual_renumeration(item, modify=False):
     for item in itemlist:
         Title = re.sub(r'\d+x\d+ - ', '', item.title)
         if modify == True:
-            ep = int(scrapertoolsV2.find_single_match(Title, r'(\d+)'))
+            ep = int(scrapertools.find_single_match(Title, r'(\d+)'))
             if item.action == 'findvideos' and not EpisodeDict.has_key(str(ep)):
                 _list.append(Title)
         else:
@@ -138,7 +138,7 @@ def manual_renumeration(item, modify=False):
         while not season:
             season = platformtools.dialog_numeric(0, config.get_localized_string(70733))
         for select in selected:
-            ep = int(scrapertoolsV2.find_single_match(_list[select], r'(\d+)'))
+            ep = int(scrapertools.find_single_match(_list[select], r'(\d+)'))
             if season == '0':
                 episode = ''
                 while not episode:
@@ -219,7 +219,7 @@ def semiautomatic_config_item(item):
             selected = platformtools.dialog_multiselect(config.get_localized_string(70734), _list)
             # if len(selected) > 0:
             for select in selected:
-                specials.append(int(scrapertoolsV2.find_single_match(_list[select],r'(\d+)')))
+                specials.append(int(scrapertools.find_single_match(_list[select], r'(\d+)')))
             dict_renumerate[TAG_SPECIAL] = specials
 
             # stop = False
@@ -359,7 +359,7 @@ def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, 
         EpisodeDict = {}
         for item in itemlist:
             if config.get_localized_string(30992) not in item.title:
-                number = scrapertoolsV2.find_single_match(item.title, r'\d+')
+                number = scrapertools.find_single_match(item.title, r'\d+')
                 item.title = typo('0x' + number + ' - ', typography) + item.title
 
 
@@ -373,10 +373,10 @@ def renumeration (itemlist, item, typography, dict_series, ID, SEASON, EPISODE, 
             return error(itemlist)
         if TYPE == 'manual' and len(EpisodeDict) < len(itemlist):
             EpisodeDict = manual_renumeration(item, True)
-        if len(EpisodeDict) >= len(itemlist) and EpisodeDict.has_key(scrapertoolsV2.find_single_match(itemlist[0].title, r'\d+')):
+        if len(EpisodeDict) >= len(itemlist) and EpisodeDict.has_key(scrapertools.find_single_match(itemlist[0].title, r'\d+')):
             for item in itemlist:
                 if config.get_localized_string(30992) not in item.title:
-                    number = scrapertoolsV2.find_single_match(item.title, r'\d+')
+                    number = scrapertools.find_single_match(item.title, r'\d+')
                     number = int(number) # if number !='0': number.lstrip('0')
                     item.title = typo(EpisodeDict[str(number)] + ' - ', typography) + item.title
         else:
@@ -467,7 +467,7 @@ def make_list(itemlist, item, typography, dict_series, ID, SEASON, EPISODE, MODE
         for item in itemlist:
             # Otiene Numerazione Episodi
             if config.get_localized_string(30992) not in item.title:
-                episode = int(scrapertoolsV2.find_single_match(item.title, r'\d+'))
+                episode = int(scrapertools.find_single_match(item.title, r'\d+'))
                 number = episode + FirstOfSeason - addiction
                 count = number + addiction
                 # Crea Dizionario Episodi

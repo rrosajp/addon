@@ -7,28 +7,26 @@ from core import support, httptools
 from core.item import Item
 from platformcode import config
 
-# __channel__ = "streamingaltadefinizione"
-# host = config.get_channel_url(__channel__)
 
-host = headers = ''
 list_servers = ['verystream', 'openload', 'wstream']
 list_quality = ['1080p', 'HD', 'DVDRIP', 'SD', 'CAM']
 
 def findhost():
-    global host, headers
     permUrl = httptools.downloadpage('https://www.popcornstream.info', follow_redirects=False).headers
     if 'google' in permUrl['location']:
+        host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
         if host[:4] != 'http':
             host = 'https://'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-        else:
-            host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
     else:
         host = permUrl['location']
-    headers = [['Referer', host]]
+    return host
+
+host = config.get_channel_url(findhost)
+headers = [['Referer', host]]
 
 @support.menu
 def mainlist(item):
-    findhost()
+
     film = ["/film/"]
     anime = ["/genere/anime/"]
     tvshow = ["/serietv/"]
@@ -54,17 +52,17 @@ def generos(item):
 
 
 def peliculas(item):
-    findhost()
+
     return support.dooplay_peliculas(item, True if "/genere/" in item.url else False)
 
 
 def episodios(item):
-    findhost()
+
     return support.dooplay_get_episodes(item)
 
 
 def findvideos(item):
-    findhost()
+
     itemlist = []
     for link in support.dooplay_get_links(item, host):
         if link['title'] != 'Guarda il trailer':

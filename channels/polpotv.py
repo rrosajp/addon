@@ -9,8 +9,7 @@ from core.item import Item
 from platformcode import config
 import json, datetime
 
-__channel__ = "polpotv"
-host = config.get_channel_url(__channel__)
+host = config.get_channel_url()
 
 headers = [['Accept', 'application/ld+json']]
 
