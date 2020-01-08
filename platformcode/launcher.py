@@ -449,12 +449,6 @@ def play_from_library(item):
     import xbmc
     from time import sleep, time
 
-    from core import jsontools
-    path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"))
-    AP = config.get_setting('autoplay')
-    APS = config.get_setting('autoplay_server_list')
-    NE = config.get_setting('autoplay_next')
-
     # Intentamos reproducir una imagen (esto no hace nada y ademas no da error)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True,
                               xbmcgui.ListItem(
@@ -468,50 +462,14 @@ def play_from_library(item):
     item.action = "findvideos"
 
     window_type = config.get_setting("window_type", "videolibrary")
-    episodes = scrapertools.find_single_match(item.strm_path, '(\d+)x(\d+)')
-    season = int(episodes[0])
-    episode = int(episodes[1])
-    
 
     # y volvemos a lanzar kodi
     if xbmc.getCondVisibility('Window.IsMedia') and not window_type == 1:
         # Ventana convencional
         xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")
-        if AP and NE:
-            while not platformtools.is_playing():
-                pass
-            while platformtools.is_playing():
-                pass
-            sleep(0.5)
-            xbmc.executebuiltin('Action(Back)')
-            ep = '%dx%02d' % (season, episode)
-            next_ep = '%dx%02d' % (season, episode+1)
-            next_season = '%dx%02d' % (season+1, 1)
-            next_ep_path = item.strm_path.replace(ep,next_ep)
-            next_season_path = item.strm_path.replace(ep,next_ep)
-            play_next = False
-            if os.path.isfile(path+next_ep_path):
-                item.contentEpisodeNumber = item.infoLabels['episode'] = episode+1
-                item.contentTitle = item.infoLabels['title'] = next_ep
-                item.strm_path = next_ep_path
-                play_next = True
-            elif os.path.isfile(path+next_season_path):
-                item.contentSeason = item.infoLabels['season'] = season+1
-                item.contentEpisodeNumber = item.infoLabels['episode'] = 1
-                item.contentTitle = item.infoLabels['title'] = next_season
-                item.strm_path = next_season_path
-                play = True
-            
-            if play_next == True and platformtools.dialog_yesno('Prossimo Episodio?', item.contentTitle, nolabel="Sì", yeslabel="No", autoclose=5000) == 0:                
-                play_from_library(item)
-
-        elif AP and APS:
-            while not platformtools.is_playing():
-                pass
-            while platformtools.is_playing():
-                pass
-            sleep(0.5)
-            xbmc.executebuiltin('Action(Back)')
+        if config.get_setting('next_ep') > 0:
+            from specials.nextep import afther_stop
+            afther_stop(item)
 
     else:
         # Ventana emergente

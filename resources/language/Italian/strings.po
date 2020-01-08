@@ -5706,8 +5706,32 @@ msgid "Enter another year..."
 msgstr "Inserisci un altro anno..."
 
 msgctxt "#70746"
-msgid "Hide server selection from Autoplay"
-msgstr "Nascondi la selezione del server da Autoplay"
+msgid "When playback ends"
+msgstr "Al termine della riproduzione"
+
+msgctxt "#70747"
+msgid "Hide server selection"
+msgstr "Nascondi la selezione del server"
+
+msgctxt "#70748"
+msgid "Go to the next episode"
+msgstr "Vai all'episodio successivo"
+
+msgctxt "#70749"
+msgid "Seconds before notification"
+msgstr "Secondi prima della notifica"
+
+msgctxt "#70750"
+msgid "Next Episode in"
+msgstr "Episodio Successivo fra"
+
+msgctxt "#70751"
+msgid "seconds"
+msgstr "secondi"
+
+msgctxt "#70752"
+msgid "Do nothing"
+msgstr "Non fare nulla"
 
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
