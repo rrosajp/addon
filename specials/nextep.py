@@ -37,7 +37,7 @@ def afther_stop(item):
         if next_file:
             play_next = False
             time_limit = time() + 30
-            TimeFromEnd = congig.get_setting('next_ep_seconds')
+            TimeFromEnd = config.get_setting('next_ep_seconds')
             while not platformtools.is_playing() and time() < time_limit:
                 sleep(1)
             while platformtools.is_playing() and play_next == False:
