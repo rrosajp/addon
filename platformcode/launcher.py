@@ -479,7 +479,6 @@ def play_from_library(item):
 
         itemlist = videolibrary.findvideos(item)
 
-
         while platformtools.is_playing():
                 # Ventana convencional
                 sleep(5)
@@ -522,15 +521,20 @@ def play_from_library(item):
                 else:
                     cabecera = config.get_localized_string(30163)
 
-                seleccion = platformtools.dialog_select(cabecera, opciones)
+                if (not config.get_setting('autoplay') and not config.get_setting('hide_servers')) or item.no_window:
+                    seleccion = platformtools.dialog_select(cabecera, opciones)
 
-                if seleccion == -1:
-                    return
-                else:
-                    item = videolibrary.play(itemlist[seleccion])[0]
-                    item.play_from = 'window'
-                    platformtools.play_video(item)
+                    if seleccion == -1:
+                        return
+                    else:
+                        item = videolibrary.play(itemlist[seleccion])[0]
+                        item.play_from = 'window'
+                        platformtools.play_video(item)
 
                 from specials import autoplay
                 if (platformtools.is_playing() and item.action) or item.server == 'torrent' or autoplay.is_active(item.contentChannel):
                     break
+
+        if config.get_setting('next_ep') > 0 and item.contentType != 'movie':
+            from specials.nextep import afther_stop
+            afther_stop(item)

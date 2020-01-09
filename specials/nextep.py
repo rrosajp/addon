@@ -5,10 +5,14 @@ from time import time, sleep
 from core import scrapertools
 from core import jsontools, filetools
 
+normal_window = True if config.get_setting("window_type", "videolibrary") == 0 else False
+
+
 
 def afther_stop(item):
     logger.info()
     condition = config.get_setting('next_ep')
+    # from core.support import dbg; dbg()
 
     if condition == 1: # Hide servers afther stop video
         while not platformtools.is_playing():
@@ -22,11 +26,15 @@ def afther_stop(item):
         from platformcode.launcher import play_from_library
         # Check if next episode exist
         current_filename = os.path.basename(item.strm_path)
-        path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"),os.path.dirname(item.strm_path))
+        base_path = os.path.basename(os.path.normpath(os.path.dirname(item.strm_path)))
+        logger.info('PATH:' + base_path)
+        path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"),base_path)
+        logger.info('PATH:' + path)
         fileList = []
         for file in os.listdir(path):
             if file.endswith('.strm'):
                 fileList.append(file)
+        # from core.support import dbg; dbg()
         nextIndex = fileList.index(current_filename) + 1
         if nextIndex == 0 or nextIndex == len(fileList):
             next_file = None
@@ -64,7 +72,7 @@ def afther_stop(item):
                 item.contentSeason = item.infoLabels['season'] = season
                 item.contentEpisodeNumber = item.infoLabels['episode'] = episode
                 item.contentTitle = item.infoLabels['title'] = next_ep
-                item.strm_path = filetools.join(os.path.dirname(item.strm_path), next_file)
+                item.strm_path = filetools.join(base_path, next_file)
                 # from core.support import dbg; dbg()
 
                 global ITEM
@@ -80,13 +88,19 @@ def afther_stop(item):
 
                 if nextDialog.stillwatching or nextDialog.continuewatching:
                     xbmc.Player().stop()
-                    sleep(0.5)
-                    xbmc.executebuiltin('Action(Back)')
+                    if normal_window:
+                        sleep(0.5)
+                        xbmc.executebuiltin('Action(Back)')
+                    else:
+                        item.no_window = True
                     sleep(0.5)
                     play_from_library(item)
                 else:
-                    sleep(0.5)
-                    xbmc.executebuiltin('Action(Back)')
+                    if normal_window:
+                        sleep(0.5)
+                        xbmc.executebuiltin('Action(Back)')
+                    else:
+                        item.no_window = True
 
 
 import xbmcgui

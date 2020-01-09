@@ -981,7 +981,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
     channel_node = autoplay_node.get(item.channel, {})
     settings_node = channel_node.get('settings', {})
     AP = get_setting('autoplay') or settings_node['active']
-    HS = config.get_setting('next_ep')
+    HS = config.get_setting('hide_servers')
 
     if CL and not AP:
         if get_setting('checklinks', item.channel):
@@ -1010,7 +1010,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
             VL = True
     except:
         pass
-    if not AP or VL or HS == 0:
+    if not AP or VL or not HS:
         return itemlist
 
 def filterLang(item, itemlist):
