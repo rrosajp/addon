@@ -37,14 +37,23 @@ def afther_stop(item):
         if next_file:
             play_next = False
             time_limit = time() + 30
-            TimeFromEnd = config.get_setting('next_ep_seconds')
+            time_steps = [20,30,40,50,60]
+            TimeFromEnd = time_steps[config.get_setting('next_ep_seconds')]
+            logger.info('TEMPO: '+str(TimeFromEnd))
             while not platformtools.is_playing() and time() < time_limit:
                 sleep(1)
+
+            sleep(1)
+
             while platformtools.is_playing() and play_next == False:
-                Difference = xbmc.Player().getTotalTime() - xbmc.Player().getTime()
-                if 0 < Difference <= 60:
-                    logger.info('Exit '+str(Difference))
-                    play_next = True
+                try:
+                    Total = xbmc.Player().getTotalTime()
+                    Actual = xbmc.Player().getTime()
+                    Difference = Total - Actual
+                    if Total > Actual >= Difference:
+                        play_next = True
+                except:
+                    break
 
             if play_next:
                 play_next = False

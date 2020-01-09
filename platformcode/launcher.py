@@ -442,7 +442,7 @@ def play_from_library(item):
         @param item: elemento con información
     """
     logger.info()
-    logger.debug("item: \n" + item.tostring('\n'))
+    # logger.debug("item: \n" + item.tostring('\n'))
 
     import xbmcgui
     import xbmcplugin

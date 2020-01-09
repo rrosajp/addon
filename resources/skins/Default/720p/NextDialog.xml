@@ -7,14 +7,15 @@
         <control type="group">
             <animation type="WindowOpen" reversible="false">
                 <effect type="fade" start="0" end="100" time="600" />
-                <effect type="slide" start="-115,-0" end="0,0" time="600" />
+                <effect type="slide" start="115,0" end="0,0" time="600" />
             </animation>
             <animation type="WindowClose" reversible="false">
                 <effect type="fade" start="100" end="0" time="400" />
-                <effect type="slide" start="0,0" end="-115,0" time="400" />
+                <effect type="slide" start="0,0" end="115,0" time="400" />
             </animation>
             <control type="group">
                 <right>0</right>
+                <top>10</top>
                 <height>50</height>
                 <width>45%</width>
                 <!-- Background -->
@@ -47,14 +48,14 @@
                             <height>50</height>
                             <width min="50">auto</width>
                             <font>font30_title</font>
-                            <textoffsetx>55</textoffsetx>
-                            <textcolor>ddffffff</textcolor>
-                            <focusedcolor>eeffffff</focusedcolor>
-                            <selectedcolor>ddffffff</selectedcolor>
+                            <textoffsetx>30</textoffsetx>
+                            <textcolor>80FFFFFF</textcolor>
+                            <focusedcolor>FFFFFFFF</focusedcolor>
+                            <selectedcolor>80FFFFFF</selectedcolor>
                             <shadowcolor>22000000</shadowcolor>
                             <aligny>center</aligny>
                             <align>center</align>
-                            <texturefocus border="10" colordiffuse="FF65B3DA">Shortcut/button-fo.png</texturefocus>
+                            <texturefocus border="10" colordiffuse="0065B3DA">Shortcut/button-fo.png</texturefocus>
                             <texturenofocus border="10" colordiffuse="0065B3DA">Shortcut/button-fo.png</texturenofocus>
                             <pulseonselect>no</pulseonselect>
                         </control>
@@ -65,14 +66,14 @@
                             <height>50</height>
                             <width min="50">auto</width>
                             <font>font30_title</font>
-                            <textoffsetx>55</textoffsetx>
-                            <textcolor>ddffffff</textcolor>
-                            <focusedcolor>eeffffff</focusedcolor>
-                            <selectedcolor>ddffffff</selectedcolor>
+                            <textoffsetx>30</textoffsetx>
+                            <textcolor>80FFFFFF</textcolor>
+                            <focusedcolor>FFFFFFFF</focusedcolor>
+                            <selectedcolor>80FFFFFF</selectedcolor>
                             <shadowcolor>22000000</shadowcolor>
                             <aligny>center</aligny>
                             <align>center</align>
-                            <texturefocus border="10" colordiffuse="FF65B3DA">Shortcut/button-fo.png</texturefocus>
+                            <texturefocus border="10" colordiffuse="0065B3DA">Shortcut/button-fo.png</texturefocus>
                             <texturenofocus border="10" colordiffuse="0065B3DA">Shortcut/button-fo.png</texturenofocus>
                             <pulseonselect>no</pulseonselect>
                         </control>
@@ -81,14 +82,14 @@
                             <height>50</height>
                             <width min="50">auto</width>
                             <font>font30_title</font>
-                            <textoffsetx>15</textoffsetx>
-                            <textcolor>ddffffff</textcolor>
-                            <focusedcolor>eeffffff</focusedcolor>
-                            <selectedcolor>ddffffff</selectedcolor>
+                            <textoffsetx>30</textoffsetx>
+                            <textcolor>80FFFFFF</textcolor>
+                            <focusedcolor>FFFFFFFF</focusedcolor>
+                            <selectedcolor>80FFFFFF</selectedcolor>
                             <shadowcolor>22000000</shadowcolor>
                             <aligny>center</aligny>
                             <align>center</align>
-                            <texturefocus border="10" colordiffuse="FF65B3DA">Shortcut/button-fo.png</texturefocus>
+                            <texturefocus border="10" colordiffuse="0065B3DA">Shortcut/button-fo.png</texturefocus>
                             <texturenofocus border="10" colordiffuse="0065B3DA">Shortcut/button-fo.png</texturenofocus>
                             <pulseonselect>no</pulseonselect>
                         </control>
