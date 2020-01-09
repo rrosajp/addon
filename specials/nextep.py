@@ -58,11 +58,12 @@ def afther_stop(item):
                     Total = xbmc.Player().getTotalTime()
                     Actual = xbmc.Player().getTime()
                     Difference = Total - Actual
-                    if Total > Actual >= Difference:
+                    if Total > TimeFromEnd >= Difference:
                         play_next = True
                 except:
                     break
 
+            # from core.support import dbg; dbg()
             if play_next:
                 play_next = False
                 season_ep = next_file.split('.')[0]
@@ -89,7 +90,8 @@ def afther_stop(item):
                 if nextDialog.stillwatching or nextDialog.continuewatching:
                     xbmc.Player().stop()
                     if normal_window:
-                        sleep(0.5)
+                        sleep(1)
+                        logger.info('BACK STILL')
                         xbmc.executebuiltin('Action(Back)')
                     else:
                         item.no_window = True
@@ -97,7 +99,8 @@ def afther_stop(item):
                     play_from_library(item)
                 else:
                     if normal_window:
-                        sleep(0.5)
+                        sleep(1)
+                        logger.info('BACK NOT STILL')
                         xbmc.executebuiltin('Action(Back)')
                     else:
                         item.no_window = True
