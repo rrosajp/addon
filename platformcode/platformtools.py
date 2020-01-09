@@ -756,6 +756,9 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
 
         # Reproduce
         xbmc_player.play(playlist, xlistitem)
+        if not item.launcher and (strm or item.strm_path) and config.get_setting('next_ep') > 0 and item.contentType != 'movie':
+            from specials.nextep import afther_stop
+            afther_stop(item)
     else:
         set_player(item, xlistitem, mediaurl, view, strm)
 
@@ -1099,7 +1102,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
             download_and_play.download_and_play(mediaurl, "download_and_play.mp4", config.get_setting("downloadpath"))
             return
 
-        elif config.get_setting("player_mode") == 0 or \
+        elif config.get_setting("player_mode") == 0 or\
                 (config.get_setting("player_mode") == 3 and mediaurl.startswith("rtmp")):
             # Añadimos el listitem a una lista de reproducción (playlist)
             playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
@@ -1137,6 +1140,10 @@ def set_player(item, xlistitem, mediaurl, view, strm):
     if strm or item.strm_path:
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.mark_auto_as_watched(item)
+
+    if not item.launcher and (strm or item.strm_path) and config.get_setting('next_ep') > 0 and item.contentType != 'movie':
+        from specials.nextep import afther_stop
+        afther_stop(item)
 
 
 def torrent_client_installed(show_tuple=False):
