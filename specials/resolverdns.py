@@ -4,7 +4,6 @@ import ssl
 import urlparse
 
 from lib.requests_toolbelt.adapters import host_header_ssl
-# from lib import cloudscraper
 from lib import doh
 from platformcode import logger, config
 import requests
@@ -15,7 +14,6 @@ except:
     import sqlite3 as sql
 
 db = os.path.join(config.get_data_path(), 'kod_db.sqlite')
-
 
 class CustomSocket(ssl.SSLSocket):
     def __init__(self, *args, **kwargs):
@@ -39,31 +37,17 @@ class CustomContext(ssl.SSLContext):
 
 class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
 
-    def __init__(self, hostname, *args, **kwargs):
-        self.ssl_context = kwargs.pop('ssl_context', None)
-        self.cipherSuite = kwargs.pop('cipherSuite', None)
-        self.hostname = hostname
-
-        if not self.ssl_context:
-            self.ssl_context = CustomContext(ssl.PROTOCOL_TLS, hostname)
-            self.ssl_context.set_ciphers(self.cipherSuite)
+    def __init__(self, domain, *args, **kwargs):
+        self.conn = sql.connect(db)
+        self.cur = self.conn.cursor()
+        self.ssl_context = CustomContext(ssl.PROTOCOL_TLS, domain)
 
         super(CipherSuiteAdapter, self).__init__(**kwargs)
 
-    def init_poolmanager(self, *args, **kwargs):
-        kwargs['ssl_context'] = self.ssl_context
-        return super(CipherSuiteAdapter, self).init_poolmanager(*args, **kwargs)
-
-    def proxy_manager_for(self, *args, **kwargs):
-        kwargs['ssl_context'] = self.ssl_context
-        return super(CipherSuiteAdapter, self).proxy_manager_for(*args, **kwargs)
-
-
-class session(requests.Session):
-    def __init__(self, *args, **kwargs):
-        self.conn = sql.connect(db)
-        self.cur = self.conn.cursor()
-        super(session, self).__init__(*args, **kwargs)
+    def flushDns(self, request, domain, **kwargs):
+        self.cur.execute('delete from dnscache where domain=?', (domain,))
+        self.conn.commit()
+        return self.send(request, flushedDns=True, **kwargs)
 
     def getIp(self, domain):
         ip = None
@@ -96,11 +80,53 @@ class session(requests.Session):
                 );""")
         self.conn.commit()
 
-    def flushDns(self, method, realUrl, domain, **kwargs):
-        self.cur.execute('delete from dnscache where domain=?', (domain,))
-        self.conn.commit()
-        return self.request(method, realUrl, flushedDns=True, **kwargs)
+    def init_poolmanager(self, *args, **kwargs):
+        kwargs['ssl_context'] = self.ssl_context
+        return super(CipherSuiteAdapter, self).init_poolmanager(*args, **kwargs)
 
+    def proxy_manager_for(self, *args, **kwargs):
+        kwargs['ssl_context'] = self.ssl_context
+        return super(CipherSuiteAdapter, self).proxy_manager_for(*args, **kwargs)
+
+    def send(self, request, flushedDns=False, **kwargs):
+        try:
+            parse = urlparse.urlparse(request.url)
+        except:
+            raise requests.exceptions.InvalidURL
+        if parse.netloc:
+            domain = parse.netloc
+        else:
+            raise requests.exceptions.URLRequired
+        print domain
+        self.ssl_context = CustomContext(ssl.PROTOCOL_TLS, domain)
+        self.ssl_context.set_ciphers(ssl._DEFAULT_CIPHERS)
+        self.init_poolmanager(self._pool_connections, self._pool_maxsize, block=self._pool_block)
+        ip = self.getIp(domain)
+
+        realUrl = request.url
+
+        if request.headers:
+            request.headers["Host"] = domain
+        else:
+            request.headers = {"Host": domain}
+        ret = None
+        tryFlush = False
+
+        parse = list(parse)
+        parse[1] = ip
+        request.url = urlparse.urlunparse(parse)
+        try:
+            ret = super(CipherSuiteAdapter, self).send(request, **kwargs)
+        except Exception as e:
+            logger.info('Request for ' + domain + ' with ip ' + ip + ' failed')
+            logger.info(e)
+            tryFlush = True
+        if (tryFlush or not ret) and not flushedDns:  # re-request ips and update cache
+            logger.info('Flushing dns cache for ' + domain)
+            return self.flushDns(request, domain, **kwargs)
+        return ret
+
+class session(requests.Session):
     def request(self, method, url, headers=None, flushedDns=False, **kwargs):
         try:
             parse = urlparse.urlparse(url)
@@ -110,47 +136,5 @@ class session(requests.Session):
             domain = parse.netloc
         else:
             raise requests.exceptions.URLRequired
-        ip = self.getIp(domain)
-        self.mount('https://', CipherSuiteAdapter(domain, cipherSuite='ALL'))
-        realUrl = url
-
-        if headers:
-            headers["Host"] = domain
-        else:
-            headers = {"Host": domain}
-        ret = None
-        tryFlush = False
-
-        parse = list(parse)
-        parse[1] = ip
-        url = urlparse.urlunparse(parse)
-
-        allow_redirects = kwargs.get('allow_redirects', True)
-        if 'allow_redirects' in kwargs:
-            del kwargs['allow_redirects']
-        try:
-            ret = super(session, self).request(method, url, headers=headers, allow_redirects=False, **kwargs)
-            newUrl = urlparse.urlparse(ret.headers.get('Location', realUrl))
-            if not newUrl.netloc and not newUrl.scheme:
-                newUrl = list(newUrl)
-                newUrl[0] = 'https://'
-                newUrl[1] = domain
-            newUrl = urlparse.urlunparse(newUrl)
-            if allow_redirects:
-                redirectN = 0
-                while newUrl != realUrl and redirectN < self.max_redirects:
-                    ret = self.request(method, newUrl, headers=headers, **kwargs)
-                    newUrl = ret.headers.get('Location', realUrl)
-                    redirectN += 1
-            ret.url = newUrl
-        except Exception as e:
-            logger.info('Request for ' + domain + ' with ip ' + ip + ' failed')
-            logger.info(e)
-            tryFlush = True
-        if (tryFlush or not ret) and not flushedDns:  # re-request ips and update cache
-            logger.info('Flushing dns cache for ' + domain)
-            return self.flushDns(method, realUrl, domain, **kwargs)
-
-        if not ret:
-            raise requests.exceptions.RequestException
-        return ret
+        self.mount('https://', CipherSuiteAdapter(domain))
+        return super(session, self).request(method, url, **kwargs)
