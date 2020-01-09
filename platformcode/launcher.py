@@ -467,9 +467,6 @@ def play_from_library(item):
     if xbmc.getCondVisibility('Window.IsMedia') and not window_type == 1:
         # Ventana convencional
         xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")
-        if config.get_setting('next_ep') > 0 and item.contentType != 'movie':
-            from specials.nextep import afther_stop
-            afther_stop(item)
 
     else:
         # Ventana emergente
@@ -535,6 +532,3 @@ def play_from_library(item):
                 if (platformtools.is_playing() and item.action) or item.server == 'torrent' or autoplay.is_active(item.contentChannel):
                     break
 
-        if config.get_setting('next_ep') > 0 and item.contentType != 'movie':
-            from specials.nextep import afther_stop
-            afther_stop(item)
