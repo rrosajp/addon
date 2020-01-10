@@ -469,12 +469,15 @@ def play_from_library(item):
         xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")
 
     else:
+
         # Ventana emergente
+        item.play_from = 'window'
         from specials import videolibrary
         p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(70004))
         p_dialog.update(0, '')
 
         itemlist = videolibrary.findvideos(item)
+
 
         while platformtools.is_playing():
                 # Ventana convencional
@@ -518,17 +521,21 @@ def play_from_library(item):
                 else:
                     cabecera = config.get_localized_string(30163)
 
-                if (not config.get_setting('autoplay') and not config.get_setting('hide_servers')) or item.no_window:
+                SHOW = True
+                if config.get_setting('autoplay') and config.get_setting('hide_servers'):
+                    SHOW = False
+
+                if SHOW:
                     seleccion = platformtools.dialog_select(cabecera, opciones)
 
                     if seleccion == -1:
                         return
                     else:
                         item = videolibrary.play(itemlist[seleccion])[0]
-                        item.play_from = 'window'
                         platformtools.play_video(item)
 
                 from specials import autoplay
                 if (platformtools.is_playing() and item.action) or item.server == 'torrent' or autoplay.is_active(item.contentChannel):
                     break
+
 

@@ -558,6 +558,7 @@ def findvideos(item):
             server.channel = "videolibrary"
             server.nfo = item.nfo
             server.strm_path = item.strm_path
+            server.play_from = item.play_from
 
             #### Compatibilidad con Kodi 18: evita que se quede la ruedecedita dando vueltas en enlaces Directos
             if server.action == 'play':
