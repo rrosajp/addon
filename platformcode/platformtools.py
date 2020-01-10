@@ -12,7 +12,7 @@ import os
 import sys
 import urllib
 
-import config
+# import config
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -22,7 +22,7 @@ from channelselector import get_thumb
 from core import channeltools
 from core import trakt_tools, scrapertools
 from core.item import Item
-from platformcode import logger, keymaptools
+from platformcode import logger, keymaptools, config
 from platformcode import unify
 
 addon = xbmcaddon.Addon('plugin.video.kod')
@@ -683,8 +683,8 @@ def is_playing():
 
 def play_video(item, strm=False, force_direct=False, autoplay=False):
     logger.info()
-    if item.play_from == 'window':
-        force_direct=True
+    # if item.play_from == 'window':
+    #     force_direct=True
     # logger.debug(item.tostring('\n'))
     logger.debug('item play: %s'%item)
     xbmc_player = XBMCPlayer()
@@ -758,9 +758,6 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
 
         # Reproduce
         xbmc_player.play(playlist, xlistitem)
-        if not item.launcher and (strm or item.strm_path) and config.get_setting('next_ep') > 0 and item.contentType != 'movie':
-            from specials.nextep import afther_stop
-            afther_stop(item)
     else:
         set_player(item, xlistitem, mediaurl, view, strm)
 
@@ -1082,7 +1079,7 @@ def get_video_seleccionado(item, seleccion, video_urls):
 
 def set_player(item, xlistitem, mediaurl, view, strm):
     logger.info()
-    logger.debug("item:\n" + item.tostring('\n'))
+    # logger.debug("item:\n" + item.tostring('\n'))
 
     # Movido del conector "torrent" aqui
     if item.server == "torrent":
@@ -1104,7 +1101,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
             download_and_play.download_and_play(mediaurl, "download_and_play.mp4", config.get_setting("downloadpath"))
             return
 
-        elif config.get_setting("player_mode") == 0 or\
+        elif config.get_setting("player_mode") == 0 or item.play_from == 'window' or\
                 (config.get_setting("player_mode") == 3 and mediaurl.startswith("rtmp")):
             # Añadimos el listitem a una lista de reproducción (playlist)
             playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
@@ -1143,7 +1140,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.mark_auto_as_watched(item)
 
-    if not item.launcher and (strm or item.strm_path) and config.get_setting('next_ep') > 0 and item.contentType != 'movie':
+    if (strm or item.strm_path) and config.get_setting('next_ep') > 0 and item.contentType != 'movie' and item.play_from != 'window':
         from specials.nextep import afther_stop
         afther_stop(item)
 
