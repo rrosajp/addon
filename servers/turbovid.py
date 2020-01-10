@@ -31,7 +31,6 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     sources = scrapertools.find_single_match(data, r'sources: \[([^\]]+)\]')
 
     for media_url in scrapertools.find_multiple_matches(sources, '"([^"]+)"'):
-        media_url = media_url.replace('https:', 'http:')
         ext = scrapertools.get_filename_from_url(media_url)[-4:]
         video_urls.append(["%s [%s]" % (ext, server), media_url])
     return video_urls
