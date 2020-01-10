@@ -10,9 +10,9 @@ from platformcode import logger, config
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
-    return True, ""
+    global data
     data = httptools.downloadpage(page_url).data
-    if "File was deleted" in data or "Page Cannot Be Found" in data:
+    if "File Not Found" in data:
         return False, config.get_localized_string(70449) % "Akvideo"
     return True, ""
 
@@ -21,8 +21,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     logger.info(" url=" + page_url)
     video_urls = []
 
-    data = httptools.downloadpage(page_url).data.replace('https','http')
-
+    global data
     vres = scrapertools.find_multiple_matches(data, 'nowrap[^>]+>([^,]+)')
     data_pack = scrapertools.find_single_match(data, "</div>\n\s*<script[^>]+>(eval.function.p,a,c,k,e,.*?)\s*</script>")
     if data_pack != "":

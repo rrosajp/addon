@@ -726,6 +726,8 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
     mediaurl, view, mpd = get_video_seleccionado(item, seleccion, video_urls)
     if mediaurl == "":
         return
+    # no certificate verification
+    mediaurl = mediaurl.replace('https://', 'http://')
 
     # se obtiene la información del video.
     if not item.contentThumbnail:
