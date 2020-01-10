@@ -269,7 +269,6 @@ def downloadpage(url, **opt):
         session.mount('https://', resolverdns.CipherSuiteAdapter(domain, CF))
 
     req_headers = default_headers.copy()
-    verify = opt.get('verify', True)
 
     # Headers passed as parameters
     if opt.get('headers', None) is not None:
@@ -291,7 +290,7 @@ def downloadpage(url, **opt):
     files = {}
     file_name = ''
 
-    session.verify = opt.get('verify', verify)
+    session.verify = opt.get('verify', True)
 
     if opt.get('cookies', True):
         session.cookies = cj
