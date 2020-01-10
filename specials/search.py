@@ -181,12 +181,8 @@ def channel_search(item):
 
     channel_list, channel_titles = get_channels(item)
 
-    if config.get_setting('resolver_dns'):
-        from specials import resolverdns
-        session = resolverdns.session()
-    else:
-        import requests
-        session = requests.Session()
+    import requests
+    session = requests.Session()
 
     searching += channel_list
     searching_titles += channel_titles
