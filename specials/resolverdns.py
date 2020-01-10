@@ -37,10 +37,12 @@ class CustomContext(ssl.SSLContext):
 
 class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
 
-    def __init__(self, domain, *args, **kwargs):
+    def __init__(self, domain, CF=False, *args, **kwargs):
         self.conn = sql.connect(db)
         self.cur = self.conn.cursor()
         self.ssl_context = CustomContext(ssl.PROTOCOL_TLS, domain)
+        self.CF = CF  # if cloudscrape is in action
+        self.cipherSuite = kwargs.pop('cipherSuite', ssl._DEFAULT_CIPHERS)
 
         super(CipherSuiteAdapter, self).__init__(**kwargs)
 
@@ -97,9 +99,10 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
             domain = parse.netloc
         else:
             raise requests.exceptions.URLRequired
-        print domain
         self.ssl_context = CustomContext(ssl.PROTOCOL_TLS, domain)
-        self.ssl_context.set_ciphers(ssl._DEFAULT_CIPHERS)
+        if self.CF:
+            self.ssl_context.options |= (ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1)
+        self.ssl_context.set_ciphers(self.cipherSuite)
         self.init_poolmanager(self._pool_connections, self._pool_maxsize, block=self._pool_block)
         ip = self.getIp(domain)
 
@@ -121,21 +124,8 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
             logger.info('Request for ' + domain + ' with ip ' + ip + ' failed')
             logger.info(e)
             tryFlush = True
-        if (tryFlush or not ret) and not flushedDns:  # re-request ips and update cache
+        if tryFlush and not flushedDns:  # re-request ips and update cache
             logger.info('Flushing dns cache for ' + domain)
             return self.flushDns(request, domain, **kwargs)
         ret.url = realUrl
         return ret
-
-class session(requests.Session):
-    def request(self, method, url, headers=None, flushedDns=False, **kwargs):
-        try:
-            parse = urlparse.urlparse(url)
-        except:
-            raise requests.exceptions.InvalidURL
-        if parse.netloc:
-            domain = parse.netloc
-        else:
-            raise requests.exceptions.URLRequired
-        self.mount('https://', CipherSuiteAdapter(domain))
-        return super(session, self).request(method, url, **kwargs)

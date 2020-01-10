@@ -251,18 +251,22 @@ def downloadpage(url, **opt):
 
         """
     load_cookies()
-    if urlparse.urlparse(url).netloc in ['www.guardaserie.media', 'casacinema.space']:
+    domain = urlparse.urlparse(url).netloc
+    CF = False
+    if domain in ['www.guardaserie.media', 'casacinema.space']:
         from lib import cloudscraper
         session = cloudscraper.create_scraper()
+        CF = True
     elif opt.get('session', False):
         session = opt['session']  # same session to speed up search
         logger.info('same session')
-    elif config.get_setting('resolver_dns') and not opt.get('use_requests', False):
-        from specials import resolverdns
-        session = resolverdns.session()
     else:
         from lib import requests
         session = requests.session()
+
+    if config.get_setting('resolver_dns') and not opt.get('use_requests', False):
+        from specials import resolverdns
+        session.mount('https://', resolverdns.CipherSuiteAdapter(domain, CF))
 
     req_headers = default_headers.copy()
     verify = opt.get('verify', True)
