@@ -475,6 +475,7 @@ def play_from_library(item):
 
         # Ventana emergente
         item.play_from = 'window'
+        item.show_server = True
 
         from specials import videolibrary, autoplay
         p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(70004))
@@ -489,8 +490,6 @@ def play_from_library(item):
             item = nextep.return_item(item)
             if item.next_ep:
                 return play_from_library(item)
-            it = item
-            logger.info('STOP:\n'+str(item))
 
         else:
             while platformtools.is_playing():
@@ -498,6 +497,7 @@ def play_from_library(item):
                     sleep(5)
             p_dialog.update(50, '')
 
+        it = item
         if item.show_server or not check_next_ep:
 
             '''# Se filtran los enlaces segun la lista negra
@@ -552,4 +552,6 @@ def play_from_library(item):
         if it.show_server and check_next_ep:
             logger.info('PARTITO')
             nextep.run(it)
+            sleep(0.5)
+            p_dialog.close()
 
