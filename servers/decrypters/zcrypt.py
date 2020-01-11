@@ -51,7 +51,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                         continue
                     else:
                         from lib import unshortenit
-                        data, status = unshortenit.unshorten(url)
+                        sh = unshortenit.UnshortenIt()
+                        data, status = sh.unshorten(url)
                         logger.info("Data - Status zcrypt vcrypt.net: [%s] [%s] " %(data, status)) 
                 elif 'linkup' in url or 'bit.ly' in url:
                     logger.info("DATA LINK {}".format(url))
