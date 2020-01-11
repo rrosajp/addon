@@ -28,7 +28,7 @@ def findhost():
 host = config.get_channel_url(findhost)
 headers = [['Referer', host]]
 
-list_servers = ['verystream','openload','rapidvideo','streamango']
+list_servers = ['mixdrop','vidoza','cloudvideo','vup','supervideo','gounlimited']
 list_quality = ['default']
 
 @support.menu
