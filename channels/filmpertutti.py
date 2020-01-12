@@ -79,8 +79,8 @@ def episodios(item):
     data = re.sub(r'>\s+<', '> <', data)
     support.log('SERIES DATA= ',data)
     if 'accordion-item' in data:
-        patronBlock = r'<span class="season[^>]*>(?P<season>\d+)[^>]+>[^>]+>[^>]+>[^>]+>\D*(?:STAGIONE|Stagione)[ -]+(?P<lang>[a-zA-Z\- ]+)[^<]*</span>(?P<block>.*?)<div id="(?:season|disqus)'
-        patron = r'<img src="(?P<thumb>[^"]+)">.*?<li class="season-no">(?P<episode>.*?)<\/li>(?P<url>.*?javascript:;">(?P<title>[^<]+)<.+?)<\/table>'
+        patronBlock = r'<span class="season[^>]*>\d+[^>]+>[^>]+>[^>]+>[^>]+>\D*(?:STAGIONE|Stagione)[ -]+(?P<lang>[a-zA-Z\- ]+)[^<]*</span>(?P<block>.*?)<div id="(?:season|disqus)'
+        patron = r'<img src="(?P<thumb>[^"]+)">.*?<li class="season-no">(?P<episode>[^<]+)<\/li>(?P<url>.*?javascript:;">)(?P<title>[^<]+)'
     else:
         # patronBlock = r'<div id="info" class="pad">(?P<block>.*?)<div id="disqus_thread">'
         # deflang='Sub-ITA'
