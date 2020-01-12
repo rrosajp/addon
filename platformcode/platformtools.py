@@ -1140,10 +1140,6 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.mark_auto_as_watched(item)
 
-    if (strm or item.strm_path) and config.get_setting('next_ep') > 0 and item.contentType != 'movie' and item.play_from != 'window':
-        from specials.nextep import afther_stop
-        afther_stop(item)
-
 
 def torrent_client_installed(show_tuple=False):
     # Plugins externos se encuentra en servers/torrent.json nodo clients

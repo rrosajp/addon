@@ -448,6 +448,7 @@ def play_from_library(item):
     import xbmcplugin
     import xbmc
     from time import sleep, time
+    from specials import nextep
 
     # Intentamos reproducir una imagen (esto no hace nada y ademas no da error)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True,
@@ -460,8 +461,10 @@ def play_from_library(item):
 
     # modificamos el action (actualmente la videoteca necesita "findvideos" ya que es donde se buscan las fuentes
     item.action = "findvideos"
+    check_next_ep = nextep.check(item)
 
-    window_type = config.get_setting("window_type", "videolibrary")
+
+    window_type = 1 if check_next_ep else config.get_setting("window_type", "videolibrary")
 
     # y volvemos a lanzar kodi
     if xbmc.getCondVisibility('Window.IsMedia') and not window_type == 1:
@@ -472,60 +475,69 @@ def play_from_library(item):
 
         # Ventana emergente
         item.play_from = 'window'
-        from specials import videolibrary
+        item.show_server = True
+
+        from specials import videolibrary, autoplay
         p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(70004))
         p_dialog.update(0, '')
 
         itemlist = videolibrary.findvideos(item)
 
+        if check_next_ep and autoplay.is_active(item.contentChannel):
+            p_dialog.update(100, '')
+            sleep(0.5)
+            p_dialog.close()
+            item = nextep.return_item(item)
+            if item.next_ep:
+                return play_from_library(item)
 
-        while platformtools.is_playing():
-                # Ventana convencional
-                sleep(5)
-        p_dialog.update(50, '')
+        else:
+            while platformtools.is_playing():
+                    # Ventana convencional
+                    sleep(5)
+            p_dialog.update(50, '')
 
-        '''# Se filtran los enlaces segun la lista negra
-        if config.get_setting('filter_servers', "servers"):
-            itemlist = servertools.filter_servers(itemlist)'''
+        it = item
+        if item.show_server or not check_next_ep:
 
-        # Se limita la cantidad de enlaces a mostrar
-        if config.get_setting("max_links", "videolibrary") != 0:
-            itemlist = limit_itemlist(itemlist)
+            '''# Se filtran los enlaces segun la lista negra
+            if config.get_setting('filter_servers', "servers"):
+                itemlist = servertools.filter_servers(itemlist)'''
 
-        # Se "limpia" ligeramente la lista de enlaces
-        if config.get_setting("replace_VD", "videolibrary") == 1:
-            itemlist = reorder_itemlist(itemlist)
+            # Se limita la cantidad de enlaces a mostrar
+            if config.get_setting("max_links", "videolibrary") != 0:
+                itemlist = limit_itemlist(itemlist)
 
-
-        p_dialog.update(100, '')
-        sleep(0.5)
-        p_dialog.close()
+            # Se "limpia" ligeramente la lista de enlaces
+            if config.get_setting("replace_VD", "videolibrary") == 1:
+                itemlist = reorder_itemlist(itemlist)
 
 
-        if len(itemlist) > 0:
-            while not xbmc.Monitor().abortRequested():
-                # El usuario elige el mirror
-                opciones = []
-                for item in itemlist:
-                    opciones.append(item.title)
+            p_dialog.update(100, '')
+            sleep(0.5)
+            p_dialog.close()
 
-                # Se abre la ventana de seleccion
-                if (item.contentSerieName != "" and
-                            item.contentSeason != "" and
-                            item.contentEpisodeNumber != ""):
-                    cabecera = ("%s - %sx%s -- %s" %
-                                (item.contentSerieName,
-                                 item.contentSeason,
-                                 item.contentEpisodeNumber,
-                                 config.get_localized_string(30163)))
-                else:
-                    cabecera = config.get_localized_string(30163)
 
-                SHOW = True
-                if config.get_setting('autoplay') and config.get_setting('hide_servers'):
-                    SHOW = False
+            if len(itemlist) > 0:
+                while not xbmc.Monitor().abortRequested():
+                    # El usuario elige el mirror
+                    opciones = []
+                    for item in itemlist:
+                        opciones.append(item.title)
 
-                if SHOW:
+                    # Se abre la ventana de seleccion
+                    if (item.contentSerieName != "" and
+                                item.contentSeason != "" and
+                                item.contentEpisodeNumber != ""):
+                        cabecera = ("%s - %sx%s -- %s" %
+                                    (item.contentSerieName,
+                                    item.contentSeason,
+                                    item.contentEpisodeNumber,
+                                    config.get_localized_string(30163)))
+                    else:
+                        cabecera = config.get_localized_string(30163)
+
+
                     seleccion = platformtools.dialog_select(cabecera, opciones)
 
                     if seleccion == -1:
@@ -534,8 +546,12 @@ def play_from_library(item):
                         item = videolibrary.play(itemlist[seleccion])[0]
                         platformtools.play_video(item)
 
-                from specials import autoplay
-                if (platformtools.is_playing() and item.action) or item.server == 'torrent' or autoplay.is_active(item.contentChannel):
-                    break
+                    if (platformtools.is_playing() and item.action) or item.server == 'torrent' or autoplay.is_active(item.contentChannel):
+                        break
 
+        if it.show_server and check_next_ep:
+            logger.info('PARTITO')
+            nextep.run(it)
+            sleep(0.5)
+            p_dialog.close()
 
