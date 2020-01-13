@@ -10,7 +10,7 @@ headers = [['Referer', host]]
 
 __channel__ = 'animeworld'
 
-list_servers = ['animeworld', 'verystream', 'streamango', 'openload', 'directo']
+list_servers = ['directo', 'animeworld', 'vvvvid']
 list_quality = ['default', '480p', '720p', '1080p']
 
 
