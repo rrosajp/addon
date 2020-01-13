@@ -253,7 +253,7 @@ def downloadpage(url, **opt):
     load_cookies()
     domain = urlparse.urlparse(url).netloc
     CF = False
-    if domain in ['www.guardaserie.media', 'casacinema.space']:
+    if domain in ['www.guardaserie.media', 'casacinema.space', 'dreamsub.stream']:
         from lib import cloudscraper
         session = cloudscraper.create_scraper()
         CF = True
