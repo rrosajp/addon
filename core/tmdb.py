@@ -160,7 +160,7 @@ def cache_response(fn):
                 conn = sqlite3.connect(fname, timeout=15)
                 c = conn.cursor()
                 url = re.sub('&year=-', '', args[0])
-                logger.error('la url %s' % url)
+                # logger.error('la url %s' % url)
                 url_base64 = base64.b64encode(url)
                 c.execute("SELECT response, added FROM tmdb_cache WHERE url=?", (url_base64,))
                 row = c.fetchone()
@@ -185,7 +185,7 @@ def cache_response(fn):
         # error al obtener los datos
         except Exception, ex:
             message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
-            logger.error("error en: %s" % message)
+            logger.error("error in: %s" % message)
 
         return result
 
@@ -214,10 +214,10 @@ def set_infoLabels(source, seekTmdb=True, idioma_busqueda=def_lang, forced=False
     start_time = time.time()
     if type(source) == list:
         ret = set_infoLabels_itemlist(source, seekTmdb, idioma_busqueda)
-        logger.debug("Se han obtenido los datos de %i enlaces en %f segundos" % (len(source), time.time() - start_time))
+        logger.debug("The data of %i links were obtained in %f seconds" % (len(source), time.time() - start_time))
     else:
         ret = set_infoLabels_item(source, seekTmdb, idioma_busqueda)
-        logger.debug("Se han obtenido los datos del enlace en %f segundos" % (time.time() - start_time))
+        logger.debug("The data of %i links were obtained in %f seconds" % (time.time() - start_time))
     return ret
 
 
@@ -242,6 +242,7 @@ def set_infoLabels_itemlist(item_list, seekTmdb=False, idioma_busqueda=def_lang,
         negativo en caso contrario.
     @rtype: list
     """
+
     if not config.get_setting('tmdb_active') and not forced:
         return
     import threading
@@ -314,7 +315,7 @@ def set_infoLabels_item(item, seekTmdb=True, idioma_busqueda=def_lang, lock=None
             try:
                 numtemporada = int(item.infoLabels['season'])
             except ValueError:
-                logger.debug("El numero de temporada no es valido")
+                logger.debug("The season number is not valid.")
                 return -1 * len(item.infoLabels)
 
             if lock:
@@ -340,7 +341,7 @@ def set_infoLabels_item(item, seekTmdb=True, idioma_busqueda=def_lang, lock=None
                 try:
                     episode = int(item.infoLabels['episode'])
                 except ValueError:
-                    logger.debug("El número de episodio (%s) no es valido" % repr(item.infoLabels['episode']))
+                    logger.debug("The episode number (%s) is not valid" % repr(item.infoLabels['episode']))
                     return -1 * len(item.infoLabels)
 
                 # Tenemos numero de temporada y numero de episodio validos...
@@ -847,7 +848,7 @@ class Tmdb(object):
             self.__discover()
 
         else:
-            logger.debug("Creado objeto vacio")
+            logger.debug("Created empty object")
 
     @staticmethod
     @cache_response
@@ -879,7 +880,7 @@ class Tmdb(object):
         # error al obtener los datos
         except Exception, ex:
             message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
-            logger.error("error en: %s" % message)
+            logger.error("error in: %s" % message)
             dict_data = {}
 
         return dict_data
@@ -895,7 +896,7 @@ class Tmdb(object):
             url = ('http://api.themoviedb.org/3/genre/%s/list?api_key=a1ab8b8669da03637a4b98fa39c39228&language=%s'
                    % (tipo, idioma))
             try:
-                logger.info("[Tmdb.py] Rellenando dicionario de generos")
+                logger.info("[Tmdb.py] Filling in dictionary of genres")
 
                 resultado = cls.get_json(url)
                 lista_generos = resultado["genres"]
@@ -903,7 +904,7 @@ class Tmdb(object):
                 for i in lista_generos:
                     cls.dic_generos[idioma][tipo][str(i["id"])] = i["name"]
             except:
-                logger.error("Error generando diccionarios")
+                logger.error("Error generating dictionaries")
 
     def __by_id(self, source='tmdb'):
 
@@ -923,7 +924,7 @@ class Tmdb(object):
                        '&language=%s' % (self.busqueda_id, source, self.busqueda_idioma))
                 buscando = "%s: %s" % (source.capitalize(), self.busqueda_id)
 
-            logger.info("[Tmdb.py] Buscando %s:\n%s" % (buscando, url))
+            logger.info("[Tmdb.py] Searching %s:\n%s" % (buscando, url))
             resultado = self.get_json(url)
 
             if resultado:
@@ -940,8 +941,8 @@ class Tmdb(object):
 
             else:
                 # No hay resultados de la busqueda
-                msg = "La busqueda de %s no dio resultados." % buscando
-                logger.debug(msg)
+                msg = "The search of %s gave no results" % buscando
+                # logger.debug(msg)
 
     def __search(self, index_results=0, page=1):
         self.result = ResultDictDefault()
@@ -963,7 +964,7 @@ class Tmdb(object):
                 url += '&year=%s' % self.busqueda_year
 
             buscando = self.busqueda_texto.capitalize()
-            logger.info("[Tmdb.py] Buscando %s en pagina %s:\n%s" % (buscando, page, url))
+            logger.info("[Tmdb.py] Searching %s on page %s:\n%s" % (buscando, page, url))
             resultado = self.get_json(url)
 
             total_results = resultado.get("total_results", 0)
@@ -984,7 +985,7 @@ class Tmdb(object):
             if index_results >= len(results):
                 # Se ha solicitado un numero de resultado mayor de los obtenidos
                 logger.error(
-                    "La busqueda de '%s' dio %s resultados para la pagina %s\nImposible mostrar el resultado numero %s"
+                    "The search for '%s' gave %s results for the page %s \n It is impossible to show the result number %s"
                     % (buscando, len(results), page, index_results))
                 return 0
 
@@ -997,7 +998,7 @@ class Tmdb(object):
 
         else:
             # No hay resultados de la busqueda
-            msg = "La busqueda de '%s' no dio resultados para la pagina %s" % (buscando, page)
+            msg = "The search for '%s' gave no results for page %s" % (buscando, page)
             logger.error(msg)
             return 0
 
@@ -1021,7 +1022,7 @@ class Tmdb(object):
             url = ('http://api.themoviedb.org/3/%s?api_key=a1ab8b8669da03637a4b98fa39c39228&%s'
                    % (type_search, "&".join(params)))
 
-            logger.info("[Tmdb.py] Buscando %s:\n%s" % (type_search, url))
+            logger.info("[Tmdb.py] Searcing %s:\n%s" % (type_search, url))
             resultado = self.get_json(url)
 
             total_results = resultado.get("total_results", -1)
@@ -1045,7 +1046,7 @@ class Tmdb(object):
 
             if index_results >= len(results):
                 logger.error(
-                    "La busqueda de '%s' no dio %s resultados" % (type_search, index_results))
+                    "The search for '%s' did not give %s results" % (type_search, index_results))
                 return 0
 
         # Retornamos el numero de resultados de esta pagina
@@ -1061,7 +1062,7 @@ class Tmdb(object):
             return len(self.results)
         else:
             # No hay resultados de la busqueda
-            logger.error("La busqueda de '%s' no dio resultados" % type_search)
+            logger.error("The search for '%s' gave no results" % type_search)
             return 0
 
     def load_resultado(self, index_results=0, page=1):
@@ -1311,20 +1312,20 @@ class Tmdb(object):
             url = "http://api.themoviedb.org/3/tv/%s/season/%s?api_key=a1ab8b8669da03637a4b98fa39c39228&language=%s" \
                   "&append_to_response=credits" % (self.result["id"], numtemporada, self.busqueda_idioma)
 
-            buscando = "id_Tmdb: " + str(self.result["id"]) + " temporada: " + str(numtemporada) + "\nURL: " + url
-            logger.info("[Tmdb.py] Buscando " + buscando)
+            buscando = "id_Tmdb: " + str(self.result["id"]) + " season: " + str(numtemporada) + "\nURL: " + url
+            logger.info("[Tmdb.py] Searcing " + buscando)
             try:
                 self.temporada[numtemporada] = self.get_json(url)
 
             except:
-                logger.error("No se ha podido obtener la temporada")
+                logger.error("Unable to get the season")
                 self.temporada[numtemporada] = {"status_code": 15, "status_message": "Failed"}
                 self.temporada[numtemporada] = {"episodes": {}}
 
             if "status_code" in self.temporada[numtemporada]:
                 #Se ha producido un error
                 msg = config.get_localized_string(70496) + buscando + config.get_localized_string(70497)
-                msg += "\nError de tmdb: %s %s" % (
+                msg += "\nTmdb error: %s %s" % (
                 self.temporada[numtemporada]["status_code"], self.temporada[numtemporada]["status_message"])
                 logger.debug(msg)
                 self.temporada[numtemporada] = {}
@@ -1351,7 +1352,7 @@ class Tmdb(object):
             capitulo = int(capitulo)
             numtemporada = int(numtemporada)
         except ValueError:
-            logger.debug("El número de episodio o temporada no es valido")
+            logger.debug("The episode or season number is not valid")
             return {}
 
         temporada = self.get_temporada(numtemporada)
@@ -1361,7 +1362,7 @@ class Tmdb(object):
 
         if len(temporada["episodes"]) == 0 or len(temporada["episodes"]) < capitulo:
             # Se ha producido un error
-            logger.error("Episodio %d de la temporada %d no encontrado." % (capitulo, numtemporada))
+            logger.error("Episode %d of the season %d not found." % (capitulo, numtemporada))
             return {}
 
         ret_dic = dict()
