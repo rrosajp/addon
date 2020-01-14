@@ -97,7 +97,6 @@ def start(itemlist, item):
         #platformtools.dialog_notification('AutoPlay ERROR', 'Sólo disponible para XBMC/Kodi')
         return itemlist
 
-
     if not autoplay_node:
         # Obtiene el nodo AUTOPLAY desde el json
         autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
@@ -707,17 +706,15 @@ def set_status(status):
 def play_multi_channel(item, itemlist):
     logger.info()
     global PLAYED
-    actual_channel = ''
-    channel_videos = []
     video_dict = dict()
     set_status(True)
 
     for video_item in itemlist:
-        if video_item.contentChannel != actual_channel:
-            actual_channel = video_item.contentChannel
-        elif is_active(actual_channel):
-            channel_videos.append(video_item)
-            video_dict[actual_channel] = channel_videos
+        if is_active(video_item.contentChannel):
+            if video_item.contentChannel not in video_dict.keys():
+                video_dict[video_item.contentChannel] = [video_item]
+            else:
+                video_dict[video_item.contentChannel].append(video_item)
 
     for channel, videos in video_dict.items():
         item.contentChannel = channel
