@@ -213,7 +213,9 @@ def findvideos(item):
     log()
     itemlist =[]
 
-    matches, data = support.match(item, '<iframe class="metaframe rptss" src="([^"]+)"[^>]+>',headers=headers)
+    html = support.match(item, patron='<iframe class="metaframe rptss" src="([^"]+)"[^>]+>',headers=headers)
+    matches = html.matches
+    data = html.data
     for url in matches:
         html = httptools.downloadpage(url, headers=headers).data
         data += str(scrapertools.find_multiple_matches(html, '<meta name="og:url" content="([^"]+)">'))
@@ -224,7 +226,7 @@ def findvideos(item):
 
         data = httptools.downloadpage(item.url).data
         patron = r'<div class="item"><a href="'+host+'/serietv/([^"\/]+)\/"><i class="icon-bars">'
-        series = scrapertools.find_single_match(data, patron)
+        series = support.match(data, patron=patron).matches
         titles = support.typo(series.upper().replace('-', ' '), 'bold color kod')
         goseries = support.typo("Vai alla Serie:", ' bold')
         itemlist.append(
