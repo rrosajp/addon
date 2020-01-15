@@ -14,7 +14,6 @@ from core import scrapertools
 from core import servertools
 from core import trakt_tools
 from core import videolibrarytools
-from core import filetools
 from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
@@ -39,7 +38,7 @@ def start():
     from specials import resolverdns
     from specials.checkhost import test_conn
     import threading
-    threading.Thread(target=test_conn, args=(True, False, True, [], [], True)).start()
+    threading.Thread(target=test_conn, args=(True, not config.get_setting('resolver_dns'), True, [], [], True)).start()
     # check_adsl = test_conn(is_exit = True, check_dns = True, view_msg = True,
     #           lst_urls = [], lst_site_check_dns = [], in_addon = True)
 
