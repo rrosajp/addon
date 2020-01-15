@@ -149,15 +149,15 @@ def findvideos(item):
         id = item.args['id']
         season = str(item.args['season'])
         episode = str(item.args['episode'])
-    res = support.match(item, 'src="([^"]+)"[^>]*></video>', url=url, headers=[['Referer', domain]])
+    res = support.match(url, patron='src="([^"]+)"[^>]*></video>', headers=[['Referer', domain]]).match
     itemlist = []
 
-    if res[0]:
+    if res:
         itemlist.append(
             Item(channel=item.channel,
                  action="play",
                  title='contentful',
-                 url=res[0][0],
+                 url=res,
                  server='directo',
                  fulltitle=item.fulltitle,
                  thumbnail=item.thumbnail,

@@ -547,11 +547,9 @@ def episodios(item):
         if pagination and i >= pag * pagination: break          # pagination
         match = []
         if episode.has_key('number'):
-            match = support.match(episode['number'], r'(?P<season>\d+)x(?P<episode>\d+)')[0]
-            if match:
-                match = match[0]
+            match = support.match(episode['number'], patron=r'(?P<season>\d+)x(?P<episode>\d+)').match
         if not match and episode.has_key('title'):
-            match = support.match(episode['title'], r'(?P<season>\d+)x(?P<episode>\d+)')[0]
+            match = support.match(episode['title'], patron=r'(?P<season>\d+)x(?P<episode>\d+)').match
             if match: match = match[0]
         if match:
             episode_number = match[1]
@@ -561,7 +559,7 @@ def episodios(item):
             season_number = episode['season'] if episode.has_key('season') else season if season else 1
             episode_number = episode['number'] if episode.has_key('number') else ''
             if not episode_number.isdigit():
-                episode_number = support.match(episode['title'], r'(?P<episode>\d+)')[0][0]
+                episode_number = support.match(episode['title'], patron=r'(?P<episode>\d+)').match
             ep = int(episode_number) if episode_number else ep
             if not episode_number:
                 episode_number = str(ep).zfill(2)

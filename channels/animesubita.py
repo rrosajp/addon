@@ -34,7 +34,7 @@ def newest(categoria):
 
             if itemlist[-1].action == "ultimiep":
                 itemlist.pop()
-    # Continua l'esecuzione in caso di errore 
+    # Continua l'esecuzione in caso di errore
     except:
         import sys
         for line in sys.exc_info():
@@ -50,7 +50,7 @@ def search(item, texto):
     item.args = 'alt'
     try:
         return peliculas(item)
-    # Continua la ricerca in caso di errore 
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
@@ -67,10 +67,9 @@ def genres(item):
 
 
 @support.scrape
-def peliculas(item):    
+def peliculas(item):
     anime = True
     if item.args == 'updated':
-        #patron = r'<div class="post-thumbnail">\s*<a href="(?P<url>[^"]+)" title="(?P<title>.*?)\s*(?P<episode>Episodio \d+)[^"]+"[^>]*>\s*<img[^src]+src="(?P<thumb>[^"]+)"'
         patron = r'<div class="post-thumbnail">\s*<a href="(?P<url>[^"]+)" title="(?P<title>.*?)\s*Episodio (?P<episode>\d+) (?P<lang>[a-zA-Z-\s]+)[^"]*"> <img[^src]+src="(?P<thumb>[^"]+)"'
         patronNext = r'<link rel="next" href="([^"]+)"\s*/>'
         action = 'findvideos'
@@ -98,32 +97,27 @@ def findvideos(item):
     itemlist = []
 
     if item.args == 'updated':
-        ep = support.match(item.fulltitle,r'(Episodio\s*\d+)')[0][0]
-        item.url = support.re.sub(r'episodio-\d+-|oav-\d+-', '',item.url)
+        ep = support.match(item.fulltitle, patron=r'(\d+)').match
+        item.url = support.re.sub(r'episodio-\d+-|oav-\d+-'+ep, '',item.url)
         if 'streaming' not in item.url: item.url = item.url.replace('sub-ita','sub-ita-streaming')
-        item.url = support.match(item, r'<a href="([^"]+)"[^>]+>', ep + '(.*?)</tr>', )[0][0]
+        item.url = support.match(item, patron= ep + r'[^>]+>[^>]+>[^>]+><a href="([^"]+)"').match
 
-    urls = support.match(item.url, r'(episodio\d*.php.*)')[0]
-    for url in urls:
-        url = host + '/' + url
-        headers['Referer'] =  url
-        data = support.match(item, headers=headers, url=url)[1]
-        cookies = ""
-        matches = support.re.compile('(.%s.*?)\n' % host.replace("http://", "").replace("www.", ""), support.re.DOTALL).findall(support.config.get_cookie_data())
-        for cookie in matches:
-            cookies += cookie.split('\t')[5] + "=" + cookie.split('\t')[6] + ";"
+    # post
+    url = host + '/' + support.match(item.url, patron=r'(episodio\d*.php.*?)"').match.replace('%3F','?').replace('%3D','=')
+    headers['Referer'] =  url
+    cookies = ""
+    matches = support.re.compile('(.%s.*?)\n' % host.replace("http://", "").replace("www.", ""), support.re.DOTALL).findall(support.config.get_cookie_data())
+    for cookie in matches:
+        cookies += cookie.split('\t')[5] + "=" + cookie.split('\t')[6] + ";"
+    headers['Cookie'] = cookies[:-1]
 
-        headers['Cookie'] = cookies[:-1]
-        
-        url = support.match(data, r'<source src="([^"]+)"[^>]+>')[0][0] + '|' + support.urllib.urlencode(headers)
-        itemlist.append(
-            support.Item(channel=item.channel,
-                         action="play",
-                         title='diretto',
-                         quality='',
-                         url=url,
-                         server='directo',
-                         fulltitle=item.fulltitle,
-                         show=item.show))
+    url = support.match(url, patron=r'<source src="([^"]+)"[^>]+>').match
 
-    return support.server(item,url,itemlist)
+    itemlist.append(
+        support.Item(channel=item.channel,
+                     action="play",
+                     title='Diretto',
+                     url=url + '|' + support.urllib.urlencode(headers),
+                     server='directo'))
+
+    return support.server(item,itemlist=itemlist)

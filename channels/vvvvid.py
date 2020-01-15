@@ -131,7 +131,7 @@ def peliculas(item):
 
     elif '=' in item.args:
         json_file = current_session.get(item.url + 'channels', headers=headers, params=payload).json()
-        Filter = support.match(item.args,r'\?([^=]+)=')[0][0]
+        Filter = support.match(item.args, patron=r'\?([^=]+)=').match
         keys = [i[Filter] for i in json_file['data'] if Filter in i][0]
         for key in keys:
             if key not in ['1','2']:
@@ -162,7 +162,7 @@ def episodios(item):
     for episode in episodes:
         for key in episode:
             if 'stagione' in key['title'].encode('utf8').lower():
-                match = support.match(key['title'].encode('utf8'), r'[Ss]tagione\s*(\d+) - [Ee]pisodio\s*(\d+)')[0][0]
+                match = support.match(key['title'].encode('utf8'), patron=r'[Ss]tagione\s*(\d+) - [Ee]pisodio\s*(\d+)').match
                 title = match[0]+'x'+match[1] + ' - ' + item.fulltitle
                 make_item = True
             elif int(key['season_id']) == int(season_id):
@@ -206,7 +206,7 @@ def findvideos(item):
             if 'youtube' in url: item.url = url
             item.url = url.replace('manifest.f4m','master.m3u8').replace('http://','https://').replace('/z/','/i/')
             if 'https' not in item.url:
-                url = support.match(item, url='https://or01.top-ix.org/videomg/_definst_/mp4:' + item.url + '/playlist.m3u')[1]
+                url = support.match('https://or01.top-ix.org/videomg/_definst_/mp4:' + item.url + '/playlist.m3u')
                 url = url.split()[-1]
                 itemlist.append(
                     Item(action= 'play',

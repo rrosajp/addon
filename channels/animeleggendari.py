@@ -74,7 +74,7 @@ def peliculas(item):
 
 @support.scrape
 def episodios(item):
-    data = support.match(item, headers=headers)[1]
+    data = support.match(item, headers=headers).data
     if not any(x in data for x in ['Lista Episodi', 'Movie Parte']):
         support.log('NOT IN DATA')
         patron = r'(?:iframe src|str)="(?P<url>[^"]+)"'
@@ -107,7 +107,7 @@ def episodios(item):
     return locals()
 
 def check(item):
-    data = support.match(item, headers=headers)[1]
+    data = support.match(item, headers=headers).data
     if 'Lista Episodi' not in data:
         item.data = data
         return findvideos(item)
@@ -120,7 +120,7 @@ def findvideos(item):
     if item.data:
         data = item.data
     else:
-        matches = support.match(item, '(?:str="([^"]+)"|iframe src="([^"]+)")')[0]
+        matches = support.match(item, patron=r'(?:str="([^"]+)"|iframe src="([^"]+)")').matches
         data = ''
         if matches:
             for match in matches:

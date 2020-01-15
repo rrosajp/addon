@@ -34,11 +34,11 @@ def peliculas(item):
 @support.scrape
 def episodios(item):
     data =''
-    url = support.match(item, patronBlock=r'<iframe width=".+?" height=".+?" src="([^"]+)" allowfullscreen frameborder="0">')[1]
-    seasons = support.match(item, r'<a href="([^"]+)">(\d+)<', r'<h3>STAGIONE</h3><ul>(.*?)</ul>', headers, url)[0]
+    url = support.match(item, patron=r'<iframe width=".+?" height=".+?" src="([^"]+)" allowfullscreen frameborder="0">').match
+    seasons = support.match(url, patron=r'<a href="([^"]+)">(\d+)<', patronBlock=r'<h3>STAGIONE</h3><ul>(.*?)</ul>', headers=headers).matches
     for season_url, season in seasons:
         season_url = support.urlparse.urljoin(url, season_url)
-        episodes = support.match(item, r'<a href="([^"]+)">(\d+)<', '<h3>EPISODIO</h3><ul>(.*?)</ul>', headers, season_url)[0]
+        episodes = support.match(season_url, patron=r'<a href="([^"]+)">(\d+)<', patronBlock=r'<h3>EPISODIO</h3><ul>(.*?)</ul>', headers=headers).matches
         for episode_url, episode in episodes:
             episode_url = support.urlparse.urljoin(url, episode_url)
             title = season + "x" + episode.zfill(2) + ' - ' + item.fulltitle

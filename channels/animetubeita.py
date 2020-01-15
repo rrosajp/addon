@@ -98,11 +98,11 @@ def episodios(item):
 def findvideos(item):
     itemlist=[]
     if item.args == 'last':
-        match = support.match(item, r'href="(?P<url>[^"]+)"[^>]+><strong>DOWNLOAD &amp; STREAMING</strong>', url=item.url)[0]
+        match = support.match(item, patron=r'href="(?P<url>[^"]+)"[^>]+><strong>DOWNLOAD &amp; STREAMING</strong>').match
         if match:
             patronBlock = r'<h6>Episodio</h6>(?P<block>.*?)(?:<!--|</table>)'
             patron = r'<a href="http://link\.animetubeita\.com/2361078/(?P<url>[^"]+)"'
-            match = support.match(item, patron, patronBlock, headers, match[0])[0]
+            match = support.match(match, patron=patron, patronBlock=patronBlock, headers=headers).match
         else: return itemlist
 
         if match: item.url = match[-1]

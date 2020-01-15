@@ -50,7 +50,7 @@ def peliculas(item):
 
 @support.scrape
 def episodios(item):
-    seasons, data = support.match(item, r'<option value="(\d+)"[^>]*>\D+(\d+)')
+    seasons = support.match(item, patron=r'<option value="(\d+)"[^>]*>\D+(\d+)').matches
     patronBlock = r'</select><div style="clear:both"></div></h2>(?P<block>.*?)<div id="trailer" class="tab">'
     patron = r'(?:<div class="list (?:active)?" data-id="(?P<season>\d+)">[^>]+>)?\s*<a data-id="(?P<episode>\d+)(?:[ ](?P<lang>[SuUbBiItTaA\-]+))?"(?P<url>[^>]+)>[^>]+>[^>]+>(?P<title>.+?)(?:\sSub-ITA)?<'
     def itemHook(item):

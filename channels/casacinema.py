@@ -39,7 +39,7 @@ def genres(item):
 
 
 def select(item):
-    item.data = support.match(item)[1]
+    item.data = support.match(item).data
     if 'continua con il video' in item.data.lower():
         support.log('select = ### è un film ###')
         item.contentType = 'movie'
@@ -140,10 +140,10 @@ def episodios(item):
 
 def findvideos(item):
     if item.contentType != 'movie':
-        links = support.match(item.url, r'href="([^"]+)"')[0]
+        links = support.match(item.url, patron=r'href="([^"]+)"').matches
     else:
         matchData = item.data if item.data else item
-        links = support.match(matchData, r'(?:SRC|href)="([^"]+)"', patronBlock=r'<div class="col-md-10">(.+?)<div class="ads">')[0]
+        links = support.match(matchData, patron=r'(?:SRC|href)="([^"]+)"', patronBlock=r'<div class="col-md-10">(.+?)<div class="ads">').matches
     data = ''
     from lib.unshortenit import unshorten_only
     for link in links:

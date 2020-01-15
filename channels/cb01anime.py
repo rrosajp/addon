@@ -59,7 +59,7 @@ def peliculas(item):
     blacklist = Blacklist
     item.contentType = 'tvshow'
     if item.args == 'newest':
-        data = support.match(item)[1]
+        # data = support.match(item).data
         patron = r'<div id="blockvids"><ul><li><a href="(?P<url>[^"]+)"[^>]+><img src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^\[]+)\[(?P<lang>[^\]]+)\]'
     else:
         patron = r'<div class="span4">\s*<a href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)"[^>]+><\/a>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> <h1>(?P<title>[^<\[]+)(?:\[(?P<lang>[^\]]+)\])?</h1></a>.*?-->(?:.*?<br />)?\s*(?P<plot>[^<]+)'
@@ -68,7 +68,7 @@ def peliculas(item):
     return locals()
 
 def check(item):
-    item.url = support.match(item,r'(?:<p>|/>)(.*?)(?:<br|</td>|</p>)', r'Streaming:(.*?)</tr>')[0]
+    item.url = support.match(item, patron=r'(?:<p>|/>)(.*?)(?:<br|</td>|</p>)', patronBlock=r'Streaming:(.*?)</tr>').matches
     if 'Episodio' in str(item.url):
         item.contentType = 'tvshow'
         return episodios(item)
@@ -87,14 +87,14 @@ def episodios(item):
     sp = 0
     for match in item.url:
         if 'stagione' in match.lower():
-            find_season = support.match(match, r'Stagione\s*(\d+)')[0]
-            season = int(find_season[0]) if find_season else season + 1 if 'prima' not in match.lower() else season
+            find_season = support.match(match, patron=r'Stagione\s*(\d+)').match
+            season = int(find_season) if find_season else season + 1 if 'prima' not in match.lower() else season
         else:
-            try: title = support.match(match,'<a[^>]+>([^<]+)</a>')[0][0]
+            try: title = support.match(match, patron=r'<a[^>]+>([^<]+)</a>').match
             except: title = ''
             if title:
                 if 'episodio' in title.lower():
-                    ep = support.match(match, r'Episodio ((?:\d+.\d|\d+|\D+))')[0][0]
+                    ep = support.match(match, patron=r'Episodio ((?:\d+.\d|\d+|\D+))').match
                     check = ep.isdigit()
                     if check or '.' in ep:
                         if '.' in ep:

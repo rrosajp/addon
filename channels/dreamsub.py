@@ -31,10 +31,11 @@ def menu(item):
     action = 'peliculas'
 
     patronBlock = r'<div class="filter-header"><b>%s</b>(?P<block>.*?)<div class="filter-box">' % item.args
-    patronMenu = r'<a class="[^"]+" data-state="[^"]+" (?P<url>[^>]+)>[^>]+></i>[^>]+></i>[^>]+></i>(?P<title>[^>]+)</a>'
+    patronMenu = r'<a class="[^"]+" data-state="[^"]+" (?P<other>[^>]+)>[^>]+></i>[^>]+></i>[^>]+></i>(?P<title>[^>]+)</a>'
 
     def itemHook(item):
-        for Type, ID in support.match(item.url, r'data-type="([^"]+)" data-id="([^"]+)"')[0]:
+        support.log(item.type)
+        for Type, ID in support.match(item.other, patron=r'data-type="([^"]+)" data-id="([^"]+)"').matches:
             item.url = host + '/search?' + Type + 'Y=' + ID
         return item
     return locals()
@@ -110,28 +111,34 @@ def findvideos(item):
     itemlist = []
     support.log()
 
-    matches, data = support.match(item, r'<a href="([^"]+)"', r'<div style="white-space: (.*?)<div id="main-content"')
+    matches = support.match(item, patron=r'<a href="([^"]+)"', patronBlock=r'<div style="white-space: (.*?)<div id="main-content"')
 
-    if not matches:
-        item.data = data
+    if not matches.matches:
+        item.data = matches.data
         item.contentType = 'tvshow'
         return episodios(item)
 
-    matches.sort()
+    # matches.matches.sort()
 
-    for url in matches:
+    for url in matches.matches:
         lang = url.split('/')[-2]
+        if 'ita' in lang.lower():
+            language = 'ITA'
+        if 'sub' in lang.lower():
+            language = 'Sub-' + language
         quality = url.split('/')[-1]
 
         itemlist.append(
             support.Item(channel=item.channel,
                          action="play",
                          contentType=item.contentType,
-                         title=lang,
+                         title=language,
                          url=url,
-                         contentLanguage = lang,
+                         contentLanguage = language,
                          quality = quality,
+                         order = quality.replace('p','').zfill(4),
                          server='directo',
                          ))
 
+    itemlist.sort(key=lambda x: (x.title, x.order), reverse=False)
     return support.server(item, itemlist=itemlist)

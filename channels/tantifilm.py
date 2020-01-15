@@ -124,7 +124,7 @@ def anime(item):
     log()
     itemlist = []
 
-    seasons = support.match(item, r'<div class="sp-body[^"]+">(.*?)<\/div>')[0]
+    seasons = support.match(item, patron=r'<div class="sp-body[^"]+">(.*?)<\/div>').matches
     for season in seasons:
         episodes = scrapertools.find_multiple_matches(season, r'<a.*?href="([^"]+)"[^>]+>([^<]+)<\/a>(.*?)<(:?br|\/p)')
         for url, title, urls, none in episodes:
@@ -208,7 +208,7 @@ def newest(categoria):
     item = Item()
     item.url = host +'/aggiornamenti/'
 
-    matches = support.match(item, r'mediaWrapAlt recomended_videos"[^>]+>\s*<a href="([^"]+)" title="([^"]+)" rel="bookmark">\s*<img[^s]+src="([^"]+)"[^>]+>')[0]
+    matches = support.match(item, patron=r'mediaWrapAlt recomended_videos"[^>]+>\s*<a href="([^"]+)" title="([^"]+)" rel="bookmark">\s*<img[^s]+src="([^"]+)"[^>]+>').matches
 
     for url, title, thumb in matches:
         title = scrapertools.decodeHtmlentities(title).replace("Permalink to ", "").replace("streaming", "")
@@ -236,11 +236,11 @@ def findvideos(item):
 ##        data = item.url
 ##    else:
 ##        data = httptools.downloadpage(item.url, headers=headers).data
-    data = httptools.downloadpage(item.url, headers=headers).data
+    data = support.match(item.url, headers=headers).data
 
     data = re.sub('\n|\t', ' ', data)
     data = re.sub(r'>\s+<', '> <', data)
-    check = scrapertools.find_single_match(data, r'<div class="category-film">\s+<h3>\s+(.*?)\s+</h3>\s+</div>')
+    check = support.match(data, patron=r'<div class="category-film">\s+<h3>\s+(.*?)\s+</h3>\s+</div>').match
     if 'sub' in check.lower():
         item.contentLanguage = 'Sub-ITA'
     support.log("CHECK : ", check)

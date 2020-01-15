@@ -108,7 +108,7 @@ def lista_serie(item):
     else:
         # Extrae las entradas
         patron = r'<li class="cat-item cat-item-\d+"><a href="([^"]+)"\s?>([^<]+)</a>'
-        matches = support.match(item, patron, headers=headers)[0]
+        matches = support.match(item, patron=patron, headers=headers).matches
     for i, (scrapedurl, scrapedtitle) in enumerate(matches):
         scrapedplot = ""
         scrapedthumbnail = ""
@@ -148,7 +148,9 @@ def episodios(item, itemlist=[]):
     patron += r'<p><a href="([^"]+)">'
 
 
-    matches, data = support.match(item, patron, headers=headers)
+    html = support.match(item, patron=patron, headers=headers)
+    matches = html.matches
+    data = html.data
 
     for scrapedurl, scrapedtitle, scrapedthumbnail in matches:
         scrapedplot = ""
@@ -224,7 +226,9 @@ def peliculas_tv(item):
 
     patron = '<div class="post-meta">\s*<a href="([^"]+)"\s*title="([^"]+)"\s*class=".*?"></a>'
 
-    matches, data = support.match(item, patron, headers=headers)
+    html = support.match(item, patron=patron, headers=headers)
+    matches = html.matches
+    data = html.data
 
     for scrapedurl, scrapedtitle in matches:
         if scrapedtitle in ["FACEBOOK", "RAPIDGATOR", "WELCOME!"]:
@@ -298,7 +302,7 @@ def search(item, texto):
     itemlist = []
 
     patron = '<li class="cat-item cat-item-\d+"><a href="([^"]+)"\s?>([^<]+)</a>'
-    matches = support.match(item, patron, headers=headers)[0]
+    matches = support.match(item, patron=patron, headers=headers).matches
     for i, (scrapedurl, scrapedtitle) in enumerate(matches):
         if texto.upper() in scrapedtitle.upper():
             scrapedthumbnail = ""
@@ -333,7 +337,7 @@ def list_az(item):
 
     alphabet = dict()
     patron = '<li class="cat-item cat-item-\d+"><a href="([^"]+)"\s?>([^<]+)</a>'
-    matches = support.match(item, patron, headers=headers)[0]
+    matches = support.match(item, patron=patron, headers=headers).matches
     for i, (scrapedurl, scrapedtitle) in enumerate(matches):
         letter = scrapedtitle[0].upper()
         if letter not in alphabet:

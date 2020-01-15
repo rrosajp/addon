@@ -73,7 +73,7 @@ def findvideos(item):
     support.log()
     itemlist = []
 
-    matches = support.match(item, 'filename: "(.*?)"')[0]
+    matches = support.match(item, patron=r'filename: "(.*?)"').matches
 
     for url in matches:
         itemlist.append(
