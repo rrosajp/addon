@@ -35,7 +35,6 @@ def mainlist(item):
 def peliculas(item):
     patronBlock = r'<div class="wrap">\s*<h.>.*?</h.>(?P<block>.*?)<footer>'
 
-
     if item.args != 'update':
         action = 'episodios'
         patron = r'<div class="item">\s*<a href="(?P<url>[^"]+)" data-original="(?P<thumb>[^"]+)" class="lazy inner">[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)<'
@@ -52,12 +51,13 @@ def peliculas(item):
 def episodios(item):
     seasons = support.match(item, patron=r'<option value="(\d+)"[^>]*>\D+(\d+)').matches
     patronBlock = r'</select><div style="clear:both"></div></h2>(?P<block>.*?)<div id="trailer" class="tab">'
-    patron = r'(?:<div class="list (?:active)?" data-id="(?P<season>\d+)">[^>]+>)?\s*<a data-id="(?P<episode>\d+)(?:[ ](?P<lang>[SuUbBiItTaA\-]+))?"(?P<url>[^>]+)>[^>]+>[^>]+>(?P<title>.+?)(?:\sSub-ITA)?<'
+    patron = r'(?:<div class="list (?:active)?")?\s*<a data-id="\d+(?:[ ](?P<lang>[SuUbBiItTaA\-]+))?"(?P<other>[^>]+)>.*?Episodio [0-9]+\s?(?:<br>(?P<title>[^<]+))?.*?Stagione (?P<season>[0-9]+) , Episodio - (?P<episode>[0-9]+).*?<(?P<url>.*?<iframe)'
     def itemHook(item):
         for value, season in seasons:
             log(value)
             log(season)
             item.title = item.title.replace(value+'x',season+'x')
+        item.url += '\n' + item.other
         return item
     return locals()
 
@@ -110,7 +110,11 @@ def newest(categoria):
 def findvideos(item):
     log()
     if item.args != 'update':
-        return support.server(item, data=item.url)
+        data = item.url
+        toUnshorten = scrapertools.find_multiple_matches(data, 'https?://buckler.link/[a-zA-Z0-9]+')
+        for link in toUnshorten:
+            data += '\n' + httptools.downloadpage(link, follow_redirects=False).headers["Location"]
+        return support.server(item, data=data)
     else:
         itemlist = []
         item.infoLabels['mediatype'] = 'episode'
