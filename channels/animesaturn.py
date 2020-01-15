@@ -12,7 +12,7 @@ host = support.config.get_channel_url()
 headers={'X-Requested-With': 'XMLHttpRequest'}
 
 
-list_servers = ['openload', 'fembed', 'animeworld']
+list_servers = ['directo', 'fembed', 'animeworld']
 list_quality = ['default', '480p', '720p', '1080p']
 
 @support.menu
@@ -33,6 +33,9 @@ def search(item, texto):
     anime = True
     patron = r'href="(?P<url>[^"]+)"[^>]+>[^>]+>(?P<title>[^<|(]+)(?:(?P<lang>\(([^\)]+)\)))?<|\)'
     action = 'check'
+    def itemHook(item):
+        item.url = item.url.replace('www.','')
+        return item
     return locals()
 
 
@@ -58,6 +61,9 @@ def newest(categoria):
 def menu(item):
     patronMenu = r'u>(?P<title>[^<]+)<u>(?P<url>.*?)</div> </div>'
     action = 'peliculas'
+    def itemHook(item):
+        item.url = item.url.replace('www.','')
+        return item
     return locals()
 
 
@@ -91,7 +97,7 @@ def check(item):
     movie = support.match(item, patron=r'Episodi:</b> (\d*) Movie')
     anime_id = support.match(movie.data, patron=r'anime_id=(\d+)').match
     item.url = host + "/loading_anime?anime_id=" + anime_id
-    if movie:
+    if movie.match:
         item.contentType = 'movie'
         episodes = episodios(item)
         if len(episodes) > 0: item.url = episodes[0].url
