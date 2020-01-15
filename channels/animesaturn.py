@@ -6,8 +6,9 @@
 
 from core import support
 
-__channel__ = "animesaturn"
-host = support.config.get_setting("channel_host", __channel__)
+# __channel__ = "animesaturn"
+# host = support.config.get_setting("channel_host", __channel__)
+host = support.config.get_channel_url()
 headers={'X-Requested-With': 'XMLHttpRequest'}
 
 
@@ -77,7 +78,7 @@ def peliculas(item):
         action = 'check'
     else:
         pagination = ''
-        if item.args == 'incorso': patron = r'"slider_title" href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)"[^>]+>(?P<title>[^\(<]+)(?:\((?P<year>\d+)\))?</a>'
+        if item.args == 'incorso': patron = r'"slider_title"\s*href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)"[^>]+>(?P<title>[^\(<]+)(?:\((?P<year>\d+)\))?</a>'
         else: patron = r'href="(?P<url>[^"]+)"[^>]+>[^>]+>(?P<title>.+?)(?:\((?P<lang>ITA)\))?(?:(?P<year>\((\d+)\)))?</span>'
         action = 'check'
     return locals()
