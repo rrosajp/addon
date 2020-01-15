@@ -34,7 +34,7 @@ class Kdicc():
         self.view_msg = view_msg
         self.lst_site_check_dns = lst_site_check_dns
         self.urls = []
-        logger.info("check #### INIZIO INIT#### ")
+        #logger.info("check #### INIZIO INIT#### ")
 
     def check_Ip(self):
         """
@@ -214,25 +214,32 @@ def test_conn(is_exit, check_dns, view_msg,
         if ktest.is_exit == True:
             exit()
     # se non ha connessione ADSL lo comunico all'utente
-    elif not ktest.check_Adsl():
+    if not ktest.check_Adsl():
         if view_msg == True:
             ktest.view_Advise(config.get_localized_string(70721))
         if ktest.is_exit == True:
             exit()
     # se ha i DNS filtrati lo comunico all'utente
-    elif ktest.check_dns:
-        if not ktest.check_Dns():
-            if view_msg == True:
-                ktest.view_Advise(config.get_localized_string(70722))
+    if check_dns == True:
+        if ktest.check_Dns():
+            if not ktest.check_Dns():
+                if view_msg == True:
+                    ktest.view_Advise(config.get_localized_string(70722))
 
     xbmc.log("############ Inizio Check DNS ############", level=xbmc.LOGNOTICE)
     xbmc.log("## IP: %s" %  (ktest.ip_addr), level=xbmc.LOGNOTICE)
     xbmc.log("## DNS: %s" %  (ktest.dns), level=xbmc.LOGNOTICE)
     xbmc.log("############ Fine Check DNS ############", level=xbmc.LOGNOTICE)
-    if ktest.check_Ip() and ktest.check_Adsl() and ktest.check_Dns():
-        return True
+    if check_dns == True:
+        if ktest.check_Ip() == True and ktest.check_Adsl() == True and ktest.check_Dns() == True:
+            return True
+        else:
+            return False
     else:
-        return False
+        if ktest.check_Ip() == True and ktest.check_Adsl() == True:
+            return True
+        else:
+            return False
 
 # def per la creazione del file channels.json
 def check_channels(inutile=''):
@@ -297,11 +304,3 @@ def check_channels(inutile=''):
     with open(folderJson+'/'+fileJson_test, 'w') as f:
         data = json.dump(risultato, f, sort_keys=True, indent=4)
         logger.info(data)
-
-    # per il futuro
-    # codice per l'invio del file su git!!!
-
-    # 1. Bottone OKNO richiesta se vuole inviare file
-    # 2. Maschera per le credenziali di Github
-    # 3. Invio file
-    # 4. Esci
