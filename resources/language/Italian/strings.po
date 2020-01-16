@@ -5737,6 +5737,10 @@ msgctxt "#70753"
 msgid "Playback"
 msgstr "Riproduzione"
 
+msgctxt "#70754"
+msgid "Compact mode"
+msgstr "Modalità compatta"
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS Check Alert"

@@ -5733,6 +5733,10 @@ msgctxt "#70753"
 msgid "Playback"
 msgstr ""
 
+msgctxt "#70754"
+msgid "Compact mode"
+msgstr ""
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS Check Alert"

@@ -7,6 +7,7 @@ from core import jsontools, filetools
 from lib.concurrent import futures
 
 PLAYER_STOP = 13
+ND = 'NextDialogCompact.xml' if config.get_setting('next_ep_type') else 'NextDialog.xml'
 
 def check(item):
     return True if config.get_setting('next_ep') > 0 and item.contentType != 'movie' else False
@@ -104,7 +105,7 @@ def next_ep(item):
                 global ITEM
                 ITEM = item
 
-                nextDialog = NextDialog('NextDialog.xml', config.get_runtime_path())
+                nextDialog = NextDialog(ND, config.get_runtime_path())
                 nextDialog.show()
                 while platformtools.is_playing() and not nextDialog.is_still_watching():
                     xbmc.sleep(100)
