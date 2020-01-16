@@ -549,7 +549,6 @@ def play_from_library(item):
                         break
 
         if it.show_server and check_next_ep:
-            logger.info('PARTITO')
             nextep.run(it)
             sleep(0.5)
             p_dialog.close()
