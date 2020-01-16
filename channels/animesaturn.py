@@ -87,9 +87,9 @@ def peliculas(item):
         if item.args == 'incorso': patron = r'"slider_title"\s*href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)"[^>]+>(?P<title>[^\(<]+)(?:\((?P<year>\d+)\))?</a>'
         else: patron = r'href="(?P<url>[^"]+)"[^>]+>[^>]+>(?P<title>.+?)(?:\((?P<lang>ITA)\))?(?:(?P<year>\((\d+)\)))?</span>'
         action = 'check'
-        def itemHook(item):
-            item.url = item.url.replace('www.','')
-            return item
+    def itemHook(item):
+        item.url = item.url.replace('www.','')
+        return item
     return locals()
 
 
@@ -120,10 +120,11 @@ def episodios(item):
 def findvideos(item):
     support.log()
     itemlist = []
-    urls = support.match(item, patron=r'<a href="([^"]+)"><div class="downloadestreaming">', headers=headers).matches
+    # support.dbg()
+    urls = support.match(item, patron=r'<a href="([^"]+)"><div class="downloadestreaming">', headers=headers, debug=False).matches
     if urls:
-        links = support.match(urls[0].replace('www.',''), patron=r'(?:<source type="[^"]+"\s*src=|file:\s*)"([^"]+)"', headers=headers).matches
-        for link in links:
+        links = support.match(urls[0].replace('www.',''), patron=r'(?:<source type="[^"]+"\s*src=|file:\s*)"([^"]+)"', headers=headers, debug=False)
+        for link in links.matches:
             itemlist.append(
                 support.Item(channel=item.channel,
                             action="play",
@@ -135,7 +136,7 @@ def findvideos(item):
                             show=item.show,
                             contentType=item.contentType,
                             folder=False))
-    return support.server(item, itemlist=itemlist)
+    return support.server(item, links, itemlist=itemlist)
 
 
 
