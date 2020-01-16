@@ -132,8 +132,12 @@ def check():
                                     urllib.urlretrieve(file['raw_url'], os.path.join(addonDir, file['filename']))
                         else:  # è un file NON testuale, lo devo scaricare
                             # se non è già applicato
-                            if not (filetools.isfile(addonDir + file['filename']) and getSha(addonDir + file['filename']) == file['sha']):
-                                urllib.urlretrieve(file['raw_url'], os.path.join(addonDir, file['filename']))
+                            filename = os.path.join(addonDir, file['filename'])
+                            dirname = os.path.dirname(filename)
+                            if not (filetools.isfile(addonDir + file['filename']) and getSha(filename) == file['sha']):
+                                if not os.path.exists(dirname):
+                                    os.makedirs(dirname)
+                                urllib.urlretrieve(file['raw_url'], filename)
                                 alreadyApplied = False
                     elif file['status'] == 'removed':
                         remove(addonDir+file["filename"])
