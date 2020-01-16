@@ -251,7 +251,7 @@ def searchSubtitle(item):
 
 
 def saveSubtitleName(item):
-    if item.show in item.title:
+    if not item.show or item.show in item.title:
         title = item.title
     else:
         title = item.show + " - " + item.title
