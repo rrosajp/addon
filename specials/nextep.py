@@ -14,14 +14,14 @@ def check(item):
 
 
 def return_item(item):
-    logger.info('AS ITEM\n'+str(item))
+    logger.info()
     with futures.ThreadPoolExecutor() as executor:
         future = executor.submit(next_ep, item)
         item = future.result()
     return item
 
 def run(item):
-    logger.info('AS ITEM\n'+str(item))
+    logger.info()
     with futures.ThreadPoolExecutor() as executor:
         future = executor.submit(next_ep, item)
         item = future.result()
@@ -71,9 +71,7 @@ def next_ep(item):
             # check i next file exist
             current_filename = os.path.basename(item.strm_path)
             base_path = os.path.basename(os.path.normpath(os.path.dirname(item.strm_path)))
-            logger.info('PATH:' + base_path)
             path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"),base_path)
-            logger.info('PATH:' + path)
             fileList = []
             for file in os.listdir(path):
                 if file.endswith('.strm'):
@@ -112,13 +110,12 @@ def next_ep(item):
                     pass
 
                 nextDialog.close()
-                logger.info('CONTINUE: ' +str(nextDialog.stillwatching))
+                logger.info('Next Episode: ' +str(nextDialog.stillwatching))
 
                 if nextDialog.stillwatching or nextDialog.continuewatching:
                     item.next_ep = True
                     xbmc.Player().stop()
                     if VL:
-                        logger.info('BACK STILL')
                         sleep(1)
                         xbmc.executebuiltin('Action(Back)')
                         sleep(0.5)
