@@ -313,8 +313,8 @@ def set_channel_info(parameters):
         else:
             content = config.get_localized_category(cat)
 
-    info = '[COLOR yellow]' + config.get_localized_string(70567) + ' [/COLOR]' + content + '\n\n'
-    info += '[COLOR yellow]' + config.get_localized_string(70568) + ' [/COLOR] ' + language
+    info = '[B]' + config.get_localized_string(70567) + ' [/B]' + content + '\n\n'
+    info += '[B]' + config.get_localized_string(70568) + ' [/B] ' + language
     return info
 
 
