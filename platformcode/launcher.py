@@ -473,7 +473,6 @@ def play_from_library(item):
     else:
 
         # Ventana emergente
-        item.play_from = 'window'
         item.show_server = True
 
         from specials import videolibrary, autoplay
@@ -543,6 +542,7 @@ def play_from_library(item):
                         return
                     else:
                         item = videolibrary.play(itemlist[seleccion])[0]
+                        item.play_from = 'window'
                         platformtools.play_video(item)
 
                     if (platformtools.is_playing() and item.action) or item.server == 'torrent' or autoplay.is_active(item.contentChannel):

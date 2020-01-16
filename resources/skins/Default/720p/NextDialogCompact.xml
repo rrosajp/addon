@@ -15,14 +15,14 @@
             </animation>
             <control type="group">
                 <right>0</right>
-                <top>10</top>
+                <top>15</top>
                 <height>50</height>
                 <width>100%</width>
                 <!-- Background -->
                 <control type="image">
                     <top>0</top>
                     <width>100%</width>
-                    <height>50</height>
+                    <height>40</height>
                     <!-- <texture colordiffuse="00111111">NextDialog/button-bg.png</texture> -->
                 </control>
                 <control type="group">
@@ -38,17 +38,17 @@
                     </control>
                     <control type="grouplist" id="20">
                         <orientation>horizontal</orientation>
-                        <height>50</height>
+                        <height>40</height>
                         <itemgap>0</itemgap>
                         <align>right</align>
                         <control type="button" id="11">
-                            <label>$INFO[Player.TimeRemaining(ss),,]</label>
+                            <label>[B]$INFO[Player.TimeRemaining(ss),,][/B]</label>
                             <onclick>SendClick(3012)</onclick>
-                            <visible>!Integer.IsGreater(Player.TimeRemaining,59)</visible>
-                            <height>50</height>
-                            <width>70</width>
+                            <!-- <visible>!Integer.IsGreater(Player.TimeRemaining,59)</visible> -->
+                            <height>40</height>
+                            <width>65</width>
                             <font>font30_title</font>
-                            <textoffsetx>15</textoffsetx>
+                            <textoffsetx>12</textoffsetx>
                             <textcolor>80FFFFFF</textcolor>
                             <focusedcolor>FFFFFFFF</focusedcolor>
                             <selectedcolor>80FFFFFF</selectedcolor>
@@ -61,8 +61,8 @@
                         </control>
                         <control type="button" id="3013">
                             <label></label>
-                            <height>50</height>
-                            <width>50</width>
+                            <height>40</height>
+                            <width>40</width>
                             <font>font30_title</font>
                             <textoffsetx>30</textoffsetx>
                             <textcolor>80FFFFFF</textcolor>
@@ -77,8 +77,8 @@
                         </control>
                             <control type="image">
                             <top>0</top>
-                            <width>30</width>
-                            <height>50</height>
+                            <width>20</width>
+                            <height>40</height>
                             <texture>NextDialog/background.png</texture>
                         </control>
                     </control>
