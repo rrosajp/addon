@@ -1055,7 +1055,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
             checklinks_number = get_setting('checklinks_number')
         itemlist = servertools.check_list_links(itemlist, checklinks_number)
 
-    if AutoPlay == True and not 'downloads' in inspect.stack()[3][1] + inspect.stack()[4][1] and item.contentChannel != 'videolibrary':
+    if AutoPlay == True and not 'downloads' in inspect.stack()[3][1] + inspect.stack()[4][1]:
         autoplay.start(itemlist, item)
 
     if item.contentChannel != 'videolibrary': videolibrary(itemlist, item, function_level=3)
