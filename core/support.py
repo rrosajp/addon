@@ -201,8 +201,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
     stagione = '' # per quei siti che hanno la stagione nel blocco ma non nelle puntate
     for i, match in enumerate(matches):
-        if pagination and (pag - 1) * pagination > i: continue  # pagination
-        if pagination and i >= pag * pagination: break          # pagination
+        if pagination and (pag - 1) * pagination > i and not search: continue  # pagination
+        if pagination and i >= pag * pagination and not search: break          # pagination
         listGroups = match.keys()
         match = match.values()
 
@@ -214,7 +214,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         for kk in known_keys:
             val = match[listGroups.index(kk)] if kk in listGroups else ''
             if val and (kk == "url" or kk == 'thumb') and 'http' not in val:
-                val = scrapertools.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
+                val = scrapertools.find_single_match(item.url, 'https?://[a-z0-9.-]+') + (val if val.startswith('/') else '/' + val)
             scraped[kk] = val
 
         if scraped['season']:
