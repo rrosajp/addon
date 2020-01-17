@@ -219,7 +219,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
         if scraped['season']:
             stagione = scraped['season']
-            episode = scraped['season'] +'x'+ scraped['episode']
+            episode = scraped['season'] +'x'+ scraped['episode'].zfill(2)
         elif item.season:
             episode = item.season +'x'+ scraped['episode']
         elif item.contentType == 'tvshow' and (scraped['episode'] == '' and scraped['season'] == '' and stagione == ''):
@@ -295,7 +295,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 quality=quality,
                 url=scraped["url"],
                 infoLabels=infolabels,
-                thumbnail=item.thumbnail if function == 'episodios' else scraped["thumb"] ,
+                thumbnail=item.thumbnail if function == 'episodios' and not scraped["thumb"] else scraped["thumb"] ,
                 args=item.args,
                 contentSerieName= scraped['title'] if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
                 contentTitle= scraped['title'] if item.contentType or CT == 'movie' else '',
