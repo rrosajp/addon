@@ -12,7 +12,11 @@ from platformcode import config
 list_servers = ['akstream', 'wstream', 'backin', 'clipwatching', 'cloudvideo', 'verystream', 'onlystream', 'mixdrop']
 list_quality = ['default']
 
-host = config.get_channel_url()
+def findhost():
+    permUrl = httptools.downloadpage('https://www.cinemalibero.online/', follow_redirects=False).headers
+    return 'https://www.' + permUrl['location'].replace('https://www.google.com/search?q=site:', '')
+
+host = config.get_channel_url(findhost)
 headers = [['Referer', host]]
 
 @support.menu
