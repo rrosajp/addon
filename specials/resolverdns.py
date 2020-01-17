@@ -40,7 +40,7 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
     def __init__(self, domain, CF=False, *args, **kwargs):
         self.conn = sql.connect(db)
         self.cur = self.conn.cursor()
-        self.ssl_context = CustomContext(ssl.PROTOCOL_TLS, domain)
+        self.ssl_context = CustomContext(ssl.PROTOCOL_SSLv23, domain)
         self.CF = CF  # if cloudscrape is in action
         self.cipherSuite = kwargs.pop('cipherSuite', ssl._DEFAULT_CIPHERS)
 
