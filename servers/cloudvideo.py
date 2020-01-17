@@ -9,8 +9,10 @@ from platformcode import logger
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
-    data = httptools.downloadpage(page_url)
-    if data.code == 404:
+    html = httptools.downloadpage(page_url)
+    global data
+    data = html.data
+    if html.code == 404:
         return False, config.get_localized_string(70292) % "CloudVideo"
     return True, ""
 
@@ -18,7 +20,8 @@ def test_video_exists(page_url):
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     logger.info("url=" + page_url)
     video_urls = []
-    data = httptools.downloadpage(page_url).data
+    global data
+    # data = httptools.downloadpage(page_url).data
     # enc_data = scrapertools.find_single_match(data, "text/javascript">(.+?)</script>")
     # dec_data = jsunpack.unpack(enc_data)
     sources = scrapertools.find_single_match(data, "<source(.*?)</source")

@@ -1,0 +1,11 @@
+{
+  "id": "pufimovies",
+  "name": "PufiMovies",
+  "active": true,
+  "adult": false,
+  "language": ["ita", "sub-ita"],
+  "thumbnail": "pufimovies.png",
+  "banner": "pufimovies.png",
+  "categories": ["movie","tvshow"],
+  "settings": []
+}
