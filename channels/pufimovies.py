@@ -1,26 +1,14 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per Filmi Gratis
+# Canale per PufiMovies
 # ------------------------------------------------------------
-"""
-    La voce "Al cinema" si riferisce ai titoli che scorrono nella home page
 
-    Problemi:
-        - Nessuno noto
+from core import support
 
-    Novità, il canale, è presente in:
-       - FILM
-"""
-import re
+host = support.config.get_channel_url()
 
-from core import servertools, httptools, support
-from core.item import Item
-from platformcode import config
-
-host = config.get_channel_url()
-
-list_servers = ['verystream', 'openload', 'streamango', 'vidoza', 'okru']
-list_quality = ['1080p', '720p', '480p', '360']
+list_servers = ['mixdrop', 'wstream', 'vupplayer', 'supervideo', 'cloudvideo', 'gounlimited']
+list_quality = ['default','1080p', '720p', '480p', '360p']
 
 headers = [['Referer', host]]
 
@@ -57,7 +45,7 @@ def search(item, text):
     try:
         item.args = 'search'
         return peliculas(item)
-    # Se captura la excepcion, para no interrumpir al buscador global si un canal falla
+    # Continua la ricerca in caso di errore
     except:
         import sys
         for line in sys.exc_info():
@@ -94,7 +82,6 @@ def newest(categoria):
 
 @support.scrape
 def peliculas(item):
-    # debug = True
     if item.contentType == 'tvshow' and not item.args:
         action = 'episodios'
         patron = r'<div class="movie-box">\s*<a href="(?P<url>[^"]+)">[^>]+>[^>]+>\D+Streaming\s(?P<lang>[^"]+)[^>]+>[^>]+>[^>]+>(?P<quality>[^<]+)[^>]+>[^>]+>[^>]+>\s*<img src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>(?P<rating>[^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)[^>]+>[^>]+>[^>]+>\s*(?P<year>\d+)'
@@ -120,5 +107,5 @@ def episodios(item):
 
 def findvideos(item):
     support.log()
-    # match = support.match(item, patron)
+    # match = support.match(item, patron='wstream', debug=True)
     return support.server(item)
