@@ -4,8 +4,8 @@
     "active": true,
     "adult": false,
     "language": ["ita","sub-ita"],
-    "thumbnail": "https:\/\/raw.githubusercontent.com\/Zanzibar82\/images\/master\/posters\/altadefinizioneclick.png",
-    "bannermenu": "https:\/\/raw.githubusercontent.com\/Zanzibar82\/images\/master\/posters\/altadefinizioneciclk.png",
+    "thumbnail": "altadefinizioneclick.png",
+    "bannermenu": "altadefinizioneciclk.png",
     "categories": ["movie","vos"],
     "settings": []
 }
