@@ -37,7 +37,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     i = 0
     for media_url in matches:
         # URL del vídeo
-        video_urls.append([vres[i] + " mp4 [Akvideo] ", media_url + '|' + _headers])
+        video_urls.append([vres[i] + " mp4 [Akvideo] ", media_url.replace('https://', 'http://') + '|' + _headers])
         i = i + 1
 
     for video_url in video_urls:
