@@ -638,8 +638,9 @@ def menu(func):
 
         item = args['item']
         host = func.__globals__['host']
-        list_servers = func.__globals__['list_servers'] if 'list_servers' in func.__globals__ else 'directo'
-        list_quality = func.__globals__['list_quality'] if 'list_quality' in func.__globals__ else 'default'
+        list_servers = func.__globals__['list_servers'] if 'list_servers' in func.__globals__ else ['directo']
+        list_quality = func.__globals__['list_quality'] if 'list_quality' in func.__globals__ else ['default']
+        log('LIST QUALITY', list_quality)
         filename = func.__module__.split('.')[1]
         global_search = False
         # listUrls = ['film', 'filmSub', 'tvshow', 'tvshowSub', 'anime', 'animeSub', 'search', 'top', 'topSub']
