@@ -2,17 +2,12 @@
 <settings>
     <!-- General -->
     <category label="70168">
-        <setting id="player_mode" type="enum" values="Direct|SetResolvedUrl|Built-In|Download and Play" label="30044" default="1"/>
-        <setting id="default_action" type="enum" lvalues="30006|30007|30008" label="30005" default="0"/>
-        <setting id="autoplay" type="bool" label="70562" default="false" visible="true"/>
-<!--        <setting id="autoplay_next" type="bool" label="Riproduci episodio successivo" default="false" visible="true"/>-->
-        <setting id="autoplay_server_list" type="bool" label="70746" default="false" visible="true"/>
-        <setting id="checklinks" type="bool" label="30020" default="false"/>
-        <setting id="checklinks_number" type="enum" values="5|10|15|20" label="30021" default="0" visible="eq(-1,true)"/>
+        
         <setting id="thumbnail_type" type="enum" lvalues="30011|30012|30200" label="30010" default="2"/>
         <setting id="channel_language" type="labelenum" values="auto|all|ita" label="30019" default="all"/>
         <setting id="trakt_sync" type="bool" label="70109" default="false"/>
         <setting id="forceview" type="bool" label="30043" default="false"/>
+        <setting id="faster_item_serialization" type="bool" label="30300" default="false"/>
         <setting id="resolver_dns" type="bool" label="707408" default="true" enable="true" visible="true"/>
         <setting id="debug" type="bool" label="30003" default="false"/>
         <setting label="70169" type="lsep"/>
@@ -40,6 +35,16 @@
         <setting id="enable_library_menu" label="30131" type="bool" default="true"/>
     </category>
 
+    <!-- Playback -->
+    <category label="70753">
+        <setting id="player_mode" type="enum" values="Direct|SetResolvedUrl|Built-In|Download and Play" label="30044" default="1"/>
+        <setting id="default_action" type="enum" lvalues="30006|30007|30008" label="30005" default="0"/>
+        <setting id="autoplay" type="bool" label="70562" default="false" visible="true"/>
+        <setting id="hide_servers" type="bool" label="70747" default="false" visible="eq(-1,true)"/>
+        <setting id="checklinks" type="bool" label="30020" default="false"/>
+        <setting id="checklinks_number" type="enum" values="5|10|15|20" label="30021" default="0" visible="eq(-1,true)"/>
+    </category>
+
     <!-- Videolibrary -->
     <category label="30131">
         <!-- <setting id="downloadpath" type="folder" label="30017" default=""/>
@@ -53,6 +58,9 @@
         <setting id="videolibrary_kodi_force" type="bool" label="" default="false" visible="false"/>
         <setting id="videolibrary_kodi" type="bool" label="70120" enable="lt(-1,2)+eq(0,false)" default="false"/>
         <setting id="videolibrary_max_quality" type="bool" label="70729" default="false" visible="true"/>
+        <setting id="next_ep" type="enum" label="70746" lvalues="70752|70747|70748" default="0"/>
+        <setting id="next_ep_type" type="bool" label="70754" default="false" visible="eq(-1,2)"/>
+        <setting id="next_ep_seconds" type="enum" values="20|30|40|50|60" label="70749" default="2" visible="!eq(-2,0)"/>
     </category>
 
 
@@ -70,61 +78,8 @@
         <setting id="custom_theme" type="folder" label="70565" default="" visible="eq(-1,true)"/>
         <setting id="infoplus_set" type="labelenum" label="70128" lvalues="70129|70130" default="70129"/>
         <setting id="video_thumbnail_type" type="enum" label="70131" lvalues="70132|70133" default="0"/>
-        <!-- <setting label="70167" type="lsep"/>
-        <setting id="unify" type="bool" label="70134" default="false"/>
-        <setting id="title_color" type="bool" label="70135" default="false" visible="eq(-1,true)"/>
-        <setting id="movie_color" type="labelenum" label="70137"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-1,true)+eq(-2,true)"/>
-        <setting id="tvshow_color" type="labelenum" label="30123"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-2,true)+eq(-3,true)"/>
-        <setting id="year_color" type="labelenum" label="60232"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-3,true)+eq(-4,true)"/>
-        <setting id="rating_1_color" type="labelenum" label="70138"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-4,true)+eq(-5,true)"/>
-        <setting id="rating_2_color" type="labelenum" label="70139"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-5,true)+eq(-6,true)"/>
-        <setting id="rating_3_color" type="labelenum" label="70140"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-6,true)+eq(-7,true)"/>
-        <setting id="quality_color" type="labelenum" label="70141"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-7,true)+eq(-8,true)"/>
-        <setting id="cast_color" type="labelenum" label="59980"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-8,true)+eq(-9,true)"/>
-        <setting id="lat_color" type="labelenum" label="59981"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-9,true)+eq(-10,true)"/>
-        <setting id="vose_color" type="labelenum" label="70142"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-10,true)+eq(-11,true)"/>
-        <setting id="sub-ita_color" type="labelenum" label="70566"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-11,true)+eq(-12,true)"/>
-        <setting id="vos_color" type="labelenum" label="70143"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-12,true)+eq(-13,true)"/>
-        <setting id="vo_color" type="labelenum" label="70144"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-13,true)+eq(-14,true)"/>
-        <setting id="server_color" type="labelenum" label="70145"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-14,true)+eq(-15,true)"/>
-        <setting id="library_color" type="labelenum" label="70146"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-15,true)+eq(-16,true)"/>
-        <setting id="update_color" type="labelenum" label="70147"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-16,true)+eq(-17,true)"/>
-        <setting id="no_update_color" type="labelenum" label="70148"
-                 values="[COLOR white]white[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]"
-                 default="white" visible="eq(-17,true)+eq(-18,true)"/> -->
     </category>
+
     <!-- Other -->
     <category label="70149">
         <setting label="70150" type="lsep"/>
@@ -137,6 +92,7 @@
 
         <setting type="sep"/>
         <setting label="70154" type="lsep"/>
+        <setting id="tmdb_active" default="true" visible="false"/>
         <setting id="tmdb_threads" type="labelenum" values="5|10|15|20|25|30" label="70155" default="20"/>
         <setting id="tmdb_plus_info" type="bool" label="70156" default="false"/>
         <setting id="tmdb_cache" type="bool" label="70157" default="true"/>
@@ -155,9 +111,6 @@
 
         <setting label="Lista activa" type="text" id="lista_activa" default="kodfavorites-default.json" visible="false"/>
 
-        <!-- <setting type="sep"/>
-        <setting label="70583" type="lsep"/>
-        <setting id="addon_quasar_update" type="bool" label="70584" default="false"/> -->
     </category>
     <!-- Custom Start -->
     <category label="70121">
@@ -172,5 +125,4 @@
 
     </category>
 
-  
 </settings>

@@ -37,7 +37,7 @@ class UnshortenIt(object):
     _rapidcrypt_regex = r'rapidcrypt\.net'
     _cryptmango_regex = r'cryptmango|xshield\.net'
     _vcrypt_regex = r'vcrypt\.net'
-    _linkup_regex = r'linkup\.pro'
+    _linkup_regex = r'linkup\.pro|buckler.link'
 
     _maxretries = 5
 

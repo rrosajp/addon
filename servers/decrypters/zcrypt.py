@@ -20,11 +20,12 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     patronvideos = [
         r'(https?://(gestyy|rapidteria|sprysphere)\.com/[a-zA-Z0-9]+)',
         r'(https?://(?:www\.)?(vcrypt|linkup)\.[^/]+/[^/]+/[a-zA-Z0-9_]+)',
-        r'(https?://(?:www\.)?(bit)\.ly/[a-zA-Z0-9]+)',
+        r'(https?://(?:www\.)?(bit|buckler)\.[^/]+/[a-zA-Z0-9]+)',
         r'(https?://(?:www\.)?(xshield)\.[^/]+/[^/]+/[^/]+/[a-zA-Z0-9_\.]+)'
     ]
 
     for patron in patronvideos:
+        # from core.support import dbg; dbg()
         logger.info(" find_videos #" + patron + "#")
         matches = re.compile(patron).findall(page_url)
 
@@ -51,9 +52,10 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                         continue
                     else:
                         from lib import unshortenit
-                        data, status = unshortenit.unshorten(url)
+                        sh = unshortenit.UnshortenIt()
+                        data, status = sh.unshorten(url)
                         logger.info("Data - Status zcrypt vcrypt.net: [%s] [%s] " %(data, status)) 
-                elif 'linkup' in url or 'bit.ly' in url:
+                elif 'linkup' in url or 'bit.ly' in url or 'buckler' in url:
                     logger.info("DATA LINK {}".format(url))
                     if '/tv/' in url:
                         url = url.replace('/tv/','/tva/')

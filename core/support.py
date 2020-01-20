@@ -180,7 +180,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
     if debug:
         regexDbg(item, patron, headers, block)
 
-    known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
+    known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang', 'other']
     # Legenda known_keys per i groups nei patron
     # known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality',
     #                'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
@@ -201,8 +201,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
     stagione = '' # per quei siti che hanno la stagione nel blocco ma non nelle puntate
     for i, match in enumerate(matches):
-        if pagination and (pag - 1) * pagination > i: continue  # pagination
-        if pagination and i >= pag * pagination: break          # pagination
+        if pagination and (pag - 1) * pagination > i and not search: continue  # pagination
+        if pagination and i >= pag * pagination and not search: break          # pagination
         listGroups = match.keys()
         match = match.values()
 
@@ -214,12 +214,12 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         for kk in known_keys:
             val = match[listGroups.index(kk)] if kk in listGroups else ''
             if val and (kk == "url" or kk == 'thumb') and 'http' not in val:
-                val = scrapertools.find_single_match(item.url, 'https?://[a-z0-9.-]+') + val
+                val = scrapertools.find_single_match(item.url, 'https?://[a-z0-9.-]+') + (val if val.startswith('/') else '/' + val)
             scraped[kk] = val
 
         if scraped['season']:
             stagione = scraped['season']
-            episode = scraped['season'] +'x'+ scraped['episode']
+            episode = scraped['season'] +'x'+ scraped['episode'].zfill(2)
         elif item.season:
             episode = item.season +'x'+ scraped['episode']
         elif item.contentType == 'tvshow' and (scraped['episode'] == '' and scraped['season'] == '' and stagione == ''):
@@ -295,13 +295,14 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 quality=quality,
                 url=scraped["url"],
                 infoLabels=infolabels,
-                thumbnail=item.thumbnail if function == 'episodios' else scraped["thumb"] ,
+                thumbnail=item.thumbnail if function == 'episodios' and not scraped["thumb"] else scraped["thumb"] ,
                 args=item.args,
                 contentSerieName= scraped['title'] if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
                 contentTitle= scraped['title'] if item.contentType or CT == 'movie' else '',
                 contentLanguage = lang1,
                 contentEpisodeNumber=episode if episode else '',
-                news= item.news if item.news else ''
+                news= item.news if item.news else '',
+                other = scraped['other'] if scraped['other'] else ''
             )
 
             for lg in list(set(listGroups).difference(known_keys)):
@@ -445,7 +446,7 @@ def scrape(func):
         if anime:
             if function == 'episodios' or item.action == 'episodios': autorenumber.renumber(itemlist, item, 'bold')
             else: autorenumber.renumber(itemlist)
-        if anime and autorenumber.check(item) == False and not scrapertools.find_single_match(itemlist[0].title, r'(\d+.\d+)'):
+        if anime and autorenumber.check(item) == False and len(itemlist)>0 and not scrapertools.find_single_match(itemlist[0].title, r'(\d+.\d+)'):
             pass
         else:
             if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
@@ -637,8 +638,9 @@ def menu(func):
 
         item = args['item']
         host = func.__globals__['host']
-        list_servers = func.__globals__['list_servers'] if 'list_servers' in func.__globals__ else 'directo'
-        list_quality = func.__globals__['list_quality'] if 'list_quality' in func.__globals__ else 'default'
+        list_servers = func.__globals__['list_servers'] if 'list_servers' in func.__globals__ else ['directo']
+        list_quality = func.__globals__['list_quality'] if 'list_quality' in func.__globals__ else ['default']
+        log('LIST QUALITY', list_quality)
         filename = func.__module__.split('.')[1]
         global_search = False
         # listUrls = ['film', 'filmSub', 'tvshow', 'tvshowSub', 'anime', 'animeSub', 'search', 'top', 'topSub']
@@ -772,31 +774,91 @@ def typo(string, typography=''):
     return string
 
 
-def match(item, patron='', patronBlock='', headers='', url='', post=''):
+def match(item_url_string, **args):
+    '''
+    match is a function that combines httptools and scraper tools:
+    '''
+    log(item_url_string)
+
     matches = []
-    if type(item) == str:
-        data = item
+    url = None
+    # arguments allowed for scrape
+    patron = args.get('patron', None)
+    patronBlock = args.get('patronBlock', None)
+    patronBlocks = args.get('patronBlock', None)
+    debug = args.get('debug', False)
+    debugBlock = args.get('debugBlock', False)
+    string = args.get('string', False)
+    # remove scrape arguments
+    args = dict([(key, val) for key, val in args.items() if key not in ['patron', 'patronBlock', 'patronBlocks', 'debug', 'debugBlock', 'string']]) 
+    # dbg()
+    # check type of item_url_string
+    if type(item_url_string) == str:
+        if item_url_string.startswith('http') and not string: url = item_url_string
+        else : data = item_url_string
     else:
-        url = url if url else item.url
-        if post:
-            data = httptools.downloadpage(url, headers=headers, ignore_response_code=True, post=post).data.replace("'", '"')
-        else:
-            data = httptools.downloadpage(url, headers=headers, ignore_response_code=True).data.replace("'", '"')
+        # if item_url_string is an item use item.url as url
+        url = item_url_string.url
+
+    # if there is a url, download the page
+    if url:
+        if args.get('ignore_response_code', None) is None:
+            args['ignore_response_code'] = True
+        data = httptools.downloadpage(url, **args).data.replace("'", '"')
+
+    # format page data
     data = re.sub(r'\n|\t', ' ', data)
     data = re.sub(r'>\s\s*<', '><', data)
-    log('DATA= ', data)
 
+    # collect blocks of a page
     if patronBlock:
-        block = scrapertools.find_single_match(data, patronBlock)
-        log('BLOCK= ',block)
+        blocks = [scrapertools.find_single_match(data, patronBlock)]
+    elif patronBlocks:
+        blocks = scrapertools.find_multiple_matches(data, patronBlock)
     else:
-        block = data
+        blocks = [data]
 
+    # match
     if patron:
-        matches = scrapertools.find_multiple_matches(block, patron)
-        log('MATCHES= ',matches)
+        if type(patron) == str:  patron = [patron]
+        for b in blocks:
+            for p in patron:
+                matches += scrapertools.find_multiple_matches(b, p)
 
-    return matches, block
+    # debug mode
+    if config.dev_mode():
+        if debugBlock:
+            match_dbg(data, patronBlock)
+        if debug:
+            for block in blocks:
+                for p in patron:
+                    match_dbg(block, p)
+
+    # create a item
+    item = Item(data=data,
+                blocks=blocks,
+                block=blocks[0] if len(blocks) > 0 else '',
+                matches=matches,
+                match=matches[0] if len(matches) > 0 else '')
+
+    return item
+
+
+def match_dbg(data, patron):
+    import json, urllib2, webbrowser
+    url = 'https://regex101.com'
+    headers = {'content-type': 'application/json'}
+    data = {
+        'regex': patron,
+        'flags': 'gm',
+        'testString': data,
+        'delimiter': '"""',
+        'flavor': 'python'
+    }
+    r = urllib2.Request(url + '/api/regex', json.dumps(data, encoding='latin1'), headers=headers)
+    r = urllib2.urlopen(r).read()
+    permaLink = json.loads(r)['permalinkFragment']
+    webbrowser.open(url + "/r/" + permaLink)
 
 
 def download(itemlist, item, typography='', function_level=1, function=''):
@@ -981,7 +1043,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
     channel_node = autoplay_node.get(item.channel, {})
     settings_node = channel_node.get('settings', {})
     AP = get_setting('autoplay') or settings_node['active']
-    APS = get_setting('autoplay_server_list')
+    HS = config.get_setting('hide_servers')
 
     if CL and not AP:
         if get_setting('checklinks', item.channel):
@@ -994,7 +1056,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
             checklinks_number = get_setting('checklinks_number')
         itemlist = servertools.check_list_links(itemlist, checklinks_number)
 
-    if AutoPlay == True and not 'downloads' in inspect.stack()[3][1] + inspect.stack()[4][1] and item.contentChannel != 'videolibrary':
+    if AutoPlay == True and not 'downloads' in inspect.stack()[3][1] + inspect.stack()[4][1]:
         autoplay.start(itemlist, item)
 
     if item.contentChannel != 'videolibrary': videolibrary(itemlist, item, function_level=3)
@@ -1010,7 +1072,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
             VL = True
     except:
         pass
-    if not AP or VL or not APS:
+    if not AP or VL or not HS:
         return itemlist
 
 def filterLang(item, itemlist):

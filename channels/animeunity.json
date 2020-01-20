@@ -1,0 +1,11 @@
+{
+  "id": "animeunity",
+  "name": "AnimeUnity",
+  "active": true,
+  "adult": false,
+  "language": ["ita", "sub-ita"],
+  "thumbnail": "animeunity.png",
+  "banner": "animeunity.png",
+  "categories": ["anime"],
+  "settings": []
+}

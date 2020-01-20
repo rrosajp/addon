@@ -11,8 +11,21 @@ headers = [['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
+    resp = httptools.downloadpage(page_url)
     global data
-    data = httptools.downloadpage(page_url).data
+    data = resp.data
+    page_url = resp.url
+    if '/streaming.php' in page_url in page_url:
+        code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers['location'].split('/')[-1].replace('.html','')
+        logger.info('WCODE='+code)
+        page_url = 'https://wstream.video/video.php?file_code=' + code
+        data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True).data
+
+    ID, code = scrapertools.find_single_match(data, r"""input\D*id=(?:'|")([^'"]+)(?:'|").*?value='([a-z0-9]+)""")
+    post = urllib.urlencode({ID: code})
+
+    data = httptools.downloadpage(page_url, headers=headers, post=post, follow_redirects=True).data
+
     if "Not Found" in data or "File was deleted" in data:
         return False, config.get_localized_string(70449) % 'Wstream'
     return True, ""
@@ -24,20 +37,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     video_urls = []
     global data
 
-    if '/streaming.php' in page_url or 'html' in page_url:
-        try:
-            code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers['location'].split('/')[-1].replace('.html','')
-            logger.info('WCODE='+code)
-            page_url = 'https://wstream.video/video.php?file_code=' + code
-            data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True).data
-        except:
-            pass
 
-    code = page_url.split('=')[-1]
-    ID = scrapertools.find_single_match(data, r'''input\D*id=(?:'|")([^'"]+)(?:'|")''')
-    post = urllib.urlencode({ID: code})
-
-    data = httptools.downloadpage(page_url, headers=headers, post=post, follow_redirects=True).data
     headers.append(['Referer', page_url])
     _headers = urllib.urlencode(dict(headers))
 

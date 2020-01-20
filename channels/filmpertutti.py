@@ -2,19 +2,7 @@
 # ------------------------------------------------------------
 # Canale per filmpertutti.py
 # ------------------------------------------------------------
-"""
-    Questi sono commenti per i beta-tester.
 
-    Su questo canale, nella categoria 'Ricerca Globale'
-    non saranno presenti le voci 'Aggiungi alla Videoteca'
-    e 'Scarica Film'/'Scarica Serie', dunque,
-    la loro assenza, nel Test, NON dovrà essere segnalata come ERRORE.
-
-    Novità (globale). Indicare in quale/i sezione/i è presente il canale:
-       - film, serie
-       - I titoli in questa sezione a gruppi di 20
-
-"""
 import re
 
 from core import scrapertools, httptools, support
@@ -24,7 +12,7 @@ from platformcode import config
 
 host = config.get_channel_url()
 headers = [['Referer', host]]
-list_servers = ['speedvideo', 'verystream', 'openload', 'streamango', 'wstream', 'akvideo']
+list_servers = ['mixdrop', 'akvideo', 'wstream', 'onlystream', 'speedvideo']
 list_quality = ['HD', 'SD']
 
 @support.menu
@@ -74,16 +62,11 @@ def peliculas(item):
 @support.scrape
 def episodios(item):
 
-    data = httptools.downloadpage(item.url, headers=headers).data
-    data = re.sub('\n|\t', ' ', data)
-    data = re.sub(r'>\s+<', '> <', data)
-    support.log('SERIES DATA= ',data)
+    data = support.match(item.url, headers=headers).data
     if 'accordion-item' in data:
         patronBlock = r'<span class="season[^>]*>\d+[^>]+>[^>]+>[^>]+>[^>]+>\D*(?:STAGIONE|Stagione)[ -]+(?P<lang>[a-zA-Z\- ]+)[^<]*</span>(?P<block>.*?)<div id="(?:season|disqus)'
-        patron = r'<img src="(?P<thumb>[^"]+)">.*?<li class="season-no">(?P<episode>[^<]+)<\/li>(?P<url>.*?javascript:;">)(?P<title>[^<]+)'
+        patron = r'<img src="(?P<thumb>[^"]+)">.*?<li class="season-no">(?P<episode>[^<]+)<\/li>(?P<url>.*?javascript:;">(?P<title>[^<]+).*?</tbody>)'
     else:
-        # patronBlock = r'<div id="info" class="pad">(?P<block>.*?)<div id="disqus_thread">'
-        # deflang='Sub-ITA'
         patronBlock = r'(?:STAGIONE|Stagione)(?:<[^>]+>)?\s*(?:(?P<lang>[A-Za-z- ]+))?(?P<block>.*?)(?:&nbsp;|<strong>|<div class="addtoany)'
         patron = r'(?:/>|p>)\s*(?P<season>\d+)(?:&#215;|×|x)(?P<episode>\d+)[^<]+(?P<url>.*?)(?:<br|</p)'
     def itemHook(item):
@@ -104,17 +87,16 @@ def genres(item):
 
     action = 'peliculas'
     patronBlock = r'<select class="cats">(?P<block>.*?)<\/select>'
-    patronMenu = r'<option data-src="(?P<url>[^"]+)">(?P<title>.*?)<\/option>'
+    patronMenu = r'<option data-src="(?P<url>[^"]+)">(?P<title>[^<]+)<\/option>'
 
     return locals()
 
 
 def select(item):
     support.log()
-
-    data = httptools.downloadpage(item.url, headers=headers).data
-    patronBlock = scrapertools.find_single_match(data, r'class="taxonomy category" ><span property="name">(.*?)</span></a><meta property="position" content="2">')
-    if patronBlock.lower() != 'film':
+    patron=r'class="taxonomy category" ><span property="name">([^>]+)</span></a><meta property="position" content="2">'
+    block = support.match(item.url, patron=patron,headers=headers).match
+    if block.lower() != 'film':
         support.log('select = ### è una serie ###')
         item.contentType='tvshow'
         return episodios(item)

@@ -6,13 +6,13 @@
 
 from core import support
 
-__channel__ = "animesaturn"
-host = support.config.get_setting("channel_host", __channel__)
+# __channel__ = "animesaturn"
+# host = support.config.get_setting("channel_host", __channel__)
+host = support.config.get_channel_url()
 headers={'X-Requested-With': 'XMLHttpRequest'}
 
-IDIOMAS = {'Italiano': 'ITA'}
-list_language = IDIOMAS.values()
-list_servers = ['openload', 'fembed', 'animeworld']
+
+list_servers = ['directo', 'fembed', 'animeworld']
 list_quality = ['default', '480p', '720p', '1080p']
 
 @support.menu
@@ -33,6 +33,9 @@ def search(item, texto):
     anime = True
     patron = r'href="(?P<url>[^"]+)"[^>]+>[^>]+>(?P<title>[^<|(]+)(?:(?P<lang>\(([^\)]+)\)))?<|\)'
     action = 'check'
+    def itemHook(item):
+        item.url = item.url.replace('www.','')
+        return item
     return locals()
 
 
@@ -58,6 +61,9 @@ def newest(categoria):
 def menu(item):
     patronMenu = r'u>(?P<title>[^<]+)<u>(?P<url>.*?)</div> </div>'
     action = 'peliculas'
+    def itemHook(item):
+        item.url = item.url.replace('www.','')
+        return item
     return locals()
 
 
@@ -67,7 +73,7 @@ def peliculas(item):
     deflang= 'Sub-ITA'
     if item.args == 'updated':
         post = "page=" + str(item.page if item.page else 1) if item.page > 1 else None
-        page, data = support.match(item, r'data-page="(\d+)" title="Next">', post=post, headers=headers)
+        page= support.match(item, patron=r'data-page="(\d+)" title="Next">', post=post, headers=headers).match
         patron = r'<img alt="[^"]+" src="(?P<thumb>[^"]+)" [^>]+></div></a>\s*<a href="(?P<url>[^"]+)"><div class="testo">(?P<title>[^\(<]+)(?:(?P<lang>\(([^\)]+)\)))?</div></a>\s*<a href="[^"]+"><div class="testo2">[^\d]+(?P<episode>\d+)</div></a>'
         if page: nextpage = page
         item.contentType='episode'
@@ -78,17 +84,20 @@ def peliculas(item):
         action = 'check'
     else:
         pagination = ''
-        if item.args == 'incorso': patron = r'"slider_title" href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)"[^>]+>(?P<title>[^\(<]+)(?:\((?P<year>\d+)\))?</a>'
+        if item.args == 'incorso': patron = r'"slider_title"\s*href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)"[^>]+>(?P<title>[^\(<]+)(?:\((?P<year>\d+)\))?</a>'
         else: patron = r'href="(?P<url>[^"]+)"[^>]+>[^>]+>(?P<title>.+?)(?:\((?P<lang>ITA)\))?(?:(?P<year>\((\d+)\)))?</span>'
         action = 'check'
+    def itemHook(item):
+        item.url = item.url.replace('www.','')
+        return item
     return locals()
 
 
 def check(item):
-    movie, data = support.match(item, r'Episodi:</b> (\d*) Movie')
-    anime_id = support.match(data, r'anime_id=(\d+)')[0][0]
+    movie = support.match(item, patron=r'Episodi:</b> (\d*) Movie')
+    anime_id = support.match(movie.data, patron=r'anime_id=(\d+)').match
     item.url = host + "/loading_anime?anime_id=" + anime_id
-    if movie:
+    if movie.match:
         item.contentType = 'movie'
         episodes = episodios(item)
         if len(episodes) > 0: item.url = episodes[0].url
@@ -102,16 +111,20 @@ def check(item):
 def episodios(item):
     if item.contentType != 'movie': anime = True
     patron = r'<strong" style="[^"]+">(?P<title>[^<]+)</b></strong></td>\s*<td style="[^"]+"><a href="(?P<url>[^"]+)"'
+    def itemHook(item):
+        item.url = item.url.replace('www.','')
+        return item
     return locals()
 
 
 def findvideos(item):
     support.log()
     itemlist = []
-    urls = support.match(item, r'<a href="([^"]+)"><div class="downloadestreaming">', headers=headers)[0]
+    # support.dbg()
+    urls = support.match(item, patron=r'<a href="([^"]+)"><div class="downloadestreaming">', headers=headers, debug=False).matches
     if urls:
-        links = support.match(item, r'(?:<source type="[^"]+"\s*src=|file:\s*)"([^"]+)"', url=urls[0], headers=headers)[0]
-        for link in links:
+        links = support.match(urls[0].replace('www.',''), patron=r'(?:<source type="[^"]+"\s*src=|file:\s*)"([^"]+)"', headers=headers, debug=False)
+        for link in links.matches:
             itemlist.append(
                 support.Item(channel=item.channel,
                             action="play",
@@ -123,7 +136,7 @@ def findvideos(item):
                             show=item.show,
                             contentType=item.contentType,
                             folder=False))
-    return support.server(item, itemlist=itemlist)
+    return support.server(item, links, itemlist=itemlist)
 
 
 

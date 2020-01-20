@@ -104,7 +104,7 @@ def peliculas(item):
 @support.scrape
 def episodios(item):
     anime = True
-    data = support.match(item, headers=headers)[1]
+    data = support.match(item, headers=headers).data
     if 'https://vcrypt.net' in data:
         patron = r'(?:<br /> |<p>)(?P<title>[^<]+)<a href="(?P<url>[^"]+)"'
     else:

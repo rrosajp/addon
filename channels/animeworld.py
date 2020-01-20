@@ -10,7 +10,7 @@ headers = [['Referer', host]]
 
 __channel__ = 'animeworld'
 
-list_servers = ['animeworld', 'verystream', 'streamango', 'openload', 'directo']
+list_servers = ['directo', 'animeworld', 'vvvvid']
 list_quality = ['default', '480p', '720p', '1080p']
 
 
@@ -34,7 +34,7 @@ def mainlist(item):
 def genres(item):
     support.log()
     itemlist = []
-    matches = support.match(item, r'<input.*?name="([^"]+)" value="([^"]+)"\s*>[^>]+>([^<]+)<\/label>' , r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> Generi <span.[^>]+>(.*?)</ul>', headers=headers)[0]
+    matches = support.match(item, patron=r'<input.*?name="([^"]+)" value="([^"]+)"\s*>[^>]+>([^<]+)<\/label>' , patronBlock=r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> Generi <span.[^>]+>(.*?)</ul>', headers=headers).matches
     for name, value, title in matches:
         support.menuItem(itemlist, __channel__, support.typo(title, 'bold'), 'peliculas', host + '/filter?' + name + '=' + value + '&sort=' + order(), 'tvshow', args='sub')
     return itemlist
@@ -44,7 +44,7 @@ def build_menu(item):
     support.log()
     itemlist = []
     support.menuItem(itemlist, __channel__, 'Tutti bold', 'peliculas', item.url , 'tvshow' , args=item.args)
-    matches = support.match(item,r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> (.*?) <span.[^>]+>(.*?)</ul>',r'<form class="filters.*?>(.*?)</form>', headers=headers)[0]
+    matches = support.match(item, patron=r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> (.*?) <span.[^>]+>(.*?)</ul>', patronBlock=r'<form class="filters.*?>(.*?)</form>', headers=headers).matches
     for title, html in matches:
         if title not in 'Lingua Ordine':
             support.menuItem(itemlist, __channel__, title + ' submenu bold', 'build_sub_menu', html, 'tvshow', args=item.args)
@@ -127,7 +127,7 @@ def peliculas(item):
 def episodios(item):
     anime=True
     pagination = 50
-    data = support.match(item, headers=headers)[1]
+    data = support.match(item, headers=headers).data
     if 'VVVVID' in data: patronBlock= r'<div class="server\s*active\s*"(?P<block>.*?)</ul>'
     else: patronBlock= r'server  active(?P<block>.*?)server  hidden '
     patron = r'<li><a [^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+"[^=]+="[^"]+" href="(?P<url>[^"]+)"[^>]+>(?P<episode>[^<]+)<'
@@ -143,9 +143,11 @@ def findvideos(item):
     import time
     support.log(item)
     itemlist = []
-    matches, data = support.match(item, r'class="tab.*?data-name="([0-9]+)">', headers=headers)
+    matches = support.match(item, patron=r'class="tab.*?data-name="([0-9]+)">', headers=headers)
+    data = matches.data
+    matches = matches.matches
     videoData = ''
- 
+
     for serverid in matches:
         if not item.number: item.number = support.scrapertools.find_single_match(item.title, r'(\d+) -')
         block = support.scrapertools.find_multiple_matches(data, 'data-id="' + serverid + '">(.*?)<div class="server')
@@ -153,7 +155,7 @@ def findvideos(item):
         support.log('ID= ',serverid)
         if id:
             if serverid == '26':
-                matches = support.match(item, r'<a href="([^"]+)"', url='%s/ajax/episode/serverPlayer?id=%s' % (host, item.url.split('/')[-1]))[0]
+                matches = support.match('%s/ajax/episode/serverPlayer?id=%s' % (host, item.url.split('/')[-1]), patron=r'<a href="([^"]+)"', ).matches
                 for url in matches:
                         videoData += '\n' + url
             else:
@@ -162,7 +164,7 @@ def findvideos(item):
                     json = jsontools.load(dataJson)
                     support.log(json)
                     if 'keepsetsu' in json['grabber']:
-                        matches = support.match(item, r'<iframe\s*src="([^"]+)"', url=json['grabber'])[0]
+                        matches = support.match(json['grabber'], patron=r'<iframe\s*src="([^"]+)"'),matches
                         for url in matches:
                             videoData += '\n' + url
                     else:

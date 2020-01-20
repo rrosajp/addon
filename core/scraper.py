@@ -123,7 +123,7 @@ def cuadro_completar(item):
     global dict_default
     dict_default = {}
 
-    COLOR = ["0xFF8A4B08", "0xFFF7BE81"]
+    COLOR = ["0xFF65B3DA", "0xFFFFFFFF"]
     # Creamos la lista de campos del infoLabel
     controls = [("title", "text", config.get_localized_string(60230)),
                 ("originaltitle", "text", config.get_localized_string(60231)),

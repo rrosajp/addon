@@ -145,7 +145,9 @@ def findvideos(item):
     itemlist = []
     patronBlock = '<div class="entry-content">(?P<block>.*)<footer class="entry-footer">'
     patron = r'<a href="([^"]+)">'
-    matches, data = support.match(item, patron, patronBlock, headers)
+    html = support.match(item, patron=patron, patronBlock=patronBlock, headers=headers)
+    matches = html.matches
+    data= html.data
 
     if item.args != 'episodios':
         item.infoLabels['mediatype'] = 'episode'
@@ -156,7 +158,7 @@ def findvideos(item):
 
     itemlist += support.server(item, data)
 
-    data = httptools.downloadpage(item.url).data
+    data = support.match(item.url).data
     patron = r'>Posted in <a href="https?://fastsubita.com/serietv/([^/]+)/(?:[^"]+)?"'
     series = scrapertools.find_single_match(data, patron)
     titles = support.typo(series.upper().replace('-', ' '), 'bold color kod')

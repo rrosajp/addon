@@ -7,6 +7,5 @@
     "thumbnail": "dreamsub.png",
     "banner": "dreamsub.png",
     "categories": ["anime", "vos"],
-    "not_active": ["include_in_newest"],
     "settings": []
 }

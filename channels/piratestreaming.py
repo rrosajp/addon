@@ -99,7 +99,7 @@ def findvideos(item):
     if item.contentType == 'episode':
         data = item.url
     else:
-        data = support.match(item)[1]
+        data = support.match(item).data
         if 'link-episode' in data:
             item.data = data
             return episodios(item)
