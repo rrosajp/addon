@@ -409,6 +409,7 @@ def init(channel, list_servers, list_quality, reset=False):
                             "quality": list_quality,
                             "settings": {
                                 "active": False,
+                                "hide_servers": False,
                                 "plan_b": True,
                                 "custom_servers": False,
                                 "custom_quality": False,
@@ -498,8 +499,16 @@ def autoplay_config(item):
     active_settings = {"id": "active", "label": config.get_localized_string(60079),
                       "type": "bool", "default": False, "enabled": allow_option,
                        "visible": allow_option}
+
     list_controls.append(active_settings)
     dict_values['active'] = settings_node.get('active', False)
+
+    hide_servers = {"id": "hide_servers", "label": config.get_localized_string(70747),
+                      "type": "bool", "default": False, "enabled": "eq(-1,true)",
+                       "visible": allow_option}
+
+    list_controls.append(hide_servers)
+    dict_values['hide_servers'] = settings_node.get('hide_servers', False)
 
     # Idioma
     status_language = config.get_setting("filter_languages", item.from_channel)
@@ -507,7 +516,7 @@ def autoplay_config(item):
         status_language = 0
 
     set_language = {"id": "language", "label": config.get_localized_string(60080),
-                    "type": "list", "default": 0, "enabled": "eq(-1,true)", "visible": True,
+                    "type": "list", "default": 0, "enabled": "eq(-2,true)", "visible": True,
                     "lvalues": get_languages(item.from_channel)}
 
     list_controls.append(set_language)
