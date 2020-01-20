@@ -40,7 +40,7 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
     def __init__(self, domain, CF=False, *args, **kwargs):
         self.conn = sql.connect(db)
         self.cur = self.conn.cursor()
-        self.ssl_context = CustomContext(ssl.PROTOCOL_SSLv23, domain)
+        self.ssl_context = CustomContext(ssl.PROTOCOL_TLS if 'PROTOCOL_TLS' in ssl.__dict__ else ssl.PROTOCOL_SSLv3, domain)
         self.CF = CF  # if cloudscrape is in action
         self.cipherSuite = kwargs.pop('cipherSuite', ssl._DEFAULT_CIPHERS)
 
@@ -99,7 +99,7 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
             domain = parse.netloc
         else:
             raise requests.exceptions.URLRequired
-        self.ssl_context = CustomContext(ssl.PROTOCOL_SSLv23, domain)
+        self.ssl_context = CustomContext(ssl.PROTOCOL_TLS if 'PROTOCOL_TLS' in ssl.__dict__ else ssl.PROTOCOL_SSLv3, domain)
         if self.CF:
             self.ssl_context.options |= (ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1)
         self.ssl_context.set_ciphers(self.cipherSuite)

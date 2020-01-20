@@ -39,30 +39,9 @@ def find_multiple_matches_groups(text, pattern):
 
 # Convierte los codigos html "&ntilde;" y lo reemplaza por "ñ" caracter unicode utf-8
 def decodeHtmlentities(data):
-    entity_re = re.compile("&(#?)(\d{1,5}|\w{1,8})(;?)")
-
-    def substitute_entity(match):
-        ent = match.group(2) + match.group(3)
-        res = ""
-        while not ent in html5 and not ent.endswith(";") and match.group(1) != "#":
-            # Excepción para cuando '&' se usa como argumento en la urls contenidas en los datos
-            try:
-                res = ent[-1] + res
-                ent = ent[:-1]
-            except:
-                break
-
-        if match.group(1) == "#":
-            ent = unichr(int(ent.replace(";", "")))
-            return ent.encode('utf-8')
-        else:
-            cp = html5.get(ent)
-            if cp:
-                return cp.decode("unicode-escape").encode('utf-8') + res
-            else:
-                return match.group()
-
-    return entity_re.subn(substitute_entity, data)[0]
+    import HTMLParser
+    parser = HTMLParser.HTMLParser()
+    return parser.unescape(data)
 
 
 def unescape(text):

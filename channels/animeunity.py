@@ -86,10 +86,11 @@ def peliculas(item):
 
 @support.scrape
 def episodios(item):
+    # debug = True
     data = item.data
     anime = True
     pagination = 50
-    patron = r'<a href="([^"]+)" class="\D+ep-button">(?P<episode>\d+)'
+    patron = r'<a href="(?P<url>[^"]+)" class="\D+ep-button">(?P<episode>\d+)'
     def itemHook(item):
         item.title = item.title + support.typo(item.fulltitle,'-- bold')
         return item
@@ -99,14 +100,14 @@ def episodios(item):
 def findvideos(item):
     support.log()
     html = support.match(item, patron=r'TIPO:\s*</b>\s*([A-Za-z]+)')
-    if html.match == 'TV':
+    if html.match == 'TV' and item.contentType != 'episode':
         item.contentType = 'tvshow'
         item.data = html.data
         return episodios(item)
     else:
         itemlist = []
+        if item.contentType != 'episode': item.contentType = 'movie'
         video = support.match(html.data, patron=r'<source src="([^"]+)"').match
-        item.contentType = 'movie'
         itemlist.append(
             support.Item(
                 channel=item.channel,

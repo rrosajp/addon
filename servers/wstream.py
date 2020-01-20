@@ -11,16 +11,17 @@ headers = [['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
+    resp = httptools.downloadpage(page_url)
     global data
-    data = httptools.downloadpage(page_url).data
+    data = resp.data
+    page_url = resp.url
     if '/streaming.php' in page_url in page_url:
         code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers['location'].split('/')[-1].replace('.html','')
         logger.info('WCODE='+code)
         page_url = 'https://wstream.video/video.php?file_code=' + code
         data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True).data
 
-    code = page_url.split('=')[-1]
-    ID = scrapertools.find_single_match(data, r'''input\D*id=(?:'|")([^'"]+)(?:'|")''')
+    ID, code = scrapertools.find_single_match(data, r"""input\D*id=(?:'|")([^'"]+)(?:'|").*?value='([a-z0-9]+)""")
     post = urllib.urlencode({ID: code})
 
     data = httptools.downloadpage(page_url, headers=headers, post=post, follow_redirects=True).data

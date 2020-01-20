@@ -77,6 +77,8 @@ def next_ep(item):
                 if file.endswith('.strm'):
                     fileList.append(file)
 
+            fileList.sort()
+
             nextIndex = fileList.index(current_filename) + 1
             if nextIndex == 0 or nextIndex == len(fileList):
                 next_file = None
