@@ -423,6 +423,9 @@ def scrape(func):
         if 'itemlistHook' in args:
             itemlist = args['itemlistHook'](itemlist)
 
+        if 'fullItemlistHook' in args:
+            itemlist = args['fullItemlistHook'](itemlist)
+
         if (pagination and len(matches) <= pag * pagination) or not pagination: # next page with pagination
             if patronNext and inspect.stack()[1][3] != 'newest':
                 nextPage(itemlist, item, data, patronNext, function)
@@ -461,8 +464,7 @@ def scrape(func):
         if 'patronMenu' in args and itemlist:
             itemlist = thumb(itemlist, genre=True)
 
-        if 'fullItemlistHook' in args:
-            itemlist = args['fullItemlistHook'](itemlist)
+        
 
         # itemlist = filterLang(item, itemlist)   # causa problemi a newest
 
@@ -971,7 +973,7 @@ def nextPage(itemlist, item, data='', patron='', function_or_level=1, next_page=
     if next_page != "":
         if resub: next_page = re.sub(resub[0], resub[1], next_page)
         if 'http' not in next_page:
-            next_page = scrapertools.find_single_match(item.url, 'https?://[a-z0-9.-]+') + next_page
+            next_page = scrapertools.find_single_match(item.url, 'https?://[a-z0-9.-]+') + (next_page if next_page.startswith('/') else '/' + next_page)
         next_page = re.sub('&amp;', '&',next_page)
         log('NEXT= ', next_page)
         itemlist.append(
