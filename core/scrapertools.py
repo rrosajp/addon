@@ -41,7 +41,7 @@ def find_multiple_matches_groups(text, pattern):
 def decodeHtmlentities(data):
     import HTMLParser
     parser = HTMLParser.HTMLParser()
-    return parser.unescape(data)
+    return unicode(parser.unescape(data))
 
 
 def unescape(text):
