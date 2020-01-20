@@ -131,7 +131,7 @@ def peliculas(item):
     # esclusione degli articoli 'di servizio'
     blacklist = ['BENVENUTI', 'Richieste Serie TV', 'CB01.UNO &#x25b6; TROVA L&#8217;INDIRIZZO UFFICIALE ',
                  'Aggiornamento Quotidiano Serie TV', 'OSCAR 2019 ▶ CB01.UNO: Vota il tuo film preferito! 🎬',
-                 'Openload: la situazione. Benvenuto Verystream', 'Openload: lo volete ancora?']
+                 'Openload: la situazione. Benvenuto Verystream', 'Openload: lo volete ancora?', 'OSCAR 2020 &#x25b6; VOTA IL TUO FILM PREFERITO! &#x1f3ac;']
     # debug = True
     if 'newest' in item.args:
         if '/serietv/' not in item.url:
