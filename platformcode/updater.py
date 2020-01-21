@@ -26,6 +26,7 @@ repo = 'addon'
 addonDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/') + '/'
 maxPage = 5  # le api restituiscono 30 commit per volta, quindi se si è rimasti troppo indietro c'è bisogno di andare avanti con le pagine
 trackingFile = "last_commit.txt"
+changelogFile = "special://profile/addon_data/plugin.video.kod/changelog.txt"
 
 
 def loadCommits(page=1):
@@ -46,7 +47,7 @@ def loadCommits(page=1):
     return ret
 
 
-def check():
+def check(background=False):
     if not addon.getSetting('addon_update_enabled'):
         return False
     logger.info('Cerco aggiornamenti..')
@@ -155,7 +156,11 @@ def check():
                 changelog += commitJson['commit']['message'] + "\n"
                 nCommitApplied += 1
         if addon.getSetting("addon_update_message"):
-            platformtools.dialog_ok('Kodi on Demand', 'Aggiornamenti applicati:\n' + changelog)
+            if background:
+                with open(xbmc.translatePath(changelogFile), 'a+') as fileC:
+                    fileC.write(changelog)
+            else:
+                platformtools.dialog_ok('Kodi on Demand', 'Aggiornamenti applicati:\n' + changelog)
 
         localCommitFile.seek(0)
         localCommitFile.truncate()
@@ -171,33 +176,14 @@ def check():
     return updated
 
 
-def timer(force=False):
-    import time
-    curTime = time.time()
-    file = "special://profile/addon_data/plugin.video.kod/updater_last_check.txt"
-    period = float(addon.getSetting('addon_update_timer')) * 3600
-    updated = False
-
-    if force:
-        updated = check()
-        checked = True
-    else:
-        checked = False
-        try:
-            with open(xbmc.translatePath(file), 'r') as fileC:
-                    lastCheck = float(fileC.read())
-                    if curTime - lastCheck > period:
-                        updated = check()
-                        checked = True
-        except:
-            updated = check()
-            checked = True
-    if checked:
-        with open(xbmc.translatePath(file), 'w') as fileC:
-            fileC.write(str(curTime))
-    return updated
-
-
+def showSavedChangelog():
+    try:
+        with open(xbmc.translatePath(changelogFile), 'r') as fileC:
+            changelog = fileC.read()
+            platformtools.dialog_ok('Kodi on Demand', 'Aggiornamenti applicati:\n' + changelog)
+        filetools.remove(xbmc.translatePath(changelogFile))
+    except:
+        pass
 
 def calcCurrHash():
     treeHash = githash.tree_hash(addonDir).hexdigest()

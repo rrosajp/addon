@@ -5,7 +5,6 @@
 
 import os
 import sys
-from threading import Thread
 
 import xbmc
 from platformcode import config, logger
@@ -17,7 +16,7 @@ sys.path.insert(0, librerias)
 
 if not config.dev_mode():
     from platformcode import updater
-    Thread(target=updater.timer())
+    updater.showSavedChangelog()
 
 from platformcode import launcher
 
