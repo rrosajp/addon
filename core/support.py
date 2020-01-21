@@ -168,10 +168,7 @@ def scrapeLang(scraped, lang, longtitle):
     return language, longtitle
 
 def cleantitle(title):
-    try:
-        cleantitle = scrapertools.htmlclean(scrapertools.decodeHtmlentities(title).replace('"', "'").replace('×', 'x').replace('–', '-')).strip()
-    except:
-        cleantitle = title
+    cleantitle = scrapertools.htmlclean(scrapertools.decodeHtmlentities(title).replace('"', "'").replace('×', 'x').replace('–', '-')).strip()
     return cleantitle
 
 def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang):
