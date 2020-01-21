@@ -22,6 +22,7 @@ from core import channeltools, filetools, videolibrarytools
 from platformcode import logger
 from platformcode import platformtools
 from specials import videolibrary
+from platformcode import updater
 
 
 def update(path, p_dialog, i, t, serie, overwrite):
@@ -306,6 +307,15 @@ def monitor_update():
             logger.info("Inicio actualizacion programada para las %s h.: %s" % (update_start, datetime.datetime.now()))
             check_for_update(overwrite=False)
 
+    if not config.dev_mode():
+        period = float(config.get_setting('addon_update_timer')) * 3600
+        curTime = time.time()
+        lastCheck = float(config.get_setting("updater_last_check", "videolibrary", '0'))
+
+        if curTime - lastCheck > period:
+            updater.check(background=True)
+            config.set_setting("updater_last_check", "videolibrary", str(curTime))
+
 # def get_channel_json():
 #     import urllib, os, xbmc
 #     addon = config.get_addon_core()
@@ -377,8 +387,7 @@ if __name__ == "__main__":
 
     # Verificar quick-fixes al abrirse Kodi, y dejarlo corriendo como Thread
     if not config.dev_mode():
-        from platformcode import updater
-        updater.timer(True)
+        updater.check()
 
     # Copia Custom code a las carpetas de Alfa desde la zona de Userdata
     from platformcode import custom_code
