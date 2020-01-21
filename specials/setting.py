@@ -343,7 +343,7 @@ def check_quickfixes(item):
 
     if not config.dev_mode():
         from platformcode import updater
-        if not updater.check():
+        if not updater.check()[0]:
             platformtools.dialog_ok('Kodi on Demand', config.get_localized_string(70667))
     else:
         return False
