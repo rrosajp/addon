@@ -424,14 +424,14 @@ def thumb(itemlist=[], genre=False, thumb=''):
                             item.thumbnail = get_thumb(thumb + '.png')
                         else: item.thumbnail = get_thumb(thumb + '.png')
                     else:
-                        thumb = item.thumbnails
+                        thumb = item.thumbnail
 
             else:
                 for thumb, titles in icon_dict.items():
                     if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
                         item.thumbnail = get_thumb(thumb + '.png')
                     else:
-                        thumb = item.thumbnails
+                        thumb = item.thumbnail
 
 
             item.title = re.sub(r'\s*\{[^\}]+\}','',item.title)

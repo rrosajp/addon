@@ -552,7 +552,7 @@ def dooplay_search_vars(item, blacklist):
 
 
 def dooplay_menu(item, type):
-    patron = '<a href="(?P<url>[^"#]+)"(?: title="[^"]+")?>(?P<title>[a-zA-Z0-9]+)'
+    patronMenu = '<a href="(?P<url>[^"#]+)"(?: title="[^"]+")?>(?P<title>[a-zA-Z0-9]+)'
     patronBlock = '<nav class="' + item.args + '">(?P<block>.*?)</nav>'
     action = 'peliculas'
 
