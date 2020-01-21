@@ -318,7 +318,7 @@ def monitor_update():
 
         if curTime - lastCheck > period:
             updated, needsReload = updater.check(background=True)
-            config.set_setting("updater_last_check", "videolibrary", str(curTime))
+            config.set_setting("updater_last_check", str(curTime), "videolibrary")
             if needsReload:
                 xbmc.executescript(__file__)
                 exit(0)
