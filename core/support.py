@@ -168,10 +168,7 @@ def scrapeLang(scraped, lang, longtitle):
     return language, longtitle
 
 def cleantitle(title):
-    try:
-        cleantitle = scrapertools.htmlclean(scrapertools.decodeHtmlentities(title).replace('"', "'").replace('×', 'x').replace('–', '-')).strip()
-    except:
-        cleantitle = title
+    cleantitle = scrapertools.htmlclean(scrapertools.decodeHtmlentities(title).replace('"', "'").replace('×', 'x').replace('–', '-')).strip()
     return cleantitle
 
 def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang):
@@ -555,7 +552,7 @@ def dooplay_search_vars(item, blacklist):
 
 
 def dooplay_menu(item, type):
-    patron = '<a href="(?P<url>[^"#]+)"(?: title="[^"]+")?>(?P<title>[a-zA-Z0-9]+)'
+    patronMenu = '<a href="(?P<url>[^"#]+)"(?: title="[^"]+")?>(?P<title>[a-zA-Z0-9]+)'
     patronBlock = '<nav class="' + item.args + '">(?P<block>.*?)</nav>'
     action = 'peliculas'
 
@@ -1048,7 +1045,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
     channel_node = autoplay_node.get(item.channel, {})
     settings_node = channel_node.get('settings', {})
     AP = get_setting('autoplay') or settings_node['active']
-    HS = config.get_setting('hide_servers')
+    HS = config.get_setting('hide_servers') or (settings_node['hide_servers'] if settings_node.has_key('hide_server') else False)
 
     if CL and not AP:
         if get_setting('checklinks', item.channel):
