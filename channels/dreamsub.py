@@ -111,15 +111,15 @@ def findvideos(item):
     itemlist = []
     support.log()
 
-    matches = support.match(item, patron=r'<a href="([^"]+)"', patronBlock=r'<div style="white-space: (.*?)<div id="main-content"')
+    matches = support.match(item, patron=r'href="([^"]+)"', patronBlock=r'<div style="white-space: (.*?)<div id="main-content"')
 
-    if not matches.matches:
+    if not matches.matches and item.contentType != 'episode':
         item.data = matches.data
         item.contentType = 'tvshow'
         return episodios(item)
 
     # matches.matches.sort()
-
+    support.log('VIDEO')
     for url in matches.matches:
         lang = url.split('/')[-2]
         if 'ita' in lang.lower():
