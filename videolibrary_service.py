@@ -395,9 +395,13 @@ if __name__ == "__main__":
     # Verificar quick-fixes al abrirse Kodi, y dejarlo corriendo como Thread
     if not config.dev_mode():
         updated, needsReload = updater.check()
+        config.set_setting("updater_last_check", str(time.time()), "videolibrary")
         if needsReload:
             xbmc.executescript(__file__)
             exit(0)
+
+    if xbmc.getCondVisibility('System.HasAddon(repository.kod)'):
+        filetools.rmdirtree(xbmc.translatePath('special://home/addons/repository.kod'))
 
     # Copia Custom code a las carpetas de Alfa desde la zona de Userdata
     from platformcode import custom_code
