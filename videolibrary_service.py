@@ -310,11 +310,18 @@ def monitor_update():
     if not config.dev_mode():
         period = float(config.get_setting('addon_update_timer')) * 3600
         curTime = time.time()
-        lastCheck = float(config.get_setting("updater_last_check", "videolibrary", '0'))
+        lastCheck = config.get_setting("updater_last_check", "videolibrary", '0')
+        if lastCheck:
+            lastCheck = float(lastCheck)
+        else:
+            lastCheck = 0
 
         if curTime - lastCheck > period:
-            updater.check(background=True)
-            config.set_setting("updater_last_check", "videolibrary", str(curTime))
+            updated, needsReload = updater.check(background=True)
+            config.set_setting("updater_last_check", str(curTime), "videolibrary")
+            if needsReload:
+                xbmc.executescript(__file__)
+                exit(0)
 
 # def get_channel_json():
 #     import urllib, os, xbmc
@@ -387,7 +394,14 @@ if __name__ == "__main__":
 
     # Verificar quick-fixes al abrirse Kodi, y dejarlo corriendo como Thread
     if not config.dev_mode():
-        updater.check()
+        updated, needsReload = updater.check()
+        config.set_setting("updater_last_check", str(time.time()), "videolibrary")
+        if needsReload:
+            xbmc.executescript(__file__)
+            exit(0)
+
+    if xbmc.getCondVisibility('System.HasAddon(repository.kod)'):
+        filetools.rmdirtree(xbmc.translatePath('special://home/addons/repository.kod'))
 
     # Copia Custom code a las carpetas de Alfa desde la zona de Userdata
     from platformcode import custom_code

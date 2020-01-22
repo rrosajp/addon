@@ -64,6 +64,7 @@ def check(background=False):
     localCommitSha = localCommitSha.replace('\n', '') # da testare
     logger.info('Commit locale: ' + localCommitSha)
     updated = False
+    serviceChanged = False
 
     pos = None
     for n, c in enumerate(commits):
@@ -105,6 +106,8 @@ def check(background=False):
                     logger.info(file["filename"])
                     if 'resources/language' in file["filename"]:
                         poFilesChanged = True
+                    if 'videolibrary_service.py' in file["filename"]:
+                        serviceChanged = True
                     if file['status'] == 'modified' or file['status'] == 'added':
                         if 'patch' in file:
                             text = ""
@@ -173,7 +176,7 @@ def check(background=False):
     else:
         logger.info('Nessun nuovo aggiornamento')
 
-    return updated
+    return updated, serviceChanged
 
 
 def showSavedChangelog():
