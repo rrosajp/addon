@@ -4,32 +4,6 @@
 # Canale per ilgeniodellostreaming
 # ------------------------------------------------------------
 
-"""
-
-    Alcuni video non si aprono sul sito...
-        
-    Avvisi per il test:
-    i link per le categorie non sono TUTTI visibili nella pagina del sito:
-    vanno costruiti con i nomi dei generi che vedete nel CANALE.
-    Es:
-        https://ilgeniodellostreaming.se/genere/+ genere nel canale
-    genere-> kids
-        https://ilgeniodellostreaming.se/genere/kids
-    genere-> avventura
-        https://ilgeniodellostreaming.se/genere/avventura
-    Se il genere è formato da 2 parola lo spazio si trasforma in -
-    genere-> televisione film
-        https://ilgeniodellostreaming.se/genere/televisione-film
-
-    Novità -> Serietv e Aggiornamenti nel canale:
-        - le pagine sono di 25 titoli
-
-
-    ##### note per i dev #########
-    - La pagina "Aggiornamenti Anime" del sito è vuota (update 13-9-2019)
-    - in url: film o serietv
-
-"""
 
 import re
 
@@ -68,7 +42,7 @@ def mainlist(item):
         ]
 
     Tvshow = [
-        ('Show TV', ['/tv-show/', 'peliculas', '', 'tvshow'])
+        ('Show TV bullet bold', ['/tv-show/', 'peliculas', '', 'tvshow'])
         ]
 
     search = ''
@@ -81,21 +55,11 @@ def peliculas(item):
     log()
 
     if item.args == 'search':
-
         patronBlock = r'<div class="search-page">(?P<block>.*?)<footer class="main">'
-        patron = r'<div class="thumbnail animation-2"><a href="(?P<url>[^"]+)">'\
-                 '<img src="(?P<thumb>[^"]+)" alt="[^"]+" \/>[^>]+>(?P<type>[^<]+)'\
-                 '<\/span>.*?<a href.*?>(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA)\])?'\
-                 '<\/a>[^>]+>(?:<span class="rating">IMDb\s*(?P<rating>[0-9.]+)<\/span>)?'\
-                 '.+?(?:<span class="year">(?P<year>[0-9]+)<\/span>)?[^>]+>[^>]+><p>(?P<plot>.*?)<\/p>'
+        patron = r'<img src="(?P<thumb>[^"]+)" alt="[^"]+" />[^>]+>(?P<type>[^<]+)</span>.*?<a href="(?P<url>[^"]+)">(?P<title>.+?)[ ]?(?:\[(?P<lang>Sub-ITA)\])?</a>[^>]+>[^>]+>(?:<span class="rating">IMDb\s*(?P<rating>[^>]+)</span>)?.?(?:<span class="year">(?P<year>[0-9]+)</span>)?[^>]+>[^>]+><p>(?P<plot>.*?)</p>'
 
-##        type_content_dict={'movie': ['film'], 'tvshow': ['tv']}
-##        type_action_dict={'findvideos': ['film'], 'episodios': ['tv']}
-        def itemHook(item):
-            if 'film' not in item.url:
-                item.contentType = 'tvshow'
-                item.action = 'episodios'
-            return item
+        typeContentDict={'movie': ['film'], 'tvshow': ['tv']}
+        typeActionDict={'findvideos': ['film'], 'episodios': ['tv']}
     else:
 
         if item.contentType == 'movie':
@@ -161,9 +125,8 @@ def genres(item):
     elif item.args == 'letter':
         patronBlock = r'<div class="movies-letter">(?P<block>.*?)<div class="clearfix">'
 
-    patron = r'<a(?:.+?)?href="(?P<url>.*?)"[ ]?>(?P<title>.*?)<\/a>'
+    patronMenu = r'<a(?:.+?)?href="(?P<url>.*?)"[ ]?>(?P<title>.*?)<\/a>'
 
-##    debug = True
     return locals()
 
 def search(item, text):
@@ -211,34 +174,4 @@ def newest(categoria):
 
 def findvideos(item):
     log()
-    itemlist =[]
-
-    html = support.match(item, patron='<iframe class="metaframe rptss" src="([^"]+)"[^>]+>',headers=headers)
-    matches = html.matches
-    data = html.data
-    for url in matches:
-        html = httptools.downloadpage(url, headers=headers).data
-        data += str(scrapertools.find_multiple_matches(html, '<meta name="og:url" content="([^"]+)">'))
-
-    itemlist = support.server(item, data)
-
-    if item.args == 'update':
-
-        data = httptools.downloadpage(item.url).data
-        patron = r'<div class="item"><a href="'+host+'/serietv/([^"\/]+)\/"><i class="icon-bars">'
-        series = support.match(data, patron=patron).matches
-        titles = support.typo(series.upper().replace('-', ' '), 'bold color kod')
-        goseries = support.typo("Vai alla Serie:", ' bold')
-        itemlist.append(
-            Item(channel=item.channel,
-                    title=goseries + titles,
-                    fulltitle=titles,
-                    show=series,
-                    contentType='tvshow',
-                    contentSerieName=series,
-                    url=host+"/serietv/"+series,
-                    action='episodios',
-                    contentTitle=titles,
-                    plot = "Vai alla Serie :" + titles + " con tutte le puntate",
-                    ))
-    return itemlist
+    return support.server(item)

@@ -57,38 +57,44 @@ def show_channels(item):
 
     for key, channel in json['channels'].items():
         # Find File Path
-        if 'http' in channel['path']: file_path = httptools.downloadpage(channel['path'],follow_redirects=True).url
+        if 'http' in channel['path']:
+            try:
+                file_path = httptools.downloadpage(channel['path'], follow_redirects=True, timeout=5).url
+            except:
+                support.log('Offline')
+                file_path = None
         else: file_path = channel['path']
 
-        # make relative path
-        path = os.path.dirname(os.path.abspath(file_path))
-        if 'http' in path: path = path[path.find('http'):].replace('\\','/').replace(':/','://')
-        if file_path.startswith('http'): file_url = httptools.downloadpage(file_path, follow_redirects=True).data
-        elif os.path.isfile(file_path): file_url = open(file_path, "r").read()
-        else:
-            item.channel_id = key
-            remove_channel(item)
-            file_url=''
+        if file_path:
+            # make relative path
+            path = os.path.dirname(os.path.abspath(file_path))
+            if 'http' in path: path = path[path.find('http'):].replace('\\','/').replace(':/','://')
+            if file_path.startswith('http'): file_url = httptools.downloadpage(file_path, follow_redirects=True).data
+            elif os.path.isfile(file_path): file_url = open(file_path, "r").read()
+            else:
+                item.channel_id = key
+                remove_channel(item)
+                file_url=''
 
-        # load json
-        if file_url:
-            json_url = jsontools.load(file_url)
+            # load json
+            if file_url:
+                json_url = jsontools.load(file_url)
 
-            thumbnail = relative('thumbnail', json_url, path)
-            if not thumbnail: thumbnail = item.thumbnail
-            fanart = relative('fanart', json_url, path)
-            plot = json_url['plot'] if json_url.has_key('plot') else ''
+                thumbnail = relative('thumbnail', json_url, path)
+                if not thumbnail: thumbnail = item.thumbnail
+                fanart = relative('fanart', json_url, path)
+                plot = json_url['plot'] if json_url.has_key('plot') else ''
 
-            itemlist.append(Item(channel=item.channel,
-                                 title=typo(channel['channel_name'],'bold'),
-                                 url=file_path,
-                                 thumbnail=thumbnail,
-                                 fanart=fanart,
-                                 plot=plot,
-                                 action='show_menu',
-                                 channel_id = key,
-                                 context=context,
-                                 path=path))
+                itemlist.append(Item(channel=item.channel,
+                                    title=typo(channel['channel_name'],'bold'),
+                                    url=file_path,
+                                    thumbnail=thumbnail,
+                                    fanart=fanart,
+                                    plot=plot,
+                                    action='show_menu',
+                                    channel_id = key,
+                                    context=context,
+                                    path=path))
 
     autoplay.show_option(item.channel, itemlist)
     support.channel_config(item, itemlist)
@@ -490,6 +496,7 @@ def get_seasons(item):
                              fulltitle=item.fulltitle,
                              show=item.show,
                              thumbnails=item.thumbnails,
+                             filterseason=str(season['season']),
                              url=url,
                              action='episodios',
                              contentSeason=season['season'],
@@ -528,8 +535,9 @@ def get_seasons(item):
 
 
 def episodios(item):
-    support.log()
+    support.log(item)
     itm = item
+
 
     if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']:
         pagination = int(defp) if defp.isdigit() else ''
@@ -573,7 +581,8 @@ def episodios(item):
 
         title = ' - ' + episode['title'] if episode.has_key('title') else ''
         title = '%sx%s%s' % (season_number, episode_number, title)
-        if season_number == item.filter or not item.filterseason:
+
+        if season_number == item.filterseason or not item.filterseason:
             itemlist.append(Item(channel= item.channel,
                                  title= format_title(title),
                                  fulltitle = item.fulltitle,
@@ -606,7 +615,7 @@ def episodios(item):
                                  action='episodios',
                                  contentSeason=season,
                                  infoLabels=infoLabels,
-                                 filterseason=season,
+                                 filterseason=str(season),
                                  path=item.path))
 
     elif pagination and len(json_data['episodes_list']) >= pag * pagination:
