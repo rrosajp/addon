@@ -515,7 +515,8 @@ class UnshortenIt(object):
 
             return uri, r.code if r else 200
         except Exception as e:
-            return uri, str(e)
+            logger.error(e)
+            return uri, 0
 
 
     def _unshorten_linkup(self, uri):

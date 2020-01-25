@@ -14,7 +14,11 @@ list_quality = ['default']
 
 def findhost():
     permUrl = httptools.downloadpage('https://www.cinemalibero.online/', follow_redirects=False).headers
-    return 'https://www.' + permUrl['location'].replace('https://www.google.com/search?q=site:', '')
+    import urlparse
+    p = list(urlparse.urlparse(permUrl['location'].replace('https://www.google.com/search?q=site:', '')))
+    if not p[0]:
+        p[0] = 'https'
+    return urlparse.urlunparse(p)
 
 host = config.get_channel_url(findhost)
 headers = [['Referer', host]]
