@@ -487,9 +487,7 @@ def update(folder_content=config.get_setting("folder_tvshows"), folder=""):
         if videolibrarypath.startswith("special:"):
             if videolibrarypath.endswith('/'):
                 videolibrarypath = videolibrarypath[:-1]
-            update_path = videolibrarypath + "/" + folder_content + "/" + folder + "/"
-        else:
-            update_path = filetools.join(videolibrarypath, folder_content, folder) + "/"
+        update_path = filetools.join(videolibrarypath, folder_content, folder) + "/"
 
         if not update_path.startswith("smb://"):
             payload["params"] = {"directory": update_path}

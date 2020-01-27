@@ -726,7 +726,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
             # ... si ha sido correcto actualizamos la videoteca de Kodi
             if config.is_xbmc() and not silent:
                 from platformcode import xbmc_videolibrary
-                xbmc_videolibrary.update(filetools.join(FOLDER_TVSHOWS, filetools.basename(path)))
+                xbmc_videolibrary.update(FOLDER_TVSHOWS, filetools.basename(path))
 
     if fallidos == len(episodelist):
         fallidos = -1
