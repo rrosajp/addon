@@ -749,7 +749,7 @@ def get_episodes(item):
 
     # Tenemos las lista, ahora vamos a comprobar
     for episode in episodes:
-
+        # from core.support import dbg;dbg()
         # Si partiamos de un item que ya era episodio estos datos ya están bien, no hay que modificarlos
         if item.contentType != "episode":
             episode.contentAction = episode.action
@@ -781,8 +781,9 @@ def get_episodes(item):
             if not episode.contentTitle:
                 episode.contentTitle = re.sub("\[[^\]]+\]|\([^\)]+\)|\d*x\d*\s*-", "", episode.title).strip()
 
-            episode.downloadFilename = filetools.validate_path(filetools.join(item.downloadFilename, "%dx%0.2d - %s" % (
-                episode.contentSeason, episode.contentEpisodeNumber, episode.contentTitle.strip())))
+            episode.downloadFilename = filetools.validate_path(filetools.join(item.downloadFilename, "%dx%0.2d - %s" % (episode.contentSeason, episode.contentEpisodeNumber, episode.contentTitle.strip())))
+            itemlist.append(episode)
+
         if season:
             if scrapertools.find_single_match(episode.title, r'(\d+)x') == season_number:
                 itemlist.append(episode)
