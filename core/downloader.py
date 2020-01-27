@@ -17,23 +17,33 @@ metodos:
   stop(erase = False)  Detiene la descarga, con erase = True elimina los datos descargados
 
 """
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from future.builtins import range
+from future.builtins import object
+from past.utils import old_div
+#from builtins import str
+import sys
+PY3 = False
+VFS = True
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int; VFS = False
+
+import urllib.request, urllib.parse, urllib.error
+
 import mimetypes
 import os
 import re
-import sys
 import threading
 import time
-import urllib
+
 from threading import Thread, Lock
 
-import urllib2
-import urlparse
-
-from core import filetools
+from core import filetools, jsontools
 from platformcode import logger, config
 
 
-class Downloader:
+class Downloader(object):
     @property
     def state(self):
         return self._state
@@ -58,7 +68,7 @@ class Downloader:
     @property
     def remaining_time(self):
         if self.speed[0] and self._file_size:
-            t = (self.size[0] - self.downloaded[0]) / self.speed[0]
+            t = old_div((self.size[0] - self.downloaded[0]), self.speed[0])
         else:
             t = 0
 
@@ -139,9 +149,17 @@ class Downloader:
             if self._seekable:
                 # Guardamos la info al final del archivo
                 self.file.seek(0, 2)
-                offset = self.file.tell()
-                self.file.write(str(self._download_info))
-                self.file.write("%0.16d" % offset)
+                try:
+                    offset = self.file.tell()
+                except:
+                    offset = self.file.seek(0, 1)
+                if not PY3:
+                    self.file.write(str(self._download_info))
+                    self.file.write("%0.16d" % offset)
+                else:
+                    download_info_dump = jsontools.dump(self._download_info).encode('utf-8')
+                    self.file.write(download_info_dump)
+                    self.file.write(b"%0.16d" % offset)
 
         self.file.close()
 
@@ -158,8 +176,8 @@ class Downloader:
         time.sleep(1)
 
         while self.state == self.states.downloading:
-            self._average_speed = (self.downloaded[0] - self._start_downloaded) / (time.time() - self._start_time)
-            self._speed = (self.downloaded[0] - self._start_downloaded) / (time.time() - self._start_time)
+            self._average_speed = old_div((self.downloaded[0] - self._start_downloaded), (time.time() - self._start_time))
+            self._speed = old_div((self.downloaded[0] - self._start_downloaded), (time.time() - self._start_time))
             # self._speed = (self.downloaded[0] - downloaded) / (time.time()  -t)
 
             if time.time() - t > 5:
@@ -224,20 +242,27 @@ class Downloader:
         self.__get_download_filename__()
 
         # Abrimos en modo "a+" para que cree el archivo si no existe, luego en modo "r+b" para poder hacer seek()
-        self.file = filetools.file_open(filetools.join(self._path, self._filename), "a+")
-        self.file = filetools.file_open(filetools.join(self._path, self._filename), "r+b")
+        self.file = filetools.file_open(filetools.join(self._path, self._filename), "a+", vfs=VFS)
+        if self.file: self.file.close() 
+        self.file = filetools.file_open(filetools.join(self._path, self._filename), "r+b", vfs=VFS)
+        if not self.file:
+            return
 
         if self._file_size >= 2 ** 31 or not self._file_size:
             try:
-                self.file.seek(2 ** 31)
+                self.file.seek(2 ** 31, 0)
             except OverflowError:
                 self._seekable = False
                 logger.info("Cannot do seek() or tell() in files larger than 2GB")
 
         self.__get_download_info__()
 
-        logger.info("Initialized Download: Parts: %s | Path: %s | Archive: %s | Size: %s" % (
-        len(self._download_info["parts"]), self._path, self._filename, self._download_info["size"]))
+        try:
+            logger.info("Initialized Download: Parts: %s | Path: %s | Archive: %s | Size: %s" % \
+                    (str(len(self._download_info["parts"])), self._pathencode('utf-8'), \
+                    self._filenameencode('utf-8'), str(self._download_info["size"])))
+        except:
+            pass
 
     def __url_to_headers__(self, url):
         # Separamos la url de los headers adicionales
@@ -245,13 +270,13 @@ class Downloader:
 
         # headers adicionales
         if "|" in url:
-            self._headers.update(dict([[header.split("=")[0], urllib.unquote_plus(header.split("=")[1])] for header in
+            self._headers.update(dict([[header.split("=")[0], urllib.parse.unquote_plus(header.split("=")[1])] for header in
                                        url.split("|")[1].split("&")]))
 
     def __get_download_headers__(self):
         if self.url.startswith("https"):
             try:
-                conn = urllib2.urlopen(urllib2.Request(self.url.replace("https", "http"), headers=self._headers))
+                conn = urllib.request.urlopen(urllib.request.Request(self.url.replace("https", "http"), headers=self._headers))
                 conn.fp._sock.close()
                 self.url = self.url.replace("https", "http")
             except:
@@ -260,16 +285,16 @@ class Downloader:
         for x in range(3):
             try:
                 if not sys.hexversion > 0x0204FFFF:
-                    conn = urllib2.urlopen(urllib2.Request(self.url, headers=self._headers))
+                    conn = urllib.request.urlopen(urllib.request.Request(self.url, headers=self._headers))
                     conn.fp._sock.close()
                 else:
-                    conn = urllib2.urlopen(urllib2.Request(self.url, headers=self._headers), timeout=5)
+                    conn = urllib.request.urlopen(urllib.request.Request(self.url, headers=self._headers), timeout=5)
 
             except:
                 self.response_headers = dict()
                 self._state = self.states.error
             else:
-                self.response_headers = conn.headers.dict
+                self.response_headers = conn.headers
                 self._state = self.states.stopped
                 break
 
@@ -278,20 +303,20 @@ class Downloader:
         if "filename" in self.response_headers.get("content-disposition",
                                                    "") and "attachment" in self.response_headers.get(
                 "content-disposition", ""):
-            cd_filename, cd_ext = os.path.splitext(urllib.unquote_plus(
+            cd_filename, cd_ext = os.path.splitext(urllib.parse.unquote_plus(
                 re.compile("attachment; filename ?= ?[\"|']?([^\"']+)[\"|']?").match(
                     self.response_headers.get("content-disposition")).group(1)))
-        if "filename" in self.response_headers.get("content-disposition", "") and "inline" in self.response_headers.get(
+        elif "filename" in self.response_headers.get("content-disposition", "") and "inline" in self.response_headers.get(
                 "content-disposition", ""):
-            cd_filename, cd_ext = os.path.splitext(urllib.unquote_plus(
+            cd_filename, cd_ext = os.path.splitext(urllib.parse.unquote_plus(
                 re.compile("inline; filename ?= ?[\"|']?([^\"']+)[\"|']?").match(
                     self.response_headers.get("content-disposition")).group(1)))
         else:
             cd_filename, cd_ext = "", ""
 
         url_filename, url_ext = os.path.splitext(
-            urllib.unquote_plus(filetools.basename(urlparse.urlparse(self.url)[2])))
-        if self.response_headers.get("content-type", "application/octet-stream") <> "application/octet-stream":
+            urllib.parse.unquote_plus(filetools.basename(urllib.parse.urlparse(self.url)[2])))
+        if self.response_headers.get("content-type", "application/octet-stream") != "application/octet-stream":
             mime_ext = mimetypes.guess_extension(self.response_headers.get("content-type"))
         else:
             mime_ext = ""
@@ -324,7 +349,7 @@ class Downloader:
         if value <= 0:
             return 0, 0, units[0]
         else:
-            return value, value / 1024.0 ** int(math.log(value, 1024)), units[int(math.log(value, 1024))]
+            return value, old_div(value, 1024.0 ** int(math.log(value, 1024))), units[int(math.log(value, 1024))]
 
     def __get_download_info__(self):
         # Continuamos con una descarga que contiene la info al final del archivo
@@ -335,13 +360,16 @@ class Downloader:
                 raise Exception()
             self.file.seek(-16, 2)
             offset = int(self.file.read())
-            self.file.seek(offset)
+            self.file.seek(offset, 0)
             data = self.file.read()[:-16]
             self._download_info = eval(data)
             if not self._download_info["size"] == self._file_size:
                 raise Exception()
-            self.file.seek(offset)
-            self.file.truncate()
+            self.file.seek(offset, 0)
+            try:
+                self.file.truncate()
+            except:
+                pass
 
             if not self._seekable:
                 for part in self._download_info["parts"]:
@@ -377,17 +405,20 @@ class Downloader:
             self.save_parts = set()
             self.download_parts = set()
 
-            self.file.seek(0)
-            self.file.truncate()
+            self.file.seek(0, 0)
+            try:
+                self.file.truncate()
+            except:
+                pass
 
     def __open_connection__(self, start, end):
         headers = self._headers.copy()
         if not end: end = ""
         headers.update({"Range": "bytes=%s-%s" % (start, end)})
         if not sys.hexversion > 0x0204FFFF:
-            conn = urllib2.urlopen(urllib2.Request(self.url, headers=headers))
+            conn = urllib.request.urlopen(urllib.request.Request(self.url, headers=headers))
         else:
-            conn = urllib2.urlopen(urllib2.Request(self.url, headers=headers), timeout=5)
+            conn = urllib.request.urlopen(urllib.request.Request(self.url, headers=headers), timeout=5)
         return conn
 
     def __check_consecutive__(self, id):
@@ -412,7 +443,7 @@ class Downloader:
                 continue
 
             if self._seekable or self._download_info["parts"][save_id]["start"] < 2 ** 31:
-                self.file.seek(self._download_info["parts"][save_id]["start"])
+                self.file.seek(self._download_info["parts"][save_id]["start"], 0)
 
             try:
                 # file = open(os.path.join(self.tmp_path, self._filename + ".part%s" % save_id), "rb")
@@ -477,9 +508,12 @@ class Downloader:
             self.pending_parts.add(id)
 
     def __open_part_file__(self, id):
-        file = open(os.path.join(self.tmp_path, self._filename + ".part%s" % id), "a+")
-        file = open(os.path.join(self.tmp_path, self._filename + ".part%s" % id), "r+b")
-        file.seek(self._download_info["parts"][id]["current"] - self._download_info["parts"][id]["start"])
+        #file = open(os.path.join(self.tmp_path, self._filename + ".part%s" % id), "a+")
+        #file = open(os.path.join(self.tmp_path, self._filename + ".part%s" % id), "r+b")
+        self.file = filetools.file_open(filetools.join(self.tmp_path, self._filename + ".part%s" % id), "a+", vfs=VFS)
+        self.file.close()
+        self.file = filetools.file_open(filetools.join(self.tmp_path, self._filename + ".part%s" % id), "r+b", vfs=VFS)
+        file.seek(self._download_info["parts"][id]["current"] - self._download_info["parts"][id]["start"], 0)
         return file
 
     def __start_part__(self):
@@ -509,7 +543,7 @@ class Downloader:
                 try:
                     start = time.time()
                     buffer = connection.read(self._block_size)
-                    speed.append(len(buffer) / ((time.time() - start) or 0.001))
+                    speed.append(old_div(len(buffer), ((time.time() - start) or 0.001)))
                 except:
                     logger.info("ID: %s Error downloading data" % id)
                     self._download_info["parts"][id]["status"] = self.states.error
@@ -523,7 +557,7 @@ class Downloader:
                         self._buffer[id].append(buffer)
                         self._download_info["parts"][id]["current"] += len(buffer)
                         if len(speed) > 10:
-                            velocidad_minima = sum(speed) / len(speed) / 3
+                            velocidad_minima = old_div(old_div(sum(speed), len(speed)), 3)
                             velocidad = speed[-1]
                             vm = self.__change_units__(velocidad_minima)
                             v = self.__change_units__(velocidad)
@@ -531,7 +565,7 @@ class Downloader:
                             if velocidad_minima > speed[-1] and velocidad_minima > speed[-2] and \
                                             self._download_info["parts"][id]["current"] < \
                                             self._download_info["parts"][id]["end"]:
-                                connection.fp._sock.close()
+                                if connection.fp: connection.fp._sock.close()
                                 logger.info(
                                     "ID: %s Restarting connection! | Minimum Speed: %.2f %s/s | Speed: %.2f %s/s" % \
                                     (id, vm[1], vm[2], v[1], v[2]))
@@ -539,7 +573,7 @@ class Downloader:
                                 break
                     else:
                         self.__set_part_completed__(id)
-                        connection.fp._sock.close()
+                        if connection.fp: connection.fp._sock.close()
                         # file.close()
                         break
 

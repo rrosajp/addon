@@ -941,8 +941,7 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
     contentTitle=item.contentTitle if item.contentTitle else ''
 
     if (function == 'findvideos' and contentType == 'movie') \
-        or (function == 'episodios' and contentType != 'movie') \
-        or function == 'get_seasons' and item.channel == 'community':
+        or (function == 'episodios' and contentType != 'movie'):
         if config.get_videolibrary_support() and len(itemlist) > 0:
             itemlist.append(
                 Item(channel=item.channel,
