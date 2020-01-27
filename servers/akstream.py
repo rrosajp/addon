@@ -11,7 +11,14 @@ from platformcode import logger, config
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     global data
-    data = httptools.downloadpage(page_url).data
+    page = httptools.downloadpage(page_url)
+    if 'embed_ak.php' in page_url:
+        code = scrapertools.find_single_match(page.url, '/embed-([0-9a-z]+)\.html')
+        if code:
+            page = httptools.downloadpage('http://akvideo.stream/video/' + code)
+        else:
+            return False, config.get_localized_string(70449) % "Akvideo"
+    data = page.data
     if "File Not Found" in data:
         return False, config.get_localized_string(70449) % "Akvideo"
     return True, ""
