@@ -88,9 +88,10 @@ def episodios(item):
     seasons = support.match(url, patron=r'<a href="([^"]+)">(\d+)<', patronBlock=r'<h3>STAGIONE</h3><ul>(.*?)</ul>', headers=headers).matches
     for season_url, season in seasons:
         season_url = support.urlparse.urljoin(url, season_url)
-        episodes = support.match(season_url, patron=r'<a href="([^"]+)">(\d+)<', patronBlock=r'<h3>EPISODIO</h3><ul>(.*?)</ul>', headers=headers).matches
+        episodes = support.match(season_url, patron=r'<a href="([^"]+)">(\d+(?:-\d+)?)<', patronBlock=r'<h3>EPISODIO</h3><ul>(.*?)</ul>', headers=headers).matches
         for episode_url, episode in episodes:
             episode_url = support.urlparse.urljoin(url, episode_url)
+            if '-' in episode: episode = episode.split('-')[0].zfill(2) + 'x' + episode.split('-')[1].zfill(2)
             title = season + "x" + episode.zfill(2) + ' - ' + item.fulltitle
             data += title + '|' + episode_url + '\n'
     patron = r'(?P<title>[^\|]+)\|(?P<url>[^\n]+)\n'
