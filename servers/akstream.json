@@ -1,8 +1,12 @@
 {
   "active": true,
   "find_videos": {
-    "ignore_urls": ["http://akvideo.stream/video"],
+    "ignore_urls": ["http://akvideo.stream/video", "http://akvideo.stream/video/api"],
     "patterns": [
+      {
+        "pattern": "(https://akvideo\\.stream/api/vcmod/fastredirect/embed_ak\\.php\\?id=[0-9]+)",
+        "url": "\\1"
+      },
       {
         "pattern": "akvideo.stream\/video\/(?:embed-)?([a-zA-Z0-9]+)",
         "url": "http://akvideo.stream\/video\/\\1"
