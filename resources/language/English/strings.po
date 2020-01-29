@@ -5801,3 +5801,7 @@ msgstr ""
 msgctxt "#707416"
 msgid "how often you want to check for updates? (hours)"
 msgstr ""
+
+msgctxt "#707417"
+msgid "Favourite quality"
+msgstr ""

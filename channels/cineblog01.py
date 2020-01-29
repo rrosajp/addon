@@ -221,11 +221,12 @@ def findvideos(item):
     load_links(itemlist, '<strong>Streamin?g 3D[^<]+</strong>(.*?)cbtable', "pink", "Streaming 3D")
     
     itemlist=support.server(item, itemlist=itemlist)
-    itemlist.insert(0,
-        Item(channel=item.channel,
-             action="",
-             title="[COLOR orange]%s[/COLOR]" % QualityStr,
-             folder=False))
+    if itemlist and QualityStr:
+        itemlist.insert(0,
+            Item(channel=item.channel,
+                 action="",
+                 title="[COLOR orange]%s[/COLOR]" % QualityStr,
+                 folder=False))
     
     return itemlist
 
