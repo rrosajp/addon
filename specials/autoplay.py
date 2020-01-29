@@ -504,7 +504,7 @@ def autoplay_config(item):
     dict_values['active'] = settings_node.get('active', False)
 
     hide_servers = {"id": "hide_servers", "label": config.get_localized_string(70747),
-                      "type": "bool", "default": False, "enabled": "eq(-1,true)",
+                      "type": "bool", "default": False, "enabled": "eq(-" + str(len(list_controls)) + ",true)",
                        "visible": allow_option}
 
     list_controls.append(hide_servers)
@@ -516,7 +516,7 @@ def autoplay_config(item):
         status_language = 0
 
     set_language = {"id": "language", "label": config.get_localized_string(60080),
-                    "type": "list", "default": 0, "enabled": "eq(-2,true)", "visible": True,
+                    "type": "list", "default": 0, "enabled": "eq(-" + str(len(list_controls)) + ",true)", "visible": True,
                     "lvalues": get_languages(item.from_channel)}
 
     list_controls.append(set_language)
@@ -533,10 +533,11 @@ def autoplay_config(item):
         enabled = False
         server_list = ["No disponible"]
     else:
-        enabled = "eq(-3,true)"
+        enabled = "eq(-" + str(len(list_controls)) + ",true)"
 
     custom_servers_settings = {"id": "custom_servers", "label": config.get_localized_string(60081),
                                "type": "bool", "default": False, "enabled": enabled, "visible": True}
+    custom_servers_pos = len(list_controls)
     list_controls.append(custom_servers_settings)
     if dict_values['active'] and enabled:
         dict_values['custom_servers'] = settings_node.get('custom_servers', False)
@@ -544,7 +545,7 @@ def autoplay_config(item):
         dict_values['custom_servers'] = False
 
     for num in range(1, 4):
-        pos1 = num + 3
+        pos1 = num + custom_servers_pos
         default = num - 1
         if default > len(server_list) - 1:
             default = 0
@@ -564,10 +565,11 @@ def autoplay_config(item):
         enabled = False
         quality_list = ["No disponible"]
     else:
-        enabled = "eq(-7,true)"
+        enabled = "eq(-" + str(len(list_controls)) + ",true)"
 
     custom_quality_settings = {"id": "custom_quality", "label": config.get_localized_string(60083),
                                "type": "bool", "default": False, "enabled": enabled, "visible": True}
+    custom_quality_pos = len(list_controls)
     list_controls.append(custom_quality_settings)
     if dict_values['active'] and enabled:
         dict_values['custom_quality'] = settings_node.get('custom_quality', False)
@@ -575,12 +577,12 @@ def autoplay_config(item):
         dict_values['custom_quality'] = False
 
     for num in range(1, 4):
-        pos1 = num + 7
+        pos1 = num + custom_quality_pos
         default = num - 1
         if default > len(quality_list) - 1:
             default = 0
 
-        set_quality = {"id": "quality_%s" % num, "label": u"          \u2665 Calidad Favorita %s" % num,
+        set_quality = {"id": "quality_%s" % num, "label": u"          \u2665 " + config.get_localized_string(707417) + " %s" % num,
                        "type": "list", "default": default,
                        "enabled": "eq(-%s,true)+eq(-%s,true)" % (pos1, num), "visible": True,
                        "lvalues": quality_list}
@@ -591,7 +593,7 @@ def autoplay_config(item):
 
     # Plan B
     dict_values['plan_b'] = settings_node.get('plan_b', False)
-    enabled = "eq(-4,true)|eq(-8,true)"
+    enabled = "eq(-" + str(custom_servers_pos) + ",true)|eq(-" + str(custom_quality_pos) + ",true)"
     plan_b = {"id": "plan_b", "label": config.get_localized_string(70172),"type": "bool", "default": False, "enabled": enabled, "visible": True}
     list_controls.append(plan_b)
 

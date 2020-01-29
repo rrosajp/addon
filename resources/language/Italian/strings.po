@@ -5805,3 +5805,7 @@ msgstr "Non hai selezionato nessuna scelta!\nVerranno utilizzati i DNS di cloudf
 msgctxt "#707416"
 msgid "how often you want to check for updates? (hours)"
 msgstr "Ogni quanto vuoi che vengano controllati? (ore)"
+
+msgctxt "#707417"
+msgid "Favourite quality"
+msgstr "Qualità preferita"
