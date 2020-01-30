@@ -357,7 +357,7 @@ def thumb(itemlist=[], genre=False, thumb=''):
         import re
 
         icon_dict = {'channels_movie':['film'],
-                     'channels_tvshow':['serie','tv','episodi','episodio'],
+                     'channels_tvshow':['serie','tv','episodi','episodio','fiction'],
                      'channels_documentary':['documentari','documentario', 'documentary'],
                      'channels_all':['tutti'],
                      'news':['novità', "novita'", 'aggiornamenti', 'nuovi', 'nuove'],
@@ -385,12 +385,14 @@ def thumb(itemlist=[], genre=False, thumb=''):
                      'popular' : ['popolari','popolare', 'più visti'],
                      'thriller':['thriller'],
                      'top_rated' : ['fortunato', 'votati'],
-                     'on_the_air' : ['corso', 'onda'],
+                     'on_the_air' : ['corso', 'onda', 'diretta', 'dirette'],
                      'channels_western':['western'],
                      'channels_vos':['sub','sub-ita'],
                      'channels_romance':['romantico','sentimentale', 'romance'],
                      'channels_family':['famiglia','famiglie', 'family'],
-                     'channels_historical':['storico', 'history'],
+                     'channels_historical':['storico', 'history', 'storia'],
+                     'channels_az':['lettera','lista','alfabetico','a-z'],
+                     'channels_year':['anno', 'anni'],
                      'autoplay':[config.get_localized_string(60071)]
                     }
 
@@ -403,7 +405,7 @@ def thumb(itemlist=[], genre=False, thumb=''):
         search = ['cerca']
 
         search_suffix ={'_movie':['film'],
-                        '_tvshow':['serie','tv']}
+                        '_tvshow':['serie','tv', 'fiction']}
 
         for item in itemlist:
 

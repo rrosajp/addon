@@ -8,35 +8,63 @@ from core import support
 from lib.concurrent import futures
 current_session = requests.Session()
 host = support.config.get_channel_url()
-menuURL = 'http://www.rai.it/dl/RaiPlay/2016/menu/PublishingBlock-20b274b1-23ae-414f-b3bf-4bdc13b86af2.html?homejson'
-channels = 'http://www.rai.it/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json'
+onair = host + '/palinsesto/onAir.json'
 
 
 @support.menu
 def mainlist(item):
-    film =   ['/film/index.json',
-             ('Genere', ['/film/index.json', 'menu', 'genre']),
-             ('A-Z', ['/film/index.json', 'menu', 'az'])
-             ]
-    tvshow = ['/serietv/index.json',
-             ('Genere', ['/serietv/index.json', 'menu', 'genre']),
-             ('A-Z', ['/serietv/index.json', 'menu', 'az'])
-             ]
-    fiction = [('Fiction {bullet bold}', ['/fiction/index.json', 'peliculas']),
-             ('Genere {submenu}', ['/fiction/index.json', 'menu', 'genre']),
-             ('A-Z {submenu}', ['/fiction/index.json', 'menu', 'az']),
-             ('Cerca Fiction... {submenu bold}', ['/fiction/index.json', 'search'])
-             ]
+    top =  [('Dirette {bold}', ['/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json', 'dirette'])]
 
-    top = [('Dirette TV {bold}', ['', 'dirette']),
-            #  ('Genere {submenu}', ['/fiction/index.json', 'menu', 'genre']),
-            #  ('A-Z {submenu}', ['/fiction/index.json', 'menu', 'az']),
-            #  ('Cerca Fiction... {submenu bold}', ['/fiction/index.json', 'search'])
-             ]
+    menu = [('Film {bullet bold}', ['/film/index.json', 'menu']),
+            ('Cerca Film... {submenu}', ['/film/index.json', 'search']),
+
+            ('Serie TV {bullet bold}', ['/serietv/index.json', 'menu']),
+            ('Cerca Serie TV... {submenu}', ['/serietv/index.json', 'search']),
+
+            ('Fiction {bullet bold}', ['/fiction/index.json', 'menu']),
+            ('Cerca Fiction... {submenu}', ['/fiction/index.json', 'search']),
+
+            ('Documentari {bullet bold}', ['/documentari/index.json', 'menu']),
+            ('Cerca Documentari... {submenu}', ['/documentari/index.json', 'search']),
+
+            ('Programmi TV{bullet bold}', ['/programmi/index.json', 'menu']),
+            ('Cerca Programmi TV... {submenu}', ['/programmi/index.json', 'search']),
+
+            ('Programmi per Bambini {bullet bold}', ['/bambini/index.json', 'menu']),
+            ('Cerca Programmi per Bambini... {submenu}', ['/bambini/index.json', 'search']),
+
+            ('Teche Rai {bullet bold storia}', ['/techerai/index.json', 'menu']),
+            ('Cerca in Teche Rai... {submenu}', ['/techerai/index.json', 'search']),
+
+            ('Musica e Teatro {bullet bold}', ['/performing-arts/index.json', 'menu']),
+            ('Cerca in Musica e Teatro... {submenu}', ['/performing-arts/index.json', 'search'])
+            ]
     return locals()
 
 
 def menu(item):
+    support.log()
+    itemlist = [
+        support.Item(channel= item.channel,
+                     title = support.typo('Tutti','bullet bold'),
+                     url = item.url,
+                     action = 'peliculas'),
+
+        support.Item(channel= item.channel,
+                     title = support.typo('Generi','submenu'),
+                     url = item.url,
+                     action = 'submenu'),
+
+        support.Item(channel= item.channel,
+                     title = support.typo('A-Z','submenu'),
+                     url = item.url,
+                     action = 'submenu'),
+    ]
+
+
+    return support.thumb(itemlist)
+
+def submenu(item):
     itemlist = []
     json = current_session.get(item.url).json()['contents'][-1]['contents']
     if item.args == 'az':
@@ -64,11 +92,13 @@ def menu(item):
                     fulltitle = key['name'],
                     show = key['name'],
                     thumbnail = getUrl(key['image']),
+                    url = getUrl(key['path_id']),
                     action = 'peliculas',
                     args = item.args
                 ))
-    support.thumb(itemlist)
-    return itemlist
+        itemlist.pop(-1)
+
+    return support.thumb(itemlist)
 
 
 def search(item, text):
@@ -83,6 +113,27 @@ def search(item, text):
         for line in sys.exc_info():
             support.logger.error("%s" % line)
         return []
+    return itemlist
+
+
+def dirette(item):
+    support.log()
+    itemlist =[]
+    json = current_session.get(item.url).json()['dirette']
+    onAir = current_session.get(onair).json()['on_air']
+    for i, key in enumerate(json):
+        itemlist.append(
+        support.Item(
+            channel = item.channel,
+            title = support.typo(key['channel'], 'bold'),
+            fulltitle = key['channel'],
+            show = key['channel'],
+            thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"),
+            fanart = getUrl(onAir[i]['currentItem']['image']),
+            url = key['video']['contentUrl'],
+            plot = support.typo(onAir[i]['currentItem']['name'],'bold')+ '\n\n' + onAir[i]['currentItem']['description'],
+            action = 'play'
+            ))
     return itemlist
 
 
@@ -109,9 +160,12 @@ def peliculas(item):
         if not item.args:
             json_url = getUrl(json['contents'][-1]['contents'][-1]['path_id'])
             json = current_session.get(json_url).json()['contents']
+        else:
+            json = json['contents']
         for key in json:
             if len(json[key]) > 0:
                 for key in json[key]:
+                    support.log(key)
                     if item.search.lower() in key['name'].lower():
                         keys.append(key)
 
@@ -121,15 +175,13 @@ def peliculas(item):
         if pagination and i >= pag * pagination: break 
         key_list.append(key)
 
-    if 'film' in item.url: item.contentType ='movie'
-    else: item.contentType = 'tvshow'
+
     with futures.ThreadPoolExecutor() as executor:
         itlist = [executor.submit(addinfo, key, item) for key in key_list]
         for res in futures.as_completed(itlist):
             if res.result():
                 itemlist.append(res.result())
     itemlist = sorted(itemlist, key=lambda it: it.title)
-
 
     if len(keys) > pag * pagination and not item.search:
         itemlist.append(
@@ -154,14 +206,17 @@ def select(item):
             support.Item(
                 channel = item.channel,
                 title = support.typo(key['name'],'bold'),
-                fulltitle = key['name'],
-                show = key['name'],
+                fulltitle = item.fulltitle,
+                show = item.show,
                 thumbnail = item.thumbnail,
                 url = key['sets'],
                 action = 'episodios',
                 args = item.args
             ))
-    return itemlist
+    if len(itemlist) == 1:
+        return episodios(itemlist[0])
+    else:
+        return itemlist
 
 
 def episodios(item):
@@ -172,10 +227,12 @@ def episodios(item):
             if res.result():
                 itemlist += res.result()
     itemlist = sorted(itemlist, key=lambda it: it.title)
+    if itemlist[0].VL: support.videolibrary(itemlist, item)
     return itemlist
 
 
 def findvideos(item):
+
     itemlist = []
     if item.contentType == 'episode':
         url = item.url
@@ -194,18 +251,18 @@ def findvideos(item):
             url = url,
             action = 'play'
         ))
-    return support.server(item, itemlist=itemlist)
+    return support.server(item, itemlist=itemlist, down_load=False)
 
 
 def getUrl(pathId):
     url = pathId.replace(" ", "%20")
     if url.startswith("/raiplay/"):
-        url = url.replace("/raiplay/","https://raiplay.it/")
+        url = url.replace("/raiplay/",host +'/')
 
     if url.startswith("//"):
         url = "https:" + url
     elif url.startswith("/"):
-        url = host[:-1] + url
+        url = host + url
 
     # fix old format of url for json
     if url.endswith(".html?json"):
@@ -229,17 +286,21 @@ def addinfo(key, item):
             fanart = getUrl(key['images']['landscape']),
             url = getUrl(key['path_id']),
             plot = info['description'],
-            action = 'findvideos' if item.contentType == 'movies' else 'select')
+            contentType = 'movie' if key['layout'] == 'single' else 'tvshow',
+            action = 'findvideos' if key['layout'] == 'single' else 'select')
     return it
 
 
 def load_episodes(key, item):
+    support.log()
     itemlist=[]
     json = current_session.get(getUrl(key['path_id'])).json()['items']
     for key in json:
-        # support.log(key)
         ep = support.match(key['subtitle'].encode('utf8'), patron=r'St\s*(\d+)\s*Ep\s*(\d+)').match
-        title = ep[0] + 'x' + ep[1].zfill(2) + support.re.sub(r'St\s*\d+\s*Ep\s*\d+','',key['subtitle'].encode('utf8'))
+        if ep:
+            title = ep[0] + 'x' + ep[1].zfill(2) + support.re.sub(r'St\s*\d+\s*Ep\s*\d+','',key['subtitle'].encode('utf8'))
+        else:
+            title = key['subtitle']
         itemlist.append(
             support.Item(
                 channel = item.channel,
@@ -251,25 +312,9 @@ def load_episodes(key, item):
                 url = key['video_url'],
                 plot = key['description'],
                 contentType = 'episode',
-                action = 'findvideos'
+                action = 'findvideos',
+                VL=True if ep else False
                 ))
     return itemlist
 
 
-def dirette(item):
-    itemlist = []
-    json = current_session.get(channels).json()['dirette']
-    for key in json:
-        itemlist.append(
-            support.Item(
-                channel = item.channel,
-                title = support.typo(key['channel'], 'bold'),
-                fulltitle = key['channel'],
-                show = key['channel'],
-                thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"),
-                fanart = key['stillFrame'],
-                url = key['video']['contentUrl'],
-                plot = key['description'],
-                action = 'play'
-                ))
-    return itemlist
