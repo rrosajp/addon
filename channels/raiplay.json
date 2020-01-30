@@ -1,0 +1,13 @@
+{
+    "id": "raiplay",
+    "name": "Rai Play",
+    "active": true,
+    "adult": false,
+    "language": ["ita"],
+    "thumbnail": "raiplay.png",
+    "banner": "raiplay.png",
+    "categories": ["movie", "tvshow", "documentary"],
+    "not_active": ["include_in_newest"],
+    "settings": [],
+    "cloudflare": true
+}
