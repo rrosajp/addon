@@ -393,6 +393,7 @@ def thumb(itemlist=[], genre=False, thumb=''):
                      'channels_historical':['storico', 'history', 'storia'],
                      'channels_az':['lettera','lista','alfabetico','a-z'],
                      'channels_year':['anno', 'anni'],
+                     'update':['replay', 'update'],
                      'autoplay':[config.get_localized_string(60071)]
                     }
 
