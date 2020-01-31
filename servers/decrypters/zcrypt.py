@@ -19,7 +19,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
     patronvideos = [
         r'(https?://(gestyy|rapidteria|sprysphere)\.com/[a-zA-Z0-9]+)',
-        r'(https?://(?:www\.)?(vcrypt|linkup)\.[^/]+/[^/]+/[a-zA-Z0-9_]+)',
+        r'(https?://(?:www\.)?(vcrypt|linkup)\.[^/]+/[^/]+/[a-zA-Z0-9_=]+)',
         r'(https?://(?:www\.)?(bit|buckler)\.[^/]+/[a-zA-Z0-9]+)',
         r'(https?://(?:www\.)?(xshield)\.[^/]+/[^/]+/[^/]+/[a-zA-Z0-9_\.]+)'
     ]
@@ -61,17 +61,20 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                         url = url.replace('/tv/','/tva/')
                     elif 'delta' in url:
                          url = url.replace('/delta/','/adelta/')
-                    if '/olink/' in url: continue
+                    elif '/ga/' in url:
+                        import base64
+                        url = base64.b64decode(url.split('/')[-1]).strip()
                     else:
                         idata = httptools.downloadpage(url).data
-                        data = scrapertools.find_single_match(idata, "<iframe[^<>]*src=\\'([^'>]*)\\'[^<>]*>")
+                        url = scrapertools.find_single_match(idata, "<iframe[^<>]*src=\\'([^'>]*)\\'[^<>]*>")
                         #fix by greko inizio
-                    if not data:
-                        data = scrapertools.find_single_match(idata, 'action="(?:[^/]+.*?/[^/]+/([a-zA-Z0-9_]+))">')
+                        if not url:
+                            url = scrapertools.find_single_match(idata, 'action="(?:[^/]+.*?/[^/]+/([a-zA-Z0-9_]+))">')
                     from lib import unshortenit
                     data, status = unshortenit.unshorten(url)
-                    # logger.info("Data - Status zcrypt linkup : [%s] [%s] " %(data, status))
-                    data = httptools.downloadpage(data, follow_redirect=True).url
+                    short = scrapertools.find_single_match(data, '^https?://.*?(https?://.*)')
+                    if short:
+                        data = short
                     if '/speedx/' in data: # aggiunto per server speedvideo
                         data = data.replace('http://linkup.pro/speedx', 'http://speedvideo.net')
                     # fix by greko fine                    
