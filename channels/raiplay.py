@@ -13,7 +13,8 @@ onair = host + '/palinsesto/onAir.json'
 
 @support.menu
 def mainlist(item):
-    top =  [('Dirette {bold}', ['/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json', 'dirette'])]
+    top =  [('Dirette {bold}', ['/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json', 'dirette']),
+            ('Replay {bold}', ['/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json', 'replay_menu'])]
 
     menu = [('Film {bullet bold}', ['/film/index.json', 'menu']),
             ('Serie TV {bullet bold}', ['/serietv/index.json', 'menu']),
@@ -32,87 +33,89 @@ def mainlist(item):
 
 def menu(item):
     support.log()
-    itemlist = [
-        support.Item(channel= item.channel,
-                     title = support.typo('Tutti','bullet bold'),
-                     url = item.url,
-                     action = 'peliculas'),
+    itemlist = [support.Item(channel= item.channel, title = support.typo('Tutti','bullet bold'),
+                             url = item.url, action = 'peliculas'),
 
-        support.Item(channel= item.channel,
-                     title = support.typo('Generi','submenu'),
-                     url = item.url,
-                     args = 'genre',
-                     action = 'submenu'),
+                support.Item(channel= item.channel, title = support.typo('Generi','submenu'),
+                             url = item.url, args = 'genre', action = 'submenu'),
 
-        support.Item(channel= item.channel,
-                     title = support.typo('A-Z','submenu'),
-                     url = item.url,
-                     args = 'az',
-                     action = 'submenu'),
-    ]
-
+                support.Item(channel= item.channel, title = support.typo('A-Z','submenu'),
+                             url = item.url, args = 'az', action = 'submenu')]
 
     return support.thumb(itemlist)
 
 
 def submenu(item):
+    support.log()
     itemlist = []
     json = current_session.get(item.url).json()['contents'][-1]['contents']
     if item.args == 'az':
         json_url = getUrl(json[-1]['path_id'])
         json = current_session.get(json_url).json()['contents']
         for key in json:
-            itemlist.append(
-                support.Item(
-                    channel = item.channel,
-                    title = support.typo(key,'bold'),
-                    fulltitle = key,
-                    show = key,
-                    url = json[key],
-                    thumbnail = item.thumbnail,
-                    action = 'peliculas',
-                    args = item.args
-                ))
+            itemlist.append(support.Item(channel = item.channel, title = support.typo(key,'bold'), fulltitle = key, show = key,
+                                         url = json[key], thumbnail = item.thumbnail, action = 'peliculas', args = item.args))
     else:
         for key in json:
-            support.log('KEY',key)
-            itemlist.append(
-                support.Item(
-                    channel = item.channel,
-                    title = support.typo(key['name'],'bold'),
-                    fulltitle = key['name'],
-                    show = key['name'],
-                    thumbnail = getUrl(key['image']),
-                    url = getUrl(key['path_id']),
-                    action = 'peliculas',
-                    args = item.args
-                ))
+            itemlist.append(support.Item(channel = item.channel, title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'],
+                                         thumbnail = getUrl(key['image']), url = getUrl(key['path_id']), action = 'peliculas', args = item.args))
         itemlist.pop(-1)
-
     return support.thumb(itemlist)
 
+
+def replay_menu(item):
+    support.log()
+    import datetime, xbmc
+
+    # create day and month list
+    days = []
+    months = []
+    days.append(xbmc.getLocalizedString(17))
+    for day in range(11, 17): days.append(xbmc.getLocalizedString(day))
+    for month in range(21, 33): months.append(xbmc.getLocalizedString(month))
+
+    # make menu
+    itemlist = []
+    today = datetime.date.today()
+    for d in range(7):
+        day = today - datetime.timedelta(days=d)
+        itemlist.append(support.Item(channel = item.channel, thumbnail = item.thumbnail, action = 'replay_channels', url = item.url, date = day.strftime("%d-%m-%Y"),
+                                     title = support.typo(days[int(day.strftime("%w"))] + " " + day.strftime("%d") + " " + months[int(day.strftime("%m"))-1], 'bold')))
+    return itemlist
+
+
+def replay_channels(item):
+    support.log()
+    itemlist = []
+    json = current_session.get(item.url).json()['dirette']
+    for key in json:
+        itemlist.append(support.Item(channel = item.channel, title = support.typo(key['channel'], 'bold'), fulltitle = key['channel'], show = key['channel'],plot = item.title, action = 'replay',
+                                     thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"), url = '%s/palinsesto/app/old/%s/%s.json' % (host, key['channel'].lower().replace(' ','-'), item.date)))
+    return itemlist
+
+
+def replay(item):
+    support.log()
+    itemlist = []
+    json = current_session.get(item.url).json()[item.fulltitle][0]['palinsesto'][0]['programmi']
+    # support.log(json)
+    for key in json:
+        support.log('KEY=',key)
+        if key and key['pathID']: itemlist.append(support.Item(channel = item.channel, thumbnail = getUrl(key['images']['landscape']), fanart = getUrl(key['images']['landscape']), url = getUrl(key['pathID']),
+                                             title = support.typo(key['timePublished'], 'color kod bold') + support.typo(' | ' + key['name'], ' bold'), fulltitle = key['name'], show = key['name'], plot = key['testoBreve'], action = 'findvideos'))
+    return itemlist
 
 def search(item, text):
     support.log()
     itemlist =[]
-    url = host + '/dl/RaiTV/RaiPlayMobile/Prod/Config/programmiAZ-elenco.json'
     try:
-        json = current_session.get(url).json()
-        itemlist =[]
+        json = current_session.get(host + '/dl/RaiTV/RaiPlayMobile/Prod/Config/programmiAZ-elenco.json').json()
         for key in json:
             for key in json[key]:
                 if key.has_key('PathID') and (text.lower() in key['name'].lower()):
-                    itemlist.append(
-                        support.Item(
-                            channel = item.channel,
-                            title = support.typo(key['name'],'bold'),
-                            fulltitle = key['name'],
-                            show = key['name'],
-                            thumbnail = getUrl(key['images']['portrait'] if key['images'].has_key('portrait') else key['images']['portrait43'] if key['images'].has_key('portrait43') else key['images']['landscape']),
-                            fanart = getUrl(key['images']['landscape'] if key['images'].has_key('landscape') else key['images']['landscape43']),
-                            url = key['PathID'].replace('/?json', '.json'),
-                            action = 'Type'
-                        ))
+                    itemlist.append(support.Item(channel = item.channel, title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'], url = key['PathID'].replace('/?json', '.json'), action = 'Type',
+                                                 thumbnail = getUrl(key['images']['portrait'] if key['images'].has_key('portrait') else key['images']['portrait43'] if key['images'].has_key('portrait43') else key['images']['landscape']),
+                                                 fanart = getUrl(key['images']['landscape'] if key['images'].has_key('landscape') else key['images']['landscape43'])))
     except:
         import sys
         for line in sys.exc_info():
@@ -138,18 +141,9 @@ def dirette(item):
     json = current_session.get(item.url).json()['dirette']
     onAir = current_session.get(onair).json()['on_air']
     for i, key in enumerate(json):
-        itemlist.append(
-        support.Item(
-            channel = item.channel,
-            title = support.typo(key['channel'], 'bold'),
-            fulltitle = key['channel'],
-            show = key['channel'],
-            thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"),
-            fanart = getUrl(onAir[i]['currentItem']['image']),
-            url = key['video']['contentUrl'],
-            plot = support.typo(onAir[i]['currentItem']['name'],'bold')+ '\n\n' + onAir[i]['currentItem']['description'],
-            action = 'play'
-            ))
+        itemlist.append(support.Item(channel = item.channel, title = support.typo(key['channel'], 'bold'), fulltitle = key['channel'], show = key['channel'],
+                                     thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"), fanart = getUrl(onAir[i]['currentItem']['image']), url = key['video']['contentUrl'],
+                                     plot = support.typo(onAir[i]['currentItem']['name'],'bold')+ '\n\n' + onAir[i]['currentItem']['description'], action = 'play'))
     return itemlist
 
 
@@ -183,12 +177,11 @@ def peliculas(item):
                 for key in json[key]:
                     keys.append(key)
 
-
+    # load titles
     for i, key in enumerate(keys):
         if pagination and (pag - 1) * pagination > i: continue  # pagination
         if pagination and i >= pag * pagination: break 
         key_list.append(key)
-
 
     with futures.ThreadPoolExecutor() as executor:
         itlist = [executor.submit(addinfo, key, item) for key in key_list]
@@ -198,35 +191,20 @@ def peliculas(item):
     itemlist = sorted(itemlist, key=lambda it: it.title)
 
     if len(keys) > pag * pagination and not item.search:
-        itemlist.append(
-            support.Item(channel=item.channel,
-                    action = item.action,
-                    contentType=item.contentType,
-                    title=support.typo(support.config.get_localized_string(30992), 'color kod bold'),
-                    fulltitle= item.fulltitle,
-                    show= item.show,
-                    url=item.url,
-                    args=item.args,
-                    page=pag + 1,
-                    thumbnail=support.thumb()))
+        itemlist.append(support.Item(channel=item.channel, action = item.action, contentType=item.contentType,
+                                     title=support.typo(support.config.get_localized_string(30992), 'color kod bold'),
+                                     fulltitle= item.fulltitle, show= item.show, url=item.url, args=item.args, page=pag + 1,
+                                     thumbnail=support.thumb()))
     return itemlist
 
 
 def select(item):
+    support.log()
     itemlist = []
     json = current_session.get(item.url).json()['blocks']
     for key in json:
-        itemlist.append(
-            support.Item(
-                channel = item.channel,
-                title = support.typo(key['name'],'bold'),
-                fulltitle = item.fulltitle,
-                show = item.show,
-                thumbnail = item.thumbnail,
-                url = key['sets'],
-                action = 'episodios',
-                args = item.args
-            ))
+        itemlist.append(support.Item(channel = item.channel, title = support.typo(key['name'],'bold'), fulltitle = item.fulltitle,
+                                     show = item.show, thumbnail = item.thumbnail, url = key['sets'], action = 'episodios', args = item.args))
     if len(itemlist) == 1:
         return episodios(itemlist[0])
     else:
@@ -234,6 +212,7 @@ def select(item):
 
 
 def episodios(item):
+    support.log()
     itemlist = []
     with futures.ThreadPoolExecutor() as executor:
         itlist = [executor.submit(load_episodes, key, item) for key in item.url]
@@ -246,29 +225,25 @@ def episodios(item):
 
 
 def findvideos(item):
+    support.log()
     itemlist = []
-    if item.contentType == 'episode':
-        url = item.url
+    if item.url.endswith('json'):
+        json = current_session.get(item.url).json()
+
+        if json.has_key('first_item_path'):
+            url = current_session.get(getUrl(json['first_item_path'])).json()['video']['content_url']
+        else:
+            url = json['video']['content_url']
     else:
-        url = getUrl(current_session.get(item.url).json()['first_item_path'])
-        url = current_session.get(url).json()['video']['content_url']
-    support.log(item)
-    itemlist.append(
-        support.Item(
-            channel = item.channel,
-            server = 'directo',
-            title = 'Diretto',
-            fulltitle = item.fulltitle,
-            show = item.show,
-            thumbnail = item.thumbnail,
-            fanart = item.json,
-            url = url,
-            action = 'play'
-        ))
+        url = item.url
+
+    itemlist.append(support.Item(channel = item.channel, server = 'directo', title = 'Diretto', fulltitle = item.fulltitle,
+            show = item.show, thumbnail = item.thumbnail, fanart = item.json, url = getUrl(url), action = 'play' ))
     return support.server(item, itemlist=itemlist, down_load=False)
 
 
 def getUrl(pathId):
+    support.log()
     url = pathId.replace(" ", "%20")
     if url.startswith("/raiplay/"):
         url = url.replace("/raiplay/",host +'/')
@@ -278,7 +253,7 @@ def getUrl(pathId):
     elif url.startswith("/"):
         url = host + url
 
-    # fix old format of url for json
+    # fix format of url for json
     if url.endswith(".html?json"):
         url = url.replace(".html?json", ".json")
     elif url.endswith("/?json"):
@@ -290,16 +265,10 @@ def getUrl(pathId):
 
 
 def addinfo(key, item):
+    support.log()
     info = current_session.get(getUrl(key['info_url'])).json()
-    it = support.Item(
-            channel = item.channel,
-            title = support.typo(key['name'],'bold'),
-            fulltitle = key['name'],
-            show = key['name'],
-            thumbnail = getUrl(key['images']['portrait_logo']),
-            fanart = getUrl(key['images']['landscape']),
-            url = getUrl(key['path_id']),
-            plot = info['description'])
+    it = support.Item( channel = item.channel, title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'],
+            thumbnail = getUrl(key['images']['portrait_logo']), fanart = getUrl(key['images']['landscape']), url = getUrl(key['path_id']), plot = info['description'])
     if key['layout'] == 'single':
         it.action = 'findvideos'
         it.contentType = 'movie'
@@ -320,21 +289,10 @@ def load_episodes(key, item):
         if ep:
             title = ep[0] + 'x' + ep[1].zfill(2) + support.re.sub(r'St\s*\d+\s*Ep\s*\d+','',key['subtitle'].encode('utf8'))
         else:
-            title = key['name']
-        itemlist.append(
-            support.Item(
-                channel = item.channel,
-                title = support.typo(title, 'bold'),
-                fulltitle = item.fulltitle,
-                show = item.show,
-                thumbnail = item.thumbnail,
-                fanart = getUrl(key['images']['landscape']),
-                url = key['video_url'],
-                plot = key['description'],
-                contentType = 'episode',
-                action = 'findvideos',
-                VL=True if ep else False
-                ))
+            title = key['subtitle']
+        itemlist.append(support.Item(channel = item.channel, title = support.typo(title, 'bold'), fulltitle = item.fulltitle, show = item.show, thumbnail = item.thumbnail,
+                                     fanart = getUrl(key['images']['landscape']), url = key['video_url'], plot = key['description'], contentType = 'episode',
+                                     action = 'findvideos', VL=True if ep else False))
     return itemlist
 
 
