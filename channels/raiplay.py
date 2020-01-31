@@ -16,29 +16,17 @@ def mainlist(item):
     top =  [('Dirette {bold}', ['/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json', 'dirette'])]
 
     menu = [('Film {bullet bold}', ['/film/index.json', 'menu']),
-            ('Cerca Film... {submenu}', ['/film/index.json', 'search']),
-
             ('Serie TV {bullet bold}', ['/serietv/index.json', 'menu']),
-            ('Cerca Serie TV... {submenu}', ['/serietv/index.json', 'search']),
-
             ('Fiction {bullet bold}', ['/fiction/index.json', 'menu']),
-            ('Cerca Fiction... {submenu}', ['/fiction/index.json', 'search']),
-
             ('Documentari {bullet bold}', ['/documentari/index.json', 'menu']),
-            ('Cerca Documentari... {submenu}', ['/documentari/index.json', 'search']),
-
             ('Programmi TV{bullet bold}', ['/programmi/index.json', 'menu']),
-            ('Cerca Programmi TV... {submenu}', ['/programmi/index.json', 'search']),
-
             ('Programmi per Bambini {bullet bold}', ['/bambini/index.json', 'menu']),
-            ('Cerca Programmi per Bambini... {submenu}', ['/bambini/index.json', 'search']),
-
             ('Teche Rai {bullet bold storia}', ['/techerai/index.json', 'menu']),
-            ('Cerca in Teche Rai... {submenu}', ['/techerai/index.json', 'search']),
+            ('Musica e Teatro {bullet bold}', ['/performing-arts/index.json', 'menu'])
+           ]
 
-            ('Musica e Teatro {bullet bold}', ['/performing-arts/index.json', 'menu']),
-            ('Cerca in Musica e Teatro... {submenu}', ['/performing-arts/index.json', 'search'])
-            ]
+    search = ''
+
     return locals()
 
 
@@ -53,16 +41,19 @@ def menu(item):
         support.Item(channel= item.channel,
                      title = support.typo('Generi','submenu'),
                      url = item.url,
+                     args = 'genre',
                      action = 'submenu'),
 
         support.Item(channel= item.channel,
                      title = support.typo('A-Z','submenu'),
                      url = item.url,
+                     args = 'az',
                      action = 'submenu'),
     ]
 
 
     return support.thumb(itemlist)
+
 
 def submenu(item):
     itemlist = []
@@ -103,17 +94,42 @@ def submenu(item):
 
 def search(item, text):
     support.log()
-    if 'film' in item.url: item.contentType ='movie'
-    else: item.contentType = 'tvshow'
-    item.search = text
+    itemlist =[]
+    url = host + '/dl/RaiTV/RaiPlayMobile/Prod/Config/programmiAZ-elenco.json'
     try:
-        itemlist = peliculas(item)
+        json = current_session.get(url).json()
+        itemlist =[]
+        for key in json:
+            for key in json[key]:
+                if key.has_key('PathID') and (text.lower() in key['name'].lower()):
+                    itemlist.append(
+                        support.Item(
+                            channel = item.channel,
+                            title = support.typo(key['name'],'bold'),
+                            fulltitle = key['name'],
+                            show = key['name'],
+                            thumbnail = getUrl(key['images']['portrait'] if key['images'].has_key('portrait') else key['images']['portrait43'] if key['images'].has_key('portrait43') else key['images']['landscape']),
+                            fanart = getUrl(key['images']['landscape'] if key['images'].has_key('landscape') else key['images']['landscape43']),
+                            url = key['PathID'].replace('/?json', '.json'),
+                            action = 'Type'
+                        ))
     except:
         import sys
         for line in sys.exc_info():
             support.logger.error("%s" % line)
         return []
     return itemlist
+
+
+def Type(item):
+    json = current_session.get(item.url).json()
+    if json['program_info']['layout'] == 'single':
+        item.contentTitle = item.fulltitle
+        item.contentType = 'movie'
+        return findvideos(item)
+    else:
+        item.contentType = 'tvshow'
+        return select(item)
 
 
 def dirette(item):
@@ -165,9 +181,7 @@ def peliculas(item):
         for key in json:
             if len(json[key]) > 0:
                 for key in json[key]:
-                    support.log(key)
-                    if item.search.lower() in key['name'].lower():
-                        keys.append(key)
+                    keys.append(key)
 
 
     for i, key in enumerate(keys):
@@ -232,13 +246,13 @@ def episodios(item):
 
 
 def findvideos(item):
-
     itemlist = []
     if item.contentType == 'episode':
         url = item.url
     else:
         url = getUrl(current_session.get(item.url).json()['first_item_path'])
         url = current_session.get(url).json()['video']['content_url']
+    support.log(item)
     itemlist.append(
         support.Item(
             channel = item.channel,
@@ -285,9 +299,15 @@ def addinfo(key, item):
             thumbnail = getUrl(key['images']['portrait_logo']),
             fanart = getUrl(key['images']['landscape']),
             url = getUrl(key['path_id']),
-            plot = info['description'],
-            contentType = 'movie' if key['layout'] == 'single' else 'tvshow',
-            action = 'findvideos' if key['layout'] == 'single' else 'select')
+            plot = info['description'])
+    if key['layout'] == 'single':
+        it.action = 'findvideos'
+        it.contentType = 'movie'
+        it.contentTitle = it.fulltitle
+    else:
+        it.action = 'select'
+        it.contentType = 'tvshow'
+        it.contentSerieName = it.fulltitle
     return it
 
 
@@ -300,7 +320,7 @@ def load_episodes(key, item):
         if ep:
             title = ep[0] + 'x' + ep[1].zfill(2) + support.re.sub(r'St\s*\d+\s*Ep\s*\d+','',key['subtitle'].encode('utf8'))
         else:
-            title = key['subtitle']
+            title = key['name']
         itemlist.append(
             support.Item(
                 channel = item.channel,
