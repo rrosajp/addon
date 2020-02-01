@@ -420,9 +420,6 @@ def scrape(func):
         if 'itemlistHook' in args:
             itemlist = args['itemlistHook'](itemlist)
 
-        if 'fullItemlistHook' in args:
-            itemlist = args['fullItemlistHook'](itemlist)
-
         if (pagination and len(matches) <= pag * pagination) or not pagination: # next page with pagination
             if patronNext and inspect.stack()[1][3] != 'newest':
                 nextPage(itemlist, item, data, patronNext, function)
@@ -461,7 +458,8 @@ def scrape(func):
         if 'patronMenu' in args and itemlist:
             itemlist = thumb(itemlist, genre=True)
 
-        
+        if 'fullItemlistHook' in args:
+            itemlist = args['fullItemlistHook'](itemlist)
 
         # itemlist = filterLang(item, itemlist)   # causa problemi a newest
 
