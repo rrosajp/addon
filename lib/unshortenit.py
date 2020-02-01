@@ -36,11 +36,11 @@ class UnshortenIt(object):
     _shrink_service_regex = r'shrink-service\.it'
     _rapidcrypt_regex = r'rapidcrypt\.net'
     _cryptmango_regex = r'cryptmango|xshield\.net'
-    _vcrypt_regex = r'vcrypt\.net'
+    _vcrypt_regex = r'vcrypt\.net|vcrypt\.pw'
     _linkup_regex = r'linkup\.pro|buckler.link'
 
     listRegex = [_adfly_regex, _linkbucks_regex, _adfocus_regex, _lnxlu_regex, _shst_regex, _hrefli_regex, _anonymz_regex,
-                 _shrink_service_regex, _rapidcrypt_regex, _cryptmango_regex, _linkup_regex]
+                 _shrink_service_regex, _rapidcrypt_regex, _cryptmango_regex, _vcrypt_regex, _linkup_regex]
 
     _maxretries = 5
 
@@ -584,7 +584,6 @@ def findlinks(text):
         regex = '(?:https?://(?:[\w\d]+\.)?)?(?:' + regex + ')/[a-zA-Z0-9_=/]+'
         for match in re.findall(regex, text):
             matches.append(match)
-
     if len(matches) == 1:
         text += '\n' + unshorten(matches[0])[0]
     elif matches:
