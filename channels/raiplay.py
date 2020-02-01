@@ -219,7 +219,7 @@ def episodios(item):
         for res in futures.as_completed(itlist):
             if res.result():
                 itemlist += res.result()
-    itemlist = sorted(itemlist, key=lambda it: it.title)
+    itemlist.reverse()
     if itemlist[0].VL: support.videolibrary(itemlist, item)
     return itemlist
 
