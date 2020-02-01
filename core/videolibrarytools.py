@@ -225,6 +225,8 @@ def save_movie(item):
 
 def filter_list(episodelist, action=None, path=None):
     if path: path = path.decode('utf8')
+    # import xbmc
+    # if xbmc.getCondVisibility('system.platform.windows') > 0: path = path.replace('smb:','').replace('/','\\')
     channel_prefs = {}
     lang_sel = quality_sel = show_title = channel =''
     if action:
@@ -234,10 +236,10 @@ def filter_list(episodelist, action=None, path=None):
         show_title = tvshow_item.infoLabels['tvshowtitle']
         if not tvshow_item.channel_prefs:
             tvshow_item.channel_prefs={channel:{}}
-            list_item = os.listdir(path)
+            list_item = filetools.listdir(path)
             for File in list_item:
                 if (File.endswith('.strm') or File.endswith('.json') or File.endswith('.nfo')):
-                    os.remove(os.path.join(path, File))
+                    filetools.remove(filetools.join(path, File))
         if channel not in tvshow_item.channel_prefs:
             tvshow_item.channel_prefs[channel] = {}
         channel_prefs = tvshow_item.channel_prefs[channel]

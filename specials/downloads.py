@@ -302,7 +302,7 @@ def move_to_libray(item):
 
         logger.info('ITEM = ' + str(item))
         name = item.contentTitle if item.contentType == 'movie' else str(item.infoLabels['season']) + 'x' + str(item.infoLabels['episode']).zfill(2)
-        list_item = os.listdir(filetools.join(config.get_videolibrary_path(), FOLDER, path_title))
+        list_item = filetools.listdir(filetools.join(config.get_videolibrary_path(), FOLDER, path_title))
 
         clean = False
         for File in list_item:
@@ -310,8 +310,8 @@ def move_to_libray(item):
             name = name.lower()
             if filename.startswith(name) and (filename.endswith('.strm') or filename.endswith('.json') or filename.endswith('.nfo')):
                 clean = True
-                logger.info('Delete File: ' + str(os.path.join(config.get_videolibrary_path(), FOLDER, path_title, File)))
-                os.remove(os.path.join(config.get_videolibrary_path(), FOLDER, path_title, File))
+                logger.info('Delete File: ' + str(filetools.join(config.get_videolibrary_path(), FOLDER, path_title, File)))
+                filetools.remove(filetools.join(config.get_videolibrary_path(), FOLDER, path_title, File))
 
         from platformcode import xbmc_videolibrary
 
