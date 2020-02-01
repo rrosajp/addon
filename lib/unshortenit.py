@@ -39,6 +39,9 @@ class UnshortenIt(object):
     _vcrypt_regex = r'vcrypt\.net'
     _linkup_regex = r'linkup\.pro|buckler.link'
 
+    listRegex = [_adfly_regex, _linkbucks_regex, _adfocus_regex, _lnxlu_regex, _shst_regex, _hrefli_regex, _anonymz_regex,
+                 _shrink_service_regex, _rapidcrypt_regex, _cryptmango_regex, _linkup_regex]
+
     _maxretries = 5
 
     _this_dir, _this_filename = os.path.split(__file__)
@@ -473,14 +476,16 @@ class UnshortenIt(object):
 
     def _unshorten_vcrypt(self, uri):
         try:
+            if 'myfoldersakstream.php' in uri or '/verys/' in uri:
+                return uri, 0
             r = None
-            import base64, pyaes
+            import pyaes
 
             def decrypt(str):
                 str = str.replace("_ppl_", "+").replace("_eqq_", "=").replace("_sll_", "/")
                 iv = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
                 key = "naphajU2usWUswec"
-                decoded = base64.b64decode(str)
+                decoded = b64decode(str)
                 decoded = decoded + '\0' * (len(decoded) % 16)
                 crypt_object = pyaes.AESModeOfOperationCBC(key, iv)
                 decrypted = ''
@@ -521,8 +526,31 @@ class UnshortenIt(object):
 
     def _unshorten_linkup(self, uri):
         try:
-            r = httptools.downloadpage(uri, follow_redirect=True, timeout=self._timeout, cookies=False)
-            return r.url, r.code
+            r = None
+            if '/tv/' in uri:
+                uri = uri.replace('/tv/', '/tva/')
+            elif 'delta' in uri:
+                uri = uri.replace('/delta/', '/adelta/')
+            elif '/ga/' in uri:
+                uri = b64decode(uri.split('/')[-1]).strip()
+            elif '/speedx/' in uri:
+                uri = uri.replace('http://linkup.pro/speedx', 'http://speedvideo.net')
+            else:
+                r = httptools.downloadpage(uri, follow_redirect=True, timeout=self._timeout, cookies=False)
+                uri = r.url
+                link = re.findall("<iframe[^<>]*src=\\'([^'>]*)\\'[^<>]*>", r.data)
+                # fix by greko inizio
+                if not link:
+                    link = re.findall('action="(?:[^/]+.*?/[^/]+/([a-zA-Z0-9_]+))">', r.data)
+                if link:
+                    uri = link
+            short = re.findall('^https?://.*?(https?://.*)', uri)
+            if short:
+                uri = short[0]
+            if not r:
+                r = httptools.downloadpage(uri, follow_redirect=True, timeout=self._timeout, cookies=False)
+                uri = r.url
+            return uri, r.code
 
         except Exception as e:
             return uri, str(e)
@@ -546,3 +574,28 @@ def unshorten(uri, type=None, timeout=10):
     if status == 200:
         uri, status = unshortener.unwrap_30x(uri, timeout=timeout)
     return uri, status
+
+
+def findlinks(text):
+    unshortener = UnshortenIt()
+    matches = []
+
+    for regex in unshortener.listRegex:
+        regex = '(?:https?://(?:[\w\d]+\.)?)?(?:' + regex + ')/[a-zA-Z0-9_=/]+'
+        for match in re.findall(regex, text):
+            matches.append(match)
+
+    if len(matches) == 1:
+        text += '\n' + unshorten(matches[0])[0]
+    elif matches:
+        # non threaded for webpdb
+        # for match in matches:
+        #     sh = unshorten(match)[0]
+        #     text += '\n' + sh
+        from concurrent import futures
+        with futures.ThreadPoolExecutor() as executor:
+            unshList = [executor.submit(unshorten, match) for match in matches]
+            for link in futures.as_completed(unshList):
+                if link.result()[0] not in matches:
+                    text += '\n' + link.result()[0]
+    return text
