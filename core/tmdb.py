@@ -183,7 +183,7 @@ def cache_response(fn):
             # logger.debug("TARDADO %s" % elapsed_time)
 
         # error al obtener los datos
-        except Exception, ex:
+        except Exception as ex:
             message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
             logger.error("error in: %s" % message)
 
@@ -217,7 +217,7 @@ def set_infoLabels(source, seekTmdb=True, idioma_busqueda=def_lang, forced=False
         logger.debug("The data of %i links were obtained in %f seconds" % (len(source), time.time() - start_time))
     else:
         ret = set_infoLabels_item(source, seekTmdb, idioma_busqueda)
-        logger.debug("The data of %i links were obtained in %f seconds" % (time.time() - start_time))
+        logger.debug("The data were obtained in %f seconds" % (time.time() - start_time))
     return ret
 
 
@@ -878,7 +878,7 @@ class Tmdb(object):
                         # logger.debug("result_data es %s" % dict_data)
 
         # error al obtener los datos
-        except Exception, ex:
+        except Exception as ex:
             message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
             logger.error("error in: %s" % message)
             dict_data = {}

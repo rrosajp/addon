@@ -6,7 +6,7 @@
     "language": ["ita"],
     "thumbnail": "raiplay.png",
     "banner": "raiplay.png",
-    "categories": ["movie", "tvshow", "documentary"],
+    "categories": ["movie", "tvshow", "documentary", "live"],
     "not_active": ["include_in_newest"],
     "settings": [],
     "cloudflare": true
