@@ -42,7 +42,7 @@
                         <itemgap>0</itemgap>
                         <align>right</align>
                         <control type="button" id="11">
-                            <label>$ADDON[plugin.video.kod 70750] $INFO[Player.TimeRemaining(ss),,] $ADDON[plugin.video.kod 70751]</label>
+                            <label>$ADDON[plugin.video.kod 70750] $INFO[Player.TimeRemaining(mm:ss)]</label>
                             <onclick>SendClick(3012)</onclick>
                             <height>40</height>
                             <width min="50">auto</width>
