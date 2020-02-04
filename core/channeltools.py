@@ -3,16 +3,16 @@
 # channeltools - Herramientas para trabajar con canales
 # ------------------------------------------------------------
 
-import os
+from __future__ import absolute_import
 
-import jsontools
-
+from . import jsontools
 from platformcode import config, logger
 
 DEFAULT_UPDATE_URL = "/channels/"
 dict_channels_parameters = dict()
 
 remote_path = 'https://raw.githubusercontent.com/kodiondemand/media/master/'
+
 
 def is_adult(channel_name):
     logger.info("channel_name=" + channel_name)
@@ -27,6 +27,7 @@ def is_enabled(channel_name):
 
 
 def get_channel_parameters(channel_name):
+    from . import filetools
     global dict_channels_parameters
 
     if channel_name not in dict_channels_parameters:
@@ -35,20 +36,24 @@ def get_channel_parameters(channel_name):
             # logger.debug(channel_parameters)
             if channel_parameters:
                 # cambios de nombres y valores por defecto
-                channel_parameters["title"] = channel_parameters.pop("name") + (' [DEPRECATED]' if channel_parameters.has_key('deprecated') and channel_parameters['deprecated'] else '')
+                channel_parameters["title"] = channel_parameters.pop("name") + (
+                    ' [DEPRECATED]' if channel_parameters.has_key('deprecated') and channel_parameters[
+                        'deprecated'] else '')
                 channel_parameters["channel"] = channel_parameters.pop("id")
 
                 # si no existe el key se declaran valor por defecto para que no de fallos en las funciones que lo llaman
                 channel_parameters["adult"] = channel_parameters.get("adult", False)
                 logger.info(channel_parameters["adult"])
                 if channel_parameters["adult"]:
-                    channel_parameters["update_url"] = channel_parameters.get("update_url", DEFAULT_UPDATE_URL+'porn/')
+                    channel_parameters["update_url"] = channel_parameters.get("update_url",
+                                                                              DEFAULT_UPDATE_URL + 'porn/')
                 else:
                     channel_parameters["update_url"] = channel_parameters.get("update_url", DEFAULT_UPDATE_URL)
                 channel_parameters["language"] = channel_parameters.get("language", ["all"])
-##                channel_parameters["adult"] = channel_parameters.get("adult", False)
+                ##                channel_parameters["adult"] = channel_parameters.get("adult", False)
                 channel_parameters["active"] = channel_parameters.get("active", False)
-                channel_parameters["include_in_global_search"] = channel_parameters.get("include_in_global_search", False)
+                channel_parameters["include_in_global_search"] = channel_parameters.get("include_in_global_search",
+                                                                                        False)
                 channel_parameters["categories"] = channel_parameters.get("categories", list())
 
                 channel_parameters["thumbnail"] = channel_parameters.get("thumbnail", "")
@@ -57,56 +62,30 @@ def get_channel_parameters(channel_name):
 
                 # Imagenes: se admiten url y archivos locales dentro de "resources/images"
                 if channel_parameters.get("thumbnail") and "://" not in channel_parameters["thumbnail"]:
-                    channel_parameters["thumbnail"] = os.path.join(remote_path, 'resources', "thumb", channel_parameters["thumbnail"])
+                    channel_parameters["thumbnail"] = filetools.join(remote_path, "resources", "media",
+                                                                     "channels", "thumb",
+                                                                     channel_parameters["thumbnail"])
                 if channel_parameters.get("banner") and "://" not in channel_parameters["banner"]:
-                    channel_parameters["banner"] = os.path.join(remote_path, 'resources', "banner", channel_parameters["banner"])
+                    channel_parameters["banner"] = filetools.join(remote_path, "resources", "media",
+                                                                  "channels", "banner", channel_parameters["banner"])
                 if channel_parameters.get("fanart") and "://" not in channel_parameters["fanart"]:
-                    channel_parameters["fanart"] = os.path.join(remote_path, 'resources', "fanart", channel_parameters["fanart"])
+                    channel_parameters["fanart"] = filetools.join(remote_path, "resources", "media",
+                                                                  "channels", "fanart", channel_parameters["fanart"])
 
                 # Obtenemos si el canal tiene opciones de configuración
                 channel_parameters["has_settings"] = False
                 if 'settings' in channel_parameters:
-                    # if not isinstance(channel_parameters['settings'], list):
-                    #     channel_parameters['settings'] = [channel_parameters['settings']]
-
-                    # if "include_in_global_search" in channel_parameters['settings']:
-                    #     channel_parameters["include_in_global_search"] = channel_parameters['settings']
-                    #     ["include_in_global_search"].get('default', False)
-                    #
-                    # found = False
-                    # for el in channel_parameters['settings']:
-                    #     for key in el.items():
-                    #         if 'include_in' not in key:
-                    #             channel_parameters["has_settings"] = True
-                    #             found = True
-                    #             break
-                    #     if found:
-                    #         break
                     channel_parameters['settings'] = get_default_settings(channel_name)
                     for s in channel_parameters['settings']:
                         if 'id' in s:
                             if s['id'] == "include_in_global_search":
                                 channel_parameters["include_in_global_search"] = True
                             elif s['id'] == "filter_languages":
-                                channel_parameters["filter_languages"] = s.get('lvalues',[])
+                                channel_parameters["filter_languages"] = s.get('lvalues', [])
                             elif s['id'].startswith("include_in_"):
                                 channel_parameters["has_settings"] = True
 
                     del channel_parameters['settings']
-
-                # Compatibilidad
-                if 'compatible' in channel_parameters:
-                    # compatible python
-                    python_compatible = True
-                    if 'python' in channel_parameters["compatible"]:
-                        import sys
-                        python_condition = channel_parameters["compatible"]['python']
-                        if sys.version_info < tuple(map(int, (python_condition.split(".")))):
-                            python_compatible = False
-
-                    channel_parameters["compatible"] = python_compatible
-                else:
-                    channel_parameters["compatible"] = True
 
                 dict_channels_parameters[channel_name] = channel_parameters
 
@@ -115,13 +94,12 @@ def get_channel_parameters(channel_name):
                 # lanzamos la excepcion y asi tenemos los valores básicos
                 raise Exception
 
-        except Exception, ex:
+        except Exception as ex:
             logger.error(channel_name + ".json error \n%s" % ex)
             channel_parameters = dict()
             channel_parameters["channel"] = ""
             channel_parameters["adult"] = False
             channel_parameters['active'] = False
-            channel_parameters["compatible"] = True
             channel_parameters["language"] = ""
             channel_parameters["update_url"] = DEFAULT_UPDATE_URL
             return channel_parameters
@@ -131,7 +109,7 @@ def get_channel_parameters(channel_name):
 
 def get_channel_json(channel_name):
     # logger.info("channel_name=" + channel_name)
-    import filetools
+    from . import filetools
     channel_json = None
     try:
         channel_path = filetools.join(config.get_runtime_path(), "channels", channel_name + ".json")
@@ -142,14 +120,15 @@ def get_channel_json(channel_name):
                 if not os.path.isfile(channel_path):
                     channel_path = filetools.join(config.get_runtime_path(), "servers", channel_name + ".json")
                     if not os.path.isfile(channel_path):
-                        channel_path = filetools.join(config.get_runtime_path(), "servers", "debriders", channel_name + ".json")
+                        channel_path = filetools.join(config.get_runtime_path(), "servers", "debriders",
+                                                      channel_name + ".json")
 
         if filetools.isfile(channel_path):
             # logger.info("channel_data=" + channel_path)
             channel_json = jsontools.load(filetools.read(channel_path))
             # logger.info("channel_json= %s" % channel_json)
 
-    except Exception, ex:
+    except Exception as ex:
         template = "An exception of type %s occured. Arguments:\n%r"
         message = template % (type(ex).__name__, ex.args)
         logger.error(" %s" % message)
@@ -173,6 +152,7 @@ def get_channel_controls_settings(channel_name):
         dict_settings[c['id']] = c['default']
 
     return list_controls, dict_settings
+
 
 def get_lang(channel_name):
     channel = __import__('channels.%s' % channel_name, fromlist=["channels.%s" % channel_name])
@@ -199,13 +179,14 @@ def get_lang(channel_name):
                 list_language.append(lang)
     return list_language
 
+
 def get_default_settings(channel_name):
     import filetools
     default_path = filetools.join(config.get_runtime_path(), 'default_channel_settings' + '.json')
     default_file = jsontools.load(filetools.read(default_path))
 
-    channel_path = filetools.join(config.get_runtime_path(),'channels',channel_name + '.json')
-    adult_path = filetools.join(config.get_runtime_path(),'channels', 'porn', channel_name + '.json')
+    channel_path = filetools.join(config.get_runtime_path(), 'channels', channel_name + '.json')
+    adult_path = filetools.join(config.get_runtime_path(), 'channels', 'porn', channel_name + '.json')
 
     # from core.support import dbg; dbg()
     if os.path.exists(channel_path) or os.path.exists(adult_path):
@@ -223,27 +204,37 @@ def get_default_settings(channel_name):
         # Apply default configurations if they do not exist
         for control in default_controls:
             if control['id'] not in str(channel_controls):
-                if 'include_in_newest' in control['id'] and 'include_in_newest' not in not_active and control['id'] not in not_active:
+                if 'include_in_newest' in control['id'] and 'include_in_newest' not in not_active and control[
+                    'id'] not in not_active:
                     label = control['id'].split('_')
                     label = label[-1]
                     if label == 'peliculas':
                         if 'movie' in categories:
-                            control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30122)
-                            control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_peliculas' in default_off) else True
+                            control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(
+                                30122)
+                            control['default'] = False if ('include_in_newest' in default_off) or (
+                                        'include_in_newest_peliculas' in default_off) else True
                             channel_controls.append(control)
-                        else: pass
+                        else:
+                            pass
                     elif label == 'series':
                         if 'tvshow' in categories:
-                            control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30123)
-                            control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_series' in default_off) else True
+                            control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(
+                                30123)
+                            control['default'] = False if ('include_in_newest' in default_off) or (
+                                        'include_in_newest_series' in default_off) else True
                             channel_controls.append(control)
-                        else: pass
+                        else:
+                            pass
                     elif label == 'anime':
                         if 'anime' in categories:
-                            control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(30124)
-                            control['default'] = False if ('include_in_newest' in default_off) or ('include_in_newest_anime' in default_off) else True
+                            control['label'] = config.get_localized_string(70727) + ' - ' + config.get_localized_string(
+                                30124)
+                            control['default'] = False if ('include_in_newest' in default_off) or (
+                                        'include_in_newest_anime' in default_off) else True
                             channel_controls.append(control)
-                        else: pass
+                        else:
+                            pass
 
                     else:
                         control['label'] = config.get_localized_string(70727) + ' - ' + label.capitalize()
@@ -259,13 +250,15 @@ def get_default_settings(channel_name):
             for control in default_controls_renumber:
                 if control['id'] not in str(channel_controls):
                     channel_controls.append(control)
-                else: pass
+                else:
+                    pass
     else:
         return get_channel_json(channel_name).get('settings', list())
     return channel_controls
 
 
 def get_channel_setting(name, channel, default=None):
+    from . import filetools
     """
     Retorna el valor de configuracion del parametro solicitado.
 
@@ -288,13 +281,15 @@ def get_channel_setting(name, channel, default=None):
     @rtype: any
 
     """
-    file_settings = os.path.join(config.get_data_path(), "settings_channels", channel + "_data.json")
+    file_settings = filetools.join(config.get_data_path(), "settings_channels", channel + "_data.json")
     dict_settings = {}
     dict_file = {}
-    if os.path.exists(file_settings):
+    if channel not in ['trakt']: def_settings = get_default_settings(channel)
+
+    if filetools.exists(file_settings):
         # Obtenemos configuracion guardada de ../settings/channel_data.json
         try:
-            dict_file = jsontools.load(open(file_settings, "rb").read())
+            dict_file = jsontools.load(filetools.read(file_settings))
             if isinstance(dict_file, dict) and 'settings' in dict_file:
                 dict_settings = dict_file['settings']
         except EnvironmentError:
@@ -313,9 +308,7 @@ def get_channel_setting(name, channel, default=None):
             dict_file['settings'] = dict_settings
             # Creamos el archivo ../settings/channel_data.json
             json_data = jsontools.dump(dict_file)
-            try:
-                open(file_settings, "wb").write(json_data)
-            except EnvironmentError:
+            if not filetools.write(file_settings, json_data, silent=True):
                 logger.error("ERROR al salvar el archivo: %s" % file_settings)
 
     # Devolvemos el valor del parametro local 'name' si existe, si no se devuelve default
@@ -323,7 +316,7 @@ def get_channel_setting(name, channel, default=None):
 
 
 def set_channel_setting(name, value, channel):
-    import filetools
+    from . import filetools
     """
     Fija el valor de configuracion del parametro indicado.
 
@@ -346,35 +339,21 @@ def set_channel_setting(name, value, channel):
 
     """
     # Creamos la carpeta si no existe
-    if not os.path.exists(os.path.join(config.get_data_path(), "settings_channels")):
-        os.mkdir(os.path.join(config.get_data_path(), "settings_channels"))
+    if not filetools.exists(filetools.join(config.get_data_path(), "settings_channels")):
+        filetools.mkdir(filetools.join(config.get_data_path(), "settings_channels"))
 
-    file_settings = os.path.join(config.get_data_path(), "settings_channels", channel + "_data.json")
+    file_settings = filetools.join(config.get_data_path(), "settings_channels", channel + "_data.json")
     dict_settings = {}
-    if channel not in ['trakt']: def_settings = get_default_settings(channel)
 
     dict_file = None
 
-    if os.path.exists(file_settings):
+    if filetools.exists(file_settings):
         # Obtenemos configuracion guardada de ../settings/channel_data.json
         try:
-            dict_file = jsontools.load(open(file_settings, "r").read())
+            dict_file = jsontools.load(filetools.read(file_settings))
             dict_settings = dict_file.get('settings', {})
         except EnvironmentError:
             logger.error("ERROR al leer el archivo: %s" % file_settings)
-
-    if os.path.isfile(filetools.join(config.get_runtime_path(), "channels", channel + ".json")):
-
-        # delete unused Settings
-        def_keys = []
-        del_keys = []
-        for key in def_settings:
-            def_keys.append(key['id'])
-        for key in dict_settings:
-            if key not in def_keys:
-                del_keys.append(key)
-        for key in del_keys:
-            del dict_settings[key]
 
     dict_settings[name] = value
 
@@ -385,10 +364,8 @@ def set_channel_setting(name, value, channel):
     dict_file['settings'] = dict_settings
 
     # Creamos el archivo ../settings/channel_data.json
-    try:
-        json_data = jsontools.dump(dict_file)
-        open(file_settings, "w").write(json_data)
-    except EnvironmentError:
+    json_data = jsontools.dump(dict_file)
+    if not filetools.write(file_settings, json_data, silent=True):
         logger.error("ERROR al salvar el archivo: %s" % file_settings)
         return None
 

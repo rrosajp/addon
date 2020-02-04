@@ -621,7 +621,7 @@ def downloadfileGzipped(url, pathfichero):
                     break
                 except:
                     reintentos += 1
-                    logger.info("ERROR in block download, retry %dd" % reintentos)
+                    logger.info("ERROR in block download, retry %d" % reintentos)
                     for line in sys.exc_info():
                         logger.error("%s" % line)
 
@@ -660,7 +660,7 @@ def GetTitleFromFile(title):
     # Imprime en el log lo que va a descartar
     logger.info("title=" + title)
     plataforma = config.get_system_platform()
-    logger.info("platform=" + plataforma)
+    logger.info("plataform=" + plataforma)
 
     # nombrefichero = xbmc.makeLegalFilename(title + url[-4:])
     nombrefichero = title
@@ -678,7 +678,7 @@ def downloadIfNotModifiedSince(url, timestamp):
 
     # Convierte la fecha a GMT
     fecha_formateada = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime(timestamp))
-    logger.info("DateFormat=%s" % fecha_formateada)
+    logger.info("fechaFormateada=%s" % fecha_formateada)
 
     # Comprueba si ha cambiado
     inicio = time.clock()
@@ -700,11 +700,11 @@ def downloadIfNotModifiedSince(url, timestamp):
     except urllib.error.URLError as e:
         # Si devuelve 304 es que no ha cambiado
         if hasattr(e, 'code'):
-            logger.info("HTTP response code: %d" % e.code)
+            logger.info("HTTP response code : %d" % e.code)
             if e.code == 304:
                 logger.info("It has not changed")
                 updated = False
-        # Agarra los errores con codigo de respuesta del servidor externo solicitado     
+        # Agarra los errores con codigo de respuesta del servidor externo solicitado
         else:
             for line in sys.exc_info():
                 logger.error("%s" % line)
@@ -814,6 +814,7 @@ def download_all_episodes(item, channel, first_episode="", preferred_server="vid
 
         for mirror_item in mirrors_itemlist:
             logger.info("mirror=" + mirror_item.title)
+
             if "(Italiano)" in mirror_item.title:
                 idioma = "(Italiano)"
                 codigo_idioma = "it"
