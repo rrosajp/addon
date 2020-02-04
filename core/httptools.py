@@ -254,7 +254,7 @@ def downloadpage(url, **opt):
     domain = urlparse.urlparse(url).netloc
     CF = False
     if domain in ['www.guardaserie.media', 'casacinema.space', 'wstream.video', 'akvideo.stream', 'backin.net',
-                  'dreamsub.stream', 'altadefinizione-nuovo.link', 'ilgeniodellostreaming.si']:
+                  'dreamsub.stream', 'altadefinizione-nuovo.link', 'ilgeniodellostreaming.si', 'www.piratestreaming.gratis']:
         from lib import cloudscraper
         session = cloudscraper.create_scraper()
         CF = True
