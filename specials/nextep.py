@@ -46,7 +46,7 @@ def next_ep(item):
 
     time_over = False
     time_limit = time() + 30
-    time_steps = [20,30,40,50,60]
+    time_steps = [20,30,40,50,60,70,80,90,100,110,120]
     TimeFromEnd = time_steps[config.get_setting('next_ep_seconds')]
 
     # wait until the video plays

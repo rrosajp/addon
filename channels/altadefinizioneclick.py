@@ -21,12 +21,12 @@ from core import support
 from core.item import Item
 from platformcode import config
 
-def findhost():
-    data = support.httptools.downloadpage('https://altadefinizione-nuovo.link/').data
-    host = support.scrapertools.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
-    return host
+# def findhost():
+#     data = support.httptools.downloadpage('https://altadefinizione-nuovo.link/').data
+#     host = support.scrapertools.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
+#     return host
 
-host = config.get_channel_url(findhost)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 list_servers = ['mixdrop', 'vidcloud', 'vidoza', 'supervideo', 'hdload', 'mystream']
 list_quality = ['1080p', '720p', '360p']

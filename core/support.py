@@ -295,7 +295,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 quality=quality,
                 url=scraped["url"],
                 infoLabels=infolabels,
-                thumbnail=item.thumbnail if function == 'episodios' and not scraped["thumb"] else scraped["thumb"] ,
+                thumbnail=item.thumbnail if function == 'episodios' and not scraped["thumb"] else scraped["thumb"] if scraped["thumb"] else '',
                 args=item.args,
                 contentSerieName= scraped['title'] if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
                 contentTitle= scraped['title'] if item.contentType or CT == 'movie' else '',
@@ -420,9 +420,6 @@ def scrape(func):
         if 'itemlistHook' in args:
             itemlist = args['itemlistHook'](itemlist)
 
-        if 'fullItemlistHook' in args:
-            itemlist = args['fullItemlistHook'](itemlist)
-
         if (pagination and len(matches) <= pag * pagination) or not pagination: # next page with pagination
             if patronNext and inspect.stack()[1][3] != 'newest':
                 nextPage(itemlist, item, data, patronNext, function)
@@ -461,7 +458,8 @@ def scrape(func):
         if 'patronMenu' in args and itemlist:
             itemlist = thumb(itemlist, genre=True)
 
-        
+        if 'fullItemlistHook' in args:
+            itemlist = args['fullItemlistHook'](itemlist)
 
         # itemlist = filterLang(item, itemlist)   # causa problemi a newest
 
@@ -1017,9 +1015,11 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
             videoitem.server = findS[2]
             videoitem.title = findS[0]
             videoitem.url = findS[1]
-        item.title = item.contentTitle.strip() if item.contentType == 'movie' or (
-                    config.get_localized_string(30161) in item.title) else item.title
-        videoitem.title = item.title + (typo(videoitem.title, '_ color kod []') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
+
+        item.title = typo(item.contentTitle.strip(),'bold') if item.contentType == 'movie' or (config.get_localized_string(30161) in item.title) else item.title
+
+        videoitem.plot= typo(videoitem.title, 'bold')
+        videoitem.title = item.title + (typo(videoitem.title, '_ color kod [] bold') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail

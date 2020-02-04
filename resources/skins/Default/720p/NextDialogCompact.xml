@@ -42,11 +42,11 @@
                         <itemgap>0</itemgap>
                         <align>right</align>
                         <control type="button" id="11">
-                            <label>[B]$INFO[Player.TimeRemaining(ss),,][/B]</label>
+                            <label>[B]$INFO[Player.TimeRemaining(mm:ss)][/B]</label>
                             <onclick>SendClick(3012)</onclick>
                             <!-- <visible>!Integer.IsGreater(Player.TimeRemaining,59)</visible> -->
                             <height>40</height>
-                            <width>65</width>
+                            <width>100</width>
                             <font>font30_title</font>
                             <textoffsetx>12</textoffsetx>
                             <textcolor>80FFFFFF</textcolor>

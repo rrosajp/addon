@@ -1,4 +1,4 @@
-<addon id="plugin.video.kod" name="Kodi on Demand" provider-name="KOD Team" version="0.7.1">
+<addon id="plugin.video.kod" name="Kodi on Demand" provider-name="KOD Team" version="0.7.2">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.libtorrent" optional="true"/>
@@ -19,10 +19,12 @@
       <screenshot>resources/media/themes/ss/2.png</screenshot>
       <screenshot>resources/media/themes/ss/3.png</screenshot>
     </assets>
-      <news>- A grande richiesta, è ora possibile riprodurre in automatico l'episodio successivo di una serie in libreria 
-- aggiunta la possibilità di nascondere la lista dei server, quando si usa l'autoplay
-- aggiunto canale pufimovies.com
-- fix vari</news>
+      <news>- - aggiunto raiplay
+- agigunto d.s.d.a (ex documentaristreamingda)
+- svariati fix ai canali (eurostreaming, streamtime, piratestreaming, altadefinizioneclick)
+- la videoteca ora può essere messa nelle unità di rete
+- aggiunto server upstream
+- altri piccoli fix vari</news>
     <description lang="it">Naviga velocemente sul web e guarda i contenuti presenti</description>
     <disclaimer>[COLOR red]The owners and submitters to this addon do not host or distribute any of the content displayed by these addons nor do they have any affiliation with the content providers.[/COLOR]
     [COLOR yellow]Kodi © is a registered trademark of the XBMC Foundation. We are not connected to or in any other way affiliated with Kodi, Team Kodi, or the XBMC Foundation. Furthermore, any software, addons, or products offered by us will receive no support in official Kodi channels, including the Kodi forums and various social networks.[/COLOR]</disclaimer>

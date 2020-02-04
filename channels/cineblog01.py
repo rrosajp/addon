@@ -35,6 +35,7 @@ def mainlist(item):
         ('HD', ['', 'menu', 'Film HD Streaming']),
         ('Generi', ['', 'menu', 'Film per Genere']),
         ('Anni', ['', 'menu', 'Film per Anno']),
+        ('Paese', ['', 'menu', 'Film per Paese']),        
         ('Ultimi Aggiornati',['/lista-film-ultimi-100-film-aggiornati/', 'peliculas', 'newest']),
         ('Ultimi Aggiunti', ['/lista-film-ultimi-100-film-aggiunti/', 'peliculas', 'newest'])
     ]
@@ -144,7 +145,8 @@ def peliculas(item):
             patron = r'src="(?P<thumb>[^"]+)" alt="(?P<title>.*?)(?: &#8211; \d+&#215;\d+)?(?:"| &#8211; )(?:(?P<lang>Sub-ITA|ITA))?[^>]*>[^>]+>[^>]+><a href="(?P<url>[^"]+)".*?<div class="rpwe-summary">.*?\((?P<year>\d{4})[^\)]*\) (?P<plot>[^<]+)<'
             action = 'episodios'
     elif '/serietv/' not in item.url:
-        patron = r'<div class="?card-image"?>.*?<img src="?(?P<thumb>[^" ]+)"? alt.*?<a href="?(?P<url>[^" >]+)(?:\/|"|\s+)>(?P<title>[^<[(]+)(?:\[(?P<quality>[A-Za-z0-9/-]+)])? (?:\((?P<year>[0-9]{4})\))?.*?<strong>(?P<genre>[^<>&–]+).*?DURATA (?P<duration>[0-9]+).*?<br(?: /)?>(?P<plot>[^<>]+)'
+        patron = r'<div class="?card-image"?>.*?<img src="?(?P<thumb>[^" ]+)"? alt[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+><a href="?(?P<url>[^" >]+)(?:\/|"|\s+)>(?P<title>[^<[(]+)(?:\[(?P<quality>[A-Za-z0-9/-]+)])? (?:\((?P<year>[0-9]{4})\))?[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<genre>[^<>&â]+)(?:[^ ]+\s*DURATA\s*(?P<duration>[0-9]+)[^>]+>[^>]+>[^>]+>(?P<plot>[^<>]+))?'
+        # patron = r'<div class="?card-image"?>.*?<img src="?(?P<thumb>[^" ]+)"? alt.*?<a href="?(?P<url>[^" >]+)(?:\/|"|\s+)>(?P<title>[^<[(]+)(?:\[(?P<quality>[A-Za-z0-9/-]+)])? (?:\((?P<year>[0-9]{4})\))?.*?<strong>(?P<genre>[^<>&–]+).*?DURATA (?P<duration>[0-9]+).*?<br(?: /)?>(?P<plot>[^<>]+)'
         action = 'findvideos'
     else:
         # debug = True
@@ -161,8 +163,8 @@ def peliculas(item):
 
 @support.scrape
 def episodios(item):
-    patronBlock = r'(?P<block><div class="sp-head[a-z ]*?" title="Espandi">\s*(?:STAGIONE [0-9]+|MINISERIE) - (?P<lang>[^-<]+)(?:- (?P<quality>[^-<]+))?.*?[^<>]*?</div>.*?)<div class="spdiv">\[riduci\]</div>'
-    patron = '(?:<p>|<strong>)(?P<episode>[0-9]+(?:&#215;|×)[0-9]+)(?P<url>.*?)(?:</p>|<br)'
+    patronBlock = r'(?P<block><div class="sp-head[a-z ]*?" title="Espandi">\s*(?:STAGION[EI]\s*(?:DA\s*[0-9]+\s*A)?\s*[0-9]+|MINISERIE) - (?P<lang>[^-<]+)(?:- (?P<quality>[^-<]+))?.*?[^<>]*?<\/div>.*?)<div class="spdiv">\[riduci\]<\/div>'
+    patron = '(?:<p>|<strong>)(?P<episode>[0-9]+(?:&#215;|×)[0-9]+)\s*(?P<title2>[^&<]*)?(?:&#8211;|-)?\s*(?P<url>.*?)(?:<\/p>|<br)'
 
     return locals()
 
@@ -208,7 +210,7 @@ def findvideos(item):
     matches = re.compile(patronvideos, re.DOTALL).finditer(data)
     QualityStr = ""
     for match in matches:
-        QualityStr = scrapertools.decodeHtmlentities(match.group(1))[6:]
+        QualityStr = scrapertools.decodeHtmlentities(match.group(1))
 
     # Estrae i contenuti - Streaming
     load_links(itemlist, '<strong>Streamin?g:</strong>(.*?)cbtable', "orange", "Streaming", "SD")
@@ -218,8 +220,16 @@ def findvideos(item):
 
     # Estrae i contenuti - Streaming 3D
     load_links(itemlist, '<strong>Streamin?g 3D[^<]+</strong>(.*?)cbtable', "pink", "Streaming 3D")
-
-    return support.server(item, itemlist=itemlist)
+    
+    itemlist=support.server(item, itemlist=itemlist)
+    if itemlist and QualityStr:
+        itemlist.insert(0,
+            Item(channel=item.channel,
+                 action="",
+                 title="[COLOR orange]%s[/COLOR]" % QualityStr,
+                 folder=False))
+    
+    return itemlist
 
     # Estrae i contenuti - Download
     # load_links(itemlist, '<strong>Download:</strong>(.*?)<tableclass=cbtable height=30>', "aqua", "Download")

@@ -50,7 +50,7 @@
         <!-- <setting id="downloadpath" type="folder" label="30017" default=""/>
         <setting id="downloadlistpath" type="folder" label="30018" default=""/> -->
         <setting label="30501" type="lsep"/>
-        <setting id="videolibrarypath" type="folder" label="30067" default=""/>
+        <setting id="videolibrarypath" type="folder" label="30067" default="special://profile/addon_data/plugin.video.kod/videolibrary"/>
         <setting id="folder_tvshows" type="text" label="70118" default="SERIES"/>
         <setting id="folder_movies" type="text" label="70119" default="CINE"/>
         <setting label="59997" type="lsep"/>
@@ -60,15 +60,15 @@
         <setting id="videolibrary_max_quality" type="bool" label="70729" default="false" visible="true"/>
         <setting id="next_ep" type="enum" label="70746" lvalues="70752|70747|70748" default="0"/>
         <setting id="next_ep_type" type="bool" label="70754" default="false" visible="eq(-1,2)"/>
-        <setting id="next_ep_seconds" type="enum" values="20|30|40|50|60" label="70749" default="2" visible="!eq(-2,0)"/>
+        <setting id="next_ep_seconds" type="enum" values="20|30|40|50|60|70|80|90|100|110|120" label="70749" default="2" visible="!eq(-2,0)"/>
     </category>
 
 
     <!-- Downloads -->
     <category label="30153">
         <setting id="downloadenabled" type="bool" label="70689" default="false"/>
-        <setting id="downloadpath" type="folder" label="30017" visible="eq(-1,true)" default=""/>
-        <setting id="downloadlistpath" type="folder" label="30018" visible="eq(-2,true)" default=""/>
+        <setting id="downloadpath" type="folder" label="30017" visible="eq(-1,true)" default="special://profile/addon_data/plugin.video.kod/downloads"/>
+        <setting id="downloadlistpath" type="folder" label="30018" visible="eq(-2,true)" default="special://profile/addon_data/plugin.video.kod/downloads/list"/>
     </category>
 
     <!-- Visual -->

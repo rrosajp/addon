@@ -25,7 +25,7 @@ headers = [['Referer', host]]
 
 
 
-list_servers = ['verystream', 'wstream', 'speedvideo', 'flashx', 'nowvideo', 'streamango', 'deltabit', 'openload']
+list_servers = ['akstream', 'wstream', 'mixdrop', 'vidtome', 'turbovid', 'speedvideo', 'flashx', 'nowvideo', 'deltabit']
 list_quality = ['default']
 
 @support.menu
