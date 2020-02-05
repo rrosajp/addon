@@ -150,9 +150,9 @@ def filterchannels(category, view="thumb_"):
             if channel_parameters["channel"] == 'community':
                 continue
 
-            # si el canal no es compatible, no se muestra
-            if not channel_parameters["compatible"]:
-                continue
+            # # si el canal no es compatible, no se muestra
+            # if not channel_parameters["compatible"]:
+            #     continue
 
             # Si no es un canal lo saltamos
             if not channel_parameters["channel"]:

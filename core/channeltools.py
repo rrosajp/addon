@@ -5,7 +5,7 @@
 
 from __future__ import absolute_import
 
-from . import jsontools
+from core import jsontools
 from platformcode import config, logger
 
 DEFAULT_UPDATE_URL = "/channels/"
@@ -27,7 +27,7 @@ def is_enabled(channel_name):
 
 
 def get_channel_parameters(channel_name):
-    from . import filetools
+    from core import filetools
     global dict_channels_parameters
 
     if channel_name not in dict_channels_parameters:
@@ -62,15 +62,11 @@ def get_channel_parameters(channel_name):
 
                 # Imagenes: se admiten url y archivos locales dentro de "resources/images"
                 if channel_parameters.get("thumbnail") and "://" not in channel_parameters["thumbnail"]:
-                    channel_parameters["thumbnail"] = filetools.join(remote_path, "resources", "media",
-                                                                     "channels", "thumb",
-                                                                     channel_parameters["thumbnail"])
+                    channel_parameters["thumbnail"] = filetools.join(remote_path, "resources", "thumb", channel_parameters["thumbnail"])
                 if channel_parameters.get("banner") and "://" not in channel_parameters["banner"]:
-                    channel_parameters["banner"] = filetools.join(remote_path, "resources", "media",
-                                                                  "channels", "banner", channel_parameters["banner"])
+                    channel_parameters["banner"] = filetools.join(remote_path, "resources", "banner", channel_parameters["banner"])
                 if channel_parameters.get("fanart") and "://" not in channel_parameters["fanart"]:
-                    channel_parameters["fanart"] = filetools.join(remote_path, "resources", "media",
-                                                                  "channels", "fanart", channel_parameters["fanart"])
+                    channel_parameters["fanart"] = filetools.join(remote_path, "resources", channel_parameters["fanart"])
 
                 # Obtenemos si el canal tiene opciones de configuración
                 channel_parameters["has_settings"] = False
@@ -109,17 +105,17 @@ def get_channel_parameters(channel_name):
 
 def get_channel_json(channel_name):
     # logger.info("channel_name=" + channel_name)
-    from . import filetools
+    from core import filetools
     channel_json = None
     try:
         channel_path = filetools.join(config.get_runtime_path(), "channels", channel_name + ".json")
-        if not os.path.isfile(channel_path):
+        if not filetools.isfile(channel_path):
             channel_path = filetools.join(config.get_runtime_path(), 'channels', "porn", channel_name + ".json")
-            if not os.path.isfile(channel_path):
+            if not filetools.isfile(channel_path):
                 channel_path = filetools.join(config.get_runtime_path(), "specials", channel_name + ".json")
-                if not os.path.isfile(channel_path):
+                if not filetools.isfile(channel_path):
                     channel_path = filetools.join(config.get_runtime_path(), "servers", channel_name + ".json")
-                    if not os.path.isfile(channel_path):
+                    if not filetools.isfile(channel_path):
                         channel_path = filetools.join(config.get_runtime_path(), "servers", "debriders",
                                                       channel_name + ".json")
 
@@ -181,7 +177,7 @@ def get_lang(channel_name):
 
 
 def get_default_settings(channel_name):
-    import filetools
+    from core import filetools
     default_path = filetools.join(config.get_runtime_path(), 'default_channel_settings' + '.json')
     default_file = jsontools.load(filetools.read(default_path))
 
@@ -189,7 +185,7 @@ def get_default_settings(channel_name):
     adult_path = filetools.join(config.get_runtime_path(), 'channels', 'porn', channel_name + '.json')
 
     # from core.support import dbg; dbg()
-    if os.path.exists(channel_path) or os.path.exists(adult_path):
+    if filetools.exists(channel_path) or filetools.exists(adult_path):
         default_controls = default_file['settings']
         default_controls_renumber = default_file['renumber']
         channel_json = get_channel_json(channel_name)
@@ -258,7 +254,7 @@ def get_default_settings(channel_name):
 
 
 def get_channel_setting(name, channel, default=None):
-    from . import filetools
+    from core import filetools
     """
     Retorna el valor de configuracion del parametro solicitado.
 
@@ -316,7 +312,7 @@ def get_channel_setting(name, channel, default=None):
 
 
 def set_channel_setting(name, value, channel):
-    from . import filetools
+    from core import filetools
     """
     Fija el valor de configuracion del parametro indicado.
 
