@@ -3,22 +3,31 @@
 # XBMC Launcher (xbmc / kodi)
 # ------------------------------------------------------------
 
+#from future import standard_library
+#standard_library.install_aliases()
+#from builtins import str
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
+
+if PY3:
+    import urllib.error as urllib2                              # Es muy lento en PY2.  En PY3 es nativo
+else:
+    import urllib2                                              # Usamos el nativo de PY2 que es más rápido
+
 import os
 import sys
-
-
-import urllib2
+import time
 
 from core import channeltools
 from core import scrapertools
 from core import servertools
-from core import trakt_tools
 from core import videolibrarytools
+from core import trakt_tools
 from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
 from platformcode.logger import WebErrorException
-
 
 
 def start():
@@ -30,21 +39,19 @@ def start():
     #config.set_setting('show_once', True)
     # Test if all the required directories are created
     config.verify_directories_created()
-
     # controlla se l'utente ha qualche problema di connessione
     # se lo ha: non lo fa entrare nell'addon
     # se ha problemi di DNS avvia ma lascia entrare
     # se tutto ok: entra nell'addon
-    from specials import resolverdns
+
     from specials.checkhost import test_conn
     import threading
-    threading.Thread(target=test_conn, args=(True, not config.get_setting('resolver_dns'), True, [], [], True)).start()
-    # check_adsl = test_conn(is_exit = True, check_dns = True, view_msg = True,
-    #           lst_urls = [], lst_site_check_dns = [], in_addon = True)
-
-
+    threading.Thread(target=test_conn,
+                          args=(True, not config.get_setting('resolver_dns'), True, [], [], True)).start()
+    
 def run(item=None):
     logger.info()
+
     if not item:
         # Extract item from sys.argv
         if sys.argv[2]:
@@ -88,6 +95,9 @@ def run(item=None):
     logger.info(item.tostring())
 
     try:
+        if not config.get_setting('tmdb_active'):
+            config.set_setting('tmdb_active', True)
+
         # If item has no action, stops here
         if item.action == "":
             logger.info("Item sin accion")
@@ -169,28 +179,28 @@ def run(item=None):
 
             # Checks if channel exists
             if os.path.isfile(os.path.join(config.get_runtime_path(), 'channels', item.channel + ".py")):
-                CHANNELS = 'channels'
+                                CHANNELS = 'channels'
             elif os.path.isfile(os.path.join(config.get_runtime_path(), 'channels', 'porn', item.channel + ".py")):
                 CHANNELS = 'channels.porn'
             else:
-                CHANNELS ='specials'
+                CHANNELS = 'specials'
 
             if CHANNELS != 'channels.porn':
                 channel_file = os.path.join(config.get_runtime_path(), CHANNELS, item.channel + ".py")
             else:
-                channel_file = os.path.join(config.get_runtime_path(), 'channels', 'porn', item.channel + ".py")
+                channel_file = os.path.join(config.get_runtime_path(), 'channels', 'porn',
+                                                         item.channel + ".py")
 
-            logger.info("channel_file= " + channel_file + ' - ' + CHANNELS +' - ' + item.channel)
+            logger.info("channel_file= " + channel_file + ' - ' + CHANNELS + ' - ' + item.channel)
 
             channel = None
 
             if os.path.exists(channel_file):
                 try:
-                    channel = __import__(CHANNELS + item.channel, None, None, [CHANNELS + item.channel])
+                    channel = __import__('channels.%s' % item.channel, None,
+                                         None, ["channels.%s" % item.channel])
                 except ImportError:
-                    importer = "import " + CHANNELS + "." + item.channel + " as channel "
-
-                    exec(importer)
+                    exec("import channels." + item.channel + " as channel")
 
             logger.info("Running channel %s | %s" % (channel.__name__, channel.__file__))
 
@@ -270,14 +280,22 @@ def run(item=None):
             # Special action for searching, first asks for the words then call the "search" function
             elif item.action == "search":
                 logger.info("item.action=%s" % item.action.upper())
-                if channeltools.get_channel_setting('last_search', 'search'):
-                    last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
-                else:
-                    last_search = ''
+
+                # last_search = ""
+                # last_search_active = config.get_setting("last_search", "search")
+                # if last_search_active:
+                #     try:
+                #         current_saved_searches_list = list(config.get_setting("saved_searches_list", "search"))
+                #         last_search = current_saved_searches_list[0]
+                #     except:
+                #         pass
+
+                last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
+
                 tecleado = platformtools.dialog_input(last_search)
+
                 if tecleado is not None:
                     channeltools.set_channel_setting('Last_searched', tecleado, 'search')
-
                     if 'search' in dir(channel):
                         itemlist = channel.search(item, tecleado)
                     else:
@@ -308,7 +326,7 @@ def run(item=None):
 
                 platformtools.render_items(itemlist, item)
 
-    except urllib2.URLError, e:
+    except urllib2.URLError as e:
         import traceback
         logger.error(traceback.format_exc())
 
@@ -323,11 +341,12 @@ def run(item=None):
             logger.error("Codigo de error HTTP : %d" % e.code)
             # "El sitio web no funciona correctamente (error http %d)"
             platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(30051) % e.code)
-    except WebErrorException, e:
+    except WebErrorException as e:
         import traceback
         logger.error(traceback.format_exc())
 
-        patron = 'File "' + os.path.join(config.get_runtime_path(), CHANNELS, "").replace("\\", "\\\\") + '([^.]+)\.py"'
+        patron = 'File "' + os.path.join(config.get_runtime_path(), "channels", "").replace("\\",
+                                                                                            "\\\\") + '([^.]+)\.py"'
         canal = scrapertools.find_single_match(traceback.format_exc(), patron)
 
         platformtools.dialog_ok(
@@ -382,13 +401,19 @@ def reorder_itemlist(itemlist):
                  [config.get_localized_string(60336), '[D]']]
 
     for item in itemlist:
-        old_title = unicode(item.title, "utf8").lower().encode("utf8")
+        if not PY3:
+            old_title = unicode(item.title, "utf8").lower().encode("utf8")
+        else:
+            old_title = item.title.lower()
         for before, after in to_change:
             if before in item.title:
                 item.title = item.title.replace(before, after)
                 break
 
-        new_title = unicode(item.title, "utf8").lower().encode("utf8")
+        if not PY3:
+            new_title = unicode(item.title, "utf8").lower().encode("utf8")
+        else:
+            new_title = item.title.lower()
         if old_title != new_title:
             mod_list.append(item)
             modified += 1

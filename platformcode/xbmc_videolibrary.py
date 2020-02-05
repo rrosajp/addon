@@ -3,17 +3,24 @@
 # XBMC Library Tools
 # ------------------------------------------------------------
 
+from future import standard_library
+standard_library.install_aliases()
+#from builtins import str
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
+    
 import os
 import threading
 import time
+import re
 
-import urllib2
 import xbmc
-
 from core import filetools
 from core import jsontools
 from platformcode import config, logger
 from platformcode import platformtools
+from core import scrapertools
 
 
 def mark_auto_as_watched(item):
@@ -83,7 +90,6 @@ def sync_trakt_addon(path_folder):
                  "special://home/addons/script.trakt/"]
 
         for path in paths:
-            import sys
             sys.path.append(xbmc.translatePath(path))
 
         # se obtiene las series vistas
@@ -94,10 +100,9 @@ def sync_trakt_addon(path_folder):
             return
 
         shows = traktapi.getShowsWatched({})
-        shows = shows.items()
+        shows = list(shows.items())
 
         # obtenemos el id de la serie para comparar
-        import re
         _id = re.findall("\[(.*?)\]", path_folder, flags=re.DOTALL)[0]
         logger.debug("el id es %s" % _id)
 
@@ -329,9 +334,7 @@ def mark_season_as_watched_on_kodi(item, value=1):
 def mark_content_as_watched_on_alfa(path):
     from specials import videolibrary
     from core import videolibrarytools
-    from core import scrapertools
-    from core import filetools
-    import re
+    
     """
         marca toda la serie o película como vista o no vista en la Videoteca de Alfa basado en su estado en la Videoteca de Kodi
         @type str: path
@@ -361,6 +364,9 @@ def mark_content_as_watched_on_alfa(path):
     if "\\" in path:
         path = path.replace("/", "\\")
     head_nfo, item = videolibrarytools.read_nfo(path)                   #Leo el .nfo del contenido
+    if not item:
+        logger.error('.NFO no encontrado: ' + path)
+        return
 
     if FOLDER_TVSHOWS in path:                                          #Compruebo si es CINE o SERIE
         contentType = "episode_view"                                    #Marco la tabla de BBDD de Kodi Video
@@ -379,7 +385,7 @@ def mark_content_as_watched_on_alfa(path):
         nfo_name = scrapertools.find_single_match(path2, '\]\/(.*?)$')  #Construyo el nombre del .nfo
         path1 = path1.replace(nfo_name, '')                             #para la SQL solo necesito la carpeta
         path2 = path2.replace(nfo_name, '')                             #para la SQL solo necesito la carpeta
-    path2 = filetools.remove_smb_credential(path2)                      #Si el archivo está en un servidor SMB, quiamos las credenciales
+    path2 = filetools.remove_smb_credential(path2)                      #Si el archivo está en un servidor SMB, quitamos las credenciales
     
     #Ejecutmos la sentencia SQL
     sql = 'select strFileName, playCount from %s where (strPath like "%s" or strPath like "%s")' % (contentType, path1, path2)
@@ -399,7 +405,11 @@ def mark_content_as_watched_on_alfa(path):
             playCount_final = 0
         elif playCount >= 1:
             playCount_final = 1
-        title_plain = title_plain.decode("utf-8").encode("utf-8")       #Hacemos esto porque si no genera esto: u'title_plain'
+
+        elif not PY3 and isinstance(title_plain, (str, unicode)):
+            title_plain = title_plain.decode("utf-8").encode("utf-8")   #Hacemos esto porque si no genera esto: u'title_plain'
+        elif PY3 and isinstance(var, bytes):
+            title_plain = title_plain.decode('utf-8')
         item.library_playcounts.update({title_plain: playCount_final})  #actualizamos el playCount del .nfo
 
     if item.infoLabels['mediatype'] == "tvshow":                        #Actualizamos los playCounts de temporadas y Serie
@@ -420,6 +430,7 @@ def get_data(payload):
     @param payload: data
     :return:
     """
+    import urllib.request, urllib.error
     logger.info("payload: %s" % payload)
     # Required header for XBMC JSON-RPC calls, otherwise you'll get a 415 HTTP response code - Unsupported media type
     headers = {'content-type': 'application/json'}
@@ -433,14 +444,14 @@ def get_data(payload):
 
             xbmc_json_rpc_url = "http://" + config.get_setting("xbmc_host", "videolibrary") + ":" + str(
                 xbmc_port) + "/jsonrpc"
-            req = urllib2.Request(xbmc_json_rpc_url, data=jsontools.dump(payload), headers=headers)
-            f = urllib2.urlopen(req)
+            req = urllib.request.Request(xbmc_json_rpc_url, data=jsontools.dump(payload), headers=headers)
+            f = urllib.request.urlopen(req)
             response = f.read()
             f.close()
 
             logger.info("get_data: response %s" % response)
             data = jsontools.load(response)
-        except Exception, ex:
+        except Exception as ex:
             template = "An exception of type %s occured. Arguments:\n%r"
             message = template % (type(ex).__name__, ex.args)
             logger.error("error en xbmc_json_rpc_url: %s" % message)
@@ -448,7 +459,7 @@ def get_data(payload):
     else:
         try:
             data = jsontools.load(xbmc.executeJSONRPC(jsontools.dump(payload)))
-        except Exception, ex:
+        except Exception as ex:
             template = "An exception of type %s occured. Arguments:\n%r"
             message = template % (type(ex).__name__, ex.args)
             logger.error("error en xbmc.executeJSONRPC: %s" % message)
@@ -477,6 +488,7 @@ def update(folder_content=config.get_setting("folder_tvshows"), folder=""):
     }
 
     if folder:
+        folder = str(folder)
         videolibrarypath = config.get_videolibrary_config_path()
 
         if folder.endswith('/') or folder.endswith('\\'):
@@ -489,9 +501,10 @@ def update(folder_content=config.get_setting("folder_tvshows"), folder=""):
                 videolibrarypath = videolibrarypath[:-1]
             update_path = videolibrarypath + "/" + folder_content + "/" + folder + "/"
         else:
-            update_path = filetools.join(videolibrarypath, folder_content, folder) + "/"
+            #update_path = filetools.join(videolibrarypath, folder_content, folder) + "/"   # Problemas de encode en "folder"
+            update_path = filetools.join(videolibrarypath, folder_content, ' ').rstrip()
 
-        if not update_path.startswith("smb://"):
+        if not scrapertools.find_single_match(update_path, '(^\w+:\/\/)'):
             payload["params"] = {"directory": update_path}
 
     while xbmc.getCondVisibility('Library.IsScanningVideo()'):
@@ -663,7 +676,7 @@ def set_content(content_type, silent=False):
         if sql_videolibrarypath.startswith("special://"):
             sql_videolibrarypath = sql_videolibrarypath.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')
             sep = '/'
-        elif sql_videolibrarypath.startswith("smb://"):
+        elif scrapertools.find_single_match(sql_videolibrarypath, '(^\w+:\/\/)'):
             sep = '/'
         else:
             sep = os.sep
@@ -881,7 +894,7 @@ def add_sources(path):
     # Nodo <name>
     nodo_name = xmldoc.createElement("name")
     sep = os.sep
-    if path.startswith("special://") or path.startswith("smb://"):
+    if path.startswith("special://") or scrapertools.find_single_match(path, '(^\w+:\/\/)'):
         sep = "/"
     name = path
     if path.endswith(sep):
