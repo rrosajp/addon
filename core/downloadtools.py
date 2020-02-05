@@ -129,7 +129,7 @@ def getfilefromtitle(url, title):
     logger.info("platform=" + plataforma)
 
     # nombrefichero = xbmc.makeLegalFilename(title + url[-4:])
-    from . import scrapertools
+    from core import scrapertools
 
     nombrefichero = title + scrapertools.get_filename_from_url(url)[-4:]
     logger.info("filename=%s" % nombrefichero)
@@ -886,8 +886,8 @@ def download_all_episodes(item, channel, first_episode="", preferred_server="vid
 
 
 def episodio_ya_descargado(show_title, episode_title):
-    from . import scrapertools
-    ficheros = os.listdir(".")
+    from core import scrapertools
+    ficheros = filetools.listdir(".")
 
     for fichero in ficheros:
         # logger.info("fichero="+fichero)
