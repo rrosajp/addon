@@ -219,11 +219,11 @@ def episodios(item):
         for res in futures.as_completed(itlist):
             if res.result():
                 itemlist += res.result()
-    if itemlist[0].VL:
+    if itemlist and itemlist[0].VL:
         itemlist.reverse()
+        support.videolibrary(itemlist, item)
     else:
         itemlist = sorted(itemlist, key=lambda it: it.title)
-    if itemlist[0].VL: support.videolibrary(itemlist, item)
     return itemlist
 
 
@@ -292,7 +292,9 @@ def load_episodes(key, item):
         if ep:
             title = ep[0] + 'x' + ep[1].zfill(2) + support.re.sub(r'St\s*\d+\s*Ep\s*\d+','',key['subtitle'].encode('utf8'))
         else:
-            title = key['subtitle']
+            title = key['subtitle'].strip()
+        if not title:
+            title = key['name']
         itemlist.append(support.Item(channel = item.channel, title = support.typo(title, 'bold'), fulltitle = item.fulltitle, show = item.show, thumbnail = item.thumbnail,
                                      fanart = getUrl(key['images']['landscape']), url = key['video_url'], plot = key['description'], contentType = 'episode',
                                      action = 'findvideos', VL=True if ep else False))
