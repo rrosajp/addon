@@ -3,6 +3,11 @@
 # Channel for recent videos on several channels
 # ------------------------------------------------------------
 
+#from builtins import str
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
+
 import glob
 import os
 import re
@@ -358,7 +363,7 @@ def get_newest(channel_id, categoria):
             modulo = __import__('channels.%s' % channel_id, fromlist=["channels.%s" % channel_id])
         except:
             try:
-                exec "import channels." + channel_id + " as modulo"
+                exec("import channels." + channel_id + " as modulo")
             except:
                 puede = False
 
@@ -409,8 +414,8 @@ def get_title(item):
 
     elif item.contentTitle:  # Si es una pelicula con el canal adaptado
         title = item.contentTitle
-    elif item.fulltitle:  # Si el canal no esta adaptado
-        title = item.fulltitle
+    elif item.contentTitle:  # Si el canal no esta adaptado
+        title = item.contentTitle
     else:  # Como ultimo recurso
         title = item.title
 
@@ -510,7 +515,7 @@ def group_by_content(list_result_canal):
             dict_contenidos[new_key] = [i]
 
     # Añadimos el contenido encontrado en la lista list_result
-    for v in dict_contenidos.values():
+    for v in list(dict_contenidos.values()):
         title = v[0].title
         if len(v) > 1:
             # Eliminar de la lista de nombres de canales los q esten duplicados
@@ -667,7 +672,7 @@ def cb_custom_button(item, dict_values):
     if value == "":
         value = False
 
-    for v in dict_values.keys():
+    for v in list(dict_values.keys()):
         dict_values[v] = not value
 
     if config.set_setting("custom_button_value_news", not value, item.channel) == True:

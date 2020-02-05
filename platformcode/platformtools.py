@@ -1206,12 +1206,6 @@ def set_player(item, xlistitem, mediaurl, view, strm, autoplay):
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.mark_auto_as_watched(item)
 
-    if is_playing():
-        xbmc.sleep(2000)
-        if is_playing():
-            if not PY3: from lib import alfaresolver
-            else: from lib import alfaresolver_py3 as alfaresolver
-            alfaresolver.frequency_count(item)
 
 def torrent_client_installed(show_tuple=False):
     # Plugins externos se encuentra en servers/torrent.json nodo clients
@@ -1399,16 +1393,6 @@ def play_torrent(item, xlistitem, mediaurl):
         mediaurl = item.url
 
     if seleccion >= 0:
-
-        # Si tiene .torrent válido o magnet, lo registramos
-        if size or item.url.startswith('magnet'):
-            try:
-                import threading
-                if not PY3: from lib import alfaresolver
-                else: from lib import alfaresolver_py3 as alfaresolver
-                threading.Thread(target=alfaresolver.frequency_count, args=(item, )).start()
-            except:
-                logger.error(traceback.format_exc(1))
         
         # Reproductor propio BT (libtorrent)
         if seleccion == 0:

@@ -4,24 +4,29 @@
 # ==============
 # - Lista de enlaces guardados como favoritos, solamente en Alfa, no Kodi.
 # - Los enlaces se organizan en carpetas (virtuales) que puede definir el usuario.
-# - Se utiliza un sólo fichero para guardar todas las carpetas y enlaces: alfavorites-default.json
-# - Se puede copiar alfavorites-default.json a otros dispositivos ya que la única dependencia local es el thumbnail asociado a los enlaces,
+# - Se utiliza un sólo fichero para guardar todas las carpetas y enlaces: kodfavourites-default.json
+# - Se puede copiar kodfavourites-default.json a otros dispositivos ya que la única dependencia local es el thumbnail asociado a los enlaces,
 #   pero se detecta por código y se ajusta al dispositivo actual.
 # - Se pueden tener distintos ficheros de alfavoritos y alternar entre ellos, pero solamente uno de ellos es la "lista activa".
-# - Los ficheros deben estar en config.get_data_path() y empezar por alfavorites- y terminar en .json
+# - Los ficheros deben estar en config.get_data_path() y empezar por kodfavourites- y terminar en .json
 
 # Requerimientos en otros módulos para ejecutar este canal:
 # - Añadir un enlace a este canal en channelselector.py
 # - Modificar platformtools.py para controlar el menú contextual y añadir "Guardar enlace" en set_context_commands
 # ------------------------------------------------------------
 
-import os
-import re
+#from builtins import str
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
+from builtins import object
+
+import os, re
 from datetime import datetime
 
-from core import filetools, jsontools
 from core.item import Item
 from platformcode import config, logger, platformtools
+from core import filetools, jsontools
 
 
 def fechahora_actual():
@@ -32,15 +37,15 @@ def fechahora_actual():
 
 PREFIJO_LISTA = 'kodfavorites-'
 
-# Devuelve el nombre de la lista activa (Ej: alfavorites-default.json)
+# Devuelve el nombre de la lista activa (Ej: kodfavourites-default.json)
 def get_lista_activa():
     return config.get_setting('lista_activa', default = PREFIJO_LISTA + 'default.json')
 
-# Extrae nombre de la lista del fichero, quitando prefijo y sufijo (Ej: alfavorites-Prueba.json => Prueba)
+# Extrae nombre de la lista del fichero, quitando prefijo y sufijo (Ej: kodfavourites-Prueba.json => Prueba)
 def get_name_from_filename(filename):
     return filename.replace(PREFIJO_LISTA, '').replace('.json', '')
 
-# Componer el fichero de lista a partir de un nombre, añadiendo prefijo y sufijo (Ej: Prueba => alfavorites-Prueba.json)
+# Componer el fichero de lista a partir de un nombre, añadiendo prefijo y sufijo (Ej: Prueba => kodfavourites-Prueba.json)
 def get_filename_from_name(name):
     return PREFIJO_LISTA + name + '.json'
 
@@ -67,7 +72,7 @@ def text_clean(txt, disallowed_chars = '[^a-zA-Z0-9\-_()\[\]. ]+', blank_char = 
 
 # Clase para cargar y guardar en el fichero de Alfavoritos
 # --------------------------------------------------------
-class kodfavoritesData:
+class KodfavouritesData(object):
 
     def __init__(self, filename = None):
 
@@ -760,9 +765,11 @@ def compartir_lista(item):
         progreso.update(10, config.get_localized_string(70645), config.get_localized_string(70646))
 
         # Envío del fichero a tinyupload mediante multipart/form-data 
+        from future import standard_library
+        standard_library.install_aliases()
         from lib import MultipartPostHandler
-        import urllib2
-        opener = urllib2.build_opener(MultipartPostHandler.MultipartPostHandler)
+        import urllib.request, urllib.error
+        opener = urllib.request.build_opener(MultipartPostHandler.MultipartPostHandler)
         params = { 'MAX_FILE_SIZE' : '52428800', 'file_description' : '', 'sessionid' : sessionid, 'uploaded_file' : open(fullfilename, 'rb') }
         handle = opener.open(upload_url, params)
         data = handle.read()
@@ -856,7 +863,7 @@ def descargar_lista(item, url):
     
     if 'tinyupload.com/' in url:
         try:
-            from urlparse import urlparse
+            from urllib.parse import urlparse
             data = httptools.downloadpage(url).data
             logger.debug(data)
             down_url, url_name = scrapertools.find_single_match(data, ' href="(download\.php[^"]*)"><b>([^<]*)')
@@ -872,7 +879,7 @@ def descargar_lista(item, url):
         if not puedes:
             platformtools.dialog_ok('Alfa', config.get_localized_string(70655), motivo)
             return False
-        url_json = video_urls[0][1] # https://www58.zippyshare.com/d/qPzzQ0UM/25460/alfavorites-testeanding.json
+        url_json = video_urls[0][1] # https://www58.zippyshare.com/d/qPzzQ0UM/25460/kodfavourites-testeanding.json
         url_name = url_json[url_json.rfind('/')+1:]
 
     elif 'friendpaste.com/' in url:
@@ -887,7 +894,7 @@ def descargar_lista(item, url):
     # Download json
     data = httptools.downloadpage(url_json).data
     
-    # Verificar formato json de alfavorites y añadir info de la descarga
+    # Verificar formato json de kodfavourites y añadir info de la descarga
     jsondata = jsontools.load(data)
     if 'user_favorites' not in jsondata or 'info_lista' not in jsondata:
         logger.debug(data)

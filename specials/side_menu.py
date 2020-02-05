@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
 
+#from builtins import str
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
+
 import os
-
-import xbmc
-import xbmcaddon
-import xbmcgui
-
-from core import jsontools
 from core.item import Item
+from core import jsontools
 from platformcode import config, logger
 from platformcode import launcher
-
-addon = xbmcaddon.Addon('metadata.themoviedb.org')
-def_lang = addon.getSetting('language')
+import xbmc, xbmcgui, xbmcplugin, xbmcaddon
 
 media_path = os.path.join(config.get_runtime_path(), "resources/skins/Default/media/side_menu/")
 menu_settings_path = os.path.join(config.get_data_path(), "settings_channels", 'menu_settings_data.json')
@@ -24,7 +22,8 @@ else:
     menu_node = {'categoria actual':config.get_setting('category')}
     jsontools.update_node(menu_node, 'menu_settings_data.json', "menu")
 
-
+addon = xbmcaddon.Addon('metadata.themoviedb.org')
+def_lang = addon.getSetting('language')
 
 ACTION_SHOW_FULLSCREEN = 36
 ACTION_GESTURE_SWIPE_LEFT = 511

@@ -200,7 +200,7 @@ def run(item=None):
                     channel = __import__('channels.%s' % item.channel, None,
                                          None, ["channels.%s" % item.channel])
                 except ImportError:
-                    exec("import channels." + item.channel + " as channel")
+                    exec("import " + CHANNELS + "." + item.channel + " as channel")
 
             logger.info("Running channel %s | %s" % (channel.__name__, channel.__file__))
 

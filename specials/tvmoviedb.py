@@ -11,10 +11,10 @@ from core import filetools
 from core import httptools
 from core import jsontools
 from core import scrapertools
-from core import trakt_tools
 from core.item import Item
-from core.support import typo, thumb
+from core.support import typo
 from core.tmdb import Tmdb
+from core import trakt_tools
 from platformcode import config, logger
 from platformcode import platformtools
 
@@ -124,13 +124,12 @@ def search_(item):
 
 def busqueda(item):
     logger.info()
-    cat = [item.extra.replace("tv", "serie")]
-    new_item = Item()
-    new_item.extra = item.contentTitle.replace("+", " ")
-    new_item.category = item.extra
+
+    new_item = Item(title=item.contentTitle, text=item.contentTitle.replace("+", " "), mode=item.contentType,
+         infoLabels=item.infoLabels)
 
     from specials import search
-    return search.do_search(new_item, cat)
+    return search.channel_search(new_item)
 
 
 def tmdb(item):
@@ -479,8 +478,10 @@ def detalles(item):
     # Si viene de seccion imdb
     if not item.infoLabels["tmdb_id"]:
         headers = [['Accept-Language', langi]]
-        data = httptools.downloadpage("http://www.imdb.com/title/" + item.infoLabels['imdb_id'], headers=headers,
-                                      replace_headers=True).data
+        #data = httptools.downloadpage("http://www.imdb.com/title/" + item.infoLabels['imdb_id'], headers=headers,
+        #                                                           replace_headers=True).data
+        data = httptools.downloadpage("http://www.imdb.com/title/" + item.infoLabels['imdb_id'], headers=headers).data
+
         pics = scrapertools.find_single_match(data, 'showAllVidsAndPics.*?href=".*?(tt\d+)')
         # Imágenes imdb
         if pics:
@@ -568,7 +569,7 @@ def detalles(item):
             post = "u=%s&proxy_formdata_server=nl&allowCookies=1&encodeURL=1&encodePage=0&stripObjects=0&stripJS=0&go=" % urllib.quote(
                 post_url)
             while True:
-                response = httptools.downloadpage(url, post, follow_redirects=False)
+                response = httptools.downloadpage(url, post=post, follow_redirects=False)
                 if response.headers.get("location"):
                     url = response.headers["location"]
                     post = ""
@@ -888,10 +889,12 @@ def listado_imdb(item):
 
     headers = [['Accept-Language', langi]]
     if "www.imdb.com" in item.url:
-        data = httptools.downloadpage(item.url, headers=headers, replace_headers=True).data
+        #data = httptools.downloadpage(item.url, headers=headers, replace_headers=True).data
+        data = httptools.downloadpage(item.url, headers=headers).data
     else:
         url = 'http://www.imdb.com/search/title?' + item.url
-        data = httptools.downloadpage(url, headers=headers, replace_headers=True).data
+        #data = httptools.downloadpage(url, headers=headers, replace_headers=True).data
+        data = httptools.downloadpage(url, headers=headers).data
 
     data = re.sub(r"\n|\r|\t|&nbsp;", "", data)
     data = re.sub(r"\s{2}", " ", data)
@@ -1155,7 +1158,7 @@ def listado_fa(item):
     if item.extra == "top":
         if item.page_fa:
             post = "from=%s" % item.page_fa
-            data = httptools.downloadpage(item.url, post).data
+            data = httptools.downloadpage(item.url, post=post).data
             if item.total > item.page_fa:
                 item.page_fa += 30
             else:
@@ -1521,7 +1524,7 @@ def detalles_fa(item):
             post = "u=%s&proxy_formdata_server=nl&allowCookies=1&encodeURL=1&encodePage=0&stripObjects=0&stripJS=0&go=" % urllib.quote(
                 post_url)
             while True:
-                response = httptools.downloadpage(url, post, follow_redirects=False)
+                response = httptools.downloadpage(url, post=post, follow_redirects=False)
                 if response.headers.get("location"):
                     url = response.headers["location"]
                     post = ""
@@ -1708,7 +1711,7 @@ def login_fa():
             return True, ""
 
         post = "postback=1&rp=&username=%s&password=%s&rememberme=on" % (user, password)
-        data = httptools.downloadpage("https://m.filmaffinity.com/%s/account.ajax.php?action=login" % langf, post).data
+        data = httptools.downloadpage("https://m.filmaffinity.com/%s/account.ajax.php?action=login" % langf, post=post).data
 
         if "Invalid username" in data:
             logger.error("Error en el login")
@@ -1716,7 +1719,7 @@ def login_fa():
         else:
             post = "name=user-menu&url=http://m.filmaffinity.com/%s/main.php" % langf
             data = httptools.downloadpage("http://m.filmaffinity.com/%s/tpl.ajax.php?action=getTemplate" % langf,
-                                          post).data
+                                          post=post).data
             userid = scrapertools.find_single_match(data, 'id-user=(\d+)')
             if userid:
                 config.set_setting("userid", userid, "tvmoviedb")
@@ -1829,7 +1832,7 @@ def acciones_fa(item):
         url = "http://filmaffinity.com/%s/movieslist.ajax.php" % langf
         movieid = item.url.rsplit("=", 1)[1]
         post = "action=%s&listId=%s&movieId=%s&itk=%s" % (item.accion, item.listid, movieid, item.itk)
-        data = jsontools.load(httptools.downloadpage(url, post).data)
+        data = jsontools.load(httptools.downloadpage(url, post=post).data)
         if not item.folder:
             import xbmc
             return xbmc.executebuiltin("Container.Refresh")
@@ -1871,7 +1874,7 @@ def callback_voto(item, values):
     item.action = "acciones_fa"
     movieid = item.url.rsplit("=", 1)[1]
     post = "id=%s&rating=%s&itk=%s&action=rate" % (movieid, item.voto, item.itk)
-    data = jsontools.load(httptools.downloadpage("http://filmaffinity.com/%s/ratingajax.php" % langf, post).data)
+    data = jsontools.load(httptools.downloadpage("http://filmaffinity.com/%s/ratingajax.php" % langf, post=post).data)
 
     if not item.folder:
         import xbmc
@@ -2040,7 +2043,8 @@ def fanartv(item):
                   % item.infoLabels['tmdb_id']
         else:
             url = "http://webservice.fanart.tv/v3/tv/%s?api_key=cab16e262d72fea6a6843d679aa10300" % id_search
-        data = jsontools.load(httptools.downloadpage(url, headers=headers, replace_headers=True).data)
+        #data = jsontools.load(httptools.downloadpage(url, headers=headers, replace_headers=True).data)
+        data = jsontools.load(httptools.downloadpage(url, headers=headers).data)
         if data and not "error message" in data:
             item.images['fanart.tv'] = {}
             for key, value in data.items():
@@ -2117,12 +2121,14 @@ def acciones_trakt(item):
         post = jsontools.dump(item.post)
 
     url = "http://api-v2launch.trakt.tv/%s" % item.url
-    data = httptools.downloadpage(url, post, headers=headers, replace_headers=True)
+    #data = httptools.downloadpage(url, post, headers=headers, replace_headers=True)
+    data = httptools.downloadpage(url, post=post, headers=headers)
     if data.code == "401":
         trakt_tools.token_trakt(item.clone(extra="renew"))
         token_auth = config.get_setting("token_trakt", "trakt")
         headers[3][1] = "Bearer %s" % token_auth
-        data = httptools.downloadpage(url, post, headers=headers, replace_headers=True)
+        #data = httptools.downloadpage(url, post, headers=headers, replace_headers=True)
+        data = httptools.downloadpage(url, post=post, headers=headers)
 
     data = data.data
     if data and "sync" in item.url:
@@ -2458,7 +2464,7 @@ def detalles_mal(item):
     try:
         title_search = re.sub(r'[^0-9A-z]+', ' ', title_mal)
         post = "busqueda=%s&button=Search" % urllib.quote(title_search)
-        data_music = httptools.downloadpage("http://www.freeanimemusic.org/song_search.php", post).data
+        data_music = httptools.downloadpage("http://www.freeanimemusic.org/song_search.php", post=post).data
         if not "NO MATCHES IN YOUR SEARCH" in data_music:
             itemlist.append(
                 item.clone(action="musica_anime", title=config.get_localized_string(70317),
@@ -3265,7 +3271,8 @@ def addlist_mal(item):
     url = "https://myanimelist.net/ownlist/anime/add.json"
     if item.lista:
         url = "https://myanimelist.net/ownlist/anime/edit.json"
-    data = httptools.downloadpage(url, post=jsontools.dump(post), headers=headers_mal, replace_headers=True).data
+    #data = httptools.downloadpage(url, post=jsontools.dump(post), headers=headers_mal, replace_headers=True).data
+    data = httptools.downloadpage(url, post=jsontools.dump(post), headers=headers_mal).data
     item.title = "En tu lista"
     if config.is_xbmc():
         import xbmc
