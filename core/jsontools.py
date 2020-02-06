@@ -10,26 +10,26 @@ from platformcode import logger
 try:
     import json
 except:
-    logger.info("json incluido en el interprete **NO** disponible")
+    logger.info("json included in the interpreter **NOT** available")
+
     try:
         import simplejson as json
     except:
-        logger.info("simplejson incluido en el interprete **NO** disponible")
+        logger.info("simplejson included in the interpreter **NOT** available")
         try:
             from lib import simplejson as json
         except:
-            logger.info("simplejson en el directorio lib **NO** disponible")
-            logger.error("No se ha encontrado un parser de JSON valido")
+            logger.info("simplejson in lib directory **NOT** available")
+            logger.error("A valid JSON parser was not found")
             json = None
         else:
-            logger.info("Usando simplejson en el directorio lib")
+            logger.info("Using simplejson in the lib directory")
     else:
-        logger.info("Usando simplejson incluido en el interprete")
+        logger.info("Using simplejson included in the interpreter")
 # ~ else:
-# ~ logger.info("Usando json incluido en el interprete")
+    # ~ logger.info("Usando json incluido en el interprete")
 
 import sys
-
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
@@ -41,7 +41,7 @@ def load(*args, **kwargs):
     try:
         value = json.loads(*args, **kwargs)
     except:
-        logger.error("**NO** se ha podido cargar el JSON")
+        logger.error("**NOT** able to load the JSON")
         logger.error(traceback.format_exc())
         value = {}
 
@@ -55,7 +55,7 @@ def dump(*args, **kwargs):
     try:
         value = json.dumps(*args, **kwargs)
     except:
-        logger.error("**NO** se ha podido guardar el JSON")
+        logger.error("JSON could **NOT** be saved")
         logger.error(traceback.format_exc())
         value = ""
     return value
@@ -112,7 +112,7 @@ def get_node_from_file(name_file, node, path=None):
         if node in dict_data:
             dict_node = dict_data[node]
 
-    # logger.debug("dict_node: %s" % dict_node)
+    #logger.debug("dict_node: %s" % dict_node)
 
     return dict_node
 
@@ -132,18 +132,18 @@ def check_to_backup(data, fname, dict_data):
     logger.info()
 
     if not dict_data:
-        logger.error("Error al cargar el json del fichero %s" % fname)
+        logger.error("Error loading json from file %s" % fname)
 
         if data != "":
             # se crea un nuevo fichero
             from core import filetools
             title = filetools.write("%s.bk" % fname, data)
             if title != "":
-                logger.error("Ha habido un error al guardar el fichero: %s.bk" % fname)
+                logger.error("There was an error saving the file: %s.bk" % fname)
             else:
-                logger.debug("Se ha guardado una copia con el nombre: %s.bk" % fname)
+                logger.debug("A copy with the name has been saved: %s.bk" % fname)
         else:
-            logger.debug("Está vacío el fichero: %s" % fname)
+            logger.debug("The file is empty: %s" % fname)
 
 
 def update_node(dict_node, name_file, node, path=None):
@@ -183,18 +183,18 @@ def update_node(dict_node, name_file, node, path=None):
         # es un dict
         if dict_data:
             if node in dict_data:
-                logger.debug("   existe el key %s" % node)
+                logger.debug("   the key exists %s" % node)
                 dict_data[node] = dict_node
             else:
-                logger.debug("   NO existe el key %s" % node)
+                logger.debug("   The key does NOT exist %s" % node)
                 new_dict = {node: dict_node}
                 dict_data.update(new_dict)
         else:
-            logger.debug("   NO es un dict")
+            logger.debug("   It is NOT a dict")
             dict_data = {node: dict_node}
         json_data = dump(dict_data)
         result = filetools.write(fname, json_data)
     except:
-        logger.error("No se ha podido actualizar %s" % fname)
+        logger.error("Could not update %s" % fname)
 
     return result, json_data
