@@ -36,9 +36,7 @@ def get_channel_parameters(channel_name):
             # logger.debug(channel_parameters)
             if channel_parameters:
                 # cambios de nombres y valores por defecto
-                channel_parameters["title"] = channel_parameters.pop("name") + (
-                    ' [DEPRECATED]' if channel_parameters.has_key('deprecated') and channel_parameters[
-                        'deprecated'] else '')
+                channel_parameters["title"] = channel_parameters.pop("name") + (' [DEPRECATED]' if 'deprecated' in channel_parameters and channel_parameters['deprecated'] else '')
                 channel_parameters["channel"] = channel_parameters.pop("id")
 
                 # si no existe el key se declaran valor por defecto para que no de fallos en las funciones que lo llaman
@@ -194,8 +192,8 @@ def get_default_settings(channel_name):
         channel_language = channel_json['language']
         channel_controls = channel_json['settings']
         categories = channel_json['categories']
-        not_active = channel_json['not_active'] if channel_json.has_key('not_active') else []
-        default_off = channel_json['default_off'] if channel_json.has_key('default_off') else []
+        not_active = channel_json['not_active'] if 'not_active' in channel_json else []
+        default_off = channel_json['default_off'] if 'default_off' in channel_json else []
 
         # Apply default configurations if they do not exist
         for control in default_controls:

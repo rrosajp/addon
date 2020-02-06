@@ -11,7 +11,10 @@ import re
 import os
 import sys
 import urllib
-import urlparse
+try:
+    import urlparse
+except:
+    import urllib.parse as urlparse
 import datetime
 import time
 import traceback

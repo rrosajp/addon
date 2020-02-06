@@ -759,7 +759,7 @@ def typo(string, typography=''):
     if '{}' in string:
         string = '{' + re.sub(r'\s\{\}','',string) + '}'
     if 'submenu' in string:
-        string = u"\u2022\u2022 ".encode('utf-8') + re.sub(r'\ssubmenu','',string)
+        string = "•• " + re.sub(r'\ssubmenu','',string)
     if 'color' in string:
         color = scrapertools.find_single_match(string, 'color ([a-z]+)')
         if color == 'kod' or '': color = kod_color
@@ -773,7 +773,7 @@ def typo(string, typography=''):
     if '--' in string:
         string = ' - ' + re.sub(r'\s--','',string)
     if 'bullet' in string:
-        string = '[B]' + u"\u2022".encode('utf-8') + '[/B] ' + re.sub(r'\sbullet','',string)
+        string = '[B]•[/B] ' + re.sub(r'\sbullet','',string)
 
     return string
 
