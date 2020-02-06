@@ -3,10 +3,8 @@
 # Ringraziamo Icarus crew
 # Canale per documentaristreamingda
 # ------------------------------------------------------------
-import re
-import urlparse
 
-from core import httptools, scrapertools, servertools, support
+from core import support
 from core.item import Item
 from platformcode import logger, config
 

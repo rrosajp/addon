@@ -3,7 +3,10 @@
 import re
 import urllib
 
-import urlparse
+try:
+    import urlparse
+except:
+    import urllib.parse as urlparse
 
 from core import httptools
 from core import jsontools as json

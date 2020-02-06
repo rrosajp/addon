@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
 import ssl
-import urlparse
+try:
+    import urlparse
+except:
+    import urllib.parse as urlparse
 
 from lib.requests_toolbelt.adapters import host_header_ssl
 from lib import doh

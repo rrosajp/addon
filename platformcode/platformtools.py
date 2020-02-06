@@ -1143,7 +1143,7 @@ def get_video_seleccionado(item, seleccion, video_urls):
     return mediaurl, view, mpd
 
 
-def set_player(item, xlistitem, mediaurl, view, strm, autoplay):
+def set_player(item, xlistitem, mediaurl, view, strm):
     logger.info()
     logger.debug("item:\n" + item.tostring('\n'))
     # Movido del conector "torrent" aqui

@@ -4,7 +4,10 @@
 # ------------------------------------------------------------
 import re
 
-import urlparse
+try:
+    import urlparse
+except:
+    import urllib.parse as urlparse
 
 from core import scrapertools, servertools, httptools
 from core import tmdb

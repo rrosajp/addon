@@ -14,7 +14,10 @@ list_quality = ['default']
 
 def findhost():
     permUrl = httptools.downloadpage('https://www.cinemalibero.online/', follow_redirects=False).headers
-    import urlparse
+    try:
+        import urlparse
+    except:
+        import urllib.parse as urlparse
     p = list(urlparse.urlparse(permUrl['location'].replace('https://www.google.com/search?q=site:', '')))
     if not p[0]:
         p[0] = 'https'

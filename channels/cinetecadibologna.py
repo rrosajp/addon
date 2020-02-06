@@ -3,14 +3,7 @@
 # Ringraziamo Icarus crew
 # Canale per cinetecadibologna
 # ------------------------------------------------------------
-
-import re
-
-import urlparse
-
-from core import httptools, scrapertools
 from core.item import Item
-from platformcode import logger, config
 
 from core import support
 

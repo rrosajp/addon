@@ -21,7 +21,6 @@ import copy
 import re
 import sqlite3
 import time
-import urllib
 
 import xbmcaddon
 

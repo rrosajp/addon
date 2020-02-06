@@ -12,7 +12,7 @@ from platformcode import config, logger
 logger.info("init...")
 
 librerias = xbmc.translatePath(os.path.join(config.get_runtime_path(), 'lib'))
-sys.path.insert(0, librerias)
+sys.path.append(librerias)
 
 if not config.dev_mode():
     from platformcode import updater

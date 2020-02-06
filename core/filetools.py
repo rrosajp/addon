@@ -87,7 +87,7 @@ def encode(path, _samba=False):
     if scrapertools.find_single_match(path, '(^\w+:\/\/)') or _samba:
         path = path.encode("utf-8", "ignore")
     else:
-        if fs_encoding:
+        if fs_encoding and not PY3:
             path = path.encode(fs_encoding, "ignore")
 
     return path
