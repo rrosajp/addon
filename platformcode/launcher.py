@@ -44,10 +44,10 @@ def start():
     # se ha problemi di DNS avvia ma lascia entrare
     # se tutto ok: entra nell'addon
 
-    from specials.checkhost import test_conn
-    import threading
-    threading.Thread(target=test_conn,
-                          args=(True, not config.get_setting('resolver_dns'), True, [], [], True)).start()
+    # from specials.checkhost import test_conn
+    # import threading
+    # threading.Thread(target=test_conn,
+    #                       args=(True, not config.get_setting('resolver_dns'), True, [], [], True)).start()
     
 def run(item=None):
     logger.info()
@@ -100,7 +100,7 @@ def run(item=None):
 
         # If item has no action, stops here
         if item.action == "":
-            logger.info("Item sin accion")
+            logger.info("Item without action")
             return
 
         # Action for main menu in channelselector
@@ -332,21 +332,20 @@ def run(item=None):
 
         # Grab inner and third party errors
         if hasattr(e, 'reason'):
-            logger.error("Razon del error, codigo: %s | Razon: %s" % (str(e.reason[0]), str(e.reason[1])))
+            logger.error("Reason for the error, code: %s | Reason: %s" % (str(e.reason[0]), str(e.reason[1])))
             texto = config.get_localized_string(30050)  # "No se puede conectar con el sitio web"
             platformtools.dialog_ok(config.get_localized_string(20000), texto)
 
         # Grab server response errors
         elif hasattr(e, 'code'):
-            logger.error("Codigo de error HTTP : %d" % e.code)
+            logger.error("HTTP error code: %d" % e.code)
             # "El sitio web no funciona correctamente (error http %d)"
             platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(30051) % e.code)
     except WebErrorException as e:
         import traceback
         logger.error(traceback.format_exc())
 
-        patron = 'File "' + os.path.join(config.get_runtime_path(), "channels", "").replace("\\",
-                                                                                            "\\\\") + '([^.]+)\.py"'
+        patron = 'File "' + os.path.join(config.get_runtime_path(), "channels", "").replace("\\", "\\\\") + '([^.]+)\.py"'
         canal = scrapertools.find_single_match(traceback.format_exc(), patron)
 
         platformtools.dialog_ok(
@@ -426,7 +425,7 @@ def reorder_itemlist(itemlist):
     new_list.extend(mod_list)
     new_list.extend(not_mod_list)
 
-    logger.info("Titulos modificados:%i | No modificados:%i" % (modified, not_modified))
+    logger.info("Modified Titles:%i |Unmodified:%i" % (modified, not_modified))
 
     if len(new_list) == 0:
         new_list = itemlist

@@ -133,13 +133,13 @@ def read(path, linea_inicio=0, total_lineas=None, whence=0, silent=False, vfs=Tr
             try:
                 linea_inicio = int(linea_inicio)
             except:
-                logger.error('Read: ERROR de linea_inicio: %s' % str(linea_inicio))
+                logger.error('Read: Start_line ERROR: %s' % str(linea_inicio))
                 linea_inicio = 0
         if total_lineas != None and not isinstance(total_lineas, int):
             try:
                 total_lineas = int(total_lineas)
             except:
-                logger.error('Read: ERROR de total_lineas: %s' % str(total_lineas))
+                logger.error('Read: ERROR of total_lineas: %s' % str(total_lineas))
                 total_lineas = None
         if xbmc_vfs and vfs:
             if not exists(path): return False
@@ -151,7 +151,7 @@ def read(path, linea_inicio=0, total_lineas=None, whence=0, silent=False, vfs=Tr
                     except:
                         return False
                 f.seek(linea_inicio, whence)
-                logger.debug('POSICIÓN de comienzo de lectura, tell(): %s' % f.seek(0, 1))
+                logger.debug('POSITION of beginning of reading,, tell(): %s' % f.seek(0, 1))
             if total_lineas == None:
                 total_lineas = 0
             data = f.read(total_lineas)
@@ -169,7 +169,7 @@ def read(path, linea_inicio=0, total_lineas=None, whence=0, silent=False, vfs=Tr
         f.close()
     except:
         if not silent:
-            logger.error("ERROR al leer el archivo: %s" % path)
+            logger.error("ERROR reading file: %s" % path)
             logger.error(traceback.format_exc())
         return False
 
@@ -226,20 +226,20 @@ def file_open(path, mode="r", silent=False, vfs=True):
         if xbmc_vfs and vfs:
             if 'r' in mode and '+' in mode:
                 mode = mode.replace('r', 'w').replace('+', '')
-                logger.debug('Open MODE cambiado a: %s' % mode)
+                logger.debug('Open MODE changed to: %s' % mode)
             if 'a' in mode:
                 mode = mode.replace('a', 'w').replace('+', '')
-                logger.debug('Open MODE cambiado a: %s' % mode)
+                logger.debug('Open MODE changed to: %s' % mode)
             return xbmcvfs.File(path, mode)
         elif path.lower().startswith("smb://"):
             return samba.smb_open(path, mode)
         else:
             return open(path, mode)
     except:
-        logger.error("ERROR al abrir el archivo: %s, %s" % (path, mode))
+        logger.error("ERROR when opening file: %s, %s" % (path, mode))
         if not silent:
             logger.error(traceback.format_exc())
-            platformtools.dialog_notification("Error al abrir", path)
+            platformtools.dialog_notification("Error Opening", path)
         return False
 
 
@@ -258,7 +258,7 @@ def file_stat(path, silent=False, vfs=True):
             return xbmcvfs.Stat(path)
         raise
     except:
-        logger.error("File_Stat no soportado: %s" % path)
+        logger.error("File_Stat not supported: %s" % path)
         if not silent:
             logger.error(traceback.format_exc())
         return False
@@ -283,9 +283,9 @@ def rename(path, new_name, silent=False, strict=False, vfs=True):
             dest = encode(join(dirname(path_end), new_name))
             result = xbmcvfs.rename(path, dest)
             if not result and not strict:
-                logger.error("ERROR al RENOMBRAR el archivo: %s.  Copiando y borrando" % path)
+                logger.error("ERROR RENAME file: %s. Copying and deleting" % path)
                 if not silent:
-                    dialogo = platformtools.dialog_progress("Copiando archivo", "")
+                    dialogo = platformtools.dialog_progress("Copying file", "")
                 result = xbmcvfs.copy(path, dest)
                 if not result:
                     return False
@@ -298,10 +298,10 @@ def rename(path, new_name, silent=False, strict=False, vfs=True):
             new_name = encode(new_name, False)
             os.rename(path, os.path.join(os.path.dirname(path), new_name))
     except:
-        logger.error("ERROR al renombrar el archivo: %s" % path)
+        logger.error("ERROR when renaming the file: %s" % path)
         if not silent:
             logger.error(traceback.format_exc())
-            platformtools.dialog_notification("Error al renombrar", path)
+            platformtools.dialog_notification("Error renaming", path)
         return False
     else:
         return True
@@ -324,9 +324,9 @@ def move(path, dest, silent=False, strict=False, vfs=True):
             dest = encode(dest)
             result = xbmcvfs.rename(path, dest)
             if not result and not strict:
-                logger.error("ERROR al MOVER el archivo: %s.  Copiando y borrando" % path)
+                logger.error("ERROR when MOVING the file: %s. Copying and deleting" % path)
                 if not silent:
-                    dialogo = platformtools.dialog_progress("Copiando archivo", "")
+                    dialogo = platformtools.dialog_progress("Copying file", "")
                 result = xbmcvfs.copy(path, dest)
                 if not result:
                     return False
@@ -349,7 +349,7 @@ def move(path, dest, silent=False, strict=False, vfs=True):
                 dialogo = platformtools.dialog_progress("Copiando archivo", "")
             return copy(path, dest) == True and remove(path) == True
     except:
-        logger.error("ERROR al mover el archivo: %s a %s" % (path, dest))
+        logger.error("ERROR when moving file: %s to %s" % (path, dest))
         if not silent:
             logger.error(traceback.format_exc())
         return False
@@ -376,7 +376,7 @@ def copy(path, dest, silent=False, vfs=True):
             if not silent:
                 dialogo = platformtools.dialog_progress("Copiando archivo", "")
             return bool(xbmcvfs.copy(path, dest))
-        
+
         fo = file_open(path, "rb")
         fd = file_open(dest, "wb")
         if fo and fd:
@@ -398,7 +398,7 @@ def copy(path, dest, silent=False, vfs=True):
             if not silent:
                 dialogo.close()
     except:
-        logger.error("ERROR al copiar el archivo: %s" % path)
+        logger.error("ERROR when copying the file: %s" % path)
         if not silent:
             logger.error(traceback.format_exc())
         return False
@@ -420,13 +420,13 @@ def exists(path, silent=False, vfs=True):
             result = bool(xbmcvfs.exists(path))
             if not result and not path.endswith('/') and not path.endswith('\\'):
                 result = bool(xbmcvfs.exists(join(path, ' ').rstrip()))
-            return result    
+            return result
         elif path.lower().startswith("smb://"):
             return samba.exists(path)
         else:
             return os.path.exists(path)
     except:
-        logger.error("ERROR al comprobar la ruta: %s" % path)
+        logger.error("ERROR when checking the path: %s" % path)
         if not silent:
             logger.error(traceback.format_exc())
         return False
@@ -458,7 +458,7 @@ def isfile(path, silent=False, vfs=True):
         else:
             return os.path.isfile(path)
     except:
-        logger.error("ERROR al comprobar el archivo: %s" % path)
+        logger.error("ERROR when checking file: %s" % path)
         if not silent:
             logger.error(traceback.format_exc())
         return False
@@ -490,7 +490,7 @@ def isdir(path, silent=False, vfs=True):
         else:
             return os.path.isdir(path)
     except:
-        logger.error("ERROR al comprobar el directorio: %s" % path)
+        logger.error("ERROR when checking the directory: %s" % path)
         if not silent:
             logger.error(traceback.format_exc())
         return False
@@ -517,7 +517,7 @@ def getsize(path, silent=False, vfs=True):
         else:
             return os.path.getsize(path)
     except:
-        logger.error("ERROR al obtener el tamaño: %s" % path)
+        logger.error("ERROR when getting the size: %s" % path)
         if not silent:
             logger.error(traceback.format_exc())
         return long(0)
@@ -540,10 +540,10 @@ def remove(path, silent=False, vfs=True):
         else:
             os.remove(path)
     except:
-        logger.error("ERROR al eliminar el archivo: %s" % path)
+        logger.error("ERROR deleting file: %s" % path)
         if not silent:
             logger.error(traceback.format_exc())
-            platformtools.dialog_notification("Error al eliminar el archivo", path)
+            platformtools.dialog_notification("ERROR deleting file", path)
         return False
     else:
         return True
@@ -580,10 +580,10 @@ def rmdirtree(path, silent=False, vfs=True):
             import shutil
             shutil.rmtree(path, ignore_errors=True)
     except:
-        logger.error("ERROR al eliminar el directorio: %s" % path)
+        logger.error("ERROR deleting directory: %s" % path)
         if not silent:
             logger.error(traceback.format_exc())
-            platformtools.dialog_notification("Error al eliminar el directorio", path)
+            platformtools.dialog_notification("ERROR deleting directory", path)
         return False
     else:
         return not exists(path)
@@ -608,10 +608,10 @@ def rmdir(path, silent=False, vfs=True):
         else:
             os.rmdir(path)
     except:
-        logger.error("ERROR al eliminar el directorio: %s" % path)
+        logger.error("ERROR deleting directory: %s" % path)
         if not silent:
             logger.error(traceback.format_exc())
-            platformtools.dialog_notification("Error al eliminar el directorio", path)
+            platformtools.dialog_notification("ERROR deleting directory", path)
         return False
     else:
         return True
@@ -641,10 +641,10 @@ def mkdir(path, silent=False, vfs=True):
         else:
             os.mkdir(path)
     except:
-        logger.error("ERROR al crear el directorio: %s" % path)
+        logger.error("ERROR when creating directory: %s" % path)
         if not silent:
             logger.error(traceback.format_exc())
-            platformtools.dialog_notification("Error al crear el directorio", path)
+            platformtools.dialog_notification("ERROR when creating directory", path)
         return False
     else:
         return True
@@ -724,7 +724,7 @@ def listdir(path, silent=False, vfs=True):
         else:
             return decode(os.listdir(path))
     except:
-        logger.error("ERROR al leer el directorio: %s" % path)
+        logger.error("ERROR when reading the directory: %s" % path)
         if not silent:
             logger.error(traceback.format_exc())
         return False
@@ -740,14 +740,13 @@ def join(*paths):
     list_path = []
     if paths[0].startswith("/"):
         list_path.append("")
-
     for path in paths:
         if path:
-            if xbmc_vfs:
+            if xbmc_vfs and type(path) != str:
                 path = encode(path)
             list_path += path.replace("\\", "/").strip("/").split("/")
 
-    if scrapertools.find_single_match(paths[0], '(^\w+:\/\/)'):
+    if scrapertools.find_single_match(paths[0], r'(^\w+:\/\/)'):
         return str("/".join(list_path))
     else:
         return str(os.sep.join(list_path))
@@ -812,8 +811,8 @@ def remove_tags(title):
         return title_without_tags
     else:
         return title
-        
-    
+
+
 def remove_smb_credential(path):
     """
     devuelve el path sin contraseña/usuario para paths de SMB
@@ -823,10 +822,10 @@ def remove_smb_credential(path):
     @rtype: str
     """
     logger.info()
-    
+
     if not scrapertools.find_single_match(path, '(^\w+:\/\/)'):
         return path
-    
+
     protocol = scrapertools.find_single_match(path, '(^\w+:\/\/)')
     path_without_credentials = scrapertools.find_single_match(path, '^\w+:\/\/(?:[^;\n]+;)?(?:[^:@\n]+[:|@])?(?:[^@\n]+@)?(.*?$)')
 
