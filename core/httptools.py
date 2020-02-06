@@ -383,6 +383,10 @@ def downloadpage(url, **opt):
 
     response['data'] = req.content
     response['url'] = req.url
+
+    if type(response['data']) != str:
+        response['data'] = response['data'].decode('UTF-8')
+
     if not response['data']:
         response['data'] = ''
     try:
