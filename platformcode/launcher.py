@@ -50,7 +50,6 @@ def start():
     
 def run(item=None):
     logger.info()
-
     if not item:
         # Extract item from sys.argv
         if sys.argv[2]:
@@ -196,8 +195,8 @@ def run(item=None):
 
             if os.path.exists(channel_file):
                 try:
-                    channel = __import__('channels.%s' % item.channel, None,
-                                         None, ["channels.%s" % item.channel])
+                    channel = __import__('%s.%s' % (CHANNELS, item.channel), None,
+                                         None, ['%s.%s' % (CHANNELS, item.channel)])
                 except ImportError:
                     exec("import " + CHANNELS + "." + item.channel + " as channel")
 

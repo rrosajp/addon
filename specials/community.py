@@ -83,7 +83,7 @@ def show_channels(item):
                 thumbnail = relative('thumbnail', json_url, path)
                 if not thumbnail: thumbnail = item.thumbnail
                 fanart = relative('fanart', json_url, path)
-                plot = json_url['plot'] if json_url.has_key('plot') else ''
+                plot = json_url['plot'] if 'plot' in json_url else ''
 
                 itemlist.append(Item(channel=item.channel,
                                     title=typo(channel['channel_name'],'bold'),
@@ -114,10 +114,10 @@ def show_menu(item):
             support.log("KEY= ",key)
             if key != 'search':
                 if type(menu[key]) == dict:
-                    title = menu[key]['title'] if menu[key].has_key('title') else item.title
+                    title = menu[key]['title'] if 'title' in menu[key] else item.title
                     thumbnail = relative('thumbnail', menu[key], item.path)
-                    url = relative('url', menu[key], item.path) if menu[key].has_key('url') else ''
-                    plot = menu[key]['plot'] if menu[key].has_key('plot') else ''
+                    url = relative('url', menu[key], item.path) if 'url' in menu[key] else ''
+                    plot = menu[key]['plot'] if 'plot' in menu[key] else ''
                 else:
                     title = menu[key]
                     thumbnail = item.thumbnail
@@ -133,10 +133,10 @@ def show_menu(item):
                                      action='submenu' if not url else 'show_menu',
                                      filterkey=key if not url else '' ))
 
-        if menu.has_key('search'):
+        if 'search' in menu:
             if type(menu['search']) == dict:
-                url = relative('url', menu['search'], item.path) if menu['search'].has_key('url') else ''
-                search_menu = menu['search']['search_menu'] if menu['search'].has_key('search_menu') else ''
+                url = relative('url', menu['search'], item.path) if 'url' in menu['search'] else ''
+                search_menu = menu['search']['search_menu'] if 'search_menu' in menu['search'] else ''
             else:
                 url = ''
                 search_menu = False
@@ -158,11 +158,11 @@ def show_menu(item):
                 for option in json_data['menu']:
                     thumbnail = relative('thumbnail', option, item.path)
                     fanart = relative('fanart', option, item.path)
-                    plot = option['plot'] if option.has_key('plot') else item.plot
+                    plot = option['plot'] if 'plot' in option else item.plot
                     url = relative('link', option, item.path)
-                    submenu = option['submenu'] if option.has_key('submenu') else []
-                    level2 = option['level2'] if option.has_key('level2') else []
-                    if option.has_key('title'):
+                    submenu = option['submenu'] if 'submenu' in option else []
+                    level2 = option['level2'] if 'level2' in option else []
+                    if 'title' in option:
                         itemlist.append(Item(channel=item.channel,
                                             title=format_title(option['title']),
                                             fulltitle=option['title'],
@@ -173,11 +173,11 @@ def show_menu(item):
                                             url=url,
                                             path=item.path,
                                             menu=level2))
-                    if option.has_key('search'):
+                    if 'search' in option:
                         menu = json_data['menu']
                         if type(option['search']) == dict:
-                            url = relative('url', option['search'], item.path) if option['search'].has_key('url') else ''
-                            search_menu = option['search']['search_menu'] if option['search'].has_key('search_menu') else ''
+                            url = relative('url', option['search'], item.path) if 'url' in option['search'] else ''
+                            search_menu = option['search']['search_menu'] if 'search_menu' in option['search'] else ''
                             itemlist.append(Item(channel=item.channel,
                                                  title=typo('Cerca nel Canale...','color kod bold'),
                                                  thumbnail=get_thumb('search.png'),
@@ -192,9 +192,9 @@ def show_menu(item):
                         for key in submenu:
                             if key != 'search':
                                 if type(submenu[key]) == dict:
-                                    title = submenu[key]['title'] if submenu[key].has_key('title') else item.title
+                                    title = submenu[key]['title'] if 'title' in ubmenu[key] else item.title
                                     thumbnail = relative('thumbnail', submenu[key], item.path)
-                                    plot = submenu[key]['plot'] if submenu[key].has_key('plot') else ''
+                                    plot = submenu[key]['plot'] if 'plot' in submenu[key] else ''
                                 else:
                                     title = submenu[key]
                                     thumbnail = item.thumbnail
@@ -207,10 +207,10 @@ def show_menu(item):
                                                      plot=plot,
                                                      action='submenu',
                                                      filterkey=key))
-                        if submenu.has_key('search'):
+                        if 'search' in submenu:
                             if type(submenu['search']) == dict:
-                                url = relative('url', submenu['search'], item.path) if submenu['search'].has_key('url') else ''
-                                search_menu = submenu['search']['search_menu'] if submenu['search'].has_key('search_menu') else ''
+                                url = relative('url', submenu['search'], item.path) if 'url' in submenu['search'] else ''
+                                search_menu = submenu['search']['search_menu'] if 'search_menu' in submenu['search'] else ''
                             else:
                                 url = ''
                                 search_menu = False
@@ -288,14 +288,14 @@ def submenu(item):
     filter_list = []
 
     json_data = load_json(item)
-    if json_data.has_key("movies_list"): item.media_type= 'movies_list'
-    elif json_data.has_key("tvshows_list"): item.media_type = 'tvshows_list'
-    elif json_data.has_key("episodes_list"): item.media_type = 'episodes_list'
-    elif json_data.has_key("generic_list"): item.media_type= 'generic_list'
+    if "movies_list" in json_data: item.media_type= 'movies_list'
+    elif "tvshows_list" in json_data: item.media_type = 'tvshows_list'
+    elif "episodes_list" in json_data: item.media_type = 'episodes_list'
+    elif "generic_list" in json_data: item.media_type= 'generic_list'
     media_type = item.media_type
 
     for media in json_data[media_type]:
-        if media.has_key(item.filterkey) and media[item.filterkey]:
+        if item.filterkey in media and media[item.filterkey]:
             if type(media[item.filterkey]) == str and media[item.filterkey] not in filter_list:
                 filter_list.append(media[item.filterkey])
             elif type(media[item.filterkey]) == list:
@@ -333,7 +333,7 @@ def list_all(item):
     if json_data:
         for i, media in enumerate(json_data[media_type]):
 
-            if media.has_key('search'): continue
+            if 'search' in media: continue
 
             if pagination and (pag - 1) * pagination > i: continue  # pagination
             if pagination and i >= pag * pagination: break          # pagination
@@ -343,8 +343,8 @@ def list_all(item):
             fulltitle = media['title']
             title = set_title(fulltitle, language, quality)
 
-            infoLabels['year'] = media['year'] if media.has_key('year')else ''
-            infoLabels['tmdb_id'] = media['tmdb_id'] if media.has_key('tmdb_id') else ''
+            infoLabels['year'] = media['year'] if 'year' in media else ''
+            infoLabels['tmdb_id'] = media['tmdb_id'] if 'tmdb_id' in media else ''
 
             if 'movies_list' in json_data or 'generic_list' in json_data:
                 url= media
@@ -355,7 +355,7 @@ def list_all(item):
             else:
                 contentSerieName = fulltitle
                 contentType = 'tvshow'
-                if media.has_key('seasons_list'):
+                if 'seasons_list' in media:
                     url = media['seasons_list']
                     action = 'get_seasons'
                 else:
@@ -421,7 +421,7 @@ def list_filtered(item):
         for i, media in enumerate(json_data[media_type]):
             if pagination and (pag - 1) * pagination > i: continue  # pagination
             if pagination and i >= pag * pagination: break          # pagination
-            if media.has_key(item.filterkey):
+            if item.filterkey in media:
                 filter_keys = [it.lower() for it in media[item.filterkey]] if type(media[item.filterkey]) == list else media[item.filterkey].lower()
                 if item.filter.lower() in filter_keys:
 
@@ -430,8 +430,8 @@ def list_filtered(item):
                     fulltitle = media['title']
                     title = set_title(fulltitle, language, quality)
 
-                    infoLabels['year'] = media['year'] if media.has_key('year')else ''
-                    infoLabels['tmdb_id'] = media['tmdb_id'] if media.has_key('tmdb_id') else ''
+                    infoLabels['year'] = media['year'] if 'year' in media else ''
+                    infoLabels['tmdb_id'] = media['tmdb_id'] if 'tmdb_id' in media else ''
 
                     if 'movies_list' in json_data or 'generic_list' in json_data:
                         url= media
@@ -442,7 +442,7 @@ def list_filtered(item):
                     else:
                         contentSerieName = fulltitle
                         contentType = 'tvshow'
-                        if media.has_key('seasons_list'):
+                        if 'seasons_list' in media:
                             url = media['seasons_list']
                             action = 'get_seasons'
                         else:
@@ -564,15 +564,15 @@ def episodios(item):
     support.log(json_data)
     infoLabels = item.infoLabels
     ep = 1
-    season = infoLabels['season'] if infoLabels.has_key('season') else item.contentSeason if item.contentSeason else 1
+    season = infoLabels['season'] if 'season' in infoLabels else item.contentSeason if item.contentSeason else 1
 
     for i, episode in enumerate(json_data['episodes_list']):
         if pagination and (pag - 1) * pagination > i: continue  # pagination
         if pagination and i >= pag * pagination: break          # pagination
         match = []
-        if episode.has_key('number'):
+        if 'number' in episode:
             match = support.match(episode['number'], patron=r'(?P<season>\d+)x(?P<episode>\d+)').match
-        if not match and episode.has_key('title'):
+        if not match and 'title' in episode:
             match = support.match(episode['title'], patron=r'(?P<season>\d+)x(?P<episode>\d+)').match
             if match: match = match[0]
         if match:
@@ -580,8 +580,8 @@ def episodios(item):
             ep = int(match[1]) + 1
             season_number = match[0]
         else:
-            season_number = episode['season'] if episode.has_key('season') else season if season else 1
-            episode_number = episode['number'] if episode.has_key('number') else ''
+            season_number = episode['season'] if 'season' in episode else season if season else 1
+            episode_number = episode['number'] if 'number' in episode else ''
             if not episode_number.isdigit():
                 episode_number = support.match(episode['title'], patron=r'(?P<episode>\d+)').match
             ep = int(episode_number) if episode_number else ep
@@ -592,10 +592,10 @@ def episodios(item):
         infoLabels['season'] = season_number
         infoLabels['episode'] = episode_number
 
-        plot = episode['plot'] if episode.has_key('plot') else item.plot
-        thumbnail = episode['poster'] if episode.has_key('poster') else episode['thumbnail'] if episode.has_key('thumbnail') else item.thumbnail
+        plot = episode['plot'] if 'plot' in episode else item.plot
+        thumbnail = episode['poster'] if 'poster' in episode else episode['thumbnail'] if 'thumbnail' in episode else item.thumbnail
 
-        title = ' - ' + episode['title'] if episode.has_key('title') else ''
+        title = ' - ' + episode['title'] if 'title' in episode else ''
         title = '%sx%s%s' % (season_number, episode_number, title)
 
         if season_number == item.filterseason or not item.filterseason:
@@ -660,7 +660,7 @@ def findvideos(item):
     if 'links' in item.url:
         for url in item.url['links']:
             quality, language, plot, poster = set_extra_values(url, item.path)
-            title = item.fulltitle + (' - '+url['title'] if url.has_key('title') else '')
+            title = item.fulltitle + (' - '+url['title'] if 'title' in url else '')
             title = set_title(title, language, quality)
 
             itemlist.append(Item(channel=item.channel, title=format_title(typo('%s','color kod') + ' - ' + title), url=url['url'], action='play', quality=quality,
@@ -705,14 +705,14 @@ def add_channel(item):
         platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(70682))
         return
     channel_to_add['channel_name'] = json_file['channel_name']
-    if json_file.has_key('thumbnail'): channel_to_add['thumbnail'] = json_file['thumbnail']
-    if json_file.has_key('fanart'): channel_to_add['fanart'] = json_file['fanart']
+    if 'thumbnail' in json_file: channel_to_add['thumbnail'] = json_file['thumbnail']
+    if 'fanart' in json_file: channel_to_add['fanart'] = json_file['fanart']
     path = os.path.join(config.get_data_path(), 'community_channels.json')
 
     community_json = open(path, "r")
     community_json = jsontools.load(community_json.read())
     id = 1
-    while community_json['channels'].has_key(str(id)):
+    while str(id) in community_json['channels']:
         id +=1
     community_json['channels'][id]=(channel_to_add)
 
@@ -805,14 +805,14 @@ def load_links(item, itemlist, json_data, text):
     def links(item, itemlist, json_data, text):
         support.log()
 
-        if json_data.has_key("movies_list"): media_type= 'movies_list'
-        elif json_data.has_key("tvshows_list"): media_type = 'tvshows_list'
-        elif json_data.has_key("episodes_list"): media_type = 'episodes_list'
-        elif json_data.has_key("generic_list"): media_type= 'generic_list'
+        if "movies_list" in json_data: media_type= 'movies_list'
+        elif "tvshows_list" in json_data: media_type = 'tvshows_list'
+        elif "episodes_list" in json_data: media_type = 'episodes_list'
+        elif "generic_list" in json_data: media_type= 'generic_list'
 
         if json_data:
             for media in json_data[media_type]:
-                if media.has_key('search'): continue
+                if 'search' in media: continue
                 if text.lower() in media['title'].lower():
                     quality, language, plot, poster = set_extra_values(media, item.path)
 
@@ -846,9 +846,9 @@ def load_links(item, itemlist, json_data, text):
                             if item.personal_plot != item.plot and item.personal_plot:
                                 item.plot = '\n\n' + typo('','submenu') + '\n' + item.personal_plot + '\n' + typo('','submenu') + '\n\n' + item.plot
 
-    if json_data.has_key('menu'):
+    if 'menu' in json_data:
         for option in json_data['menu']:
-            if option.has_key('link'):
+            if 'link' in option:
                 json_data = load_json(option['link'] if option['link'].startswith('http') else item.path+option['link'])
                 load_links(item, itemlist, json_data, text)
     else:
@@ -858,7 +858,7 @@ def load_links(item, itemlist, json_data, text):
 
 
 def relative(key, json, path):
-    if json.has_key(key):
+    if key in json:
         if key == 'thumbnail':
             ret = json[key] if ':/' in json[key] else path + json[key] if '/' in json[key] else get_thumb(json[key]) if json[key] else ''
         else:
