@@ -5,9 +5,11 @@ import base64
 import inspect
 import os
 import re
-import urllib
-import urlparse
-import xbmcaddon
+try:
+    import urllib.request as urllib
+    import urllib.parse as urlparse
+except ImportError:
+    import urllib, urlparse
 
 from channelselector import thumb
 from core import httptools, scrapertools, servertools, tmdb, channeltools
@@ -65,9 +67,11 @@ def hdpass_get_servers(item):
 
 
 def url_decode(url_enc):
+    from past.utils import old_div
+
     lenght = len(url_enc)
     if lenght % 2 == 0:
-        len2 = lenght / 2
+        len2 = old_div(lenght, 2)
         first = url_enc[0:len2]
         last = url_enc[len2:lenght]
         url_enc = last + first
@@ -78,7 +82,7 @@ def url_decode(url_enc):
     url_enc[lenght - 1] = ' '
     url_enc = url_enc.strip()
     len1 = len(url_enc)
-    len2 = len1 / 2
+    len2 = old_div(len1, 2)
     first = url_enc[0:len2]
     last = url_enc[len2:len1]
     url_enc = last + first

@@ -2,7 +2,7 @@
 import io
 import os
 import shutil
-from cStringIO import StringIO
+from lib.six import StringIO
 
 from core import filetools
 from platformcode import logger, platformtools

@@ -11,7 +11,6 @@ try:
     import json
 except:
     logger.info("json incluido en el interprete **NO** disponible")
-
     try:
         import simplejson as json
     except:
@@ -26,8 +25,13 @@ except:
             logger.info("Usando simplejson en el directorio lib")
     else:
         logger.info("Usando simplejson incluido en el interprete")
-else:
-    logger.info("Usando json incluido en el interprete")
+# ~ else:
+# ~ logger.info("Usando json incluido en el interprete")
+
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
 
 def load(*args, **kwargs):
@@ -46,12 +50,12 @@ def load(*args, **kwargs):
 
 def dump(*args, **kwargs):
     if not kwargs:
-        kwargs = {"indent": 4, "skipkeys": True, "sort_keys": True, "ensure_ascii": False}
+        kwargs = {"indent": 4, "skipkeys": True, "sort_keys": True, "ensure_ascii": True}
 
     try:
         value = json.dumps(*args, **kwargs)
     except:
-        logger.error("**NO** se ha podido cargar el JSON")
+        logger.error("**NO** se ha podido guardar el JSON")
         logger.error(traceback.format_exc())
         value = ""
     return value
@@ -59,11 +63,15 @@ def dump(*args, **kwargs):
 
 def to_utf8(dct):
     if isinstance(dct, dict):
-        return dict((to_utf8(key), to_utf8(value)) for key, value in dct.iteritems())
+        return dict((to_utf8(key), to_utf8(value)) for key, value in dct.items())
     elif isinstance(dct, list):
         return [to_utf8(element) for element in dct]
     elif isinstance(dct, unicode):
-        return dct.encode('utf-8')
+        dct = dct.encode("utf8")
+        if PY3: dct = dct.decode("utf8")
+        return dct
+    elif PY3 and isinstance(dct, bytes):
+        return dct.decode('utf-8')
     else:
         return dct
 
@@ -104,7 +112,7 @@ def get_node_from_file(name_file, node, path=None):
         if node in dict_data:
             dict_node = dict_data[node]
 
-    #logger.debug("dict_node: %s" % dict_node)
+    # logger.debug("dict_node: %s" % dict_node)
 
     return dict_node
 

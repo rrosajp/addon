@@ -9,7 +9,6 @@ has been tested with Python2.7 and Python 3.4.
 
 from __future__ import print_function
 
-import argparse
 import os
 import stat
 import sys
@@ -75,7 +74,7 @@ def blob_hash(stream, size):
     while True:
         # We read just 64K at a time to be kind to
         # runtime storage requirements.
-        data = stream.read(65536)
+        data = stream.read(65536).encode('ascii')
         if data == b'':
             break
         nread += len(data)
