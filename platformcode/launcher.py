@@ -44,10 +44,9 @@ def start():
     # se ha problemi di DNS avvia ma lascia entrare
     # se tutto ok: entra nell'addon
 
-    # from specials.checkhost import test_conn
-    # import threading
-    # threading.Thread(target=test_conn,
-    #                       args=(True, not config.get_setting('resolver_dns'), True, [], [], True)).start()
+    from specials.checkhost import test_conn
+    import threading
+    threading.Thread(target=test_conn, args=(True, not config.get_setting('resolver_dns'), True, [], [], True)).start()
     
 def run(item=None):
     logger.info()

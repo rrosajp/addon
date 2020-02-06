@@ -80,13 +80,13 @@ def update(path, p_dialog, i, t, serie, overwrite):
                         #    serie.infoLabels['playcount'] = serie.playcount
                     insertados_total += insertados
 
-                except Exception, ex:
+                except Exception as ex:
                     logger.error("Error al guardar los capitulos de la serie")
                     template = "An exception of type %s occured. Arguments:\n%r"
                     message = template % (type(ex).__name__, ex.args)
                     logger.error(message)
 
-            except Exception, ex:
+            except Exception as ex:
                 logger.error("Error al obtener los episodios de: %s" % serie.show)
                 template = "An exception of type %s occured. Arguments:\n%r"
                 message = template % (type(ex).__name__, ex.args)
@@ -247,7 +247,7 @@ def check_for_update(overwrite=True):
         else:
             logger.info("No actualiza la videoteca, está desactivado en la configuración de alfa")
 
-    except Exception, ex:
+    except Exception as ex:
         logger.error("Se ha producido un error al actualizar las series")
         template = "An exception of type %s occured. Arguments:\n%r"
         message = template % (type(ex).__name__, ex.args)
