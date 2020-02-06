@@ -5,8 +5,11 @@ import xbmcaddon
 import json
 from platformcode import config, logger
 import requests
-from requests.exceptions import HTTPError
-from lib import httplib2
+import sys
+if sys.version_info[0] >= 3:
+    from lib.httplib2 import py3 as httplib2
+else:
+    from lib.httplib2 import py2 as httplib2
 import socket
 
 addon = xbmcaddon.Addon()
