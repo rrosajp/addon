@@ -153,8 +153,12 @@ def run(item=None):
                 if xbmc.getCondVisibility('system.platform.linux') and xbmc.getCondVisibility('system.platform.android'):  # android
                     xbmc.executebuiltin('StartAndroidActivity("", "android.intent.action.VIEW", "", "%s")' % (item.url))
                 else:
-                    short = urllib2.urlopen(
-                        'https://u.nu/api.php?action=shorturl&format=simple&url=' + item.url).read()
+                    try:
+                        import urllib.request as urllib
+                    except ImportError:
+                        import urllib
+                    short = urllib.urlopen(
+                        'https://u.nu/api.php?action=shorturl&format=simple&url=' + item.url).read().decode('utf-8')
                     platformtools.dialog_ok(config.get_localized_string(20000),
                                             config.get_localized_string(70740) % short)
         # Action in certain channel specified in "action" and "channel" parameters
