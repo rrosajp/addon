@@ -33,7 +33,7 @@ def loadCommits(page=1):
     apiLink = 'https://api.github.com/repos/' + user + '/' + repo + '/commits?sha=' + branch + "&page=" + str(page)
     logger.info(apiLink)
     # riprova ogni secondo finchè non riesce (ad esempio per mancanza di connessione)
-    for n in xrange(10):
+    for n in range(10):
         try:
             commitsLink = urllib.urlopen(apiLink).read()
             ret = json.loads(commitsLink)
@@ -267,7 +267,7 @@ def updateFromZip(message='Installazione in corso...'):
     dp.update(0)
 
     remotefilename = 'https://github.com/' + user + "/" + repo + "/archive/" + branch + ".zip"
-    localfilename = os.path.join(xbmc.translatePath("special://home/addons/"), "plugin.video.kod.update.zip").encode('utf-8')
+    localfilename = filetools.join(xbmc.translatePath("special://home/addons/"), "plugin.video.kod.update.zip")
     destpathname = xbmc.translatePath("special://home/addons/")
 
     logger.info("remotefilename=%s" % remotefilename)
@@ -306,7 +306,7 @@ def updateFromZip(message='Installazione in corso...'):
             for member in zip.infolist():
                 zip.extract(member, destpathname)
                 cur_size += member.file_size
-                dp.update(80 + cur_size * 19 / size)
+                dp.update(int(90 + cur_size * 9 / size))
 
     except Exception as e:
         logger.info('Non sono riuscito ad estrarre il file zip')
@@ -423,7 +423,8 @@ def fOpen(file, mode = 'r'):
 def _pbhook(numblocks, blocksize, filesize, url, dp):
     try:
         percent = min((numblocks*blocksize*90)/filesize, 100)
-        dp.update(percent)
-    except:
+        dp.update(int(percent))
+    except Exception as e:
+        logger.error(e)
         percent = 90
         dp.update(percent)
