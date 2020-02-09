@@ -175,9 +175,9 @@ def read(path, linea_inicio=0, total_lineas=None, whence=0, silent=False, vfs=Tr
 
     else:
         if not PY3:
-            return "".join(data)
+            return unicode("".join(data))
         else:
-            return b"".join(data)
+            return unicode(b"".join(data))
 
 
 def write(path, data, mode="wb", silent=False, vfs=True):
