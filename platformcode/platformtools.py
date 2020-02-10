@@ -797,7 +797,7 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
         # Reproduce
         xbmc_player.play(playlist, xlistitem)
     else:
-        set_player(item, xlistitem, mediaurl, view, strm, autoplay)
+        set_player(item, xlistitem, mediaurl, view, strm)
 
 
 def stop_video():

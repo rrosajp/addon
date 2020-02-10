@@ -74,7 +74,7 @@ def blob_hash(stream, size):
     while True:
         # We read just 64K at a time to be kind to
         # runtime storage requirements.
-        data = stream.read(65536).encode('ascii')
+        data = stream.read(65536)
         if data == b'':
             break
         nread += len(data)

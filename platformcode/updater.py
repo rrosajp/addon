@@ -2,7 +2,7 @@
 import io
 import os
 import shutil
-from lib.six import StringIO
+from lib.six import BytesIO
 
 from core import filetools
 from platformcode import logger, platformtools
@@ -259,7 +259,7 @@ def getSha(path):
 
 
 def getShaStr(str):
-    return githash.blob_hash(StringIO(str), len(str)).hexdigest()
+    return githash.blob_hash(BytesIO(str.encode('utf-8')), len(str)).hexdigest()
 
 
 def updateFromZip(message='Installazione in corso...'):
