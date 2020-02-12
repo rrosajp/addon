@@ -2,7 +2,11 @@
 # Kodi on Demand - Kodi Addon - Kodi Addon
 # by DrZ3r0 - Fix Alhaziel
 
-import re, json, urllib
+import re, json
+try:
+    import urllib.parse as urllib
+except ImportError:
+    import urllib
 
 from core import httptools, scrapertools
 from platformcode import logger, config
@@ -21,10 +25,9 @@ def test_video_exists(page_url):
         page_url = 'https://wstream.video/video.php?file_code=' + code
         data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True).data
 
-    a = scrapertools.find_single_match(data, r"""input\D*id=(?:'|")([^'"]+)(?:'|").*?value='([a-z0-9]+)""")
-    if a:
-        ID, code = a
-        post = urllib.urlencode({ID: code})
+    possibleParam = scrapertools.find_multiple_matches(data, r"""<input.*?(?:name=["']([^'"]+).*?value=["']([^'"]*)['"]>|>)""")
+    if possibleParam:
+        post = urllib.urlencode({param[0]: param[1] for param in possibleParam if param[0]})
         data = httptools.downloadpage(page_url, headers=headers, post=post, follow_redirects=True).data
     else:
         page_url = scrapertools.find_single_match(data, r"""<center><a href='(https?:\/\/wstream[^']+)'\s*title='bkg'""")
