@@ -5809,3 +5809,63 @@ msgstr "Ogni quanto vuoi che vengano controllati? (ore)"
 msgctxt "#707417"
 msgid "Favourite quality"
 msgstr "Qualità preferita"
+
+msgctxt "#707418"
+msgid "Follow the steps below:"
+msgstr "Segui i seguenti passi:"
+
+msgctxt "#707419"
+msgid "%s) click here to enable debug logging"
+msgstr "%s) clicca qui per attivare il logging di debug"
+
+msgctxt "#707420"
+msgid "%s) repeat what you did to cause the error"
+msgstr "%s) ripeti ciò che hai fatto per causare l'errore"
+
+msgctxt "#707421"
+msgid "%s) click here to create the report"
+msgstr "%s) clicca qui per creare il report"
+
+msgctxt "#707422"
+msgid "%s) click here to disable debug logging"
+msgstr "%s) clicca qui per disattivare il logging di debug"
+
+msgctxt "#707423"
+msgid "Explain the issue and share this link:"
+msgstr "Spiega il problema e condividi questo link:"
+
+msgctxt "#707424"
+msgid "Service not available. Try again later"
+msgstr "Servizio non disponibile Riprova più tardi"
+
+msgctxt "#707425"
+msgid "Debug should be active"
+msgstr "Il debug dovrebbe essere attivo"
+
+msgctxt "#707426"
+msgid "before generating the report"
+msgstr "prima di generare il report"
+
+msgctxt "#707427"
+msgid "Unable to read kodi log"
+msgstr "Impossibile leggere il log di kodi"
+
+msgctxt "#707428"
+msgid "Failed to upload report"
+msgstr "Impossibile caricare il report"
+
+msgctxt "#707429"
+msgid "Report an issue"
+msgstr "Segnala un problema"
+
+msgctxt "#707430"
+msgid "Debug logging"
+msgstr "Logging di debug"
+
+msgctxt "#707431"
+msgid "Enabled"
+msgstr "Attivato"
+
+msgctxt "#707432"
+msgid "Disabed"
+msgstr "Disattivato"

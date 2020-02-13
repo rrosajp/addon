@@ -888,24 +888,24 @@ def report_menu(item):
     # Los servidores "pastbin" gratuitos tienen limitación de capacidad, por lo que el tamaño del log es importante
     # Al final de la operación de upload, se pasa al usuario la dirección de log en el servidor para que los reporte
     
-    itemlist.append(Item(channel=item.channel, action="", title="[COLOR gold]SIGA los siguiente PASOS:[/COLOR]", 
+    itemlist.append(Item(channel=item.channel, action="", title=config.get_localized_string(707418),
                 thumbnail=thumb_next, folder=False))
     #if not config.get_setting('debug'):
     itemlist.append(Item(channel=item.channel, action="activate_debug", extra=True, 
-                    title="PASO %s: Active DEBUG aquí antes de generar el log" % 
+                    title=config.get_localized_string(707419) %
                     str(paso), thumbnail=thumb_debug, folder=False))
     paso += 1
     itemlist.append(Item(channel="channelselector", action="getmainlist", 
-                    title="PASO %s: Reproduzca el problema y vuelva al PASO %s" % 
-                    (str(paso), str(paso+1)), thumbnail=thumb_debug, folder=False))
+                    title=config.get_localized_string(707420) %
+                    str(paso), thumbnail=thumb_debug))
     paso += 1
     itemlist.append(Item(channel=item.channel, action="report_send", 
-                    title="PASO %s: Genere el informe de FALLO desde aquí" % 
-                    str(paso), thumbnail=thumb_error))
+                    title=config.get_localized_string(707421) %
+                    str(paso), thumbnail=thumb_error, folder=False))
     paso += 1
     #if config.get_setting('debug'):
     itemlist.append(Item(channel=item.channel, action="activate_debug", extra=False, 
-                    title="PASO %s: Desactive DEBUG aquí -opcional-" % str(paso), 
+                    title=config.get_localized_string(707422) % str(paso),
                     thumbnail=thumb_debug, folder=False))
     paso += 1
     
@@ -913,26 +913,26 @@ def report_menu(item):
         itemlist.append(Item(channel=item.channel, action="", title="", folder=False))
     
         itemlist.append(Item(channel=item.channel, action="", 
-                    title="[COLOR limegreen]Ha terminado de generar el informe de fallo,[/COLOR]", 
+                    title=config.get_localized_string(707423),
                     thumbnail=thumb_next, folder=False))
-        itemlist.append(Item(channel=item.channel, action="", 
-                    title="[COLOR limegreen]Repórtelo en el Foro de Alfa: [/COLOR][COLOR yellow](pinche si Chrome)[/COLOR]", 
-                    thumbnail=thumb_next, 
-                    folder=False))        
-        itemlist.append(Item(channel=item.channel, action="call_chrome", 
-                    url='https://alfa-addon.com/foros/ayuda.12/', 
-                    title="**- [COLOR yellow]https://alfa-addon.com/foros/ayuda.12/[/COLOR] -**", 
-                    thumbnail=thumb_next, unify=False, folder=False))
     
         if item.one_use:
             action = ''
             url = ''
         else:
-            action = 'call_chrome'
+            action = 'call_browser'
             url = item.url
         itemlist.append(Item(channel=item.channel, action=action, 
                     title="**- LOG: [COLOR gold]%s[/COLOR] -**" % item.url, url=url, 
                     thumbnail=thumb_next, unify=False, folder=False))
+
+        itemlist.append(Item(channel=item.channel, action="call_browser",
+                             title="su Github (raccomandato)", url='https://github.com/kodiondemand/addon/issues',
+                             thumbnail=thumb_next,
+                             folder=False))
+        itemlist.append(Item(channel=item.channel, action="call_browser",
+                             url='https://t.me/kodiondemand', title="Su telegram",
+                             thumbnail=thumb_next, unify=False, folder=False))
         
         if item.one_use:
             itemlist.append(Item(channel=item.channel, action="", 
@@ -955,19 +955,17 @@ def activate_debug(item):
         return report_menu(item)
     if item.extra:
         config.set_setting('debug', True)
-        platformtools.dialog_notification('Modo DEBUG', 'Activado')
+        platformtools.dialog_notification(config.get_localized_string(707430), config.get_localized_string(707431))
     else:
         config.set_setting('debug', False)
-        platformtools.dialog_notification('Modo DEBUG', 'Desactivado')
+        platformtools.dialog_notification(config.get_localized_string(707430), config.get_localized_string(707432))
         
         
 def report_send(item, description='', fatal=False):
     import xbmc
-    import xbmcaddon
     import random
     import traceback
-    import re
-    
+
     if PY3:
         #from future import standard_library
         #standard_library.install_aliases()
@@ -984,7 +982,7 @@ def report_send(item, description='', fatal=False):
         requests_status = False
         logger.error(traceback.format_exc())
     
-    from core import jsontools, httptools, proxytools, scrapertools
+    from core import jsontools, httptools, scrapertools
     from platformcode import envtal
     
     # Esta función realiza la operación de upload del LOG.  El tamaño del archivo es de gran importacia porque
@@ -1040,11 +1038,11 @@ def report_send(item, description='', fatal=False):
     paste_params = ()
     paste_post = ''
     status = False
-    msg = 'Servicio no disponible.  Inténtelo más tarde'
+    msg = config.get_localized_string(707424)
     
     # Se verifica que el DEBUG=ON, si no está se rechaza y se pide al usuario que lo active y reproduzca el fallo
     if not config.get_setting('debug'):
-        platformtools.dialog_notification('DEBUG debe estar ACTIVO', 'antes de generar el informe')
+        platformtools.dialog_notification(config.get_localized_string(707425), config.get_localized_string(707426))
         return report_menu(item)
     
     # De cada al futuro se permitira al usuario que introduzca una breve descripción del fallo que se añadirá al LOG
@@ -1052,7 +1050,6 @@ def report_send(item, description='', fatal=False):
         description = platformtools.dialog_input('', 'Introduzca una breve descripción del fallo')
 
     # Escribimos en el log algunas variables de Kodi y Alfa que nos ayudarán en el diagnóstico del fallo
-    var = proxytools.logger_disp(debugging=True)
     environment = envtal.list_env()
     if not environment['log_path']:
         environment['log_path'] = str(filetools.join(xbmc.translatePath("special://logpath/"), 'kodi.log'))
@@ -1066,16 +1063,16 @@ def report_send(item, description='', fatal=False):
         log_size = float(environment['log_size'])                       # Tamaño del archivivo en MB
         log_data = filetools.read(log_path)                             # Datos del archivo
         if not log_data:                                                # Algún error?
-            platformtools.dialog_notification('No puede leer el log de Kodi', 'Comuniquelo directamente en el Foro de Alfa')
+            platformtools.dialog_notification(config.get_localized_string(707427), '', 2)
             return report_menu(item)
     else:                                                               # Log no existe o path erroneo?
-        platformtools.dialog_notification('LOG de Kodi no encontrado', 'Comuniquelo directamente en el Foro de Alfa')
+        platformtools.dialog_notification(config.get_localized_string(707427), '', 2)
         return report_menu(item)
 
     # Si se ha introducido la descripción del fallo, se inserta la principio de los datos del LOG
-    log_title = '***** DESCRIPCIÓN DEL FALLO *****'
-    if description:
-        log_data = '%s\n%s\n\n%s' %(log_title, description, log_data)
+    # log_title = '***** DESCRIPCIÓN DEL FALLO *****'
+    # if description:
+    #     log_data = '%s\n%s\n\n%s' %(log_title, description, log_data)
     
     # Se aleatorizan los nombre de los servidores "patebin"
     for label_a, value_a in list(pastebin_list.items()):
@@ -1232,25 +1229,37 @@ def report_send(item, description='', fatal=False):
                 continue
 
             status = True                                               # Operación de upload terminada con éxito
-            logger.info('Informe de Fallo en Alfa CREADO: ' + str(item.url))    #Se guarda la URL del informe a usuario
-            if fatal:                                                   # De uso futuro, para logger.crash
-                platformtools.dialog_ok('Informe de ERROR en Alfa CREADO', 'Repórtelo en el foro agregando ERROR FATAL y esta URL: ', '[COLOR gold]%s[/COLOR]' % item.url, pastebin_one_use_msg)
-            else:                                                       # Se pasa la URL del informe a usuario
-                platformtools.dialog_ok('Informe de Fallo en Alfa CREADO', 'Repórtelo en el foro agregando una descripcion del fallo y esta URL: ', '[COLOR gold]%s[/COLOR]' % item.url, pastebin_one_use_msg)
+            logger.info('Report created: ' + str(item.url))    #Se guarda la URL del informe a usuario
+            # if fatal:                                                   # De uso futuro, para logger.crash
+            #     platformtools.dialog_ok('Informe de ERROR en Alfa CREADO', 'Repórtelo en el foro agregando ERROR FATAL y esta URL: ', '[COLOR gold]%s[/COLOR]' % item.url, pastebin_one_use_msg)
+            # else:                                                       # Se pasa la URL del informe a usuario
+            #     platformtools.dialog_ok('Informe de Fallo en Alfa CREADO', 'Repórtelo en el foro agregando una descripcion del fallo y esta URL: ', '[COLOR gold]%s[/COLOR]' % item.url, pastebin_one_use_msg)
 
             break                                                       # Operación terminado, no seguimos buscando
     
     if not status and not fatal:                                        # Operación fracasada...
-        platformtools.dialog_notification('Fallo al guardar el informe', msg)   #... se notifica la causa
-        logger.error('Fallo al guardar el informe. ' + msg)
+        platformtools.dialog_notification(config.get_localized_string(707428), msg)   #... se notifica la causa
+        logger.error(config.get_localized_string(707428) + msg)
     
     # Se devuelve control con item.url actualizado, así aparecerá en el menú la URL del informe
-    return report_menu(item)
+    item.action = 'report_menu'
+    platformtools.itemlist_update(item, True)
+    # return report_menu(item)
     
     
-def call_chrome(item):
-    from lib import generictools
-
-    resultado = generictools.call_chrome(item.url)
-    
-    return resultado
+def call_browser(item):
+    import webbrowser
+    if not webbrowser.open(item.url):
+        import xbmc
+        if xbmc.getCondVisibility('system.platform.linux') and xbmc.getCondVisibility(
+                'system.platform.android'):  # android
+            xbmc.executebuiltin('StartAndroidActivity("", "android.intent.action.VIEW", "", "%s")' % (item.url))
+        else:
+            try:
+                import urllib.request as urllib
+            except ImportError:
+                import urllib
+            short = urllib.urlopen(
+                'https://u.nu/api.php?action=shorturl&format=simple&url=' + item.url).read()
+            platformtools.dialog_ok(config.get_localized_string(20000),
+                                    config.get_localized_string(70740) % short)

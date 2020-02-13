@@ -5805,3 +5805,63 @@ msgstr ""
 msgctxt "#707417"
 msgid "Favourite quality"
 msgstr ""
+
+msgctxt "#707418"
+msgid "Follow the steps below:"
+msgstr ""
+
+msgctxt "#707419"
+msgid "%s) click here to enable debug logging"
+msgstr ""
+
+msgctxt "#707420"
+msgid "%s) repeat what you did to cause the error"
+msgstr ""
+
+msgctxt "#707421"
+msgid "%s) click here to create the report"
+msgstr ""
+
+msgctxt "#707422"
+msgid "%s) click here to disable debug logging"
+msgstr ""
+
+msgctxt "#707423"
+msgid "Explain the issue and share this link:"
+msgstr ""
+
+msgctxt "#707424"
+msgid "Service not available. Try again later"
+msgstr ""
+
+msgctxt "#707425"
+msgid "Debug should be active"
+msgstr ""
+
+msgctxt "#707426"
+msgid "before generating the report"
+msgstr ""
+
+msgctxt "#707427"
+msgid "Unable to read kodi log"
+msgstr ""
+
+msgctxt "#707428"
+msgid "Failed to upload report"
+msgstr ""
+
+msgctxt "#707429"
+msgid "Report an issue"
+msgstr ""
+
+msgctxt "#707430"
+msgid "Debug logging"
+msgstr ""
+
+msgctxt "#707431"
+msgid "Enabled"
+msgstr ""
+
+msgctxt "#707432"
+msgid "Disabled"
+msgstr ""
