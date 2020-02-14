@@ -19,7 +19,6 @@
 """
 
 from core import support
-from core import scrapertools, httptools
 from core.item import Item
 
 
@@ -119,7 +118,7 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            log('newest log: ', {0}.format(line))
+            support.log('newest log: ', {0}.format(line))
         return []
 
     return itemlist

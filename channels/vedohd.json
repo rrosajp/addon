@@ -2,7 +2,7 @@
 	"id": "vedohd",
 	"name": "VedoHD",
 	"language": ["ita"],
-	"active": true,
+	"active": false,
 	"adult": false,
 	"thumbnail": "vedohd.png",
 	"banner": "vedohd.png",

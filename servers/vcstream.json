@@ -4,12 +4,12 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "vcstream.to/(?:embed|f)/([A-z0-9]+)/([A-z0-9.]+)",
+        "pattern": "vcstream.to/(?:embed|f|v)/([A-z0-9]+)/([A-z0-9.]+)",
         "url": "https://vcstream.to/embed/\\1/\\2"
       },
       {
-        "pattern": "https://vidcloud.co/v/([a-z0-9A-Z]+)",
-        "url": "https:\/\/vidcloud.co\/v\/\\1"
+        "pattern": "vidcloud.co/(?:embed|f|v)/([a-z0-9A-Z]+)",
+        "url": "https://vidcloud.co\/v\/\\1"
       }
     ]
   },

@@ -250,6 +250,7 @@ def downloadpage(url, **opt):
                 HTTPResponse.time: float Time taken to make the request
 
         """
+    url = scrapertools.unescape(url)
     load_cookies()
     domain = urlparse.urlparse(url).netloc
     CF = False

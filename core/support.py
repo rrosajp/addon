@@ -5,6 +5,8 @@ import base64
 import inspect
 import os
 import re
+from concurrent import futures
+
 try:
     import urllib.request as urllib
     import urllib.parse as urlparse
@@ -19,76 +21,59 @@ from platformcode import logger, config
 from specials import autoplay
 
 def hdpass_get_servers(item):
+    def get_url(mir_url, srv):
+        data = httptools.downloadpage(urlparse.urljoin(url, mir_url)).data  # .replace('\n', '')
+        for media_url in scrapertools.find_multiple_matches(data, patron_media):
+            log("video -> ", res_video)
+            return Item(channel=item.channel,
+                        action="play",
+                        fulltitle=item.fulltitle,
+                        quality=res_video,
+                        show=item.show,
+                        thumbnail=item.thumbnail,
+                        contentType=item.contentType,
+                        url=base64.b64decode(media_url))
+
     # Carica la pagina
     itemlist = []
-    data = httptools.downloadpage(item.url).data.replace('\n', '')
-    patron = r'<iframe(?: id="[^"]+")? width="[^"]+" height="[^"]+" src="([^"]+)"[^>]+><\/iframe>'
-    url = scrapertools.find_single_match(data, patron).replace("?alta", "")
-    url = url.replace("&download=1", "")
+    if 'hdpass' in item.url or 'hdplayer' in item.url:
+        url = item.url
+    else:
+        data = httptools.downloadpage(item.url).data.replace('\n', '')
+        patron = r'<iframe(?: id="[^"]+")? width="[^"]+" height="[^"]+" src="([^"]+)"[^>]+><\/iframe>'
+        url = scrapertools.find_single_match(data, patron).replace("?alta", "")
+        url = url.replace("&download=1", "")
+        if 'hdpass' not in url and 'hdplayer' not in url:
+            return itemlist
     if 'https' not in url:
         url = 'https:' + url
 
-    if 'hdpass' or 'hdplayer' in url:
-        data = httptools.downloadpage(url).data
+    data = httptools.downloadpage(url).data
+    patron_res = '<div class="buttons-bar resolutions-bar">(.*?)<div class="buttons-bar'
+    patron_mir = '<div class="buttons-bar hosts-bar">(.*?)<div id="fake'
+    patron_media = r'<iframe allowfullscreen custom-src="([^"]+)'
+    patron_option = r'<a href="([^"]+?)".*?>([^<]+?)</a>'
 
-        start = data.find('<div class="row mobileRes">')
-        end = data.find('<div id="playerFront">', start)
-        data = data[start:end]
+    res = scrapertools.find_single_match(data, patron_res)
 
-        patron_res = '<div class="row mobileRes">(.*?)</div>'
-        patron_mir = '<div class="row mobileMirrs">(.*?)</div>'
-        patron_media = r'<input type="hidden" name="urlEmbed" data-mirror="([^"]+)" id="urlEmbed"\s*value="([^"]+)"\s*/>'
+    itemlist = []
 
-        res = scrapertools.find_single_match(data, patron_res)
+    with futures.ThreadPoolExecutor() as executor:
+        thL = []
+        for res_url, res_video in scrapertools.find_multiple_matches(res, patron_option):
+            if data:  # per non riscaricare
+                page = data
+                data = ''
+            else:
+                page = httptools.downloadpage(urlparse.urljoin(url, res_url)).data
+            mir = scrapertools.find_single_match(page, patron_mir)
 
-        itemlist = []
-
-        for res_url, res_video in scrapertools.find_multiple_matches(res, '<option.*?value="([^"]+?)">([^<]+?)</option>'):
-
-            data = httptools.downloadpage(urlparse.urljoin(url, res_url)).data.replace('\n', '')
-
-            mir = scrapertools.find_single_match(data, patron_mir)
-
-            for mir_url, srv in scrapertools.find_multiple_matches(mir, '<option.*?value="([^"]+?)">([^<]+?)</value>'):
-
-                data = httptools.downloadpage(urlparse.urljoin(url, mir_url)).data.replace('\n', '')
-                for media_label, media_url in scrapertools.find_multiple_matches(data, patron_media):
-                    itemlist.append(Item(channel=item.channel,
-                                         action="play",
-                                         fulltitle=item.fulltitle,
-                                         quality=res_video,
-                                         show=item.show,
-                                         thumbnail=item.thumbnail,
-                                         contentType=item.contentType,
-                                         url=url_decode(media_url)))
-                    log("video -> ", res_video)
-
+            for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
+                thL.append(executor.submit(get_url, mir_url, srv))
+        for res in futures.as_completed(thL):
+            if res.result():
+                itemlist.append(res.result())
     return server(item, itemlist=itemlist)
-
-
-def url_decode(url_enc):
-    from past.utils import old_div
-
-    lenght = len(url_enc)
-    if lenght % 2 == 0:
-        len2 = old_div(lenght, 2)
-        first = url_enc[0:len2]
-        last = url_enc[len2:lenght]
-        url_enc = last + first
-        reverse = url_enc[::-1]
-        return base64.b64decode(reverse)
-
-    last_car = url_enc[lenght - 1]
-    url_enc[lenght - 1] = ' '
-    url_enc = url_enc.strip()
-    len1 = len(url_enc)
-    len2 = old_div(len1, 2)
-    first = url_enc[0:len2]
-    last = url_enc[len2:len1]
-    url_enc = last + first
-    reverse = url_enc[::-1]
-    reverse = reverse + last_car
-    return base64.b64decode(reverse)
 
 
 def color(text, color):
@@ -1014,13 +999,17 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
     verifiedItemlist = []
     for videoitem in itemlist:
         if not videoitem.server:
-            videoitem.url = unshortenit.unshorten(videoitem.url)[0]
             findS = servertools.findvideos(videoitem.url)
             if findS:
                 findS = findS[0]
             else:
-                log(videoitem, 'Non supportato')
-                continue
+                videoitem.url = unshortenit.unshorten(videoitem.url)[0]
+                findS = servertools.findvideos(videoitem.url)
+                if findS:
+                    findS = findS[0]
+                else:
+                    log(videoitem, 'Non supportato')
+                    continue
             videoitem.server = findS[2]
             videoitem.title = findS[0]
             videoitem.url = findS[1]
