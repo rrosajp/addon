@@ -14,8 +14,8 @@
                 <effect type="slide" start="0,0" end="115,0" time="400" />
             </animation>
             <control type="group">
-                <right>0</right>
-                <bottom>20</bottom>
+                <right>30</right>
+                <bottom>30</bottom>
                 <height>220</height>
                 <width>326</width>
                 <!-- Background -->
@@ -106,11 +106,11 @@
                 </control>
 				<control type="label">
                     <top>20</top>
-					<left>20</left>
+					<right>25</right>
                     <height>auto</height>
                     <aligny>top</aligny>
                     <visible>true</visible>
-                    <align>left</align>
+                    <align>right</align>
                     <scroll>true</scroll>
                     <scrollspeed>50</scrollspeed>
 					<textcolor>FFFFFFFF</textcolor>
