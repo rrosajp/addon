@@ -2,14 +2,14 @@
 
 from core import httptools
 from core import scrapertools
-from platformcode import logger
+from platformcode import logger, config
 
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url).data
     if "Not Found" in data or "File Does not Exist" in data:
-        return False, "[Vidto.me] El fichero no existe o ha sido borrado"
+        return False, config.get_localized_string(70292) % 'vidto.me'
     return True, ""
 
 
