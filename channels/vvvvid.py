@@ -206,7 +206,7 @@ def findvideos(item):
             if 'youtube' in url: item.url = url
             item.url = url.replace('manifest.f4m','master.m3u8').replace('http://','https://').replace('/z/','/i/')
             if 'https' not in item.url:
-                url = support.match('https://or01.top-ix.org/videomg/_definst_/mp4:' + item.url + '/playlist.m3u')
+                url = support.match('https://or01.top-ix.org/videomg/_definst_/mp4:' + item.url + '/playlist.m3u').data
                 url = url.split()[-1]
                 itemlist.append(
                     Item(action= 'play',
