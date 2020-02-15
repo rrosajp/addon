@@ -5738,7 +5738,19 @@ msgid "Playback"
 msgstr ""
 
 msgctxt "#70754"
-msgid "Compact mode"
+msgid "Display mode"
+msgstr ""
+
+msgctxt "#70755"
+msgid "Default"
+msgstr ""
+
+msgctxt "#70756"
+msgid "Extended"
+msgstr ""
+
+msgctxt "#70757"
+msgid "Compact"
 msgstr ""
 
 # DNS start [ settings and declaration ]

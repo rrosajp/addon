@@ -5742,8 +5742,20 @@ msgid "Playback"
 msgstr "Riproduzione"
 
 msgctxt "#70754"
-msgid "Compact mode"
-msgstr "Modalità compatta"
+msgid "Display mode"
+msgstr "Modalità visualizzazione"
+
+msgctxt "#70755"
+msgid "Default"
+msgstr "Predefinita"
+
+msgctxt "#70756"
+msgid "Extended"
+msgstr "Estesa"
+
+msgctxt "#70757"
+msgid "Compact"
+msgstr "Compatta"
 
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
