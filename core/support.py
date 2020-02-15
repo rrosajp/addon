@@ -21,19 +21,25 @@ from platformcode import logger, config
 from specials import autoplay
 
 def hdpass_get_servers(item):
-    def get_url(mir_url, srv):
-        data = httptools.downloadpage(urlparse.urljoin(url, mir_url)).data  # .replace('\n', '')
-        for media_url in scrapertools.find_multiple_matches(data, patron_media):
-            log("video -> ", res_video)
-            return Item(channel=item.channel,
-                        action="play",
-                        fulltitle=item.fulltitle,
-                        quality=res_video,
-                        show=item.show,
-                        thumbnail=item.thumbnail,
-                        contentType=item.contentType,
-                        url=base64.b64decode(media_url))
+    def get_hosts(url, quality):
+        ret = []
+        page = httptools.downloadpage(url).data
+        log(page)
 
+        mir = scrapertools.find_single_match(page, patron_mir)
+
+        for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
+            ret.append(Item(channel=item.channel,
+                                 action="play",
+                                 fulltitle=item.fulltitle,
+                                 quality=quality,
+                                 show=item.show,
+                                 thumbnail=item.thumbnail,
+                                 contentType=item.contentType,
+                                 title=srv,
+                                 server=srv,
+                                 url=mir_url))
+        return ret
     # Carica la pagina
     itemlist = []
     if 'hdpass' in item.url or 'hdplayer' in item.url:
@@ -51,30 +57,24 @@ def hdpass_get_servers(item):
     data = httptools.downloadpage(url).data
     patron_res = '<div class="buttons-bar resolutions-bar">(.*?)<div class="buttons-bar'
     patron_mir = '<div class="buttons-bar hosts-bar">(.*?)<div id="fake'
-    patron_media = r'<iframe allowfullscreen custom-src="([^"]+)'
     patron_option = r'<a href="([^"]+?)".*?>([^<]+?)</a>'
 
     res = scrapertools.find_single_match(data, patron_res)
 
-    itemlist = []
-
     with futures.ThreadPoolExecutor() as executor:
         thL = []
         for res_url, res_video in scrapertools.find_multiple_matches(res, patron_option):
-            if data:  # per non riscaricare
-                page = data
-                data = ''
-            else:
-                page = httptools.downloadpage(urlparse.urljoin(url, res_url)).data
-            mir = scrapertools.find_single_match(page, patron_mir)
-
-            for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
-                thL.append(executor.submit(get_url, mir_url, srv))
+            thL.append(executor.submit(get_hosts, res_url, res_video))
         for res in futures.as_completed(thL):
             if res.result():
-                itemlist.append(res.result())
+                itemlist.extend(res.result())
     return server(item, itemlist=itemlist)
 
+def hdpass_get_url(item):
+    patron_media = r'<iframe allowfullscreen custom-src="([^"]+)'
+    data = httptools.downloadpage(item.url).data
+    item.url = base64.b64decode(scrapertools.find_single_match(data, patron_media))
+    return [item]
 
 def color(text, color):
     return "[COLOR " + color + "]" + text + "[/COLOR]"
@@ -992,10 +992,9 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
 
     if not data and not itemlist:
         data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
-
-    itemList = servertools.find_video_items(data=str(data))
-    itemlist = itemlist + itemList
-
+    if data:
+        itemList = servertools.find_video_items(data=str(data))
+        itemlist = itemlist + itemList
     verifiedItemlist = []
     for videoitem in itemlist:
         if not videoitem.server:
