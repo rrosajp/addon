@@ -398,13 +398,13 @@ def set_infoLabels_item(item, seekTmdb=True, idioma_busqueda=def_lang, lock=None
                 if temporada:
                     # Actualizar datos
                     __leer_datos(otmdb_global)
-                    item.infoLabels['title'] = temporada['name'] if temporada.has_key('name') else ''
-                    if temporada.has_key('overview') and temporada['overview']:
+                    item.infoLabels['title'] = temporada['name'] if 'name' in temporada else ''
+                    if 'overview' in  temporada and temporada['overview']:
                         item.infoLabels['plot'] = temporada['overview']
-                    if temporada.has_key('air_date') and temporada['air_date']:
+                    if 'air_date' in temporada and temporada['air_date']:
                         date = temporada['air_date'].split('-')
                         item.infoLabels['aired'] = date[2] + "/" + date[1] + "/" + date[0]
-                    if temporada.has_key('poster_path') and temporada['poster_path']:
+                    if 'poster_path' in temporada and temporada['poster_path']:
                         item.infoLabels['poster_path'] = 'http://image.tmdb.org/t/p/original' + temporada['poster_path']
                         item.thumbnail = item.infoLabels['poster_path']
 
@@ -507,7 +507,7 @@ def find_and_set_infoLabels(item):
         title = title.replace(year, "").strip()
         item.infoLabels['year'] = year[1:-1]
 
-    if not item.infoLabels.get("tmdb_id"):
+    if not item.infoLabels.get("tmdb_id") or not item.infoLabels.get("tmdb_id")[0].isdigit():
         if not item.infoLabels.get("imdb_id"):
             otmdb_global = Tmdb(texto_buscado=title, tipo=tipo_busqueda, year=item.infoLabels['year'])
         else:

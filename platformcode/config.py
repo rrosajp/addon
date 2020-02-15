@@ -374,7 +374,7 @@ def get_localized_category(categ):
     categories = {'movie': get_localized_string(30122), 'tvshow': get_localized_string(30123),
                   'anime': get_localized_string(30124), 'documentary': get_localized_string(30125),
                   'vos': get_localized_string(30136), 'sub-ita': get_localized_string(70566), 'adult': get_localized_string(30126),
-                  'direct': get_localized_string(30137), 'torrent': get_localized_string(70015)}
+                  'direct': get_localized_string(30137), 'torrent': get_localized_string(70015), 'live': get_localized_string(30138)}
     return categories[categ] if categ in categories else categ
 
 

@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 # -*- Channel Community -*-
 
-import re, os, inspect, requests, xbmc, xbmcaddon, xbmcgui
 
-from core import httptools, scrapertools, servertools, jsontools, tmdb, support
+import re, os, inspect, xbmcaddon, xbmcgui
+
+from core import httptools, jsontools, tmdb, support, filetools
 from core.item import Item
-from core.support import typo
-from channelselector import get_thumb
-from platformcode import  config, platformtools
+from platformcode import config, platformtools
 from specials import autoplay
+from channelselector import get_thumb
 
 addon = xbmcaddon.Addon('metadata.themoviedb.org')
 lang = addon.getSetting('language')
@@ -16,8 +16,6 @@ lang = addon.getSetting('language')
 defpage = ["", "20", "40", "60", "80", "100"]
 defp = defpage[config.get_setting('pagination','community')]
 show_seasons = config.get_setting('show_seasons','community')
-
-list_data = {}
 
 list_servers = ['directo', 'akstream', 'wstream', 'backin', 'cloudvideo', 'clipwatching', 'fembed', 'gounlimited', 'mega', 'mixdrop']
 list_quality = ['SD', '720', '1080', '4k']
@@ -28,8 +26,8 @@ tmdb_api = 'a1ab8b8669da03637a4b98fa39c39228'
 def mainlist(item):
     support.log()
 
-    path = os.path.join(config.get_data_path(), 'community_channels.json')
-    if not os.path.exists(path):
+    path = filetools.join(config.get_data_path(), 'community_channels.json')
+    if not filetools.exists(path):
         with open(path, "w") as file:
             file.write('{"channels":{}}')
             file.close()
@@ -42,548 +40,238 @@ def show_channels(item):
     support.log()
     itemlist = []
 
-    context = [{"title": config.get_localized_string(50005),
-                "action": "remove_channel",
-                "channel": "community"}]
+    # add context menu
+    context = [{"title": config.get_localized_string(50005), "action": "remove_channel",  "channel": "community"}]
 
-    path = os.path.join(config.get_data_path(), 'community_channels.json')
-    file = open(path, "r")
-    json = jsontools.load(file.read())
+    # read json
+    json = load_and_check(item)
 
     itemlist.append(Item(channel=item.channel,
-                         title=typo(config.get_localized_string(70676),'bold color kod'),
+                         title=support.typo(config.get_localized_string(70676),'bold color kod'),
                          action='add_channel',
                          thumbnail=get_thumb('add.png')))
 
     for key, channel in json['channels'].items():
-        # Find File Path
-        if 'http' in channel['path']:
-            try:
-                file_path = httptools.downloadpage(channel['path'], follow_redirects=True, timeout=5).url
-            except:
-                support.log('Offline')
-                file_path = None
-        else: file_path = channel['path']
+        path = filetools.dirname(channel['path']) # relative path
+        channel_json = load_json(channel['path']) # read channel json
 
-        if file_path:
-            # make relative path
-            path = os.path.dirname(os.path.abspath(file_path))
-            if 'http' in path: path = path[path.find('http'):].replace('\\','/').replace(':/','://')
-            if file_path.startswith('http'): file_url = httptools.downloadpage(file_path, follow_redirects=True).data
-            elif os.path.isfile(file_path): file_url = open(file_path, "r").read()
-            else:
-                item.channel_id = key
-                remove_channel(item)
-                file_url=''
+        # retrieve information from json
+        thumbnail = relative('thumbnail', channel_json, path)
+        if not thumbnail: thumbnail = item.thumbnail
+        fanart = relative('fanart', channel_json, path)
+        plot = channel_json['plot'] if 'plot' in channel_json else ''
 
-            # load json
-            if file_url:
-                json_url = jsontools.load(file_url)
-
-                thumbnail = relative('thumbnail', json_url, path)
-                if not thumbnail: thumbnail = item.thumbnail
-                fanart = relative('fanart', json_url, path)
-                plot = json_url['plot'] if 'plot' in json_url else ''
-
-                itemlist.append(Item(channel=item.channel,
-                                    title=typo(channel['channel_name'],'bold'),
-                                    url=file_path,
-                                    thumbnail=thumbnail,
-                                    fanart=fanart,
-                                    plot=plot,
-                                    action='show_menu',
-                                    channel_id = key,
-                                    context=context,
-                                    path=path))
+        itemlist.append(Item(channel=item.channel,
+                             title=support.typo(channel['channel_name'],'bold'),
+                             url=channel['path'],
+                             thumbnail=thumbnail,
+                             fanart=fanart,
+                             plot=plot,
+                             action='show_menu',
+                             channel_id = key,
+                             context=context,
+                             path=path))
 
     autoplay.show_option(item.channel, itemlist)
     support.channel_config(item, itemlist)
     return itemlist
 
+
 def show_menu(item):
-    global list_data
-    itemlist = []
-    add_search = True
     support.log()
-    # If Second Level Menu
-    if item.menu:
-        menu = item.menu
-        item.menu = None
-        if item.url: itemlist.append(item)
-        for key in menu:
-            support.log("KEY= ",key)
-            if key != 'search':
-                if type(menu[key]) == dict:
-                    title = menu[key]['title'] if 'title' in menu[key] else item.title
-                    thumbnail = relative('thumbnail', menu[key], item.path)
-                    url = relative('url', menu[key], item.path) if 'url' in menu[key] else ''
-                    plot = menu[key]['plot'] if 'plot' in menu[key] else ''
-                else:
-                    title = menu[key]
-                    thumbnail = item.thumbnail
-                    plot = ''
-                    url = ''
+    itemlist = []
 
-                itemlist.append(Item(channel=item.channel,
-                                     title=typo(title,'submenu' if not url else 'bold'),
-                                     url=url if url else item.url,
-                                     path=item.path,
-                                     thumbnail=thumbnail,
-                                     plot=plot,
-                                     action='submenu' if not url else 'show_menu',
-                                     filterkey=key if not url else '' ))
-
-        if 'search' in menu:
-            if type(menu['search']) == dict:
-                url = relative('url', menu['search'], item.path) if 'url' in menu['search'] else ''
-                search_menu = menu['search']['search_menu'] if 'search_menu' in menu['search'] else ''
-            else:
-                url = ''
-                search_menu = False
-
-            itemlist.append(Item(channel=item.channel,
-                                 title=typo('Cerca ' + item.fulltitle +'...','color kod bold'),
-                                 thumbnail=get_thumb('search.png'),
-                                 action='search',
-                                 url=item.url,
-                                 custom_url=url,
-                                 search_menu=search_menu,
-                                 path=item.path))
-        return itemlist
-
+    if item.menu: # if second level menu
+        get_sub_menu(item, item.menu, 'level2', itemlist)
     else:
-        json_data = load_json(item)
-        for key in json_data:
+        if type(item.url) == dict:
+            json = item.url
+        else:
+            json = load_json(item)
+        for key in json:
             if key == 'menu':
-                for option in json_data['menu']:
-                    thumbnail = relative('thumbnail', option, item.path)
-                    fanart = relative('fanart', option, item.path)
-                    plot = option['plot'] if 'plot' in option else item.plot
-                    url = relative('link', option, item.path)
-                    submenu = option['submenu'] if 'submenu' in option else []
-                    level2 = option['level2'] if 'level2' in option else []
-                    if 'title' in option:
-                        itemlist.append(Item(channel=item.channel,
-                                            title=format_title(option['title']),
-                                            fulltitle=option['title'],
-                                            thumbnail=thumbnail,
-                                            fanart=fanart,
-                                            plot=plot,
-                                            action='show_menu',
-                                            url=url,
-                                            path=item.path,
-                                            menu=level2))
-                    if 'search' in option:
-                        menu = json_data['menu']
-                        if type(option['search']) == dict:
-                            url = relative('url', option['search'], item.path) if 'url' in option['search'] else ''
-                            search_menu = option['search']['search_menu'] if 'search_menu' in option['search'] else ''
-                            itemlist.append(Item(channel=item.channel,
-                                                 title=typo('Cerca nel Canale...','color kod bold'),
-                                                 thumbnail=get_thumb('search.png'),
-                                                 action='search',
-                                                 url=item.url,
-                                                 custom_url=url,
-                                                 search_menu=search_menu,
-                                                 path=item.path))
-                            add_search = False
+                get_menu(item, json, key, itemlist)
+            if item.filterkey:
+                itemlist += submenu(item, json, key)
+            elif key in ['movies_list','tvshows_list', 'generic_list']:
+                itemlist += peliculas(item, json, key)
+            elif key in ['episodes_list']:
+                itemlist += episodios(item, json, key)
+            elif key in ['links']:
+                itemlist += findvideos(item)
 
-                    if submenu:
-                        for key in submenu:
-                            if key != 'search':
-                                if type(submenu[key]) == dict:
-                                    title = submenu[key]['title'] if 'title' in ubmenu[key] else item.title
-                                    thumbnail = relative('thumbnail', submenu[key], item.path)
-                                    plot = submenu[key]['plot'] if 'plot' in submenu[key] else ''
-                                else:
-                                    title = submenu[key]
-                                    thumbnail = item.thumbnail
-                                    plot = ''
-                                itemlist.append(Item(channel=item.channel,
-                                                     title=typo(title,'submenu'),
-                                                     url=url,
-                                                     path=item.path,
-                                                     thumbnail=thumbnail,
-                                                     plot=plot,
-                                                     action='submenu',
-                                                     filterkey=key))
-                        if 'search' in submenu:
-                            if type(submenu['search']) == dict:
-                                url = relative('url', submenu['search'], item.path) if 'url' in submenu['search'] else ''
-                                search_menu = submenu['search']['search_menu'] if 'search_menu' in submenu['search'] else ''
-                            else:
-                                url = ''
-                                search_menu = False
-                            itemlist.append(Item(channel=item.channel,
-                                                 title=typo('Cerca ' + option['title'] +'...','color kod bold'),
-                                                 thumbnail=get_thumb('search.png'),
-                                                 action='search',
-                                                 url=item.url,
-                                                 custom_url=url,
-                                                 search_menu=search_menu,
-                                                 path=item.path))
-
-            elif 'list' in key:
-                # select type of list
-                item.url = { key: json_data[key]}
-                support.log(item.url)
-                if key == "movies_list":
-                    item.media_type = 'movies_list'
-                    item.contentType = 'movie'
-                    item.action = 'findvideos'
-                elif key == "tvshows_list":
-                    item.media_type = 'tvshows_list'
-                    item.contentType = 'tvshow'
-                    item.action = 'get_season'
-                elif key == "episodes_list":
-                    item.media_type = 'episodes_list'
-                    item.contentType = 'episode'
-                    item.action = 'episodios'
-                elif key == "generic_list":
-                    item.media_type= 'generic_list'
-                itemlist += list_all(item)
-
-        # add Search
-        if 'channel_name' in json_data and add_search:
-            itemlist.append(Item(channel=item.channel,
-                                 title=typo('Cerca nel Canale...','color kod bold'),
-                                 thumbnail=get_thumb('search.png'),
-                                 action='search',
-                                 url=item.url,
-                                 path=item.path))
-
-    return itemlist
-
-
-def filter_thread(filter,item):
-    thumbnail = ''
-    plot = ''
-    dict_ = {'url': 'search/person', 'language': lang, 'query': filter, 'page': 1}
-    tmdb_inf = tmdb.discovery(item, dict_=dict_)
-    results = tmdb_inf.results[0]
-    id = results['id']
-    if id:
-        thumbnail = 'http://image.tmdb.org/t/p/original' + results['profile_path'] if results['profile_path'] else item.thumbnail
-        json_file = httptools.downloadpage('http://api.themoviedb.org/3/person/'+ str(id) + '?api_key=' + tmdb_api + '&language=en', use_requests=True).data
-        plot += jsontools.load(json_file)['biography']
-
-    item = Item(channel=item.channel,
-                title=typo(filter, 'bold'),
-                url=item.url,
-                media_type=item.media_type,
-                action='list_filtered',
-                thumbnail=thumbnail,
-                plot=plot,
-                path=item.path,
-                filterkey=item.filterkey,
-                filter=filter)
-    return item
-
-
-def submenu(item):
-    support.log()
-    from lib.concurrent import futures
-
-    itemlist = []
-    filter_list = []
-
-    json_data = load_json(item)
-    if "movies_list" in json_data: item.media_type= 'movies_list'
-    elif "tvshows_list" in json_data: item.media_type = 'tvshows_list'
-    elif "episodes_list" in json_data: item.media_type = 'episodes_list'
-    elif "generic_list" in json_data: item.media_type= 'generic_list'
-    media_type = item.media_type
-
-    for media in json_data[media_type]:
-        if item.filterkey in media and media[item.filterkey]:
-            if type(media[item.filterkey]) == str and media[item.filterkey] not in filter_list:
-                filter_list.append(media[item.filterkey])
-            elif type(media[item.filterkey]) == list:
-                for f in media[item.filterkey]:
-                    if f not in filter_list:
-                        filter_list.append(f)
-
-    filter_list.sort()
-
-    with futures.ThreadPoolExecutor() as executor:
-        List = [executor.submit(filter_thread, filter, item) for filter in filter_list]
-        for res in futures.as_completed(List):
-            if res.result():
-                itemlist.append(res.result())
-    itemlist = sorted(itemlist, key=lambda it: it.title)
-    return itemlist
-
-
-def list_all(item):
-    support.log()
-    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']:
-        pagination = int(defp) if defp.isdigit() else ''
-    else: pagination = ''
-    pag = item.page if item.page else 1
-
-    itemlist = []
-    media_type = item.media_type
-    if type(item.url) == dict:
-        json_data = item.url
-    else:
-        json_data = load_json(item)
-    contentTitle = contentSerieName = ''
-    infoLabels = item.infoLabels if item.infoLabels else {}
-
-    if json_data:
-        for i, media in enumerate(json_data[media_type]):
-
-            if 'search' in media: continue
-
-            if pagination and (pag - 1) * pagination > i: continue  # pagination
-            if pagination and i >= pag * pagination: break          # pagination
-
-            quality, language, plot, poster = set_extra_values(media, item.path)
-
-            fulltitle = media['title']
-            title = set_title(fulltitle, language, quality)
-
-            infoLabels['year'] = media['year'] if 'year' in media else ''
-            infoLabels['tmdb_id'] = media['tmdb_id'] if 'tmdb_id' in media else ''
-
-            if 'movies_list' in json_data or 'generic_list' in json_data:
-                url= media
-                contentTitle = fulltitle
-                contentType = 'movie'
-                action='findvideos'
-
+        if 'channel_name' in json:
+            if 'search' in json and 'url' in json['search']:
+                search_json = json['search']
+                itemlist += get_search_menu(item, search_json, channel_name=json['channel_name'])
             else:
-                contentSerieName = fulltitle
-                contentType = 'tvshow'
-                if 'seasons_list' in media:
-                    url = media['seasons_list']
-                    action = 'get_seasons'
-                else:
-                    url = relative('link', media, item.path)
-                    action = 'episodios'
+                itemlist += get_search_menu(item, json, channel_name=json['channel_name'])
 
-            itemlist.append(Item(channel=item.channel,
-                                 contentType=contentType,
-                                 title=format_title(title),
-                                 fulltitle=fulltitle,
-                                 show=fulltitle,
-                                 quality=quality,
-                                 language=language,
-                                 plot=plot,
-                                 personal_plot=plot,
-                                 thumbnail=poster,
-                                 path=item.path,
-                                 url=url,
-                                 contentTitle=contentTitle,
-                                 contentSerieName=contentSerieName,
-                                 infoLabels=infoLabels,
-                                 action=action))
-
-        if pagination and len(json_data[media_type]) >= pag * pagination:
-            if inspect.stack()[1][3] != 'get_newest':
-                itemlist.append(
-                    Item(channel=item.channel,
-                         action = 'list_all',
-                         contentType=contentType,
-                         title=typo(config.get_localized_string(30992), 'color kod bold'),
-                         fulltitle= item.fulltitle,
-                         show= item.show,
-                         url=item.url,
-                         args=item.args,
-                         page=pag + 1,
-                         path=item.path,
-                         media_type=item.media_type,
-                         thumbnail=support.thumb()))
-
-        if not 'generic_list' in json_data:
-            tmdb.set_infoLabels(itemlist, seekTmdb=True)
-            for item in itemlist:
-                if item.personal_plot != item.plot and item.personal_plot:
-                    item.plot = '\n\n' + typo('','submenu') + '\n' + item.personal_plot + '\n' + typo('','submenu') + '\n\n' + item.plot
-        return itemlist
+    return itemlist
 
 
-def list_filtered(item):
-    support.log()
-
-    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']:
-        pagination = int(defp) if defp.isdigit() else ''
-    else: pagination = ''
-    pag = item.page if item.page else 1
-
+def search(item, text):
+    support.log(text)
     itemlist = []
-    media_type = item.media_type
-    json_data = load_json(item)
-    contentTitle = contentSerieName = ''
+
+    if item.custom_search:
+        if '{}' in item.url:
+            item.url = item.custom_search.format(text)
+        else:
+            item.url = item.custom_search + text
+    elif item.global_search:
+        itemlist = global_search(item, text)
+    else:
+        item.search = text
+
+    json = load_json(item)
+    if json:
+        for key in json:
+            peliculas(item, json, key, itemlist)
+
+    return itemlist
+
+def global_search(item, text):
+    itemlist = []
+    json = load_json(item)
+    item.global_search = None
+
+    if 'menu' in json:
+        for option in json['menu']:
+            if option in ['submenu', 'level2'] and 'seach' in json['menu'][option] and 'url' in json['menu'][option]['search']:
+                item.custom_search = json['menu'][option]['search']['url']
+                itemlist += search(item, text)
+            else:
+                extra = set_extra_values(item, option, item.path)
+                item.url = extra.url
+                if item.url:
+                    itemlist += global_search(item, text)
+
+    if any(key in json for key in ['movies_list','tvshows_list', 'generic_list']):
+        itemlist += search(item, text)
+    return itemlist
+
+
+
+
+def peliculas(item, json='', key='', itemlist=[]):
+    item.plot = item.thumb = item.fanart =''
+    support.log()
+    if not json:
+        key = item.key
+        json = load_json(item)[key]
+    else:
+        json = json[key]
+
     infoLabels = item.infoLabels if item.infoLabels else {}
+    contentType = 'tvshow' if 'tvshow' in key else 'movie'
+    itlist = filterkey = []
+    action = 'findvideos'
 
-    if json_data:
-        for i, media in enumerate(json_data[media_type]):
-            if pagination and (pag - 1) * pagination > i: continue  # pagination
-            if pagination and i >= pag * pagination: break          # pagination
-            if item.filterkey in media:
-                filter_keys = [it.lower() for it in media[item.filterkey]] if type(media[item.filterkey]) == list else media[item.filterkey].lower()
-                if item.filter.lower() in filter_keys:
+    for option in json:
+        if item.filterkey and item.filterkey in option:
+            filterkey = [it.lower() for it in option[item.filterkey]] if type(option[item.filterkey]) == list else [option[item.filterkey].lower()]
+        title = option['title'] if 'title' in option else ''
 
-                    quality, language, plot, poster = set_extra_values(media, item.path)
+        if 'tvshows_list' in key:
+            action = 'episodios'
 
-                    fulltitle = media['title']
-                    title = set_title(fulltitle, language, quality)
+        # filter elements
+        if (not item.filter or item.filter.lower() in filterkey) and item.search.lower() in title.lower() and title:
+            extra = set_extra_values(item, option, item.path)
 
-                    infoLabels['year'] = media['year'] if 'year' in media else ''
-                    infoLabels['tmdb_id'] = media['tmdb_id'] if 'tmdb_id' in media else ''
+            infoLabels['year'] = option['year'] if 'year' in option else ''
+            infoLabels['tmdb_id'] = option['tmdb_id'] if 'tmdb_id' in option else ''
 
-                    if 'movies_list' in json_data or 'generic_list' in json_data:
-                        url= media
-                        contentTitle = fulltitle
-                        contentType = 'movie'
-                        action='findvideos'
+            it = Item(channel = item.channel,
+                      title = set_title(title, extra.language, extra.quality),
+                      fulltitle = title,
+                      show = title,
+                      contentTitle = title if contentType == 'movie' else '',
+                      contentSerieName = title if contentType != 'movie' else '',
+                      contentType = contentType,
+                      infoLabels = infoLabels,
+                      url = extra.url,
+                      path = item.path,
+                      thumbnail = extra.thumb,
+                      fanart = extra.fanart,
+                      plot = extra.plot,
+                      personal_plot = extra.plot,
+                      action = action)
+            itlist.append(it)
 
-                    else:
-                        contentSerieName = fulltitle
-                        contentType = 'tvshow'
-                        if 'seasons_list' in media:
-                            url = media['seasons_list']
-                            action = 'get_seasons'
-                        else:
-                            url = relative('link', media, item.path)
-                            action = 'episodios'
-
-                    itemlist.append(Item(channel=item.channel,
-                                         contentType=contentType,
-                                         title=format_title(title),
-                                         fulltitle=fulltitle,
-                                         show=fulltitle,
-                                         quality=quality,
-                                         language=language,
-                                         plot=plot,
-                                         personal_plot=plot,
-                                         thumbnail=poster,
-                                         path=item.path,
-                                         url=url,
-                                         contentTitle=contentTitle,
-                                         contentSerieName=contentSerieName,
-                                         infoLabels=infoLabels,
-                                         action=action))
-
-        if pagination and len(json_data[media_type]) >= pag * pagination and len(itemlist) >= pag * pagination:
-            if inspect.stack()[1][3] != 'get_newest':
-                itemlist.append(
-                    Item(channel=item.channel,
-                         action = 'list_filtered',
-                         contentType=contentType,
-                         title=typo(config.get_localized_string(30992), 'color kod bold'),
-                         fulltitle= item.fulltitle,
-                         show= item.show,
-                         url=item.url,
-                         args=item.args,
-                         page=pag + 1,
-                         path=item.path,
-                         media_type=item.media_type,
-                         thumbnail=support.thumb()))
-
-        if not 'generic_list' in json_data:
-            tmdb.set_infoLabels(itemlist, seekTmdb=True)
-        for item in itemlist:
-            if item.personal_plot != item.plot and item.personal_plot:
-                item.plot = '\n\n' + typo('','submenu') + '\n' + item.personal_plot + '\n' + typo('','submenu') + '\n\n' + item.plot
+    if not 'generic_list' in key:
+        tmdb.set_infoLabels(itlist, seekTmdb=True)
+    itemlist += itlist
     return itemlist
 
 
 def get_seasons(item):
-    itm = item
     support.log()
     itemlist = []
-    infoLabels = item.infoLabels if item.infolabels else {}
-    list_seasons = item.url
+    infoLabels = item.infoLabels
+    json = item.url['seasons_list'] if type(item.url) == dict else item.url
 
-    for season in list_seasons:
-        infoLabels['season'] = season['season']
-        title = config.get_localized_string(60027) % season['season']
-        url = relative('link', season, item.path)
+    for option in json:
+        infoLabels['season'] = option['season']
+        title = config.get_localized_string(60027) % option['season']
+        extra = set_extra_values(item, option, item.path)
+        # url = relative('link', option, item.path)
 
         itemlist.append(Item(channel=item.channel,
-                             title=format_title(title),
+                             title=set_title(title),
                              fulltitle=item.fulltitle,
                              show=item.show,
-                             thumbnails=item.thumbnails,
-                             filterseason=str(season['season']),
-                             url=url,
+                             thumbnail=extra.thumb,
+                             filterseason=int(option['season']),
+                             url=extra.url,
                              action='episodios',
-                             contentSeason=season['season'],
+                             contentSeason=option['season'],
                              infoLabels=infoLabels,
-                             contentType='tvshow',
-                             path=item.path))
+                             contentType='season',
+                             path=extra.path))
 
-
-    if inspect.stack()[1][3] in ['add_tvshow', "get_seasons"] or show_seasons == False:
-        it = []
+    if inspect.stack()[2][3] in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest'] or show_seasons == False:
+        itlist = []
         for item in itemlist:
-            if os.path.isfile(item.url) or requests.head(item.url): it += episodios(item)
-        itemlist = it
-
-        if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest']:
-            pagination = int(defp) if defp.isdigit() else ''
-            pag = itm.page if itm.page else 1
-            it = []
-            for i, item in enumerate(itemlist):
-                if pagination and (pag - 1) * pagination > i: continue  # pagination
-                if pagination and i >= pag * pagination: break          # pagination
-                it.append(item)
-
-            if pagination and len(itemlist) >= pag * pagination:
-                itm.page = pag + 1
-                itm.title=typo(config.get_localized_string(30992), 'color kod bold')
-                itm.thumbnail=support.thumb()
-                it.append(itm)
-            itemlist = it
-    else:
-        tmdb.set_infoLabels(itemlist, seekTmdb=True)
-        itemlist = sorted(itemlist, key=lambda i: i.title)
-        support.videolibrary(itemlist,item)
-
+            itlist += episodios(item)
+        itemlist = itlist
+        if inspect.stack()[2][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest'] and defpage:
+            itemlist = pagination(item, itemlist)
     return itemlist
 
 
-def episodios(item):
-    support.log(item)
-    itm = item
-
-
-    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']:
-        pagination = int(defp) if defp.isdigit() else ''
-    else: pagination = ''
-    pag = item.page if item.page else 1
-
-    itemlist = []
-    if type(item.url) == dict:
-        json_data = {}
-        json_data['episodes_list'] = [item.url]
-    else:
-        json_data = load_json(item)
-    support.log(json_data)
+def episodios(item, json ='', key='', itemlist =[]):
+    support.log()
     infoLabels = item.infoLabels
+    itm=item
+
+    if type(item.url) == dict:
+        if 'seasons_list' in item.url:
+            return get_seasons(item)
+        else:
+            json = {}
+            json = item.url['episodes_list']
+    else:
+        json = load_json(item)['episodes_list']
+
+    # set variable
     ep = 1
     season = infoLabels['season'] if 'season' in infoLabels else item.contentSeason if item.contentSeason else 1
-
-    for i, episode in enumerate(json_data['episodes_list']):
-        if pagination and (pag - 1) * pagination > i: continue  # pagination
-        if pagination and i >= pag * pagination: break          # pagination
-        match = []
-        if 'number' in episode:
-            match = support.match(episode['number'], patron=r'(?P<season>\d+)x(?P<episode>\d+)').match
-        if not match and 'title' in episode:
-            match = support.match(episode['title'], patron=r'(?P<season>\d+)x(?P<episode>\d+)').match
-            if match: match = match[0]
+    # make items
+    for option in json:
+        # build numeration of episodes
+        numeration = option['number'] if 'number' in option else option['title']
+        match = support.match(numeration , patron=r'(?P<season>\d+)x(?P<episode>\d+)').match
         if match:
             episode_number = match[1]
             ep = int(match[1]) + 1
-            season_number = match[0]
+            season_number = int(match[0])
         else:
-            season_number = episode['season'] if 'season' in episode else season if season else 1
-            episode_number = episode['number'] if 'number' in episode else ''
+            season_number = option['season'] if 'season' in option else season if season else 1
+            episode_number = option['number'] if 'number' in option else ''
             if not episode_number.isdigit():
-                episode_number = support.match(episode['title'], patron=r'(?P<episode>\d+)').match
+                episode_number = support.match(option['title'], patron=r'(?P<episode>\d+)').match
             ep = int(episode_number) if episode_number else ep
             if not episode_number:
                 episode_number = str(ep).zfill(2)
@@ -591,92 +279,381 @@ def episodios(item):
 
         infoLabels['season'] = season_number
         infoLabels['episode'] = episode_number
-
-        plot = episode['plot'] if 'plot' in episode else item.plot
-        thumbnail = episode['poster'] if 'poster' in episode else episode['thumbnail'] if 'thumbnail' in episode else item.thumbnail
-
-        title = ' - ' + episode['title'] if 'title' in episode else ''
+        title = ' - ' + option['title'] if 'title' in option else ''
         title = '%sx%s%s' % (season_number, episode_number, title)
-
+        extra = set_extra_values(item, option, item.path)
         if season_number == item.filterseason or not item.filterseason:
-            itemlist.append(Item(channel= item.channel,
-                                 title= format_title(title),
+            itemlist.append(Item(channel = item.channel,
+                                 title = set_title(title, extra.language, extra.quality),
                                  fulltitle = item.fulltitle,
                                  show = item.show,
-                                 url= episode,
-                                 action= 'findvideos',
-                                 plot= plot,
-                                 thumbnail= thumbnail,
-                                 contentSeason= season_number,
-                                 contentEpisode= episode_number,
-                                 infoLabels= infoLabels,
-                                 contentType= 'episode',
-                                 path=item.path))
+                                 url = option,
+                                 action = 'findvideos',
+                                 plot = extra.plot,
+                                 thumbnail= extra.thumb if extra.thumb else item.thumbnail,
+                                 fanart = extra.fanart,
+                                 contentSeason = season_number,
+                                 contentEpisode = episode_number,
+                                 infoLabels = infoLabels,
+                                 contentType = 'episode',
+                                 path = item.path))
 
-
-    if show_seasons == True and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes'] and not item.filterseason:
-        itm.contentType='season'
-        season_list = []
-        for item in itemlist:
-            if item.contentSeason not in season_list:
-                season_list.append(item.contentSeason)
-        itemlist = []
-        for season in season_list:
-            itemlist.append(Item(channel=item.channel,
-                                 title=format_title(config.get_localized_string(60027) % season),
-                                 fulltitle=itm.fulltitle,
-                                 show=itm.show,
-                                 thumbnails=itm.thumbnails,
-                                 url=itm.url,
-                                 action='episodios',
-                                 contentSeason=season,
-                                 infoLabels=infoLabels,
-                                 filterseason=str(season),
-                                 path=item.path))
-
-    elif pagination and len(json_data['episodes_list']) >= pag * pagination:
-        if inspect.stack()[1][3] != 'get_newest':
-            itemlist.append(
-                Item(channel=item.channel,
-                     action = 'episodios',
-                     contentType='episode',
-                     title=typo(config.get_localized_string(30992), 'color kod bold'),
-                     fulltitle= item.fulltitle,
-                     show= item.show,
-                     url=item.url,
-                     args=item.args,
-                     page=pag + 1,
-                     media_type=item.media_type,
-                     thumbnail=support.thumb(),
-                     path=item.path))
-
-    tmdb.set_infoLabels(itemlist, seekTmdb=True)
+    # if showseason
+    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest']:
+        if show_seasons and not item.filterseason:
+            itm.contentType='season'
+            season_list = []
+            for item in itemlist:
+                if item.contentSeason not in season_list:
+                    season_list.append(item.contentSeason)
+            itemlist = []
+            for season in season_list:
+                itemlist.append(Item(channel=item.channel,
+                                    title=set_title(config.get_localized_string(60027) % season),
+                                    fulltitle=itm.fulltitle,
+                                    show=itm.show,
+                                    thumbnails=itm.thumbnails,
+                                    url=itm.url,
+                                    action='episodios',
+                                    contentSeason=season,
+                                    infoLabels=infoLabels,
+                                    filterseason=str(season),
+                                    path=item.path))
+        elif defpage and inspect.stack()[1][3] not in ['get_seasons']:
+            itemlist = pagination(item, itemlist)
     return itemlist
 
 
+# Find Servers
 def findvideos(item):
     support.log()
     itemlist = []
     if 'links' in item.url:
-        for url in item.url['links']:
-            quality, language, plot, poster = set_extra_values(url, item.path)
-            title = item.fulltitle + (' - '+url['title'] if 'title' in url else '')
-            title = set_title(title, language, quality)
+        json = item.url['links']
+    else:
+        json = item.url
+    for option in json:
+        extra = set_extra_values(item, option, item.path)
+        title = item.fulltitle + (' - '+option['title'] if 'title' in option else '')
+        title = set_title(title, extra.language, extra.quality) + support.typo('%s','_ [] color kod bold')
 
-            itemlist.append(Item(channel=item.channel, title=format_title(typo('%s','color kod') + ' - ' + title), url=url['url'], action='play', quality=quality,
-                                language=language, infoLabels = item.infoLabels))
+        itemlist.append(Item(channel=item.channel, title=title, url=option['url'], action='play', quality=extra.quality,
+                             language=extra.language, infoLabels = item.infoLabels))
 
-        itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
+    itemlist = support.servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
+    if inspect.stack()[2][3] != 'start_download':
+        autoplay.start(itemlist, item)
+    support.videolibrary(itemlist,item)
+    return itemlist
 
-        if inspect.stack()[2][3] != 'start_download':
-            autoplay.start(itemlist, item)
 
-        return itemlist
 
+################################   Menu   ################################
+
+def get_menu(item, json, key, itemlist=[]):
+    support.log()
+    json = json[key]
+    for option in json:
+        title = option['title'] if 'title' in option else json[option] if 'search' not in option else ''
+        extra = set_extra_values(item, option, item.path)
+        level2 =  option if 'level2' in option else []
+        it = Item(channel = item.channel,
+                title = support.typo(title, 'bullet bold'),
+                fulltitle = title,
+                show = title,
+                url = extra.url,
+                path = item.path,
+                thumbnail = extra.thumb,
+                fanart = extra.fanart,
+                plot = extra.plot,
+                action = 'show_menu',
+                menu = level2 if not item.menu else None)
+        if title:
+            itemlist.append(it)
+
+        if 'search' in option:
+            get_search_menu(it, json, itemlist)
+
+        elif 'submenu' in option:
+            get_sub_menu(it, option, 'submenu' ,itemlist)
+
+    return support.thumb(itemlist)
+
+
+def get_sub_menu(item, json, key, itemlist=[]):
+    support.log('SUBMENU',item)
+    json = json[key]
+    search = False
+    if item.menu:
+        item.menu = None
+        itemlist.append(item)
+    for option in json:
+        support.log(item)
+        title = json[option]['title'] if 'title' in json[option] else json[option] if option != 'search' else ''
+        if title:
+            extra = set_extra_values(item, json[option], item.path)
+            if not extra.url: extra.url = item.url
+            filterkey = option
+            level2 =  option if 'level2' in option else []
+            it = Item(channel = item.channel,
+                      title = support.typo(title,'submenu'),
+                      fulltitle = title,
+                      show = title,
+                      url = extra.url,
+                      path = item.path,
+                      thumbnail = extra.thumb,
+                      fanart = extra.fanart,
+                      plot = extra.plot,
+                      action = 'show_menu',
+                      menu = level2 if not item.menu else None,
+                      filterkey = filterkey)
+            itemlist.append(it)
+
+        if 'search' in option:
+            search = True
+            search_json = json[option]
+
+    if search:
+        get_search_menu(item, search_json, itemlist)
+
+    return itemlist
+
+
+def get_search_menu(item, json='', itemlist=[], channel_name=''):
+    support.log()
+    if channel_name:
+        title = 'Cerca in ' + channel_name + '...'
+    else:
+        title = 'Cerca ' + item.fulltitle + '...'
+    extra = set_extra_values(item, json, item.path)
+
+    itemlist.append(Item(channel=item.channel,
+                         title=support.typo(title,'submenu bold'),
+                         fulltitle=title,
+                         show=title,
+                         thumbnail=extra.thumb if extra.thumb else get_thumb('search.png'),
+                         faneart=extra.fanart if extra.fanart else item.fanart,
+                         plot=extra.plot,
+                         action='search',
+                         url=item.url,
+                         custom_search=extra.url if extra.url != item.url else '',
+                         path=item.path,
+                         global_search=True if channel_name else False))
+
+    return itemlist
+
+
+def submenu(item, json, key, itemlist = []):
+    from lib.concurrent import futures
+
+    filter_list = []
+    for option in json[key]:
+        if item.filterkey in option and option[item.filterkey]:
+            if type(option[item.filterkey]) == str and option[item.filterkey] not in filter_list:
+                filter_list.append(option[item.filterkey])
+            elif type(option[item.filterkey]) == list:
+                for f in option[item.filterkey]:
+                    if f not in filter_list:
+                        filter_list.append(f)
+
+    filter_list.sort()
+
+    with futures.ThreadPoolExecutor() as executor:
+        List = [executor.submit(filter_thread, filter, key, item) for filter in filter_list]
+        for res in futures.as_completed(List):
+            if res.result():
+                itemlist.append(res.result())
+    itemlist = sorted(itemlist, key=lambda it: it.title)
+    return itemlist
+
+
+################################   Filter results   ################################
+
+# filter results
+def filter_thread(filter, key, item):
+    thumbnail = ''
+    plot = ''
+    if item.filterkey in ['actors', 'director']:
+        dict_ = {'url': 'search/person', 'language': lang, 'query': filter, 'page': 1}
+        tmdb_inf = tmdb.discovery(item, dict_=dict_)
+        if tmdb_inf.results:
+            results = tmdb_inf.results[0]
+            id = results['id']
+        if id:
+            thumbnail = 'http://image.tmdb.org/t/p/original' + results['profile_path'] if results['profile_path'] else item.thumbnail
+            json_file = httptools.downloadpage('http://api.themoviedb.org/3/person/'+ str(id) + '?api_key=' + tmdb_api + '&language=en', use_requests=True).data
+            plot += jsontools.load(json_file)['biography']
+
+    item = Item(channel=item.channel,
+                title=support.typo(filter, 'bold'),
+                url=item.url,
+                media_type=item.media_type,
+                action='peliculas',
+                thumbnail=thumbnail,
+                plot=plot,
+                path=item.path,
+                filterkey=item.filterkey,
+                filter=filter,
+                key=key)
+    return item
+
+
+################################   Utils   ################################
+
+# for load json from item or url
+def load_json(item):
+    support.log()
+
+    url = item.url if type(item) == Item else item
+    try:
+        if url.startswith('http'):
+            json_file = httptools.downloadpage(url).data
+        else:
+            json_file = open(url, "r").read()
+
+        json = jsontools.load(json_file)
+
+    except:
+        json = {}
+
+    return json
+
+
+# Load Channels json and check that the paths and channel titles are correct
+def load_and_check(item):
+    support.log()
+    path = filetools.join(config.get_data_path(), 'community_channels.json')
+    file = open(path, "r")
+    json = jsontools.load(file.read())
+
+    for key, channel in json['channels'].items():
+        if not 'checked' in channel:
+            response = httptools.downloadpage(channel['path'], follow_redirects=True, timeout=5)
+            if response.sucess:
+                channel['path'] = response.url
+                channel['channel_name'] = re.sub(r'\[[^\]]+\]', '', channel['channel_name'])
+                channel['check'] = True
+
+                with open(path, "w") as file:
+                    file.write(jsontools.dump(json))
+                file.close()
+    return json
+
+
+# set extra values
+def set_extra_values(item, json, path):
+    support.log(json)
+    ret = Item()
+    for key in json:
+        if key == 'quality':
+            ret.quality = json[key].upper()
+        elif key ==  'language':
+            ret.language = json[key].upper()
+        elif key ==  'plot':
+            ret.plot = json[key]
+        elif key in ['poster', 'thumbnail']:
+            ret.thumb = json[key] if ':/' in json[key] else filetools.join(path,json[key]) if '/' in json[key] else get_thumb(json[key])
+        elif key ==  'fanart':
+            ret.fanart = json[key] if ':/' in json[key] else filetools.join(path,json[key])
+        elif key in ['url', 'link']:
+            ret.url = json[key] if ':/' in json[key] or type(json[key]) == dict else filetools.join(path,json[key])
+        elif key ==  'seasons_list':
+            ret.url = {}
+            ret.url['seasons_list'] = json['seasons_list']
+        elif key ==  'episodes_list':
+            ret.url = {}
+            ret.url['episodes_list'] = json['episodes_list']
+        elif key ==  'links':
+            ret.url={}
+            ret.url['links'] = json[key]
+
+    if not ret.thumb:
+        ret.thumb = item.thumbnail
+    if not ret.fanart:
+        ret.fanart = item.fanart
+    if not ret.plot:
+        ret.plot = item.plot
+
+    return ret
+
+
+# format titles
+def set_title(title, language='', quality=''):
+    support.log()
+
+    t = support.match(title, patron=r'\{([^\}]+)\}').match
+    if 'bold' not in t: t += ' bold'
+    title = re.sub(r'(\{[^\}]+\})','',title)
+    title = support.typo(title,t)
+
+    if quality:
+        title += support.typo(quality, '_ [] color kod bold')
+    if language:
+        if not isinstance(language, list):
+            title += support.typo(language.upper(), '_ [] color kod bold')
+        else:
+            for lang in language:
+                title += support.typo(lang.upper(), '_ [] color kod bold')
+
+    return title
+
+
+# for relative path
+def relative(key, json, path):
+    support.log()
+    ret = ''
+    if key in json:
+        if key in ['thumbnail', 'poster']:
+            ret = json[key] if ':/' in json[key] else filetools.join(path,json[key]) if '/' in json[key] else get_thumb(json[key]) if json[key] else ''
+        else:
+            ret = json[key] if ':/' in json[key] else filetools.join(path,json[key])  if '/' in json[key] else ''
+
+    return ret
+
+
+def pagination(item, itemlist = []):
+    support.log()
+    import json
+    itlist = []
+
+    if not itemlist:
+        itemlist = []
+        for it in item.itemlist:
+            itemlist.append(Item().fromurl(it))
+    encoded_itemlist = []
+    for it in itemlist:
+        encoded_itemlist.append(it.tourl())
+    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']:
+        Pagination = int(defp) if defp.isdigit() else ''
+    else: Pagination = ''
+    pag = item.page if item.page else 1
+
+    for i, item in enumerate(itemlist):
+        if Pagination and (pag - 1) * Pagination > i: continue  # pagination
+        if Pagination and i >= pag * Pagination: break          # pagination
+
+        itlist.append(item)
+
+    if Pagination and len(itemlist) >= pag * Pagination:
+        if inspect.stack()[1][3] != 'get_newest':
+            itlist.append(
+                Item(channel=item.channel,
+                        action = 'pagination',
+                        contentType=item.contentType,
+                        title=support.typo(config.get_localized_string(30992), 'color kod bold'),
+                        fulltitle= item.fulltitle,
+                        show= item.show,
+                        url=item.url,
+                        args=item.args,
+                        page=pag + 1,
+                        path=item.path,
+                        media_type=item.media_type,
+                        thumbnail=support.thumb(),
+                        itemlist= encoded_itemlist))
+    return itlist
 
 def add_channel(item):
     support.log()
-
     channel_to_add = {}
     json_file = ''
     result = platformtools.dialog_select(config.get_localized_string(70676), [config.get_localized_string(70678), config.get_localized_string(70679)])
@@ -707,14 +684,14 @@ def add_channel(item):
     channel_to_add['channel_name'] = json_file['channel_name']
     if 'thumbnail' in json_file: channel_to_add['thumbnail'] = json_file['thumbnail']
     if 'fanart' in json_file: channel_to_add['fanart'] = json_file['fanart']
-    path = os.path.join(config.get_data_path(), 'community_channels.json')
+    path = filetools.join(config.get_data_path(), 'community_channels.json')
 
     community_json = open(path, "r")
     community_json = jsontools.load(community_json.read())
     id = 1
     while str(id) in community_json['channels']:
         id +=1
-    community_json['channels'][id]=(channel_to_add)
+    community_json['channels'][str(id)]=(channel_to_add)
 
     with open(path, "w") as file:
          file.write(jsontools.dump(community_json))
@@ -723,11 +700,10 @@ def add_channel(item):
     platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(70683) % json_file['channel_name'])
     return
 
-
 def remove_channel(item):
     support.log()
 
-    path = os.path.join(config.get_data_path(), 'community_channels.json')
+    path = filetools.join(config.get_data_path(), 'community_channels.json')
 
     community_json = open(path, "r")
     community_json = jsontools.load(community_json.read())
@@ -742,144 +718,3 @@ def remove_channel(item):
     platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(70684) % to_delete)
     platformtools.itemlist_refresh()
     return
-
-
-def set_extra_values(dict, path):
-    support.log()
-    quality = ''
-    language = ''
-    plot = ''
-    poster = ''
-
-    if 'quality' in dict and dict['quality'] != '':
-        quality = dict['quality'].upper()
-    if 'language' in dict and dict['language'] != '':
-        language = dict['language'].upper()
-    if 'plot' in dict and dict['plot'] != '':
-        plot = dict['plot']
-    if 'poster' in dict and dict['poster'] != '':
-        poster = dict['poster']if ':/' in dict['poster'] else path + dict['poster'] if '/' in dict['poster'] else ''
-    elif 'thumbnail' in dict and dict['thumbnail'] != '':
-        poster = dict['thumbnail']if ':/' in dict['thumbnail'] else path + dict['thumbnail'] if '/' in dict['thumbnail'] else ''
-
-    return quality, language, plot, poster
-
-def set_title(title, language, quality):
-    support.log()
-
-    if not config.get_setting('unify'):
-        if quality != '':
-            title += typo(quality, '_ [] color kod')
-        if language != '':
-            if not isinstance(language, list):
-                title += typo(language.upper(), '_ [] color kod')
-            else:
-                for lang in language:
-                    title += typo(lang.upper(), '_ [] color kod')
-
-    return title
-
-
-def format_title(title):
-    t = scrapertools.find_single_match(title, r'\{([^\}]+)\}')
-    if 'bold' not in t: t += ' bold'
-    title = re.sub(r'(\{[^\}]+\})','',title)
-    return typo(title,t)
-
-
-def search(item, text):
-    support.log('Search ', text)
-    if item.custom_url:
-        item.url=item.custom_url + text
-    if item.search_menu:
-        return show_menu(item)
-    itemlist = []
-    json_data = load_json(item)
-
-    return load_links(item, itemlist, json_data, text)
-
-
-def load_links(item, itemlist, json_data, text):
-    support.log(json_data)
-
-    def links(item, itemlist, json_data, text):
-        support.log()
-
-        if "movies_list" in json_data: media_type= 'movies_list'
-        elif "tvshows_list" in json_data: media_type = 'tvshows_list'
-        elif "episodes_list" in json_data: media_type = 'episodes_list'
-        elif "generic_list" in json_data: media_type= 'generic_list'
-
-        if json_data:
-            for media in json_data[media_type]:
-                if 'search' in media: continue
-                if text.lower() in media['title'].lower():
-                    quality, language, plot, poster = set_extra_values(media, item.path)
-
-                    title = media['title']
-                    title = set_title(title, language, quality)
-
-                    new_item = Item(channel=item.channel, title=format_title(title), quality=quality,
-                                    language=language, plot=plot, personal_plot=plot, thumbnail=poster, path=item.path)
-
-                    new_item.infoLabels['year'] = media['year'] if 'year' in media else ''
-                    new_item.infoLabels['tmdb_id'] = media['tmdb_id'] if 'tmdb_id' in media else ''
-
-                    if 'movies_list' in json_data or 'generic_list' in json_data:
-                        new_item.url = media
-                        new_item.contentTitle = media['title']
-                        new_item.action = 'findvideos'
-                    elif 'tvshows_list' in json_data:
-                        new_item.url = media
-                        new_item.contentTitle = media['title']
-                        new_item.action = 'episodios'
-                    else:
-                        new_item.url = media['seasons_list']
-                        new_item.contentSerieName = media['title']
-                        new_item.action = 'seasons'
-
-                    itemlist.append(new_item)
-
-                    if not 'generic_list' in json_data:
-                        tmdb.set_infoLabels(itemlist, seekTmdb=True)
-                        for item in itemlist:
-                            if item.personal_plot != item.plot and item.personal_plot:
-                                item.plot = '\n\n' + typo('','submenu') + '\n' + item.personal_plot + '\n' + typo('','submenu') + '\n\n' + item.plot
-
-    if 'menu' in json_data:
-        for option in json_data['menu']:
-            if 'link' in option:
-                json_data = load_json(option['link'] if option['link'].startswith('http') else item.path+option['link'])
-                load_links(item, itemlist, json_data, text)
-    else:
-        links(item, itemlist, json_data, text)
-
-    return itemlist
-
-
-def relative(key, json, path):
-    if key in json:
-        if key == 'thumbnail':
-            ret = json[key] if ':/' in json[key] else path + json[key] if '/' in json[key] else get_thumb(json[key]) if json[key] else ''
-        else:
-            ret = json[key] if ':/' in json[key] else path + json[key] if '/' in json[key] else ''
-    else:
-        ret = ''
-    return ret
-
-
-def load_json(item):
-    support.log()
-    url= item if type(item) == str else item.url
-    try:
-        if url.startswith('http'):
-            json_file = httptools.downloadpage(url).data
-        else:
-            json_file = open(url, "r").read()
-
-        json_data = jsontools.load(json_file)
-
-    except:
-        json_data = {}
-
-    return json_data

@@ -245,6 +245,10 @@ msgctxt "#30137"
 msgid "Direct"
 msgstr ""
 
+msgctxt "#30138"
+msgid "Live"
+msgstr ""
+
 msgctxt "#30151"
 msgid "Watch the video"
 msgstr ""

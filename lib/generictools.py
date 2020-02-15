@@ -164,7 +164,8 @@ def update_title(item):
                 item.channel = new_item.channel     #Restuaramos el nombre del canal, por si lo habíamos cambiado
             if item.tmdb_stat == True:
                 if new_item.contentSerieName:       #Si es serie...
-                    if config.get_setting("filter_languages", item.channel) >= 0:
+                    filter_languages =  config.get_setting("filter_languages", item.channel)
+                    if filter_languages and filter_languages >= 0:
                         item.title_from_channel = new_item.contentSerieName         #Guardo el título incial para Filtertools
                         item.contentSerieName = new_item.contentSerieName           #Guardo el título incial para Filtertools
                     else:
