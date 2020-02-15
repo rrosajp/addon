@@ -235,7 +235,7 @@ def save_movie(item):
     return 0, 0, -1
 
 def filter_list(episodelist, action=None, path=None):
-    if path: path = path.decode('utf8')
+    # if path: path = path.decode('utf8')
     # import xbmc
     # if xbmc.getCondVisibility('system.platform.windows') > 0: path = path.replace('smb:','').replace('/','\\')
     channel_prefs = {}
