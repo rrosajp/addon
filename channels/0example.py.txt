@@ -44,8 +44,6 @@
 
 # per l'uso dei decoratori, per i log, e funzioni per siti particolari
 from core import support
-# se non si fa uso di findhost()
-from platformcode import config
 
 # in caso di necessità
 #from core import scrapertools, httptools, servertools, tmdb
@@ -54,30 +52,22 @@ from core.item import Item # per newest
 
 ##### fine import
 
-# impostazioni variabili o def findhost()
-
-# se necessaria la variabile __channel__
-# da cancellare se non utilizzata
-__channel__ = "id nel json"
-# da cancellare se si utilizza findhost()
-host = config.get_channel_url('id nel json' OR __channel__) # <-- ATTENZIONE
-headers = [['Referer', host]]
-
-# Inizio findhost() - da cancellare se usato l'altro metodo
-#impostati dinamicamente da findhost()
-host = ""
-headers = ""
-
+# se il sito ha un link per ottenere l'url corretto in caso di oscuramenti
+# la funzione deve ritornare l'indirizzo corretto, verrà chiamata solo se necessario (link primario irraggiungibile)
 def findhost():
-    global host, headers
-    # da adattare alla bisogna...
-    permUrl = httptools.downloadpage('INSERIRE-URL-QUI', follow_redirects=False).headers
-    host = 'https://www.'+permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-    # cancellare host non utilizzato
-    host = scrapertools.find_single_match(permUrl, r'<div class="elementor-button-wrapper"> <a href="([^"]+)"')
-    headers = [['Referer', host]]
- # così le imposta una volta per tutte
-### fine findhost
+    def findhost():
+    permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
+    if 'google' in permUrl['location']:
+        host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+    else:
+        host = permUrl['location']
+    return host
+
+# se si usa findhost
+host = config.get_channel_url(findhost)
+# se non si usa (metti l'url in channels.json)
+host = config.get_channel_url()
+headers = [['Referer', host]]
 
 # server di esempio...
 list_servers = ['supervideo', 'streamcherry','rapidvideo', 'streamango', 'openload']
@@ -141,25 +131,24 @@ def mainlist(item):
     nome = [( '' ['', '', '', ''])
     return locals()
 
-    # Legenda known_keys per i groups nei patron
-    # known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality',
-    #                'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
-    # url = link relativo o assoluto alla pagina titolo film/serie
-    # title = titolo Film/Serie/Anime/Altro
-    # title2 = titolo dell'episodio Serie/Anime/Altro
-    # season = stagione in formato numerico
-    # episode = numero episodio, in formato numerico.
-    # thumb = linkrealtivo o assoluto alla locandina Film/Serie/Anime/Altro
-    # quality = qualità indicata del video
-    # year = anno in formato numerico (4 cifre)
-    # duration = durata del Film/Serie/Anime/Altro
-    # genere = genere del Film/Serie/Anime/Altro. Es: avventura, commedia
-    # rating = punteggio/voto in formato numerico
-    # type = tipo del video. Es. movie per film o tvshow per le serie. Di solito sono discrimanti usati dal sito
-    # lang = lingua del video. Es: ITA, Sub-ITA, Sub, SUB ITA.
-    # AVVERTENZE: Se il titolo è trovato nella ricerca TMDB/TVDB/Altro allora le locandine e altre info non saranno quelle recuperate nel sito.!!!!
 
-
+# Legenda known_keys per i groups nei patron
+# known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality',
+#                'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
+# url = link relativo o assoluto alla pagina titolo film/serie
+# title = titolo Film/Serie/Anime/Altro
+# title2 = titolo dell'episodio Serie/Anime/Altro
+# season = stagione in formato numerico
+# episode = numero episodio, in formato numerico.
+# thumb = linkrealtivo o assoluto alla locandina Film/Serie/Anime/Altro
+# quality = qualità indicata del video
+# year = anno in formato numerico (4 cifre)
+# duration = durata del Film/Serie/Anime/Altro
+# genere = genere del Film/Serie/Anime/Altro. Es: avventura, commedia
+# rating = punteggio/voto in formato numerico
+# type = tipo del video. Es. movie per film o tvshow per le serie. Di solito sono discrimanti usati dal sito
+# lang = lingua del video. Es: ITA, Sub-ITA, Sub, SUB ITA.
+# AVVERTENZE: Se il titolo è trovato nella ricerca TMDB/TVDB/Altro allora le locandine e altre info non saranno quelle recuperate nel sito.!!!!
 @support.scrape
 def peliculas(item):
     support.log(item)
