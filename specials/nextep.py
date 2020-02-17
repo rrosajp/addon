@@ -79,7 +79,7 @@ def next_ep(item):
             base_path = os.path.basename(os.path.normpath(os.path.dirname(item.strm_path)))
             path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"),base_path)
             fileList = []
-            for file in os.listdir(path):
+            for file in filetools.listdir(path):
                 if file.endswith('.strm'):
                     fileList.append(file)
 
