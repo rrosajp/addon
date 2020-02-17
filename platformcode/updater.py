@@ -112,7 +112,7 @@ def check(background=False):
                         if 'patch' in file:
                             text = ""
                             try:
-                                localFile = open(addonDir + file["filename"], 'r+')
+                                localFile = io.open(addonDir + file["filename"], 'r+', encoding="utf8")
                                 text = localFile.read()
                             except IOError: # nuovo file
                                 # crea le cartelle se non esistono
@@ -120,7 +120,7 @@ def check(background=False):
                                 if not os.path.exists(dirname):
                                     os.makedirs(dirname)
 
-                                localFile = open(addonDir + file["filename"], 'w')
+                                localFile = io.open(addonDir + file["filename"], 'w', encoding="utf8")
 
                             patched = apply_patch(text, (file['patch']+'\n').encode('utf-8'))
                             if patched != text:  # non eseguo se già applicata (es. scaricato zip da github)
@@ -250,7 +250,7 @@ def apply_patch(s,patch,revert=False):
 
 def getSha(path):
     try:
-        f = open(path, 'rb')
+        f = io.open(path, 'rb', encoding="utf8")
     except:
         return ''
     size = len(f.read())
@@ -417,7 +417,7 @@ def fOpen(file, mode = 'r'):
         logger.info('android, uso FileIO per leggere')
         return io.FileIO(file, mode)
     else:
-        return open(file, mode)
+        return io.open(file, mode)
 
 
 def _pbhook(numblocks, blocksize, filesize, url, dp):
