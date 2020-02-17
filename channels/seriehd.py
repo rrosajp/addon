@@ -4,7 +4,7 @@
 # ------------------------------------------------------------
 
 
-from core import scrapertools, httptools, support
+from core import support
 from core.item import Item
 
 host = support.config.get_channel_url()
@@ -85,41 +85,38 @@ def peliculas(item):
 def episodios(item):
     def get_season(pageData, seas_url, season):
         data = ''
-        if pageData:  # per non riscaricare
-            episodes = pageData
-            pageData = ''
-        else:
-            episodes = httptools.downloadpage(seas_url).data
-        episodes = scrapertools.find_single_match(episodes, patron_episode)
-        for episode_url, episode in scrapertools.find_multiple_matches(episodes, patron_option):
+        episodes = support.match(pageData if pageData else seas_url, patronBlock=patron_episode, patron=patron_option).matches
+        for episode_url, episode in episodes:
             episode_url = support.urlparse.urljoin(item.url, episode_url)
             if '-' in episode: episode = episode.split('-')[0].zfill(2) + 'x' + episode.split('-')[1].zfill(2)
             title = season + "x" + episode.zfill(2) + ' - ' + item.fulltitle
             data += title + '|' + episode_url + '\n'
         return data
 
-    def itemlistHook(itemlist):
-        itemlist.sort(key=lambda item: item.title)
-        return itemlist
-    url = support.match(item,
-                        patron=r'<iframe id="iframeVid" width="[^"]+" height="[^"]+" src="([^"]+)" allowfullscreen').match
-    pageData = httptools.downloadpage(url).data
     patron_season = '<div class="buttons-bar seasons">(.*?)<div class="buttons'
     patron_episode = '<div class="buttons-bar episodes">(.*?)<div class="buttons'
     patron_option = r'<a href="([^"]+?)".*?>([^<]+?)</a>'
-    data = ''
 
-    seasons = scrapertools.find_single_match(pageData, patron_season)
+    url = support.match(item, patron=r'<iframe id="iframeVid" width="[^"]+" height="[^"]+" src="([^"]+)" allowfullscreen').match
+    seasons = support.match(url, patronBlock=patron_season, patron=patron_option)
+
+    data = ''
     from concurrent import futures
     with futures.ThreadPoolExecutor() as executor:
         thL = []
-        for seas_url, season in scrapertools.find_multiple_matches(seasons, patron_option):
-            thL.append(executor.submit(get_season, pageData, seas_url, season))
+        for i, season in enumerate(seasons.matches):
+            thL.append(executor.submit(get_season, seasons.data if i == 0 else '', season[0], season[1]))
         for res in futures.as_completed(thL):
             if res.result():
                 data += res.result()
+
     patron = r'(?P<title>[^\|]+)\|(?P<url>[^\n]+)\n'
     action = 'findvideos'
+
+    def itemlistHook(itemlist):
+        itemlist.sort(key=lambda item: item.title)
+        return itemlist
+
     return locals()
 
 
