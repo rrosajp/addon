@@ -10,8 +10,10 @@ from concurrent import futures
 try:
     import urllib.request as urllib
     import urllib.parse as urlparse
+    from urllib.parse import urlencode
 except ImportError:
     import urllib, urlparse
+    from urllib import urlencode
 
 from channelselector import thumb
 from core import httptools, scrapertools, servertools, tmdb, channeltools
@@ -472,7 +474,7 @@ def dooplay_get_links(item, host):
     ret = []
 
     for type, post, nume, title, server in matches:
-        postData = urllib.urlencode({
+        postData = urlencode({
             "action": "doo_player_ajax",
             "post": post,
             "nume": nume,
@@ -586,7 +588,7 @@ def swzz_get_url(item):
     elif 'https://stayonline.pro' in item.url:
         id = item.url.split('/')[-2]
         reqUrl = 'https://stayonline.pro/ajax/linkView.php'
-        p = urllib.urlencode({"id": id})
+        p = urlencode({"id": id})
         data = httptools.downloadpage(reqUrl, post=p).data
         try:
             import json
