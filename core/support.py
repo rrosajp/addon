@@ -10,8 +10,10 @@ from concurrent import futures
 try:
     import urllib.request as urllib
     import urllib.parse as urlparse
+    from urllib.parse import urlencode
 except ImportError:
     import urllib, urlparse
+    from urllib import urlencode
 
 from channelselector import thumb
 from core import httptools, scrapertools, servertools, tmdb, channeltools
@@ -157,7 +159,8 @@ def scrapeLang(scraped, lang, longtitle):
     return language, longtitle
 
 def cleantitle(title):
-    cleantitle = scrapertools.htmlclean(scrapertools.decodeHtmlentities(title).replace('"', "'").replace('×', 'x').replace('–', '-')).strip()
+    if type(title) != str: title.decode('UTF-8')
+    cleantitle = title.replace('"', "'").replace('×', 'x').replace('–', '-').strip()
     return cleantitle
 
 def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang):
@@ -192,16 +195,17 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
     for i, match in enumerate(matches):
         if pagination and (pag - 1) * pagination > i and not search: continue  # pagination
         if pagination and i >= pag * pagination and not search: break          # pagination
-        listGroups = match.keys()
-        match = match.values()
+        # listGroups = match.keys()
+        # match = match.values()
 
-        if len(listGroups) > len(match):  # to fix a bug
-            match = list(match)
-            match.extend([''] * (len(listGroups) - len(match)))
+        # if len(listGroups) > len(match):  # to fix a bug
+        #     match = list(match)
+        #     match.extend([''] * (len(listGroups) - len(match)))
 
         scraped = {}
         for kk in known_keys:
-            val = match[listGroups.index(kk)] if kk in listGroups else ''
+            val = match[kk] if kk in match else ''
+            # val = match[listGroups.index(kk)] if kk in listGroups else ''
             if val and (kk == "url" or kk == 'thumb') and 'http' not in val:
                 val = scrapertools.find_single_match(item.url, 'https?://[a-z0-9.-]+') + (val if val.startswith('/') else '/' + val)
             scraped[kk] = val
@@ -294,8 +298,10 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 other = scraped['other'] if scraped['other'] else ''
             )
 
-            for lg in list(set(listGroups).difference(known_keys)):
-                it.__setattr__(lg, match[listGroups.index(lg)])
+            # for lg in list(set(listGroups).difference(known_keys)):
+            #     it.__setattr__(lg, match[listGroups.index(lg)])
+            for lg in list(set(match.keys()).difference(known_keys)):
+                it.__setattr__(lg, match[lg])
 
             if 'itemHook' in args:
                 it = args['itemHook'](it)
@@ -468,7 +474,7 @@ def dooplay_get_links(item, host):
     ret = []
 
     for type, post, nume, title, server in matches:
-        postData = urllib.urlencode({
+        postData = urlencode({
             "action": "doo_player_ajax",
             "post": post,
             "nume": nume,
@@ -582,7 +588,7 @@ def swzz_get_url(item):
     elif 'https://stayonline.pro' in item.url:
         id = item.url.split('/')[-2]
         reqUrl = 'https://stayonline.pro/ajax/linkView.php'
-        p = urllib.urlencode({"id": id})
+        p = urlencode({"id": id})
         data = httptools.downloadpage(reqUrl, post=p).data
         try:
             import json
@@ -744,7 +750,7 @@ def typo(string, typography=''):
     if '{}' in string:
         string = '{' + re.sub(r'\s\{\}','',string) + '}'
     if 'submenu' in string:
-        string = u"\u2022\u2022 ".encode('utf-8') + re.sub(r'\ssubmenu','',string)
+        string = "•• " + re.sub(r'\ssubmenu','',string)
     if 'color' in string:
         color = scrapertools.find_single_match(string, 'color ([a-z]+)')
         if color == 'kod' or '': color = kod_color
@@ -758,7 +764,7 @@ def typo(string, typography=''):
     if '--' in string:
         string = ' - ' + re.sub(r'\s--','',string)
     if 'bullet' in string:
-        string = '[B]' + u"\u2022".encode('utf-8') + '[/B] ' + re.sub(r'\sbullet','',string)
+        string = '[B]' + "•" + '[/B] ' + re.sub(r'\sbullet','',string)
 
     return string
 
@@ -1064,7 +1070,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
     channel_node = autoplay_node.get(item.channel, {})
     settings_node = channel_node.get('settings', {})
     AP = get_setting('autoplay') or settings_node['active']
-    HS = config.get_setting('hide_servers') or (settings_node['hide_servers'] if settings_node.has_key('hide_server') else False)
+    HS = config.get_setting('hide_servers') or (settings_node['hide_servers'] if 'hide_server' in settings_node else False)
 
     if CL and not AP:
         if get_setting('checklinks', item.channel):
