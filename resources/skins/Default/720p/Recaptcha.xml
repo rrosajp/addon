@@ -32,7 +32,7 @@
             <texturenofocus>Controls/KeyboardKeyNF.png</texturenofocus>
             <align>center</align>
             <aligny>center</aligny>
-            <label>Aceptar</label>
+            <label>$ADDON[plugin.video.kod 70007]</label>
 			<onup>10013</onup>
 			<ondown>10003</ondown>
 			<onleft>10013</onleft>
@@ -48,7 +48,7 @@
             <texturenofocus>Controls/KeyboardKeyNF.png</texturenofocus>
             <align>center</align>
             <aligny>center</aligny>
-            <label>Cancelar</label>
+            <label>$ADDON[plugin.video.kod 707433]</label>
 			<onup>10002</onup>
 			<ondown>10004</ondown>
 			<onleft>10002</onleft>
@@ -64,7 +64,7 @@
             <texturenofocus>Controls/KeyboardKeyNF.png</texturenofocus>
             <align>center</align>
             <aligny>center</aligny>
-            <label>Recargar</label>
+            <label>$ADDON[plugin.video.kod 70008]</label>
 			<onup>10003</onup>
 			<ondown>10005</ondown>
 			<onleft>10003</onleft>

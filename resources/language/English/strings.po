@@ -5881,3 +5881,11 @@ msgstr ""
 msgctxt "#707432"
 msgid "Disabled"
 msgstr ""
+
+msgctxt "#707433"
+msgid "Delete"
+msgstr ""
+
+msgctxt "#707434"
+msgid "reCaptcha verification failed"
+msgstr ""

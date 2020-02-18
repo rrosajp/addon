@@ -5885,3 +5885,11 @@ msgstr "Attivato"
 msgctxt "#707432"
 msgid "Disabed"
 msgstr "Disattivato"
+
+msgctxt "#707433"
+msgid "Delete"
+msgstr "Cancella"
+
+msgctxt "#707434"
+msgid "reCaptcha verification failed"
+msgstr "Verifica reCaptcha fallita"
