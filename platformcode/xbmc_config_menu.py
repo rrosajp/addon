@@ -17,7 +17,7 @@ import os
 import xbmcgui
 
 from core import channeltools
-from core import servertools
+from core import servertools, scrapertools
 from platformcode import config, logger
 
 
@@ -260,7 +260,9 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
             return cond
 
         # Obtenemos las condiciones
-        conditions = re.compile("(!?eq|!?gt|!?lt)?\(([^,]+),[\"|']?([^)|'|\"]*)['|\"]?\)[ ]*([+||])?").findall(cond)
+        # conditions = re.compile("(!?eq|!?gt|!?lt)?\(([^,]+),[\"|']?([^)|'|\"]*)['|\"]?\)[ ]*([+||])?").findall(cond)
+        conditions = re.compile(r'''(!?eq|!?gt|!?lt)?\s*\(\s*([^, ]+)\s*,\s*["']?([^"'\)]+)["']?\)([+|])?''').findall(cond)
+        # conditions = scrapertools.find_multiple_matches(cond, r"(!?eq|!?gt|!?lt)?\(([^,]+),[\"|']?([^)|'|\"]*)['|\"]?\)[ ]*([+||])?")
         for operator, id, value, next in conditions:
             # El id tiene que ser un numero, sino, no es valido y devuelve False
             try:
@@ -286,7 +288,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
 
                 if value.startswith('@') and unicode(value[1:]).isnumeric():
                     value = config.get_localized_string(int(value[1:]))
-            
+
             # Operaciones lt "menor que" y gt "mayor que", requieren que las comparaciones sean numeros, sino devuelve
             # False
             if operator in ["lt", "!lt", "gt", "!gt"]:
@@ -827,9 +829,9 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         if action == 1:
             # Si el foco no está en ninguno de los tres botones inferiores, y esta en un "list" cambiamos el valor
             if focus not in [10004, 10005, 10006]:
-                control = self.getFocus()
+                control = self.getFocus().getId()
                 for cont in self.list_controls:
-                    if cont["type"] == "list" and cont["control"] == control:
+                    if cont["type"] == "list" and cont["control"].getId() == control:
                         index = cont["lvalues"].index(cont["label"].getLabel())
                         if index > 0:
                             cont["label"].setLabel(cont["lvalues"][index - 1])
@@ -853,9 +855,9 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         elif action == 2:
             # Si el foco no está en ninguno de los tres botones inferiores, y esta en un "list" cambiamos el valor
             if focus not in [10004, 10005, 10006]:
-                control = self.getFocus()
+                control = self.getFocus().getId()
                 for cont in self.list_controls:
-                    if cont["type"] == "list" and cont["control"] == control:
+                    if cont["type"] == "list" and cont["control"].getId() == control:
                         index = cont["lvalues"].index(cont["label"].getLabel())
                         if index < len(cont["lvalues"]) - 1:
                             cont["label"].setLabel(cont["lvalues"][index + 1])
@@ -880,11 +882,9 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
             # Si el foco no está en ninguno de los tres botones inferiores, bajamos el foco en los controles de ajustes
             if focus not in [10004, 10005, 10006]:
                 try:
-                    focus_control = \
-                        [self.visible_controls.index(c) for c in self.visible_controls if
-                         c["control"] == self.getFocus()][
-                            0]
+                    focus_control = [self.visible_controls.index(c) for c in self.visible_controls if c["control"].getId() == self.getFocus().getId()][0]
                     focus_control += 1
+
                 except:
                     focus_control = 0
 
@@ -905,9 +905,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
             if focus not in [10003, 10004, 10005, 10006]:
                 try:
                     focus_control = \
-                        [self.visible_controls.index(c) for c in self.visible_controls if
-                         c["control"] == self.getFocus()][
-                            0]
+                        [self.visible_controls.index(c) for c in self.visible_controls if c["control"].getId() == self.getFocus().getId()][0]
                     focus_control -= 1
 
                     while not focus_control == -1 and (self.visible_controls[focus_control]["type"] == "label" or not
