@@ -18,7 +18,7 @@ def test_video_exists(page_url):
         global data,headers
         page_url = scrapertools.find_single_match(data, r"""<center><a href='(https?:\/\/wstream[^']+)'\s*title='bkg'""")
         if page_url:
-            data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True).data    
+            data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True, post={'g-recaptcha-response': captcha}).data
             
     logger.info("(page_url='%s')" % page_url)
     resp = httptools.downloadpage(page_url)
@@ -28,14 +28,18 @@ def test_video_exists(page_url):
     if captcha:
         page_url = resp.url
         if '/streaming.php' in page_url in page_url:
-            code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers['location'].split('/')[-1].replace('.html','')
-            logger.info('WCODE='+code)
+            code = \
+            httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers['location'].split('/')[
+                -1].replace('.html', '')
+            logger.info('WCODE=' + code)
             page_url = 'https://wstream.video/video.php?file_code=' + code
             data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True).data
 
-        possibleParam = scrapertools.find_multiple_matches(data, r"""<input.*?(?:name=["']([^'"]+).*?value=["']([^'"]*)['"]>|>)""")
+        possibleParam = scrapertools.find_multiple_matches(data,
+                                                           r"""<input.*?(?:name=["']([^'"]+).*?value=["']([^'"]*)['"]>|>)""")
         if possibleParam:
-            post = urllib.urlencode({param[0]: param[1] for param in possibleParam if param[0]})
+            post = {param[0]: param[1] for param in possibleParam if param[0]}
+            post['g-recaptcha-response'] = captcha
             if post:
                 data = httptools.downloadpage(page_url, headers=headers, post=post, follow_redirects=True).data
             else:
@@ -43,9 +47,9 @@ def test_video_exists(page_url):
         else:
             int_bckup_method()
 
-        if "Not Found" in data or "File was deleted" in data:
-            return False, config.get_localized_string(70449) % 'Wstream'
-        return True, ""
+            if "Not Found" in data or "File was deleted" in data:
+                return False, config.get_localized_string(70449) % 'Wstream'
+            return True, ""
     else:
         return False, config.get_localized_string(707434)
 
