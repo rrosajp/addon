@@ -132,13 +132,13 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
         except Exception as e:
             logger.info('Request for ' + domain + ' with ip ' + ip + ' failed')
             logger.info(e)
-            if 'SSLError' in str(e):
-                # disabilito
-                config.set_setting("resolver_dns", False)
-                request.url = realUrl
-                ret = super(CipherSuiteAdapter, self).send(request, **kwargs)
-            else:
-                tryFlush = True
+            # if 'SSLError' in str(e):
+            #     # disabilito
+            #     config.set_setting("resolver_dns", False)
+            #     request.url = realUrl
+            #     ret = super(CipherSuiteAdapter, self).send(request, **kwargs)
+            # else:
+            #     tryFlush = True
         if tryFlush and not flushedDns:  # re-request ips and update cache
             logger.info('Flushing dns cache for ' + domain)
             return self.flushDns(request, domain, **kwargs)
