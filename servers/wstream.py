@@ -24,7 +24,6 @@ def test_video_exists(page_url):
     resp = httptools.downloadpage(page_url)
     global data
     data = resp.data
-    logger.info(data)
 
     sitekey = scrapertools.find_single_match(data, 'data-sitekey="([^"]+)')
     captcha = platformtools.show_recaptcha(sitekey, page_url) if sitekey else ''
@@ -46,12 +45,13 @@ def test_video_exists(page_url):
             int_bckup_method()
     elif captcha:
         int_bckup_method()
-
-        if "Not Found" in data or "File was deleted" in data:
-            return False, config.get_localized_string(70449) % 'Wstream'
-        return True, ""
     else:
         return False, config.get_localized_string(707434)
+
+    if "Not Found" in data or "File was deleted" in data:
+        return False, config.get_localized_string(70449) % 'Wstream'
+    else:
+        return True, ""
 
 
 # Returns an array of possible video url's from the page_url
