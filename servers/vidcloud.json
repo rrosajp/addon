@@ -8,13 +8,13 @@
         "url": "https://vcstream.to/embed/\\1/\\2"
       },
       {
-        "pattern": "vidcloud.co/(?:embed|f|v)/([a-z0-9A-Z]+)",
-        "url": "https://vidcloud.co\/v\/\\1"
+        "pattern": "vidcloud.ru/(?:embed|f|v)/([a-z0-9A-Z]+)",
+        "url": "https://vidcloud.ru\/v\/\\1"
       }
     ]
   },
   "free": true,
-  "id": "vcstream",
+  "id": "vidcloud",
   "name": "Vidcloud",
   "settings": [
     {
