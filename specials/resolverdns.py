@@ -138,7 +138,7 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
             #     request.url = realUrl
             #     ret = super(CipherSuiteAdapter, self).send(request, **kwargs)
             # else:
-            #     tryFlush = True
+            tryFlush = True
         if tryFlush and not flushedDns:  # re-request ips and update cache
             logger.info('Flushing dns cache for ' + domain)
             return self.flushDns(request, domain, **kwargs)
