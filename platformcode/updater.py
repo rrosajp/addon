@@ -15,7 +15,8 @@ try:
     import urllib.request as urllib
 except ImportError:
     import urllib
-
+import sys
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 addon = xbmcaddon.Addon('plugin.video.kod')
 
 _hdr_pat = re.compile("^@@ -(\d+),?(\d+)? \+(\d+),?(\d+)? @@.*")
@@ -259,7 +260,11 @@ def getSha(path):
 
 
 def getShaStr(str):
-    return githash.blob_hash(BytesIO(str.encode('utf-8')), len(str)).hexdigest()
+    if PY3:
+        return githash.blob_hash(BytesIO(str.encode('utf-8')), len(str.encode('utf-8'))).hexdigest()
+    else:
+        return githash.blob_hash(BytesIO(str), len(str)).hexdigest()
+
 
 
 def updateFromZip(message='Installazione in corso...'):
