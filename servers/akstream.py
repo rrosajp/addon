@@ -6,19 +6,28 @@ import urllib
 from core import httptools
 from core import scrapertools
 from platformcode import logger, config
+from core.support import dbg
 
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     global data
+    # dbg()
     page = httptools.downloadpage(page_url)
+    logger.info(page.data)
     if 'embed_ak.php' in page_url:
         code = scrapertools.find_single_match(page.url, '/embed-([0-9a-z]+)\.html')
-        if code:
+        if not code:
+            code = scrapertools.find_single_match(page.data, r"""input\D*id=(?:'|")[^'"]+(?:'|").*?value='([a-z0-9]+)""")
+        if code :
             page = httptools.downloadpage('http://akvideo.stream/video/' + code)
         else:
             return False, config.get_localized_string(70449) % "Akvideo"
     data = page.data
+
+    # ID, code = scrapertools.find_single_match(data, r"""input\D*id=(?:'|")([^'"]+)(?:'|").*?value='([a-z0-9]+)""")
+    # post = urllib.urlencode({ID: code})
+    logger.info('PAGE DATA' + data)
     if "File Not Found" in data:
         return False, config.get_localized_string(70449) % "Akvideo"
     return True, ""
