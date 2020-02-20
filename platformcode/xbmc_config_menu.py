@@ -769,23 +769,23 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         # Controles de ajustes, si se cambia el valor de un ajuste, cambiamos el valor guardado en el diccionario de
         # valores
         # Obtenemos el control sobre el que se ha echo click
-        control = self.getControl(id)
+        # control = self.getControl(id)
 
         # Lo buscamos en el listado de controles
         for cont in self.list_controls:
 
             # Si el control es un "downBtn" o "upBtn" son los botones del "list"
             # en este caso cambiamos el valor del list
-            if cont["type"] == "list" and (cont["downBtn"] == control or cont["upBtn"] == control):
+            if cont["type"] == "list" and (cont["downBtn"].getId() == id or cont["upBtn"].getId() == id):
 
                 # Para bajar una posicion
-                if cont["downBtn"] == control:
+                if cont["downBtn"].getId() == id:
                     index = cont["lvalues"].index(cont["label"].getLabel())
                     if index > 0:
                         cont["label"].setLabel(cont["lvalues"][index - 1])
 
                 # Para subir una posicion
-                elif cont["upBtn"] == control:
+                elif cont["upBtn"].getId() == id:
                     index = cont["lvalues"].index(cont["label"].getLabel())
                     if index < len(cont["lvalues"]) - 1:
                         cont["label"].setLabel(cont["lvalues"][index + 1])
@@ -794,11 +794,11 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                 self.values[cont["id"]] = cont["lvalues"].index(cont["label"].getLabel())
 
             # Si esl control es un "bool", guardamos el nuevo valor True/False
-            if cont["type"] == "bool" and cont["control"] == control:
+            if cont["type"] == "bool" and cont["control"].getId() == id:
                 self.values[cont["id"]] = bool(cont["control"].isSelected())
 
             # Si esl control es un "text", guardamos el nuevo valor
-            if cont["type"] == "text" and cont["control"] == control:
+            if cont["type"] == "text" and cont["control"].getId() == id:
                 # Versiones antiguas requieren abrir el teclado manualmente
                 if xbmcgui.ControlEdit == ControlEdit:
                     import xbmc
