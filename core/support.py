@@ -705,9 +705,9 @@ def menu(func):
         if global_search:
             menuItem(itemlist, filename, config.get_localized_string(70741) % '… bold', 'search', host + dictUrl['search'])
 
-
-        autoplay.init(item.channel, list_servers, list_quality)
-        autoplay.show_option(item.channel, itemlist)
+        if 'get_channel_results' not in inspect.stack()[1][3]:
+            autoplay.init(item.channel, list_servers, list_quality)
+            autoplay.show_option(item.channel, itemlist)
         channel_config(item, itemlist)
 
         return itemlist
