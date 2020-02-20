@@ -745,12 +745,14 @@ def check_list_links(itemlist, numero='', timeout=3):
             numero -= 1
     return itemlist
 
-def check_video_link(url, server, timeout=3):
+def check_video_link(item, timeout=3):
     """
-    Comprueba si el enlace a un video es valido y devuelve un string de 2 posiciones con la verificacion.
-    :param url, server: Link y servidor
-    :return: str(2) '??':No se ha podido comprobar. 'Ok':Parece que el link funciona. 'NO':Parece que no funciona.
-    """
+        Comprueba si el enlace a un video es valido y devuelve un string de 2 posiciones con la verificacion.
+        :param url, server: Link y servidor
+        :return: str(2) '??':No se ha podido comprobar. 'Ok':Parece que el link funciona. 'NO':Parece que no funciona.
+        """
+    url = item.url
+    server = item.server
     
     NK = "[COLOR 0xFFF9B613][B]" + u"\u2022".encode('utf-8') + "[/B][/COLOR]"
     OK = "[COLOR 0xFF00C289][B]" + u"\u2022".encode('utf-8') + "[/B][/COLOR]"
@@ -785,7 +787,7 @@ def check_video_link(url, server, timeout=3):
 
         finally:
             httptools.HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT = ant_timeout  # Restaurar tiempo de descarga
-            return resultado
+            return item, resultado
 
     logger.info("[check_video_link] No hay test_video_exists para servidor: %s" % server)
-    return NK
+    return item, NK
