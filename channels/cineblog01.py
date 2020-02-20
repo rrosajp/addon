@@ -35,7 +35,7 @@ def mainlist(item):
         ('HD', ['', 'menu', 'Film HD Streaming']),
         ('Generi', ['', 'menu', 'Film per Genere']),
         ('Anni', ['', 'menu', 'Film per Anno']),
-        ('Paese', ['', 'menu', 'Film per Paese']),        
+        ('Paese', ['', 'menu', 'Film per Paese']),
         ('Ultimi Aggiornati',['/lista-film-ultimi-100-film-aggiornati/', 'peliculas', 'newest']),
         ('Ultimi Aggiunti', ['/lista-film-ultimi-100-film-aggiunti/', 'peliculas', 'newest'])
     ]
@@ -63,7 +63,7 @@ def menu(item):
 
 # @support.scrape
 # def newest(categoria):
-#     
+#
 #     # debug = True
 #     patron = r'<a href="?(?P<url>[^">]+)"?>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N|SUB-ITA)\])?\s*(?:\[(?P<quality>HD|SD|HD/3D)\])?\s*\((?P<year>[0-9]{4})\)<\/a>'
 
@@ -93,7 +93,7 @@ def menu(item):
 
 def newest(categoria):
     support.log(categoria)
-    
+
     item = support.Item()
     try:
         if categoria == "series":
@@ -170,7 +170,7 @@ def episodios(item):
 
 
 def findvideos(item):
-    
+
 
     if item.contentType == "episode":
         return findvid_serie(item)
@@ -178,18 +178,15 @@ def findvideos(item):
     def load_links(itemlist, re_txt, color, desc_txt, quality=""):
         streaming = scrapertools.find_single_match(data, re_txt).replace('"', '')
         support.log('STREAMING',streaming)
-        support.log('STREAMING=', streaming)
-        # patron = '<td><a.*?href=(.*?) (?:target|rel)[^>]+>([^<]+)<'
-        patron = '<td><a.*?href=([^ ]+) [^>]+>([^<]+)<'
-        matches = re.compile(patron, re.DOTALL).findall(streaming)
-        for scrapedurl, scrapedtitle in matches:
-            logger.debug("##### findvideos %s ## %s ## %s ##" % (desc_txt, scrapedurl, scrapedtitle))
+        matches = support.match(streaming, patron = r'<td><a.*?href=([^ ]+) [^>]+>([^<]+)<').matches
+        for url, server in matches:
+            logger.debug("##### findvideos %s ## %s ## %s ##" % (desc_txt, url, server))
             itemlist.append(
                 Item(channel=item.channel,
                      action="play",
-                     title=scrapedtitle,
-                     url=scrapedurl,
-                     server=scrapedtitle,
+                     title=server,
+                     url=final_links(url),
+                     server=server,
                      fulltitle=item.fulltitle,
                      thumbnail=item.thumbnail,
                      show=item.show,
@@ -220,15 +217,15 @@ def findvideos(item):
 
     # Estrae i contenuti - Streaming 3D
     load_links(itemlist, '<strong>Streamin?g 3D[^<]+</strong>(.*?)cbtable', "pink", "Streaming 3D")
-    
+
     itemlist=support.server(item, itemlist=itemlist)
     if itemlist and QualityStr:
         itemlist.insert(0,
             Item(channel=item.channel,
                  action="",
-                 title="[COLOR orange]%s[/COLOR]" % QualityStr,
+                 title=support.typo(QualityStr,'[] color kod bold'),
                  folder=False))
-    
+
     return itemlist
 
     # Estrae i contenuti - Download
@@ -239,23 +236,22 @@ def findvideos(item):
 
 
 def findvid_serie(item):
-    def load_vid_series(html, item, itemlist, blktxt):
-        logger.info('HTML' + html)
-        patron = r'<a href="([^"]+)"[^=]+="_blank"[^>]+>(?!<!--)(.*?)</a>'
+    def load_vid_series(html, item, itemlist, blktxt=''):
+        # logger.info('HTML' + html)
+        # patron = r'<a href="([^"]+)"[^=]+="_blank"[^>]+>(?!<!--)(.*?)</a>'
         # Estrae i contenuti
-        matches = re.compile(patron, re.DOTALL).finditer(html)
-        for match in matches:
-            scrapedurl = match.group(1)
-            scrapedtitle = ("%s" %  support.color(blktxt,"orange") + " - " if blktxt else "") + match.group(2)
-            # title = item.title + " [COLOR blue][" + scrapedtitle + "][/COLOR]"
+        # matches = re.compile(patron, re.DOTALL).finditer(html)
+        matches = support.match(html, patron = r'<a href="([^"]+)"[^=]+="_blank"[^>]+>(?!<!--)(.*?)</a>').matches
+        for url, server in matches:
             itemlist.append(
                 Item(channel=item.channel,
                      action="play",
-                     title=scrapedtitle,
-                     url=scrapedurl,
-                     server=scrapedtitle,
+                     title=server,
+                     url=final_links(url),
+                     server=server,
                      fulltitle=item.fulltitle,
                      show=item.show,
+                     quality=blktxt,
                      contentType=item.contentType,
                      folder=False))
 
@@ -266,9 +262,9 @@ def findvid_serie(item):
     lnkblkp = []
 
     data = item.url
-    
+
     # Blocks with split
-    blk=re.split("(?:>\s*)?([A-Za-z\s0-9]*):\s*<",data,re.S)
+    blk=re.split(r"(?:>\s*)?([A-Za-z\s0-9]*):\s*<",data,re.S)
     blktxt=""
     for b in blk:
         if b[0:3]=="a h" or b[0:4]=="<a h":
@@ -280,9 +276,11 @@ def findvid_serie(item):
     return support.server(item, itemlist=itemlist)
 
 
-def play(item):
+def final_links(url):
     support.log()
     itemlist = []
+    item= Item()
+    item.url = url
     ### Handling new cb01 wrapper
     if host[9:] + "/film/" in item.url:
         iurl = httptools.downloadpage(item.url, only_headers=True, follow_redirects=False).headers.get("location", "")
@@ -306,9 +304,9 @@ def play(item):
             data, c = unshortenit.unwrap_30x_only(data)
         else:
             data = scrapertools.find_single_match(data, r'<a href="([^"]+)".*?class="btn-wrapper">.*?licca.*?</a>')
-        
+
         logger.debug("##### play go.php data ##\n%s\n##" % data)
     else:
         data = support.swzz_get_url(item)
 
-    return servertools.find_video_items(data=data)
+    return data
