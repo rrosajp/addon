@@ -736,13 +736,21 @@ def check_list_links(itemlist, numero='', timeout=3):
     El parámetro timeout indica un tope de espera para descargar la página
     """
     numero = ((int(numero) + 1) * 5) if numero != '' else 10
-    for it in itemlist:
-        if numero > 0 and it.server != '' and it.url != '':
-            verificacion = check_video_link(it.url, it.server, timeout)
-            it.title = verificacion + ' ' + it.title.strip()
-            logger.info('VERIFICATION= '+ verificacion)
-            it.alive = verificacion
-            numero -= 1
+    from lib.concurrent import futures
+    with futures.ThreadPoolExecutor() as executor:
+        checked = []
+        for it in itemlist:
+            if numero > 0 and it.server != '' and it.url != '':
+                checked.append(executor.submit(check_video_link, it, timeout))
+                numero -= 1
+        for link in futures.as_completed(checked):
+            res = link.result()
+            if res:
+                it = res[0]
+                verificacion = res[1]
+                it.title = verificacion + ' ' + it.title.strip()
+                logger.info('VERIFICATION= ' + verificacion)
+                it.alive = verificacion
     return itemlist
 
 def check_video_link(item, timeout=3):
