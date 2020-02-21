@@ -259,9 +259,6 @@ def downloadpage(url, **opt):
         from lib import cloudscraper
         session = cloudscraper.create_scraper()
         CF = True
-    elif opt.get('session', False):
-        session = opt['session']  # same session to speed up search
-        logger.info('same session')
     else:
         from lib import requests
         session = requests.session()
@@ -360,6 +357,7 @@ def downloadpage(url, **opt):
                                   timeout=opt['timeout'])
         except Exception as e:
             from lib import requests
+            req = requests.Response()
             if not opt.get('ignore_response_code', False) and not proxy_data.get('stat', ''):
                 response['data'] = ''
                 response['sucess'] = False
@@ -371,7 +369,6 @@ def downloadpage(url, **opt):
                     show_infobox(info_dict)
                 return type('HTTPResponse', (), response)
             else:
-                req = requests.Response()
                 req.status_code = str(e)
 
     else:

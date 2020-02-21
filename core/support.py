@@ -373,7 +373,7 @@ def scrape(func):
 
         log('PATRON= ', patron)
         if not data:
-            page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True, session=item.session)
+            page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True)
             # if url may be changed and channel has findhost to update
             if (not page.data or scrapertools.get_domain_from_url(page.url) != scrapertools.get_domain_from_url(item.url)) and 'findhost' in func.__globals__:
                 host = func.__globals__['findhost']()
@@ -382,8 +382,7 @@ def scrape(func):
                 jsontools.update_node(host, func.__module__.split('.')[-1], 'url')
                 parse[1] = scrapertools.get_domain_from_url(host)
                 item.url = urlparse.urlunparse(parse)
-                page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True,
-                                              session=item.session)
+                page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True)
             data = page.data.replace("'", '"')
             data = re.sub('\n|\t', ' ', data)
             data = re.sub(r'>\s+<', '> <', data)
