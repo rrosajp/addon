@@ -126,12 +126,12 @@ def check(background=False):
 
                             patched = apply_patch(text, (file['patch']+'\n').encode('utf-8'))
                             if patched != text:  # non eseguo se già applicata (es. scaricato zip da github)
+                                alreadyApplied = False
                                 if getShaStr(patched) == file['sha']:
                                     localFile.seek(0)
                                     localFile.truncate()
                                     localFile.writelines(patched)
                                     localFile.close()
-                                    alreadyApplied = False
                                 else:  # nel caso ci siano stati problemi
                                     logger.info('lo sha non corrisponde, scarico il file')
                                     localFile.close()
