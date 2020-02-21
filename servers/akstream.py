@@ -36,14 +36,20 @@ def test_video_exists(page_url):
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     logger.info(" url=" + page_url)
     video_urls = []
+    # dbg()
 
     global data
+    logger.info('PAGE DATA' + data)
     vres = scrapertools.find_multiple_matches(data, 'nowrap[^>]+>([^,]+)')
+    if not vres: vres = scrapertools.find_multiple_matches(data, '<td>(\d+x\d+)')
+
     data_pack = scrapertools.find_single_match(data, "</div>\n\s*<script[^>]+>(eval.function.p,a,c,k,e,.*?)\s*</script>")
     if data_pack != "":
         from lib import jsunpack
         data = jsunpack.unpack(data_pack)
 
+    block = scrapertools.find_single_match(data, "sources:\s\[([^\]]+)\]")
+    data = block if block else data
     # URL
     # logger.info(data)
     matches = scrapertools.find_multiple_matches(data, '(http.*?\.mp4)')
@@ -56,6 +62,4 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         video_urls.append([vres[i] + " mp4 [Akvideo] ", media_url.replace('https://', 'http://') + '|' + _headers])
         i = i + 1
 
-    for video_url in video_urls:
-        logger.info(" %s - %s" % (video_url[0], video_url[1]))
-    return sorted(video_urls, key=lambda x: x[0].split('x')[1])
+    return sorted(video_urls, key=lambda x: int(x[0].split('x')[0]))
