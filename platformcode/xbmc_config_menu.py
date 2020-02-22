@@ -3,13 +3,21 @@
 # XBMC Config Menu
 # ------------------------------------------------------------
 
+from __future__ import division
+#from builtins import str
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
+from builtins import range
+from past.utils import old_div
+
 import inspect
 import os
 
 import xbmcgui
 
 from core import channeltools
-from core import servertools
+from core import servertools, scrapertools
 from platformcode import config, logger
 
 
@@ -161,7 +169,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         self.callback = callback
         self.item = item
 
-        if type(custom_button) == dict:
+        if isinstance(custom_button, dict):
             self.custom_button = {}
             self.custom_button["label"] = custom_button.get("label", "")
             self.custom_button["function"] = custom_button.get("function", "")
@@ -245,12 +253,16 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
     def evaluate(self, index, cond):
         import re
 
+        ok = False
+
         # Si la condicion es True o False, no hay mas que evaluar, ese es el valor
-        if type(cond) == bool:
+        if isinstance(cond, bool):
             return cond
 
         # Obtenemos las condiciones
-        conditions = re.compile("(!?eq|!?gt|!?lt)?\(([^,]+),[\"|']?([^)|'|\"]*)['|\"]?\)[ ]*([+||])?").findall(cond)
+        # conditions = re.compile("(!?eq|!?gt|!?lt)?\(([^,]+),[\"|']?([^)|'|\"]*)['|\"]?\)[ ]*([+||])?").findall(cond)
+        conditions = re.compile(r'''(!?eq|!?gt|!?lt)?\s*\(\s*([^, ]+)\s*,\s*["']?([^"'\)]+)["']?\)([+|])?''').findall(cond)
+        # conditions = scrapertools.find_multiple_matches(cond, r"(!?eq|!?gt|!?lt)?\(([^,]+),[\"|']?([^)|'|\"]*)['|\"]?\)[ ]*([+||])?")
         for operator, id, value, next in conditions:
             # El id tiene que ser un numero, sino, no es valido y devuelve False
             try:
@@ -276,7 +288,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
 
                 if value.startswith('@') and unicode(value[1:]).isnumeric():
                     value = config.get_localized_string(int(value[1:]))
-            
+
             # Operaciones lt "menor que" y gt "mayor que", requieren que las comparaciones sean numeros, sino devuelve
             # False
             if operator in ["lt", "!lt", "gt", "!gt"]:
@@ -294,9 +306,9 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                     pass
 
                 # valor bool
-                if value.lower() == "true":
+                if not isinstance(value, int) and value.lower() == "true":
                     value = True
-                elif value.lower() == "false":
+                elif not isinstance(value, int) and value.lower() == "false":
                     value = False
 
             # operacion "eq" "igual a"
@@ -515,7 +527,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                 continue
             if c["type"] == "list" and "lvalues" not in c:
                 continue
-            if c["type"] == "list" and not type(c["lvalues"]) == list:
+            if c["type"] == "list" and not isinstance(c["lvalues"], list):
                 continue
             if c["type"] == "list" and not len(c["lvalues"]) > 0:
                 continue
@@ -590,7 +602,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         self.check_ok(self.values)
 
     def dispose_controls(self, index, focus=False, force=False):
-        show_controls = self.controls_height / self.height_control - 1
+        show_controls = old_div(self.controls_height, self.height_control) - 1
 
         visible_count = 0
 
@@ -609,7 +621,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
             if index < 0: index = 0
             new_index = index
 
-        if self.index <> new_index or force:
+        if self.index != new_index or force:
             for x, c in enumerate(self.visible_controls):
                 if x < new_index or visible_count > show_controls or not c["show"]:
                     self.set_visible(c, False)
@@ -693,7 +705,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                 else:
                     self.return_value = getattr(cb_channel, self.custom_button['function'])(self.item, self.values)
                     if not self.custom_button["close"]:
-                        if isinstance(self.return_value, dict) and self.return_value.has_key("label"):
+                        if isinstance(self.return_value, dict) and "label" in self.return_value:
                             self.getControl(10006).setLabel(self.return_value['label'])
 
                         for c in self.list_controls:
@@ -757,23 +769,23 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         # Controles de ajustes, si se cambia el valor de un ajuste, cambiamos el valor guardado en el diccionario de
         # valores
         # Obtenemos el control sobre el que se ha echo click
-        control = self.getControl(id)
+        # control = self.getControl(id)
 
         # Lo buscamos en el listado de controles
         for cont in self.list_controls:
 
             # Si el control es un "downBtn" o "upBtn" son los botones del "list"
             # en este caso cambiamos el valor del list
-            if cont["type"] == "list" and (cont["downBtn"] == control or cont["upBtn"] == control):
+            if cont["type"] == "list" and (cont["downBtn"].getId() == id or cont["upBtn"].getId() == id):
 
                 # Para bajar una posicion
-                if cont["downBtn"] == control:
+                if cont["downBtn"].getId() == id:
                     index = cont["lvalues"].index(cont["label"].getLabel())
                     if index > 0:
                         cont["label"].setLabel(cont["lvalues"][index - 1])
 
                 # Para subir una posicion
-                elif cont["upBtn"] == control:
+                elif cont["upBtn"].getId() == id:
                     index = cont["lvalues"].index(cont["label"].getLabel())
                     if index < len(cont["lvalues"]) - 1:
                         cont["label"].setLabel(cont["lvalues"][index + 1])
@@ -782,11 +794,11 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                 self.values[cont["id"]] = cont["lvalues"].index(cont["label"].getLabel())
 
             # Si esl control es un "bool", guardamos el nuevo valor True/False
-            if cont["type"] == "bool" and cont["control"] == control:
+            if cont["type"] == "bool" and cont["control"].getId() == id:
                 self.values[cont["id"]] = bool(cont["control"].isSelected())
 
             # Si esl control es un "text", guardamos el nuevo valor
-            if cont["type"] == "text" and cont["control"] == control:
+            if cont["type"] == "text" and cont["control"].getId() == id:
                 # Versiones antiguas requieren abrir el teclado manualmente
                 if xbmcgui.ControlEdit == ControlEdit:
                     import xbmc
@@ -817,9 +829,9 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         if action == 1:
             # Si el foco no está en ninguno de los tres botones inferiores, y esta en un "list" cambiamos el valor
             if focus not in [10004, 10005, 10006]:
-                control = self.getFocus()
+                control = self.getFocus().getId()
                 for cont in self.list_controls:
-                    if cont["type"] == "list" and cont["control"] == control:
+                    if cont["type"] == "list" and cont["control"].getId() == control:
                         index = cont["lvalues"].index(cont["label"].getLabel())
                         if index > 0:
                             cont["label"].setLabel(cont["lvalues"][index - 1])
@@ -843,9 +855,9 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         elif action == 2:
             # Si el foco no está en ninguno de los tres botones inferiores, y esta en un "list" cambiamos el valor
             if focus not in [10004, 10005, 10006]:
-                control = self.getFocus()
+                control = self.getFocus().getId()
                 for cont in self.list_controls:
-                    if cont["type"] == "list" and cont["control"] == control:
+                    if cont["type"] == "list" and cont["control"].getId() == control:
                         index = cont["lvalues"].index(cont["label"].getLabel())
                         if index < len(cont["lvalues"]) - 1:
                             cont["label"].setLabel(cont["lvalues"][index + 1])
@@ -870,11 +882,9 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
             # Si el foco no está en ninguno de los tres botones inferiores, bajamos el foco en los controles de ajustes
             if focus not in [10004, 10005, 10006]:
                 try:
-                    focus_control = \
-                        [self.visible_controls.index(c) for c in self.visible_controls if
-                         c["control"] == self.getFocus()][
-                            0]
+                    focus_control = [self.visible_controls.index(c) for c in self.visible_controls if c["control"].getId() == self.getFocus().getId()][0]
                     focus_control += 1
+
                 except:
                     focus_control = 0
 
@@ -895,9 +905,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
             if focus not in [10003, 10004, 10005, 10006]:
                 try:
                     focus_control = \
-                        [self.visible_controls.index(c) for c in self.visible_controls if
-                         c["control"] == self.getFocus()][
-                            0]
+                        [self.visible_controls.index(c) for c in self.visible_controls if c["control"].getId() == self.getFocus().getId()][0]
                     focus_control -= 1
 
                     while not focus_control == -1 and (self.visible_controls[focus_control]["type"] == "label" or not
@@ -936,11 +944,11 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         elif action == 504:
 
             if self.xx > raw_action.getAmount2():
-                if (self.xx - int(raw_action.getAmount2())) / self.height_control:
+                if old_div((self.xx - int(raw_action.getAmount2())), self.height_control):
                     self.xx -= self.height_control
                     self.dispose_controls(self.index + 1)
             else:
-                if (int(raw_action.getAmount2()) - self.xx) / self.height_control:
+                if old_div((int(raw_action.getAmount2()) - self.xx), self.height_control):
                     self.xx += self.height_control
                 self.dispose_controls(self.index - 1)
             return
@@ -981,7 +989,7 @@ class ControlEdit(xbmcgui.ControlButton):
 
     def setWidth(self, w):
         xbmcgui.ControlButton.setWidth(self, w)
-        self.textControl.setWidth(w / 2)
+        self.textControl.setWidth(old_div(w, 2))
 
     def setHeight(self, w):
         xbmcgui.ControlButton.setHeight(self, w)
@@ -992,7 +1000,7 @@ class ControlEdit(xbmcgui.ControlButton):
         if xbmcgui.__version__ == "1.2":
             self.textControl.setPosition(x + self.getWidth(), y)
         else:
-            self.textControl.setPosition(x + self.getWidth() / 2, y)
+            self.textControl.setPosition(x + old_div(self.getWidth(), 2), y)
 
     def setText(self, text):
         self.text = text

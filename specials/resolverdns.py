@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
 import ssl
-import urlparse
+try:
+    import urlparse
+except:
+    import urllib.parse as urlparse
 
 from lib.requests_toolbelt.adapters import host_header_ssl
 from lib import doh
@@ -74,7 +77,6 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
                 logger.error('Failed to resolve hostname, fallback to normal dns')
                 import traceback
                 logger.error(traceback.print_exc())
-                ip = domain
         return ip
 
     def writeToCache(self, domain, ip):
@@ -105,39 +107,41 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
             domain = parse.netloc
         else:
             raise requests.exceptions.URLRequired
-        self.ssl_context = CustomContext(protocol, domain)
-        if self.CF:
-            self.ssl_context.options |= (ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1)
-        self.ssl_context.set_ciphers(self.cipherSuite)
-        self.init_poolmanager(self._pool_connections, self._pool_maxsize, block=self._pool_block)
         ip = self.getIp(domain)
+        if ip:
+            self.ssl_context = CustomContext(protocol, domain)
+            if self.CF:
+                self.ssl_context.options |= (ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1)
+            self.ssl_context.set_ciphers(self.cipherSuite)
+            self.init_poolmanager(self._pool_connections, self._pool_maxsize, block=self._pool_block)
+            realUrl = request.url
 
-        realUrl = request.url
-
-        if request.headers:
-            request.headers["Host"] = domain
-        else:
-            request.headers = {"Host": domain}
-        ret = None
-        tryFlush = False
-
-        parse = list(parse)
-        parse[1] = ip
-        request.url = urlparse.urlunparse(parse)
-        try:
-            ret = super(CipherSuiteAdapter, self).send(request, **kwargs)
-        except Exception as e:
-            logger.info('Request for ' + domain + ' with ip ' + ip + ' failed')
-            logger.info(e)
-            if 'SSLError' in str(e):
-                # disabilito
-                config.set_setting("resolver_dns", False)
-                request.url = realUrl
-                ret = super(CipherSuiteAdapter, self).send(request, **kwargs)
+            if request.headers:
+                request.headers["Host"] = domain
             else:
+                request.headers = {"Host": domain}
+            ret = None
+            tryFlush = False
+
+            parse = list(parse)
+            parse[1] = ip
+            request.url = urlparse.urlunparse(parse)
+            try:
+                ret = super(CipherSuiteAdapter, self).send(request, **kwargs)
+            except Exception as e:
+                logger.info('Request for ' + domain + ' with ip ' + ip + ' failed')
+                logger.info(e)
+                # if 'SSLError' in str(e):
+                #     # disabilito
+                #     config.set_setting("resolver_dns", False)
+                #     request.url = realUrl
+                #     ret = super(CipherSuiteAdapter, self).send(request, **kwargs)
+                # else:
                 tryFlush = True
-        if tryFlush and not flushedDns:  # re-request ips and update cache
-            logger.info('Flushing dns cache for ' + domain)
-            return self.flushDns(request, domain, **kwargs)
-        ret.url = realUrl
+            if tryFlush and not flushedDns:  # re-request ips and update cache
+                logger.info('Flushing dns cache for ' + domain)
+                return self.flushDns(request, domain, **kwargs)
+            ret.url = realUrl
+        else:
+            ret = super(host_header_ssl.HostHeaderSSLAdapter, self).send(request, **kwargs)
         return ret

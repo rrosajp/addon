@@ -3,18 +3,32 @@
 # Server management
 # --------------------------------------------------------------------------------
 
-import os
+from __future__ import division
+from __future__ import absolute_import
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
+
+if PY3:
+    #from future import standard_library
+    #standard_library.install_aliases()
+    import urllib.parse as urlparse                             # Es muy lento en PY2.  En PY3 es nativo
+else:
+    import urlparse                                             # Usamos el nativo de PY2 que es más rápido
+
+from future.builtins import range
+from past.utils import old_div
+
+import datetime
 import re
+import time
 
-import filetools
-import urlparse
-
+from core import filetools
 from core import httptools
 from core import jsontools
 from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
-# from servers.decrypters import zcrypt
 from lib import unshortenit
 
 dict_servers_parameters = {}
@@ -80,7 +94,7 @@ def get_servers_itemlist(itemlist, fnc=None, sort=False):
     @type sort: bool
     """
     # Recorre los servidores
-    for serverid in get_servers_list().keys():
+    for serverid in list(get_servers_list().keys()):
         server_parameters = get_server_parameters(serverid)
 
         # Recorre los patrones
@@ -105,18 +119,18 @@ def get_servers_itemlist(itemlist, fnc=None, sort=False):
                             item.url = url
 
     # Eliminamos los servidores desactivados
-    itemlist = filter(lambda i: not i.server or is_server_enabled(i.server), itemlist)
+    #itemlist = filter(lambda i: not i.server or is_server_enabled(i.server), itemlist)
+    # Filtrar si es necesario
+    itemlist = filter_servers(itemlist)
 
     for item in itemlist:
-        # Asignamos "directo" en caso de que el server no se encuentre en pelisalcarta
+        # Asignamos "directo" en caso de que el server no se encuentre en Alfa
         if not item.server and item.url:
-            item.server = 'directo'
+            item.server = "directo"
 
         if fnc:
             item.title = fnc(item)
 
-    # Filtrar si es necesario
-    itemlist = filter_servers(itemlist)
 
     # Ordenar segun favoriteslist si es necesario
     if sort:
@@ -137,7 +151,8 @@ def findvideos(data, skip=False):
     logger.info()
     devuelve = []
     skip = int(skip)
-    servers_list = get_servers_list().keys()
+    servers_list = list(get_servers_list().keys())
+
 
     # Ordenar segun favoriteslist si es necesario
     servers_list = sort_servers(servers_list)
@@ -145,8 +160,8 @@ def findvideos(data, skip=False):
 
     # Ejecuta el findvideos en cada servidor activo
     for serverid in servers_list:
-        if not is_server_enabled(serverid):
-            continue
+        '''if not is_server_enabled(serverid):
+            continue'''
         if config.get_setting("filter_servers") == True and config.get_setting("black_list", server=serverid):
             is_filter_servers = True
             continue
@@ -167,6 +182,8 @@ def findvideosbyserver(data, serverid):
         return []
 
     server_parameters = get_server_parameters(serverid)
+    if not server_parameters["active"]:
+        return []
     devuelve = []
     if "find_videos" in server_parameters:
         # Recorre los patrones
@@ -229,6 +246,8 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
 
     # Si el vídeo es "directo" o "local", no hay que buscar más
     if server == "directo" or server == "local":
+        if isinstance(video_password, list):
+            return video_password, len(video_password) > 0, "<br/>".join(error_messages)
         logger.info("Server: %s, la url es la buena" % server)
         video_urls.append(["%s [%s]" % (urlparse.urlparse(url)[2][-4:], server), url])
 
@@ -309,7 +328,7 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
 
                 # Muestra el progreso
                 if muestra_dialogo:
-                    progreso.update((100 / len(opciones)) * opciones.index(opcion), config.get_localized_string(70180) % server_name)
+                    progreso.update((old_div(100, len(opciones))) * opciones.index(opcion), config.get_localized_string(70180) % server_name)
 
                 # Modo free
                 if opcion == "free":
@@ -377,7 +396,7 @@ def get_server_name(serverid):
     serverid = serverid.lower().split(".")[0]
 
     # Obtenemos el listado de servers
-    server_list = get_servers_list().keys()
+    server_list = list(get_servers_list().keys())
 
     # Si el nombre está en la lista
     if serverid in server_list:
@@ -445,25 +464,25 @@ def get_server_parameters(server):
     if server not in dict_servers_parameters:
         try:
             # Servers
-            if os.path.isfile(os.path.join(config.get_runtime_path(), "servers", server + ".json")):
-                path = os.path.join(config.get_runtime_path(), "servers", server + ".json")
+            if filetools.isfile(filetools.join(config.get_runtime_path(), "servers", server + ".json")):
+                path = filetools.join(config.get_runtime_path(), "servers", server + ".json")
 
             # Debriders
-            elif os.path.isfile(os.path.join(config.get_runtime_path(), "servers", "debriders", server + ".json")):
-                path = os.path.join(config.get_runtime_path(), "servers", "debriders", server + ".json")
+            elif filetools.isfile(filetools.join(config.get_runtime_path(), "servers", "debriders", server + ".json")):
+                path = filetools.join(config.get_runtime_path(), "servers", "debriders", server + ".json")
             #
             #Cuando no está bien definido el server en el canal (no existe conector), muestra error por no haber "path" y se tiene que revisar el canal
             #
-            data = filetools.read(path)
-            dict_server = jsontools.load(data)
+            dict_server = jsontools.load(filetools.read(path))
 
             # Imagenes: se admiten url y archivos locales dentro de "resources/images"
             if dict_server.get("thumbnail") and "://" not in dict_server["thumbnail"]:
-                dict_server["thumbnail"] = os.path.join("https://raw.githubusercontent.com/kodiondemand/media/master/resources/servers", dict_server["thumbnail"])
+                dict_server["thumbnail"] = filetools.join(config.get_runtime_path(), "resources", "media",
+                                                        "servers", dict_server["thumbnail"])
             for k in ['premium', 'id']:
                 dict_server[k] = dict_server.get(k, list())
 
-                if type(dict_server[k]) == str:
+                if isinstance(dict_server[k], str):
                     dict_server[k] = [dict_server[k]]
 
             if "find_videos" in dict_server:
@@ -497,7 +516,7 @@ def get_server_json(server_name):
         server_json = jsontools.load(filetools.read(server_path))
         # logger.info("server_json= %s" % server_json)
 
-    except Exception, ex:
+    except Exception as ex:
         template = "An exception of type %s occured. Arguments:\n%r"
         message = template % (type(ex).__name__, ex.args)
         logger.error(" %s" % message)
@@ -554,16 +573,16 @@ def get_server_setting(name, server, default=None):
 
         """
     # Creamos la carpeta si no existe
-    if not os.path.exists(os.path.join(config.get_data_path(), "settings_servers")):
-        os.mkdir(os.path.join(config.get_data_path(), "settings_servers"))
+    if not filetools.exists(filetools.join(config.get_data_path(), "settings_servers")):
+        filetools.mkdir(filetools.join(config.get_data_path(), "settings_servers"))
 
-    file_settings = os.path.join(config.get_data_path(), "settings_servers", server + "_data.json")
+    file_settings = filetools.join(config.get_data_path(), "settings_servers", server + "_data.json")
     dict_settings = {}
     dict_file = {}
-    if os.path.exists(file_settings):
+    if filetools.exists(file_settings):
         # Obtenemos configuracion guardada de ../settings/channel_data.json
         try:
-            dict_file = jsontools.load(open(file_settings, "rb").read())
+            dict_file = jsontools.load(filetools.read(file_settings))
             if isinstance(dict_file, dict) and 'settings' in dict_file:
                 dict_settings = dict_file['settings']
         except EnvironmentError:
@@ -580,10 +599,7 @@ def get_server_setting(name, server, default=None):
             dict_settings = default_settings
             dict_file['settings'] = dict_settings
             # Creamos el archivo ../settings/channel_data.json
-            json_data = jsontools.dump(dict_file)
-            try:
-                open(file_settings, "wb").write(json_data)
-            except EnvironmentError:
+            if not filetools.write(file_settings, jsontools.dump(dict_file)):
                 logger.info("ERROR al salvar el archivo: %s" % file_settings)
 
     # Devolvemos el valor del parametro local 'name' si existe, si no se devuelve default
@@ -592,18 +608,18 @@ def get_server_setting(name, server, default=None):
 
 def set_server_setting(name, value, server):
     # Creamos la carpeta si no existe
-    if not os.path.exists(os.path.join(config.get_data_path(), "settings_servers")):
-        os.mkdir(os.path.join(config.get_data_path(), "settings_servers"))
+    if not filetools.exists(filetools.join(config.get_data_path(), "settings_servers")):
+        filetools.mkdir(filetools.join(config.get_data_path(), "settings_servers"))
 
-    file_settings = os.path.join(config.get_data_path(), "settings_servers", server + "_data.json")
+    file_settings = filetools.join(config.get_data_path(), "settings_servers", server + "_data.json")
     dict_settings = {}
 
     dict_file = None
 
-    if os.path.exists(file_settings):
+    if filetools.exists(file_settings):
         # Obtenemos configuracion guardada de ../settings/channel_data.json
         try:
-            dict_file = jsontools.load(open(file_settings, "r").read())
+            dict_file = jsontools.load(filetools.read(file_settings))
             dict_settings = dict_file.get('settings', {})
         except EnvironmentError:
             logger.info("ERROR al leer el archivo: %s" % file_settings)
@@ -617,10 +633,7 @@ def set_server_setting(name, value, server):
     dict_file['settings'] = dict_settings
 
     # Creamos el archivo ../settings/channel_data.json
-    try:
-        json_data = jsontools.dump(dict_file)
-        open(file_settings, "w").write(json_data)
-    except EnvironmentError:
+    if not filetools.write(file_settings, jsontools.dump(dict_file)):
         logger.info("ERROR al salvar el archivo: %s" % file_settings)
         return None
 
@@ -636,11 +649,10 @@ def get_servers_list():
     @rtype: dict
     """
     server_list = {}
-    for server in os.listdir(os.path.join(config.get_runtime_path(), "servers")):
+    for server in filetools.listdir(filetools.join(config.get_runtime_path(), "servers")):
         if server.endswith(".json") and not server == "version.json":
             server_parameters = get_server_parameters(server)
-            if server_parameters["active"] == True:
-                server_list[server.split(".")[0]] = server_parameters
+            server_list[server.split(".")[0]] = server_parameters
 
     return server_list
 
@@ -654,7 +666,7 @@ def get_debriders_list():
     @rtype: dict
     """
     server_list = {}
-    for server in os.listdir(os.path.join(config.get_runtime_path(), "servers", "debriders")):
+    for server in filetools.listdir(filetools.join(config.get_runtime_path(), "servers", "debriders")):
         if server.endswith(".json"):
             server_parameters = get_server_parameters(server)
             if server_parameters["active"] == True:
@@ -678,6 +690,7 @@ def sort_servers(servers_list):
         else:
             servers_list = sorted(servers_list,
                                   key=lambda x: config.get_setting("favorites_servers_list", server=x) or 100)
+
     return servers_list
 
 
@@ -689,18 +702,26 @@ def filter_servers(servers_list):
     u objetos Item. En cuyo caso es necesario q tengan un atributo item.server del tipo str.
     :return: Lista del mismo tipo de objetos que servers_list filtrada en funcion de la Lista Negra.
     """
+    #Eliminamos los inactivos
+    if servers_list:
+        servers_list = [i for i in servers_list if not i.server or is_server_enabled(i.server)]
+
+    
     if servers_list and config.get_setting('filter_servers'):
         if isinstance(servers_list[0], Item):
-            servers_list_filter = filter(lambda x: not config.get_setting("black_list", server=x.server), servers_list)
+            servers_list_filter = [x for x in servers_list if not config.get_setting("black_list", server=x.server)]
         else:
-            servers_list_filter = filter(lambda x: not config.get_setting("black_list", server=x), servers_list)
+            servers_list_filter = [x for x in servers_list if not config.get_setting("black_list", server=x)]
 
         # Si no hay enlaces despues de filtrarlos
         if servers_list_filter or not platformtools.dialog_yesno(config.get_localized_string(60000),
                                                                  config.get_localized_string(60010),
                                                                  config.get_localized_string(70281)):
             servers_list = servers_list_filter
-
+    
+    if config.get_setting("favorites_servers") == True:
+        servers_list = sort_servers(servers_list)
+    
     return servers_list
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -715,21 +736,31 @@ def check_list_links(itemlist, numero='', timeout=3):
     El parámetro timeout indica un tope de espera para descargar la página
     """
     numero = ((int(numero) + 1) * 5) if numero != '' else 10
-    for it in itemlist:
-        if numero > 0 and it.server != '' and it.url != '':
-            verificacion = check_video_link(it.url, it.server, timeout)
-            it.title = verificacion + ' ' + it.title.strip()
-            logger.info('VERIFICATION= '+ verificacion)
-            it.alive = verificacion
-            numero -= 1
+    from lib.concurrent import futures
+    with futures.ThreadPoolExecutor() as executor:
+        checked = []
+        for it in itemlist:
+            if numero > 0 and it.server != '' and it.url != '':
+                checked.append(executor.submit(check_video_link, it, timeout))
+                numero -= 1
+        for link in futures.as_completed(checked):
+            res = link.result()
+            if res:
+                it = res[0]
+                verificacion = res[1]
+                it.title = verificacion + ' ' + it.title.strip()
+                logger.info('VERIFICATION= ' + verificacion)
+                it.alive = verificacion
     return itemlist
 
-def check_video_link(url, server, timeout=3):
+def check_video_link(item, timeout=3):
     """
-    Comprueba si el enlace a un video es valido y devuelve un string de 2 posiciones con la verificacion.
-    :param url, server: Link y servidor
-    :return: str(2) '??':No se ha podido comprobar. 'Ok':Parece que el link funciona. 'NO':Parece que no funciona.
-    """
+        Comprueba si el enlace a un video es valido y devuelve un string de 2 posiciones con la verificacion.
+        :param url, server: Link y servidor
+        :return: str(2) '??':No se ha podido comprobar. 'Ok':Parece que el link funciona. 'NO':Parece que no funciona.
+        """
+    url = item.url
+    server = item.server
     
     NK = "[COLOR 0xFFF9B613][B]" + u"\u2022".encode('utf-8') + "[/B][/COLOR]"
     OK = "[COLOR 0xFF00C289][B]" + u"\u2022".encode('utf-8') + "[/B][/COLOR]"
@@ -744,7 +775,7 @@ def check_video_link(url, server, timeout=3):
     except:
         server_module = None
         logger.info("[check_video_link] No se puede importar el servidor! %s" % server)
-        return NK
+        return item, NK
         
     if hasattr(server_module, 'test_video_exists'):
         ant_timeout = httptools.HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT
@@ -764,7 +795,7 @@ def check_video_link(url, server, timeout=3):
 
         finally:
             httptools.HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT = ant_timeout  # Restaurar tiempo de descarga
-            return resultado
+            return item, resultado
 
     logger.info("[check_video_link] No hay test_video_exists para servidor: %s" % server)
-    return NK
+    return item, NK

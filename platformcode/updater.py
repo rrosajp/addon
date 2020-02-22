@@ -2,7 +2,7 @@
 import io
 import os
 import shutil
-from cStringIO import StringIO
+from lib.six import BytesIO
 
 from core import filetools
 from platformcode import logger, platformtools
@@ -15,7 +15,9 @@ try:
     import urllib.request as urllib
 except ImportError:
     import urllib
-
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 addon = xbmcaddon.Addon('plugin.video.kod')
 
 _hdr_pat = re.compile("^@@ -(\d+),?(\d+)? \+(\d+),?(\d+)? @@.*")
@@ -33,7 +35,7 @@ def loadCommits(page=1):
     apiLink = 'https://api.github.com/repos/' + user + '/' + repo + '/commits?sha=' + branch + "&page=" + str(page)
     logger.info(apiLink)
     # riprova ogni secondo finchè non riesce (ad esempio per mancanza di connessione)
-    for n in xrange(10):
+    for n in range(10):
         try:
             commitsLink = urllib.urlopen(apiLink).read()
             ret = json.loads(commitsLink)
@@ -112,24 +114,26 @@ def check(background=False):
                         if 'patch' in file:
                             text = ""
                             try:
-                                localFile = open(addonDir + file["filename"], 'r+')
+                                localFile = io.open(addonDir + file["filename"], 'r+', encoding="utf8")
                                 text = localFile.read()
+                                if not PY3:
+                                    text = text.decode('utf-8')
                             except IOError: # nuovo file
                                 # crea le cartelle se non esistono
                                 dirname = os.path.dirname(addonDir + file["filename"])
                                 if not os.path.exists(dirname):
                                     os.makedirs(dirname)
 
-                                localFile = open(addonDir + file["filename"], 'w')
+                                localFile = io.open(addonDir + file["filename"], 'w', encoding="utf8")
 
                             patched = apply_patch(text, (file['patch']+'\n').encode('utf-8'))
                             if patched != text:  # non eseguo se già applicata (es. scaricato zip da github)
+                                alreadyApplied = False
                                 if getShaStr(patched) == file['sha']:
                                     localFile.seek(0)
                                     localFile.truncate()
                                     localFile.writelines(patched)
                                     localFile.close()
-                                    alreadyApplied = False
                                 else:  # nel caso ci siano stati problemi
                                     logger.info('lo sha non corrisponde, scarico il file')
                                     localFile.close()
@@ -250,7 +254,7 @@ def apply_patch(s,patch,revert=False):
 
 def getSha(path):
     try:
-        f = open(path, 'rb')
+        f = io.open(path, 'rb', encoding="utf8")
     except:
         return ''
     size = len(f.read())
@@ -259,7 +263,11 @@ def getSha(path):
 
 
 def getShaStr(str):
-    return githash.blob_hash(StringIO(str), len(str)).hexdigest()
+    if PY3:
+        return githash.blob_hash(BytesIO(str.encode('utf-8')), len(str.encode('utf-8'))).hexdigest()
+    else:
+        return githash.blob_hash(BytesIO(str), len(str)).hexdigest()
+
 
 
 def updateFromZip(message='Installazione in corso...'):
@@ -267,7 +275,7 @@ def updateFromZip(message='Installazione in corso...'):
     dp.update(0)
 
     remotefilename = 'https://github.com/' + user + "/" + repo + "/archive/" + branch + ".zip"
-    localfilename = os.path.join(xbmc.translatePath("special://home/addons/"), "plugin.video.kod.update.zip").encode('utf-8')
+    localfilename = filetools.join(xbmc.translatePath("special://home/addons/"), "plugin.video.kod.update.zip")
     destpathname = xbmc.translatePath("special://home/addons/")
 
     logger.info("remotefilename=%s" % remotefilename)
@@ -306,7 +314,7 @@ def updateFromZip(message='Installazione in corso...'):
             for member in zip.infolist():
                 zip.extract(member, destpathname)
                 cur_size += member.file_size
-                dp.update(80 + cur_size * 19 / size)
+                dp.update(int(90 + cur_size * 9 / size))
 
     except Exception as e:
         logger.info('Non sono riuscito ad estrarre il file zip')
@@ -417,13 +425,14 @@ def fOpen(file, mode = 'r'):
         logger.info('android, uso FileIO per leggere')
         return io.FileIO(file, mode)
     else:
-        return open(file, mode)
+        return io.open(file, mode)
 
 
 def _pbhook(numblocks, blocksize, filesize, url, dp):
     try:
         percent = min((numblocks*blocksize*90)/filesize, 100)
-        dp.update(percent)
-    except:
+        dp.update(int(percent))
+    except Exception as e:
+        logger.error(e)
         percent = 90
         dp.update(percent)

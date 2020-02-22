@@ -9,34 +9,49 @@ except ImportError:
     import urllib
 
 from core import httptools, scrapertools
-from platformcode import logger, config
+from platformcode import logger, config, platformtools
 
 headers = [['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0']]
 
 def test_video_exists(page_url):
+    def int_bckup_method():
+        global data,headers
+        page_url = scrapertools.find_single_match(data, r"""<center><a href='(https?:\/\/wstream[^']+)'\s*title='bkg'""")
+        if page_url:
+            data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True, post={'g-recaptcha-response': captcha}).data
+
     logger.info("(page_url='%s')" % page_url)
     resp = httptools.downloadpage(page_url)
     global data
     data = resp.data
+
+    sitekey = scrapertools.find_single_match(data, 'data-sitekey="([^"]+)')
+    captcha = platformtools.show_recaptcha(sitekey, page_url) if sitekey else ''
+
     page_url = resp.url
     if '/streaming.php' in page_url in page_url:
-        code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers['location'].split('/')[-1].replace('.html','')
-        logger.info('WCODE='+code)
+        code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers['location'].split('/')[-1].replace('.html', '')
+        logger.info('WCODE=' + code)
         page_url = 'https://wstream.video/video.php?file_code=' + code
         data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True).data
 
     possibleParam = scrapertools.find_multiple_matches(data, r"""<input.*?(?:name=["']([^'"]+).*?value=["']([^'"]*)['"]>|>)""")
     if possibleParam:
-        post = urllib.urlencode({param[0]: param[1] for param in possibleParam if param[0]})
-        data = httptools.downloadpage(page_url, headers=headers, post=post, follow_redirects=True).data
+        post = {param[0]: param[1] for param in possibleParam if param[0]}
+        if captcha: post['g-recaptcha-response'] = captcha
+        if post:
+            data = httptools.downloadpage(page_url, headers=headers, post=post, follow_redirects=True).data
+        elif captcha:
+            int_bckup_method()
+    elif captcha:
+        int_bckup_method()
     else:
-        page_url = scrapertools.find_single_match(data, r"""<center><a href='(https?:\/\/wstream[^']+)'\s*title='bkg'""")
-        if page_url:
-            data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True).data
+        return False, config.get_localized_string(707434)
 
     if "Not Found" in data or "File was deleted" in data:
         return False, config.get_localized_string(70449) % 'Wstream'
-    return True, ""
+    else:
+        return True, ""
 
 
 # Returns an array of possible video url's from the page_url

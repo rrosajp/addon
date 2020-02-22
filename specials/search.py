@@ -3,8 +3,16 @@
 # -*- Created for Alfa-addon -*-
 # -*- By the Alfa Develop Group -*-
 
+from __future__ import division
+from builtins import range
+from past.utils import old_div
+#from builtins import str
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
+
 import os, json, time, inspect, channelselector
-from lib.concurrent import futures
+from concurrent import futures
 from core.item import Item
 from core import tmdb, scrapertools, channeltools, filetools, jsontools
 from channelselector import get_thumb
@@ -181,9 +189,6 @@ def channel_search(item):
 
     channel_list, channel_titles = get_channels(item)
 
-    import requests
-    session = requests.Session()
-
     searching += channel_list
     searching_titles += channel_titles
     cnt = 0
@@ -193,7 +198,7 @@ def channel_search(item):
     config.set_setting('tmdb_active', False)
 
     with futures.ThreadPoolExecutor(max_workers=set_workers()) as executor:
-        c_results = [executor.submit(get_channel_results, ch, item, session) for ch in channel_list]
+        c_results = [executor.submit(get_channel_results, ch, item) for ch in channel_list]
 
         for res in futures.as_completed(c_results):
             cnt += 1
@@ -206,7 +211,7 @@ def channel_search(item):
             if finished in searching:
                 searching_titles.remove(searching_titles[searching.index(finished)])
                 searching.remove(finished)
-                progress.update((cnt * 100) / len(channel_list), config.get_localized_string(70744) % str(len(channel_list) - cnt),
+                progress.update(old_div((cnt * 100), len(channel_list)), config.get_localized_string(70744) % str(len(channel_list) - cnt),
                                 str(searching_titles))
 
     progress.close()
@@ -221,7 +226,7 @@ def channel_search(item):
         ch_name = channel_titles[channel_list.index(key)]
         grouped = list()
         cnt += 1
-        progress.update((cnt * 100) / len(ch_list), config.get_localized_string(60295), config.get_localized_string(60293))
+        progress.update(old_div((cnt * 100), len(ch_list)), config.get_localized_string(60295), config.get_localized_string(60293))
         if len(value) <= max_results and item.mode != 'all':
             if len(value) == 1:
                 if not value[0].action or config.get_localized_string(70006).lower() in value[0].title.lower():
@@ -286,20 +291,18 @@ def channel_search(item):
     return valid + results
 
 
-def get_channel_results(ch, item, session):
+def get_channel_results(ch, item):
     max_results = 10
     results = list()
 
     ch_params = channeltools.get_channel_parameters(ch)
 
-    exec("from channels import " + ch_params["channel"] + " as module")
-
-    mainlist = module.mainlist(Item(channel=ch_params["channel"]))
+    module = __import__('channels.%s' % ch_params["channel"], fromlist=["channels.%s" % ch_params["channel"]])
+    mainlist = getattr(module, 'mainlist')(Item(channel=ch_params["channel"]))
     search_action = [elem for elem in mainlist if elem.action == "search" and (item.mode == 'all' or elem.contentType == item.mode)]
 
     if search_action:
         for search_ in search_action:
-            search_.session = session
             try:
                 results.extend(module.search(search_, item.text))
             except:
@@ -431,7 +434,7 @@ def setting_channel_new(item):
     elif presel_values[ret] == 'none':
         preselect = []
     elif presel_values[ret] == 'all':
-        preselect = range(len(ids))
+        preselect = list(range(len(ids)))
     elif presel_values[ret] in ['cast', 'lat']:
         preselect = []
         for i, lg in enumerate(lista_lang):
@@ -488,7 +491,7 @@ def genres_menu(item):
     mode = item.mode.replace('show', '')
 
     genres = tmdb.get_genres(mode)
-    for key, value in genres[mode].items():
+    for key, value in list(genres[mode].items()):
         discovery = {'url': 'discover/%s' % mode, 'with_genres': key,
                      'language': def_lang, 'page': '1'}
 

@@ -20,8 +20,8 @@ metodos:
 from __future__ import division
 from future import standard_library
 standard_library.install_aliases()
-from future.builtins import range
-from future.builtins import object
+from builtins import range
+from builtins import object
 from past.utils import old_div
 #from builtins import str
 import sys
@@ -243,7 +243,7 @@ class Downloader(object):
 
         # Abrimos en modo "a+" para que cree el archivo si no existe, luego en modo "r+b" para poder hacer seek()
         self.file = filetools.file_open(filetools.join(self._path, self._filename), "a+", vfs=VFS)
-        if self.file: self.file.close() 
+        if self.file: self.file.close()
         self.file = filetools.file_open(filetools.join(self._path, self._filename), "r+b", vfs=VFS)
         if not self.file:
             return
@@ -258,7 +258,7 @@ class Downloader(object):
         self.__get_download_info__()
 
         try:
-            logger.info("Initialized Download: Parts: %s | Path: %s | Archive: %s | Size: %s" % \
+            logger.info("Descarga inicializada: Partes: %s | Ruta: %s | Archivo: %s | Tamaño: %s" % \
                     (str(len(self._download_info["parts"])), self._pathencode('utf-8'), \
                     self._filenameencode('utf-8'), str(self._download_info["size"])))
         except:

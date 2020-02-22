@@ -40,14 +40,13 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
+    if config.is_xbmc():
+        itemlist.append(Item(title=config.get_localized_string(707429), channel="setting", action="report_menu",
+                             thumbnail=get_thumb("error.png"), viewmode="list"))
+
     itemlist.append(Item(channel=item.channel, action="", title=config.get_localized_string(60447),
                          thumbnail=get_thumb("help.png"),
                          folder=False))
-    if config.is_xbmc():
-        itemlist.append(Item(channel=item.channel, action="faq",
-                             title=config.get_localized_string(60448),
-                             thumbnail=get_thumb("help.png"),
-                             folder=False, extra="report_error"))
     itemlist.append(Item(channel=item.channel, action="faq",
                          title=config.get_localized_string(60449),
                          thumbnail=get_thumb("help.png"),

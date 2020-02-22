@@ -9,7 +9,6 @@ has been tested with Python2.7 and Python 3.4.
 
 from __future__ import print_function
 
-import argparse
 import os
 import stat
 import sys

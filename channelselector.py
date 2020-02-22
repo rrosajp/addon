@@ -69,7 +69,6 @@ def getmainlist(view="thumb_"):
     itemlist.append(Item(title=config.get_localized_string(30100), channel="setting", action="mainlist",
                          thumbnail=get_thumb(thumb_setting, view),
                          category=config.get_localized_string(30100), viewmode="list"))
-
     itemlist.append(Item(title=config.get_localized_string(30104) + " (v" + config.get_addon_version(with_fix=True) + ")", channel="help", action="mainlist",
                          thumbnail=get_thumb("help.png", view),
                          category=config.get_localized_string(30104), viewmode="list"))
@@ -109,7 +108,7 @@ def getchanneltypes(view="thumb_"):
 
 
     itemlist.append(Item(title=config.get_localized_string(70685), channel="community", action="mainlist", view=view,
-                         category=title, channel_type="all", thumbnail=get_thumb("channels_community.png", view),
+                         category=config.get_localized_string(70685), channel_type="all", thumbnail=get_thumb("channels_community.png", view),
                          viewmode="thumbnails"))
     return itemlist
 
@@ -150,9 +149,9 @@ def filterchannels(category, view="thumb_"):
             if channel_parameters["channel"] == 'community':
                 continue
 
-            # si el canal no es compatible, no se muestra
-            if not channel_parameters["compatible"]:
-                continue
+            # # si el canal no es compatible, no se muestra
+            # if not channel_parameters["compatible"]:
+            #     continue
 
             # Si no es un canal lo saltamos
             if not channel_parameters["channel"]:

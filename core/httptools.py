@@ -31,7 +31,7 @@ cookies_file = os.path.join(config.get_data_path(), "cookies.dat")
 default_headers = dict()
 default_headers["User-Agent"] = "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
 default_headers["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
-default_headers["Accept-Language"] = "es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3"
+default_headers["Accept-Language"] = "it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3"
 default_headers["Accept-Charset"] = "UTF-8"
 default_headers["Accept-Encoding"] = "gzip"
 
@@ -255,13 +255,11 @@ def downloadpage(url, **opt):
     domain = urlparse.urlparse(url).netloc
     CF = False
     if domain in ['www.guardaserie.media', 'casacinema.space', 'wstream.video', 'akvideo.stream', 'backin.net',
-                  'dreamsub.stream', 'altadefinizione-nuovo.link', 'ilgeniodellostreaming.si', 'www.piratestreaming.gratis']:
+                  'dreamsub.stream', 'altadefinizione-nuovo.link', 'ilgeniodellostreaming.si', 'www.piratestreaming.gratis',
+                  'altadefinizione.style']:
         from lib import cloudscraper
         session = cloudscraper.create_scraper()
         CF = True
-    elif opt.get('session', False):
-        session = opt['session']  # same session to speed up search
-        logger.info('same session')
     else:
         from lib import requests
         session = requests.session()
@@ -360,6 +358,7 @@ def downloadpage(url, **opt):
                                   timeout=opt['timeout'])
         except Exception as e:
             from lib import requests
+            req = requests.Response()
             if not opt.get('ignore_response_code', False) and not proxy_data.get('stat', ''):
                 response['data'] = ''
                 response['sucess'] = False
@@ -371,7 +370,6 @@ def downloadpage(url, **opt):
                     show_infobox(info_dict)
                 return type('HTTPResponse', (), response)
             else:
-                req = requests.Response()
                 req.status_code = str(e)
 
     else:
@@ -384,6 +382,10 @@ def downloadpage(url, **opt):
 
     response['data'] = req.content
     response['url'] = req.url
+
+    if type(response['data']) != str:
+        response['data'] = response['data'].decode('UTF-8')
+
     if not response['data']:
         response['data'] = ''
     try:

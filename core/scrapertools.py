@@ -1,15 +1,34 @@
 # -*- coding: utf-8 -*-
 # --------------------------------------------------------------------------------
-# Scraper tools v2 for reading and processing web elements
+# Scraper tools for reading and processing web elements
 # --------------------------------------------------------------------------------
+
+#from future import standard_library
+#standard_library.install_aliases()
+#from builtins import str
+#from builtins import chr
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
 import re
 import time
 
-import urlparse
-
+# from core import httptools
 from core.entities import html5
 from platformcode import logger
+
+
+# def get_header_from_response(url, header_to_get="", post=None, headers=None):
+#     header_to_get = header_to_get.lower()
+#     response = httptools.downloadpage(url, post=post, headers=headers, only_headers=True)
+#     return response.headers.get(header_to_get)
+
+
+# def read_body_and_headers(url, post=None, headers=None, follow_redirects=False, timeout=None):
+#     response = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects,
+#                                       timeout=timeout)
+#     return response.data, response.headers
 
 
 def printMatches(matches):
@@ -89,7 +108,10 @@ def unescape(text):
         else:
             # named entity
             try:
-                import htmlentitydefs
+                if PY3:
+                    import html.entities as htmlentitydefs
+                else:
+                    import htmlentitydefs
                 text = unichr(htmlentitydefs.name2codepoint[text[1:-1]]).encode("utf-8")
             except KeyError:
                 logger.error("keyerror")
@@ -101,6 +123,50 @@ def unescape(text):
     return re.sub("&#?\w+;", fixup, text)
 
     # Convierte los codigos html "&ntilde;" y lo reemplaza por "ñ" caracter unicode utf-8
+
+
+# def decodeHtmlentities(string):
+#     string = entitiesfix(string)
+#     entity_re = re.compile("&(#?)(\d{1,5}|\w{1,8});")
+
+#     def substitute_entity(match):
+#         if PY3:
+#             from html.entities import name2codepoint as n2cp
+#         else:
+#             from htmlentitydefs import name2codepoint as n2cp
+#         ent = match.group(2)
+#         if match.group(1) == "#":
+#             return unichr(int(ent)).encode('utf-8')
+#         else:
+#             cp = n2cp.get(ent)
+
+#             if cp:
+#                 return unichr(cp).encode('utf-8')
+#             else:
+#                 return match.group()
+
+#     return entity_re.subn(substitute_entity, string)[0]
+
+
+# def entitiesfix(string):
+#     # Las entidades comienzan siempre con el símbolo & , y terminan con un punto y coma ( ; ).
+#     string = string.replace("&aacute", "&aacute;")
+#     string = string.replace("&eacute", "&eacute;")
+#     string = string.replace("&iacute", "&iacute;")
+#     string = string.replace("&oacute", "&oacute;")
+#     string = string.replace("&uacute", "&uacute;")
+#     string = string.replace("&Aacute", "&Aacute;")
+#     string = string.replace("&Eacute", "&Eacute;")
+#     string = string.replace("&Iacute", "&Iacute;")
+#     string = string.replace("&Oacute", "&Oacute;")
+#     string = string.replace("&Uacute", "&Uacute;")
+#     string = string.replace("&uuml", "&uuml;")
+#     string = string.replace("&Uuml", "&Uuml;")
+#     string = string.replace("&ntilde", "&ntilde;")
+#     string = string.replace("&#191", "&#191;")
+#     string = string.replace("&#161", "&#161;")
+#     string = string.replace(";;", ";")
+#     return string
 
 
 def htmlclean(cadena):
@@ -292,8 +358,12 @@ def remove_show_from_title(title, show):
     return title
 
 
-# scrapertools.get_filename_from_url(media_url)[-4:]
 def get_filename_from_url(url):
+    if PY3:
+        import urllib.parse as urlparse                             # Es muy lento en PY2.  En PY3 es nativo
+    else:
+        import urlparse                                             # Usamos el nativo de PY2 que es más rápido
+
     parsed_url = urlparse.urlparse(url)
     try:
         filename = parsed_url.path
@@ -311,6 +381,11 @@ def get_filename_from_url(url):
 
 
 def get_domain_from_url(url):
+    if PY3:
+       import urllib.parse as urlparse                             # Es muy lento en PY2.  En PY3 es nativo
+    else:
+       import urlparse                                             # Usamos el nativo de PY2 que es más rápido
+
     parsed_url = urlparse.urlparse(url)
     try:
         filename = parsed_url.netloc

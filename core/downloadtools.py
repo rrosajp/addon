@@ -110,6 +110,8 @@ def limpia_nombre_excepto_1(s):
     stripped = ''.join(c for c in s if c in validchars)
     # Convierte a iso
     s = stripped.encode("iso-8859-1")
+    if PY3:
+        s = s.decode('utf-8')
     return s
 
 
@@ -129,7 +131,7 @@ def getfilefromtitle(url, title):
     logger.info("platform=" + plataforma)
 
     # nombrefichero = xbmc.makeLegalFilename(title + url[-4:])
-    from . import scrapertools
+    from core import scrapertools
 
     nombrefichero = title + scrapertools.get_filename_from_url(url)[-4:]
     logger.info("filename=%s" % nombrefichero)
@@ -169,7 +171,10 @@ def downloadbest(video_urls, title, continuar=False):
     for elemento in invertida:
         # videotitle = elemento[0]
         url = elemento[1]
-        logger.info("Downloading option " + title + " " + url.encode('ascii', 'ignore'))
+        if not PY3:
+            logger.info("Downloading option " + title + " " + url.encode('ascii', 'ignore'))
+        else:
+            logger.info("Downloading option " + title + " " + url.encode('ascii', 'ignore').decode('utf-8'))
 
         # Calcula el fichero donde debe grabar
         try:
@@ -621,7 +626,7 @@ def downloadfileGzipped(url, pathfichero):
                     break
                 except:
                     reintentos += 1
-                    logger.info("ERROR in block download, retry %dd" % reintentos)
+                    logger.info("ERROR in block download, retry %d" % reintentos)
                     for line in sys.exc_info():
                         logger.error("%s" % line)
 
@@ -660,7 +665,7 @@ def GetTitleFromFile(title):
     # Imprime en el log lo que va a descartar
     logger.info("title=" + title)
     plataforma = config.get_system_platform()
-    logger.info("platform=" + plataforma)
+    logger.info("plataform=" + plataforma)
 
     # nombrefichero = xbmc.makeLegalFilename(title + url[-4:])
     nombrefichero = title
@@ -678,7 +683,7 @@ def downloadIfNotModifiedSince(url, timestamp):
 
     # Convierte la fecha a GMT
     fecha_formateada = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime(timestamp))
-    logger.info("DateFormat=%s" % fecha_formateada)
+    logger.info("fechaFormateada=%s" % fecha_formateada)
 
     # Comprueba si ha cambiado
     inicio = time.clock()
@@ -700,11 +705,11 @@ def downloadIfNotModifiedSince(url, timestamp):
     except urllib.error.URLError as e:
         # Si devuelve 304 es que no ha cambiado
         if hasattr(e, 'code'):
-            logger.info("HTTP response code: %d" % e.code)
+            logger.info("HTTP response code : %d" % e.code)
             if e.code == 304:
                 logger.info("It has not changed")
                 updated = False
-        # Agarra los errores con codigo de respuesta del servidor externo solicitado     
+        # Agarra los errores con codigo de respuesta del servidor externo solicitado
         else:
             for line in sys.exc_info():
                 logger.error("%s" % line)
@@ -814,6 +819,7 @@ def download_all_episodes(item, channel, first_episode="", preferred_server="vid
 
         for mirror_item in mirrors_itemlist:
             logger.info("mirror=" + mirror_item.title)
+
             if "(Italiano)" in mirror_item.title:
                 idioma = "(Italiano)"
                 codigo_idioma = "it"
@@ -885,8 +891,8 @@ def download_all_episodes(item, channel, first_episode="", preferred_server="vid
 
 
 def episodio_ya_descargado(show_title, episode_title):
-    from . import scrapertools
-    ficheros = os.listdir(".")
+    from core import scrapertools
+    ficheros = filetools.listdir(".")
 
     for fichero in ficheros:
         # logger.info("fichero="+fichero)

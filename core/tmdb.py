@@ -1,10 +1,26 @@
 # -*- coding: utf-8 -*-
 
+#from future import standard_library
+#standard_library.install_aliases()
+#from builtins import str
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
+
+if PY3:
+    import urllib.parse as urllib                               # Es muy lento en PY2.  En PY3 es nativo
+else:
+    import urllib                                               # Usamos el nativo de PY2 que es más rápido
+
+from future.builtins import range
+from future.builtins import object
+
+import ast
+
 import copy
 import re
 import sqlite3
 import time
-import urllib
 
 import xbmcaddon
 
@@ -37,8 +53,8 @@ def_lang = addon.getSetting('language')
 #       tmdb.set_infoLabels(item, seekTmdb = True)
 #
 #       Obtener datos basicos de una pelicula:
-#           Antes de llamar al metodo set_infoLabels el titulo a buscar debe estar en item.fulltitle
-#           o en item.contentTitle y el año en item.infoLabels['year'].
+#           Antes de llamar al metodo set_infoLabels el titulo a buscar debe estar en item.contentTitle
+#           y el año en item.infoLabels['year'].
 #
 #       Obtener datos basicos de una serie:
 #           Antes de llamar al metodo set_infoLabels el titulo a buscar debe estar en item.show o en
@@ -72,7 +88,6 @@ def_lang = addon.getSetting('language')
 
 otmdb_global = None
 fname = filetools.join(config.get_data_path(), "kod_db.sqlite")
-
 
 def create_bd():
     conn = sqlite3.connect(fname)
@@ -160,7 +175,7 @@ def cache_response(fn):
                 conn = sqlite3.connect(fname, timeout=15)
                 c = conn.cursor()
                 url = re.sub('&year=-', '', args[0])
-                # logger.error('la url %s' % url)
+                if PY3: url = str.encode(url)
                 url_base64 = base64.b64encode(url)
                 c.execute("SELECT response, added FROM tmdb_cache WHERE url=?", (url_base64,))
                 row = c.fetchone()
@@ -171,7 +186,9 @@ def cache_response(fn):
                 # si no se ha obtenido información, llamamos a la funcion
                 if not result:
                     result = fn(*args)
-                    result_base64 = base64.b64encode(str(result))
+                    result = str(result)
+                    if PY3: result = str.encode(result)
+                    result_base64 = base64.b64encode(result)
                     c.execute("INSERT OR REPLACE INTO tmdb_cache (url, response, added) VALUES (?, ?, ?)",
                               (url_base64, result_base64, time.time()))
 
@@ -375,17 +392,19 @@ def set_infoLabels_item(item, seekTmdb=True, idioma_busqueda=def_lang, lock=None
                 # ... buscar datos temporada
                 item.infoLabels['mediatype'] = 'season'
                 temporada = otmdb_global.get_temporada(numtemporada)
+                if not isinstance(temporada, dict):
+                    temporada = ast.literal_eval(temporada.decode('utf-8'))
 
                 if temporada:
                     # Actualizar datos
                     __leer_datos(otmdb_global)
-                    item.infoLabels['title'] = temporada['name'] if temporada.has_key('name') else ''
-                    if temporada.has_key('overview') and temporada['overview']:
+                    item.infoLabels['title'] = temporada['name'] if 'name' in temporada else ''
+                    if 'overview' in  temporada and temporada['overview']:
                         item.infoLabels['plot'] = temporada['overview']
-                    if temporada.has_key('air_date') and temporada['air_date']:
+                    if 'air_date' in temporada and temporada['air_date']:
                         date = temporada['air_date'].split('-')
                         item.infoLabels['aired'] = date[2] + "/" + date[1] + "/" + date[0]
-                    if temporada.has_key('poster_path') and temporada['poster_path']:
+                    if 'poster_path' in temporada and temporada['poster_path']:
                         item.infoLabels['poster_path'] = 'http://image.tmdb.org/t/p/original' + temporada['poster_path']
                         item.thumbnail = item.infoLabels['poster_path']
 
@@ -445,12 +464,8 @@ def set_infoLabels_item(item, seekTmdb=True, idioma_busqueda=def_lang, lock=None
                     # Busqueda de pelicula por titulo...
                     if item.infoLabels['year'] or item.infoLabels['filtro']:
                         # ...y año o filtro
-                        if item.contentTitle:
-                            titulo_buscado = item.contentTitle
-                        else:
-                            titulo_buscado = item.fulltitle
-
-                        otmdb = Tmdb(texto_buscado=titulo_buscado, tipo=tipo_busqueda, idioma_busqueda=idioma_busqueda,
+                        searched_title = item.contentTitle if item.contentTitle else item.fulltitle
+                        otmdb = Tmdb(texto_buscado=searched_title, tipo=tipo_busqueda, idioma_busqueda=idioma_busqueda,
                                      filtro=item.infoLabels.get('filtro', {}), year=item.infoLabels['year'])
                 if otmdb is not None:
                     if otmdb.get_id() and config.get_setting("tmdb_plus_info", default=False):
@@ -492,7 +507,7 @@ def find_and_set_infoLabels(item):
         title = title.replace(year, "").strip()
         item.infoLabels['year'] = year[1:-1]
 
-    if not item.infoLabels.get("tmdb_id"):
+    if not item.infoLabels.get("tmdb_id") or not item.infoLabels.get("tmdb_id")[0].isdigit():
         if not item.infoLabels.get("imdb_id"):
             otmdb_global = Tmdb(texto_buscado=title, tipo=tipo_busqueda, year=item.infoLabels['year'])
         else:
@@ -588,7 +603,6 @@ def get_genres(type):
     return genres.dic_generos[lang]
 
 
-
 # Clase auxiliar
 class ResultDictDefault(dict):
     # Python 2.4
@@ -606,7 +620,7 @@ class ResultDictDefault(dict):
             return list()
         elif key == 'images_posters':
             posters = dict()
-            if 'images' in super(ResultDictDefault, self).keys() and \
+            if 'images' in list(super(ResultDictDefault, self).keys()) and \
                             'posters' in super(ResultDictDefault, self).__getitem__('images'):
                 posters = super(ResultDictDefault, self).__getitem__('images')['posters']
                 super(ResultDictDefault, self).__setattr__("images_posters", posters)
@@ -615,7 +629,7 @@ class ResultDictDefault(dict):
 
         elif key == "images_backdrops":
             backdrops = dict()
-            if 'images' in super(ResultDictDefault, self).keys() and \
+            if 'images' in list(super(ResultDictDefault, self).keys()) and \
                             'backdrops' in super(ResultDictDefault, self).__getitem__('images'):
                 backdrops = super(ResultDictDefault, self).__getitem__('images')['backdrops']
                 super(ResultDictDefault, self).__setattr__("images_backdrops", backdrops)
@@ -624,7 +638,7 @@ class ResultDictDefault(dict):
 
         elif key == "images_profiles":
             profiles = dict()
-            if 'images' in super(ResultDictDefault, self).keys() and \
+            if 'images' in list(super(ResultDictDefault, self).keys()) and \
                             'profiles' in super(ResultDictDefault, self).__getitem__('images'):
                 profiles = super(ResultDictDefault, self).__getitem__('images')['profiles']
                 super(ResultDictDefault, self).__setattr__("images_profiles", profiles)
@@ -640,7 +654,7 @@ class ResultDictDefault(dict):
 
     def tostring(self, separador=',\n'):
         ls = []
-        for i in super(ResultDictDefault, self).items():
+        for i in list(super(ResultDictDefault, self).items()):
             i_str = str(i)[1:-1]
             if isinstance(i[0], str):
                 old = i[0] + "',"
@@ -899,12 +913,16 @@ class Tmdb(object):
                 logger.info("[Tmdb.py] Filling in dictionary of genres")
 
                 resultado = cls.get_json(url)
+                if not isinstance(resultado, dict):
+                    resultado = ast.literal_eval(resultado.decode('utf-8'))
                 lista_generos = resultado["genres"]
 
                 for i in lista_generos:
                     cls.dic_generos[idioma][tipo][str(i["id"])] = i["name"]
             except:
                 logger.error("Error generating dictionaries")
+                import traceback
+                logger.error(traceback.format_exc())
 
     def __by_id(self, source='tmdb'):
 
@@ -926,6 +944,8 @@ class Tmdb(object):
 
             logger.info("[Tmdb.py] Searching %s:\n%s" % (buscando, url))
             resultado = self.get_json(url)
+            if not isinstance(resultado, dict):
+                resultado = ast.literal_eval(resultado.decode('utf-8'))
 
             if resultado:
                 if source != "tmdb":
@@ -942,14 +962,14 @@ class Tmdb(object):
             else:
                 # No hay resultados de la busqueda
                 msg = "The search of %s gave no results" % buscando
-                # logger.debug(msg)
+                logger.debug(msg)
 
     def __search(self, index_results=0, page=1):
         self.result = ResultDictDefault()
         results = []
-        total_results = 0
         text_simple = self.busqueda_texto.lower()
         text_quote = urllib.quote(text_simple)
+        total_results = 0
         total_pages = 0
         buscando = ""
 
@@ -957,15 +977,17 @@ class Tmdb(object):
             # http://api.themoviedb.org/3/search/movie?api_key=a1ab8b8669da03637a4b98fa39c39228&query=superman&language=es
             # &include_adult=false&page=1
             url = ('http://api.themoviedb.org/3/search/%s?api_key=a1ab8b8669da03637a4b98fa39c39228&query=%s&language=%s'
-                   '&include_adult=%s&page=%s' % (self.busqueda_tipo, text_quote.replace(' ', '%20'),
+                   '&include_adult=%s&page=%s' % (self.busqueda_tipo, text_quote,
                                                   self.busqueda_idioma, self.busqueda_include_adult, page))
 
             if self.busqueda_year:
                 url += '&year=%s' % self.busqueda_year
 
             buscando = self.busqueda_texto.capitalize()
-            logger.info("[Tmdb.py] Searching %s on page %s:\n%s" % (buscando, page, url))
+            logger.info("[Tmdb.py] Buscando %s en pagina %s:\n%s" % (buscando, page, url))
             resultado = self.get_json(url)
+            if not isinstance(resultado, dict):
+                resultado = ast.literal_eval(resultado.decode('utf-8'))
 
             total_results = resultado.get("total_results", 0)
             total_pages = resultado.get("total_pages", 0)
@@ -973,11 +995,13 @@ class Tmdb(object):
             if total_results > 0:
                 results = resultado["results"]
 
-            if self.busqueda_filtro and results:
+            if self.busqueda_filtro and total_results > 1:
                 # TODO documentar esta parte
-                for key, value in dict(self.busqueda_filtro).items():
+                for key, value in list(dict(self.busqueda_filtro).items()):
                     for r in results[:]:
-                        if key not in r or r[key] != value:
+                        if not r[key]:
+                            r[key] = str(r[key])
+                        if key not in r or value not in r[key]:
                             results.remove(r)
                             total_results -= 1
 
@@ -1015,7 +1039,7 @@ class Tmdb(object):
         type_search = self.discover.get('url', '')
         if type_search:
             params = []
-            for key, value in self.discover.items():
+            for key, value in list(self.discover.items()):
                 if key != "url":
                     params.append(key + "=" + str(value))
             # http://api.themoviedb.org/3/discover/movie?api_key=a1ab8b8669da03637a4b98fa39c39228&query=superman&language=es
@@ -1024,6 +1048,8 @@ class Tmdb(object):
 
             logger.info("[Tmdb.py] Searcing %s:\n%s" % (type_search, url))
             resultado = self.get_json(url)
+            if not isinstance(resultado, dict):
+                resultado = ast.literal_eval(resultado.decode('utf-8'))
 
             total_results = resultado.get("total_results", -1)
             total_pages = resultado.get("total_pages", 1)
@@ -1036,7 +1062,7 @@ class Tmdb(object):
                     results = resultado["results"]
                 if self.busqueda_filtro and results:
                     # TODO documentar esta parte
-                    for key, value in dict(self.busqueda_filtro).items():
+                    for key, value in list(dict(self.busqueda_filtro).items()):
                         for r in results[:]:
                             if key not in r or r[key] != value:
                                 results.remove(r)
@@ -1184,6 +1210,8 @@ class Tmdb(object):
                        (self.busqueda_tipo, self.busqueda_id, self.busqueda_idioma))
 
                 resultado = self.get_json(url)
+                if not isinstance(resultado, dict):
+                    resultado = ast.literal_eval(resultado.decode('utf-8'))
 
                 if 'overview' in resultado:
                     self.result['overview'] = resultado['overview']
@@ -1316,6 +1344,8 @@ class Tmdb(object):
             logger.info("[Tmdb.py] Searcing " + buscando)
             try:
                 self.temporada[numtemporada] = self.get_json(url)
+                if not isinstance(self.temporada[numtemporada], dict):
+                    self.temporada[numtemporada] = ast.literal_eval(self.temporada[numtemporada].decode('utf-8'))
 
             except:
                 logger.error("Unable to get the season")
@@ -1356,6 +1386,8 @@ class Tmdb(object):
             return {}
 
         temporada = self.get_temporada(numtemporada)
+        if not isinstance(temporada, dict):
+            temporada = ast.literal_eval(temporada.decode('utf-8'))
         if not temporada:
             # Se ha producido un error
             return {}
@@ -1388,9 +1420,9 @@ class Tmdb(object):
             dic_aux = dict((i['id'], i) for i in ret_dic["temporada_crew"])
             for e in temporada["episodes"]:
                 for crew in e['crew']:
-                    if crew['id'] not in dic_aux.keys():
+                    if crew['id'] not in list(dic_aux.keys()):
                         dic_aux[crew['id']] = crew
-            ret_dic["temporada_crew"] = dic_aux.values()
+            ret_dic["temporada_crew"] = list(dic_aux.values())
 
         # Obtener datos del capitulo si procede
         if capitulo != -1:
@@ -1429,6 +1461,8 @@ class Tmdb(object):
                       % (self.busqueda_tipo, self.result['id'], self.busqueda_idioma)
 
                 dict_videos = self.get_json(url)
+                if not isinstance(dict_videos, dict):
+                    dict_videos = ast.literal_eval(dict_videos.decode('utf-8'))
 
                 if dict_videos['results']:
                     dict_videos['results'] = sorted(dict_videos['results'], key=lambda x: (x['type'], x['size']))
@@ -1440,6 +1474,8 @@ class Tmdb(object):
                       % (self.busqueda_tipo, self.result['id'])
 
                 dict_videos = self.get_json(url)
+                if not isinstance(dict_videos, dict):
+                    dict_videos = ast.literal_eval(dict_videos.decode('utf-8'))
 
                 if dict_videos['results']:
                     dict_videos['results'] = sorted(dict_videos['results'], key=lambda x: (x['type'], x['size']))
@@ -1481,13 +1517,13 @@ class Tmdb(object):
         if not origen:
             origen = self.result
 
-        if 'credits' in origen.keys():
+        if 'credits' in list(origen.keys()):
             dic_origen_credits = origen['credits']
             origen['credits_cast'] = dic_origen_credits.get('cast', [])
             origen['credits_crew'] = dic_origen_credits.get('crew', [])
             del origen['credits']
 
-        items = origen.items()
+        items = list(origen.items())
 
         # Informacion Temporada/episodio
         if ret_infoLabels['season'] and self.temporada.get(ret_infoLabels['season']):
@@ -1496,14 +1532,14 @@ class Tmdb(object):
             if ret_infoLabels['episode']:
                 episodio = ret_infoLabels['episode']
 
-            items.extend(self.get_episodio(ret_infoLabels['season'], episodio).items())
+            items.extend(list(self.get_episodio(ret_infoLabels['season'], episodio).items()))
 
         # logger.info("ret_infoLabels" % ret_infoLabels)
 
         for k, v in items:
             if not v:
                 continue
-            elif type(v) == str:
+            elif isinstance(v, str):
                 v = re.sub(r"\n|\r|\t", "", v)
                 # fix
                 if v == "None":
@@ -1517,7 +1553,7 @@ class Tmdb(object):
 
             elif k == 'runtime':                                #Duration for movies
                 ret_infoLabels['duration'] = int(v) * 60
-                
+
             elif k == 'episode_run_time':                       #Duration for episodes
                 try:
                     for v_alt in v:                             #It comes as a list (?!)
@@ -1572,7 +1608,7 @@ class Tmdb(object):
 
             elif k == 'credits_cast' or k == 'temporada_cast' or k == 'episodio_guest_stars':
                 dic_aux = dict((name, character) for (name, character) in l_castandrole)
-                l_castandrole.extend([(p['name'], p['character']) for p in v if p['name'] not in dic_aux.keys()])
+                l_castandrole.extend([(p['name'], p['character']) for p in v if p['name'] not in list(dic_aux.keys())])
 
             elif k == 'videos':
                 if not isinstance(v, list):

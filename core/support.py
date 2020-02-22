@@ -10,8 +10,10 @@ from concurrent import futures
 try:
     import urllib.request as urllib
     import urllib.parse as urlparse
+    from urllib.parse import urlencode
 except ImportError:
     import urllib, urlparse
+    from urllib import urlencode
 
 from channelselector import thumb
 from core import httptools, scrapertools, servertools, tmdb, channeltools
@@ -157,7 +159,8 @@ def scrapeLang(scraped, lang, longtitle):
     return language, longtitle
 
 def cleantitle(title):
-    cleantitle = scrapertools.htmlclean(scrapertools.decodeHtmlentities(title).replace('"', "'").replace('×', 'x').replace('–', '-')).strip()
+    if type(title) != str: title.decode('UTF-8')
+    cleantitle = title.replace('"', "'").replace('×', 'x').replace('–', '-').strip()
     return cleantitle
 
 def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang):
@@ -192,16 +195,17 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
     for i, match in enumerate(matches):
         if pagination and (pag - 1) * pagination > i and not search: continue  # pagination
         if pagination and i >= pag * pagination and not search: break          # pagination
-        listGroups = match.keys()
-        match = match.values()
+        # listGroups = match.keys()
+        # match = match.values()
 
-        if len(listGroups) > len(match):  # to fix a bug
-            match = list(match)
-            match.extend([''] * (len(listGroups) - len(match)))
+        # if len(listGroups) > len(match):  # to fix a bug
+        #     match = list(match)
+        #     match.extend([''] * (len(listGroups) - len(match)))
 
         scraped = {}
         for kk in known_keys:
-            val = match[listGroups.index(kk)] if kk in listGroups else ''
+            val = match[kk] if kk in match else ''
+            # val = match[listGroups.index(kk)] if kk in listGroups else ''
             if val and (kk == "url" or kk == 'thumb') and 'http' not in val:
                 val = scrapertools.find_single_match(item.url, 'https?://[a-z0-9.-]+') + (val if val.startswith('/') else '/' + val)
             scraped[kk] = val
@@ -294,8 +298,10 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 other = scraped['other'] if scraped['other'] else ''
             )
 
-            for lg in list(set(listGroups).difference(known_keys)):
-                it.__setattr__(lg, match[listGroups.index(lg)])
+            # for lg in list(set(listGroups).difference(known_keys)):
+            #     it.__setattr__(lg, match[listGroups.index(lg)])
+            for lg in list(set(match.keys()).difference(known_keys)):
+                it.__setattr__(lg, match[lg])
 
             if 'itemHook' in args:
                 it = args['itemHook'](it)
@@ -367,7 +373,7 @@ def scrape(func):
 
         log('PATRON= ', patron)
         if not data:
-            page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True, session=item.session)
+            page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True)
             # if url may be changed and channel has findhost to update
             if (not page.data or scrapertools.get_domain_from_url(page.url) != scrapertools.get_domain_from_url(item.url)) and 'findhost' in func.__globals__:
                 host = func.__globals__['findhost']()
@@ -376,8 +382,7 @@ def scrape(func):
                 jsontools.update_node(host, func.__module__.split('.')[-1], 'url')
                 parse[1] = scrapertools.get_domain_from_url(host)
                 item.url = urlparse.urlunparse(parse)
-                page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True,
-                                              session=item.session)
+                page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True)
             data = page.data.replace("'", '"')
             data = re.sub('\n|\t', ' ', data)
             data = re.sub(r'>\s+<', '> <', data)
@@ -468,7 +473,7 @@ def dooplay_get_links(item, host):
     ret = []
 
     for type, post, nume, title, server in matches:
-        postData = urllib.urlencode({
+        postData = urlencode({
             "action": "doo_player_ajax",
             "post": post,
             "nume": nume,
@@ -582,7 +587,7 @@ def swzz_get_url(item):
     elif 'https://stayonline.pro' in item.url:
         id = item.url.split('/')[-2]
         reqUrl = 'https://stayonline.pro/ajax/linkView.php'
-        p = urllib.urlencode({"id": id})
+        p = urlencode({"id": id})
         data = httptools.downloadpage(reqUrl, post=p).data
         try:
             import json
@@ -699,9 +704,9 @@ def menu(func):
         if global_search:
             menuItem(itemlist, filename, config.get_localized_string(70741) % '… bold', 'search', host + dictUrl['search'])
 
-
-        autoplay.init(item.channel, list_servers, list_quality)
-        autoplay.show_option(item.channel, itemlist)
+        if 'get_channel_results' not in inspect.stack()[1][3]:
+            autoplay.init(item.channel, list_servers, list_quality)
+            autoplay.show_option(item.channel, itemlist)
         channel_config(item, itemlist)
 
         return itemlist
@@ -744,7 +749,7 @@ def typo(string, typography=''):
     if '{}' in string:
         string = '{' + re.sub(r'\s\{\}','',string) + '}'
     if 'submenu' in string:
-        string = u"\u2022\u2022 ".encode('utf-8') + re.sub(r'\ssubmenu','',string)
+        string = "•• " + re.sub(r'\ssubmenu','',string)
     if 'color' in string:
         color = scrapertools.find_single_match(string, 'color ([a-z]+)')
         if color == 'kod' or '': color = kod_color
@@ -758,7 +763,7 @@ def typo(string, typography=''):
     if '--' in string:
         string = ' - ' + re.sub(r'\s--','',string)
     if 'bullet' in string:
-        string = '[B]' + u"\u2022".encode('utf-8') + '[/B] ' + re.sub(r'\sbullet','',string)
+        string = '[B]' + "•" + '[/B] ' + re.sub(r'\sbullet','',string)
 
     return string
 
@@ -766,10 +771,33 @@ def typo(string, typography=''):
 def match(item_url_string, **args):
     '''
     match is a function that combines httptools and scraper tools:
+
+    supports all httptools and the following arggs:
+        @param item_url_string: if it's a titem download the page item.url, if it's a URL download the page, if it's a string pass it to scrapertools
+        @type  item_url_string: item or str
+        @param string: force item_url_string to be a string
+        @type  string: bool
+        @param patronBlock: find first element in patron
+        @type  patronBlock: str
+        @param patronBloks: find multiple matches
+        @type  patronBloks: str or list
+        @param debugBlock: regex101.com for debug
+        @type  debugBlock: bool
+        @param patron: find multiple matches on block, blocks or data
+        @type  patron: str or list
+        @param debug: regex101.com for debug
+        @type  debug: bool
+
+    Return a item with the following key:
+        data: data of the webpage
+        block: first block
+        blocks: all the blocks
+        match: first match
+        matches: all the matches
     '''
     log(item_url_string)
 
-    matches = []
+    matches = blocks = []
     url = None
     # arguments allowed for scrape
     patron = args.get('patron', None)
@@ -778,12 +806,15 @@ def match(item_url_string, **args):
     debug = args.get('debug', False)
     debugBlock = args.get('debugBlock', False)
     string = args.get('string', False)
+
     # remove scrape arguments
     args = dict([(key, val) for key, val in args.items() if key not in ['patron', 'patronBlock', 'patronBlocks', 'debug', 'debugBlock', 'string']]) 
-    # dbg()
+
     # check type of item_url_string
-    if type(item_url_string) == str:
-        if item_url_string.startswith('http') and not string: url = item_url_string
+    if string:
+        data = item_url_string
+    elif type(item_url_string) == str:
+        if item_url_string.startswith('http'): url = item_url_string
         else : data = item_url_string
     else:
         # if item_url_string is an item use item.url as url
@@ -803,7 +834,9 @@ def match(item_url_string, **args):
     if patronBlock:
         blocks = [scrapertools.find_single_match(data, patronBlock)]
     elif patronBlocks:
-        blocks = scrapertools.find_multiple_matches(data, patronBlock)
+        if type(patronBlock) == str:  patron = [patronBlock]
+        for p in patronBlock:
+            blocks += scrapertools.find_multiple_matches(data, p)
     else:
         blocks = [data]
 
@@ -1010,7 +1043,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
 
         item.title = typo(item.contentTitle.strip(),'bold') if item.contentType == 'movie' or (config.get_localized_string(30161) in item.title) else item.title
 
-        videoitem.plot= typo(videoitem.title, 'bold')
+        videoitem.plot= typo(videoitem.title, 'bold') + typo(videoitem.quality, '_ [] bold')
         videoitem.title = item.title + (typo(videoitem.title, '_ color kod [] bold') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
@@ -1036,7 +1069,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
     channel_node = autoplay_node.get(item.channel, {})
     settings_node = channel_node.get('settings', {})
     AP = get_setting('autoplay') or settings_node['active']
-    HS = config.get_setting('hide_servers') or (settings_node['hide_servers'] if settings_node.has_key('hide_server') else False)
+    HS = config.get_setting('hide_servers') or (settings_node['hide_servers'] if 'hide_server' in settings_node else False)
 
     if CL and not AP:
         if get_setting('checklinks', item.channel):

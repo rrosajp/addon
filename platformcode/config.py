@@ -3,6 +3,11 @@
 # Parámetros de configuración (kodi)
 # ------------------------------------------------------------
 
+#from builtins import str
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
+
 import os
 import re
 
@@ -62,10 +67,12 @@ def get_platform(full_version=False):
     ret = {}
     codename = {"10": "dharma", "11": "eden", "12": "frodo",
                 "13": "gotham", "14": "helix", "15": "isengard",
-                "16": "jarvis", "17": "krypton", "18": "leia"}
+                "16": "jarvis", "17": "krypton", "18": "leia", 
+                "19": "matrix"}
     code_db = {'10': 'MyVideos37.db', '11': 'MyVideos60.db', '12': 'MyVideos75.db',
                '13': 'MyVideos78.db', '14': 'MyVideos90.db', '15': 'MyVideos93.db',
-               '16': 'MyVideos99.db', '17': 'MyVideos107.db', '18': 'MyVideos116.db'}
+               '16': 'MyVideos99.db', '17': 'MyVideos107.db', '18': 'MyVideos116.db', 
+               '19': 'MyVideos116.db'}
 
     num_version = xbmc.getInfoLabel('System.BuildVersion')
     num_version = re.match("\d+\.\d+", num_version).group(0)
@@ -334,7 +341,7 @@ def set_setting(name, value, channel="", server=""):
 
             __settings__.setSetting(name, value)
 
-        except Exception, ex:
+        except Exception as ex:
             from platformcode import logger
             logger.error("Error al convertir '%s' no se guarda el valor \n%s" % (name, ex))
             return None
@@ -346,7 +353,18 @@ def get_localized_string(code):
     dev = __language__(code)
 
     try:
-        dev = dev.encode("utf-8")
+        # Unicode to utf8
+        if isinstance(dev, unicode):
+            dev = dev.encode("utf8")
+            if PY3: dev = dev.decode("utf8")
+
+        # All encodings to utf8
+        elif not PY3 and isinstance(dev, str):
+            dev = unicode(dev, "utf8", errors="replace").encode("utf8")
+        
+        # Bytes encodings to utf8
+        elif PY3 and isinstance(dev, bytes):
+            dev = dev.decode("utf8")
     except:
         pass
 
@@ -356,7 +374,7 @@ def get_localized_category(categ):
     categories = {'movie': get_localized_string(30122), 'tvshow': get_localized_string(30123),
                   'anime': get_localized_string(30124), 'documentary': get_localized_string(30125),
                   'vos': get_localized_string(30136), 'sub-ita': get_localized_string(70566), 'adult': get_localized_string(30126),
-                  'direct': get_localized_string(30137), 'torrent': get_localized_string(70015)}
+                  'direct': get_localized_string(30137), 'torrent': get_localized_string(70015), 'live': get_localized_string(30138)}
     return categories[categ] if categ in categories else categ
 
 
@@ -389,6 +407,14 @@ def get_data_path():
         os.makedirs(dev)
 
     return dev
+
+
+def get_icon():
+    return xbmc.translatePath(__settings__.getAddonInfo('icon'))
+
+
+def get_fanart():
+    return xbmc.translatePath(__settings__.getAddonInfo('fanart'))
 
 
 def get_cookie_data():

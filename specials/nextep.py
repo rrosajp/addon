@@ -6,8 +6,14 @@ from core import scrapertools
 from core import jsontools, filetools
 from lib.concurrent import futures
 
-PLAYER_STOP = 13
-ND = 'NextDialogCompact.xml' if config.get_setting('next_ep_type') else 'NextDialog.xml'
+next_dialogs = ['NextDialog.xml', 'NextDialogExtended.xml', 'NextDialogCompact.xml']
+next_ep_type = config.get_setting('next_ep_type')
+
+# compatibility with previous version
+if type(next_ep_type) == bool:
+    ND = 'NextDialogCompact.xml' if config.get_setting('next_ep_type') else 'NextDialog.xml'
+else:
+    ND = next_dialogs[next_ep_type]
 
 def check(item):
     return True if config.get_setting('next_ep') > 0 and item.contentType != 'movie' else False
@@ -73,7 +79,7 @@ def next_ep(item):
             base_path = os.path.basename(os.path.normpath(os.path.dirname(item.strm_path)))
             path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"),base_path)
             fileList = []
-            for file in os.listdir(path):
+            for file in filetools.listdir(path):
                 if file.endswith('.strm'):
                     fileList.append(file)
 
@@ -84,6 +90,7 @@ def next_ep(item):
                 next_file = None
             else:
                 next_file = fileList[nextIndex]
+                logger.info('NEXTFILE' + next_file)
 
             # start next episode window afther x time
             if next_file:
@@ -102,8 +109,9 @@ def next_ep(item):
                     infoLabels= {'episode': episode, 'mediatype': 'tvshow', 'season': season, 'title': next_ep},
                     strm_path= filetools.join(base_path, next_file))
 
-                global ITEM
-                ITEM = item
+                global INFO
+                INFO = filetools.join(path, next_file.replace("strm", "nfo"))
+                logger.info('NEXTINFO' + INFO)
 
                 nextDialog = NextDialog(ND, config.get_runtime_path())
                 nextDialog.show()
@@ -142,9 +150,23 @@ class NextDialog(xbmcgui.WindowXMLDialog):
 
     def __init__(self, *args, **kwargs):
         logger.info()
-        self.action_exitkeys_id = [10, 13]
+        self.action_exitkeys_id = [xbmcgui.ACTION_STOP, xbmcgui.ACTION_BACKSPACE, xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]
         self.progress_control = None
-        self.item = ITEM
+
+        # set info
+        with open(INFO, 'r') as f:
+            full_info = f.readlines()
+            full_info = full_info[1:]
+        full_info = "".join(full_info)
+        info = jsontools.load(full_info)
+        info = info["infoLabels"]
+        self.setProperty("title", info["tvshowtitle"])
+        self.setProperty("ep_title", "%dx%02d - %s" % (info["season"], info["episode"], info["title"]))
+        if "episodio_imagen" in info:
+            img = info["episodio_imagen"]
+        else:
+            img = filetools.join(config.get_runtime_path(), "resources", "noimage.png")
+        self.setProperty("next_img", img)
 
     def set_still_watching(self, stillwatching):
         self.stillwatching = stillwatching
@@ -175,6 +197,6 @@ class NextDialog(xbmcgui.WindowXMLDialog):
 
     def onAction(self, action):
         logger.info()
-        if action == PLAYER_STOP:
+        if action in self.action_exitkeys_id:
             self.set_continue_watching(False)
             self.close()

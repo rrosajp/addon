@@ -42,7 +42,7 @@
                         <itemgap>0</itemgap>
                         <align>right</align>
                         <control type="button" id="11">
-                            <label>[B]$INFO[Player.TimeRemaining(mm:ss)][/B]</label>
+                            <label>[B]$INFO[Player.TimeRemaining(secs),,][/B]</label>
                             <onclick>SendClick(3012)</onclick>
                             <!-- <visible>!Integer.IsGreater(Player.TimeRemaining,59)</visible> -->
                             <height>40</height>
