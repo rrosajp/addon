@@ -175,28 +175,18 @@ def findvideos(item):
     if item.contentType == "episode":
         return findvid_serie(item)
 
-    def load_links(itemlist, re_txt, color, desc_txt, quality=""):
-        streaming = scrapertools.find_single_match(data, re_txt).replace('"', '')
-        support.log('STREAMING',streaming)
-        matches = support.match(streaming, patron = r'<td><a.*?href=([^ ]+) [^>]+>([^<]+)<').matches
-        for url, server in matches:
-            logger.debug("##### findvideos %s ## %s ## %s ##" % (desc_txt, url, server))
-            itemlist.append(
-                Item(channel=item.channel,
-                     action="play",
-                     title=server,
-                     url=final_links(url),
-                     server=server,
-                     fulltitle=item.fulltitle,
-                     thumbnail=item.thumbnail,
-                     show=item.show,
-                     quality=quality,
-                     contentType=item.contentType,
-                     folder=False))
+    def load_links(urls, re_txt, color, desc_txt, quality=""):
+        if re_txt:
+            streaming = scrapertools.find_single_match(data, re_txt).replace('"', '')
+            support.log('STREAMING',streaming)
+            matches = support.match(streaming, patron = r'<td><a.*?href=([^ ]+) [^>]+>([^<])+<').matches
+            for url, server in matches:
+                logger.debug("##### findvideos %s ## %s ## %s ##" % (desc_txt, url, server))
+                urls.append(final_links(url))
 
     support.log()
 
-    itemlist = []
+    itemlist = urls = []
 
     # Carica la pagina
     data = httptools.downloadpage(item.url).data
@@ -210,15 +200,15 @@ def findvideos(item):
         QualityStr = scrapertools.decodeHtmlentities(match.group(1))
 
     # Estrae i contenuti - Streaming
-    load_links(itemlist, '<strong>Streamin?g:</strong>(.*?)cbtable', "orange", "Streaming", "SD")
+    load_links(urls, '<strong>Streamin?g:</strong>(.*?)cbtable', "orange", "Streaming", "SD")
 
     # Estrae i contenuti - Streaming HD
-    load_links(itemlist, '<strong>Streamin?g HD[^<]+</strong>(.*?)cbtable', "yellow", "Streaming HD", "HD")
+    load_links(urls, '<strong>Streamin?g HD[^<]+</strong>(.*?)cbtable', "yellow", "Streaming HD", "HD")
 
     # Estrae i contenuti - Streaming 3D
-    load_links(itemlist, '<strong>Streamin?g 3D[^<]+</strong>(.*?)cbtable', "pink", "Streaming 3D")
+    load_links(urls, '<strong>Streamin?g 3D[^<]+</strong>(.*?)cbtable', "pink", "Streaming 3D")
 
-    itemlist=support.server(item, itemlist=itemlist)
+    itemlist=support.server(item, urls)
     if itemlist and QualityStr:
         itemlist.insert(0,
             Item(channel=item.channel,
@@ -236,30 +226,21 @@ def findvideos(item):
 
 
 def findvid_serie(item):
-    def load_vid_series(html, item, itemlist, blktxt=''):
+    def load_vid_series(html, item, urls, blktxt=''):
         # logger.info('HTML' + html)
         # patron = r'<a href="([^"]+)"[^=]+="_blank"[^>]+>(?!<!--)(.*?)</a>'
         # Estrae i contenuti
         # matches = re.compile(patron, re.DOTALL).finditer(html)
         matches = support.match(html, patron = r'<a href="([^"]+)"[^=]+="_blank"[^>]+>(?!<!--)(.*?)</a>').matches
         for url, server in matches:
-            itemlist.append(
-                Item(channel=item.channel,
-                     action="play",
-                     title=server,
-                     url=final_links(url),
-                     server=server,
-                     fulltitle=item.fulltitle,
-                     show=item.show,
-                     quality=blktxt,
-                     contentType=item.contentType,
-                     folder=False))
+            urls.append(final_links(url))
 
     support.log()
 
     itemlist = []
     lnkblk = []
     lnkblkp = []
+    urls = []
 
     data = item.url
 
@@ -268,12 +249,12 @@ def findvid_serie(item):
     blktxt=""
     for b in blk:
         if b[0:3]=="a h" or b[0:4]=="<a h":
-            load_vid_series("<%s>"%b, item, itemlist, blktxt)
+            load_vid_series("<%s>"%b, item, urls, blktxt)
             blktxt=""
         elif len(b.strip())>1:
             blktxt=b.strip()
 
-    return support.server(item, itemlist=itemlist)
+    return support.server(item, urls)
 
 
 def final_links(url):
