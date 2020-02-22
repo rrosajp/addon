@@ -110,6 +110,7 @@ def episodios(item):
 def findvideos(item):
     itemlist = []
     support.log()
+    # support.dbg()
 
     matches = support.match(item, patron=r'href="([^"]+)"', patronBlock=r'<div style="white-space: (.*?)<div id="main-content"')
 
@@ -118,27 +119,37 @@ def findvideos(item):
         item.contentType = 'tvshow'
         return episodios(item)
 
-    # matches.matches.sort()
-    support.log('VIDEO')
-    for url in matches.matches:
-        lang = url.split('/')[-2]
-        if 'ita' in lang.lower():
-            language = 'ITA'
-        if 'sub' in lang.lower():
-            language = 'Sub-' + language
-        quality = url.split('/')[-1]
-
+    if 'vvvvid' in matches.data:
         itemlist.append(
-            support.Item(channel=item.channel,
-                         action="play",
-                         contentType=item.contentType,
-                         title=language,
-                         url=url,
-                         contentLanguage = language,
-                         quality = quality,
-                         order = quality.replace('p','').zfill(4),
-                         server='directo',
-                         ))
+                support.Item(channel=item.channel,
+                            action="play",
+                            contentType=item.contentType,
+                            title='vvvid',
+                            url=support.match(matches.data, patron=r'(http://www.vvvvid[^"]+)').match,
+                            server='vvvvid',
+                            ))
+    else:
+    # matches.matches.sort()
+        support.log('VIDEO')
+        for url in matches.matches:
+            lang = url.split('/')[-2]
+            if 'ita' in lang.lower():
+                language = 'ITA'
+            if 'sub' in lang.lower():
+                language = 'Sub-' + language
+            quality = url.split('/')[-1]
+
+            itemlist.append(
+                support.Item(channel=item.channel,
+                            action="play",
+                            contentType=item.contentType,
+                            title=language,
+                            url=url,
+                            contentLanguage = language,
+                            quality = quality,
+                            order = quality.replace('p','').zfill(4),
+                            server='directo',
+                            ))
 
     itemlist.sort(key=lambda x: (x.title, x.order), reverse=False)
     return support.server(item, itemlist=itemlist)
