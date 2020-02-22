@@ -11,7 +11,7 @@ from core.support import dbg
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
-    page_url = re.sub('akvideo.stream/(?:video/|video\\.php\\?file_code=)?(?:embed-)?([a-zA-Z0-9]+)','akvideo.stream/video/\\1',page_url)
+    # page_url = re.sub('akvideo.stream/(?:video/|video\\.php\\?file_code=)?(?:embed-)?([a-zA-Z0-9]+)','akvideo.stream/video/\\1',page_url)
     global data
     # dbg()
     page = httptools.downloadpage(page_url)
@@ -28,7 +28,7 @@ def test_video_exists(page_url):
 
     # ID, code = scrapertools.find_single_match(data, r"""input\D*id=(?:'|")([^'"]+)(?:'|").*?value='([a-z0-9]+)""")
     # post = urllib.urlencode({ID: code})
-    logger.info('PAGE DATA' + data)
+    # logger.info('PAGE DATA' + data)
     if "File Not Found" in data:
         return False, config.get_localized_string(70449) % "Akvideo"
     return True, ""
