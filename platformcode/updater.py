@@ -283,7 +283,7 @@ def updateFromZip(message='Installazione in corso...'):
 
     # pulizia preliminare
     remove(localfilename)
-    removeTree(destpathname + "addon-" + branch)
+    removeTree(filetools.join(destpathname, "addon-" + branch))
 
     try:
         urllib.urlretrieve(remotefilename, localfilename,
@@ -314,7 +314,7 @@ def updateFromZip(message='Installazione in corso...'):
             for member in zip.infolist():
                 zip.extract(member, destpathname)
                 cur_size += member.file_size
-                dp.update(int(90 + cur_size * 9 / size))
+                dp.update(int(80 + cur_size * 19 / size))
 
     except Exception as e:
         logger.info('Non sono riuscito ad estrarre il file zip')
@@ -332,7 +332,7 @@ def updateFromZip(message='Installazione in corso...'):
     removeTree(addonDir)
     xbmc.sleep(1000)
 
-    rename(destpathname + "addon-" + branch, addonDir)
+    rename(filetools.join(destpathname, "addon-" + branch), 'plugin.video.kod')
 
     logger.info("Cancellando il file zip...")
     remove(localfilename)
