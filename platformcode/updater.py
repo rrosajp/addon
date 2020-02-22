@@ -116,6 +116,8 @@ def check(background=False):
                             try:
                                 localFile = io.open(addonDir + file["filename"], 'r+', encoding="utf8")
                                 text = localFile.read()
+                                if not PY3:
+                                    text = text.decode('utf-8')
                             except IOError: # nuovo file
                                 # crea le cartelle se non esistono
                                 dirname = os.path.dirname(addonDir + file["filename"])
