@@ -775,7 +775,7 @@ def check_video_link(item, timeout=3):
     except:
         server_module = None
         logger.info("[check_video_link] No se puede importar el servidor! %s" % server)
-        return NK
+        return item, NK
         
     if hasattr(server_module, 'test_video_exists'):
         ant_timeout = httptools.HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT
