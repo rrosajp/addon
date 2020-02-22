@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # by DrZ3r0
 
-import urllib
+import urllib, re
 
 from core import httptools
 from core import scrapertools
@@ -11,6 +11,7 @@ from core.support import dbg
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
+    page_url = re.sub('akvideo.stream/(?:video/|video\\.php\\?file_code=)?(?:embed-)?([a-zA-Z0-9]+)','akvideo.stream/video/\\1',page_url)
     global data
     # dbg()
     page = httptools.downloadpage(page_url)

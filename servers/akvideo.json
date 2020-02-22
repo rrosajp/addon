@@ -8,17 +8,13 @@
         "url": "\\1"
       },
       {
-        "pattern": "akvideo.stream\/video\/(?:embed-)?([a-zA-Z0-9]+)",
-        "url": "http://akvideo.stream\/video\/\\1"
-      },
-      {
-        "pattern": "akvideo.stream/(?:embed-)?([a-zA-Z0-9]+)",
+        "pattern": "akvideo.stream/(?:video/|video\\.php\\?file_code=)?(?:embed-)?([a-zA-Z0-9]+)",
         "url": "http://akvideo.stream/video/\\1"
       }
     ]
   },
   "free": true,
-  "id": "akstream",
+  "id": "akvideo",
   "name": "Akvideo",
   "settings": [
     {
