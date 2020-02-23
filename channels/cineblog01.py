@@ -176,7 +176,7 @@ def findvideos(item):
     if item.contentType == "episode":
         return findvid_serie(item)
 
-    def load_links(urls, re_txt, desc_txt, quality=""):
+    def load_links(itemlist, re_txt, desc_txt, quality=""):
         if re_txt:
             streaming = scrapertools.find_single_match(data, re_txt).replace('"', '')
             support.log('STREAMING',streaming)
@@ -185,14 +185,23 @@ def findvideos(item):
                 u = [executor.submit(final_links, match) for match in matches]
                 for res in futures.as_completed(u):
                     if res.result():
-                        urls.append(res.result())
+                        itemlist.append(
+                            Item(channel=item.channel,
+                                 action="play",
+                                 url=res.result(),
+                                 fulltitle=item.fulltitle,
+                                 thumbnail=item.thumbnail,
+                                 show=item.show,
+                                 quality=quality,
+                                 contentType=item.contentType,
+                                 folder=False))
             # for url in matches:
             #     # logger.debug("##### findvideos %s ## %s ## %s ##" % (desc_txt, url, server))
             #     urls.append(final_links(url))
 
     support.log()
 
-    itemlist = urls = []
+    itemlist = []
 
     # Carica la pagina
     data = httptools.downloadpage(item.url).data
@@ -206,15 +215,15 @@ def findvideos(item):
         QualityStr = scrapertools.decodeHtmlentities(match.group(1))
 
     # Estrae i contenuti - Streaming
-    load_links(urls, '<strong>Streamin?g:</strong>(.*?)cbtable', "Streaming", "SD")
+    load_links(itemlist, '<strong>Streamin?g:</strong>(.*?)cbtable', "Streaming", "SD")
 
     # Estrae i contenuti - Streaming HD
-    load_links(urls, '<strong>Streamin?g HD[^<]+</strong>(.*?)cbtable', "Streaming HD", "HD")
+    load_links(itemlist, '<strong>Streamin?g HD[^<]+</strong>(.*?)cbtable', "Streaming HD", "HD")
 
     # Estrae i contenuti - Streaming 3D
-    load_links(urls, '<strong>Streamin?g 3D[^<]+</strong>(.*?)cbtable', "Streaming 3D")
+    load_links(itemlist, '<strong>Streamin?g 3D[^<]+</strong>(.*?)cbtable', "Streaming 3D")
 
-    itemlist=support.server(item, urls)
+    itemlist=support.server(item, itemlist=itemlist)
     if itemlist and QualityStr:
         itemlist.insert(0,
             Item(channel=item.channel,
@@ -232,7 +241,7 @@ def findvideos(item):
 
 
 def findvid_serie(item):
-    def load_vid_series(html, item, urls, blktxt=''):
+    def load_vid_series(html, item, itemlist, blktxt=''):
         # logger.info('HTML' + html)
         # patron = r'<a href="([^"]+)"[^=]+="_blank"[^>]+>(?!<!--)(.*?)</a>'
         # Estrae i contenuti
@@ -242,7 +251,15 @@ def findvid_serie(item):
                 u = [executor.submit(final_links, match) for match in matches]
                 for res in futures.as_completed(u):
                     if res.result():
-                        urls.append(res.result())
+                        itemlist.append(
+                            Item(channel=item.channel,
+                                 action="play",
+                                 url=res.result(),
+                                 fulltitle=item.fulltitle,
+                                 thumbnail=item.thumbnail,
+                                 show=item.show,
+                                 contentType=item.contentType,
+                                 folder=False))
         # for url, server in matches:
         #     urls.append(final_links(url))
 
@@ -251,8 +268,6 @@ def findvid_serie(item):
     itemlist = []
     lnkblk = []
     lnkblkp = []
-    urls = []
-
     data = item.url
 
     # Blocks with split
@@ -260,12 +275,12 @@ def findvid_serie(item):
     blktxt=""
     for b in blk:
         if b[0:3]=="a h" or b[0:4]=="<a h":
-            load_vid_series("<%s>"%b, item, urls, blktxt)
+            load_vid_series("<%s>"%b, item, itemlist, blktxt)
             blktxt=""
         elif len(b.strip())>1:
             blktxt=b.strip()
 
-    return support.server(item, urls)
+    return support.server(item, itemlist=itemlist)
 
 
 def final_links(url):
