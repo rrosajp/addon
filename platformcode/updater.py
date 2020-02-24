@@ -96,7 +96,7 @@ def check(background=False):
             if len(commitJson['files']) > 50:
                 localCommitFile.close()
                 c['sha'] = updateFromZip('Aggiornamento in corso...')
-                localCommitFile = open(addonDir + trackingFile, 'w')  # il file di tracking viene eliminato, lo ricreo
+                localCommitFile = open(os.path.join(xbmc.translatePath("special://home/addons/"), 'plugin.video.kod', trackingFile), 'w')  # il file di tracking viene eliminato, lo ricreo
                 changelog += commitJson['commit']['message'] + "\n"
                 nCommitApplied += 3  # il messaggio sarà lungo, probabilmente, il tempo di vis. è maggiorato
                 break
@@ -217,7 +217,7 @@ def calcCurrHash():
         logger.info('Non sono riuscito a trovare il commit attuale, scarico lo zip')
         hash = updateFromZip()
         # se ha scaricato lo zip si trova di sicuro all'ultimo commit
-        localCommitFile = open(addonDir + trackingFile, 'w')
+        localCommitFile = open(os.path.join(xbmc.translatePath("special://home/addons/"), 'plugin.video.kod', trackingFile), 'w')
         localCommitFile.write(hash if hash else lastCommitSha)
         localCommitFile.close()
 
@@ -395,7 +395,7 @@ def removeTree(dir):
 
 def rename(dir1, dir2):
     try:
-        filetools.rename(dir1, dir2)
+        filetools.rename(dir1, dir2, silent=True, vfs=False)
     except:
         logger.info('cartella ' + dir1 + ' NON rinominata')
 
