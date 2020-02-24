@@ -395,7 +395,7 @@ def removeTree(dir):
 
 def rename(dir1, dir2):
     try:
-        filetools.rename(dir1, dir2)
+        filetools.rename(dir1, dir2, silent=True, vfs=False)
     except:
         logger.info('cartella ' + dir1 + ' NON rinominata')
 
