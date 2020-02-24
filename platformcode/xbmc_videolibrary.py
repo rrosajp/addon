@@ -2,9 +2,11 @@
 # ------------------------------------------------------------
 # XBMC Library Tools
 # ------------------------------------------------------------
-
-from future import standard_library
-standard_library.install_aliases()
+try:
+    from future import standard_library
+    standard_library.install_aliases()
+except:
+    pass
 #from builtins import str
 import sys
 PY3 = False
