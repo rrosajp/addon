@@ -277,13 +277,15 @@ def updateFromZip(message='Installazione in corso...'):
     remotefilename = 'https://github.com/' + user + "/" + repo + "/archive/" + branch + ".zip"
     localfilename = filetools.join(xbmc.translatePath("special://home/addons/"), "plugin.video.kod.update.zip")
     destpathname = xbmc.translatePath("special://home/addons/")
+    extractedDir = filetools.join(destpathname, "addon-" + branch)
 
     logger.info("remotefilename=%s" % remotefilename)
     logger.info("localfilename=%s" % localfilename)
+    logger.info('extract dir: ' + extractedDir)
 
     # pulizia preliminare
     remove(localfilename)
-    removeTree(filetools.join(destpathname, "addon-" + branch))
+    removeTree(extractedDir)
 
     try:
         urllib.urlretrieve(remotefilename, localfilename,
@@ -329,10 +331,13 @@ def updateFromZip(message='Installazione in corso...'):
     dp.update(99)
 
     # puliamo tutto
-    removeTree(addonDir)
+    global addonDir
+    if extractedDir != addonDir:
+        removeTree(addonDir)
     xbmc.sleep(1000)
 
-    rename(filetools.join(destpathname, "addon-" + branch), 'plugin.video.kod')
+    rename(extractedDir, 'plugin.video.kod')
+    addonDir = filetools.join(destpathname, 'plugin.video.kod')
 
     logger.info("Cancellando il file zip...")
     remove(localfilename)
