@@ -249,6 +249,8 @@ def apply_patch(s,patch,revert=False):
         if line[0] == sign or line[0] == ' ': t += line[1:]
         sl += (line[0] != sign)
   t += ''.join(s[sl:])
+  if not PY3:
+      t = t.decode('utf-8')
   return t
 
 
