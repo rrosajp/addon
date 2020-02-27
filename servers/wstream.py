@@ -42,14 +42,17 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True, post={'g-recaptcha-response': captcha}).data
 
     def getSources(data):
-        data = scrapertools.find_single_match(data, r'sources:\s*(\[[^\]]+\])')
-        if data:
-            data = re.sub('([A-z]+):(?!/)', '"\\1":', data)
-            keys = json.loads(data)
+        possibileSources = scrapertools.find_multiple_matches(data, r'sources:\s*(\[[^\]]+\])')
+        for data in possibileSources:
+            try:
+                data = re.sub('([A-z]+):(?!/)', '"\\1":', data)
+                keys = json.loads(data)
 
-            for key in keys:
-                video_urls.append(['%s [%sp]' % (key['type'].replace('video/', ''), key['label']),
-                                   key['src'].replace('https', 'http') + '|' + _headers])
+                for key in keys:
+                    video_urls.append(['%s [%sp]' % (key['type'].replace('video/', ''), key['label']),
+                                       key['src'].replace('https', 'http') + '|' + _headers])
+            except:
+                pass
 
     logger.info("[Wstream] url=" + page_url)
     video_urls = []
