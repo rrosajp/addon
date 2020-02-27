@@ -114,7 +114,7 @@ def episodios(item):
     action = 'findvideos'
 
     def itemlistHook(itemlist):
-        itemlist.sort(key=lambda item: item.title)
+        itemlist.sort(key=lambda item: int(support.re.sub(r'\[[^\]]+\]','',item.title).split('x')[0]))
         return itemlist
 
     return locals()

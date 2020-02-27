@@ -351,93 +351,97 @@ def auto_filter(auto_lang=False):
     # return lang, lang_list
 
 
-def thumb(itemlist=[], genre=False, thumb=''):
-    if itemlist:
-        import re
+def thumb(item_or_itemlist=None, genre=False, thumb=''):
+    import re
+    icon_dict = {'channels_movie':['film'],
+                 'channels_tvshow':['serie','tv','episodi','episodio','fiction'],
+                 'channels_documentary':['documentari','documentario', 'documentary'],
+                 'channels_all':['tutti'],
+                 'news':['novità', "novita'", 'aggiornamenti', 'nuovi', 'nuove'],
+                 'now_playing':['cinema', 'in sala'],
+                 'channels_anime':['anime'],
+                 'genres':['genere', 'generi', 'categorie', 'categoria'],
+                 'channels_animation': ['animazione', 'cartoni', 'cartoon', 'animation'],
+                 'channels_action':['azione', 'arti marziali', 'action'],
+                 'channels_adventure': ['avventura', 'adventure'],
+                 'channels_biographical':['biografico'],
+                 'channels_comedy':['comico','commedia', 'demenziale', 'comedy'],
+                 'channels_adult':['erotico', 'hentai', 'harem', 'ecchi'],
+                 'channels_drama':['drammatico', 'drama'],
+                 'channels_syfy':['fantascienza', 'science fiction'],
+                 'channels_fantasy':['fantasy', 'magia'],
+                 'channels_crime':['gangster','poliziesco', 'crime', 'crimine'],
+                 'channels_grotesque':['grottesco'],
+                 'channels_war':['guerra', 'war'],
+                 'channels_children':['bambini', 'kids'],
+                 'horror':['horror'],
+                 'lucky': ['fortunato'],
+                 'channels_musical':['musical', 'musica', 'music'],
+                 'channels_mistery':['mistero', 'giallo', 'mystery'],
+                 'channels_noir':['noir'],
+                 'popular' : ['popolari','popolare', 'più visti'],
+                 'thriller':['thriller'],
+                 'top_rated' : ['fortunato', 'votati'],
+                 'on_the_air' : ['corso', 'onda', 'diretta', 'dirette'],
+                 'channels_western':['western'],
+                 'channels_vos':['sub','sub-ita'],
+                 'channels_romance':['romantico','sentimentale', 'romance'],
+                 'channels_family':['famiglia','famiglie', 'family'],
+                 'channels_historical':['storico', 'history', 'storia'],
+                 'channels_az':['lettera','lista','alfabetico','a-z'],
+                 'channels_year':['anno', 'anni'],
+                 'update':['replay', 'update'],
+                 'autoplay':[config.get_localized_string(60071)]
+                }
 
-        icon_dict = {'channels_movie':['film'],
-                     'channels_tvshow':['serie','tv','episodi','episodio','fiction'],
-                     'channels_documentary':['documentari','documentario', 'documentary'],
-                     'channels_all':['tutti'],
-                     'news':['novità', "novita'", 'aggiornamenti', 'nuovi', 'nuove'],
-                     'now_playing':['cinema', 'in sala'],
-                     'channels_anime':['anime'],
-                     'genres':['genere', 'generi', 'categorie', 'categoria'],
-                     'channels_animation': ['animazione', 'cartoni', 'cartoon', 'animation'],
-                     'channels_action':['azione', 'arti marziali', 'action'],
-                     'channels_adventure': ['avventura', 'adventure'],
-                     'channels_biographical':['biografico'],
-                     'channels_comedy':['comico','commedia', 'demenziale', 'comedy'],
-                     'channels_adult':['erotico', 'hentai', 'harem', 'ecchi'],
-                     'channels_drama':['drammatico', 'drama'],
-                     'channels_syfy':['fantascienza', 'science fiction'],
-                     'channels_fantasy':['fantasy', 'magia'],
-                     'channels_crime':['gangster','poliziesco', 'crime', 'crimine'],
-                     'channels_grotesque':['grottesco'],
-                     'channels_war':['guerra', 'war'],
-                     'channels_children':['bambini', 'kids'],
-                     'horror':['horror'],
-                     'lucky': ['fortunato'],
-                     'channels_musical':['musical', 'musica', 'music'],
-                     'channels_mistery':['mistero', 'giallo', 'mystery'],
-                     'channels_noir':['noir'],
-                     'popular' : ['popolari','popolare', 'più visti'],
-                     'thriller':['thriller'],
-                     'top_rated' : ['fortunato', 'votati'],
-                     'on_the_air' : ['corso', 'onda', 'diretta', 'dirette'],
-                     'channels_western':['western'],
-                     'channels_vos':['sub','sub-ita'],
-                     'channels_romance':['romantico','sentimentale', 'romance'],
-                     'channels_family':['famiglia','famiglie', 'family'],
-                     'channels_historical':['storico', 'history', 'storia'],
-                     'channels_az':['lettera','lista','alfabetico','a-z'],
-                     'channels_year':['anno', 'anni'],
-                     'update':['replay', 'update'],
-                     'autoplay':[config.get_localized_string(60071)]
-                    }
+    suffix_dict = {'_hd':['hd','altadefinizione','alta definizione'],
+                '_4k':['4K'],
+                '_az':['lettera','lista','alfabetico','a-z'],
+                '_year':['anno', 'anni'],
+                '_genre':['genere', 'generi', 'categorie', 'categoria']}
 
-        suffix_dict = {'_hd':['hd','altadefinizione','alta definizione'],
-                       '_4k':['4K'],
-                       '_az':['lettera','lista','alfabetico','a-z'],
-                       '_year':['anno', 'anni'],
-                       '_genre':['genere', 'generi', 'categorie', 'categoria']}
+    search = ['cerca']
 
-        search = ['cerca']
+    search_suffix ={'_movie':['film'],
+                    '_tvshow':['serie','tv', 'fiction']}
 
-        search_suffix ={'_movie':['film'],
-                        '_tvshow':['serie','tv', 'fiction']}
-
-        for item in itemlist:
-
-            if genre == False:
-
-                for thumb, titles in icon_dict.items():
-                    if any( word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in search):
-                        thumb = 'search'
-                        for suffix, titles in search_suffix.items():
+    def autoselect_thumb(item, genre):
+        if genre == False:
+            for thumb, titles in icon_dict.items():
+                if any( word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in search):
+                    thumb = 'search'
+                    for suffix, titles in search_suffix.items():
+                        if any( word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
+                            thumb = thumb + suffix
+                    item.thumbnail = get_thumb(thumb + '.png')
+                elif any( word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
+                    if thumb == 'channels_movie' or thumb == 'channels_tvshow':
+                        for suffix, titles in suffix_dict.items():
                             if any( word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
                                 thumb = thumb + suffix
                         item.thumbnail = get_thumb(thumb + '.png')
-                    elif any( word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
-                        if thumb == 'channels_movie' or thumb == 'channels_tvshow':
-                            for suffix, titles in suffix_dict.items():
-                                if any( word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
-                                    thumb = thumb + suffix
-                            item.thumbnail = get_thumb(thumb + '.png')
-                        else: item.thumbnail = get_thumb(thumb + '.png')
-                    else:
-                        thumb = item.thumbnail
+                    else: item.thumbnail = get_thumb(thumb + '.png')
+                else:
+                    thumb = item.thumbnail
 
-            else:
-                for thumb, titles in icon_dict.items():
-                    if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
-                        item.thumbnail = get_thumb(thumb + '.png')
-                    else:
-                        thumb = item.thumbnail
+        else:
+            for thumb, titles in icon_dict.items():
+                if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
+                    item.thumbnail = get_thumb(thumb + '.png')
+                else:
+                    thumb = item.thumbnail
 
+        item.title = re.sub(r'\s*\{[^\}]+\}','',item.title)
+        return item
+    if item_or_itemlist:
+        if type(item_or_itemlist) == list:
+            for item in item_or_itemlist:
+                autoselect_thumb(item, genre)
+            return item_or_itemlist
 
-            item.title = re.sub(r'\s*\{[^\}]+\}','',item.title)
-        return itemlist
+        else:
+            return autoselect_thumb(item_or_itemlist, genre)
+
     elif thumb:
         return get_thumb(thumb)
     else:
