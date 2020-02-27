@@ -154,7 +154,7 @@ class NextDialog(xbmcgui.WindowXMLDialog):
         self.progress_control = None
 
         # set info
-        with filetools.file_open(INFO, 'r') as f:
+        with filetools.file_open(INFO, 'r', vfs=False) as f:
             full_info = f.readlines()
             full_info = full_info[1:]
         full_info = "".join(full_info)
