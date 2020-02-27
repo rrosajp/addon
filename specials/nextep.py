@@ -154,9 +154,10 @@ class NextDialog(xbmcgui.WindowXMLDialog):
         self.progress_control = None
 
         # set info
-        with filetools.file_open(INFO, 'r', vfs=False) as f:
-            full_info = f.readlines()
-            full_info = full_info[1:]
+        f = filetools.file_open(INFO, 'r')
+        full_info = f.read().split('\n')
+        full_info = full_info[1:]
+        f.close()
         full_info = "".join(full_info)
         info = jsontools.load(full_info)
         info = info["infoLabels"]
