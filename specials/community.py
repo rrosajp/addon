@@ -377,7 +377,10 @@ def get_menu(item, json, key, itemlist=[]):
         elif 'submenu' in option:
             get_sub_menu(it, option, 'submenu' ,itemlist)
 
-    return support.thumb(itemlist)
+    for item in itemlist:
+        if not item.thumbnail: support.thumb(item)
+
+    return itemlist
 
 
 def get_sub_menu(item, json, key, itemlist=[]):
