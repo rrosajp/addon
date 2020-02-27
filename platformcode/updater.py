@@ -83,90 +83,100 @@ def check(background=False):
         changelog = ''
         poFilesChanged = False
         nCommitApplied = 0
-        for c in reversed(commits[:pos]):
-            commit = urllib.urlopen(c['url']).read()
-            commitJson = json.loads(commit)
-            # evitiamo di applicare i merge commit
-            if 'Merge' in commitJson['commit']['message']:
-                continue
-            logger.info('aggiornando a ' + commitJson['sha'])
-            alreadyApplied = True
-
-            # major update
-            if len(commitJson['files']) > 50:
-                localCommitFile.close()
-                c['sha'] = updateFromZip('Aggiornamento in corso...')
-                localCommitFile = open(os.path.join(xbmc.translatePath("special://home/addons/"), 'plugin.video.kod', trackingFile), 'w')  # il file di tracking viene eliminato, lo ricreo
-                changelog += commitJson['commit']['message'] + "\n"
-                nCommitApplied += 3  # il messaggio sarà lungo, probabilmente, il tempo di vis. è maggiorato
-                break
-
-            for file in commitJson['files']:
-                if file["filename"] == trackingFile:  # il file di tracking non si modifica
+        try:
+            for c in reversed(commits[:pos]):
+                commit = urllib.urlopen(c['url']).read()
+                commitJson = json.loads(commit)
+                # evitiamo di applicare i merge commit
+                if 'Merge' in commitJson['commit']['message']:
                     continue
-                else:
-                    logger.info(file["filename"])
-                    if 'resources/language' in file["filename"]:
-                        poFilesChanged = True
-                    if 'videolibrary_service.py' in file["filename"]:
-                        serviceChanged = True
-                    if file['status'] == 'modified' or file['status'] == 'added':
-                        if 'patch' in file:
-                            text = ""
-                            try:
-                                localFile = io.open(addonDir + file["filename"], 'r+', encoding="utf8")
-                                text = localFile.read()
-                                if not PY3:
-                                    text = text.decode('utf-8')
-                            except IOError: # nuovo file
-                                # crea le cartelle se non esistono
-                                dirname = os.path.dirname(addonDir + file["filename"])
-                                if not os.path.exists(dirname):
-                                    os.makedirs(dirname)
+                logger.info('aggiornando a ' + commitJson['sha'])
+                alreadyApplied = True
 
-                                localFile = io.open(addonDir + file["filename"], 'w', encoding="utf8")
+                # major update
+                if len(commitJson['files']) > 50:
+                    localCommitFile.close()
+                    c['sha'] = updateFromZip('Aggiornamento in corso...')
+                    localCommitFile = open(os.path.join(xbmc.translatePath("special://home/addons/"), 'plugin.video.kod', trackingFile), 'w')  # il file di tracking viene eliminato, lo ricreo
+                    changelog += commitJson['commit']['message'] + "\n"
+                    nCommitApplied += 3  # il messaggio sarà lungo, probabilmente, il tempo di vis. è maggiorato
+                    break
 
-                            patched = apply_patch(text, (file['patch']+'\n').encode('utf-8'))
-                            if patched != text:  # non eseguo se già applicata (es. scaricato zip da github)
-                                alreadyApplied = False
-                                if getShaStr(patched) == file['sha']:
-                                    localFile.seek(0)
-                                    localFile.truncate()
-                                    localFile.writelines(patched)
-                                    localFile.close()
-                                else:  # nel caso ci siano stati problemi
-                                    logger.info('lo sha non corrisponde, scarico il file')
-                                    localFile.close()
-                                    urllib.urlretrieve(file['raw_url'], os.path.join(addonDir, file['filename']))
-                        else:  # è un file NON testuale, lo devo scaricare
-                            # se non è già applicato
-                            filename = os.path.join(addonDir, file['filename'])
-                            dirname = os.path.dirname(filename)
-                            if not (filetools.isfile(addonDir + file['filename']) and getSha(filename) == file['sha']):
-                                if not os.path.exists(dirname):
-                                    os.makedirs(dirname)
-                                urllib.urlretrieve(file['raw_url'], filename)
-                                alreadyApplied = False
-                    elif file['status'] == 'removed':
-                        remove(addonDir+file["filename"])
-                        alreadyApplied = False
-                    elif file['status'] == 'renamed':
-                        # se non è già applicato
-                        if not (filetools.isfile(addonDir + file['filename']) and getSha(addonDir + file['filename']) == file['sha']):
-                            dirs = file['filename'].split('/')
-                            for d in dirs[:-1]:
-                                if not filetools.isdir(addonDir + d):
-                                    filetools.mkdir(addonDir + d)
-                            filetools.move(addonDir + file['previous_filename'], addonDir + file['filename'])
+                for file in commitJson['files']:
+                    if file["filename"] == trackingFile:  # il file di tracking non si modifica
+                        continue
+                    else:
+                        logger.info(file["filename"])
+                        if 'resources/language' in file["filename"]:
+                            poFilesChanged = True
+                        if 'videolibrary_service.py' in file["filename"]:
+                            serviceChanged = True
+                        if file['status'] == 'modified' or file['status'] == 'added':
+                            if 'patch' in file:
+                                text = ""
+                                try:
+                                    localFile = io.open(addonDir + file["filename"], 'r+', encoding="utf8")
+                                    text = localFile.read()
+                                    if not PY3:
+                                        text = text.decode('utf-8')
+                                except IOError: # nuovo file
+                                    # crea le cartelle se non esistono
+                                    dirname = os.path.dirname(addonDir + file["filename"])
+                                    if not os.path.exists(dirname):
+                                        os.makedirs(dirname)
+
+                                    localFile = io.open(addonDir + file["filename"], 'w', encoding="utf8")
+
+                                patched = apply_patch(text, (file['patch']+'\n').encode('utf-8'))
+                                if patched != text:  # non eseguo se già applicata (es. scaricato zip da github)
+                                    alreadyApplied = False
+                                    if getShaStr(patched) == file['sha']:
+                                        localFile.seek(0)
+                                        localFile.truncate()
+                                        localFile.writelines(patched)
+                                        localFile.close()
+                                    else:  # nel caso ci siano stati problemi
+                                        logger.info('lo sha non corrisponde, scarico il file')
+                                        localFile.close()
+                                        urllib.urlretrieve(file['raw_url'], os.path.join(addonDir, file['filename']))
+                            else:  # è un file NON testuale, lo devo scaricare
+                                # se non è già applicato
+                                filename = os.path.join(addonDir, file['filename'])
+                                dirname = os.path.dirname(filename)
+                                if not (filetools.isfile(addonDir + file['filename']) and getSha(filename) == file['sha']):
+                                    if not os.path.exists(dirname):
+                                        os.makedirs(dirname)
+                                    urllib.urlretrieve(file['raw_url'], filename)
+                                    alreadyApplied = False
+                        elif file['status'] == 'removed':
+                            remove(addonDir+file["filename"])
                             alreadyApplied = False
-            if not alreadyApplied:  # non mando notifica se già applicata (es. scaricato zip da github)
-                changelog += commitJson['commit']['message'] + "\n"
-                nCommitApplied += 1
+                        elif file['status'] == 'renamed':
+                            # se non è già applicato
+                            if not (filetools.isfile(addonDir + file['filename']) and getSha(addonDir + file['filename']) == file['sha']):
+                                dirs = file['filename'].split('/')
+                                for d in dirs[:-1]:
+                                    if not filetools.isdir(addonDir + d):
+                                        filetools.mkdir(addonDir + d)
+                                filetools.move(addonDir + file['previous_filename'], addonDir + file['filename'])
+                                alreadyApplied = False
+                if not alreadyApplied:  # non mando notifica se già applicata (es. scaricato zip da github)
+                    changelog += commitJson['commit']['message'] + "\n"
+                    nCommitApplied += 1
+        except:
+            import traceback
+            logger.error(traceback.format_exc())
+            # fallback
+            localCommitFile.close()
+            c['sha'] = updateFromZip('Aggiornamento in corso...')
+            localCommitFile = open(
+                os.path.join(xbmc.translatePath("special://home/addons/"), 'plugin.video.kod', trackingFile),
+                'w')  # il file di tracking viene eliminato, lo ricreo
         if addon.getSetting("addon_update_message"):
             if background:
                 with open(xbmc.translatePath(changelogFile), 'a+') as fileC:
                     fileC.write(changelog)
-            else:
+            elif changelog:
                 platformtools.dialog_ok('Kodi on Demand', 'Aggiornamenti applicati:\n' + changelog)
 
         localCommitFile.seek(0)
