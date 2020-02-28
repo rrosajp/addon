@@ -420,7 +420,7 @@ def scrape(func):
 
         # next page for pagination
         if pagination and len(matches) > pag * pagination and not search:
-            if inspect.stack()[1][3] != 'get_newest':
+            if inspect.stack()[1][3] not in ['newest','get_newest']:
                 itemlist.append(
                     Item(channel=item.channel,
                          action = item.action,
