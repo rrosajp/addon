@@ -158,7 +158,8 @@ def peliculas(item):
 
     # patronBlock=[r'<div class="?sequex-page-left"?>(?P<block>.*?)<aside class="?sequex-page-right"?>',
     #                                           '<div class="?card-image"?>.*?(?=<div class="?card-image"?>|<div class="?rating"?>)']
-    if 'newest' not in item.args: patronNext = '<a class="?page-link"? href="?([^>]+)"?><i class="fa fa-angle-right">'
+    # if 'newest' not in item.args: 
+    patronNext = '<a class="?page-link"? href="?([^>]+)"?><i class="fa fa-angle-right">'
 
     return locals()
 
