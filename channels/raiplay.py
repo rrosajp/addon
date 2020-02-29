@@ -112,10 +112,10 @@ def search(item, text):
         json = current_session.get(host + '/dl/RaiTV/RaiPlayMobile/Prod/Config/programmiAZ-elenco.json').json()
         for key in json:
             for key in json[key]:
-                if key.has_key('PathID') and (text.lower() in key['name'].lower()):
+                if 'PathID' in key and (text.lower() in key['name'].lower()):
                     itemlist.append(support.Item(channel = item.channel, title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'], url = key['PathID'].replace('/?json', '.json'), action = 'Type',
-                                                 thumbnail = getUrl(key['images']['portrait'] if key['images'].has_key('portrait') else key['images']['portrait43'] if key['images'].has_key('portrait43') else key['images']['landscape']),
-                                                 fanart = getUrl(key['images']['landscape'] if key['images'].has_key('landscape') else key['images']['landscape43'])))
+                                                 thumbnail = getUrl(key['images']['portrait'] if 'portrait' in key['images'] else key['images']['portrait43'] if 'portrait43' in key['images'] else key['images']['landscape']),
+                                                 fanart = getUrl(key['images']['landscape'] if 'landscape' in key['images'] else key['images']['landscape43'])))
     except:
         import sys
         for line in sys.exc_info():
@@ -233,7 +233,7 @@ def findvideos(item):
     if item.url.endswith('json'):
         json = current_session.get(item.url).json()
 
-        if json.has_key('first_item_path'):
+        if 'first_item_path' in json:
             url = current_session.get(getUrl(json['first_item_path'])).json()['video']['content_url']
         else:
             url = json['video']['content_url']
@@ -288,9 +288,9 @@ def load_episodes(key, item):
     itemlist=[]
     json = current_session.get(getUrl(key['path_id'])).json()['items']
     for key in json:
-        ep = support.match(key['subtitle'].encode('utf8'), patron=r'St\s*(\d+)\s*Ep\s*(\d+)').match
+        ep = support.match(key['subtitle'], patron=r'St\s*(\d+)\s*Ep\s*(\d+)').match
         if ep:
-            title = ep[0] + 'x' + ep[1].zfill(2) + support.re.sub(r'St\s*\d+\s*Ep\s*\d+','',key['subtitle'].encode('utf8'))
+            title = ep[0] + 'x' + ep[1].zfill(2) + support.re.sub(r'St\s*\d+\s*Ep\s*\d+','',key['subtitle'])
         else:
             title = key['subtitle'].strip()
         if not title:

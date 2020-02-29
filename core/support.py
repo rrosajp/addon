@@ -813,12 +813,15 @@ def match(item_url_string, **args):
     # check type of item_url_string
     if string:
         data = item_url_string
-    elif type(item_url_string) == str:
-        if item_url_string.startswith('http'): url = item_url_string
-        else : data = item_url_string
-    else:
+    elif isinstance(item_url_string, Item):
         # if item_url_string is an item use item.url as url
         url = item_url_string.url
+    else:
+        if item_url_string.startswith('http'): url = item_url_string
+        else : data = item_url_string
+    # else:
+    #     # if item_url_string is an item use item.url as url
+    #     url = item_url_string.url
 
     # if there is a url, download the page
     if url:
