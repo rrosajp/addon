@@ -13,7 +13,7 @@ if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
 import os, json, time, inspect, channelselector
 
-if PY3
+if PY3:
     from lib.concurrent import futures
 else:
     from lib.concurrent_py2 import futures
