@@ -30,7 +30,7 @@ def mainlist(item):
     film = ["/film/"]
     anime = ["/genere/anime/"]
     tvshow = ["/serietv/"]
-    top = [('Generi',['', 'generos'])]
+    top = [('Generi',['', 'genre'])]
 
     return locals()
 
@@ -43,8 +43,8 @@ def search(item, text):
 
 
 @support.scrape
-def generos(item):
-    patron = '<a href="(?P<url>[^"#]+)">(?P<title>[a-zA-Z]+)'
+def genre(item):
+    patronMenu = '<a href="(?P<url>[^"#]+)">(?P<title>[a-zA-Z]+)'
     patronBlock='<a href="#">Genere</a><ul class="sub-menu">(?P<block>.*?)</ul>'
     action='peliculas'
 
