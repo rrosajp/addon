@@ -1,20 +1,5 @@
 # -*- coding: utf-8 -*-
 # -*- Channel altadefinizione01_link -*-
-"""
-
-    Eccezioni che non superano il test del canale:
-       - indicare i problemile eccezioni
-
-    Novità. Indicare in quale/i sezione/i è presente il canale:
-       -film
-    
-    Avvisi:
-        - la voce 'Mi sento fortunato' è il rettangolino in basso nel sito
-        con scritto 'FILM RANDOM'
-        
-    Ulteriori info:
-
-"""
 
 from core import support
 from core.item import Item
@@ -51,15 +36,9 @@ def mainlist(item):
 def peliculas(item):
     support.log('peliculas',item)
 
-    patron = r'class="innerImage">.*?href="(?P<url>[^"]+)".*?src="(?P<thumb>[^"]+)"'\
-             '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)[^>]+>'\
-             '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>'\
-             '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>'\
-             '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>'\
-             '[^>]+>[^>]+>[^>]+>[^>]+> (?P<year>\d{4})[^>]+>[^>]+> (?P<duration>\d+)'\
-             '[^>]+>[^>]+> (?P<quality>[a-zA-Z]+) [^>]+>[^>]+> (?P<lang>[^>]+) [^>]+>'
+    patron = r'<a href="(?P<url>[^"]+)">(?P<title>[^<]+)[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>\s*<div class="[^"]+" style="background-image:url\((?P<thumb>[^\)]+)[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>\s*(?P<year>\d{4})[^>]+>[^>]+> (?P<duration>\d+)[^>]+>[^>]+> (?P<quality>[a-zA-Z]+) [^>]+>[^>]+> (?P<lang>[^>]+) [^>]+>'
     patronNext =  r'<span>\d</span> <a href="([^"]+)">'
-    #debug = True
+    # debug = True
     return locals()
 
 # =========== def pagina categorie ======================================
@@ -77,7 +56,7 @@ def genres(item):
     elif item.args == 'lucky': # sono i titoli random nella pagina
         patronBlock = r'FILM RANDOM.*?class="listSubCat">(?P<block>.*)</ul>'
         action = 'findvideos'
-    patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
+    patronMenu = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
 
     #debug = True
     return locals()
