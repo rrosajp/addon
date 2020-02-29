@@ -692,8 +692,8 @@ class Tvdb(object):
             response.close()
 
         except Exception as ex:
-            if isinstance(ex, urllib).HTTPError:
-                logger.debug("code es %s " % ex.code)
+            # if isinstance(ex, urllib).HTTPError:
+            logger.debug("code es %s " % ex.code)
 
             message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
             logger.error("error en: %s" % message)
@@ -757,8 +757,8 @@ class Tvdb(object):
             response.close()
 
         except Exception as ex:
-            if isinstance(ex, urllib).HTTPError:
-                logger.debug("code es %s " % ex.code)
+            # if isinstance(ex, urllib.parse).HTTPError:
+            logger.debug("code es %s " % ex.code)
 
             message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
             logger.error("error en: %s" % message)
@@ -846,8 +846,8 @@ class Tvdb(object):
             response.close()
 
         except Exception as ex:
-            if isinstance(ex, urllib).HTTPError:
-                logger.debug("code es %s " % ex.code)
+            # if isinstance(ex, urllib).HTTPError:
+            logger.debug("code es %s " % ex.code)
 
             message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
             logger.error("error en: %s" % message)
