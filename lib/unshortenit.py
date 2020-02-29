@@ -593,9 +593,9 @@ def findlinks(text):
         #     text += '\n' + sh
         import sys
         if sys.version_info[0] >= 3:
-            from lib.concurrent import futures
+            from concurrent import futures
         else:
-            from lib.concurrent_py2 import futures
+            from concurrent_py2 import futures
         with futures.ThreadPoolExecutor() as executor:
             unshList = [executor.submit(unshorten, match) for match in matches]
             for link in futures.as_completed(unshList):

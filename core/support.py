@@ -7,9 +7,9 @@ import os
 import re
 import sys
 if sys.version_info[0] >= 3:
-    from lib.concurrent import futures
+    from concurrent import futures
 else:
-    from lib.concurrent_py2 import futures
+    from concurrent_py2 import futures
 
 try:
     import urllib.request as urllib

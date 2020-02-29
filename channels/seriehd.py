@@ -103,9 +103,9 @@ def episodios(item):
     data = ''
     import sys
     if sys.version_info[0] >= 3:
-        from lib.concurrent import futures
+        from concurrent import futures
     else:
-        from lib.concurrent_py2 import futures
+        from concurrent_py2 import futures
     with futures.ThreadPoolExecutor() as executor:
         thL = []
         for i, season in enumerate(seasons.matches):

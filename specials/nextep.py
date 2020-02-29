@@ -6,9 +6,9 @@ from core import scrapertools
 from core import jsontools, filetools
 import sys
 if sys.version_info[0] >= 3:
-    from lib.concurrent import futures
+    from concurrent import futures
 else:
-    from lib.concurrent_py2 import futures
+    from concurrent_py2 import futures
 
 next_dialogs = ['NextDialog.xml', 'NextDialogExtended.xml', 'NextDialogCompact.xml']
 next_ep_type = config.get_setting('next_ep_type')

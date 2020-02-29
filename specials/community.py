@@ -449,9 +449,9 @@ def get_search_menu(item, json='', itemlist=[], channel_name=''):
 def submenu(item, json, key, itemlist = []):
     import sys
     if sys.version_info[0] >= 3:
-        from lib.concurrent import futures
+        from concurrent import futures
     else:
-        from lib.concurrent_py2 import futures
+        from concurrent_py2 import futures
 
     filter_list = []
     for option in json[key]:
