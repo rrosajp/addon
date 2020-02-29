@@ -101,7 +101,11 @@ def episodios(item):
     seasons = support.match(url, patronBlock=patron_season, patron=patron_option)
 
     data = ''
-    from concurrent import futures
+    import sys
+    if sys.version_info[0] >= 3:
+        from lib.concurrent import futures
+    else:
+        from lib.concurrent_py2 import futures
     with futures.ThreadPoolExecutor() as executor:
         thL = []
         for i, season in enumerate(seasons.matches):

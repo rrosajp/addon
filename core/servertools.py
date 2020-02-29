@@ -736,7 +736,11 @@ def check_list_links(itemlist, numero='', timeout=3):
     El parámetro timeout indica un tope de espera para descargar la página
     """
     numero = ((int(numero) + 1) * 5) if numero != '' else 10
-    from lib.concurrent import futures
+    import sys
+    if sys.version_info[0] >= 3:
+        from lib.concurrent import futures
+    else:
+        from lib.concurrent_py2 import futures
     with futures.ThreadPoolExecutor() as executor:
         checked = []
         for it in itemlist:

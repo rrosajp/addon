@@ -6,7 +6,11 @@ import requests, re
 from core import  support, tmdb
 from core.item import Item
 from specials import autorenumber
-from lib.concurrent import futures
+import sys
+if sys.version_info[0] >= 3:
+    from lib.concurrent import futures
+else:
+    from lib.concurrent_py2 import futures
 
 
 host = support.config.get_channel_url()

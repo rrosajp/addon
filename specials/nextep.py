@@ -4,7 +4,11 @@ from platformcode import config, platformtools, logger
 from time import time, sleep
 from core import scrapertools
 from core import jsontools, filetools
-from lib.concurrent import futures
+import sys
+if sys.version_info[0] >= 3:
+    from lib.concurrent import futures
+else:
+    from lib.concurrent_py2 import futures
 
 next_dialogs = ['NextDialog.xml', 'NextDialogExtended.xml', 'NextDialogCompact.xml']
 next_ep_type = config.get_setting('next_ep_type')
