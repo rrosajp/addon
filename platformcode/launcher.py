@@ -289,7 +289,11 @@ def run(item=None):
                 #     except:
                 #         pass
 
-                last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
+                # last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
+                if channeltools.get_channel_setting('last_search', 'search'):
+                    last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
+                else:
+                    last_search = ''
 
                 tecleado = platformtools.dialog_input(last_search)
 
