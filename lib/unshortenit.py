@@ -600,5 +600,10 @@ def findlinks(text):
             unshList = [executor.submit(unshorten, match) for match in matches]
             for link in futures.as_completed(unshList):
                 if link.result()[0] not in matches:
-                    text += '\n' + link.result()[0]
+                    links = link.result()[0]
+                    if type(links) == list:
+                        for l in links:
+                            text += '\n' + l
+                    else:
+                        text += '\n' + str(link.result()[0])
     return text
