@@ -357,7 +357,7 @@ def get_channels(item):
             list_cat[n] = 'tvshow'
 
         if item.mode == 'all' or (item.mode in list_cat):
-            if config.get_setting("include_in_global_search", channel):
+            if config.get_setting("include_in_global_search", channel) and ch_param.get("active", False):
                 channels_list.append(channel)
                 title_list.append(ch_param.get('title', channel))
 
