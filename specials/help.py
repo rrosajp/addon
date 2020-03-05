@@ -42,7 +42,7 @@ def mainlist(item):
 
     if config.is_xbmc():
         itemlist.append(Item(title=config.get_localized_string(707429), channel="setting", action="report_menu",
-                             thumbnail=get_thumb("error.png"), viewmode="list"))
+                             thumbnail=get_thumb("error.png"), viewmode="list",folder=True))
 
     itemlist.append(Item(channel=item.channel, action="", title=config.get_localized_string(60447),
                          thumbnail=get_thumb("help.png"),
@@ -78,7 +78,7 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, action="faq",
                          title=config.get_localized_string(60455),
                          thumbnail=get_thumb("help.png"),
-                         folder=True, extra="prob_bib"))
+                         folder=False, extra="prob_bib"))
     itemlist.append(Item(channel=item.channel, action="faq",
                          title=config.get_localized_string(60456),
                          thumbnail=get_thumb("help.png"),

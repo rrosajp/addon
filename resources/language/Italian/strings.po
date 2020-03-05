@@ -105,6 +105,14 @@ msgctxt "#30023"
 msgid "NO"
 msgstr "NO"
 
+msgctxt "#30024"
+msgid "Contextual Menu"
+msgstr "Menu Contestuale"
+
+msgctxt "#30025"
+msgid "KoD Preferences"
+msgstr "Preferenze KoD"
+
 msgctxt "#30043"
 msgid "Force view mode:"
 msgstr "Forza modalità di visualizzazione:"
@@ -1538,8 +1546,8 @@ msgid "Search Trailer"
 msgstr "Cerca Trailer"
 
 msgctxt "#60360"
-msgid "[B]QUICK MENU[/B]"
-msgstr "[B]MENU RAPIDO[/B]"
+msgid "Qiuick Menu"
+msgstr "Menu Rapido"
 
 msgctxt "#60361"
 msgid "Super Favourites Menu"
@@ -5674,8 +5682,8 @@ msgid "Completed Serie"
 msgstr "Serie Completa"
 
 msgctxt "#70737"
-msgid "[B]SIDE MENU[/B]"
-msgstr "[B]MENU LATERALE[/B]"
+msgid "Side Menu"
+msgstr "Menu Laterale"
 
 msgctxt "#70738"
 msgid "Ready channels %d/%d"

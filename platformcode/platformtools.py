@@ -584,9 +584,9 @@ def set_context_commands(item, parent_item):
         # Ir al Menu Principal (channel.mainlist)
         if parent_item.channel not in ["news", "channelselector"] and item.action != "mainlist" \
                 and parent_item.action != "mainlist":
-            context_commands.append((config.get_localized_string(60349), "XBMC.Container.Refresh (%s?%s)" %
+            context_commands.insert(0, (config.get_localized_string(60349), "XBMC.Container.Refresh (%s?%s)" %
                                      (sys.argv[0], Item(channel=item.channel, action="mainlist").tourl())))
-            context_commands.insert(2, (config.get_localized_string(70739),
+            context_commands.insert(1, (config.get_localized_string(70739),
                                         "XBMC.Container.Update (%s?%s)" % (sys.argv[0], Item(action="open_browser",
                                                                                              url=item.url).tourl())))
 
@@ -598,11 +598,11 @@ def set_context_commands(item, parent_item):
                                      (sys.argv[0], item.clone(channel="favorites", action="addFavourite",
                                                               from_channel=item.channel,
                                                               from_action=item.action).tourl())))
-        
+
         # Añadir a Alfavoritos (Mis enlaces)
         if item.channel not in ["favorites", "videolibrary", "help", ""] and parent_item.channel != "favorites":
             context_commands.append(
-                ('[COLOR blue]%s[/COLOR]' % config.get_localized_string(70557), "XBMC.RunPlugin(%s?%s)" %
+                (config.get_localized_string(70557), "XBMC.RunPlugin(%s?%s)" %
                  (sys.argv[0], item.clone(channel="kodfavourites", action="addFavourite",
                                           from_channel=item.channel,
                                           from_action=item.action).tourl())))
@@ -630,7 +630,7 @@ def set_context_commands(item, parent_item):
                                                                                    text=item.wanted).tourl())))
 
             context_commands.append(
-                ("[COLOR yellow]%s[/COLOR]" % config.get_localized_string(70561), "XBMC.Container.Update (%s?%s)" % (
+                (config.get_localized_string(70561), "XBMC.Container.Update (%s?%s)" % (
                     sys.argv[0], item.clone(channel='search', action='from_context', search_type='list', page='1',
                                             list_type='%s/%s/similar' % (
                                             mediatype, item.infoLabels['tmdb_id'])).tourl())))
@@ -703,7 +703,7 @@ def set_context_commands(item, parent_item):
         context_commands.append((config.get_localized_string(60361),
                                  "XBMC.RunScript(special://home/addons/plugin.program.super.favourites/LaunchSFMenu.py)"))
 
-    context_commands = sorted(context_commands, key=lambda comand: comand[0])
+    # context_commands = sorted(context_commands, key=lambda comand: comand[0])
     
     # Menu Rapido
     # context_commands.insert(0, (config.get_localized_string(60360),
@@ -712,7 +712,7 @@ def set_context_commands(item, parent_item):
     #                                                                                  parent=parent_item.tourl()).tourl(
     #                             ))))
     if config.dev_mode():
-        context_commands.insert(2, ("item info",
+        context_commands.insert(0, ("item info",
                 "XBMC.Container.Update (%s?%s)" % (sys.argv[0], Item(action="itemInfo", parent=item.tojson()).tourl())))
     return context_commands
 

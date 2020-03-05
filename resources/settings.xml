@@ -79,6 +79,11 @@
         <setting id="custom_theme" type="folder" label="70565" default="" visible="eq(-1,true)"/>
         <setting id="infoplus_set" type="labelenum" label="70128" lvalues="70129|70130" default="70129"/>
         <setting id="video_thumbnail_type" type="enum" label="70131" lvalues="70132|70133" default="0"/>
+        <!-- Contextual -->
+        <setting label="30024" type="lsep"/>
+        <setting id="quick_menu" type="bool" label="60360" default="false"/>
+        <setting id="side_menu" type="bool" label="70737" default="false"/>
+        <setting id="kod_menu" type="bool" label="30025" default="false"/>
     </category>
 
     <!-- Other -->

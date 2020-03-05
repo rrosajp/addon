@@ -24,7 +24,9 @@ from core import httptools, scrapertools, servertools, tmdb, channeltools
 from core.item import Item
 from lib import unshortenit
 from platformcode import logger, config
-from specials import autoplay
+from specials import autoplay, shortcuts
+
+CONTEXT =shortcuts.context()
 
 def hdpass_get_servers(item):
     def get_hosts(url, quality):
@@ -299,7 +301,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 contentLanguage = lang1,
                 contentEpisodeNumber=episode if episode else '',
                 news= item.news if item.news else '',
-                other = scraped['other'] if scraped['other'] else ''
+                other = scraped['other'] if scraped['other'] else '',
+                context = CONTEXT
             )
 
             # for lg in list(set(listGroups).difference(known_keys)):
@@ -620,7 +623,8 @@ def menuItem(itemlist, filename, title='', action='', url='', contentType='movie
         url = url,
         extra = extra,
         args = args,
-        contentType = contentType
+        contentType = contentType,
+        context = CONTEXT
     ))
 
     # Apply auto Thumbnails at the menus
@@ -668,7 +672,7 @@ def menu(func):
                              url = host + var[0] if len(var) > 0 else '',
                              action = var[1] if len(var) > 1 else 'peliculas',
                              args=var[2] if len(var) > 2 else '',
-                             contentType= var[3] if len(var) > 3 else 'movie',)
+                             contentType= var[3] if len(var) > 3 else 'movie')
 
             # Make MAIN MENU
             elif dictUrl[name] is not None:
@@ -687,7 +691,7 @@ def menu(func):
                              url = host + var[0] if len(var) > 0 else '',
                              action = var[1] if len(var) > 1 else 'peliculas',
                              args=var[2] if len(var) > 2 else '',
-                             contentType= var[3] if len(var) > 3 else 'movie' if name == 'film' else 'tvshow',)
+                             contentType= var[3] if len(var) > 3 else 'movie' if name == 'film' else 'tvshow')
                 # add search menu for category
                 if 'search' not in args: menuItem(itemlist, filename, config.get_localized_string(70741) % title + ' … submenu bold', 'search', host + url, contentType='movie' if name == 'film' else 'tvshow')
 
@@ -768,6 +772,12 @@ def typo(string, typography=''):
         string = ' - ' + re.sub(r'\s--','',string)
     if 'bullet' in string:
         string = '[B]' + "•" + '[/B] ' + re.sub(r'\sbullet','',string)
+    if 'capitalize' in string.lower():
+        string =  re.sub(r'\scapitalize','',string).capitalize()
+    if 'uppercase' in string.lower():
+        string =  re.sub(r'\suppercase','',string).upper()
+    if 'lowercase' in string.lower():
+        string =  re.sub(r'\slowercase','',string).lower()
 
     return string
 
