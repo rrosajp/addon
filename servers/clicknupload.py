@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import urllib
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
+
+if PY3:
+    #from future import standard_library
+    #standard_library.install_aliases()
+    import urllib.parse as urllib                               # Es muy lento en PY2.  En PY3 es nativo
+else:
+    import urllib                                               # Usamos el nativo de PY2 que es más rápido
 
 from core import httptools
 from core import scrapertools
@@ -48,7 +57,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 def get_data(url_orig, req_post=""):
     try:
         if not excption:
-            response = httptools.downloadpage(url_orig, req_post)
+            response = httptools.downloadpage(url_orig, post=req_post)
             if not response.data or "urlopen error [Errno 1]" in str(response.code):
                 global excption
                 excption = True
@@ -57,7 +66,6 @@ def get_data(url_orig, req_post=""):
         else:
             raise Exception
     except:
-        import urllib
         post = {"address": url_orig.replace(".me", ".org")}
         if req_post:
             post["options"] = [{"man": "--data", "attribute": req_post}]

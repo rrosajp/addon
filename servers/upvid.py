@@ -3,9 +3,7 @@
 # Conector UpVID By Alfa development Group
 # --------------------------------------------------------
 
-import base64
-import re
-
+import re, base64
 from core import httptools
 from core import scrapertools
 from lib.aadecode import decode as aadecode
@@ -31,7 +29,7 @@ def get_video_url(page_url, premium = False, user = "", password = "", video_pas
         if 'ﾟωﾟﾉ' in data:
             break
         else:
-            page_url = scrapertools.find_single_match(data, '\'<iframe src="([^"]+)')
+            page_url = scrapertools.find_single_match(data, '"iframe" src="([^"]+)')
             if not page_url:
                 page_url = scrapertools.find_single_match(data, '<input type="hidden" id="link" value="([^"]+)')
     data = re.sub(r'"|\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
@@ -50,7 +48,7 @@ def get_video_url(page_url, premium = False, user = "", password = "", video_pas
 def resuelve(r, o):
     a = '';
     n = 0
-    e = range(256)
+    e = list(range(256))
     for f in range(256):
         n = (n + e[f] + ord(r[(f % len(r))])) % 256
         t = e[f];

@@ -5,7 +5,7 @@ import urllib, re
 
 from core import httptools
 from core import scrapertools
-from platformcode import logger, config
+from platformcode import logger, config, platformtools
 from core.support import dbg
 
 
@@ -40,7 +40,15 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     # dbg()
 
     global data
-    logger.info('PAGE DATA' + data)
+    # logger.info('PAGE DATA' + data)
+    # sitekey = scrapertools.find_single_match(data, 'data-sitekey="([^"]+)')
+    sitekey = '6LeNU5IUAAAAAPNs_w-s8Rc-X2C2SPE3UW8lkkjW'
+    # from core import support
+    # support.dbg()
+    captcha = platformtools.show_recaptcha(sitekey, page_url) if sitekey else ''
+
+    if captcha:
+        data = httptools.downloadpage(page_url, post={'g-recaptcha-response': captcha}).data
     vres = scrapertools.find_multiple_matches(data, 'nowrap[^>]+>([^,]+)')
     if not vres: vres = scrapertools.find_multiple_matches(data, '<td>(\d+x\d+)')
 

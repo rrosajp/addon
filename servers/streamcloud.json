@@ -1,5 +1,5 @@
 {
-  "active": true,
+  "active": false,
   "find_videos": {
     "ignore_urls": [
       "http://streamcloud.eu/stylesheets",
@@ -26,6 +26,9 @@
   "free": true,
   "id": "streamcloud",
   "name": "streamcloud",
+  "premium": [
+    "alldebrid"
+  ],
   "settings": [
     {
       "default": false,
