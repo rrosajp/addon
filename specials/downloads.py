@@ -782,11 +782,9 @@ def get_episodes(item):
                 episode.contentTitle = re.sub("\[[^\]]+\]|\([^\)]+\)|\d*x\d*\s*-", "", episode.title).strip()
 
             episode.downloadFilename = filetools.validate_path(filetools.join(item.downloadFilename, "%dx%0.2d - %s" % (episode.contentSeason, episode.contentEpisodeNumber, episode.contentTitle.strip())))
-            itemlist.append(episode)
-
-        if season:
-            if scrapertools.find_single_match(episode.title, r'(\d+)x') == season_number:
-                itemlist.append(episode)
+            if season:
+                if scrapertools.find_single_match(episode.title, r'(\d+)x') == season_number:
+                    itemlist.append(episode)
             else:
                 itemlist.append(episode)
         # Cualquier otro resultado no nos vale, lo ignoramos
