@@ -4,7 +4,7 @@ import urllib
 import time
 from core import httptools
 from core import scrapertools
-from platformcode import logger
+from platformcode import logger, config
 from lib import jsunpack
 
 def test_video_exists(page_url):
