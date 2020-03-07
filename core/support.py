@@ -1091,11 +1091,9 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
     if CL and not AP:
         if get_setting('checklinks', item.channel):
             checklinks = get_setting('checklinks', item.channel)
-        else:
-            checklinks = get_setting('checklinks')
-        if get_setting('checklinks_number', item.channel):
             checklinks_number = get_setting('checklinks_number', item.channel)
         else:
+            checklinks = get_setting('checklinks')
             checklinks_number = get_setting('checklinks_number')
         itemlist = servertools.check_list_links(itemlist, checklinks_number)
 

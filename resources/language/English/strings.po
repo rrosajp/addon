@@ -106,12 +106,32 @@ msgid "NO"
 msgstr ""
 
 msgctxt "#30024"
-msgid "Contextual Menu"
+msgid "Select the elements you want to display on the Contextual Menu"
 msgstr ""
 
 msgctxt "#30025"
 msgid "KoD Preferences"
 msgstr "Preferenze KoD"
+
+msgctxt "#30026"
+msgid "Direct"
+msgstr ""
+
+msgctxt "#30027"
+msgid "SetResolvedUrl"
+msgstr ""
+
+msgctxt "#30028"
+msgid "Built-In"
+msgstr ""
+
+msgctxt "#30029"
+msgid "Download and Play"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Advanced Options"
+msgstr ""
 
 msgctxt "#30043"
 msgid "Force view mode:"
@@ -2327,11 +2347,11 @@ msgid "Videolibrary options"
 msgstr ""
 
 msgctxt "#60567"
-msgid "   Overwrite the entire video library (strm, nfo and json)"
+msgid "Overwrite the entire video library (strm, nfo and json)"
 msgstr ""
 
 msgctxt "#60568"
-msgid "   Search for new episodes and update the video library"
+msgid "Search for new episodes and update the video library"
 msgstr ""
 
 msgctxt "#60569"
@@ -3267,12 +3287,12 @@ msgid "Movie|Tv Shows|Anime|Children|Documentary|Horror|Castellan|Latin|Torrent"
 msgstr ""
 
 msgctxt "#70126"
-msgid "Visual Options"
+msgid "Customization"
 msgstr ""
 
 msgctxt "#70128"
-msgid "Infoplus visual option"
-msgstr ""
+msgid "Infoplus Animation"
+msgstr "Animazione Infoplus"
 
 msgctxt "#70129"
 msgid "Without animation"
@@ -3679,15 +3699,15 @@ msgid "File location"
 msgstr ""
 
 msgctxt "#70230"
-msgid "  - Add completed downloads to the video library "
+msgid "Add completed downloads to the video library "
 msgstr ""
 
 msgctxt "#70231"
-msgid "  - Move the downloaded file to the video library"
+msgid "Move the downloaded file to the video library"
 msgstr ""
 
 msgctxt "#70232"
-msgid "  - View files downloaded from downloads"
+msgid "View files downloaded from downloads"
 msgstr ""
 
 msgctxt "#70233"
@@ -3715,7 +3735,7 @@ msgid "- Order of servers"
 msgstr ""
 
 msgctxt "#70240"
-msgid "  - Preferred quality"
+msgid "Preferred quality"
 msgstr ""
 
 msgctxt "#70241"
@@ -3723,7 +3743,7 @@ msgid "The highest"
 msgstr ""
 
 msgctxt "#70242"
-msgid "  - Choose the fastest servers"
+msgid "Choose the fastest servers"
 msgstr ""
 
 msgctxt "#70243"
@@ -5562,7 +5582,7 @@ msgid "Use your custom channel URLs"
 msgstr ""
 
 msgctxt "#70706"
-msgid "autostart KOD at Kodi boot"
+msgid "Autostart KOD at Kodi boot"
 msgstr ""
 
 msgctxt "#70707"
@@ -5598,7 +5618,7 @@ msgid "Customize Homepage"
 msgstr ""
 
 msgctxt "#70716"
-msgid "Choose menus you wanna in homepage"
+msgid "Select the elements you want to display on the Homepage"
 msgstr ""
 
 msgctxt "#70717"
@@ -5759,6 +5779,38 @@ msgstr ""
 
 msgctxt "#70757"
 msgid "Compact"
+msgstr ""
+
+msgctxt "#70758"
+msgid "Buffer size to download before playback"
+msgstr ""
+
+msgctxt "#70759"
+msgid "Limit (in Kb's) of background download speed (DOES NOT affect RAR)"
+msgstr ""
+
+msgctxt "#70760"
+msgid "Do you want the RAR and ZIP files to be decompressed for playback?"
+msgstr ""
+
+msgctxt "#70761"
+msgid "Uncompressing RARs in the background?"
+msgstr ""
+
+msgctxt "#70762"
+msgid "Do you want to convert Magnets to Torrents to see sizes and store them?"
+msgstr ""
+
+msgctxt "#70763"
+msgid "HD 1080"
+msgstr ""
+
+msgctxt "#70764"
+msgid "HD 720"
+msgstr ""
+
+msgctxt "#70765"
+msgid "SD"
 msgstr ""
 
 # DNS start [ settings and declaration ]

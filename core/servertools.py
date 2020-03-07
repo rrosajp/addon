@@ -735,7 +735,7 @@ def check_list_links(itemlist, numero='', timeout=3):
     El parámetro numero indica cuantos enlaces hay que verificar (0:5, 1:10, 2:15, 3:20)
     El parámetro timeout indica un tope de espera para descargar la página
     """
-    numero = ((int(numero) + 1) * 5) if numero != '' else 10
+    numero = numero if numero > 4 else ((int(numero) + 1) * 5) if numero != '' else 5
     import sys
     if sys.version_info[0] >= 3:
         from concurrent import futures

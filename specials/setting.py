@@ -155,7 +155,7 @@ def setting_torrent(item):
         {
             "id": "mct_buffer",
             "type": "text",
-            "label": "MCT - Tamaño del Buffer a descargar antes de la reproducción",
+            "label": "MCT - " + config.get_localized_string(70758),
             "default": BUFFER,
             "enabled": True,
             "visible": "eq(-1,%s)" % torrent_options[2]
@@ -163,7 +163,7 @@ def setting_torrent(item):
         {
             "id": "mct_download_path",
             "type": "text",
-            "label": "MCT - Ruta de la carpeta de descarga",
+            "label": "MCT - " + config.get_localized_string(30017),
             "default": DOWNLOAD_PATH,
             "enabled": True,
             "visible": "eq(-2,%s)" % torrent_options[2]
@@ -171,7 +171,7 @@ def setting_torrent(item):
         {
             "id": "bt_buffer",
             "type": "text",
-            "label": "BT - Tamaño del Buffer a descargar antes de la reproducción",
+            "label": "BT - " + config.get_localized_string(70758),
             "default": BUFFER_BT,
             "enabled": True,
             "visible": "eq(-3,%s)" % torrent_options[1]
@@ -179,7 +179,7 @@ def setting_torrent(item):
         {
             "id": "bt_download_path",
             "type": "text",
-            "label": "BT - Ruta de la carpeta de descarga",
+            "label": "BT - " + config.get_localized_string(30017),
             "default": DOWNLOAD_PATH_BT,
             "enabled": True,
             "visible": "eq(-4,%s)" % torrent_options[1]
@@ -187,7 +187,7 @@ def setting_torrent(item):
         {
             "id": "mct_download_limit",
             "type": "text",
-            "label": "Límite (en Kb's) de la velocidad de descarga en segundo plano (NO afecta a RAR)",
+            "label": config.get_localized_string(70759),
             "default": DOWNLOAD_LIMIT,
             "enabled": True,
             "visible": "eq(-5,%s) | eq(-5,%s)" % (torrent_options[1], torrent_options[2])
@@ -195,7 +195,7 @@ def setting_torrent(item):
         {
             "id": "mct_rar_unpack",
             "type": "bool",
-            "label": "¿Quiere que se descompriman los archivos RAR y ZIP para su reproducción?",
+            "label": config.get_localized_string(70760),
             "default": RAR,
             "enabled": True,
             "visible": True
@@ -203,7 +203,7 @@ def setting_torrent(item):
         {
             "id": "mct_background_download",
             "type": "bool",
-            "label": "¿Se procesa la descompresión de RARs en segundo plano?",
+            "label": config.get_localized_string(70761),
             "default": BACKGROUND,
             "enabled": True,
             "visible": True
@@ -211,7 +211,7 @@ def setting_torrent(item):
         {
             "id": "magnet2torrent",
             "type": "bool",
-            "label": "¿Quiere convertir los Magnets a Torrents para ver tamaños y almacenarlos?",
+            "label": config.get_localized_string(70762),
             "default": MAGNET2TORRENT,
             "enabled": True,
             "visible": True

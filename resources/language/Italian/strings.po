@@ -106,12 +106,32 @@ msgid "NO"
 msgstr "NO"
 
 msgctxt "#30024"
-msgid "Contextual Menu"
-msgstr "Menu Contestuale"
+msgid "Select the elements you want to display on the Contextual Menu"
+msgstr "Seleziona gli elementi che vuoi visualizzare nel Menu Contestuale"
 
 msgctxt "#30025"
 msgid "KoD Preferences"
 msgstr "Preferenze KoD"
+
+msgctxt "#30026"
+msgid "Direct"
+msgstr "Direct"
+
+msgctxt "#30027"
+msgid "SetResolvedUrl"
+msgstr "SetResolvedUrl"
+
+msgctxt "#30028"
+msgid "Built-In"
+msgstr "Built-In"
+
+msgctxt "#30029"
+msgid "Download and Play"
+msgstr "Download and Play"
+
+msgctxt "#30030"
+msgid "Advanced Options"
+msgstr "Opzioni Avanzate"
 
 msgctxt "#30043"
 msgid "Force view mode:"
@@ -2326,11 +2346,11 @@ msgid "Videolibrary options"
 msgstr "Opzioni della videoteca"
 
 msgctxt "#60567"
-msgid "   Overwrite the entire video library (strm, nfo and json)"
+msgid "Overwrite the entire video library (strm, nfo and json)"
 msgstr "Sovrascrivi l'intera videoteca (strm, nfo e json)"
 
 msgctxt "#60568"
-msgid "   Search for new episodes and update the video library"
+msgid "Search for new episodes and update the video library"
 msgstr "Cerca nuovi episodi e aggiorna la videoteca"
 
 msgctxt "#60569"
@@ -3266,12 +3286,12 @@ msgid "Movie|Tv Shows|Anime|Children|Documentary|Horror|Castellan|Latin|Torrent"
 msgstr "Fim|Serie TV|Anime|Bambini|Documentari|Horror|Castigliano|Latino|Torrent"
 
 msgctxt "#70126"
-msgid "Visual Options"
-msgstr "Opzioni Vista"
+msgid "Customization"
+msgstr "Personalizzazione"
 
 msgctxt "#70128"
-msgid "Infoplus visual option"
-msgstr "Opzioni Vista Infoplus"
+msgid "Infoplus Animation"
+msgstr "Animazione Infoplus"
 
 msgctxt "#70129"
 msgid "Without animation"
@@ -3678,16 +3698,16 @@ msgid "File location"
 msgstr "Posizione dei files"
 
 msgctxt "#70230"
-msgid "  - Add completed downloads to the video library "
-msgstr "  - Aggiungi download completi alla videoteca"
+msgid "Add completed downloads to the video library "
+msgstr "Aggiungi download completi alla videoteca"
 
 msgctxt "#70231"
-msgid "  - Move the downloaded file to the video library"
-msgstr "  - Sposta i files scaricati nella videoteca"
+msgid "Move the downloaded file to the video library"
+msgstr "Sposta i files scaricati nella videoteca"
 
 msgctxt "#70232"
-msgid "  - View files downloaded from downloads"
-msgstr "  - Visualizzare i files scaricati da Downloads"
+msgid "View files downloaded from downloads"
+msgstr "Visualizzare i files scaricati da Downloads"
 
 msgctxt "#70233"
 msgid "  - Size per block"
@@ -3714,16 +3734,16 @@ msgid "- Order of servers"
 msgstr "  - Ordine dei servers"
 
 msgctxt "#70240"
-msgid "  - Preferred quality"
-msgstr "  - Qualità preferita"
+msgid "Preferred quality"
+msgstr "Qualità preferita"
 
 msgctxt "#70241"
 msgid "The highest"
 msgstr "La più alta"
 
 msgctxt "#70242"
-msgid "  - Choose the fastest servers"
-msgstr "  - Scegli i servers più veloci"
+msgid "Choose the fastest servers"
+msgstr "Scegli i servers più veloci"
 
 msgctxt "#70243"
 msgid "Download"
@@ -5562,8 +5582,8 @@ msgid "Use your custom channel URLs"
 msgstr "Utilizza URL personalizzati per i canali"
 
 msgctxt "#70706"
-msgid "autostart KOD at Kodi boot"
-msgstr "avvio automatico di KOD al boot di Kodi"
+msgid "Autostart KOD at Kodi boot"
+msgstr "Avvio automatico di KOD al boot di Kodi"
 
 msgctxt "#70707"
 msgid "Enable"
@@ -5598,8 +5618,8 @@ msgid "Customize Homepage"
 msgstr "Personalizza Homepage"
 
 msgctxt "#70716"
-msgid "Choose menus you wanna in homepage"
-msgstr "Seleziona gli elementi che vuoi visualizzare nella homepage"
+msgid "Select the elements you want to display on the Homepage"
+msgstr "Seleziona gli elementi che vuoi visualizzare nella Homepage"
 
 msgctxt "#70717"
 msgid "Are all the special episodes present?"
@@ -5764,6 +5784,38 @@ msgstr "Estesa"
 msgctxt "#70757"
 msgid "Compact"
 msgstr "Compatta"
+
+msgctxt "#70758"
+msgid "Buffer size to download before playback"
+msgstr "Dimensione del buffer da scaricare prima della riproduzione"
+
+msgctxt "#70759"
+msgid "Limit (in Kb's) of background download speed (DOES NOT affect RAR)"
+msgstr "Limite (in Kb) della velocità di download in background (NON influisce su RAR)"
+
+msgctxt "#70760"
+msgid "Do you want the RAR and ZIP files to be decompressed for playback?"
+msgstr "Vuoi che i file RAR e ZIP vengano decompressi per la riproduzione?"
+
+msgctxt "#70761"
+msgid "Uncompressing RARs in the background?"
+msgstr "Decomprimere i RAR in secondo piano?"
+
+msgctxt "#70762"
+msgid "Do you want to convert Magnets to Torrents to see sizes and store them?"
+msgstr "Vuoi convertire i Magnets to Torrents per vedere le dimensioni e memorizzarle?"
+
+msgctxt "#70763"
+msgid "HD 1080"
+msgstr "HD 1080"
+
+msgctxt "#70764"
+msgid "HD 720"
+msgstr "HD 720"
+
+msgctxt "#70765"
+msgid "SD"
+msgstr "SD"
 
 # DNS start [ settings and declaration ]
 msgctxt "#707401"

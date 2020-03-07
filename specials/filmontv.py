@@ -82,7 +82,7 @@ def mainlist(item):
     return itemlist
 
 def server_config(item):
-    return platformtools.show_channel_settings(channelpath=filetools.join(config.get_runtime_path(), "specials", item.config))
+    return platformtools.show_channel_settings(channelpath=filetools.join(config.get_runtime_path(), "server", item.config))
 
 def now_on_misc_film(item):
     logger.info("filmontv tvoggi")

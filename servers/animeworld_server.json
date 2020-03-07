@@ -10,8 +10,8 @@
     ]
   },
   "free": true,
-  "id": "animeworld",
-  "name": "animeworld",
+  "id": "animeworld_server",
+  "name": "Animeworld",
   "settings": [
     {
       "default": false,

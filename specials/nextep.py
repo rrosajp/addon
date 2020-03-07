@@ -57,7 +57,9 @@ def next_ep(item):
     time_over = False
     time_limit = time() + 30
     time_steps = [20,30,40,50,60,70,80,90,100,110,120]
-    TimeFromEnd = time_steps[config.get_setting('next_ep_seconds')]
+    time_setting = config.get_setting('next_ep_seconds')
+    TimeFromEnd = time_setting if time_setting > 10 else time_steps[time_setting]
+
 
     # wait until the video plays
     while not platformtools.is_playing() and time() < time_limit:
