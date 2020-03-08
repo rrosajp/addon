@@ -9,8 +9,12 @@ from core import scrapertools, httptools, support
 from core.item import Item
 from platformcode import config
 
+def findhost():
+    page = httptools.downloadpage("https://www.filmpertutti.group/").data
+    url = scrapertools.find_single_match(page, 'Il nuovo indirizzo di FILMPERTUTTI è <a href="([^"]+)')
+    return url
 
-host = config.get_channel_url()
+host = config.get_channel_url(findhost)
 headers = [['Referer', host]]
 list_servers = ['mixdrop', 'akvideo', 'wstream', 'onlystream', 'speedvideo']
 list_quality = ['HD', 'SD']
