@@ -52,14 +52,13 @@ def peliculas(item):
     #findhost()
     action = 'episodios'
     if item.args == 'newest':
-        #patron = r'<span class="serieTitle" style="font-size:20px">(?P<title>.*?).[^–][\s]?<a href="(?P<url>[^"]+)"\s+target="_blank">(?P<episode>\d+x\d+-\d+|\d+x\d+) (?P<title2>.*?)[ ]?(?:|\((?P<lang>SUB ITA)\))?</a>'
-        patron = r'<span class="serieTitle" style="font-size:20px">(?P<title>.*?).[^â][\s]?<a href="(?P<url>[^"]+)"\s+target="_blank">(?:<episode>\d+x\d+-\d+|\d+x\d+) .*?[ ]?\(?(?P<lang>SUB ITA)?\)?</a>'
+        patron = r'<span class="serieTitle" style="font-size:20px">(?P<title>.*?)[^Ã¢ÂÂâ][\s]*<a href="(?P<url>[^"]+)"[^>]*> ?(?P<episode>\d+x\d+-\d+|\d+x\d+) .*?[ ]?\(?(?P<lang>SUB ITA)?\)?</a>'
         pagination = ''
     else:
         patron = r'<div class="post-thumb">.*?\s<img src="(?P<thumb>[^"]+)".*?><a href="(?P<url>[^"]+)"[^>]+>(?P<title>.+?)\s?(?: Serie Tv)?\s?\(?(?P<year>\d{4})?\)?<\/a><\/h2>'
         patronNext='a class="next page-numbers" href="?([^>"]+)">Avanti &raquo;</a>'
 
-    #debug = True
+    # debug = True
     return locals()
 
 @support.scrape
