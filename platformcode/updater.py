@@ -25,7 +25,7 @@ _hdr_pat = re.compile("^@@ -(\d+),?(\d+)? \+(\d+),?(\d+)? @@.*")
 branch = 'master'
 user = 'kodiondemand'
 repo = 'addon'
-addonDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace('\\', '/') + '/'
+addonDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 maxPage = 5  # le api restituiscono 30 commit per volta, quindi se si è rimasti troppo indietro c'è bisogno di andare avanti con le pagine
 trackingFile = "last_commit.txt"
 changelogFile = "special://profile/addon_data/plugin.video.kod/changelog.txt"
@@ -49,19 +49,20 @@ def loadCommits(page=1):
     return ret
 
 
+# ret -> aggiornato, necessita reload videolibrary_service
 def check(background=False):
     if not addon.getSetting('addon_update_enabled'):
-        return False
+        return False, False
     logger.info('Cerco aggiornamenti..')
     commits = loadCommits()
     if not commits:
-        return False
+        return False, False
 
     try:
-        localCommitFile = open(addonDir+trackingFile, 'r+')
+        localCommitFile = open(os.path.join(addonDir, trackingFile), 'r+')
     except:
         calcCurrHash()
-        localCommitFile = open(addonDir + trackingFile, 'r+')
+        localCommitFile = open(os.path.join(addonDir, trackingFile), 'r+')
     localCommitSha = localCommitFile.read()
     localCommitSha = localCommitSha.replace('\n', '') # da testare
     logger.info('Commit locale: ' + localCommitSha)
@@ -77,7 +78,7 @@ def check(background=False):
         # evitiamo che dia errore perchè il file è già in uso
         localCommitFile.close()
         calcCurrHash()
-        return True
+        return True, False
 
     if pos > 0:
         changelog = ''
@@ -115,17 +116,17 @@ def check(background=False):
                             if 'patch' in file:
                                 text = ""
                                 try:
-                                    localFile = io.open(addonDir + file["filename"], 'r+', encoding="utf8")
+                                    localFile = io.open(os.path.join(addonDir, file["filename"]), 'r+', encoding="utf8")
                                     text = localFile.read()
                                     if not PY3:
                                         text = text.decode('utf-8')
                                 except IOError: # nuovo file
                                     # crea le cartelle se non esistono
-                                    dirname = os.path.dirname(addonDir + file["filename"])
+                                    dirname = os.path.dirname(os.path.join(addonDir, file["filename"]))
                                     if not os.path.exists(dirname):
                                         os.makedirs(dirname)
 
-                                    localFile = io.open(addonDir + file["filename"], 'w', encoding="utf8")
+                                    localFile = io.open(os.path.join(addonDir, file["filename"]), 'w', encoding="utf8")
 
                                 patched = apply_patch(text, (file['patch']+'\n').encode('utf-8'))
                                 if patched != text:  # non eseguo se già applicata (es. scaricato zip da github)
@@ -143,22 +144,22 @@ def check(background=False):
                                 # se non è già applicato
                                 filename = os.path.join(addonDir, file['filename'])
                                 dirname = os.path.dirname(filename)
-                                if not (filetools.isfile(addonDir + file['filename']) and getSha(filename) == file['sha']):
+                                if not (filetools.isfile(os.path.join(addonDir, file['filename'])) and getSha(filename) == file['sha']):
                                     if not os.path.exists(dirname):
                                         os.makedirs(dirname)
                                     urllib.urlretrieve(file['raw_url'], filename)
                                     alreadyApplied = False
                         elif file['status'] == 'removed':
-                            remove(addonDir+file["filename"])
+                            remove(os.path.join(addonDir, file["filename"]))
                             alreadyApplied = False
                         elif file['status'] == 'renamed':
                             # se non è già applicato
-                            if not (filetools.isfile(addonDir + file['filename']) and getSha(addonDir + file['filename']) == file['sha']):
+                            if not (filetools.isfile(os.path.join(addonDir, file['filename'])) and getSha(os.path.join(addonDir, file['filename'])) == file['sha']):
                                 dirs = file['filename'].split('/')
                                 for d in dirs[:-1]:
-                                    if not filetools.isdir(addonDir + d):
-                                        filetools.mkdir(addonDir + d)
-                                filetools.move(addonDir + file['previous_filename'], addonDir + file['filename'])
+                                    if not filetools.isdir(os.path.join(addonDir, d)):
+                                        filetools.mkdir(os.path.join(addonDir, d))
+                                filetools.move(os.path.join(addonDir, file['previous_filename']), os.path.join(addonDir, file['filename']))
                                 alreadyApplied = False
                 if not alreadyApplied:  # non mando notifica se già applicata (es. scaricato zip da github)
                     changelog += commitJson['commit']['message'] + "\n"
@@ -212,7 +213,7 @@ def calcCurrHash():
         found = False
         for n, c in enumerate(commits):
              if c['commit']['tree']['sha'] == treeHash:
-                localCommitFile = open(addonDir + trackingFile, 'w')
+                localCommitFile = open(os.path.join(addonDir, trackingFile), 'w')
                 localCommitFile.write(c['sha'])
                 localCommitFile.close()
                 found = True
