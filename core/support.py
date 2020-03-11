@@ -727,7 +727,12 @@ def typo(string, typography=''):
     kod_color = '0xFF65B3DA' #'0xFF0081C2'
     try: string = str(string)
     except: string = str(string.encode('utf8'))
+    
+    typography2 = match(string, patron=r'\{([^\}]+)\}').match
     # Check if the typographic attributes are in the string or outside
+    if typography2:
+        string = re.sub(r'(\s*\{[^\}]+\})', '', string)
+        typography += ' ' + typography2
     if typography:
         string = string + ' ' + typography
     if config.get_localized_string(30992) in string:
@@ -754,8 +759,8 @@ def typo(string, typography=''):
         string = '[' + re.sub(r'\s\[\]','',string) + ']'
     if '()' in string:
         string = '(' + re.sub(r'\s\(\)','',string) + ')'
-    if '{}' in string:
-        string = '{' + re.sub(r'\s\{\}','',string) + '}'
+    # if '{}' in string:
+    #     string = '{' + re.sub(r'\s\{\}','',string) + '}'
     if 'submenu' in string:
         string = "•• " + re.sub(r'\ssubmenu','',string)
     if 'color' in string:
