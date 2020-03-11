@@ -91,7 +91,7 @@ def show_menu(item):
         for key in json:
             if key == 'menu':
                 get_menu(item, json, key, itemlist)
-            if item.filterkey:
+            if item.filterkey and not item.filter:
                 itemlist += submenu(item, json, key)
             elif key in ['movies_list','tvshows_list', 'generic_list']:
                 itemlist += peliculas(item, json, key)
@@ -235,7 +235,7 @@ def get_seasons(item):
     if inspect.stack()[2][3] in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest'] or show_seasons == False:
         itlist = []
         for item in itemlist:
-            itlist += episodios(item)
+            itlist = episodios(item)
         itemlist = itlist
         if inspect.stack()[2][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest'] and defpage:
             itemlist = pagination(item, itemlist)
@@ -368,7 +368,9 @@ def get_menu(item, json, key, itemlist=[]):
                 fanart = extra.fanart,
                 plot = extra.plot,
                 action = 'show_menu',
-                menu = level2 if not item.menu else None)
+                menu = level2 if not item.menu else None,
+                filterkey = extra.filterkey,
+                filter = extra.filter)
         if title:
             itemlist.append(it)
 
@@ -385,14 +387,13 @@ def get_menu(item, json, key, itemlist=[]):
 
 
 def get_sub_menu(item, json, key, itemlist=[]):
-    support.log('SUBMENU',item)
+    support.log()
     json = json[key]
     search = False
     if item.menu:
         item.menu = None
         itemlist.append(item)
     for option in json:
-        support.log(item)
         title = json[option]['title'] if 'title' in json[option] else json[option] if option != 'search' else ''
         if title:
             extra = set_extra_values(item, json[option], item.path)
@@ -546,7 +547,7 @@ def load_and_check(item):
 
 # set extra values
 def set_extra_values(item, json, path):
-    support.log(json)
+    support.log()
     ret = Item()
     for key in json:
         if key == 'quality':
@@ -570,6 +571,10 @@ def set_extra_values(item, json, path):
         elif key ==  'links':
             ret.url={}
             ret.url['links'] = json[key]
+        elif key == 'filter':
+            filterkey = json[key].keys()[0]
+            ret.filter = json[key][filterkey]
+            ret.filterkey = filterkey
 
     if not ret.thumb:
         ret.thumb = item.thumbnail
@@ -638,7 +643,7 @@ def pagination(item, itemlist = []):
 
         itlist.append(item)
 
-    if Pagination and len(itemlist) >= pag * Pagination:
+    if Pagination and len(itemlist) > pag * Pagination:
         if inspect.stack()[1][3] != 'get_newest':
             itlist.append(
                 Item(channel=item.channel,
