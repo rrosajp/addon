@@ -18,13 +18,21 @@ list_quality = ['1080p','720p','480p','360p']
 
 @support.menu
 def mainlist(item):
-    menu = [
-        ('Ultimi Film aggiunti', ['/api/movies', 'peliculas', '']),
-        ('Ultime Serie TV aggiunte', ['/api/shows', 'peliculas', '']),
-        ('Generi', ['/api/genres', 'search_movie_by_genre', '']),
-        ('Anni {film}', ['', 'search_movie_by_year', '']),
-        ('Cerca... bold', ['', 'search', ''])
-    ]
+    # menu = [
+    #     ('Ultimi Film aggiunti', ['/api/movies', 'peliculas', '']),
+    #     ('Ultime Serie TV aggiunte', ['/api/shows', 'peliculas', '']),
+    #     ('Generi', ['/api/genres', 'search_movie_by_genre', '']),
+    #     ('Anni {film}', ['', 'search_movie_by_year', '']),
+    #     ('Cerca... bold', ['', 'search', ''])
+    # ]
+    film = ['/api/movies',
+            ('Generi', ['/api/genres', 'search_movie_by_genre', '']),
+            ('Anni', ['', 'search_movie_by_year', '']),]
+
+    tvshow=['/api/shows']
+
+    search=''
+
     return locals()
 
 def newest(categoria):
