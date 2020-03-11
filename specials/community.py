@@ -203,6 +203,7 @@ def peliculas(item, json='', key='', itemlist=[]):
     if not 'generic_list' in key:
         tmdb.set_infoLabels(itlist, seekTmdb=True)
     itemlist += itlist
+    itemlist = pagination(item, itemlist)
     return itemlist
 
 
