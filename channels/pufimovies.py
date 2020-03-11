@@ -39,12 +39,15 @@ def menu(item):
 
 def search(item, text):
     support.log('search', item)
-
+    itemlist = []
     text = text.replace(' ', '+')
     item.url = host + '/search/keyword/' + text
     try:
         item.args = 'search'
-        return peliculas(item)
+        itemlist = peliculas(item)
+        if itemlist[-1].action == 'peliculas':
+            itemlist.pop()
+        return itemlist
     # Continua la ricerca in caso di errore
     except:
         import sys
@@ -68,8 +71,8 @@ def newest(categoria):
             item.contentType = 'tvshow'
             itemlist = peliculas(item)
 
-            if itemlist[-1].action == 'peliculas':
-                itemlist.pop()
+        if itemlist[-1].action == 'peliculas':
+            itemlist.pop()
     # Continua la ricerca in caso di errore
     except:
         import sys

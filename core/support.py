@@ -751,8 +751,8 @@ def typo(string, typography=''):
         string = '[' + re.sub(r'\s\[\]','',string) + ']'
     if '()' in string:
         string = '(' + re.sub(r'\s\(\)','',string) + ')'
-    # if '{}' in string:
-    #     string = '{' + re.sub(r'\s\{\}','',string) + '}'
+    if '{}' in string:
+        string = '{' + re.sub(r'\s\{\}','',string) + '}'
     if 'submenu' in string:
         string = "•• " + re.sub(r'\ssubmenu','',string)
     if 'color' in string:
