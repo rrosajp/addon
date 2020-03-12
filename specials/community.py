@@ -168,7 +168,14 @@ def peliculas(item, json='', key='', itemlist=[]):
     itlist = filterkey = []
     action = 'findvideos'
 
-    for option in json:
+    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']:
+        Pagination = int(defp) if defp.isdigit() else ''
+    else: Pagination = ''
+    pag = item.page if item.page else 1
+
+    for i, option in enumerate(json):
+        if Pagination and (pag - 1) * Pagination > i: continue  # pagination
+        if Pagination and i >= pag * Pagination: break 
         if item.filterkey and item.filterkey in option:
             filterkey = [it.lower() for it in option[item.filterkey]] if type(option[item.filterkey]) == list else [option[item.filterkey].lower()]
         title = option['title'] if 'title' in option else ''
@@ -203,7 +210,13 @@ def peliculas(item, json='', key='', itemlist=[]):
     if not 'generic_list' in key:
         tmdb.set_infoLabels(itlist, seekTmdb=True)
     itemlist += itlist
-    itemlist = pagination(item, itemlist)
+
+    if Pagination and len(itemlist) > pag * Pagination:
+        if inspect.stack()[1][3] != 'get_newest':
+            item.title = support.typo(config.get_localized_string(30992), 'color kod bold')
+            item.page = pag + 1
+            item.thumbnail = support.thumb()
+            itemlist.append(item)
     return itemlist
 
 
@@ -259,8 +272,16 @@ def episodios(item, json ='', key='', itemlist =[]):
     # set variable
     ep = 1
     season = infoLabels['season'] if 'season' in infoLabels else item.contentSeason if item.contentSeason else 1
+    
+    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']:
+        Pagination = int(defp) if defp.isdigit() else ''
+    else: Pagination = ''
+    pag = item.page if item.page else 1
+    
     # make items
-    for option in json:
+    for i, option in enumerate(json):
+        if Pagination and (pag - 1) * Pagination > i: continue  # pagination
+        if Pagination and i >= pag * Pagination: break 
         # build numeration of episodes
         numeration = option['number'] if 'number' in option else option['title']
         match = support.match(numeration , patron=r'(?P<season>\d+)x(?P<episode>\d+)').match
@@ -321,7 +342,12 @@ def episodios(item, json ='', key='', itemlist =[]):
                                     filterseason=str(season),
                                     path=item.path))
         elif defpage and inspect.stack()[1][3] not in ['get_seasons']:
-            itemlist = pagination(item, itemlist)
+            if Pagination and len(itemlist) > pag * Pagination:
+                if inspect.stack()[1][3] != 'get_newest':
+                    item.title = support.typo(config.get_localized_string(30992), 'color kod bold')
+                    item.page = pag + 1
+                    item.thumbnail = support.thumb()
+                    itemlist.append(item)
     return itemlist
 
 
