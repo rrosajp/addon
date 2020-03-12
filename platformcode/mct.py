@@ -70,7 +70,7 @@ if DOWNLOAD_LIMIT:
 else:
     DOWNLOAD_LIMIT = 0
 UPLOAD_LIMIT = 100 * 1024
-msg_header = 'Alfa MCT Cliente Torrent'
+msg_header = 'KoD Client Torrent MCT'
 
 
 def play(url, xlistitem={}, is_view=None, subtitle="", password="", item=None):
@@ -220,7 +220,7 @@ def play(url, xlistitem={}, is_view=None, subtitle="", password="", item=None):
         dp = xbmcgui.DialogProgress()
         dp.create(msg_header)
         while not h.has_metadata():
-            message, porcent, msg_file, s, download = getProgress(h, "Creando torrent desde magnet")
+            message, porcent, msg_file, s, download = getProgress(h, "Creating torrent from magnet")
             dp.update(porcent, message, msg_file)
             if s.state == 1: download = 1
             if dp.iscanceled():
@@ -286,14 +286,11 @@ def play(url, xlistitem={}, is_view=None, subtitle="", password="", item=None):
         if "/" in filename:
             filename = filename.split("/")[1]
         if RAR and BACKGROUND:
-            xbmcgui.Dialog().notification("Encontrado archivo .RAR de %.2f MB" % (video_size / 1048576.0),
-                                        "Puedes realizar otras tareas en Kodi mientrastanto. " + \
-                                        "Te informaremos...", time=10000)
+            xbmcgui.Dialog().notification(config.get_localized_string(70768) % (video_size / 1048576.0), config.get_localized_string(70769), time=10000)
             dialog = True
         else:
-            dialog = xbmcgui.Dialog().yesno("Encontrado archivo .RAR...", "Nombre: %s" % filename,
-                                        "Tamaño: %.2f MB" % (video_size / 1048576.0),
-                                        "¿Descargar en segundo plano? Cancelar en menú Descargas")
+            dialog = xbmcgui.Dialog().yesno(config.get_localized_string(70770), config.get_localized_string(70771) % filename,
+                                        config.get_localized_string(70772) % (video_size / 1048576.0), config.get_localized_string(70773))
         if dialog:
             dp_cerrado = False
             dp = xbmcgui.DialogProgressBG()
@@ -532,7 +529,7 @@ def play(url, xlistitem={}, is_view=None, subtitle="", password="", item=None):
                         message, porcent, msg_file, s, download = getProgress(h, video_file, _pf=_pieces_info)
                         dp.update(porcent, message, '[CR]' +  message + '[CR]' + msg_file)
                     else:
-                        dp.update(100, "Descarga completa: " + video_file)
+                        dp.update(100, "Download complete: " + video_file)
 
                     # -- Se canceló el progreso en el visionado -
                     # -- Continuar                              -

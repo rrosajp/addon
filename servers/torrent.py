@@ -362,7 +362,7 @@ def bt_client(mediaurl, xlistitem, rar_files, subtitle=None, password=None, item
     video_file = ''
     video_path = ''
     videourl = ''
-    msg_header = 'Alfa %s Cliente Torrent' % torr_client
+    msg_header = 'KoD %s Client Torrent' % torr_client
     extensions_list = ['.aaf', '.3gp', '.asf', '.avi', '.flv', '.mpeg',
                        '.m1v', '.m2v', '.m4v', '.mkv', '.mov', '.mpg',
                        '.mpe', '.mp4', '.ogg', '.rar', '.wmv', '.zip']

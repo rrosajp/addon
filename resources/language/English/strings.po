@@ -5837,6 +5837,38 @@ msgctxt "#70765"
 msgid "SD"
 msgstr ""
 
+msgctxt "#70766"
+msgid "Installing Internal Torrent Client"
+msgstr ""
+
+msgctxt "#70767"
+msgid "You can ask for Superuser permissions"
+msgstr ""
+
+msgctxt "#70768"
+msgid "%.2f MB RAR file found"
+msgstr ""
+
+msgctxt "#70769"
+msgid "You can do other tasks in Kodi in the meantime. We will inform you..."
+msgstr ""
+
+msgctxt "#70770"
+msgid "RAR file found..."
+msgstr ""
+
+msgctxt "#70771"
+msgid "Name: %s"
+msgstr ""
+
+msgctxt "#70772"
+msgid "Size: %.2f MB"
+msgstr ""
+
+msgctxt "#70773"
+msgid "Download in the background? Cancel in Downloads menu"
+msgstr ""
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS Check Alert"

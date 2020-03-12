@@ -184,9 +184,7 @@ try:
                 LIBTORRENT_MSG = config.get_setting("libtorrent_msg", server="torrent", default='')
                 if not LIBTORRENT_MSG:
                     dialog = xbmcgui.Dialog()
-                    dialog.notification('ALFA: Instalando Cliente Torrent interno', \
-                                'Puede solicitarle permisos de Superusuario', time=15000)
-                    log('### ALFA: Notificación enviada: Instalando Cliente Torrent interno')
+                    dialog.notification('KoD: '+ config.get_localizad_string(70766), config.get_localizad_string(70767), time=15000)
                     config.set_setting("libtorrent_msg", 'OK', server="torrent")
                 
                 from core import scrapertools

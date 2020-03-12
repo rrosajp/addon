@@ -33,7 +33,7 @@ except:
 DOWNLOAD_PATH = config.get_setting("bt_download_path", server="torrent", default=config.get_setting("downloadpath"))
 BACKGROUND = config.get_setting("mct_background_download", server="torrent", default=True)
 RAR = config.get_setting("mct_rar_unpack", server="torrent", default=True)
-msg_header = 'Alfa BT Cliente Torrent'
+msg_header = 'Client Torrent BT'
 
 
 class Client(object):
