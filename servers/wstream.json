@@ -7,7 +7,7 @@
     "find_videos": {
         "patterns": [
             {
-                "pattern": "wstream\\.video(?!<)(?:=|/)(?:video[a-zA-Z0-9]*|embed[a-zA-Z0-9]*|)?(?!api|swembedid)(?:-|/)?(?:[a-z0-9A-Z]+/)?([a-z0-9A-Z]+)",
+                "pattern": "wstream\\.video(?!<)(?:=|/)(?:video[a-zA-Z0-9.?_]*|embed[a-zA-Z0-9]*|)?(?!api|swembedid)(?:-|/|=)?(?:[a-z0-9A-Z]+/)?([a-z0-9A-Z]+)",
                 "url": "https://wstream.video/video.php?file_code=\\1"
             },
             {
