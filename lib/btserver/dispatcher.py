@@ -2,12 +2,18 @@
 
 from monitor import Monitor
 
-try:
-    from python_libtorrent import get_libtorrent
+import traceback
 
-    lt = get_libtorrent()
-except Exception, e:
-    import libtorrent as lt
+try:
+    import xbmc, xbmcgui
+except:
+    pass
+
+from platformcode import config
+LIBTORRENT_PATH = config.get_setting("libtorrent_path", server="torrent", default='')
+
+from servers import torrent as torr
+lt, e, e1, e2 = torr.import_libtorrent(LIBTORRENT_PATH)
 
 
 class Dispatcher(Monitor):

@@ -329,6 +329,7 @@ def update_libtorrent():
                     config.get_setting("libtorrent_path", server="torrent", default="") :
         return
 
+    
     try:
         from lib.python_libtorrent.python_libtorrent import get_libtorrent
     except Exception as e:

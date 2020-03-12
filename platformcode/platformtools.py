@@ -1235,8 +1235,8 @@ def play_torrent(item, xlistitem, mediaurl):
 
     # Opciones disponibles para Reproducir torrents
     torrent_options = list()
-    torrent_options.append(["Cliente interno (necesario libtorrent)"])
-    torrent_options.append(["Cliente interno MCT (necesario libtorrent)"])
+    torrent_options.append([config.get_localized_string(30033)])
+    torrent_options.append([config.get_localized_string(30033) + ' MCT'])
 
     torrent_options.extend(torrent_client_installed(show_tuple=True))
 
@@ -1329,17 +1329,14 @@ def play_torrent(item, xlistitem, mediaurl):
             password = item.password
 
         videolibrary_path = config.get_videolibrary_path()  # Calculamos el path absoluto a partir de la Videoteca
-        if scrapertools.find_single_match(videolibrary_path,
-                                            '(^\w+:\/\/)'):  # Si es una conexión REMOTA, usamos userdata local
+        if scrapertools.find_single_match(videolibrary_path, '(^\w+:\/\/)'):  # Si es una conexión REMOTA, usamos userdata local
             videolibrary_path = config.get_data_path()  # Calculamos el path absoluto a partir de Userdata
         if not filetools.exists(videolibrary_path):  # Si no existe el path, pasamos al modo clásico
             videolibrary_path = False
         else:
-            torrents_path = filetools.join(videolibrary_path, 'temp_torrents_Alfa', \
-                                           'cliente_torrent_Alfa.torrent')  # path descarga temporal
-        if not videolibrary_path or not filetools.exists(filetools.join(videolibrary_path, \
-                                                                        'temp_torrents_Alfa')):  # Si no existe la carpeta temporal, la creamos
-            filetools.mkdir(filetools.join(videolibrary_path, 'temp_torrents_Alfa'))
+            torrents_path = filetools.join(videolibrary_path, 'temp_torrents', 'client_torrent.torrent')  # path descarga temporal
+        if not videolibrary_path or not filetools.exists(filetools.join(videolibrary_path, 'temp_torrents')):  # Si no existe la carpeta temporal, la creamos
+            filetools.mkdir(filetools.join(videolibrary_path, 'temp_torrents'))
 
         # Si hay headers, se pasar a la petición de descarga del .torrent
         headers = {}
@@ -1355,10 +1352,7 @@ def play_torrent(item, xlistitem, mediaurl):
             if item.referer: referer = item.referer
             if item.post: post = item.post
             # Descargamos el .torrent
-            size, url, torrent_f, rar_files = generictools.get_torrent_size(item.url, referer, post, \
-                                                                            torrents_path=torrents_path,
-                                                                            timeout=timeout, lookup=False,
-                                                                            headers=headers, short_pad=True)
+            size, url, torrent_f, rar_files = generictools.get_torrent_size(item.url, referer, post, torrents_path=torrents_path, timeout=timeout, lookup=False, headers=headers, short_pad=True)
             if url:
                 url_stat = True
                 item.url = url
@@ -1393,7 +1387,17 @@ def play_torrent(item, xlistitem, mediaurl):
         mediaurl = item.url
 
     if seleccion >= 0:
-        
+
+        # Si tiene .torrent válido o magnet, lo registramos
+        if size or item.url.startswith('magnet'):
+            try:
+                import threading
+                if not PY3: from lib import alfaresolver
+                else: from lib import alfaresolver_py3 as alfaresolver
+                threading.Thread(target=alfaresolver.frequency_count, args=(item, )).start()
+            except:
+                logger.error(traceback.format_exc(1))
+
         # Reproductor propio BT (libtorrent)
         if seleccion == 0:
             torrent.bt_client(mediaurl, xlistitem, rar_files, subtitle=item.subtitle, password=password, item=item)
@@ -1425,7 +1429,7 @@ def play_torrent(item, xlistitem, mediaurl):
                 rar_file, save_path_videos, folder_torr = torrent.wait_for_download(rar_files,
                                                                                     torr_client)  # Esperamos mientras se descarga el RAR
                 if rar_file and save_path_videos:  # Si se ha descargado el RAR...
-                    dp = dialog_progress_bg('Alfa %s' % torr_client)
+                    dp = dialog_progress_bg('KoD %s' % torr_client)
                     video_file, rar, video_path, erase_file_path = torrent.extract_files(rar_file, \
                                                                                          save_path_videos, password, dp,
                                                                                          item,
@@ -1452,7 +1456,7 @@ def play_torrent(item, xlistitem, mediaurl):
             while is_playing() and rar and not xbmc.abortRequested:
                 time.sleep(3)  # Repetimos cada intervalo
             if rar and not xbmc.abortRequested:
-                if dialog_yesno('Alfa %s' % torr_client, '¿Borrar las descargas del RAR y Vídeo?'):
+                if dialog_yesno('KoD %s' % torr_client, config.get_localized_string(30031)):
                     log("##### erase_file_path: %s" % erase_file_path)
                     try:
                         torr_data, deamon_url, index = torrent.get_tclient_data(folder_torr, torr_client)

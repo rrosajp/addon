@@ -1226,9 +1226,10 @@ def post_tmdb_findvideos(item, itemlist):
     return (item, itemlist)
     
     
-def get_torrent_size(url, referer=None, post=None, data_torrent=False, timeout=5):
+def get_torrent_size(url, referer=None, post=None, torrents_path=None, data_torrent=False, \
+                        timeout=5, file_list=False, lookup=True, local_torr=None, headers={}, short_pad=False):
     logger.info()
-    from core import videolibrarytools
+    from servers import torrent
     
     """
     
@@ -1243,7 +1244,8 @@ def get_torrent_size(url, referer=None, post=None, data_torrent=False, timeout=5
     Entrada: post:      contenido del post en caso de llamada con post
     Entrada: data_torrent:  Flag por si se quiere el contenido del .torretn de vuelta
     Salida: size:       str con el tamaño y tipo de medida ( MB, GB, etc)
-    Salida: torrent:    dict() con el contenido del .torrent (opcional)
+    Salida: torrent_f:  dict() con el contenido del .torrent (opcional)
+    Salida: files:      dict() con los nombres de los archivos del torrent y su tamaño (opcional)
     
     """
     
@@ -1251,17 +1253,21 @@ def get_torrent_size(url, referer=None, post=None, data_torrent=False, timeout=5
         import math
         if (size == 0):
             return '0B'
-        size_name = ("B", "KB", "M B", "G B", "TB", "PB", "EB", "ZB", "YB")
+        size_name = ("B", "KB", "M·B", "G·B", "TB", "PB", "EB", "ZB", "YB")
         i = int(math.floor(math.log(size, 1024)))
         p = math.pow(1024, i)
-        s = round(size / p, 2)
+        #s = round(size / p, 2)
+        s = round(old_div(size, p), 2)
         return '%s %s' % (s, size_name[i])
     
     def decode(text):
         try:
             src = tokenize(text)
-            data = decode_item(src.next, src.next())
-            for token in src:  # look for more tokens
+            if not PY3:
+                data = decode_item(src.next, src.next())                        #Py2
+            else:
+                data = decode_item(src.__next__, next(src))                     #Py3
+            for token in src:                                                   # look for more tokens
                 raise SyntaxError("trailing junk")
         except (AttributeError, ValueError, StopIteration):
             try:
@@ -1301,15 +1307,18 @@ def get_torrent_size(url, referer=None, post=None, data_torrent=False, timeout=5
                 data.append(decode_item(next, tok))
                 tok = next()
             if token == "d":
-                data = dict(zip(data[0::2], data[1::2]))
+                #data = dict(zip(data[0::2], data[1::2]))
+                data = dict(list(zip(data[0::2], data[1::2])))
         else:
             raise ValueError
         return data
         
     
     #Móludo principal
-    size = ""
-    torrent = ''
+    size = ''
+    torrent_f = ''
+    torrent_file = ''
+    files = {}
     try:
         #torrents_path = config.get_videolibrary_path() + '/torrents'            #path para dejar el .torrent
 
@@ -1319,32 +1328,56 @@ def get_torrent_size(url, referer=None, post=None, data_torrent=False, timeout=5
         #urllib.URLopener.version = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0'
         #urllib.urlretrieve(url, torrents_path + "/generictools.torrent")        #desacargamos el .torrent a la carpeta
         #torrent_file = open(torrents_path + "/generictools.torrent", "rb").read()   #leemos el .torrent
-        
-        torrents_path, torrent_file = videolibrarytools.caching_torrents(url, referer=referer, post=post, timeout=timeout, lookup=True, data_torrent=True)
+
+        if ((url and not local_torr) or url.startswith('magnet')):
+            torrents_path, torrent_file = torrent.caching_torrents(url, \
+                        referer=referer, post=post, torrents_path=torrents_path, \
+                        timeout=timeout, lookup=lookup, data_torrent=True, headers=headers)
+        elif local_torr:
+            torrent_file = filetools.read(local_torr)
         if not torrent_file:
-            if data_torrent:
-                return (size, torrent)
+            if not lookup:
+                return (size, torrents_path, torrent_f, files)
+            elif file_list and data_torrent:
+                return (size, torrent_f, files)
+            elif file_list:
+                return (size, files)
+            elif data_torrent:
+                return (size, torrent_f)
             return size                                         #Si hay un error, devolvemos el "size" y "torrent" vacíos
 
-        torrent = decode(torrent_file)                                          #decodificamos el .torrent
+        torrent_f = decode(torrent_file)                                        #decodificamos el .torrent
 
         #si sólo tiene un archivo, tomamos la longitud y la convertimos a una unidad legible, si no dará error
         try:
-            sizet = torrent["info"]['length']
+            sizet = torrent_f["info"]['length']
             size = convert_size(sizet)
+            
+            files = torrent_f["info"].copy()
+            if 'path' not in files: files.update({'path': ['']})
+            if 'piece length' in files: del files['piece length']
+            if 'pieces' in files: del files['pieces']
+            if 'name' in files: del files['name']
+            files = [files]
+            files.append({"__name": torrent_f["info"]["name"], 'length': 0})
         except:
             pass
             
         #si tiene múltiples archivos sumamos la longitud de todos
         if not size:
             try:
-                check_video = scrapertools.find_multiple_matches(str(torrent["info"]["files"]), "'length': (\d+).*?}")
+                check_video = scrapertools.find_multiple_matches(str(torrent_f["info"]["files"]), "'length': (\d+).*?}")
                 sizet = sum([int(i) for i in check_video])
                 size = convert_size(sizet)
+                
+                files = torrent_f["info"]["files"][:]
+                files.append({"__name": torrent_f["info"]["name"], 'length': 0})
+                
             except:
-                pass
+                size = 'ERROR'
 
     except:
+        size = 'ERROR'
         logger.error('ERROR al buscar el tamaño de un .Torrent: ' + str(url))
         logger.error(traceback.format_exc())
         
@@ -1352,13 +1385,22 @@ def get_torrent_size(url, referer=None, post=None, data_torrent=False, timeout=5
     #    os.remove(torrents_path + "/generictools.torrent")                      #borramos el .torrent
     #except:
     #    pass
+
+    if '.rar' in str(files):
+        size = '[COLOR magenta][B]RAR-[/B][/COLOR]%s' % size
         
     #logger.debug(str(url))
     logger.info(str(size))
     
-    if data_torrent:
-        return (size, torrent)
-    return size
+    if not lookup:
+        return (size, torrents_path, torrent_f, files)
+    elif file_list and data_torrent:
+        return (size, torrent_f, files)
+    elif file_list:
+        return (size, files)
+    elif data_torrent:
+        return (size, torrent_f)
+    return size 
 
     
 def get_field_from_kodi_DB(item, from_fields='*', files='file'):

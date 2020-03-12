@@ -459,8 +459,7 @@ def bt_client(mediaurl, xlistitem, rar_files, subtitle=None, password=None, item
                     break
 
                 else:
-                    if platformtools.dialog_yesno(msg_header, "¿Borramos los archivo descargados? (incompletos)",  
-                                    "Selecciona NO para seguir descargando en segundo plano"):
+                    if platformtools.dialog_yesno(msg_header, config.get_localized_string(30031), config.get_localized_string(30032)):
                         dp_cerrado = False
                         progreso = platformtools.dialog_progress(msg_header, '')
                         break
@@ -568,8 +567,7 @@ def bt_client(mediaurl, xlistitem, rar_files, subtitle=None, password=None, item
                     finalizado = True
                     break
 
-                if platformtools.dialog_yesno(msg_header, "¿Borramos los archivo descargados? (incompletos)",  
-                                    "Selecciona NO para seguir descargando en segundo plano"):
+                if platformtools.dialog_yesno(msg_header, config.get_localized_string(30031), config.get_localized_string(30032)):
                     progreso = platformtools.dialog_progress(msg_header, '')
                     dp_cerrado = False
                     break
@@ -1332,9 +1330,7 @@ def import_libtorrent(LIBTORRENT_PATH):
             logger.error(traceback.format_exc())
             if fp: fp.close()
             e = e1 or e2
-            ok = platformtools.dialog_ok('ERROR en el cliente Interno Libtorrent', \
-                        'Módulo no encontrado o imcompatible con el dispositivo.', \
-                        'Reporte el fallo adjuntando un "log" %s' % str(e2))
+            ok = platformtools.dialog_ok(config.get_localized_string(30035), config.get_localized_string(30036), config.get_localized_string(60015), str(e2))
         except:
             pass
     

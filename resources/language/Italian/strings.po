@@ -133,6 +133,30 @@ msgctxt "#30030"
 msgid "Advanced Options"
 msgstr "Opzioni Avanzate"
 
+msgctxt "#30031"
+msgid "Delete Download?"
+msgstr "Cancellare Download?"
+
+msgctxt "#30032"
+msgid "Select NO to continue downloading in the background"
+msgstr "Seleziona NO per continuare il download in background"
+
+msgctxt "#30033"
+msgid "Internal Client"
+msgstr "Client Interno"
+
+msgctxt "#30034"
+msgid ": Select the video, or 'Cancel' for all"
+msgstr ": Seleziona il video o 'Annulla' per tutti"
+
+msgctxt "#30035"
+msgid "ERROR in the Client"
+msgstr "ERRORE nel Client"
+
+msgctxt "#30036"
+msgid "Module not found or incompatible with the device."
+msgstr "Modulo non trovato o incompatibile con il dispositivo."
+
 msgctxt "#30043"
 msgid "Force view mode:"
 msgstr "Forza modalità di visualizzazione:"

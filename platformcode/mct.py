@@ -93,7 +93,7 @@ def play(url, xlistitem={}, is_view=None, subtitle="", password="", item=None):
             url = decode_adfly(data)
         except:
             ddd = xbmcgui.Dialog()
-            ddd.ok( msg_header + ": Sin soporte adf.ly", "El script no tiene soporte para el acortador de urls adf.ly.", "", "url: " + url )
+            ddd.ok( msg_header + ": No adf.ly support "," The script has no support for the adf.ly url shortener.", "", "url: " + url )
             return
 
     """
@@ -153,8 +153,7 @@ def play(url, xlistitem={}, is_view=None, subtitle="", password="", item=None):
     except Exception as e:
         do = xbmcgui.Dialog()
         e = e1 or e2
-        do.ok('ERROR en el cliente MCT Libtorrent', 'Módulo no encontrado o imcompatible con el dispositivo.', 
-                    'Reporte el fallo adjuntando un "log".', str(e))
+        do.ok(config.get_localized_string(30035) + 'MCT Libtorrent', config.get_localized_string(30036), config.get_localized_string(60015), str(e))
         return
         
     log("XXX libtorrent version: %s" % lt.version)
@@ -257,7 +256,7 @@ def play(url, xlistitem={}, is_view=None, subtitle="", password="", item=None):
     # -- Prioritarizar/Seleccionar archivo-----------------------
     _index, video_file, video_size, len_files = get_video_files_sizes( info )
     if len_files == 0:
-        dp = xbmcgui.Dialog().ok("No se puede reproducir", "El torrent no contiene ningún archivo de vídeo")
+        dp = xbmcgui.Dialog().ok(config.get_localized_string(20000), config.get_localized_string(60339))
 
     if _index < 0:
         log("##### parts = %s #########" % str(video_file))
@@ -574,8 +573,7 @@ def play(url, xlistitem={}, is_view=None, subtitle="", password="", item=None):
             if h.status().num_pieces < tot_piece_set:
                 # -- Diálogo continuar o terminar ---------------
                 # Preguntamos si el usuario quiere pasar a backgroung
-                ok = xbmcgui.Dialog().yesno(msg_header, "¿Borramos los archivo descargados? (incompletos)",  
-                                    "Selecciona NO para seguir descargando en segundo plano")
+                ok = xbmcgui.Dialog().yesno(msg_header, config.get_localized_string(30031), config.get_localized_string(30032))
             else: ok = True
             # -- NO ---------------------------------------------
             if not ok:
@@ -618,8 +616,7 @@ def play(url, xlistitem={}, is_view=None, subtitle="", password="", item=None):
         if not bkg_user and dp_cerrado and dp.iscanceled():
             dp.close()
             # Preguntamos si el usuario quiere pasar a backgroung
-            dialog = xbmcgui.Dialog().yesno(msg_header, "¿Borramos los archivo descargados? (incompletos)", 
-                                        "Seleccione NO para seguir descargando en segundo plano")
+            dialog = xbmcgui.Dialog().yesno(msg_header, config.get_localized_string(30031), config.get_localized_string(30032))
             if not dialog:
                 bkg_user = True
                 dp_cerrado = False
@@ -791,7 +788,7 @@ def get_video_files_sizes( info ):
             return index, rar_parts, rar_size, len(opciones)
         else:
             d = xbmcgui.Dialog()
-            seleccion = d.select(msg_header + ": Selecciona el vídeo, o 'Cancelar' para todos", list(opciones.values()))
+            seleccion = d.select(msg_header + config.get_localized_string(30034), list(opciones.values()))
     else: seleccion = 0
 
     index = list(opciones.keys())[seleccion]
@@ -829,7 +826,7 @@ def remove_files( download, torrent_file, video_file, ses, h, ren_video_file="" 
     if dialog_view and ren_video_file:
         if h.status().num_pieces >= tot_piece_set:
             d = xbmcgui.Dialog()
-            ok = d.yesno(msg_header, '¿Borrarmos los archivos descargados? (completos)', video_file)
+            ok = d.yesno(msg_header, config.get_localized_string(30031), video_file)
         else:
             ok = True
 
