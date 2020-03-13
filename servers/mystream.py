@@ -24,6 +24,11 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     video_urls = []
     global page_data
     dec = scrapertools.find_single_match(page_data, '(\$=~\[\];.*?\(\)\))\(\);')
+    # needed to increase recursion
+    import sys
+    sys.setrecursionlimit(10000)
+
     deObfCode = js2py.eval_js(dec)
+
     video_urls.append(['mp4 [mystream]', scrapertools.find_single_match(str(deObfCode), "'src',\s*'([^']+)")])
     return video_urls
