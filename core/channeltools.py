@@ -10,6 +10,7 @@ from platformcode import config, logger
 
 DEFAULT_UPDATE_URL = "/channels/"
 dict_channels_parameters = dict()
+default_file = dict()
 
 remote_path = 'https://raw.githubusercontent.com/kodiondemand/media/master/'
 
@@ -177,7 +178,9 @@ def get_lang(channel_name):
 def get_default_settings(channel_name):
     from core import filetools
     default_path = filetools.join(config.get_runtime_path(), 'default_channel_settings' + '.json')
-    default_file = jsontools.load(filetools.read(default_path))
+    global default_file
+    if not default_file:
+        default_file = jsontools.load(filetools.read(default_path))
 
     channel_path = filetools.join(config.get_runtime_path(), 'channels', channel_name + '.json')
     adult_path = filetools.join(config.get_runtime_path(), 'channels', 'porn', channel_name + '.json')
