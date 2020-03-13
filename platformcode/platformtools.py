@@ -1268,7 +1268,7 @@ def play_torrent(item, xlistitem, mediaurl):
     # Si es Libtorrent y no está soportado, se ofrecen alternativas, si las hay...
     if seleccion < 2 and not LIBTORRENT:
         dialog_ok(config.get_localized_string(30033), config.get_localized_string(70774), \
-                  config.get_localized_string(70774) % config.get_setting("libtorrent_error", server="torrent", default=''), \
+                  config.get_localized_string(70775) % config.get_setting("libtorrent_error", server="torrent", default=''), \
                   config.get_localized_string(70776))
         if len(torrent_options) > 2:
             seleccion = dialog_select(config.get_localized_string(70193), [opcion[0] for opcion in torrent_options])
@@ -1289,7 +1289,7 @@ def play_torrent(item, xlistitem, mediaurl):
             torrent_options[seleccion][0] \
             and xbmcaddon.Addon(id="plugin.video.%s" % torrent_options[seleccion][0].replace('Plugin externo: ', '')) \
             .getSetting('download_storage') == '1':
-        if dialog_yesno(torrent_options[seleccion][0], congig.get_localized_string(70780) % size_rar, congig.get_localized_string(70781)):
+        if dialog_yesno(torrent_options[seleccion][0], config.get_localized_string(70780) % size_rar, config.get_localized_string(70781)):
             __settings__ = xbmcaddon.Addon(
                 id="plugin.video.%s" % torrent_options[seleccion][0].replace('Plugin externo: ', ''))
             __settings__.openSettings()  # Se visulizan los Ajustes de Elementum
