@@ -168,7 +168,7 @@ def peliculas(item, json='', key='', itemlist=[]):
     itlist = filterkey = []
     action = 'findvideos'
 
-    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']:
+    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'search']:
         Pagination = int(defp) if defp.isdigit() else ''
     else: Pagination = ''
     pag = item.page if item.page else 1
@@ -211,7 +211,7 @@ def peliculas(item, json='', key='', itemlist=[]):
         tmdb.set_infoLabels(itlist, seekTmdb=True)
     itemlist += itlist
 
-    if Pagination and len(itemlist) > pag * Pagination:
+    if Pagination and len(itemlist) >= Pagination:
         if inspect.stack()[1][3] != 'get_newest':
             item.title = support.typo(config.get_localized_string(30992), 'color kod bold')
             item.page = pag + 1
@@ -273,7 +273,7 @@ def episodios(item, json ='', key='', itemlist =[]):
     ep = 1
     season = infoLabels['season'] if 'season' in infoLabels else item.contentSeason if item.contentSeason else 1
     
-    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']:
+    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'search']:
         Pagination = int(defp) if defp.isdigit() else ''
     else: Pagination = ''
     pag = item.page if item.page else 1
@@ -321,7 +321,7 @@ def episodios(item, json ='', key='', itemlist =[]):
                                  path = item.path))
 
     # if showseason
-    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest']:
+    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest', 'search']:
         if show_seasons and not item.filterseason:
             itm.contentType='season'
             season_list = []
@@ -341,8 +341,9 @@ def episodios(item, json ='', key='', itemlist =[]):
                                     infoLabels=infoLabels,
                                     filterseason=str(season),
                                     path=item.path))
+
         elif defpage and inspect.stack()[1][3] not in ['get_seasons']:
-            if Pagination and len(itemlist) > pag * Pagination:
+            if Pagination and len(itemlist) >= Pagination:
                 if inspect.stack()[1][3] != 'get_newest':
                     item.title = support.typo(config.get_localized_string(30992), 'color kod bold')
                     item.page = pag + 1
@@ -662,7 +663,7 @@ def pagination(item, itemlist = []):
     encoded_itemlist = []
     for it in itemlist:
         encoded_itemlist.append(it.tourl())
-    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']:
+    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'search']:
         Pagination = int(defp) if defp.isdigit() else ''
     else: Pagination = ''
     pag = item.page if item.page else 1
@@ -673,7 +674,7 @@ def pagination(item, itemlist = []):
 
         itlist.append(item)
 
-    if Pagination and len(itemlist) > pag * Pagination:
+    if Pagination and len(itemlist) >= Pagination:
         if inspect.stack()[1][3] != 'get_newest':
             itlist.append(
                 Item(channel=item.channel,
