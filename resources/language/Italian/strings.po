@@ -133,6 +133,46 @@ msgctxt "#30030"
 msgid "Advanced Options"
 msgstr "Opzioni Avanzate"
 
+msgctxt "#30031"
+msgid "Delete Download?"
+msgstr "Cancellare Download?"
+
+msgctxt "#30032"
+msgid "Select NO to continue downloading in the background"
+msgstr "Seleziona NO per continuare il download in background"
+
+msgctxt "#30033"
+msgid "Internal Client"
+msgstr "Client Interno"
+
+msgctxt "#30034"
+msgid ": Select the video, or 'Cancel' for all"
+msgstr ": Seleziona il video o 'Annulla' per tutti"
+
+msgctxt "#30035"
+msgid "ERROR in the Client"
+msgstr "ERRORE nel Client"
+
+msgctxt "#30036"
+msgid "Module not found or incompatible with the device."
+msgstr "Modulo non trovato o incompatibile con il dispositivo."
+
+msgctxt "#30037"
+msgid "Delete Folder"
+msgstr "Elimina Cartella"
+
+msgctxt "#30038"
+msgid "Do you really want to delete the %s folder and all its contents?"
+msgstr "Vuoi veramente eliminare la cartella %s e tutto il suo contenuto?"
+
+msgctxt "#30039"
+msgid "Delete File"
+msgstr "Elimina File"
+
+msgctxt "#30040"
+msgid "Do you really want to delete the %s file?"
+msgstr "Vuoi veramente eliminare il file %s?"
+
 msgctxt "#30043"
 msgid "Force view mode:"
 msgstr "Forza modalità di visualizzazione:"
@@ -5816,6 +5856,70 @@ msgstr "HD 720"
 msgctxt "#70765"
 msgid "SD"
 msgstr "SD"
+
+msgctxt "#70766"
+msgid "Installing Internal Torrent Client"
+msgstr "Installazione del Client Torrent Interno"
+
+msgctxt "#70767"
+msgid "You can ask for Superuser permissions"
+msgstr "Puoi richiedere le autorizzazioni Superuser"
+
+msgctxt "#70768"
+msgid "%.2f MB RAR file found"
+msgstr "File RAR di %.2f MB trovato"
+
+msgctxt "#70769"
+msgid "You can do other tasks in Kodi in the meantime. We will inform you..."
+msgstr "Nel frattempo puoi svolgere altre attività in Kodi. Ti informeremo..."
+
+msgctxt "#70770"
+msgid "RAR file found..."
+msgstr "File RAR Trovato..."
+
+msgctxt "#70771"
+msgid "Name: %s"
+msgstr "Nome: %s"
+
+msgctxt "#70772"
+msgid "Size: %.2f MB"
+msgstr "Dimensione: %.2f MB"
+
+msgctxt "#70773"
+msgid "Download in the background? Cancel in Downloads menu"
+msgstr "Scarica in background? Annulla nel menu Download"
+
+msgctxt "#70774"
+msgid "Client not supported on this device."
+msgstr "Client non supportato su questo dispositivo."
+
+msgctxt "#70775"
+msgid "Error: %s"
+msgstr "Errore: %s"
+
+msgctxt "#70776"
+msgid "Use a supported client."
+msgstr "Usa un client supportato."
+
+msgctxt "#70777"
+msgid "This external plugin does not support the extraction of RAR files online"
+msgstr "Questo plugin esterno non supporta l'estrazione di file RAR online"
+
+msgctxt "#70778"
+msgid "Do you want us to use the internal MCT client this time?"
+msgstr "Vuoi che questa volta utilizziamo il client MCT interno?"
+
+msgctxt "#70779"
+msgid "This will take %s + times the size of the video"
+msgstr "Questa operazione occuperà %s + volte la dimensione del video"
+
+msgctxt "#70780"
+msgid "Elementum with memory download does not support to extract online RAR files (disk occupation %s + times)"
+msgstr "Elementum con download di memoria non supporta l'estrazione di file RAR online (occupazione del disco %s + volte)"
+
+msgctxt "#70781"
+msgid "Do you want to call Elementum Settings to temporarily switch to Use Files?"
+msgstr "Vuoi aprire i settaggi di Elementum per passare temporaneamente a usare i file?"
 
 # DNS start [ settings and declaration ]
 msgctxt "#707401"

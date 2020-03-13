@@ -133,6 +133,46 @@ msgctxt "#30030"
 msgid "Advanced Options"
 msgstr ""
 
+msgctxt "#30031"
+msgid "Delete Download?"
+msgstr ""
+
+msgctxt "#30032"
+msgid "Select NO to continue downloading in the background"
+msgstr ""
+
+msgctxt "#30033"
+msgid "Internal Client"
+msgstr ""
+
+msgctxt "#30034"
+msgid ": Select the video, or 'Cancel' for all"
+msgstr ""
+
+msgctxt "#30035"
+msgid "ERROR in the Client"
+msgstr "ERRORE nel Client"
+
+msgctxt "#30036"
+msgid "Module not found or incompatible with the device."
+msgstr "Modulo non trovato o incompatibile con il dispositivo."
+
+msgctxt "#30037"
+msgid "Delete Folder"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Do you really want to delete the %s folder and all its contents?"
+msgstr ""
+
+msgctxt "#30039"
+msgid "Delete File"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Do you really want to delete the %s file?"
+msgstr ""
+
 msgctxt "#30043"
 msgid "Force view mode:"
 msgstr ""
@@ -5811,6 +5851,62 @@ msgstr ""
 
 msgctxt "#70765"
 msgid "SD"
+msgstr ""
+
+msgctxt "#70766"
+msgid "Installing Internal Torrent Client"
+msgstr ""
+
+msgctxt "#70767"
+msgid "You can ask for Superuser permissions"
+msgstr ""
+
+msgctxt "#70768"
+msgid "%.2f MB RAR file found"
+msgstr ""
+
+msgctxt "#70769"
+msgid "You can do other tasks in Kodi in the meantime. We will inform you..."
+msgstr ""
+
+msgctxt "#70770"
+msgid "RAR file found..."
+msgstr ""
+
+msgctxt "#70771"
+msgid "Name: %s"
+msgstr ""
+
+msgctxt "#70772"
+msgid "Size: %.2f MB"
+msgstr ""
+
+msgctxt "#70773"
+msgid "Download in the background? Cancel in Downloads menu"
+msgstr ""
+
+msgctxt "#70774"
+msgid "Client not supported on this device."
+msgstr ""
+
+msgctxt "#70775"
+msgid "Error: %s"
+msgstr ""
+
+msgctxt "#70776"
+msgid "Use a supported client."
+msgstr ""
+
+msgctxt "#70777"
+msgid "This external plugin does not support the extraction of RAR files online"
+msgstr ""
+
+msgctxt "#70778"
+msgid "Do you want us to use the internal MCT client this time?"
+msgstr ""
+
+msgctxt "#70779"
+msgid "This will take %s + times the size of the video"
 msgstr ""
 
 # DNS start [ settings and declaration ]

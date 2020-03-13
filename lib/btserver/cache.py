@@ -7,13 +7,18 @@
 import base64
 import os.path
 import re
+import traceback
 
 try:
-    from python_libtorrent import get_libtorrent
+    import xbmc, xbmcgui
+except:
+    pass
 
-    lt = get_libtorrent()
-except Exception, e:
-    import libtorrent as lt
+from platformcode import config
+LIBTORRENT_PATH = config.get_setting("libtorrent_path", server="torrent", default='')
+
+from servers import torrent as torr
+lt, e, e1, e2 = torr.import_libtorrent(LIBTORRENT_PATH)
 
 
 class Cache(object):

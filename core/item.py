@@ -353,7 +353,7 @@ class Item(object):
     def fromurl(self, url):
         """
         Genera un item a partir de una cadena de texto. La cadena puede ser creada por la funcion tourl() o tener
-        el formato antiguo: plugin://plugin.video.alfa/?channel=... (+ otros parametros)
+        el formato antiguo: plugin://plugin.video.kod/?channel=... (+ otros parametros)
         Uso: item.fromurl("cadena")
 
         @param url: url
