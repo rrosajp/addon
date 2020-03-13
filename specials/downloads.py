@@ -130,16 +130,29 @@ def settings(item):
 def browser(item):
     logger.info()
     itemlist = []
+    context = [{ 'title': 'cancella', 'channel': 'downloads', 'action': "del_file"}]
 
     for file in filetools.listdir(item.url):
         if file == "list": continue
         if filetools.isdir(filetools.join(item.url, file)):
-            itemlist.append(
-                Item(channel=item.channel, title=file, action=item.action, url=filetools.join(item.url, file)))
+            itemlist.append(Item(channel=item.channel, title=file, action=item.action, url=filetools.join(item.url, file), context=[{ 'title': config.get_localized_string(30037), 'channel': 'downloads', 'action': "del_dir"}]))
         else:
-            itemlist.append(Item(channel=item.channel, title=file, action="play", url=filetools.join(item.url, file)))
+            itemlist.append(Item(channel=item.channel, title=file, action="play", url=filetools.join(item.url, file), context=[{ 'title': config.get_localized_string(30039), 'channel': 'downloads', 'action': "del_file"}]))
 
     return itemlist
+
+
+def del_file(item):
+    ok = platformtools.dialog_yesno(config.get_localized_string(30039),config.get_localized_string(30040))
+    if ok:
+        filetools.remove(item.url)
+        platformtools.itemlist_refresh()
+
+def del_dir(item):
+    ok = platformtools.dialog_yesno(config.get_localized_string(30037),config.get_localized_string(30038))
+    if ok:
+        filetools.rmdirtree(item.url)
+        platformtools.itemlist_refresh()
 
 
 def clean_all(item):

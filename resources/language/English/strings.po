@@ -157,6 +157,22 @@ msgctxt "#30036"
 msgid "Module not found or incompatible with the device."
 msgstr "Modulo non trovato o incompatibile con il dispositivo."
 
+msgctxt "#30037"
+msgid "Delete Folder"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Do you really want to delete the %s folder and all its contents?"
+msgstr ""
+
+msgctxt "#30039"
+msgid "Delete File"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Do you really want to delete the %s file?"
+msgstr ""
+
 msgctxt "#30043"
 msgid "Force view mode:"
 msgstr ""
