@@ -5889,6 +5889,38 @@ msgctxt "#70773"
 msgid "Download in the background? Cancel in Downloads menu"
 msgstr "Scarica in background? Annulla nel menu Download"
 
+msgctxt "#70774"
+msgid "Client not supported on this device."
+msgstr "Client non supportato su questo dispositivo."
+
+msgctxt "#70775"
+msgid "Error: %s"
+msgstr "Errore: %s"
+
+msgctxt "#70776"
+msgid "Use a supported client."
+msgstr "Usa un client supportato."
+
+msgctxt "#70777"
+msgid "This external plugin does not support the extraction of RAR files online"
+msgstr "Questo plugin esterno non supporta l'estrazione di file RAR online"
+
+msgctxt "#70778"
+msgid "Do you want us to use the internal MCT client this time?"
+msgstr "Vuoi che questa volta utilizziamo il client MCT interno?"
+
+msgctxt "#70779"
+msgid "This will take %s + times the size of the video"
+msgstr "Questa operazione occuperà %s + volte la dimensione del video"
+
+msgctxt "#70780"
+msgid "Elementum with memory download does not support to extract online RAR files (disk occupation %s + times)"
+msgstr "Elementum con download di memoria non supporta l'estrazione di file RAR online (occupazione del disco %s + volte)"
+
+msgctxt "#70781"
+msgid "Do you want to call Elementum Settings to temporarily switch to Use Files?"
+msgstr "Vuoi aprire i settaggi di Elementum per passare temporaneamente a usare i file?"
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS Check Alert"

@@ -311,7 +311,7 @@ def set_setting(name, value, channel="", server=""):
     canal 'channel'.
     Devuelve el valor cambiado o None si la asignacion no se ha podido completar.
 
-    Si se especifica el nombre del canal busca en la ruta \addon_data\plugin.video.alfa\settings_channels el
+    Si se especifica el nombre del canal busca en la ruta \addon_data\plugin.video.kod\settings_channels el
     archivo channel_data.json y establece el parametro 'name' al valor indicado por 'value'. Si el archivo
     channel_data.json no existe busca en la carpeta channels el archivo channel.json y crea un archivo channel_data.json
     antes de modificar el parametro 'name'.

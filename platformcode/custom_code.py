@@ -29,7 +29,7 @@ def init():
     """
     Todo el código añadido al add-on se borra con cada actualización.  Esta función permite restaurarlo automáticamente con cada actualización.  Esto permite al usuario tener su propio código, bajo su responsabilidad, y restaurarlo al add-on cada vez que se actualiza.
     
-    El mecanismo funciona copiando el contenido de la carpeta-arbol "./userdata/addon_data/plugin.video.alfa/custom_code/..." sobre
+    El mecanismo funciona copiando el contenido de la carpeta-arbol "./userdata/addon_data/plugin.video.kod/custom_code/..." sobre
     las carpetas de código del add-on.  No verifica el contenido, solo vuelca(reemplaza) el contenido de "custom_code".
     
     El usuario almacenará en las subcarpetas de "custom_code" su código actualizado y listo para ser copiado en cualquier momento.
@@ -42,7 +42,7 @@ def init():
             from platformcode import custom_code
             custom_code.init()
             
-    2.- En el inicio de Kodi, comprueba si existe la carpeta "custom_code" en "./userdata/addon_data/plugin.video.alfa/".  
+    2.- En el inicio de Kodi, comprueba si existe la carpeta "custom_code" en "./userdata/addon_data/plugin.video.kod/".  
         Si no existe, la crea y sale sin más, dando al ususario la posibilidad de copiar sobre esa estructura su código, 
         y que la función la vuelque sobre el add-on en el próximo inicio de Kodi.
         
@@ -63,7 +63,7 @@ def init():
 
     try:
         #Borra el .zip de instalación de Alfa de la carpeta Packages, por si está corrupto, y que así se pueda descargar de nuevo
-        version = 'plugin.video.alfa-%s.zip' % config.get_addon_version(with_fix=False)
+        version = 'plugin.video.kod-%s.zip' % config.get_addon_version(with_fix=False)
         filetools.remove(filetools.join(xbmc.translatePath('special://home'), 'addons', 'packages', version), True)
         
         #Verifica si Kodi tiene algún achivo de Base de Datos de Vídeo de versiones anteriores, entonces los borra

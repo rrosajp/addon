@@ -562,7 +562,7 @@ class Client(object):
         Servicio encargado de anunciar el torrent
         """
         self._th.force_reannounce()
-        self._th.force_dht_announce()
+        self._th.force_dht_announce() 
 
     def save_state(self):
         """

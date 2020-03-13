@@ -1267,10 +1267,9 @@ def play_torrent(item, xlistitem, mediaurl):
 
     # Si es Libtorrent y no está soportado, se ofrecen alternativas, si las hay...
     if seleccion < 2 and not LIBTORRENT:
-        dialog_ok('Cliente Interno (LibTorrent):', 'Este cliente no está soportado en su dispositivo.', \
-                  'Error: [COLOR yellow]%s[/COLOR]' % config.get_setting("libtorrent_error", server="torrent",
-                                                                         default=''), \
-                  'Use otro cliente Torrent soportado')
+        dialog_ok(config.get_localized_string(30033), config.get_localized_string(70774), \
+                  config.get_localized_string(70774) % config.get_setting("libtorrent_error", server="torrent", default=''), \
+                  config.get_localized_string(70776))
         if len(torrent_options) > 2:
             seleccion = dialog_select(config.get_localized_string(70193), [opcion[0] for opcion in torrent_options])
             if seleccion < 2:
@@ -1280,14 +1279,8 @@ def play_torrent(item, xlistitem, mediaurl):
     # Si es Torrenter o Elementum con opción de Memoria, se ofrece la posibilidad ee usar Libtorrent temporalemente
     elif seleccion > 1 and LIBTORRENT and UNRAR and 'RAR-' in item.torrent_info and (
             "torrenter" in torrent_options[seleccion][0] \
-            or ("elementum" in torrent_options[seleccion][0] and xbmcaddon.Addon(id="plugin.video.%s" \
-                                                                                    % torrent_options[seleccion][
-                                                                                        0].replace('Plugin externo: ',
-                                                                                                   '')).getSetting(
-        'download_storage') == '1')):
-        if dialog_yesno(torrent_options[seleccion][0], 'Este plugin externo no soporta extraer on-line archivos RAR', \
-                        '[COLOR yellow]¿Quiere que usemos esta vez el Cliente interno MCT?[/COLOR]', \
-                        'Esta operación ocupará en disco [COLOR yellow][B]%s+[/B][/COLOR] veces el tamaño del vídeo' % size_rar):
+            or ("elementum" in torrent_options[seleccion][0] and xbmcaddon.Addon(id="plugin.video.%s"  % torrent_options[seleccion][0].replace('Plugin externo: ','')).getSetting('download_storage') == '1')):
+        if dialog_yesno(torrent_options[seleccion][0], config.get_localized_string(70777), config.get_localized_string(70778), config.get_localized_string(70779) % size_rar):
             seleccion = 1
         else:
             return
@@ -1296,11 +1289,7 @@ def play_torrent(item, xlistitem, mediaurl):
             torrent_options[seleccion][0] \
             and xbmcaddon.Addon(id="plugin.video.%s" % torrent_options[seleccion][0].replace('Plugin externo: ', '')) \
             .getSetting('download_storage') == '1':
-        if dialog_yesno(torrent_options[seleccion][0],
-                        'Elementum con descarga en [COLOR yellow]Memoria[/COLOR] no soporta ' + \
-                        'extraer on-line archivos RAR (ocupación en disco [COLOR yellow][B]%s+[/B][/COLOR] veces)' % size_rar, \
-                        '[COLOR yellow]¿Quiere llamar a los Ajustes de Elementum para cambiar [B]temporalmente[/B] ' + \
-                        'a [COLOR hotpink]"Usar Archivos"[/COLOR] y [B]reintentarlo[/B]?[/COLOR]'):
+        if dialog_yesno(torrent_options[seleccion][0], congig.get_localized_string(70780) % size_rar, congig.get_localized_string(70781)):
             __settings__ = xbmcaddon.Addon(
                 id="plugin.video.%s" % torrent_options[seleccion][0].replace('Plugin externo: ', ''))
             __settings__.openSettings()  # Se visulizan los Ajustes de Elementum

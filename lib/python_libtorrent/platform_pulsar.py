@@ -30,7 +30,7 @@ try:
     #__settings__ = xbmcaddon.Addon(id='script.module.libtorrent')              ### Alfa
     #__version__ = __settings__.getAddonInfo('version')                         ### Alfa
     #__plugin__ = __settings__.getAddonInfo('name') + " v." + __version__       ### Alfa
-    __settings__ = xbmcaddon.Addon(id='plugin.video.alfa')                      ### Alfa
+    __settings__ = xbmcaddon.Addon(id='plugin.video.kod')                      ### Alfa
     __version__ = '1.1.17'                                                      ### Alfa
     __plugin__ = "python-libtorrent v.1.1.7"                                    ### Alfa
 except:

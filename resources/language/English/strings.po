@@ -5885,6 +5885,30 @@ msgctxt "#70773"
 msgid "Download in the background? Cancel in Downloads menu"
 msgstr ""
 
+msgctxt "#70774"
+msgid "Client not supported on this device."
+msgstr ""
+
+msgctxt "#70775"
+msgid "Error: %s"
+msgstr ""
+
+msgctxt "#70776"
+msgid "Use a supported client."
+msgstr ""
+
+msgctxt "#70777"
+msgid "This external plugin does not support the extraction of RAR files online"
+msgstr ""
+
+msgctxt "#70778"
+msgid "Do you want us to use the internal MCT client this time?"
+msgstr ""
+
+msgctxt "#70779"
+msgid "This will take %s + times the size of the video"
+msgstr ""
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS Check Alert"
