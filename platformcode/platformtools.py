@@ -657,7 +657,7 @@ def set_context_commands(item, parent_item):
                                          (sys.argv[0], item.clone(action="add_pelicula_to_library",
                                                                   from_action=item.action).tourl())))
 
-        if item.channel != "downloads" and item.server != 'torrent':
+        if item.channel not in ["downloads", "videolibrary"] and item.server != 'torrent':
             # Descargar pelicula
             if item.contentType == "movie" and item.contentTitle:
                 context_commands.append((config.get_localized_string(60354), "XBMC.RunPlugin(%s?%s)" %
@@ -670,6 +670,10 @@ def set_context_commands(item, parent_item):
                 if item.contentType == "tvshow":
                     context_commands.append((config.get_localized_string(60355), "XBMC.RunPlugin(%s?%s)" %
                                              (sys.argv[0], item.clone(channel="downloads", action="save_download",
+                                                                      from_channel=item.channel,
+                                                                      from_action=item.action).tourl())))
+                    context_commands.append((config.get_localized_string(60357), "XBMC.RunPlugin(%s?%s)" %
+                                             (sys.argv[0], item.clone(channel="downloads", action="save_download",  download="seson",
                                                                       from_channel=item.channel,
                                                                       from_action=item.action).tourl())))
                 # Descargar episodio
