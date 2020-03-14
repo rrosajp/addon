@@ -45,8 +45,7 @@ except:
 
 try:
     DOWNLOAD_PATH = ''
-    DOWNLOAD_PATH = xbmc.translatePath(config.get_setting("mct_download_path", \
-                server="torrent", default=config.get_setting("downloadpath")))
+    DOWNLOAD_PATH = xbmc.translatePath(config.get_setting("mct_download_path", server="torrent", default=config.get_setting("torrent_downloadpath")))
 except:
     DOWNLOAD_PATH = config.get_setting("mct_download_path", server="torrent", default=config.get_setting("downloadpath"))
 if not config.get_setting("mct_download_path", server="torrent") and DOWNLOAD_PATH:

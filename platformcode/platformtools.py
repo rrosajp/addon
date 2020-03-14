@@ -1215,8 +1215,7 @@ def torrent_client_installed(show_tuple=False):
     # Plugins externos se encuentra en servers/torrent.json nodo clients
     from core import filetools
     from core import jsontools
-    torrent_clients = jsontools.get_node_from_file("torrent.json", "clients", filetools.join(config.get_runtime_path(),
-                                                                                             "servers"))
+    torrent_clients = jsontools.get_node_from_file("torrent.json", "clients", filetools.join(config.get_runtime_path(),"servers"))
     torrent_options = []
     for client in torrent_clients:
         if xbmc.getCondVisibility('System.HasAddon("%s")' % client["id"]):
@@ -1237,6 +1236,17 @@ def play_torrent(item, xlistitem, mediaurl):
     from lib import generictools
     from servers import torrent
 
+    
+
+    # Si Libtorrent ha dado error de inicialización, no se pueden usar los clientes internos
+    UNRAR = config.get_setting("unrar_path", server="torrent", default="")
+    LIBTORRENT = config.get_setting("libtorrent_path", server="torrent", default='')
+    size_rar = 2
+    rar_files = []
+    if item.password:
+        size_rar = 3
+
+
     # Opciones disponibles para Reproducir torrents
     torrent_options = list()
     torrent_options.append([config.get_localized_string(30033)])
@@ -1245,6 +1255,12 @@ def play_torrent(item, xlistitem, mediaurl):
     torrent_options.extend(torrent_client_installed(show_tuple=True))
 
     torrent_client = config.get_setting("torrent_client", server="torrent")
+
+    # Si es Libtorrent y no está soportado, se ofrecen alternativas, si las hay...
+    if not LIBTORRENT and len(torrent_options) < 3:
+        from specials import quasar_download
+        if dialog_yesno(config.get_localized_string(70784), config.get_localized_string(70782)):
+            quasar_download.download()
 
     if torrent_client and torrent_client - 1 <= len(torrent_options):
         if torrent_client == 0:
@@ -1257,15 +1273,6 @@ def play_torrent(item, xlistitem, mediaurl):
         else:
             seleccion = 0
 
-    # Si Libtorrent ha dado error de inicialización, no se pueden usar los clientes internos
-    UNRAR = config.get_setting("unrar_path", server="torrent", default="")
-    LIBTORRENT = config.get_setting("libtorrent_path", server="torrent", default='')
-    size_rar = 2
-    rar_files = []
-    if item.password:
-        size_rar = 3
-
-    # Si es Libtorrent y no está soportado, se ofrecen alternativas, si las hay...
     if seleccion < 2 and not LIBTORRENT:
         dialog_ok(config.get_localized_string(30033), config.get_localized_string(70774), \
                   config.get_localized_string(70775) % config.get_setting("libtorrent_error", server="torrent", default=''), \

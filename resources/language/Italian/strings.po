@@ -5921,6 +5921,23 @@ msgctxt "#70781"
 msgid "Do you want to call Elementum Settings to temporarily switch to Use Files?"
 msgstr "Vuoi aprire i settaggi di Elementum per passare temporaneamente a usare i file?"
 
+msgctxt "#70782"
+msgid "Your device is not compatible with the Internal Client, do you want to use Quasar for Torrents?"
+msgstr "Il tuo dispositivo non è compatibile con il Client Interno, Vuoi usare Quasar per i Torrent?"
+
+msgctxt "#70783"
+msgid "Quasar installed and configured, enjoy!"
+msgstr "Quasar installato e configurato, buona Visione!"
+
+msgctxt "#70784"
+msgid "Attention!"
+msgstr "Attenzione!"
+
+msgctxt "#70785"
+msgid "Install external torrent client (Quasar)"
+msgstr "Installa client torrent esterno (Quasar)"
+
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS Check Alert"
