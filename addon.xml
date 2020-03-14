@@ -1,4 +1,4 @@
-<addon id="plugin.video.kod" name="Kodi on Demand" provider-name="KOD Team" version="0.8">
+<addon id="plugin.video.kod" name="Kodi on Demand" provider-name="KOD Team" version="0.8.1">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.libtorrent" optional="true"/>
@@ -19,11 +19,11 @@
       <screenshot>resources/media/themes/ss/2.png</screenshot>
       <screenshot>resources/media/themes/ss/3.png</screenshot>
     </assets>
-      <news>- tanti miglioramenti &quot;sotto il cofano&quot;, supporto iniziale al futuro kodi 19
-- Nuova modalità di visualizzazione per episodio successivo
-- fixato wstream tramite l'aggiunta della finestra per risolvere il reCaptcha
-- aggiunta sezione &quot;segnala un problema&quot; in Aiuto
-- altri fix e migliorie varie a canali e server</news>
+      <news>- riorganizzate le impostazioni
+- aggiunte descrizioni tag qualità su cb01 (presto anche sugli altri)
+- aggiunto il supporto alle serie di polpotv
+- fixato server mystream
+- fix Rinumerazione per episodi Nuovi</news>
     <description lang="it">Naviga velocemente sul web e guarda i contenuti presenti</description>
     <disclaimer>[COLOR red]The owners and submitters to this addon do not host or distribute any of the content displayed by these addons nor do they have any affiliation with the content providers.[/COLOR]
     [COLOR yellow]Kodi © is a registered trademark of the XBMC Foundation. We are not connected to or in any other way affiliated with Kodi, Team Kodi, or the XBMC Foundation. Furthermore, any software, addons, or products offered by us will receive no support in official Kodi channels, including the Kodi forums and various social networks.[/COLOR]</disclaimer>

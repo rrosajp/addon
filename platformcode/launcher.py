@@ -490,7 +490,7 @@ def play_from_library(item):
     check_next_ep = nextep.check(item)
 
 
-    window_type = 1 if check_next_ep else config.get_setting("window_type", "videolibrary")
+    window_type = config.get_setting("window_type", "videolibrary")
 
     # y volvemos a lanzar kodi
     if xbmc.getCondVisibility('Window.IsMedia') and not window_type == 1:

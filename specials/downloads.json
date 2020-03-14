@@ -10,36 +10,6 @@
   "settings": [
     {
       "type": "label",
-      "label": "@70229",
-      "enabled": true,
-      "visible": true
-    },
-    {
-      "id": "library_add",
-      "type": "bool",
-      "label": "@70230",
-      "default": false,
-      "enabled": true,
-      "visible": true
-    },
-    {
-      "id": "library_move",
-      "type": "bool",
-      "label": "@70231",
-      "default": false,
-      "enabled": "eq(-1,true)",
-      "visible": true
-    },
-    {
-      "id": "browser",
-      "type": "bool",
-      "label": "@70232",
-      "default": true,
-      "enabled": true,
-      "visible": true
-    },
-    {
-      "type": "label",
       "label": "@70243",
       "enabled": true,
       "visible": true
@@ -123,28 +93,6 @@
       "visible": true
     },
     {
-      "id": "quality",
-      "type": "list",
-      "label": "@70240",
-      "lvalues": [
-        "@70241",
-        "HD 1080",
-        "HD 720",
-        "SD"
-      ],
-      "default": 0,
-      "enabled": true,
-      "visible": true
-    },
-    {
-      "id": "server_speed",
-      "type": "bool",
-      "label": "@70242",
-      "default": true,
-      "enabled": true,
-      "visible": true
-    },
-    {
       "id": "server_reorder",
       "type": "list",
       "label": "@70238",
@@ -161,10 +109,10 @@
       "type": "list",
       "label": "@70246",
       "lvalues": [
-        "Ita, Sub, Eng, Vos, Vosi",
-        "Eng, Ita, Sub, Vos, Vosi",
-        "Sub, Ita, Eng, Vos, Vosi",
-        "Eng, Sub, Ita, Vos, Vosi"
+        "Ita, Sub, Eng",
+        "Eng, Ita, Sub",
+        "Sub, Ita, Eng",
+        "Eng, Sub, Ita"
       ],
       "default": 0,
       "enabled": "eq(-1,'@70245')",

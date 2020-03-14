@@ -56,6 +56,8 @@ if xinfoplus_set == config.get_localized_string(70129):
     set_animation = False
 if xinfoplus_set == config.get_localized_string(70130):
     set_animation = True
+else:
+    set_animation  = xinfoplus_set
 
 def start(item, recomendaciones=[], from_window=False):
     if from_window:

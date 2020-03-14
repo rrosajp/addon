@@ -3,8 +3,7 @@
 
 from core import httptools
 from core import scrapertools
-from lib import jsunpack
-from platformcode import logger
+from platformcode import logger, config
 
 
 def test_video_exists(page_url):

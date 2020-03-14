@@ -105,6 +105,74 @@ msgctxt "#30023"
 msgid "NO"
 msgstr ""
 
+msgctxt "#30024"
+msgid "Select the elements you want to display on the Contextual Menu"
+msgstr ""
+
+msgctxt "#30025"
+msgid "KoD Preferences"
+msgstr "Preferenze KoD"
+
+msgctxt "#30026"
+msgid "Direct"
+msgstr ""
+
+msgctxt "#30027"
+msgid "SetResolvedUrl"
+msgstr ""
+
+msgctxt "#30028"
+msgid "Built-In"
+msgstr ""
+
+msgctxt "#30029"
+msgid "Download and Play"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Advanced Options"
+msgstr ""
+
+msgctxt "#30031"
+msgid "Delete Download?"
+msgstr ""
+
+msgctxt "#30032"
+msgid "Select NO to continue downloading in the background"
+msgstr ""
+
+msgctxt "#30033"
+msgid "Internal Client"
+msgstr ""
+
+msgctxt "#30034"
+msgid ": Select the video, or 'Cancel' for all"
+msgstr ""
+
+msgctxt "#30035"
+msgid "ERROR in the Client"
+msgstr "ERRORE nel Client"
+
+msgctxt "#30036"
+msgid "Module not found or incompatible with the device."
+msgstr "Modulo non trovato o incompatibile con il dispositivo."
+
+msgctxt "#30037"
+msgid "Delete Folder"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Do you really want to delete the %s folder and all its contents?"
+msgstr ""
+
+msgctxt "#30039"
+msgid "Delete File"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Do you really want to delete the %s file?"
+msgstr ""
+
 msgctxt "#30043"
 msgid "Force view mode:"
 msgstr ""
@@ -1539,7 +1607,7 @@ msgid "Search Trailer"
 msgstr ""
 
 msgctxt "#60360"
-msgid "[B]QUICK MENU[/B]"
+msgid "Quick Menu"
 msgstr ""
 
 msgctxt "#60361"
@@ -2319,11 +2387,11 @@ msgid "Videolibrary options"
 msgstr ""
 
 msgctxt "#60567"
-msgid "   Overwrite the entire video library (strm, nfo and json)"
+msgid "Overwrite the entire video library (strm, nfo and json)"
 msgstr ""
 
 msgctxt "#60568"
-msgid "   Search for new episodes and update the video library"
+msgid "Search for new episodes and update the video library"
 msgstr ""
 
 msgctxt "#60569"
@@ -3259,12 +3327,12 @@ msgid "Movie|Tv Shows|Anime|Children|Documentary|Horror|Castellan|Latin|Torrent"
 msgstr ""
 
 msgctxt "#70126"
-msgid "Visual Options"
+msgid "Customization"
 msgstr ""
 
 msgctxt "#70128"
-msgid "Infoplus visual option"
-msgstr ""
+msgid "Infoplus Animation"
+msgstr "Animazione Infoplus"
 
 msgctxt "#70129"
 msgid "Without animation"
@@ -3671,15 +3739,15 @@ msgid "File location"
 msgstr ""
 
 msgctxt "#70230"
-msgid "  - Add completed downloads to the video library "
+msgid "Add completed downloads to the video library "
 msgstr ""
 
 msgctxt "#70231"
-msgid "  - Move the downloaded file to the video library"
+msgid "Move the downloaded file to the video library"
 msgstr ""
 
 msgctxt "#70232"
-msgid "  - View files downloaded from downloads"
+msgid "View files downloaded from downloads"
 msgstr ""
 
 msgctxt "#70233"
@@ -3707,7 +3775,7 @@ msgid "- Order of servers"
 msgstr ""
 
 msgctxt "#70240"
-msgid "  - Preferred quality"
+msgid "Preferred quality"
 msgstr ""
 
 msgctxt "#70241"
@@ -3715,7 +3783,7 @@ msgid "The highest"
 msgstr ""
 
 msgctxt "#70242"
-msgid "  - Choose the fastest servers"
+msgid "Choose the fastest servers"
 msgstr ""
 
 msgctxt "#70243"
@@ -5554,7 +5622,7 @@ msgid "Use your custom channel URLs"
 msgstr ""
 
 msgctxt "#70706"
-msgid "autostart KOD at Kodi boot"
+msgid "Autostart KOD at Kodi boot"
 msgstr ""
 
 msgctxt "#70707"
@@ -5590,7 +5658,7 @@ msgid "Customize Homepage"
 msgstr ""
 
 msgctxt "#70716"
-msgid "Choose menus you wanna in homepage"
+msgid "Select the elements you want to display on the Homepage"
 msgstr ""
 
 msgctxt "#70717"
@@ -5670,7 +5738,7 @@ msgid "%s Special Episode Number"
 msgstr ""
 
 msgctxt "#70737"
-msgid "[B]SIDE MENU[/B]"
+msgid "Side Menu"
 msgstr ""
 
 msgctxt "#70738"
@@ -5751,6 +5819,94 @@ msgstr ""
 
 msgctxt "#70757"
 msgid "Compact"
+msgstr ""
+
+msgctxt "#70758"
+msgid "Buffer size to download before playback"
+msgstr ""
+
+msgctxt "#70759"
+msgid "Limit (in Kb's) of background download speed (DOES NOT affect RAR)"
+msgstr ""
+
+msgctxt "#70760"
+msgid "Do you want the RAR and ZIP files to be decompressed for playback?"
+msgstr ""
+
+msgctxt "#70761"
+msgid "Uncompressing RARs in the background?"
+msgstr ""
+
+msgctxt "#70762"
+msgid "Do you want to convert Magnets to Torrents to see sizes and store them?"
+msgstr ""
+
+msgctxt "#70763"
+msgid "HD 1080"
+msgstr ""
+
+msgctxt "#70764"
+msgid "HD 720"
+msgstr ""
+
+msgctxt "#70765"
+msgid "SD"
+msgstr ""
+
+msgctxt "#70766"
+msgid "Installing Internal Torrent Client"
+msgstr ""
+
+msgctxt "#70767"
+msgid "You can ask for Superuser permissions"
+msgstr ""
+
+msgctxt "#70768"
+msgid "%.2f MB RAR file found"
+msgstr ""
+
+msgctxt "#70769"
+msgid "You can do other tasks in Kodi in the meantime. We will inform you..."
+msgstr ""
+
+msgctxt "#70770"
+msgid "RAR file found..."
+msgstr ""
+
+msgctxt "#70771"
+msgid "Name: %s"
+msgstr ""
+
+msgctxt "#70772"
+msgid "Size: %.2f MB"
+msgstr ""
+
+msgctxt "#70773"
+msgid "Download in the background? Cancel in Downloads menu"
+msgstr ""
+
+msgctxt "#70774"
+msgid "Client not supported on this device."
+msgstr ""
+
+msgctxt "#70775"
+msgid "Error: %s"
+msgstr ""
+
+msgctxt "#70776"
+msgid "Use a supported client."
+msgstr ""
+
+msgctxt "#70777"
+msgid "This external plugin does not support the extraction of RAR files online"
+msgstr ""
+
+msgctxt "#70778"
+msgid "Do you want us to use the internal MCT client this time?"
+msgstr ""
+
+msgctxt "#70779"
+msgid "This will take %s + times the size of the video"
 msgstr ""
 
 # DNS start [ settings and declaration ]

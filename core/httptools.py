@@ -12,11 +12,10 @@ except ImportError:
     import urllib, urlparse, cookielib
 
 
-import inspect, os, time, json
+import os, time, json
 from threading import Lock
 from core.jsontools import to_utf8
 from platformcode import config, logger
-from platformcode.logger import WebErrorException
 from core import scrapertools
 
 # Get the addon version
@@ -41,6 +40,13 @@ if HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT == 0: HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT =
 
 # Random use of User-Agents, if nad is not specified
 HTTPTOOLS_DEFAULT_RANDOM_HEADERS = False
+
+domainCF = list()
+channelsCF = ['guardaserieclick', 'casacinema', 'dreamsub', 'ilgeniodellostreaming', 'piratestreaming', 'altadefinizioneclick', 'altadefinizione01_link']
+otherCF = ['altadefinizione-nuovo.link', 'wstream.video', 'akvideo.stream', 'backin.net']
+for ch in channelsCF:
+    domainCF.append(urlparse.urlparse(config.get_channel_url(name=ch)).hostname)
+domainCF.extend(otherCF)
 
 def get_user_agent():
     # Returns the global user agent to be used when necessary for the url.
@@ -253,10 +259,9 @@ def downloadpage(url, **opt):
     url = scrapertools.unescape(url)
     load_cookies()
     domain = urlparse.urlparse(url).netloc
+    global domainCF
     CF = False
-    if domain in ['www.guardaserie.media', 'casacinema.space', 'wstream.video', 'akvideo.stream', 'backin.net',
-                  'dreamsub.stream', 'altadefinizione-nuovo.link', 'ilgeniodellostreaming.si', 'www.piratestreaming.gratis',
-                  'altadefinizione.style']:
+    if domain in domainCF:
         from lib import cloudscraper
         session = cloudscraper.create_scraper()
         CF = True

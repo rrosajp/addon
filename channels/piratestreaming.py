@@ -12,10 +12,6 @@ host = config.get_channel_url()
 list_servers = ['mixdrop', 'speedvideo', 'gounlimited', 'onlystream', 'youtube']
 list_quality = ['default']
 
-
-checklinks = config.get_setting('checklinks', 'piratestreaming')
-checklinks_number = config.get_setting('checklinks_number', 'piratestreaming')
-
 headers = [['Referer', host]]
 
 @support.menu

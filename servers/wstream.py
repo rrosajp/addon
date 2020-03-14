@@ -57,7 +57,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     logger.info("[Wstream] url=" + page_url)
     video_urls = []
     global data, real_url
-
+    logger.info(data)
     sitekey = scrapertools.find_multiple_matches(data, """data-sitekey=['"] *([^"']+)""")
     if sitekey: sitekey = sitekey[-1]
     captcha = platformtools.show_recaptcha(sitekey, page_url) if sitekey else ''

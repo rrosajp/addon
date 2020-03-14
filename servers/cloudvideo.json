@@ -4,14 +4,14 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "cloudvideo.tv/(?:embed-)?([a-z0-9]+)(?:.html)?",
+        "pattern": "cloudvideo.tv/(?:embed-|)([a-z0-9]+)(?:.html|)",
         "url": "https://cloudvideo.tv/embed-\\1.html"
       }
     ]
   },
   "free": true,
   "id": "cloudvideo",
-  "name": "CloudVideo",
+  "name": "cloudvideo",
   "settings": [
     {
       "default": false,

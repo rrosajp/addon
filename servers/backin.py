@@ -1,19 +1,24 @@
 # -*- coding: utf-8 -*-
 
-import urllib
-
 from core import httptools
 from core import scrapertools
-from platformcode import logger
-
+from platformcode import logger, config
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
 
-    data = httptools.downloadpage(page_url)
+    if 'http://' in page_url:  # fastids
+        page_url = httptools.downloadpage(page_url, follow_redirects=False).headers['location']
+        page_url = scrapertools.find_single_match(page_url, 'backin.net/([a-zA-Z0-9]+)')
+    global data
+    data = httptools.downloadpage("http://backin.net/stream-%s-500x400.html" % page_url).data
 
-    # if '<meta property="og:title" content=""/>' in data:
-    # return False,"The video has been cancelled from Backin.net"
+    if 'File Not Found' in data:
+        return False, config.get_localized_string(70449) % "backin"
 
     return True, ""
 
@@ -25,15 +30,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
     headers = [["User-Agent", "Mozilla/5.0 (Windows NT 6.1; rv:54.0) Gecko/20100101 Firefox/54.0"]]
 
-
-
-    # First access
-    httptools.downloadpage("http://backin.net/s/streams.php?s=%s" % page_url, headers=headers)
-
-    # xbmc.sleep(10000)
-    headers.append(["Referer", "http://backin.net/%s" % page_url])
-    #xbmc.sleep(10000)
-    data = httptools.downloadpage("http://backin.net/stream-%s-500x400.html" % page_url, headers=headers).data
+    global data
     
     data_pack = scrapertools.find_single_match(data, r"(eval.function.p,a,c,k,e,.*?)\s*</script>")
     if data_pack:
@@ -48,9 +45,9 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     logger.info("URL=" + str(url))
 
     # URL del vídeo
-    video_urls.append([".mp4" + " [backin]", url + '|' + urllib.urlencode(dict(headers))])
+    video_urls.append([".mp4" + " [backin]", url])
 
     for video_url in video_urls:
-        logger.info("%s - %s" % (video_url[0], video_url[1]))
+        logger.info("%s - %s" % (video_url[0],  httptools.get_url_headers(video_url[1])))
 
     return video_urls

@@ -112,7 +112,7 @@ def mainlist(item):
                                 contentType=item.contentType, contentChannel=item.contentChannel,
                                 contentSerieName=item.contentSerieName))
 
-    if not item.contentType == "tvshow" and config.get_setting("browser", "downloads") == True:
+    if not item.contentType == "tvshow" and config.get_setting("browser") == True:
         itemlist.insert(0, Item(channel=item.channel, action="browser", title=support.typo(config.get_localized_string(70222),'bold'),url=DOWNLOAD_PATH))
 
     if not item.contentType == "tvshow":
@@ -130,16 +130,29 @@ def settings(item):
 def browser(item):
     logger.info()
     itemlist = []
+    context = [{ 'title': 'cancella', 'channel': 'downloads', 'action': "del_file"}]
 
     for file in filetools.listdir(item.url):
         if file == "list": continue
         if filetools.isdir(filetools.join(item.url, file)):
-            itemlist.append(
-                Item(channel=item.channel, title=file, action=item.action, url=filetools.join(item.url, file)))
+            itemlist.append(Item(channel=item.channel, title=file, action=item.action, url=filetools.join(item.url, file), context=[{ 'title': config.get_localized_string(30037), 'channel': 'downloads', 'action': "del_dir"}]))
         else:
-            itemlist.append(Item(channel=item.channel, title=file, action="play", url=filetools.join(item.url, file)))
+            itemlist.append(Item(channel=item.channel, title=file, action="play", url=filetools.join(item.url, file), context=[{ 'title': config.get_localized_string(30039), 'channel': 'downloads', 'action': "del_file"}]))
 
     return itemlist
+
+
+def del_file(item):
+    ok = platformtools.dialog_yesno(config.get_localized_string(30039),config.get_localized_string(30040))
+    if ok:
+        filetools.remove(item.url)
+        platformtools.itemlist_refresh()
+
+def del_dir(item):
+    ok = platformtools.dialog_yesno(config.get_localized_string(30037),config.get_localized_string(30038))
+    if ok:
+        filetools.rmdirtree(item.url)
+        platformtools.itemlist_refresh()
 
 
 def clean_all(item):
@@ -285,7 +298,7 @@ def move_to_libray(item):
     library_path = filetools.join(move_path, *filetools.split(item.downloadFilename))
     final_path = download_path
 
-    if config.get_setting("library_add", "downloads") == True and config.get_setting("library_move", "downloads") == True:
+    if config.get_setting("library_add") == True and config.get_setting("library_move") == True:
         if not filetools.isdir(filetools.dirname(library_path)):
             filetools.mkdir(filetools.dirname(library_path))
 
@@ -322,7 +335,7 @@ def move_to_libray(item):
                 xbmc.sleep(500)
             xbmc_videolibrary.clean()
 
-    if config.get_setting("library_add", "downloads") == True and config.get_setting("library_move", "downloads") == False:
+    if config.get_setting("library_add") == True and config.get_setting("library_move") == False:
         if filetools.isfile(final_path):
             if item.contentType == "movie" and item.infoLabels["tmdb_id"]:
                 library_item = Item(title=config.get_localized_string(70228) % item.downloadFilename, channel="downloads",
@@ -471,7 +484,7 @@ def sort_method(item):
                          "VOSI": ["VOSI"]}
 
     order_list_calidad = ["BLURAY", "FULLHD", "HD", "480P", "360P", "240P"]
-    order_list_calidad = quality_orders[int(config.get_setting("quality", "downloads"))]
+    order_list_calidad = quality_orders[int(config.get_setting("quality"))]
     match_list_calidad = {"BLURAY": ["BR", "BLURAY", '4K'],
                           "FULLHD": ["FULLHD", "FULL HD", "1080", "HD1080", "HD 1080", "1080p"],
                           "HD": ["HD", "HD REAL", "HD 720", "720", "HDTV", "720p"],
@@ -482,7 +495,7 @@ def sort_method(item):
     value = (get_match_list(item.title, match_list_idimas, order_list_idiomas, ignorecase=True, only_ascii=True).index, \
              get_match_list(item.title, match_list_calidad, order_list_calidad, ignorecase=True, only_ascii=True).index)
 
-    if config.get_setting("server_speed", "downloads"):
+    if config.get_setting("server_speed"):
         value += tuple([get_server_position(item.server)])
 
     return value
@@ -723,8 +736,8 @@ def start_download(item):
 
 
 def get_episodes(item):
-    logger.info("contentAction: %s | contentChannel: %s | contentType: %s" % (
-        item.contentAction, item.contentChannel, item.contentType))
+    logger.info("contentAction: %s | contentChannel: %s | contentType: %s" % (item.contentAction, item.contentChannel, item.contentType))
+
     if 'dlseason' in item:
         season = True
         season_number = item.dlseason
@@ -787,6 +800,8 @@ def get_episodes(item):
                     itemlist.append(episode)
             else:
                 itemlist.append(episode)
+
+
         # Cualquier otro resultado no nos vale, lo ignoramos
         else:
             logger.info("Omitiendo item no válido: %s" % episode.tostring())

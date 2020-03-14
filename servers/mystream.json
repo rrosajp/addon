@@ -4,15 +4,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "https://embed.mystream.to/(\\w+)",
-        "url": "https://embed.mystream.to/\\1"
-      },
-      {
-        "pattern": "https://mystream\\.premiumserver\\.club/(\\w+)",
-        "url": "https://embed.mystream.to/\\1"
-      },
-      {
-        "pattern": "https://mstream\\.(?:xyz|icu)/(\\w+)",
+        "pattern": "(?:\\w+\\.)?my?stream\\.(?:to|fun)/(?:watch/)?([a-zA-Z0-9]+)",
         "url": "https://embed.mystream.to/\\1"
       }
     ]

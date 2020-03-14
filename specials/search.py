@@ -12,7 +12,11 @@ PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
 import os, json, time, inspect, channelselector
-from concurrent import futures
+
+if PY3:
+    from concurrent import futures
+else:
+    from concurrent_py2 import futures
 from core.item import Item
 from core import tmdb, scrapertools, channeltools, filetools, jsontools
 from channelselector import get_thumb
@@ -43,7 +47,7 @@ def mainlist(item):
 
                 Item(channel=item.channel, title=typo(config.get_localized_string(59994), 'color kod bold'), action='opciones', thumbnail=get_thumb('setting_0.png')),
 
-                Item(channel=item.channel, title=typo(config.get_localized_string(30100), 'color kod bold'), action='settings', thumbnail=get_thumb('setting_0.png'))]
+                Item(channel='shortcuts', title=typo(config.get_localized_string(30100), 'color kod bold'), action='SettingOnPosition', category=3, thumbnail=get_thumb('setting_0.png'))]
 
     itemlist = set_context(itemlist)
 
@@ -110,7 +114,8 @@ def new_search(item):
     logger.info()
 
     itemlist = []
-    if channeltools.get_channel_setting('last_search', 'search'):
+    if config.get_setting('last_search'):
+    # if channeltools.get_channel_setting('last_search', 'search'):
         last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
     else:
         last_search = ''
@@ -249,7 +254,7 @@ def channel_search(item):
             if it in valid:
                 continue
             if mode == 'all' or (it.contentType and mode == it.contentType):
-                if config.get_setting('result_mode', 'search') != 0:
+                if config.get_setting('result_mode') != 0:
                     if config.get_localized_string(30992) not in it.title:
                         it.title += typo(ch_name,'_ [] color kod bold')
                         results.append(it)
@@ -263,7 +268,7 @@ def channel_search(item):
         if not grouped:
             continue
         # to_temp[key] = grouped
-        if config.get_setting('result_mode', 'search') == 0:
+        if config.get_setting('result_mode') == 0:
             if not config.get_setting('unify'):
                 title = typo(ch_name,'bold') + typo(str(len(grouped)), '_ [] color kod bold')
             else:
@@ -353,7 +358,7 @@ def get_channels(item):
             list_cat[n] = 'tvshow'
 
         if item.mode == 'all' or (item.mode in list_cat):
-            if config.get_setting("include_in_global_search", channel):
+            if config.get_setting("include_in_global_search", channel) and ch_param.get("active", False):
                 channels_list.append(channel)
                 title_list.append(ch_param.get('title', channel))
 
@@ -367,9 +372,8 @@ def settings(item):
     return platformtools.show_channel_settings(caption=config.get_localized_string(59993))
 
 def set_workers():
-    list_mode=[None,1,2,4,6,8,16,24,32,64]
-    index = config.get_setting('thread_number', 'search')
-    return list_mode[index]
+    workers = config.get_setting('thread_number') if config.get_setting('thread_number') > 0 else None
+    return workers
 
 def setting_channel_new(item):
     import xbmcgui
@@ -719,7 +723,7 @@ def get_from_temp(item):
 
 def save_search(text):
     if text:
-        saved_searches_limit = int((10, 20, 30, 40)[int(config.get_setting("saved_searches_limit", "search"))])
+        saved_searches_limit = config.get_setting("saved_searches_limit")
 
         current_saved_searches_list = config.get_setting("saved_searches_list", "search")
         if current_saved_searches_list is None:

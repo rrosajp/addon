@@ -461,13 +461,14 @@ def save_tvshow(item, episodelist):
         item.infoLabels['title'] = item.contentSerieName
         item_tvshow = Item(title=item.contentSerieName, channel="videolibrary", action="get_seasons",
                            fanart=item.infoLabels['fanart'], thumbnail=item.infoLabels['thumbnail'],
-                           infoLabels=item.infoLabels, path=path.replace(TVSHOWS_PATH, ""))
+                           infoLabels=item.infoLabels, path=path.replace(TVSHOWS_PATH, ""), fulltitle=item.fulltitle)
         item_tvshow.library_playcounts = {}
         item_tvshow.library_urls = {item.channel: item.url}
 
     else:
         # Si existe tvshow.nfo, pero estamos añadiendo un nuevo canal actualizamos el listado de urls
         head_nfo, item_tvshow = read_nfo(tvshow_path)
+        item_tvshow.fulltitle = item.fulltitle
         item_tvshow.channel = "videolibrary"
         item_tvshow.action = "get_seasons"
         item_tvshow.library_urls[item.channel] = item.url

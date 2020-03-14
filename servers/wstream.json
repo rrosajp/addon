@@ -7,15 +7,15 @@
     "find_videos": {
         "patterns": [
             {
-                "pattern": "wstream\\.video(?!<)(?:=|/)(?:video[a-zA-Z0-9]*|embed[a-zA-Z0-9]*|)?(?!api|swembedid)(?:-|/)?(?:[a-z0-9A-Z]+/)?([a-z0-9A-Z]+)",
+                "pattern": "wstream\\.video(?!<)(?:=|/)(?:video[a-zA-Z0-9.?_]*|embed[a-zA-Z0-9]*|)?(?!api|swembedid)(?:-|/|=)?(?:[a-z0-9A-Z]+/)?([a-z0-9A-Z]+)",
                 "url": "https://wstream.video/video.php?file_code=\\1"
             },
             {
-                "pattern": "wstream\\.video/([a-zA-Z0-9/]+.html)",
+                "pattern": "wstream\\.video/(?!api|swembedid)([a-zA-Z0-9/]+.html)",
                 "url": "https://wstream.video/\\1"
             },
             {
-                "pattern": "wstream\\.video/(api/vcmod/fastredirect/streaming\\.php\\?id=[0-9]+)",
+                "pattern": "wstream\\.video/(api/vcmod/fastredirect/streaming\\.php\\?id=[$0-9]+)",
                 "url": "https://wstream.video/\\1"
             }
         ],

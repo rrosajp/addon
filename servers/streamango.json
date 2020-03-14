@@ -20,6 +20,10 @@
   "free": true,
   "id": "streamango",
   "name": "streamango",
+  "premium": [
+    "realdebrid",
+    "alldebrid"
+  ],
   "settings": [
     {
       "default": false,

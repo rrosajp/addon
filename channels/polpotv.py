@@ -2,7 +2,7 @@
 # ------------------------------------------------------------
 # KoD - XBMC Plugin
 # Canale polpotv
-# ------------------------------------------------------------
+# ------------------------------------------------------------ 
 
 from core import scrapertools, httptools, support, jsontools
 from core.item import Item
@@ -18,12 +18,21 @@ list_quality = ['1080p','720p','480p','360p']
 
 @support.menu
 def mainlist(item):
-    menu = [
-        ('Ultimi Film aggiunti', ['/api/movies', 'peliculas', '']),
-        ('Generi', ['/api/genres', 'search_movie_by_genre', '']),
-        ('Anni {film}', ['', 'search_movie_by_year', '']),
-        ('Cerca Film... bold', ['', 'search', ''])
-    ]
+    # menu = [
+    #     ('Ultimi Film aggiunti', ['/api/movies', 'peliculas', '']),
+    #     ('Ultime Serie TV aggiunte', ['/api/shows', 'peliculas', '']),
+    #     ('Generi', ['/api/genres', 'search_movie_by_genre', '']),
+    #     ('Anni {film}', ['', 'search_movie_by_year', '']),
+    #     ('Cerca... bold', ['', 'search', ''])
+    # ]
+    film = ['/api/movies',
+            ('Generi', ['/api/genres', 'search_movie_by_genre', '']),
+            ('Anni', ['', 'search_movie_by_year', '']),]
+
+    tvshow=['/api/shows']
+
+    search=''
+
     return locals()
 
 def newest(categoria):
@@ -32,16 +41,23 @@ def newest(categoria):
     if categoria == 'peliculas':
         item.contentType = 'movie'
         item.url = host + '/api/movies'
+    elif categoria == 'series':
+        item.contentType = 'tvshow'      
+        item.url = host+'/api/shows'
     return peliculas(item)
 
 def peliculas(item):
     support.log()
     itemlist = []
+    
     data = httptools.downloadpage(item.url, headers=headers).data
     json_object = jsontools.load(data)
-
-    for movie in json_object['hydra:member']:
-        itemlist.extend(get_itemlist_movie(movie,item))
+    for element in json_object['hydra:member']:
+        if 'shows' not in item.url:
+            item.contentType='movie'
+        else:
+            item.contentType='tvshow'
+        itemlist.extend(get_itemlist_element(element,item))
 
     try:
         if support.inspect.stack()[1][3] not in ['newest']:
@@ -51,6 +67,36 @@ def peliculas(item):
 
     return itemlist
 
+def episodios(item):
+    support.log()
+    itemlist = []
+    data = httptools.downloadpage(item.url, headers=headers).data
+    json_object = jsontools.load(data)
+    for season in json_object['seasons']:
+        seas_url=host+season['@id']+'/releases'
+        itemlist_season=get_season(item.channel, seas_url, season['seasonNumber'])
+        if(len(itemlist_season)>0):
+            itemlist.extend(itemlist_season)
+
+    support.videolibrary(itemlist, item, 'color kod bold')
+
+    return itemlist
+
+def get_season(channel, seas_url, seasonNumber):
+    support.log()
+    itemlist = []
+    data = httptools.downloadpage(seas_url, headers=headers).data
+    json_object = jsontools.load(data)
+    for episode in json_object['hydra:member']:
+        itemlist.append(
+            Item(channel=channel,
+                 action='findvideos',
+                 contentType='episode',
+                 title=str(seasonNumber)+"x"+str("%02d"%episode['episodeNumber']),
+                 url=seas_url,
+                 extra=str(len(json_object['hydra:member'])-episode['episodeNumber'])))
+    return itemlist[::-1]
+
 def search(item, texto):
     support.log(item.url, "search", texto)
     itemlist=[]
@@ -59,7 +105,14 @@ def search(item, texto):
         data = httptools.downloadpage(item.url, headers=headers).data
         json_object = jsontools.load(data)
         for movie in json_object['hydra:member']:
-            itemlist.extend(get_itemlist_movie(movie,item))
+            item.contentType='movie'
+            itemlist.extend(get_itemlist_element(movie,item))
+        item.url = host + "/api/shows?originalTitle="+texto+"&translations.name=" +texto
+        data = httptools.downloadpage(item.url, headers=headers).data
+        json_object = jsontools.load(data)
+        for tvshow in json_object['hydra:member']:
+            item.contentType='tvshow'
+            itemlist.extend(get_itemlist_element(tvshow,item))            
         return itemlist
     # Continua la ricerca in caso di errore
     except:
@@ -104,10 +157,10 @@ def findvideos(item):
     try:
         data = httptools.downloadpage(item.url, headers=headers).data
         json_object = jsontools.load(data)
-        for video in json_object['hydra:member'][0]['playlist']['videos']:
-            # data = httptools.downloadpage(video['src'], headers={'Origin': host},follow_redirects=None).data
-            # patron = 'href="([^"]+)"'
-            # video_link = scrapertools.find_single_match(data, patron)
+        array_index=0
+        if item.contentType!='movie':
+            array_index=int(item.extra)
+        for video in json_object['hydra:member'][array_index]['playlist']['videos']:
             itemlist.append(
                 Item(
                     channel=item.channel,
@@ -121,44 +174,53 @@ def findvideos(item):
         pass
     return support.server(item, itemlist=itemlist)
 
-def get_itemlist_movie(movie,item):
+def get_itemlist_element(element,item):
     support.log()
     itemlist=[]
     try:
-        if movie['originalLanguage']['id']=='it':
-            scrapedtitle=movie['originalTitle']
+        if element['originalLanguage']['id']=='it':
+            scrapedtitle=element['originalTitle']
         else:
-            scrapedtitle=movie['translations'][1]['name']
+            scrapedtitle=element['translations'][1]['name']
         if scrapedtitle=='':
-            scrapedtitle=movie['originalTitle']
+            scrapedtitle=element['originalTitle']
     except:
-        scrapedtitle=movie['originalTitle']
+        scrapedtitle=element['originalTitle']
     try:
-        scrapedplot=movie['translations'][1]['overview']
+        scrapedplot=element['translations'][1]['overview']
     except:
         scrapedplot = ""
     try:
-        scrapedthumbnail="http://"+movie['posterPath']
+        scrapedthumbnail="http://"+element['posterPath']
     except:
         scrapedthumbnail=""
     try:
-        scrapedfanart="http://"+movie['backdropPath']
+        scrapedfanart="http://"+element['backdropPath']
     except:
         scrapedfanart=""
+
     infoLabels = {}
-    infoLabels['tmdbid']=movie['tmdbId']
+    if item.contentType=='movie':
+        next_action='findvideos'
+        quality=support.typo(element['lastQuality'].upper(), '_ [] color kod bold')
+        url="%s%s/releases"
+        infoLabels['tmdbid']=element['tmdbId']
+    else:
+        next_action='episodios'
+        quality=''
+        url="%s%s"
     itemlist.append(
         Item(channel=item.channel,
-             action="findvideos",
-             title=support.typo(scrapedtitle,'bold') + support.typo(movie['lastQuality'].upper(), '_ [] color kod bold'),
+             action=next_action,
+             title=support.typo(scrapedtitle,'bold') + quality,
              fulltitle=scrapedtitle,
              show=scrapedtitle,
              plot=scrapedplot,
              fanart=scrapedfanart,
              thumbnail=scrapedthumbnail,
-             contentType='movie',
+             contentType=item.contentType,
              contentTitle=scrapedtitle,
-             url="%s%s/releases" %(host,movie['@id'] ),
+             url=url %(host,element['@id'] ),
              infoLabels=infoLabels,
              extra=item.extra))
     return itemlist

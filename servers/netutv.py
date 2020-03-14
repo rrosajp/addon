@@ -1,8 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import random
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
+
+if PY3:
+    #from future import standard_library
+    #standard_library.install_aliases()
+    import urllib.parse as urllib                               # Es muy lento en PY2.  En PY3 es nativo
+else:
+    import urllib                                               # Usamos el nativo de PY2 que es más rápido
+
+from builtins import chr
+from builtins import range
+
 import re
-import urllib
 
 from core import httptools
 from core import jsontools
@@ -12,6 +24,8 @@ from platformcode import logger
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
+    #Deshabilitamos el server hasta nueva orden
+    return False, "[netutv] Servidor deshabilitado"
     # http://netu.tv/watch_video.php=XX solo contiene una redireccion, ir directamente a http://hqq.tv/player/embed_player.php?vid=XX
     page_url = page_url.replace("/watch_video.php?v=", "/player/embed_player.php?vid=")
     data = httptools.downloadpage(page_url).data
@@ -35,17 +49,15 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     page_url = page_url.replace('https://waaw.tv/', 'http://hqq.watch/')
 
     data = httptools.downloadpage(page_url).data
-    logger.debug(data)
+    # ~ logger.debug(data)
 
-    # js_wise = scrapertools.find_single_match(data, "<script type=[\"']text/javascript[\"']>\s*;?(eval.*?)</script>")
-    js_wise = scrapertools.find_single_match(data, "<script>\s*;(eval.*?)\s*</script>")
-    logger.info('JS_WISE= '+ js_wise)
+    js_wise = scrapertools.find_single_match(data, "<script type=[\"']text/javascript[\"']>\s*;?(eval.*?)</script>")
     data = jswise(js_wise).replace("\\", "")
-    logger.debug(data)
+    # ~ logger.debug(data)
 
     alea = str(random.random())[2:]
     data_ip = httptools.downloadpage('http://hqq.watch/player/ip.php?type=json&rand=%s' % alea).data
-    logger.debug(data_ip)
+    # ~ logger.debug(data_ip)
     json_data_ip = jsontools.load(data_ip)
 
     url = scrapertools.find_single_match(data, 'self\.location\.replace\("([^)]+)\)')
@@ -53,15 +65,14 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     url = url.replace('"+data.ip+"', json_data_ip['ip'])
     url = url.replace('"+need_captcha+"', '0') #json_data_ip['need_captcha'])
     url = url.replace('"+token', '')
-    # logger.info('URL= '+url)
-    # logger.debug(url)
+    # ~ logger.debug(url)
 
     headers = { "User-Agent": 'Mozilla/5.0 (X11; U; Linux i686; en-US) AppleWebKit/533.4 (KHTML, like Gecko) Chrome/5.0.375.127 Large Screen Safari/533.4 GoogleTV/162671' }
     data = httptools.downloadpage('http://hqq.watch'+url, headers=headers).data
-    # logger.debug(data)
+    # ~ logger.debug(data)
     
     codigo_js = scrapertools.find_multiple_matches(data, '<script>document.write\(unescape\("([^"]+)')
-    # logger.debug(codigo_js)
+    # ~ logger.debug(codigo_js)
     
     js_aux = urllib.unquote(codigo_js[0])
     at = scrapertools.find_single_match(js_aux, 'var at = "([^"]+)')

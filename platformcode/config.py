@@ -19,6 +19,8 @@ PLUGIN_NAME = "kod"
 __settings__ = xbmcaddon.Addon(id="plugin.video." + PLUGIN_NAME)
 __language__ = __settings__.getLocalizedString
 
+channels_data = list()
+
 def get_addon_core():
     return __settings__
 
@@ -97,12 +99,13 @@ def is_xbmc():
 def get_videolibrary_support():
     return True
 
-def get_channel_url(findhostMethod=None):
+def get_channel_url(findhostMethod=None, name=None):
     from core import jsontools
     import inspect
 
     frame = inspect.stack()[1]
-    name = os.path.basename(frame[0].f_code.co_filename).replace('.py', '')
+    if not name:
+        name = os.path.basename(frame[0].f_code.co_filename).replace('.py', '')
     if findhostMethod:
         url = jsontools.get_node_from_file(name, 'url')
         if not url:
@@ -112,9 +115,11 @@ def get_channel_url(findhostMethod=None):
     else:
         ROOT_DIR = xbmc.translatePath(__settings__.getAddonInfo('Path'))
         LOCAL_FILE = os.path.join(ROOT_DIR, "channels.json")
-        with open(LOCAL_FILE) as f:
-            data = jsontools.load(f.read())
-            return data[name]
+        global channels_data
+        if not channels_data:
+            with open(LOCAL_FILE) as f:
+                channels_data = jsontools.load(f.read())
+        return channels_data[name]
 
 def get_system_platform():
     """ fonction: pour recuperer la platform que xbmc tourne """
@@ -306,7 +311,7 @@ def set_setting(name, value, channel="", server=""):
     canal 'channel'.
     Devuelve el valor cambiado o None si la asignacion no se ha podido completar.
 
-    Si se especifica el nombre del canal busca en la ruta \addon_data\plugin.video.alfa\settings_channels el
+    Si se especifica el nombre del canal busca en la ruta \addon_data\plugin.video.kod\settings_channels el
     archivo channel_data.json y establece el parametro 'name' al valor indicado por 'value'. Si el archivo
     channel_data.json no existe busca en la carpeta channels el archivo channel.json y crea un archivo channel_data.json
     antes de modificar el parametro 'name'.

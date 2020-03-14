@@ -129,7 +129,7 @@ class KodfavouritesData(object):
 
 def addFavourite(item):
     logger.info()
-    alfav = kodfavoritesData()
+    alfav = KodfavouritesData()
 
     # Si se llega aquí mediante el menú contextual, hay que recuperar los parámetros action y channel
     if item.from_action:
@@ -182,7 +182,7 @@ def addFavourite(item):
 
 def mainlist(item):
     logger.info()
-    alfav = kodfavoritesData()
+    alfav = KodfavouritesData()
     item.category = get_name_from_filename(os.path.basename(alfav.user_favorites_file))
 
     itemlist = []
@@ -219,7 +219,7 @@ def mainlist(item):
 
 def mostrar_perfil(item):
     logger.info()
-    alfav = kodfavoritesData()
+    alfav = KodfavouritesData()
 
     itemlist = []
 
@@ -294,7 +294,7 @@ def _crea_perfil(alfav):
 
 def crear_perfil(item):
     logger.info()
-    alfav = kodfavoritesData()
+    alfav = KodfavouritesData()
 
     if not _crea_perfil(alfav): return False
 
@@ -304,7 +304,7 @@ def crear_perfil(item):
 
 def editar_perfil_titulo(item):
     logger.info()
-    alfav = kodfavoritesData()
+    alfav = KodfavouritesData()
 
     if not alfav.user_favorites[item.i_perfil]: return False
 
@@ -321,7 +321,7 @@ def editar_perfil_titulo(item):
 
 def eliminar_perfil(item):
     logger.info()
-    alfav = kodfavoritesData()
+    alfav = KodfavouritesData()
 
     if not alfav.user_favorites[item.i_perfil]: return False
 
@@ -369,7 +369,7 @@ def acciones_enlace(item):
 
 def editar_enlace_titulo(item):
     logger.info()
-    alfav = kodfavoritesData()
+    alfav = KodfavouritesData()
 
     if not alfav.user_favorites[item.i_perfil]: return False
     if not alfav.user_favorites[item.i_perfil]['items'][item.i_enlace]: return False
@@ -391,7 +391,7 @@ def editar_enlace_titulo(item):
 
 def editar_enlace_color(item):
     logger.info()
-    alfav = kodfavoritesData()
+    alfav = KodfavouritesData()
 
     if not alfav.user_favorites[item.i_perfil]: return False
     if not alfav.user_favorites[item.i_perfil]['items'][item.i_enlace]: return False
@@ -415,7 +415,7 @@ def editar_enlace_color(item):
 
 def editar_enlace_thumbnail(item):
     logger.info()
-    alfav = kodfavoritesData()
+    alfav = KodfavouritesData()
 
     if not alfav.user_favorites[item.i_perfil]: return False
     if not alfav.user_favorites[item.i_perfil]['items'][item.i_enlace]: return False
@@ -475,7 +475,7 @@ def editar_enlace_thumbnail(item):
 
 def editar_enlace_carpeta(item):
     logger.info()
-    alfav = kodfavoritesData()
+    alfav = KodfavouritesData()
 
     if not alfav.user_favorites[item.i_perfil]: return False
     if not alfav.user_favorites[item.i_perfil]['items'][item.i_enlace]: return False
@@ -494,7 +494,7 @@ def editar_enlace_carpeta(item):
 
 def editar_enlace_lista(item):
     logger.info()
-    alfav = kodfavoritesData()
+    alfav = KodfavouritesData()
 
     if not alfav.user_favorites[item.i_perfil]: return False
     if not alfav.user_favorites[item.i_perfil]['items'][item.i_enlace]: return False
@@ -515,7 +515,7 @@ def editar_enlace_lista(item):
     if ret == -1: 
         return False # pedido cancel
 
-    alfav_destino = kodfavoritesData(opciones[ret])
+    alfav_destino = KodfavouritesData(opciones[ret])
 
     # Diálogo para escoger/crear carpeta en la lista de destino
     i_perfil = _selecciona_perfil(alfav_destino, 'Seleccionar carpeta destino', -1)
@@ -532,7 +532,7 @@ def editar_enlace_lista(item):
 
 def eliminar_enlace(item):
     logger.info()
-    alfav = kodfavoritesData()
+    alfav = KodfavouritesData()
 
     if not alfav.user_favorites[item.i_perfil]: return False
     if not alfav.user_favorites[item.i_perfil]['items'][item.i_enlace]: return False
@@ -548,7 +548,7 @@ def eliminar_enlace(item):
 # ------------------------
 def mover_perfil(item):
     logger.info()
-    alfav = kodfavoritesData()
+    alfav = KodfavouritesData()
 
     alfav.user_favorites = _mover_item(alfav.user_favorites, item.i_perfil, item.direccion)
     alfav.save()
@@ -558,7 +558,7 @@ def mover_perfil(item):
 
 def mover_enlace(item):
     logger.info()
-    alfav = kodfavoritesData()
+    alfav = KodfavouritesData()
 
     if not alfav.user_favorites[item.i_perfil]: return False
     alfav.user_favorites[item.i_perfil]['items'] = _mover_item(alfav.user_favorites[item.i_perfil]['items'], item.i_enlace, item.direccion)
@@ -726,7 +726,7 @@ def informacion_lista(item):
         platformtools.dialog_ok('Alfa', config.get_localized_string(70630), item.lista)
         return False
 
-    alfav = kodfavoritesData(item.lista)
+    alfav = KodfavouritesData(item.lista)
     
     txt = 'Lista: [COLOR gold]%s[/COLOR]' % item.lista
     txt += '[CR]' + config.get_localized_string(70634) + ' ' + alfav.info_lista['created'] + ' ' + config.get_localized_string(70635) + ' ' + alfav.info_lista['updated']
@@ -790,7 +790,7 @@ def compartir_lista(item):
     # Apuntar código en fichero de log y dentro de la lista
     save_log_lista_shared(config.get_localized_string(70648) + ' ' + item.lista + ' ' + codigo + ' ' + config.get_localized_string(70649))
     
-    alfav = kodfavoritesData(item.lista)
+    alfav = KodfavouritesData(item.lista)
     alfav.info_lista['tinyupload_date'] = fechahora_actual()
     alfav.info_lista['tinyupload_code'] = codigo
     alfav.save()
@@ -851,7 +851,7 @@ def crear_lista(item):
         return False
 
     # Provocar que se guarde con las carpetas vacías por defecto
-    alfav = kodfavoritesData(filename)
+    alfav = KodfavouritesData(filename)
 
     platformtools.itemlist_refresh()
     return True

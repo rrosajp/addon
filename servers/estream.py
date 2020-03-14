@@ -4,7 +4,6 @@
 # --------------------------------------------------------
 
 import re
-
 from core import httptools
 from platformcode import logger
 

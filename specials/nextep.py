@@ -4,7 +4,11 @@ from platformcode import config, platformtools, logger
 from time import time, sleep
 from core import scrapertools
 from core import jsontools, filetools
-from lib.concurrent import futures
+import sys
+if sys.version_info[0] >= 3:
+    from concurrent import futures
+else:
+    from concurrent_py2 import futures
 
 next_dialogs = ['NextDialog.xml', 'NextDialogExtended.xml', 'NextDialogCompact.xml']
 next_ep_type = config.get_setting('next_ep_type')
@@ -53,7 +57,9 @@ def next_ep(item):
     time_over = False
     time_limit = time() + 30
     time_steps = [20,30,40,50,60,70,80,90,100,110,120]
-    TimeFromEnd = time_steps[config.get_setting('next_ep_seconds')]
+    time_setting = config.get_setting('next_ep_seconds')
+    TimeFromEnd = time_setting if time_setting > 10 else time_steps[time_setting]
+
 
     # wait until the video plays
     while not platformtools.is_playing() and time() < time_limit:
