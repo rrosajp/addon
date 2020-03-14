@@ -6,7 +6,9 @@ import inspect
 import os
 import re
 import sys
-if sys.version_info[0] >= 3:
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
+if PY3:
     from concurrent import futures
 else:
     from concurrent_py2 import futures
@@ -1188,12 +1190,19 @@ def addQualityTag(item, itemlist, data, patron):
         "AC3": "audio in Dolby Digital 5.1 di alta qualità.",
         "MP3": "codec per compressione audio utilizzato MP3.",
     }
+    qualityStr = scrapertools.find_single_match(data, patron).strip()
+    if PY3:
+        qualityStr = qualityStr.encode('ascii', 'ignore')
+    else:
+        qualityStr = qualityStr.decode('unicode_escape').encode('ascii', 'ignore')
 
-    qualityStr = scrapertools.find_single_match(data, patron)
     if qualityStr:
-        audio, video = qualityStr.split('.')
-        descr = typo(video + ': ', 'color kod') + defQualVideo.get(video.upper(), '') + '\n' +\
-                typo(audio + ': ', 'color kod') + defQualAudio.get(audio.upper(), '')
+        try:
+            audio, video = qualityStr.split('.')
+            descr = typo(video + ': ', 'color kod') + defQualVideo.get(video.upper(), '') + '\n' +\
+                    typo(audio + ': ', 'color kod') + defQualAudio.get(audio.upper(), '')
+        except:
+            descr = ''
         itemlist.insert(0,
                         Item(channel=item.channel,
                              action="",
