@@ -204,13 +204,6 @@ def findvideos(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub('\n|\t', '', data)
 
-    # Extract the quality format
-    patronvideos = '>([^<]+)</strong></div>'
-    matches = re.compile(patronvideos, re.DOTALL).finditer(data)
-    QualityStr = ""
-    for match in matches:
-        QualityStr = scrapertools.decodeHtmlentities(match.group(1))
-
     # Estrae i contenuti - Streaming
     load_links(itemlist, '<strong>Streamin?g:</strong>(.*?)cbtable', "orange", "Streaming", "SD")
 
@@ -221,12 +214,9 @@ def findvideos(item):
     load_links(itemlist, '<strong>Streamin?g 3D[^<]+</strong>(.*?)cbtable', "pink", "Streaming 3D")
 
     itemlist = support.server(item, itemlist=itemlist)
-    if itemlist and QualityStr:
-        itemlist.insert(0,
-                        Item(channel=item.channel,
-                             action="",
-                             title=support.typo(QualityStr,'[] color kod bold'),
-                             folder=False))
+    # Extract the quality format
+    patronvideos = '>([^<]+)</strong></div>'
+    support.addQualityTag(item, itemlist, data, patronvideos)
 
     return itemlist
 

@@ -1021,7 +1021,7 @@ def pagination(itemlist, item, page, perpage, function_level=1):
                  thumbnail=thumb()))
     return itemlist
 
-def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, down_load=True):
+def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, down_load=True, patronTag=None):
 
     if not data and not itemlist:
         data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
@@ -1057,6 +1057,8 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         videoitem.contentType = item.contentType
         verifiedItemlist.append(videoitem)
 
+    if patronTag:
+        addQualityTag(item, verifiedItemlist, data, patronTag)
     return controls(verifiedItemlist, item, AutoPlay, CheckLinks, down_load)
 
 def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
@@ -1146,3 +1148,57 @@ def extract_wrapped(decorated):
     from types import FunctionType
     closure = (c.cell_contents for c in decorated.__closure__)
     return next((c for c in closure if isinstance(c, FunctionType)), None)
+
+def addQualityTag(item, itemlist, data, patron):
+    defQualVideo = {
+        "CAM": "metodo di ripresa che indica video di bassa qualità",
+        "TS": "questo metodo di ripresa effettua la ripresa su un tre piedi. Qualità sufficiente.",
+        "TC": "abbreviazione di TeleCine. Il metodo di ripresa del film è basato su una macchina capace di riversare le Super-8, o 35mm. La qualità è superiore a quella offerta da CAM e TS.",
+        "R5": "la qualità video di un R5 è pari a quella di un dvd, può contenere anche sottotitoli. Se è presente la dicitura LINE.ITALIAN è in italiano, altrimenti sarà disponibile in una lingua asiatica o russa.",
+        "R6": "video proveniente dall’Asia.",
+        "FS": "video a schermo pieno, cioè FullScreen, quindi con un rapporto di 4:3.",
+        "WS": "video WideScreen, cioè rapporto 16:9.",
+        "VHSSCR": "video estratto da una videocassetta VHS.",
+        "DVDRIP": "la fonte video proviene da un DVD, la qualità è buona.",
+        "DVDSCR": "la fonte video proviene da un DVD. Tali filmati, di solito, appartengono a copie promozionali.",
+        "HDTVRIP": "video copiato e registrato da televisori in HD e che, per questo, restituiscono una qualità eccellente.",
+        "PD": "video registrato da Tv satellitare, qualità accettabile.",
+        "TV": "video registrato da Tv satellitare, qualità accettabile.",
+        "SAT": "video registrato da Tv satellitare, qualità accettabile.",
+        "DVBRIP": "video registrato da Tv satellitare, qualità accettabile.",
+        "TVRIP": "ripping simile al SAT RIP, solo che, in questo caso, la qualità del vide può variare a seconda dei casi.",
+        "VHSRIP": "video registrato da videocassetta. Qualità variabile.",
+        "BRRIP": "indica che il video è stato preso da una fonte BluRay. Nella maggior parte dei casi, avremo un video ad alta definizione.",
+        "BDRIP": "indica che il video è stato preso da una fonte BluRay. Nella maggior parte dei casi, avremo un video ad alta definizione.",
+        "DTTRIP": "video registrato da un canale digitale terreste. Qualità sufficiente.",
+        "HQ": "video in alta qualità.",
+        "WEBRIP": "in questo caso, i film sono estratti da portali relativi a canali televisivi o di video sharing come YouTube. La qualità varia dall’SD al 1080p.",
+        "WEB-DL": "si tratta di un 720p o 1080p reperiti dalla versione americana di iTunes americano. La qualità è paragonabile a quella di un BluRayRip e permette di fruire di episodi televisivi, senza il fastidioso bollo distintivo della rete che trasmette.",
+        "WEBDL": "si tratta di un 720p o 1080p reperiti dalla versione americana di iTunes americano. La qualità è paragonabile a quella di un BluRayRip e permette di fruire di episodi televisivi, senza il fastidioso bollo distintivo della rete che trasmette.",
+        "DLMux": "si tratta di un 720p o 1080p reperiti dalla versione americana di iTunes americano. La qualità è paragonabile a quella di un BluRayRip e permette di fruire di episodi televisivi, senza il fastidioso bollo distintivo della rete che trasmette.",
+        "DVD5": "il film è in formato DVD Single Layer, nel quale vengono mantenute tutte le caratteristiche del DVD originale: tra queste il menu multilingue, i sottotitoli e i contenuti speciali, se presenti. Il video è codificato nel formato DVD originale MPEG-2.",
+        "DVD9": "ha le stesse caratteristiche del DVD5, ma le dimensioni del file sono di un DVD Dual Layer (8,5 GB).",
+    }
+
+    defQualAudio = {
+        "MD": "l’audio è stato registrato via microfono, quindi la qualità è scarsa.",
+        "DTS": "audio ricavato dai dischi DTS2, quindi la qualità audio è elevata.",
+        "LD": "l’audio è stato registrato tramite jack collegato alla macchina da presa, pertanto di discreta qualità.",
+        "DD": "audio ricavato dai dischi DTS cinema. L’audio è di buona qualità, ma potreste riscontrare il fatto che non potrebbe essere più riproducibile.",
+        "AC3": "audio in Dolby Digital 5.1 di alta qualità.",
+        "MP3": "codec per compressione audio utilizzato MP3.",
+    }
+
+    qualityStr = scrapertools.find_single_match(data, patron)
+    if qualityStr:
+        audio, video = qualityStr.split('.')
+        descr = typo(video + ': ', 'color kod') + defQualVideo.get(video.upper(), '') + '\n' +\
+                typo(audio + ': ', 'color kod') + defQualAudio.get(audio.upper(), '')
+        itemlist.insert(0,
+                        Item(channel=item.channel,
+                             action="",
+                             title=typo(qualityStr, '[] color kod bold'),
+                             plot=descr,
+                             folder=False))
+    else:
+        log('nessun tag qualità trovato')
