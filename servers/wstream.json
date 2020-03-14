@@ -11,7 +11,7 @@
                 "url": "https://wstream.video/video.php?file_code=\\1"
             },
             {
-                "pattern": "wstream\\.video/([a-zA-Z0-9/]+.html)",
+                "pattern": "wstream\\.video/(?!api|swembedid)([a-zA-Z0-9/]+.html)",
                 "url": "https://wstream.video/\\1"
             },
             {
