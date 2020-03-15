@@ -476,6 +476,7 @@ class UnshortenIt(object):
 
     def _unshorten_vcrypt(self, uri):
         try:
+            headers = {}
             if 'myfoldersakstream.php' in uri or '/verys/' in uri:
                 return uri, 0
             r = None
@@ -495,23 +496,23 @@ class UnshortenIt(object):
             if 'shield' in uri.split('/')[-2]:
                 uri = decrypt(uri.split('/')[-1])
             else:
-                import datetime, hashlib
-                ip = urllib.urlopen('http://ip.42.pl/raw').read()
-                day = datetime.date.today().strftime('%Y%m%d')
-                headers = {
-                    "Cookie": hashlib.md5(ip+day).hexdigest() + "=1"
-                }
-                uri = uri.replace('sb/', 'sb1/')
-                uri = uri.replace('akv/', 'akv1/')
-                uri = uri.replace('wss/', 'wss1/')
-                uri = uri.replace('wsd/', 'wsd1/')
+                if 'sb/' in uri or 'akv/' in uri or 'wss/' in uri or 'wsd/' in uri:
+                    import datetime, hashlib
+                    ip = urllib.urlopen('http://ip.42.pl/raw').read()
+                    day = datetime.date.today().strftime('%Y%m%d')
+                    headers = {
+                        "Cookie": hashlib.md5(ip+day).hexdigest() + "=1"
+                    }
+                    uri = uri.replace('sb/', 'sb1/')
+                    uri = uri.replace('akv/', 'akv1/')
+                    uri = uri.replace('wss/', 'wss1/')
+                    uri = uri.replace('wsd/', 'wsd1/')
                 r = httptools.downloadpage(uri, timeout=self._timeout, headers=headers, follow_redirects=False)
                 if 'Wait 1 hour' in r.data:
                     uri = ''
                     logger.info('IP bannato da vcrypt, aspetta un ora')
                 else:
                     uri = r.headers['location']
-
             if "4snip" in uri:
                 if 'out_generator' in uri:
                     uri = re.findall('url=(.*)$', uri)[0]

@@ -16,6 +16,7 @@ headers = [['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     resp = httptools.downloadpage(page_url)
+
     global data, real_url
     data = resp.data
 
