@@ -4,6 +4,10 @@
     "ignore_urls": ["http://akvideo.stream/video", "http://akvideo.stream/video/api"],
     "patterns": [
       {
+        "pattern": "(https?://akvideo.stream/swembedid/\\d+)",
+        "url": "\\1"
+      },
+      {
         "pattern": "(https://akvideo\\.stream/api/vcmod/fastredirect/embed_ak\\.php\\?id=[0-9]+)",
         "url": "\\1"
       },

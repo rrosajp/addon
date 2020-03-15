@@ -14,11 +14,11 @@ def test_video_exists(page_url):
     global data
     page = httptools.downloadpage(page_url)
     logger.info(page.data)
-    if 'embed_ak.php' in page_url:
+    if 'embed_ak.php' in page_url or '/embed-' in page.url:
         code = scrapertools.find_single_match(page.url, '/embed-([0-9a-z]+)\.html')
         if not code:
             code = scrapertools.find_single_match(page.data, r"""input\D*id=(?:'|")[^'"]+(?:'|").*?value='([a-z0-9]+)""")
-        if code :
+        if code:
             page = httptools.downloadpage('http://akvideo.stream/video/' + code)
         else:
             return False, config.get_localized_string(70449) % "Akvideo"
