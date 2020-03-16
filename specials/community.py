@@ -10,6 +10,9 @@ from platformcode import config, platformtools
 from specials import autoplay
 from channelselector import get_thumb
 
+from specials import shortcuts
+CONTEXT = shortcuts.context()
+
 addon = xbmcaddon.Addon('metadata.themoviedb.org')
 lang = addon.getSetting('language')
 
@@ -41,7 +44,7 @@ def show_channels(item):
     itemlist = []
 
     # add context menu
-    context = [{"title": config.get_localized_string(50005), "action": "remove_channel",  "channel": "community"}]
+    context = CONTEXT + [{"title": config.get_localized_string(50005), "action": "remove_channel",  "channel": "community"}]
 
     # read json
     json = load_and_check(item)
@@ -204,7 +207,8 @@ def peliculas(item, json='', key='', itemlist=[]):
                       fanart = extra.fanart,
                       plot = extra.plot,
                       personal_plot = extra.plot,
-                      action = action)
+                      action = action,
+                      context = CONTEXT)
             itlist.append(it)
 
     if not 'generic_list' in key:
@@ -243,7 +247,8 @@ def get_seasons(item):
                              contentSeason=option['season'],
                              infoLabels=infoLabels,
                              contentType='season',
-                             path=extra.path))
+                             path=extra.path,
+                             context = CONTEXT))
 
     if inspect.stack()[2][3] in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest'] or show_seasons == False:
         itlist = []
@@ -318,7 +323,8 @@ def episodios(item, json ='', key='', itemlist =[]):
                                  contentEpisode = episode_number,
                                  infoLabels = infoLabels,
                                  contentType = 'episode',
-                                 path = item.path))
+                                 path = item.path,
+                                 context = CONTEXT))
 
     # if showseason
     if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest', 'search']:
@@ -340,7 +346,8 @@ def episodios(item, json ='', key='', itemlist =[]):
                                     contentSeason=season,
                                     infoLabels=infoLabels,
                                     filterseason=str(season),
-                                    path=item.path))
+                                    path=item.path,
+                                    context = CONTEXT))
 
         elif defpage and inspect.stack()[1][3] not in ['get_seasons']:
             if Pagination and len(itemlist) >= Pagination:
@@ -368,11 +375,13 @@ def findvideos(item):
         itemlist.append(Item(channel=item.channel, title=title, url=option['url'], action='play', quality=extra.quality,
                              language=extra.language, infoLabels = item.infoLabels))
 
-    itemlist = support.servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
-    if inspect.stack()[2][3] != 'start_download':
-        autoplay.start(itemlist, item)
-    support.videolibrary(itemlist,item)
-    return itemlist
+    return support.server(item, itemlist=itemlist)
+
+    # itemlist = support.servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
+    # if inspect.stack()[2][3] != 'start_download':
+    #     autoplay.start(itemlist, item)
+    # support.videolibrary(itemlist,item)
+    # return itemlist
 
 
 
@@ -397,7 +406,8 @@ def get_menu(item, json, key, itemlist=[]):
                 action = 'show_menu',
                 menu = level2 if not item.menu else None,
                 filterkey = extra.filterkey,
-                filter = extra.filter)
+                filter = extra.filter,
+                context = CONTEXT)
         if title:
             itemlist.append(it)
 
@@ -438,7 +448,8 @@ def get_sub_menu(item, json, key, itemlist=[]):
                       plot = extra.plot,
                       action = 'show_menu',
                       menu = level2 if not item.menu else None,
-                      filterkey = filterkey)
+                      filterkey = filterkey,
+                      context = CONTEXT)
             itemlist.append(it)
 
         if 'search' in option:
@@ -470,7 +481,8 @@ def get_search_menu(item, json='', itemlist=[], channel_name=''):
                          url=item.url,
                          custom_search=extra.url if extra.url != item.url else '',
                          path=item.path,
-                         global_search=True if channel_name else False))
+                         global_search=True if channel_name else False,
+                         context = CONTEXT))
 
     return itemlist
 
@@ -530,7 +542,8 @@ def filter_thread(filter, key, item):
                 path=item.path,
                 filterkey=item.filterkey,
                 filter=filter,
-                key=key)
+                key=key,
+                context = CONTEXT)
     return item
 
 
@@ -689,7 +702,8 @@ def pagination(item, itemlist = []):
                         path=item.path,
                         media_type=item.media_type,
                         thumbnail=support.thumb(),
-                        itemlist= encoded_itemlist))
+                        itemlist= encoded_itemlist,
+                        context = CONTEXT))
     return itlist
 
 def add_channel(item):
