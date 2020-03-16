@@ -134,12 +134,12 @@ msgid "Advanced Options"
 msgstr "Opzioni Avanzate"
 
 msgctxt "#30031"
-msgid "Delete Download?"
-msgstr "Cancellare Download?"
+msgid "Continue Download?"
+msgstr "Continuare il Download?"
 
 msgctxt "#30032"
-msgid "Select NO to continue downloading in the background"
-msgstr "Seleziona NO per continuare il download in background"
+msgid "Select YES to continue downloading in the background"
+msgstr "Seleziona SI per continuare il download in background"
 
 msgctxt "#30033"
 msgid "Internal Client"

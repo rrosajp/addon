@@ -572,7 +572,7 @@ def play(url, xlistitem={}, is_view=None, subtitle="", password="", item=None):
                 ok = xbmcgui.Dialog().yesno(msg_header, config.get_localized_string(30031), config.get_localized_string(30032))
             else: ok = True
             # -- NO ---------------------------------------------
-            if not ok:
+            if ok:
                 is_view=None
                 bkg_user = True
                 dp_cerrado = False
@@ -613,7 +613,7 @@ def play(url, xlistitem={}, is_view=None, subtitle="", password="", item=None):
             dp.close()
             # Preguntamos si el usuario quiere pasar a backgroung
             dialog = xbmcgui.Dialog().yesno(msg_header, config.get_localized_string(30031), config.get_localized_string(30032))
-            if not dialog:
+            if dialog:
                 bkg_user = True
                 dp_cerrado = False
                 dp = xbmcgui.DialogProgressBG()

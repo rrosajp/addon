@@ -459,7 +459,7 @@ def bt_client(mediaurl, xlistitem, rar_files, subtitle=None, password=None, item
                     break
 
                 else:
-                    if platformtools.dialog_yesno(msg_header, config.get_localized_string(30031), config.get_localized_string(30032)):
+                    if not platformtools.dialog_yesno(msg_header, config.get_localized_string(30031), config.get_localized_string(30032)):
                         dp_cerrado = False
                         progreso = platformtools.dialog_progress(msg_header, '')
                         break
