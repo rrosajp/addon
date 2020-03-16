@@ -370,19 +370,12 @@ def findvideos(item):
     for option in json:
         extra = set_extra_values(item, option, item.path)
         title = item.fulltitle + (' - '+option['title'] if 'title' in option else '')
-        title = set_title(title, extra.language, extra.quality) + support.typo('%s','_ [] color kod bold')
+        title = set_title(title, extra.language, extra.quality)
 
         itemlist.append(Item(channel=item.channel, title=title, url=option['url'], action='play', quality=extra.quality,
                              language=extra.language, infoLabels = item.infoLabels))
 
     return support.server(item, itemlist=itemlist)
-
-    # itemlist = support.servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
-    # if inspect.stack()[2][3] != 'start_download':
-    #     autoplay.start(itemlist, item)
-    # support.videolibrary(itemlist,item)
-    # return itemlist
-
 
 
 ################################   Menu   ################################
