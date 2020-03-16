@@ -220,7 +220,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
         if scraped['season']:
             stagione = scraped['season']
-            episode = scraped['season'] +'x'+ scraped['episode'].zfill(2)
+            episode = str(int(scraped['season'])) +'x'+ str(int(scraped['episode'])).zfill(2)
         elif item.season:
             episode = item.season +'x'+ scraped['episode']
         elif item.contentType == 'tvshow' and (scraped['episode'] == '' and scraped['season'] == '' and stagione == ''):
