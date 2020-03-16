@@ -571,16 +571,11 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
 
     new_episodelist = []
     # Obtenemos el numero de temporada y episodio y descartamos los q no lo sean
-    tags = []
-    if config.get_setting("enable_filter", "videolibrary"):
-        tags = [x.strip() for x in config.get_setting("filters", "videolibrary").lower().split(",")]
 
     for e in episodelist:
         headers = {}
         if e.headers:
             headers = e.headers
-        if tags != [] and tags != None and any(tag in e.title.lower() for tag in tags):
-            continue
 
         try:
             season_episode = scrapertools.get_season_and_episode(e.title)
@@ -659,7 +654,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
         json_path = filetools.join(path, ("%s [%s].json" % (season_episode, e.channel)).lower())
 
         if season_episode in nostrm_episodelist:
-            logger.error('Error in the structure of the Video Library: Seriese ' + serie.contentSerieName + ' ' + season_episode)
+            logger.info('Skipped: Serie ' + serie.contentSerieName + ' ' + season_episode + ' available as local content')
             continue
         strm_exists = strm_path in ficheros
         nfo_exists = nfo_path in ficheros
