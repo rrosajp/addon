@@ -1,40 +1,40 @@
 # -*- coding: utf-8 -*-
 
-from core import httptools
 from core import servertools
+from core.support import match, log
 from core.item import Item
 from platformcode import config, logger
 
 
 def mainlist(item):
-    logger.info()
+    log()
 
     itemlist = []
-    itemlist.append(Item(channel=item.channel, action="search", title=config.get_localized_string(60089)))
-    itemlist.append(Item(channel=item.channel, action="search", title=config.get_localized_string(60090)))
-    itemlist.append(Item(channel=item.channel, action="search", title=config.get_localized_string(60091)))
+    itemlist.append(Item(channel=item.channel, action="search", title=config.get_localized_string(60089), thumbnail=item.thumbnail, args='server'))
+    itemlist.append(Item(channel=item.channel, action="search", title=config.get_localized_string(60090), thumbnail=item.thumbnail, args='direct'))
+    itemlist.append(Item(channel=item.channel, action="search", title=config.get_localized_string(60091), thumbnail=item.thumbnail))
 
     return itemlist
 
 
-# Al llamarse "search" la función, el launcher pide un texto a buscar y lo añade como parámetro
-def search(item, texto):
-    logger.info("texto=" + texto)
+# Al llamarse "search" la función, el launcher pide un text a buscar y lo añade como parámetro
+def search(item, text):
+    log(text)
 
-    if not texto.startswith("http"):
-        texto = "http://" + texto
+    if not text.startswith("http"):
+        text = "http://" + text
 
     itemlist = []
 
-    if "servidor" in item.title:
-        itemlist = servertools.find_video_items(data=texto)
+    if "server" in item.args:
+        itemlist = servertools.find_video_items(data=text)
         for item in itemlist:
             item.channel = "url"
             item.action = "play"
-    elif "directo" in item.title:
-        itemlist.append(Item(channel=item.channel, action="play", url=texto, server="directo", title=config.get_localized_string(60092)))
+    elif "direct" in item.args:
+        itemlist.append(Item(channel=item.channel, action="play", url=text, server="directo", title=config.get_localized_string(60092)))
     else:
-        data = httptools.downloadpage(texto).data
+        data = match(text).data
         itemlist = servertools.find_video_items(data=data)
         for item in itemlist:
             item.channel = "url"
