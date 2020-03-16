@@ -73,29 +73,6 @@
       ]
     },
     {
-      "id": "addition",
-      "type": "label",
-      "label": "@70092",
-      "enabled": true,
-      "visible": true
-    },
-    {
-      "id": "enable_filter",
-      "type": "bool",
-      "label": "@70090",
-      "enabled": true,
-      "visible": true,
-      "default": false
-    },
-    {
-      "id": "filters",
-      "type": "text",
-      "label": "@70091",
-      "visible": true,
-      "enabled": "eq(-1,true)"
-    },
-    
-    {
       "id": "window_type",
       "type": "list",
       "label": "@60621",
