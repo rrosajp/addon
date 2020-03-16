@@ -174,4 +174,27 @@ def newest(categoria):
 
 def findvideos(item):
     log()
-    return support.server(item)
+    matches = support.match(item, patron=[r'class="metaframe rptss" src="([^"]+)"',r' href="#option-\d">([^\s]+)\s*([^\s]+)']).matches
+    itemlist = []
+    list_url = []
+    list_quality = []
+    list_servers = []
+    for match in matches:
+        if type(match) == tuple:
+            list_servers.append(match[0])
+            list_quality.append(match[1])
+        else:
+            if 'player.php' in match:
+                match = support.httptools.downloadpage(match, follow_redirect=True).url
+            list_url.append(match)
+
+    for i, url in enumerate(list_url):
+        itemlist.append(support.Item(
+            channel=item.channel,
+            title=list_servers[i],
+            url=url,
+            action='play',
+            quality=list_quality[i],
+            infoLabels = item.infoLabels))
+
+    return support.server(item, itemlist=itemlist)
