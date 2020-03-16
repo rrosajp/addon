@@ -625,8 +625,7 @@ def download_from_server(item):
 
 
 def download_from_best_server(item):
-    logger.info(
-        "contentAction: %s | contentChannel: %s | url: %s" % (item.contentAction, item.contentChannel, item.url))
+    logger.info("contentAction: %s | contentChannel: %s | url: %s" % (item.contentAction, item.contentChannel, item.url))
 
     result = {"downloadStatus": STATUS_CODES.error}
 
@@ -639,18 +638,16 @@ def download_from_best_server(item):
     progreso.update(50, config.get_localized_string(70184), config.get_localized_string(70180) % item.contentChannel)
 
     if hasattr(channel, item.contentAction):
-        play_items = getattr(channel, item.contentAction)(
-            item.clone(action=item.contentAction, channel=item.contentChannel))
+        play_items = getattr(channel, item.contentAction)(item.clone(action=item.contentAction, channel=item.contentChannel))
     else:
         play_items = servertools.find_video_items(item.clone(action=item.contentAction, channel=item.contentChannel))
 
     play_items = [x for x in play_items if x.action == "play" and not "trailer" in x.title.lower()]
 
-    progreso.update(100, config.get_localized_string(70183), config.get_localized_string(70181) % len(play_items),
-                    config.get_localized_string(70182))
+    progreso.update(100, config.get_localized_string(70183), config.get_localized_string(70181) % len(play_items), config.get_localized_string(70182))
 
-    if config.get_setting("server_reorder", "downloads") == 1:
-        play_items.sort(key=sort_method)
+    # if config.get_setting("server_reorder", "downloads") == 1:
+    play_items.sort(key=sort_method)
 
     if progreso.iscanceled():
         return {"downloadStatus": STATUS_CODES.canceled}

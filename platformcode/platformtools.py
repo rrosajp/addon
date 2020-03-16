@@ -273,6 +273,9 @@ def render_items(itemlist, parent_item):
         elif parent_item.list_type == '':
             listitem.addContextMenuItems(context_commands, replaceItems=True)
 
+        from specials import shortcuts
+        context_commands += shortcuts.context()
+
         if not item.totalItems:
             item.totalItems = 0
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url='%s?%s' % (sys.argv[0], item.tourl()),
@@ -659,7 +662,7 @@ def set_context_commands(item, parent_item):
 
         if item.channel not in ["downloads", "videolibrary"] and item.server != 'torrent':
             # Descargar pelicula
-            if item.contentType == "movie" and item.contentTitle:
+            if item.contentType == "movie":
                 context_commands.append((config.get_localized_string(60354), "XBMC.RunPlugin(%s?%s)" %
                                          (sys.argv[0], item.clone(channel="downloads", action="save_download",
                                                                   from_channel=item.channel, from_action=item.action)
@@ -689,10 +692,10 @@ def set_context_commands(item, parent_item):
                                                                       from_channel=item.channel,
                                                                       from_action=item.action).tourl())))
 
-        # Abrir configuración
-        if parent_item.channel not in ["setting", "news", "search"] and item.action == "play":
-            context_commands.append((config.get_localized_string(60358), "XBMC.Container.Update(%s?%s)" %
-                                     (sys.argv[0], Item(channel="setting", action="mainlist").tourl())))
+        # # Abrir configuración
+        # if parent_item.channel not in ["setting", "news", "search"] and item.action == "play":
+        #     context_commands.append((config.get_localized_string(60358), "XBMC.Container.Update(%s?%s)" %
+        #                              (sys.argv[0], Item(channel="setting", action="mainlist").tourl())))
 
         # Buscar Trailer
         if item.action == "findvideos" or "buscar_trailer" in context:
