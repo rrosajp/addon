@@ -1039,6 +1039,8 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
             findS = servertools.findvideos(videoitem.url)
             if findS:
                 findS = findS[0]
+            elif item.channel == 'community':
+                findS= ('Diretto', videoitem.url, 'directo')
             else:
                 videoitem.url = unshortenit.unshorten(videoitem.url)[0]
                 findS = servertools.findvideos(videoitem.url)
