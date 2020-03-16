@@ -675,8 +675,7 @@ def mark_auto_as_watched(item):
         #logger.debug("Llamado el marcado")
 
 
-def wait_for_download(item, mediaurl, rar_files, torr_client, password='', size='', \
-                      rar_control={}):
+def wait_for_download(item, mediaurl, rar_files, torr_client, password='', size='', rar_control={}):
     logger.info()
 
     from subprocess import Popen, PIPE, STDOUT
