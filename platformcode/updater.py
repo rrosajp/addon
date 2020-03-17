@@ -83,7 +83,6 @@ def check(background=False):
     if pos > 0:
         changelog = ''
         poFilesChanged = False
-        nCommitApplied = 0
         try:
             for c in reversed(commits[:pos]):
                 commit = urllib.urlopen(c['url']).read()
@@ -100,7 +99,7 @@ def check(background=False):
                     c['sha'] = updateFromZip('Aggiornamento in corso...')
                     localCommitFile = open(os.path.join(xbmc.translatePath("special://home/addons/"), 'plugin.video.kod', trackingFile), 'w')  # il file di tracking viene eliminato, lo ricreo
                     changelog += commitJson['commit']['message'] + "\n"
-                    nCommitApplied += 3  # il messaggio sarà lungo, probabilmente, il tempo di vis. è maggiorato
+                    poFilesChanged = True
                     break
 
                 for file in commitJson['files']:
@@ -163,7 +162,6 @@ def check(background=False):
                                 alreadyApplied = False
                 if not alreadyApplied:  # non mando notifica se già applicata (es. scaricato zip da github)
                     changelog += commitJson['commit']['message'] + "\n"
-                    nCommitApplied += 1
         except:
             import traceback
             logger.error(traceback.format_exc())
@@ -199,7 +197,7 @@ def showSavedChangelog():
         with open(xbmc.translatePath(changelogFile), 'r') as fileC:
             changelog = fileC.read()
             platformtools.dialog_ok('Kodi on Demand', 'Aggiornamenti applicati:\n' + changelog)
-        filetools.remove(xbmc.translatePath(changelogFile))
+        os.remove(xbmc.translatePath(changelogFile))
     except:
         pass
 
@@ -357,9 +355,9 @@ def updateFromZip(message='Installazione in corso...'):
 
     dp.update(100)
     dp.close()
-    xbmc.executebuiltin("UpdateLocalAddons")
-
-    refreshLang()
+    if message != 'Installazione in corso...':
+        xbmc.executebuiltin("UpdateLocalAddons")
+        refreshLang()
 
     return hash
 
