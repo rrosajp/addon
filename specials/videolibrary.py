@@ -318,6 +318,8 @@ def get_seasons(item):
     itemlist = []
     dict_temp = {}
 
+    videolibrarytools.check_renumber_options(item)
+
     raiz, carpetas_series, ficheros = next(filetools.walk(item.path))
 
     # Menu contextual: Releer tvshow.nfo
@@ -441,6 +443,7 @@ def findvideos(item):
     from specials import autoplay
     logger.info()
     # logger.debug("item:\n" + item.tostring('\n'))
+    videolibrarytools.check_renumber_options(item)
 
     itemlist = []
     list_canales = {}

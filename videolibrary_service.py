@@ -26,17 +26,19 @@ from platformcode import updater
 
 
 def update(path, p_dialog, i, t, serie, overwrite):
-    logger.info("Actualizando " + path)
+    logger.info("Updating " + path)
     insertados_total = 0
-      
+
     head_nfo, it = videolibrarytools.read_nfo(path + '/tvshow.nfo')
+    # videolibrarytools.check_renumber_options(it)
+    videolibrarytools.update_renumber_options(it, head_nfo, path)
     category = serie.category
 
     # logger.debug("%s: %s" %(serie.contentSerieName,str(list_canales) ))
     for channel, url in serie.library_urls.items():
         serie.channel = channel
         serie.url = url
-        
+
         ###### Redirección al canal NewPct1.py si es un clone, o a otro canal y url si ha intervención judicial
         try:
             head_nfo, it = videolibrarytools.read_nfo(path + '/tvshow.nfo')         #Refresca el .nfo para recoger actualizaciones
@@ -102,18 +104,18 @@ def update(path, p_dialog, i, t, serie, overwrite):
             xbmc_videolibrary.mark_content_as_watched_on_alfa(path + '/tvshow.nfo')
     except:
         logger.error(traceback.format_exc())
-    
+
     return insertados_total > 0
 
 
 def check_for_update(overwrite=True):
-    logger.info("Actualizando series...")
+    logger.info("Update Series...")
     p_dialog = None
     serie_actualizada = False
     update_when_finished = False
     hoy = datetime.date.today()
     estado_verify_playcount_series = False
-    
+
     try:
         if config.get_setting("update", "videolibrary") != 0 or overwrite:
             config.set_setting("updatelibrary_last_check", hoy.strftime('%Y-%m-%d'), "videolibrary")
@@ -132,10 +134,10 @@ def check_for_update(overwrite=True):
             for i, tvshow_file in enumerate(show_list):
                 head_nfo, serie = videolibrarytools.read_nfo(tvshow_file)
                 path = filetools.dirname(tvshow_file)
-                    
+
                 logger.info("serie=" + serie.contentSerieName)
                 p_dialog.update(int(math.ceil((i + 1) * t)), heading, serie.contentSerieName)
-                
+
                 #Verificamos el estado del serie.library_playcounts de la Serie por si está incompleto
                 try:
                     estado = False
@@ -161,7 +163,7 @@ def check_for_update(overwrite=True):
                                 xbmc_videolibrary.mark_content_as_watched_on_alfa(path + '/tvshow.nfo')
                         except:
                             logger.error(traceback.format_exc())
-                    
+
                         continue
 
                 # obtenemos las fecha de actualizacion y de la proxima programada para esta serie
@@ -209,7 +211,7 @@ def check_for_update(overwrite=True):
                     serie_actualizada = update(path, p_dialog, i, t, serie, overwrite)
                     if not serie_actualizada:
                         update_next += datetime.timedelta(days=interval)
-                        
+
                 if serie_actualizada:
                     update_last = hoy
                     update_next = hoy + datetime.timedelta(days=interval)
@@ -235,7 +237,7 @@ def check_for_update(overwrite=True):
 
             if estado_verify_playcount_series:                                                  #Si se ha cambiado algún playcount, ...
                 estado = config.set_setting("verify_playcount", True, "videolibrary")           #... actualizamos la opción de Videolibrary
-            
+
             if config.get_setting("search_new_content", "videolibrary") == 1 and update_when_finished:
                 # Actualizamos la videoteca de Kodi: Buscar contenido en todas las series
                 if config.is_xbmc():
@@ -255,7 +257,7 @@ def check_for_update(overwrite=True):
 
         if p_dialog:
             p_dialog.close()
-            
+
     from core.item import Item
     item_dummy = Item()
     videolibrary.list_movies(item_dummy, silent=True)
@@ -409,7 +411,7 @@ if __name__ == "__main__":
 
     if not config.get_setting("update", "videolibrary") == 2:
         check_for_update(overwrite=False)
-    
+
 
     # Se ejecuta ciclicamente
     if config.get_platform(True)['num_version'] >= 14:
