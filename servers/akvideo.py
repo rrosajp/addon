@@ -13,7 +13,6 @@ def test_video_exists(page_url):
     # page_url = re.sub('akvideo.stream/(?:video/|video\\.php\\?file_code=)?(?:embed-)?([a-zA-Z0-9]+)','akvideo.stream/video/\\1',page_url)
     global data
     page = httptools.downloadpage(page_url)
-    logger.info(page.data)
     if 'embed_ak.php' in page_url or '/embed-' in page.url:
         code = scrapertools.find_single_match(page.url, '/embed-([0-9a-z]+)\.html')
         if not code:
@@ -55,7 +54,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     data = block if block else data
     # URL
     # logger.info(data)
-    matches = scrapertools.find_multiple_matches(data, '(http.*?\.mp4)')
+    matches = scrapertools.find_multiple_matches(data, '''src:\s*["']?(http.*?\.mp4)''')
     # logger.info(str(matches))
     _headers = urllib.urlencode(httptools.default_headers)
 
