@@ -802,7 +802,7 @@ def match(item_url_string, **args):
         match: first match
         matches: all the matches
     '''
-    log(item_url_string)
+    log()
 
     matches = blocks = []
     url = None
