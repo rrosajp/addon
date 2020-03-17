@@ -876,11 +876,11 @@ def add_movie(item):
     insertados, sobreescritos, fallidos = save_movie(new_item)
 
     if fallidos == 0:
-        platformtools.dialog_ok(config.get_localized_string(30131), new_item.contentTitle,
-                                config.get_localized_string(30135))  # 'se ha añadido a la videoteca'
+        platformtools.dialog_ok(config.get_localized_string(30131),
+                                config.get_localized_string(30135) % new_item.contentTitle)  # 'se ha añadido a la videoteca'
     else:
         platformtools.dialog_ok(config.get_localized_string(30131),
-                                config.get_localized_string(60066))  #"ERROR, la pelicula NO se ha añadido a la videoteca")
+                                config.get_localized_string(60066) % new_item.contentTitle)  #"ERROR, la pelicula NO se ha añadido a la videoteca")
 
 
 def add_tvshow(item, channel=None):
@@ -948,20 +948,20 @@ def add_tvshow(item, channel=None):
     insertados, sobreescritos, fallidos, path = save_tvshow(item, itemlist)
 
     if not insertados and not sobreescritos and not fallidos:
-        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60067))
-        logger.error("The %s series could not be added to the video library. Could not get any episode" % item.show)
+        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60067) % item.show)
+        logger.error("La serie %s no se ha podido añadir a la videoteca. No se ha podido obtener ningun episodio" % item.show)
 
     elif fallidos == -1:
-        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60068))
-        logger.error("The %s series could not be added to the video library" % item.show)
+        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60068) % item.show)
+        logger.error("La serie %s no se ha podido añadir a la videoteca" % item.show)
 
     elif fallidos > 0:
-        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60069))
-        logger.error("Could not add %s episodes of the %s series to the video library" % (fallidos, item.show))
+        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60069) % item.show)
+        logger.error("No se han podido añadir %s episodios de la serie %s a la videoteca" % (fallidos, item.show))
 
     else:
-        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60070))
-        logger.info("%s episodes of the %s series have been added to the video library" % (insertados, item.show))
+        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60070) % item.show)
+        logger.info("Se han añadido %s episodios de la serie %s a la videoteca" % (insertados, item.show))
         if config.is_xbmc():
             if config.get_setting("sync_trakt_new_tvshow", "videolibrary"):
                 import xbmc
