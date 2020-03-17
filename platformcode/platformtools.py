@@ -112,6 +112,12 @@ def dialog_textviewer(heading, text):  # disponible a partir de kodi 16
     return xbmcgui.Dialog().textviewer(heading, text)
 
 
+def dialog_browse(_type, heading, default=""):
+    dialog = xbmcgui.Dialog()
+    d = dialog.browse(_type, heading, 'files')
+    return d
+
+
 def itemlist_refresh():
     xbmc.executebuiltin("Container.Refresh")
 

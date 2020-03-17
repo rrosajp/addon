@@ -42,7 +42,9 @@
 
         <setting label="30030" type="lsep"/>
         <setting id="vidolibrary_preferences" type="action" label="60542" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAiY2hhbm5lbF9jb25maWciLA0KICAgICJjaGFubmVsIjogInZpZGVvbGlicmFyeSINCn0==)"/>
-        <setting id="vidolibrary_overwrite" type="action" label="60567" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAib3ZlcndyaXRlX3Rvb2xzIiwNCiAgICAiY2hhbm5lbCI6ICJzZXR0aW5nIg0KfQ==)"/>
+        <setting id="vidolibrary_export" type="action" label="80000" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAiZXhwb3J0X3ZpZGVvbGlicmFyeSIsDQogICAgImNoYW5uZWwiOiAiYmFja3VwIg0KfQ==)"/>
+        <setting id="vidolibrary_import" type="action" label="80001" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAiaW1wb3J0X3ZpZGVvbGlicmFyeSIsDQogICAgImNoYW5uZWwiOiAiYmFja3VwIg0KfQ==)"/>
+        <setting id="vidolibrary_restore" type="action" label="60567" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAicmVzdG9yZV90b29scyIsDQogICAgImNoYW5uZWwiOiAic2V0dGluZyINCn0=)"/>
         <setting id="vidolibrary_update" type="action" label="60568" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAidXBkYXRlX3ZpZGVvbGlicmFyeSIsDQogICAgImNoYW5uZWwiOiAidmlkZW9saWJyYXJ5Ig0KfQ==)"/>
     </category>
 

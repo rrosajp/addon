@@ -445,7 +445,7 @@ def submenu_tools(item):
                              thumbnail=get_thumb("setting_0.png")))
         itemlist.append(Item(channel=CHANNELNAME, title=config.get_localized_string(60566) + ":", action="", folder=False,
                              text_bold=True, thumbnail=get_thumb("videolibrary.png")))
-        itemlist.append(Item(channel=CHANNELNAME, action="overwrite_tools", folder=False,
+        itemlist.append(Item(channel=CHANNELNAME, action="restore_tools", folder=False,
                              thumbnail=get_thumb("videolibrary.png"),
                              title="- " + config.get_localized_string(60567)))
         itemlist.append(Item(channel="videolibrary", action="update_videolibrary", folder=False,
@@ -795,7 +795,7 @@ def channel_status(item, dict_values):
         platformtools.dialog_notification(config.get_localized_string(60579), config.get_localized_string(60580))
 
 
-def overwrite_tools(item):
+def restore_tools(item):
     import videolibrary_service
     from core import videolibrarytools
     import os
