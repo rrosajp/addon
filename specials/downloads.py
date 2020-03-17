@@ -116,7 +116,7 @@ def mainlist(item):
         itemlist.insert(0, Item(channel=item.channel, action="browser", title=support.typo(config.get_localized_string(70222),'bold'),url=DOWNLOAD_PATH))
 
     if not item.contentType == "tvshow":
-        itemlist.insert(0, Item(channel=item.channel, action="settings", title= support.typo(config.get_localized_string(70223),'bold color kod')))
+        itemlist.insert(0, Item(channel='shortcuts', action="SettingOnPosition", category=4, setting=0, title= support.typo(config.get_localized_string(70288),'bold color kod')))
 
     return itemlist
 

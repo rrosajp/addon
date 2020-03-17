@@ -802,7 +802,7 @@ def match(item_url_string, **args):
         match: first match
         matches: all the matches
     '''
-    log(item_url_string)
+    log()
 
     matches = blocks = []
     url = None
@@ -1185,6 +1185,8 @@ def addQualityTag(item, itemlist, data, patron):
         "DLMux": "si tratta di un 720p o 1080p reperiti dalla versione americana di iTunes americano. La qualità è paragonabile a quella di un BluRayRip e permette di fruire di episodi televisivi, senza il fastidioso bollo distintivo della rete che trasmette.",
         "DVD5": "il film è in formato DVD Single Layer, nel quale vengono mantenute tutte le caratteristiche del DVD originale: tra queste il menu multilingue, i sottotitoli e i contenuti speciali, se presenti. Il video è codificato nel formato DVD originale MPEG-2.",
         "DVD9": "ha le stesse caratteristiche del DVD5, ma le dimensioni del file sono di un DVD Dual Layer (8,5 GB).",
+        "HDTS": "viene utilizzata una videocamera professionale ad alta definizione posizionata in modo fisso. La qualità audio video è buona.",
+        "DVDMUX": "indica una buona qualità video, l’audio è stato aggiunto da una sorgente diversa per una migliore qualità.",
     }
 
     defQualAudio = {
@@ -1194,6 +1196,7 @@ def addQualityTag(item, itemlist, data, patron):
         "DD": "audio ricavato dai dischi DTS cinema. L’audio è di buona qualità, ma potreste riscontrare il fatto che non potrebbe essere più riproducibile.",
         "AC3": "audio in Dolby Digital puo' variare da 2.0 a 5.1 canali in alta qualità.",
         "MP3": "codec per compressione audio utilizzato MP3.",
+        "RESYNC": "il film è stato lavorato e re sincronizzato con una traccia audio. A volte potresti riscontrare una mancata sincronizzazione tra audio e video.",
     }
     qualityStr = scrapertools.find_single_match(data, patron).strip()
     if PY3:

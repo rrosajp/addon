@@ -18,7 +18,7 @@ msgstr ""
 "Language: en_EN\n"
 
 msgctxt "#20000"
-msgid "KOD"
+msgid "Kodi on Demand"
 msgstr ""
 
 msgctxt "#20001"
@@ -38,7 +38,7 @@ msgid "Enable debug logging:"
 msgstr ""
 
 msgctxt "#30004"
-msgid "Automatic update channels:"
+msgid "Automatically update channels:"
 msgstr ""
 
 msgctxt "#30005"
@@ -110,8 +110,8 @@ msgid "Select the elements you want to display on the Contextual Menu"
 msgstr ""
 
 msgctxt "#30025"
-msgid "KoD Preferences"
-msgstr "Preferenze KoD"
+msgid "KoD settings"
+msgstr ""
 
 msgctxt "#30026"
 msgid "Direct"
@@ -206,7 +206,7 @@ msgid "Unsopported Server"
 msgstr ""
 
 msgctxt "#30067"
-msgid "Videolibrary path:"
+msgid "Video library path:"
 msgstr ""
 
 msgctxt "#30068"
@@ -270,7 +270,7 @@ msgid "Movies"
 msgstr ""
 
 msgctxt "#30123"
-msgid "TV Shows"
+msgid "TV shows"
 msgstr ""
 
 msgctxt "#30124"
@@ -290,7 +290,7 @@ msgid "Recent"
 msgstr ""
 
 msgctxt "#30131"
-msgid "Videolibrary"
+msgid "Video library"
 msgstr ""
 
 msgctxt "#30132"
@@ -302,7 +302,7 @@ msgid "Do you want to remove links from this channel?"
 msgstr ""
 
 msgctxt "#30135"
-msgid "added to the videolibrary"
+msgid "added to the video library"
 msgstr ""
 
 msgctxt "#30136"
@@ -334,7 +334,7 @@ msgid "Add to favorites"
 msgstr ""
 
 msgctxt "#30161"
-msgid "Add to videolibrary"
+msgid "Add to video library"
 msgstr ""
 
 msgctxt "#30162"
@@ -375,7 +375,7 @@ msgid "Movie Info"
 msgstr ""
 
 msgctxt "#30976"
-msgid "TVShows - Airing Today"
+msgid "TV shows - Airing Today"
 msgstr ""
 
 msgctxt "#30977"
@@ -383,7 +383,7 @@ msgid "Last Episodes - On-Air"
 msgstr ""
 
 msgctxt "#30978"
-msgid "New TVShows"
+msgid "New TV shows"
 msgstr ""
 
 msgctxt "#30979"
@@ -503,7 +503,7 @@ msgid "Synchronization with Trakt started"
 msgstr ""
 
 msgctxt "#59971"
-msgid "KOD Auto-configuration"
+msgid "Kodi video library configuration"
 msgstr ""
 
 msgctxt "#59972"
@@ -667,7 +667,7 @@ msgid "This website seems to be unavailable, try later, if the problem persists,
 msgstr ""
 
 msgctxt "#60014"
-msgid "It may be due to a connection problem, the web page of the channel has changed its structure, or an internal error of KOD. To have more details, see the log file."
+msgid "It may be due to a connection problem, the web page of the channel has changed its structure, or an internal error of KoD. To have more details, see the log file."
 msgstr ""
 
 msgctxt "#60015"
@@ -691,11 +691,11 @@ msgid "Delete this movie"
 msgstr ""
 
 msgctxt "#60020"
-msgid "Mark tv series as not watched"
+msgid "Mark TV show as not watched"
 msgstr ""
 
 msgctxt "#60021"
-msgid "Mark tv series as watched"
+msgid "Mark TV show as watched"
 msgstr ""
 
 msgctxt "#60022"
@@ -707,11 +707,11 @@ msgid "Automatically find new episodes: Enable"
 msgstr ""
 
 msgctxt "#60024"
-msgid "Delete tv series/channel"
+msgid "Delete TV show/channel"
 msgstr ""
 
 msgctxt "#60025"
-msgid "Delete tv series"
+msgid "Delete TV show"
 msgstr ""
 
 msgctxt "#60026"
@@ -759,11 +759,11 @@ msgid "Episode %s"
 msgstr ""
 
 msgctxt "#60037"
-msgid "Tv series update ..."
+msgid "TV show update..."
 msgstr ""
 
 msgctxt "#60038"
-msgid "An error has occurred on KOD"
+msgid "An error has occurred in KoD"
 msgstr ""
 
 msgctxt "#60039"
@@ -775,7 +775,7 @@ msgid "Delete movie"
 msgstr ""
 
 msgctxt "#60041"
-msgid "Delete tv series"
+msgid "Delete TV show"
 msgstr ""
 
 msgctxt "#60042"
@@ -787,7 +787,7 @@ msgid "Delete %s links of channel %s"
 msgstr ""
 
 msgctxt "#60044"
-msgid "Do you want really to delete '%s' from videolibrary?"
+msgid "Do you want really to delete '%s' from video library?"
 msgstr ""
 
 msgctxt "#60045"
@@ -827,7 +827,7 @@ msgid "Do you want to configure this scraper in italian as default option for th
 msgstr ""
 
 msgctxt "#60054"
-msgid "Do you want to configure this scraper in italian as default option for the tv series ?"
+msgid "Do you want to configure this scraper in italian as default option for the TV shows?"
 msgstr ""
 
 msgctxt "#60055"
@@ -835,11 +835,11 @@ msgid "Error of provider configuration in BD."
 msgstr ""
 
 msgctxt "#60056"
-msgid "Videolibrary %s not configured"
+msgid "Video library %s not configured"
 msgstr ""
 
 msgctxt "#60057"
-msgid "Videolibrary %s configured"
+msgid "Video library %s configured"
 msgstr ""
 
 msgctxt "#60058"
@@ -851,7 +851,7 @@ msgid "Congratulations, Kodi's video library has been configured correctly."
 msgstr ""
 
 msgctxt "#60060"
-msgid "KOD Auto-configuration"
+msgid "Kodi video library configuration"
 msgstr ""
 
 msgctxt "#60062"
@@ -863,11 +863,11 @@ msgid "Error in adding movies to your video library..."
 msgstr ""
 
 msgctxt "#60064"
-msgid "Adding Episodes to the Video Library..."
+msgid "Adding episodes to the video library..."
 msgstr ""
 
 msgctxt "#60065"
-msgid "Added Episode to Video Library..."
+msgid "Added episode to the video library..."
 msgstr ""
 
 msgctxt "#60066"
@@ -875,23 +875,23 @@ msgid "ERROR, It has NOT been possible to add the video to the video library"
 msgstr ""
 
 msgctxt "#60067"
-msgid "ERROR, tv series has NOT been added to videolibrary\nIt has NOT been possible to add no episode"
+msgid "ERROR, TV show has NOT been added to video library\nIt has NOT been possible to add no episode"
 msgstr ""
 
 msgctxt "#60068"
-msgid "ERROR, tv series has NOT been added to videolibrary"
+msgid "ERROR, TV show has NOT been added to video library"
 msgstr ""
 
 msgctxt "#60069"
-msgid "ERRORE, tv series has NOT been added completely to videolibrary"
+msgid "ERRORE, TV show has NOT been added completely to video library"
 msgstr ""
 
 msgctxt "#60070"
-msgid "tv series has been added to videolibrary"
+msgid "TV show has been added to video library"
 msgstr ""
 
 msgctxt "#60071"
-msgid "Autoplay Configuration"
+msgid "Autoplay configuration"
 msgstr ""
 
 msgctxt "#60072"
@@ -1163,7 +1163,7 @@ msgid "Movie"
 msgstr ""
 
 msgctxt "#60245"
-msgid "tv show"
+msgid "TV show"
 msgstr ""
 
 msgctxt "#60246"
@@ -1227,7 +1227,7 @@ msgid "Problem in the connection process"
 msgstr ""
 
 msgctxt "#60261"
-msgid "KOD"
+msgid "Kodi on Demand"
 msgstr ""
 
 msgctxt "#60262"
@@ -1343,7 +1343,7 @@ msgid "More than 17 years old"
 msgstr ""
 
 msgctxt "#60292"
-msgid "Searching for TV Series Information"
+msgid "Searching for TV show information"
 msgstr ""
 
 msgctxt "#60293"
@@ -1351,7 +1351,7 @@ msgid "Please wait..."
 msgstr ""
 
 msgctxt "#60294"
-msgid "Searching for TV Series Information"
+msgid "Searching for TV show information"
 msgstr ""
 
 msgctxt "#60295"
@@ -1359,7 +1359,7 @@ msgid "Loading results..."
 msgstr ""
 
 msgctxt "#60296"
-msgid "Searching for TV Series Information"
+msgid "Searching for TV show information"
 msgstr ""
 
 msgctxt "#60297"
@@ -1367,7 +1367,7 @@ msgid "Find %s possible matches"
 msgstr ""
 
 msgctxt "#60298"
-msgid "[%s]: Select the correct TV series"
+msgid "[%s]: Select the correct TV show"
 msgstr ""
 
 msgctxt "#60299"
@@ -1499,7 +1499,7 @@ msgid "Favorites"
 msgstr ""
 
 msgctxt "#60331"
-msgid "Videolibrary"
+msgid "Video library"
 msgstr ""
 
 msgctxt "#60332"
@@ -1515,23 +1515,15 @@ msgid "Password for adult channels"
 msgstr ""
 
 msgctxt "#60335"
-msgid "Watch in"
+msgid "Watch in..."
 msgstr ""
 
 msgctxt "#60336"
-msgid "Download in"
-msgstr ""
-
-msgctxt "#60337"
-msgid "KOD-MCT: No support adf.ly"
-msgstr ""
-
-msgctxt "#60338"
-msgid "The script does not support URL reduction adf.ly."
+msgid "Download in..."
 msgstr ""
 
 msgctxt "#60339"
-msgid "Nothing to Play"
+msgid "Nothing to play"
 msgstr ""
 
 msgctxt "#60342"
@@ -1539,15 +1531,11 @@ msgid "Download completed: "
 msgstr ""
 
 msgctxt "#60343"
-msgid "BMC-Kodi has closed the video."
+msgid "Kodi has closed the video"
 msgstr ""
 
 msgctxt "#60344"
 msgid "Continue with the session?"
-msgstr ""
-
-msgctxt "#60345"
-msgid "KOD-MCT: List of videos"
 msgstr ""
 
 msgctxt "#60346"
@@ -1575,11 +1563,11 @@ msgid "Set as Homepage"
 msgstr ""
 
 msgctxt "#60352"
-msgid "Add TV Series to Videolibrary"
+msgid "Add TV show to video library"
 msgstr ""
 
 msgctxt "#60353"
-msgid "Add Movie to Videolibrary"
+msgid "Add movie to video library"
 msgstr ""
 
 msgctxt "#60354"
@@ -1587,7 +1575,7 @@ msgid "Download Movie"
 msgstr ""
 
 msgctxt "#60355"
-msgid "Download TV Series"
+msgid "Download TV show"
 msgstr ""
 
 msgctxt "#60356"
@@ -1623,7 +1611,7 @@ msgid "The server on which it is hosted"
 msgstr ""
 
 msgctxt "#60364"
-msgid "is not yet supported in KOD"
+msgid "is not yet supported in KoD"
 msgstr ""
 
 msgctxt "#60365"
@@ -1663,7 +1651,7 @@ msgid "Genres:"
 msgstr ""
 
 msgctxt "#60383"
-msgid "Series:"
+msgid "TV show:"
 msgstr ""
 
 msgctxt "#60384"
@@ -1687,11 +1675,11 @@ msgid "Summary:"
 msgstr ""
 
 msgctxt "#60389"
-msgid "Videolibrary update...."
+msgid "Video library update..."
 msgstr ""
 
 msgctxt "#60390"
-msgid "AutoPlay Configuration"
+msgid "AutoPlay configuration"
 msgstr ""
 
 msgctxt "#60391"
@@ -1783,11 +1771,11 @@ msgid "Choose channels to include"
 msgstr ""
 
 msgctxt "#60413"
-msgid "New Movie Search..."
+msgid "New movie search..."
 msgstr ""
 
 msgctxt "#60414"
-msgid "New search tv series..."
+msgid "New TV show search..."
 msgstr ""
 
 msgctxt "#60415"
@@ -1847,7 +1835,7 @@ msgid "FILTER: Delete '%s'"
 msgstr ""
 
 msgctxt "#60429"
-msgid "Filter configuration for TV series..."
+msgid "Filter configuration for TV show..."
 msgstr ""
 
 msgctxt "#60430"
@@ -1871,7 +1859,7 @@ msgid "Configure [%s]%s"
 msgstr ""
 
 msgctxt "#60435"
-msgid "There are no filters, search for a TV series and click on the context menu 'FILTER: Configure'"
+msgid "There are no filters, search for a TV show and click on the context menu 'FILTER: Configure'"
 msgstr ""
 
 msgctxt "#60436"
@@ -1959,7 +1947,7 @@ msgid "    - Links of interest"
 msgstr ""
 
 msgctxt "#60457"
-msgid "KOD"
+msgid "Kodi On Demand"
 msgstr ""
 
 msgctxt "#60458"
@@ -1975,11 +1963,11 @@ msgid "This can be improved by limiting the maximum number of links or by displa
 msgstr ""
 
 msgctxt "#60461"
-msgid "KOD - FAQ - %s"
+msgid "KoD - FAQ - %s"
 msgstr ""
 
 msgctxt "#60462"
-msgid "You may not have written the library path correctly in 'Settings>Preferences'.\nIl The specified path must be exactly the same as the 'source' entered in 'Archive' of the Kodi library.\nAVANZATO: This path is also found in 'sources.xml'.\nThere can be problems using some Kodi forks and paths with 'special://'. SPMC, for example, has problems with this, and there doesn't seem to be a solution, as it is an external problem to Kodi on Demand that has existed for a long time.\nYou can try solving these problems in 'Settings>Library Settings' by changing the 'Search in' setting from 'The folder of each series' to 'All library'."
+msgid "You may not have written the library path correctly in 'Settings>Preferences'.\nIl The specified path must be exactly the same as the 'source' entered in 'Archive' of the Kodi library.\nAVANZATO: This path is also found in 'sources.xml'.\nThere can be problems using some Kodi forks and paths with 'special://'. SPMC, for example, has problems with this, and there doesn't seem to be a solution, as it is an external problem to Kodi on Demand that has existed for a long time.\nYou can try solving these problems in 'Settings>Library Settings' by changing the 'Search in' setting from 'The folder of each TV show' to 'All library'."
 msgstr ""
 
 msgctxt "#60463"
@@ -1987,7 +1975,7 @@ msgid "The channel site may not work. In case the site works you can report the 
 msgstr ""
 
 msgctxt "#60464"
-msgid "It is possible that you have updated KOD recently and that the changes have not been fully applied Well, you can try 'Settings>Other Tools', checking the *_data.json files or reattaching everything to the library again"
+msgid "It is possible that you have updated KoD recently and that the changes have not been fully applied Well, you can try 'Settings>Other Tools', checking the *_data.json files or reattaching everything to the library again"
 msgstr ""
 
 msgctxt "#60465"
@@ -1999,7 +1987,7 @@ msgid "Yes, the option to display merged or split results by channels can be fou
 msgstr ""
 
 msgctxt "#60467"
-msgid "To report a problem on'https://t.me/kodiondemand' you need to:|the version you're using of Alpha.|The version you're using of kodi, mediaserver, etc.|the version and name of the operating system you're using.|The name of the skin (in case you're using Kodi) and whether using the default skin has solved the problem.|Description of the problem and any test cases.To activate the log in detailed mode, go to:|Configuration.|Preferences.|In the General tab - Check the option: Generate detailed log. The detailed log file can be found in the following path: \n\n%s"
+msgid "To report a problem on'https://t.me/kodiondemand' you need to:|the version you're using of Alpha.|The version you're using of Kodi, mediaserver, etc.|the version and name of the operating system you're using.|The name of the skin (in case you're using Kodi) and whether using the default skin has solved the problem.|Description of the problem and any test cases.To activate the log in detailed mode, go to:|Configuration.|Preferences.|In the General tab - Check the option: Generate detailed log. The detailed log file can be found in the following path: \n\n%s"
 msgstr ""
 
 msgctxt "#60468"
@@ -2103,11 +2091,11 @@ msgid "[B]Seasons/Episodes: [/B]"
 msgstr ""
 
 msgctxt "#60493"
-msgid "[B]Is there the tv series you're looking for?[/B]"
+msgid "[B]Is the TV show you're looking for inlcuded?[/B]"
 msgstr ""
 
 msgctxt "#60494"
-msgid "[B]Is there the movie you are looking for?[/B]"
+msgid "[B]Is the movie you're looking for inlcuded?[/B]"
 msgstr ""
 
 msgctxt "#60495"
@@ -2175,11 +2163,11 @@ msgid "Kids"
 msgstr ""
 
 msgctxt "#60511"
-msgid "TV series Episodes"
+msgid "TV show episodes"
 msgstr ""
 
 msgctxt "#60512"
-msgid "Anime Episodes"
+msgid "Anime episodes"
 msgstr ""
 
 msgctxt "#60513"
@@ -2243,11 +2231,11 @@ msgid "    - Kids"
 msgstr ""
 
 msgctxt "#60528"
-msgid "    - Series Tv Episodes"
+msgid "    - TV show episodes"
 msgstr ""
 
 msgctxt "#60529"
-msgid "    - Anime Episodes"
+msgid "    - Anime episodes"
 msgstr ""
 
 msgctxt "#60530"
@@ -2255,7 +2243,7 @@ msgid "    - Documentaries"
 msgstr ""
 
 msgctxt "#60531"
-msgid "Other Settings"
+msgid "Other settings"
 msgstr ""
 
 msgctxt "#60532"
@@ -2299,7 +2287,7 @@ msgid "Download settings"
 msgstr ""
 
 msgctxt "#60542"
-msgid "Videolibrary settings"
+msgid "Video library settings"
 msgstr ""
 
 msgctxt "#60544"
@@ -2383,15 +2371,15 @@ msgid "   Check the files * _data.json"
 msgstr ""
 
 msgctxt "#60566"
-msgid "Videolibrary options"
+msgid "Video library options"
 msgstr ""
 
 msgctxt "#60567"
-msgid "Overwrite the entire video library (strm, nfo and json)"
+msgid "Restore video library (strm, nfo and json)"
 msgstr ""
 
 msgctxt "#60568"
-msgid "Search for new episodes and update the video library"
+msgid "Search for new episodes and update video library"
 msgstr ""
 
 msgctxt "#60569"
@@ -2427,7 +2415,7 @@ msgid "A saving error occurred"
 msgstr ""
 
 msgctxt "#60581"
-msgid "Overwriting the entire video library"
+msgid "Restoring video library"
 msgstr ""
 
 msgctxt "#60582"
@@ -2439,15 +2427,15 @@ msgid "Do you want to continue?"
 msgstr ""
 
 msgctxt "#60584"
-msgid "Overwriting the video library...TV SERIES"
+msgid "Restoring TV shows video library"
 msgstr ""
 
 msgctxt "#60585"
-msgid "kod"
+msgid "Kodi on Demand"
 msgstr ""
 
 msgctxt "#60586"
-msgid "Overwriting the video library...MOVIES"
+msgid "Restoring movies video library"
 msgstr ""
 
 msgctxt "#60587"
@@ -2495,11 +2483,11 @@ msgid "    Server #%s"
 msgstr ""
 
 msgctxt "#60598"
-msgid "Configuration -- Video Library"
+msgid "Configuration of video library"
 msgstr ""
 
 msgctxt "#60600"
-msgid "Series"
+msgid "TV shows"
 msgstr ""
 
 msgctxt "#60601"
@@ -2551,7 +2539,7 @@ msgid "    Begin scheduled update from"
 msgstr ""
 
 msgctxt "#60614"
-msgid "    Search for new episodes in active tv series"
+msgid "    Search for new episodes in active TV shows"
 msgstr ""
 
 msgctxt "#60615"
@@ -2571,7 +2559,7 @@ msgid "    Search for content in"
 msgstr ""
 
 msgctxt "#60619"
-msgid "The folder of each tv series"
+msgid "The folder of each TV show"
 msgstr ""
 
 msgctxt "#60620"
@@ -2655,11 +2643,11 @@ msgid "        Show notification"
 msgstr ""
 
 msgctxt "#60640"
-msgid "    On adding a TV series to the video library"
+msgid "    On adding a TV show to the video library"
 msgstr ""
 
 msgctxt "#60641"
-msgid "        Wait until the tv series is added"
+msgid "        Wait until the TV show is added"
 msgstr ""
 
 msgctxt "#60642"
@@ -2667,7 +2655,7 @@ msgid "Show option \"All Seasons\"."
 msgstr ""
 
 msgctxt "#60643"
-msgid "Do not combine the seasons of the series"
+msgid "Do not combine the seasons of the TV shows"
 msgstr ""
 
 msgctxt "#60644"
@@ -2703,7 +2691,7 @@ msgid "    Movies:"
 msgstr ""
 
 msgctxt "#60652"
-msgid "    TV Series:"
+msgid "    TV show:"
 msgstr ""
 
 msgctxt "#60653"
@@ -2823,7 +2811,7 @@ msgid "movies"
 msgstr ""
 
 msgctxt "#60682"
-msgid "tv series"
+msgid "TV show"
 msgstr ""
 
 msgctxt "#60683"
@@ -2899,7 +2887,7 @@ msgid "Active channels"
 msgstr ""
 
 msgctxt "#70017"
-msgid "TV Series"
+msgid "TV show"
 msgstr ""
 
 msgctxt "#70018"
@@ -2923,7 +2911,7 @@ msgid " - Movies"
 msgstr ""
 
 msgctxt "#70023"
-msgid " - TV Shows"
+msgid " - TV shows"
 msgstr ""
 
 msgctxt "#70024"
@@ -2983,7 +2971,7 @@ msgid "Search director, writer..."
 msgstr ""
 
 msgctxt "#70038"
-msgid "Custom Filter"
+msgid "Custom filter"
 msgstr ""
 
 msgctxt "#70039"
@@ -2992,10 +2980,6 @@ msgstr ""
 
 msgctxt "#70040"
 msgid "Top Filmaffinity"
-msgstr ""
-
-msgctxt "#70041"
-msgid "Modern TV Shows"
 msgstr ""
 
 msgctxt "#70042"
@@ -3011,11 +2995,11 @@ msgid "Sagas and Collections"
 msgstr ""
 
 msgctxt "#70045"
-msgid "Movies/TV Shows/Documentaries by Themes"
+msgid "Movies/TV shows/Documentaries"
 msgstr ""
 
 msgctxt "#70046"
-msgid "Search Movies/TV Shows"
+msgid "Search Movies/TV shows"
 msgstr ""
 
 msgctxt "#70047"
@@ -3063,7 +3047,7 @@ msgid "My lists"
 msgstr ""
 
 msgctxt "#70058"
-msgid "Top Series"
+msgid "Top TV shows"
 msgstr ""
 
 msgctxt "#70059"
@@ -3087,7 +3071,7 @@ msgid "Anime by Genres"
 msgstr ""
 
 msgctxt "#70064"
-msgid "Search Tv Shows/Movies/Anime"
+msgid "Search TV shows/Movies/Anime"
 msgstr ""
 
 msgctxt "#70065"
@@ -3107,7 +3091,7 @@ msgid "In my Collection"
 msgstr ""
 
 msgctxt "#70069"
-msgid "Search %s in KOD: %s"
+msgid "Search %s in KoD: %s"
 msgstr ""
 
 msgctxt "#70070"
@@ -3163,7 +3147,7 @@ msgid "Delete movie"
 msgstr ""
 
 msgctxt "#70085"
-msgid "Delete TV Show"
+msgid "Delete TV show"
 msgstr ""
 
 msgctxt "#70086"
@@ -3175,7 +3159,7 @@ msgid "Deleted %s links from canal %s"
 msgstr ""
 
 msgctxt "#70088"
-msgid "Are you sure you want to delete '%s' from videolibrary ?"
+msgid "Are you sure you want to delete '%s' from video library?"
 msgstr ""
 
 msgctxt "#70089"
@@ -3191,7 +3175,7 @@ msgid "    Words"
 msgstr ""
 
 msgctxt "#70092"
-msgid "Add to videolibrary"
+msgid "Add to video library"
 msgstr ""
 
 msgctxt "#70093"
@@ -3227,15 +3211,15 @@ msgid "The Movie Database not present.\nInstall it now?"
 msgstr ""
 
 msgctxt "#70101"
-msgid "Error fixing videolibrarypath in BD"
+msgid "Error fixing video library path in BD"
 msgstr ""
 
 msgctxt "#70102"
-msgid "Videolibrary %s not configured"
+msgid "Video library %s not configured"
 msgstr ""
 
 msgctxt "#70103"
-msgid "Videolibrary %s configured"
+msgid "Video library %s configured"
 msgstr ""
 
 msgctxt "#70104"
@@ -3243,7 +3227,7 @@ msgid "Congratulations, the Kodi video library has been configured correctly."
 msgstr ""
 
 msgctxt "#70105"
-msgid "Do you want KOD to automatically configure the Kodi library? You will be asked to set up scrapers for movies and series."
+msgid "Do you want KoD to configure the Kodi library? You will be asked to set up scrapers for movies and TV shows."
 msgstr ""
 
 msgctxt "#70106"
@@ -3251,11 +3235,11 @@ msgid "If you choose 'No' you can do it later from 'Configuration > Preferences 
 msgstr ""
 
 msgctxt "#70107"
-msgid "Select scraper for Tv Shows"
+msgid "Select scraper for TV shows"
 msgstr ""
 
 msgctxt "#70108"
-msgid "Icons Set"
+msgid "Icons set"
 msgstr ""
 
 msgctxt "#70109"
@@ -3295,15 +3279,15 @@ msgid "Confirm New password:"
 msgstr ""
 
 msgctxt "#70118"
-msgid "Folder name for 'Series'"
+msgid "Folder name for TV shows"
 msgstr ""
 
 msgctxt "#70119"
-msgid "Folder name for 'Movies'"
+msgid "Folder name for movies"
 msgstr ""
 
 msgctxt "#70120"
-msgid "Autoconfigure XBMC / Kodi library for KOD content"
+msgid "Add KoD content to Kodi video library"
 msgstr ""
 
 msgctxt "#70121"
@@ -3323,7 +3307,7 @@ msgid "Category"
 msgstr ""
 
 msgctxt "#70125"
-msgid "Movie|Tv Shows|Anime|Children|Documentary|Horror|Castellan|Latin|Torrent"
+msgid "Movie|TV shows|Anime|Children|Documentary|Horror|Castellan|Latin|Torrent"
 msgstr ""
 
 msgctxt "#70126"
@@ -3363,7 +3347,7 @@ msgid "Custom Colours"
 msgstr ""
 
 msgctxt "#70136"
-msgid "Tv Show"
+msgid "TV show"
 msgstr ""
 
 msgctxt "#70137"
@@ -3403,15 +3387,15 @@ msgid "Servers"
 msgstr ""
 
 msgctxt "#70146"
-msgid "Add to videolibrary"
+msgid "Add to video library"
 msgstr ""
 
 msgctxt "#70147"
-msgid "Videolibrary (Update series)"
+msgid "Video library (update TV show)"
 msgstr ""
 
 msgctxt "#70148"
-msgid "Videolibrary (Do not update series)"
+msgid "Video library (do not update TV show)"
 msgstr ""
 
 msgctxt "#70149"
@@ -3419,7 +3403,7 @@ msgid "Others"
 msgstr ""
 
 msgctxt "#70150"
-msgid "Movie/series info in contextual menu"
+msgid "Movie/TV show info in contextual menu"
 msgstr ""
 
 msgctxt "#70151"
@@ -3431,11 +3415,11 @@ msgid "Show ExtendedInfo option (External addon required):"
 msgstr ""
 
 msgctxt "#70153"
-msgid "Buttons/Access keys (Changes require Kodi restart)"
+msgid "Buttons/Access keys (changes require Kodi restart)"
 msgstr ""
 
 msgctxt "#70154"
-msgid "TheMovieDB (obtains data from movies or series)"
+msgid "TheMovieDB (obtains data for movies or TV shows)"
 msgstr ""
 
 msgctxt "#70155"
@@ -3571,7 +3555,7 @@ msgid "connecting with %s..."
 msgstr ""
 
 msgctxt "#70188"
-msgid "Obtaining data from the series"
+msgid "Obtaining data for the TV show"
 msgstr ""
 
 msgctxt "#70189"
@@ -3595,11 +3579,11 @@ msgid "Open torrent with..."
 msgstr ""
 
 msgctxt "#70194"
-msgid "KOD-torrent"
+msgid "KoD-torrent"
 msgstr ""
 
 msgctxt "#70195"
-msgid "KOD - Torrent"
+msgid "KoD - Torrent"
 msgstr ""
 
 msgctxt "#70196"
@@ -3847,7 +3831,7 @@ msgid "Settings -- Torrent"
 msgstr ""
 
 msgctxt "#70258"
-msgid "KOD Started"
+msgid "KoD started"
 msgstr ""
 
 msgctxt "#70259"
@@ -3867,11 +3851,11 @@ msgid "Stopping the Websocket server ..."
 msgstr ""
 
 msgctxt "#70263"
-msgid "KOD stopped"
+msgid "KoD stopped"
 msgstr ""
 
 msgctxt "#70264"
-msgid "Enter the username and password to access KOD"
+msgid "Enter the username and password to access KoD"
 msgstr ""
 
 msgctxt "#70265"
@@ -3887,11 +3871,11 @@ msgid "Search new episodes now"
 msgstr ""
 
 msgctxt "#70270"
-msgid "Videolibrary movies"
+msgid "Movies video library"
 msgstr ""
 
 msgctxt "#70271"
-msgid "Videolibrary Tv Shows"
+msgid "TV shows video library"
 msgstr ""
 
 msgctxt "#70272"
@@ -4039,19 +4023,19 @@ msgid "Movies Now in Theatres "
 msgstr ""
 
 msgctxt "#70310"
-msgid "Series by Genre"
+msgid "TV shows by Genre"
 msgstr ""
 
 msgctxt "#70311"
-msgid "Series most polupar"
+msgid "TV shows most popular"
 msgstr ""
 
 msgctxt "#70312"
-msgid "Series in progress"
+msgid "TV shows in progress"
 msgstr ""
 
 msgctxt "#70313"
-msgid "Top rated Series"
+msgid "Top rated TV shows"
 msgstr ""
 
 msgctxt "#70314"
@@ -4199,7 +4183,7 @@ msgid "List sorted by %s. Change order?"
 msgstr ""
 
 msgctxt "#70350"
-msgid "Search in kod: %s"
+msgid "Search in KoD: %s"
 msgstr ""
 
 msgctxt "#70351"
@@ -4467,7 +4451,7 @@ msgid "=== Movies ==="
 msgstr ""
 
 msgctxt "#70417"
-msgid "=== TV Shows ==="
+msgid "=== TV shows ==="
 msgstr ""
 
 msgctxt "#70418"
@@ -4955,7 +4939,7 @@ msgid "* To add links to folders, access the context menu from any point in Kodi
 msgstr ""
 
 msgctxt "#70541"
-msgid "* The links can be channels, sections within the channels, searches, and even movies and series although for the latter it is preferable to use the video library."
+msgid "* The links can be channels, sections within the channels, searches, and even movies and TV shows although for the latter it is preferable to use the video library."
 msgstr ""
 
 msgctxt "#70542"
@@ -5039,7 +5023,7 @@ msgid "Search Similar"
 msgstr ""
 
 msgctxt "#70562"
-msgid "Enable autoplay on all supported channels"
+msgid "Enable AutoPlay on all supported channels"
 msgstr ""
 
 msgctxt "#70563"
@@ -5107,7 +5091,7 @@ msgid "To avoid waiting too long when a server does not respond:"
 msgstr ""
 
 msgctxt "#70579"
-msgid "Settings of KoD updates:"
+msgid "Settings of KoD updates"
 msgstr ""
 
 msgctxt "#70580"
@@ -5123,7 +5107,7 @@ msgid "Do you want to be notified?"
 msgstr ""
 
 msgctxt "#70583"
-msgid "Management of updates of other addons related to KOD:"
+msgid "Management of updates of other addons related to KoD:"
 msgstr ""
 
 msgctxt "#70584"
@@ -5135,7 +5119,7 @@ msgid "Renumbering"
 msgstr ""
 
 msgctxt "#70586"
-msgid "Set up series number..."
+msgid "Set up TV show renumbering..."
 msgstr ""
 
 msgctxt "#70587"
@@ -5143,7 +5127,7 @@ msgid "Set up"
 msgstr ""
 
 msgctxt "#70588"
-msgid "No series found, look for a series and click on contextual menu"
+msgid "No TV show found, look for a TV show and click on contextual menu"
 msgstr ""
 
 msgctxt "#70589"
@@ -5199,7 +5183,7 @@ msgid "Update from the Internet:"
 msgstr ""
 
 msgctxt "#70602"
-msgid "The first season that is added always starts in \"0 \" episodes, the second season that is added starts in the total number of episodes of the first season, the third season will be the sum of the episodes of the previous seasons and so on.\n  \nSerial example divided into several seasons: \n\nFairy Tail: \n - SEASON 1: EPISODE 48 -> [season 1, episode: 0] \n - SEASON 2: EPISODE 48 - -> [season 2, episode: 48] \n - SEASON 3: EPISODE 54 -> [season 3, episode: 96 ([48 = season2] + [48 = season1])] \n - SEASON 4: EPISODE 175 -> [season 4: episode: 150 ([54 = season3] + [48 = season2] + [48 = season3])]  \n  \nExample of a series that continues in the season of the original: \n \nFate / Zero 2nd Season: \n - SEASON 1: EPISODE 12 -> [season 1, episode: 13]  \n  \nExample example which is the second Season of the original: \n \nFate / kaleid liner Prism☆Illya 2wei!: \n - SEASON 1: EPISODE 12 -> [season 2, episode: 0]  \n"
+msgid "The first season that is added always starts in \"0 \" episodes, the second season that is added starts in the total number of episodes of the first season, the third season will be the sum of the episodes of the previous seasons and so on.\n  \nTV show example divided into several seasons: \n\nFairy Tail: \n - SEASON 1: EPISODE 48 -> [season 1, episode: 0] \n - SEASON 2: EPISODE 48 - -> [season 2, episode: 48] \n - SEASON 3: EPISODE 54 -> [season 3, episode: 96 ([48 = season2] + [48 = season1])] \n - SEASON 4: EPISODE 175 -> [season 4: episode: 150 ([54 = season3] + [48 = season2] + [48 = season3])]  \n  \nExample of a TV show that continues in the season of the original: \n \nFate / Zero 2nd Season: \n - SEASON 1: EPISODE 12 -> [season 1, episode: 13]  \n  \nExample which is the second season of the original: \n \nFate / kaleid liner Prism☆Illya 2wei!: \n - SEASON 1: EPISODE 12 -> [season 2, episode: 0]  \n"
 msgstr ""
 
 msgctxt "#70603"
@@ -5494,11 +5478,11 @@ msgid "Addon successfully updated to %s.fix %d"
 msgstr ""
 
 msgctxt "#70673"
-msgid "Alpha updated to"
+msgid "KoD updated to"
 msgstr ""
 
 msgctxt "#70674"
-msgid "KOD updates"
+msgid "KoD updates"
 msgstr ""
 
 msgctxt "#70675"
@@ -5522,7 +5506,7 @@ msgid "From URL"
 msgstr ""
 
 msgctxt "#70680"
-msgid "KOD - (Community)"
+msgid "KoD - (Community)"
 msgstr ""
 
 msgctxt "#70681"
@@ -5554,7 +5538,7 @@ msgid "Special Episodes"
 msgstr ""
 
 msgctxt "#70688"
-msgid "Are there special episodes in the series \n(Episode 0 Excluded)?"
+msgid "Are there special episodes in the TV show \n(Episode 0 Excluded)?"
 msgstr ""
 
 msgctxt "#70689"
@@ -5570,7 +5554,7 @@ msgid "Using the download function you declare that you have a physical copy and
 msgstr ""
 
 msgctxt "#70692"
-msgid "The KOD team assumes no responsibility for the use that is made of this proposed function"
+msgid "The KoD team assumes no responsibility for the use that is made of this proposed function"
 msgstr ""
 
 msgctxt "#70693"
@@ -5622,7 +5606,7 @@ msgid "Use your custom channel URLs"
 msgstr ""
 
 msgctxt "#70706"
-msgid "Autostart KOD at Kodi boot"
+msgid "Start KoD at Kodi boot"
 msgstr ""
 
 msgctxt "#70707"
@@ -5737,6 +5721,10 @@ msgctxt "#70735"
 msgid "%s Special Episode Number"
 msgstr ""
 
+msgctxt "#70736"
+msgid "Completed TV show"
+msgstr ""
+
 msgctxt "#70737"
 msgid "Side Menu"
 msgstr ""
@@ -5762,7 +5750,7 @@ msgid "Movies by Year"
 msgstr ""
 
 msgctxt "#70743"
-msgid "Series by Year"
+msgid "TV shows by Year"
 msgstr ""
 
 msgctxt "#70744"
@@ -5960,7 +5948,7 @@ msgid "By disabling the alert, you have activated a notice\nthat will appear at 
 msgstr ""
 
 msgctxt "#707407"
-msgid "For any change to the DNS you MUST restart KODI!"
+msgid "For any change to the DNS you MUST restart Kodi!"
 msgstr ""
 
 msgctxt "#707408"
@@ -6040,7 +6028,7 @@ msgid "before generating the report"
 msgstr ""
 
 msgctxt "#707427"
-msgid "Unable to read kodi log"
+msgid "Unable to read Kodi log"
 msgstr ""
 
 msgctxt "#707428"
@@ -6069,4 +6057,44 @@ msgstr ""
 
 msgctxt "#707434"
 msgid "reCaptcha verification failed"
+msgstr ""
+
+msgctxt "#80000"
+msgid "Export video library"
+msgstr ""
+
+msgctxt "#80001"
+msgid "Import video library"
+msgstr ""
+
+msgctxt "#80002"
+msgid "Select the folder where to export the video library"
+msgstr ""
+
+msgctxt "#80003"
+msgid "Exporting video library..."
+msgstr ""
+
+msgctxt "#80004"
+msgid "The video library has been exported"
+msgstr ""
+
+msgctxt "#80005"
+msgid "Select the zip file to be imported"
+msgstr ""
+
+msgctxt "#80006"
+msgid "Attention, the current video library will be overwritten. Proceed anyway?"
+msgstr ""
+
+msgctxt "#80007"
+msgid "Importing video library..."
+msgstr "Importazione videoteca..."
+
+msgctxt "#80008"
+msgid "The video library has been imported"
+msgstr ""
+
+msgctxt "#80009"
+msgid "Would you like to search for new episodes and update video library?"
 msgstr ""

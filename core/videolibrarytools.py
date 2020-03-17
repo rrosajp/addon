@@ -234,12 +234,54 @@ def save_movie(item):
     p_dialog.close()
     return 0, 0, -1
 
+def update_renumber_options(item, head_nfo, path):
+    from core import jsontools
+    # from core.support import dbg;dbg()
+    tvshow_path = filetools.join(path, 'tvshow.nfo')
+    for channel in item.channel_prefs:
+        filename = filetools.join(config.get_data_path(), "settings_channels", channel + '_data.json')
+
+        json_file = jsontools.load(filetools.read(filename))
+        if 'TVSHOW_AUTORENUMBER' in json_file:
+            json = json_file['TVSHOW_AUTORENUMBER']
+            if item.fulltitle in json:
+                item.channel_prefs[channel]['TVSHOW_AUTORENUMBER'] = json[item.fulltitle]
+                logger.info('UPDATED=\n' + str(item.channel_prefs))
+                filetools.write(tvshow_path, head_nfo + item.tojson())
+
+def add_renumber_options(item, head_nfo, path):
+    from core import jsontools
+    # from core.support import dbg;dbg()
+    ret = None
+    filename = filetools.join(config.get_data_path(), "settings_channels", item.channel + '_data.json')
+    json_file = jsontools.load(filetools.read(filename))
+    if 'TVSHOW_AUTORENUMBER' in json_file:
+        json = json_file['TVSHOW_AUTORENUMBER']
+        if item.fulltitle in json:
+            ret = json[item.fulltitle]
+    return ret
+
+def check_renumber_options(item):
+    from specials.autorenumber import load, write
+    for key in item.channel_prefs:
+        if 'TVSHOW_AUTORENUMBER' in item.channel_prefs[key]:
+            item.channel = key
+            json = load(item)
+            if not json or item.fulltitle not in json:
+                json[item.fulltitle] = item.channel_prefs[key]['TVSHOW_AUTORENUMBER']
+                write(item, json)
+
+    # head_nfo, tvshow_item = read_nfo(filetools.join(item.context[0]['nfo']))
+    # if tvshow_item['channel_prefs'][item.fullti]
+
+
 def filter_list(episodelist, action=None, path=None):
     # if path: path = path.decode('utf8')
     # import xbmc
     # if xbmc.getCondVisibility('system.platform.windows') > 0: path = path.replace('smb:','').replace('/','\\')
     channel_prefs = {}
     lang_sel = quality_sel = show_title = channel =''
+    # from core.support import dbg;dbg()
     if action:
         tvshow_path = filetools.join(path, "tvshow.nfo")
         head_nfo, tvshow_item = read_nfo(tvshow_path)
@@ -253,7 +295,12 @@ def filter_list(episodelist, action=None, path=None):
                     filetools.remove(filetools.join(path, File))
         if channel not in tvshow_item.channel_prefs:
             tvshow_item.channel_prefs[channel] = {}
+
         channel_prefs = tvshow_item.channel_prefs[channel]
+
+        renumber = add_renumber_options(episodelist[0], head_nfo, tvshow_path)
+        if renumber:
+            channel_prefs['TVSHOW_AUTORENUMBER'] = renumber
 
         if action == 'get_seasons':
             if 'favourite_language' not in channel_prefs:
