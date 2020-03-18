@@ -178,9 +178,13 @@ def peliculas(item, json='', key='', itemlist=[]):
 
     for i, option in enumerate(json):
         if Pagination and (pag - 1) * Pagination > i: continue  # pagination
-        if Pagination and i >= pag * Pagination: break 
+        if Pagination and i >= pag * Pagination: break
         if item.filterkey and item.filterkey in option:
             filterkey = [it.lower() for it in option[item.filterkey]] if type(option[item.filterkey]) == list else [option[item.filterkey].lower()]
+        else:
+            filterkey = []
+
+
         title = option['title'] if 'title' in option else ''
 
         if 'tvshows_list' in key:
@@ -277,16 +281,16 @@ def episodios(item, json ='', key='', itemlist =[]):
     # set variable
     ep = 1
     season = infoLabels['season'] if 'season' in infoLabels else item.contentSeason if item.contentSeason else 1
-    
+
     if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'search']:
         Pagination = int(defp) if defp.isdigit() else ''
     else: Pagination = ''
     pag = item.page if item.page else 1
-    
+
     # make items
     for i, option in enumerate(json):
         if Pagination and (pag - 1) * Pagination > i: continue  # pagination
-        if Pagination and i >= pag * Pagination: break 
+        if Pagination and i >= pag * Pagination: break
         # build numeration of episodes
         numeration = option['number'] if 'number' in option else option['title']
         match = support.match(numeration , patron=r'(?P<season>\d+)x(?P<episode>\d+)').match
