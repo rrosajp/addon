@@ -722,6 +722,8 @@ def add_channel(item):
     elif result==1:
         url = platformtools.dialog_input("", config.get_localized_string(70681), False)
         try:
+            if url[:4] != 'http':
+                url = 'http://' + url
             channel_to_add['path'] = url
             json_file = jsontools.load(httptools.downloadpage(url).data)
         except:
@@ -749,6 +751,9 @@ def add_channel(item):
     file.close()
 
     platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(70683) % json_file['channel_name'])
+    import xbmc
+    xbmc.sleep(1000)
+    platformtools.itemlist_refresh()
     return
 
 def remove_channel(item):
