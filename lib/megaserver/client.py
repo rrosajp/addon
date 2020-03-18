@@ -184,6 +184,7 @@ class Client(object):
         decrypted = ''
         for p in range(0, len(data), 16):
             decrypted += decryptor.decrypt(data[p:p + 16]).replace('\0', '')
+        logger.info(decrypted)
         return decrypted
 
     def aes_cbc_decrypt_a32(self,data, key):
