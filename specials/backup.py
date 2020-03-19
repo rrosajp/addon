@@ -16,7 +16,7 @@ movies_path = os.path.join(temp_path, "movies")
 tvshows_path = os.path.join(temp_path, "tvshows")
 
 
-def export_videolibrary():
+def export_videolibrary(item):
     logger.info()
 
     zip_file_folder = platformtools.dialog_browse(3, config.get_localized_string(80002))
@@ -50,7 +50,7 @@ def export_videolibrary():
                                       time=5000, sound=False)
 
 
-def import_videolibrary():
+def import_videolibrary(item):
     logger.info()
 
     zip_file = platformtools.dialog_browse(1, config.get_localized_string(80005))
