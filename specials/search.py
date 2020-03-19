@@ -47,7 +47,7 @@ def mainlist(item):
 
                 Item(channel=item.channel, title=typo(config.get_localized_string(59994), 'color kod bold'), action='opciones', thumbnail=get_thumb('setting_0.png')),
 
-                Item(channel='shortcuts', title=typo(config.get_localized_string(30100), 'color kod bold'), action='SettingOnPosition', category=3, thumbnail=get_thumb('setting_0.png'))]
+                Item(channel='shortcuts', title=typo(config.get_localized_string(70286), 'color kod bold'), action='SettingOnPosition', category=3, thumbnail=get_thumb('setting_0.png'))]
 
     itemlist = set_context(itemlist)
 

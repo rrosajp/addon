@@ -2,6 +2,9 @@
 
 #from builtins import str
 import sys
+
+from core.support import typo
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
@@ -27,6 +30,7 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, action="list_tvshows", title=config.get_localized_string(60600),
                          category=config.get_localized_string(70271),
                          thumbnail=get_thumb("videolibrary_tvshow.png")))
+    itemlist.append(Item(channel='shortcuts', action="SettingOnPosition", category=2, setting=0, title=typo(config.get_localized_string(70287),'bold color kod')))
 
     return itemlist
 

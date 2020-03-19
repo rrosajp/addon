@@ -5,6 +5,9 @@
 
 #from builtins import str
 import sys
+
+from core.support import typo
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
@@ -115,6 +118,9 @@ def mainlist(item):
                     thumbnail=thumbnail)
     set_category_context(new_item)
     itemlist.append(new_item)
+
+    itemlist.append(Item(channel='shortcuts', action="SettingOnPosition", category=5, setting=0,
+                         title=typo(config.get_localized_string(70285), 'bold color kod')))
 
     return itemlist
 
