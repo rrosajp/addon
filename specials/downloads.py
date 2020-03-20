@@ -281,7 +281,7 @@ def menu(item):
 
 def move_to_libray(item):
     title = item.fulltitle
-    if config.get_setting('lowerize_title', 'videolibrary'):
+    if config.get_setting("lowerize_title", "videolibrary"):
         title = title.lower()
 
     if item.contentType == 'movie':
@@ -917,7 +917,7 @@ def save_download_tvshow(item):
     if not item.contentSerieName: item.contentSerieName = item.fulltitle
 
     item.downloadFilename = filetools.validate_path("%s [%s]" % (item.contentSerieName, item.infoLabels['IMDBNumber']))
-    if config.get_setting("lowerize_title", "videolibrary") == 0:
+    if config.get_setting("lowerize_title", "videolibrary"):
         item.downloadFilename = item.downloadFilename.lower()
     progreso.update(0, config.get_localized_string(70186), config.get_localized_string(70187) % item.contentChannel)
 

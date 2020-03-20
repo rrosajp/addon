@@ -32,8 +32,8 @@ from core.item import InfoLabels
 from platformcode import config
 from platformcode import logger
 
-addon = xbmcaddon.Addon('metadata.themoviedb.org')
-def_lang = addon.getSetting('language')
+info_language = ["de", "en", "es", "fr", "it", "pt"] # from videolibrary.json
+def_lang = info_language[config.get_setting("info_language", "videolibrary")]
 
 # -----------------------------------------------------------------------------------------------------------
 # Conjunto de funciones relacionadas con las infoLabels.

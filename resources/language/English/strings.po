@@ -26,23 +26,23 @@ msgid "eng"
 msgstr ""
 
 msgctxt "#30001"
-msgid "Check for updates:"
+msgid "Check for updates"
 msgstr ""
 
 msgctxt "#30002"
-msgid "Enable adult mode:"
+msgid "Enable adult mode"
 msgstr ""
 
 msgctxt "#30003"
-msgid "Enable debug logging:"
+msgid "Enable debug logging"
 msgstr ""
 
 msgctxt "#30004"
-msgid "Automatically update channels:"
+msgid "Automatically update channels"
 msgstr ""
 
 msgctxt "#30005"
-msgid "Default play setting:"
+msgid "Play mode"
 msgstr ""
 
 msgctxt "#30006"
@@ -58,7 +58,7 @@ msgid "Watch in high quality"
 msgstr ""
 
 msgctxt "#30010"
-msgid "Channel icons view:"
+msgid "Channel icons view"
 msgstr ""
 
 msgctxt "#30011"
@@ -70,23 +70,23 @@ msgid "Banner (horizontal)"
 msgstr ""
 
 msgctxt "#30014"
-msgid "Username:"
+msgid "Username"
 msgstr ""
 
 msgctxt "#30015"
-msgid "Password:"
+msgid "Password"
 msgstr ""
 
 msgctxt "#30017"
-msgid "Download path:"
+msgid "Download path"
 msgstr ""
 
 msgctxt "#30018"
-msgid "Download list path:"
+msgid "Download list path"
 msgstr ""
 
 msgctxt "#30019"
-msgid "Filter channels by language:"
+msgid "Filter channels by language"
 msgstr ""
 
 msgctxt "#30020"
@@ -106,11 +106,11 @@ msgid "NO"
 msgstr ""
 
 msgctxt "#30024"
-msgid "Select the elements you want to display on the Contextual Menu"
+msgid "Contextual menu"
 msgstr ""
 
 msgctxt "#30025"
-msgid "KoD settings"
+msgid "Show KoD settings"
 msgstr ""
 
 msgctxt "#30026"
@@ -126,15 +126,15 @@ msgid "Built-In"
 msgstr ""
 
 msgctxt "#30029"
-msgid "Download and Play"
+msgid "Download and play"
 msgstr ""
 
 msgctxt "#30030"
-msgid "Advanced Options"
+msgid "Advanced options"
 msgstr ""
 
 msgctxt "#30031"
-msgid "Continue Download?"
+msgid "Continue download?"
 msgstr ""
 
 msgctxt "#30032"
@@ -174,11 +174,11 @@ msgid "Do you really want to delete the %s file?"
 msgstr ""
 
 msgctxt "#30043"
-msgid "Force view mode:"
+msgid "Force view mode"
 msgstr ""
 
 msgctxt "#30044"
-msgid "Play mode:"
+msgid "Play mode"
 msgstr ""
 
 msgctxt "#30050"
@@ -206,11 +206,11 @@ msgid "Unsopported Server"
 msgstr ""
 
 msgctxt "#30067"
-msgid "Video library path:"
+msgid "Video library path"
 msgstr ""
 
 msgctxt "#30068"
-msgid "Filter by servers:"
+msgid "Filter by servers"
 msgstr ""
 
 msgctxt "#30100"
@@ -363,7 +363,7 @@ msgid "Faster context menus"
 msgstr ""
 
 msgctxt "#30501"
-msgid "Paths"
+msgid "Path and folders"
 msgstr ""
 
 msgctxt "#30974"
@@ -467,11 +467,11 @@ msgid "Shortcut"
 msgstr ""
 
 msgctxt "#30999"
-msgid "Add key to open Shortcut"
+msgid "Assign key to open shortcut"
 msgstr ""
 
 msgctxt "#31000"
-msgid "Remove key to open Shortcut"
+msgid "Remove key to open shortcut"
 msgstr ""
 
 msgctxt "#50000"
@@ -591,7 +591,7 @@ msgid "Configuration -- Search"
 msgstr ""
 
 msgctxt "#59994"
-msgid "Choose channels to include in your search"
+msgid "Channels included in search"
 msgstr ""
 
 msgctxt "#59995"
@@ -1083,11 +1083,11 @@ msgid "Complete information"
 msgstr ""
 
 msgctxt "#60225"
-msgid "Search in TheMovieDB.org"
+msgid "Search on TMDB"
 msgstr ""
 
 msgctxt "#60226"
-msgid "Search in TheTvDB.org"
+msgid "Search on TVDB"
 msgstr ""
 
 msgctxt "#60227"
@@ -1595,7 +1595,7 @@ msgid "Search Trailer"
 msgstr ""
 
 msgctxt "#60360"
-msgid "Quick Menu"
+msgid "Show quick menu"
 msgstr ""
 
 msgctxt "#60361"
@@ -2163,11 +2163,11 @@ msgid "Kids"
 msgstr ""
 
 msgctxt "#60511"
-msgid "TV show episodes"
+msgid "TV shows"
 msgstr ""
 
 msgctxt "#60512"
-msgid "Anime episodes"
+msgid "Anime"
 msgstr ""
 
 msgctxt "#60513"
@@ -2219,7 +2219,7 @@ msgid " (In %s)"
 msgstr ""
 
 msgctxt "#60525"
-msgid "Channels included in:"
+msgid "Included channels by category"
 msgstr ""
 
 msgctxt "#60526"
@@ -2511,7 +2511,7 @@ msgid "At the start of Kodi and once a day"
 msgstr ""
 
 msgctxt "#60606"
-msgid "    Wait before updating at startup of Kodi"
+msgid "      Wait before updating at startup of Kodi"
 msgstr ""
 
 msgctxt "#60607"
@@ -2535,11 +2535,11 @@ msgid "60 sec"
 msgstr ""
 
 msgctxt "#60613"
-msgid "    Begin scheduled update from"
+msgid "      Begin scheduled update from"
 msgstr ""
 
 msgctxt "#60614"
-msgid "    Search for new episodes in active TV shows"
+msgid "      Search for new episodes in active TV shows"
 msgstr ""
 
 msgctxt "#60615"
@@ -2555,7 +2555,7 @@ msgid "According to new episodes"
 msgstr ""
 
 msgctxt "#60618"
-msgid "    Search for content in"
+msgid "      Search for content in"
 msgstr ""
 
 msgctxt "#60619"
@@ -2571,7 +2571,7 @@ msgid "Show links in"
 msgstr ""
 
 msgctxt "#60622"
-msgid "Conventional window"
+msgid "Normal window"
 msgstr ""
 
 msgctxt "#60623"
@@ -2579,7 +2579,7 @@ msgid "Pop-up window"
 msgstr ""
 
 msgctxt "#60624"
-msgid "    Maximum number of links to display (recommended for slow devices)"
+msgid "      Maximum number of links to display"
 msgstr ""
 
 msgctxt "#60625"
@@ -2587,35 +2587,27 @@ msgid "All"
 msgstr ""
 
 msgctxt "#60626"
-msgid "    Sort by whitelist"
+msgid "      Sort by whitelist"
 msgstr ""
 
 msgctxt "#60627"
-msgid "    Remove the channel name at the beginning"
+msgid "      Remove the channel name at the beginning"
 msgstr ""
 
 msgctxt "#60628"
-msgid "    Pop-up window: Replace \'View in\' with \'[V]\' and \'Download in\' with \'[D]\'"
+msgid "      Replace \'View in\' with \'[V]\' and \'Download in\' with \'[D]\'"
 msgstr ""
 
 msgctxt "#60629"
-msgid "Database location"
-msgstr ""
-
-msgctxt "#60630"
-msgid "Local"
-msgstr ""
-
-msgctxt "#60631"
-msgid "Remote"
-msgstr ""
+msgid "Remote database"
+msgstr "Database remoto"
 
 msgctxt "#60632"
-msgid "    Server Name"
+msgid "        Server name"
 msgstr ""
 
 msgctxt "#60633"
-msgid "    Server port"
+msgid "        Server port"
 msgstr ""
 
 msgctxt "#60634"
@@ -2623,7 +2615,7 @@ msgid "Automatically mark as watched"
 msgstr ""
 
 msgctxt "#60635"
-msgid "    Video viewing time"
+msgid "      Video viewing time"
 msgstr ""
 
 msgctxt "#60636"
@@ -2635,23 +2627,23 @@ msgid "Synchronizing with Trakt"
 msgstr ""
 
 msgctxt "#60638"
-msgid "    After mark as watched the episode"
+msgid "      After mark as watched the episode"
 msgstr ""
 
 msgctxt "#60639"
-msgid "        Show notification"
+msgid "      Show notification"
 msgstr ""
 
 msgctxt "#60640"
-msgid "    On adding a TV show to the video library"
+msgid "      On adding a TV show to the video library"
 msgstr ""
 
 msgctxt "#60641"
-msgid "        Wait until the TV show is added"
+msgid "      Wait until the TV show is added"
 msgstr ""
 
 msgctxt "#60642"
-msgid "Show option \"All Seasons\"."
+msgid "Show option \'All Seasons\'"
 msgstr ""
 
 msgctxt "#60643"
@@ -2667,35 +2659,27 @@ msgid "Show channel selection box"
 msgstr ""
 
 msgctxt "#60646"
-msgid "Create directories on your system using"
-msgstr ""
-
-msgctxt "#60647"
-msgid "Localized title"
+msgid "Create folders using original title"
 msgstr ""
 
 msgctxt "#60648"
 msgid "Never"
 msgstr ""
 
-msgctxt "#60649"
-msgid "Original title"
-msgstr ""
-
 msgctxt "#60650"
-msgid "When you add content, you get information from:"
+msgid "Video library information provider"
 msgstr ""
 
 msgctxt "#60651"
-msgid "    Movies:"
+msgid "      Movies"
 msgstr ""
 
 msgctxt "#60652"
-msgid "    TV show:"
+msgid "      TV show"
 msgstr ""
 
 msgctxt "#60653"
-msgid "        If there are no results also search in English"
+msgid "      If there are no results search in English"
 msgstr ""
 
 msgctxt "#60654"
@@ -2711,7 +2695,7 @@ msgid "Simultaneous search (multiprocessing)"
 msgstr ""
 
 msgctxt "#60657"
-msgid "Show Results:"
+msgid "Show results"
 msgstr ""
 
 msgctxt "#60658"
@@ -2731,7 +2715,7 @@ msgid "News"
 msgstr ""
 
 msgctxt "#60662"
-msgid "code cleaning"
+msgid "      Language"
 msgstr ""
 
 msgctxt "#60663"
@@ -2775,7 +2759,7 @@ msgid "Global Search"
 msgstr ""
 
 msgctxt "#60673"
-msgid "Number of Search Threads"
+msgid "Number of search threads"
 msgstr ""
 
 msgctxt "#60674"
@@ -3243,7 +3227,7 @@ msgid "Icons set"
 msgstr ""
 
 msgctxt "#70109"
-msgid "Sync with Trakt.tv (You must have an account)"
+msgid "Syncronize with Trakt.tv"
 msgstr ""
 
 msgctxt "#70110"
@@ -3251,7 +3235,7 @@ msgid "Priority Method"
 msgstr ""
 
 msgctxt "#70111"
-msgid "Stop looking when you find an option"
+msgid "Stop search when find an option"
 msgstr ""
 
 msgctxt "#70112"
@@ -3271,19 +3255,19 @@ msgid "Request password to open adult channels"
 msgstr ""
 
 msgctxt "#70116"
-msgid "New password:"
+msgid "New password"
 msgstr ""
 
 msgctxt "#70117"
-msgid "Confirm New password:"
+msgid "Confirm new password"
 msgstr ""
 
 msgctxt "#70118"
-msgid "Folder name for TV shows"
+msgid "TV shows folder
 msgstr ""
 
 msgctxt "#70119"
-msgid "Folder name for movies"
+msgid "Movies folder"
 msgstr ""
 
 msgctxt "#70120"
@@ -3291,15 +3275,15 @@ msgid "Add KoD content to Kodi video library"
 msgstr ""
 
 msgctxt "#70121"
-msgid "Activate Home Page"
+msgid "Activate"
 msgstr ""
 
 msgctxt "#70122"
-msgid "Custom (select from a channel)"
+msgid "Show channel (select it from homepage)"
 msgstr ""
 
 msgctxt "#70123"
-msgid "Show Recent"
+msgid "Show news"
 msgstr ""
 
 msgctxt "#70124"
@@ -3403,35 +3387,35 @@ msgid "Others"
 msgstr ""
 
 msgctxt "#70150"
-msgid "Movie/TV show info in contextual menu"
+msgid "Contextual menu"
 msgstr ""
 
 msgctxt "#70151"
-msgid "Show Infoplus option:"
+msgid "Show Infoplus"
 msgstr ""
 
 msgctxt "#70152"
-msgid "Show ExtendedInfo option (External addon required):"
+msgid "Show ExtendedInfo"
 msgstr ""
 
 msgctxt "#70153"
-msgid "Buttons/Access keys (changes require Kodi restart)"
+msgid "KoD shortcut"
 msgstr ""
 
 msgctxt "#70154"
-msgid "TheMovieDB (obtains data for movies or TV shows)"
+msgid "TMDB search options"
 msgstr ""
 
 msgctxt "#70155"
-msgid "Simultaneous searches (may cause instability)"
+msgid "Simultaneous searches"
 msgstr ""
 
 msgctxt "#70156"
-msgid "Search extended information (actor's data) Increase search time"
+msgid "Search actor's information"
 msgstr ""
 
 msgctxt "#70157"
-msgid "Use cache (improves recurring searches)"
+msgid "Use cache"
 msgstr ""
 
 msgctxt "#70158"
@@ -3455,7 +3439,7 @@ msgid "Renew cache?"
 msgstr ""
 
 msgctxt "#70163"
-msgid "Press to 'Clear cache' saved"
+msgid "Clear cache"
 msgstr ""
 
 msgctxt "#70164"
@@ -3731,7 +3715,7 @@ msgid "Move the downloaded file to the video library"
 msgstr ""
 
 msgctxt "#70232"
-msgid "View files downloaded from downloads"
+msgid "View downloaded files
 msgstr ""
 
 msgctxt "#70233"
@@ -3767,7 +3751,7 @@ msgid "The highest"
 msgstr ""
 
 msgctxt "#70242"
-msgid "Choose the fastest servers"
+msgid "Choose fastest servers"
 msgstr ""
 
 msgctxt "#70243"
@@ -3931,19 +3915,19 @@ msgid "%.2f%% of %.1fMB %s | %.1f kB/s"
 msgstr ""
 
 msgctxt "#70285"
-msgid "Configure News"
+msgid "Configure news"
 msgstr ""
 
 msgctxt "#70286"
-msgid "Configure Search"
+msgid "Configure search"
 msgstr ""
 
 msgctxt "#70287"
-msgid "Configure VideoLibrary"
+msgid "Configure video library"
 msgstr ""
 
 msgctxt "#70288"
-msgid "Configure Downloads"
+msgid "Configure downloads"
 msgstr ""
 
 msgctxt "#70291"
@@ -5031,11 +5015,11 @@ msgid "Italian"
 msgstr ""
 
 msgctxt "#70564"
-msgid "Enable Custom Theme"
+msgid "Enable custom theme"
 msgstr ""
 
 msgctxt "#70565"
-msgid "Custom Theme Path"
+msgid "Custom theme path"
 msgstr ""
 
 msgctxt "#70566"
@@ -5087,15 +5071,15 @@ msgid "Modify starting from "
 msgstr ""
 
 msgctxt "#70578"
-msgid "To avoid waiting too long when a server does not respond:"
+msgid "Torrents"
 msgstr ""
 
 msgctxt "#70579"
-msgid "Settings of KoD updates"
+msgid "KoD update"
 msgstr ""
 
 msgctxt "#70580"
-msgid "Timeout (maximum waiting time)"
+msgid "Server answer timeout (seconds)"
 msgstr ""
 
 msgctxt "#70581"
@@ -5103,7 +5087,7 @@ msgid "Check for updates"
 msgstr ""
 
 msgctxt "#70582"
-msgid "Do you want to be notified?"
+msgid "Updates notification"
 msgstr ""
 
 msgctxt "#70583"
@@ -5542,7 +5526,7 @@ msgid "Are there special episodes in the TV show \n(Episode 0 Excluded)?"
 msgstr ""
 
 msgctxt "#70689"
-msgid "Enable Download"
+msgid "Enable download"
 msgstr ""
 
 msgctxt "#70690"
@@ -5594,7 +5578,7 @@ msgid "Restart Kodi to apply the changes"
 msgstr ""
 
 msgctxt "#70703"
-msgid "Create directories with lowercase letters"
+msgid "Create folders with lowercase letters"
 msgstr ""
 
 msgctxt "#70704"
@@ -5638,11 +5622,11 @@ msgid "Modify "
 msgstr " "
 
 msgctxt "#70715"
-msgid "Customize Homepage"
+msgid "Customized homepage"
 msgstr ""
 
 msgctxt "#70716"
-msgid "Select the elements you want to display on the Homepage"
+msgid "Homepage categories"
 msgstr ""
 
 msgctxt "#70717"
@@ -5726,7 +5710,7 @@ msgid "Completed TV show"
 msgstr ""
 
 msgctxt "#70737"
-msgid "Side Menu"
+msgid "Show side menu"
 msgstr ""
 
 msgctxt "#70738"
@@ -5918,7 +5902,7 @@ msgid "Attention!!"
 msgstr "Attenzione!"
 
 msgctxt "#70785"
-msgid "Install external torrent client (Quasar)"
+msgid "Install Quasar"
 msgstr ""
 
 
@@ -5984,7 +5968,7 @@ msgid "You have not selected any choice, the cloudflare DNS will be used."
 msgstr ""
 
 msgctxt "#707416"
-msgid "how often you want to check for updates? (hours)"
+msgid "Updates check interval (hours)"
 msgstr ""
 
 msgctxt "#707417"

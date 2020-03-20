@@ -32,8 +32,8 @@ from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
 
-addon = xbmcaddon.Addon('metadata.themoviedb.org')
-def_lang = addon.getSetting('language')
+info_language = ["de", "en", "es", "fr", "it", "pt"] # from videolibrary.json
+def_lang = info_language[config.get_setting("info_language", "videolibrary")]
 
 result = None
 window_select = []

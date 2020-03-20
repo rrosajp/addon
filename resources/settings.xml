@@ -2,7 +2,7 @@
 <settings>
     <!-- General -->
     <category label="70168">
-        <setting id="autostart" type="action" label="70706" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAiYXV0b3N0YXJ0IiwNCiAgICAiY2hhbm5lbCI6ICJzZXR0aW5nIg0KfQ==)" default='707432'/>
+        <setting id="autostart" type="action" label="70706" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAiYXV0b3N0YXJ0IiwNCiAgICAiY2hhbm5lbCI6ICJzZXR0aW5nIg0KfQ==)" default="707432"/>
         <setting type="sep"/>
         <setting id="thumbnail_type" type="select" lvalues="30011|30012|30200" label="30010" default="2"/>
         <setting id="channel_language" type="select" values="auto|all|ita" label="30019" default="all"/>
@@ -19,19 +19,18 @@
         <setting id="player_mode" type="select" lvalues="30026|30027|30028|30029" label="30044" default="1"/>
         <setting id="default_action" type="select" lvalues="30006|30007|30008" label="30005" default="0"/>
         <setting id="autoplay" type="bool" label="70562" default="false" visible="true"/>
-        <setting id="hide_servers" type="bool" label="70747" default="false" visible="eq(-1,true)"/>
+        <setting id="hide_servers" type="bool" label="70747" default="false" visible="eq(-1,true)" subsetting="true"/>
         <setting id="checklinks" type="bool" label="30020" default="false"/>
-        <setting id="checklinks_number" type="slider" option="int" range="5,5,20" label="30021" default="5" visible="eq(-1,true)"/>
+        <setting id="checklinks_number" type="slider" option="int" range="5,5,20" label="30021" default="5" visible="eq(-1,true)" subsetting="true"/>
     </category>
 
     <!-- Videolibrary -->
     <category label="30131">
         <setting label="30501" type="lsep"/>
         <setting id="videolibrarypath" type="action" label="30067" action="RunPlugin(plugin://plugin.video.kod/?ew0KCSJjaGFubmVsIjoibW92ZV92aWRlb2xpYnJhcnkiLA0KCSJhY3Rpb24iOiJzZXRfdmlkZW9saWJyYXJ5X3BhdGgiDQp9)" default="special://profile/addon_data/plugin.video.kod/videolibrary"/>
-
         <!-- <setting id="videolibrarypath" type="folder" label="30067" default="special://profile/addon_data/plugin.video.kod/videolibrary"/> -->
-        <setting id="folder_tvshows" type="text" label="70118" default="SERIES" subsetting="true"/>
-        <setting id="folder_movies" type="text" label="70119" default="CINE" subsetting="true"/>
+        <setting id="folder_tvshows" type="text" label="70118" default="SERIES"/>
+        <setting id="folder_movies" type="text" label="70119" default="CINE"/>
 
         <setting label="59997" type="lsep"/>
         <setting id="videolibrary_kodi_flag" type="number" label="" default="0" visible="false"/>
@@ -105,11 +104,11 @@
         <setting id="enable_fav_menu" label="30102" type="bool" default="true"/>
         <setting id="enable_library_menu" label="30131" type="bool" default="true"/>
         <!-- Custom Start -->
-        <setting label="70121" type="lsep"/>
+        <setting label="70715" type="lsep"/>
         <setting id="start_page" type="bool" label="70121" default="false"/>
-        <setting id="custom_start" type="bool" label="70122" default="false" visible="eq(-1,True)"/>
-        <setting id="news_start" type="bool" label="70123" default="false" visible="eq(-2,True)" enable="eq(-1,False)+eq(-2,True"/>
-        <setting id="category" type="action" label="70124" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJzZWxlY3QiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkiaWQiOiJjYXRlZ29yeSIsDQoJInR5cGUiOiJsYWJlbHMiLA0KCSJ2YWx1ZXMiOiI3MDEzN3wzMDEyM3wzMDEyNHw2MDUxMyIsDQoJImxhYmVsIjoiNzAxMjQiDQp9)" visible="eq(-3,True)+eq(-1,True)+eq(-2,False)" enable="eq(-3,True)+eq(-1,True)+(-2,false)"/>
+        <setting id="custom_start" type="bool" label="70122" default="false" visible="eq(-1,True)" enable="eq(-1,True)+eq(1,False)" subsetting="true"/>
+        <setting id="news_start" type="bool" label="70123" default="false" visible="eq(-2,True)" enable="eq(-1,False)+eq(-2,True)" subsetting="true"/>
+        <setting id="category" type="action" label="70124" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJzZWxlY3QiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkiaWQiOiJjYXRlZ29yeSIsDQoJInR5cGUiOiJsYWJlbHMiLA0KCSJ2YWx1ZXMiOiI3MDEzN3wzMDEyM3wzMDEyNHw2MDUxMyIsDQoJImxhYmVsIjoiNzAxMjQiDQp9)" visible="eq(-3,True)+eq(-1,True)+eq(-2,False)" enable="eq(-3,True)+eq(-1,True)+eq(-2,False)" subsetting="true"/>
         <!-- <setting id="category" type="select" label="70124" lvalues="70137|30123|30124|60513" default="Film" visible="eq(-3,True)+eq(-1,True)+eq(-2,False)" enable="eq(-3,True)+eq(-1,True)+(-2,false)"/> -->
     </category>
 
@@ -124,13 +123,13 @@
         <setting id="resolve_priority" type="select" label="70110" lvalues="70164|70165|70166" default="0"/>
         <setting id="resolve_stop" type="bool" label="70111" default="true"/>
         <setting id="hidepremium" type="bool" label="70112" default="false"/>
-        <setting label="70578" type="lsep"/>
         <setting id="httptools_timeout" type="slider" option="int" range="0,5,120" label="70580" default="15"/>
-        <setting label="60538" type="lsep"/>
+        <setting label="70145" type="lsep"/>
         <setting id="servers_favorites" type="action" label="60551" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAic2VydmVyc19mYXZvcml0ZXMiLA0KICAgICJjaGFubmVsIjogInNldHRpbmciDQp9==)"/>
         <setting id="servers_blacklist" type="action" label="60550" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAic2VydmVyc19ibGFja2xpc3QiLA0KICAgICJjaGFubmVsIjogInNldHRpbmciDQp9==)"/>
         <setting id="servers_config" type="action" label="60538" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAic2VydmVyc19tZW51IiwNCiAgICAiY2hhbm5lbCI6ICJzaG9ydGN1dHMiDQp9==)"/>
         <setting id="debriders_config" type="action" label="60552" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAic2VydmVyc19tZW51IiwNCiAgICAiY2hhbm5lbCI6ICJzaG9ydGN1dHMiLA0KCSJ0eXBlIjogImRlYnJpZGVycyINCn0==)"/>
+        <setting label="70578" type="lsep"/>
         <setting id="torrent_config" type="action" label="70253" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJzZXR0aW5nX3RvcnJlbnQiLA0KICAgICJjaGFubmVsIjoic2V0dGluZyINCn0=)"/>
         <setting id="quasar_install" type="action" label="70785" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJkb3dubG9hZCIsDQogICAgImNoYW5uZWwiOiJxdWFzYXJfZG93bmxvYWQiDQp9)"/>
     </category>

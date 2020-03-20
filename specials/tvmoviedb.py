@@ -18,8 +18,8 @@ from core import trakt_tools
 from platformcode import config, logger
 from platformcode import platformtools
 
-addon = xbmcaddon.Addon('metadata.themoviedb.org')
-def_lang = addon.getSetting('language')
+info_language = ["de", "en", "es", "fr", "it", "pt"] # from videolibrary.json
+def_lang = info_language[config.get_setting("info_language", "videolibrary")]
 
 langs = ['auto', 'de', 'fr', 'pt', 'it', 'es-MX', 'ca', 'en', 'es']
 langt = langs[config.get_setting('tmdb', "tvmoviedb")]

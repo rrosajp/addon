@@ -13,8 +13,8 @@ from channelselector import get_thumb
 from specials import shortcuts
 CONTEXT = shortcuts.context()
 
-addon = xbmcaddon.Addon('metadata.themoviedb.org')
-lang = addon.getSetting('language')
+info_language = ["de", "en", "es", "fr", "it", "pt"] # from videolibrary.json
+lang = info_language[config.get_setting("info_language", "videolibrary")]
 
 defpage = ["", "20", "40", "60", "80", "100"]
 defp = defpage[config.get_setting('pagination','community')]

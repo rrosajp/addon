@@ -130,7 +130,7 @@ def save_movie(item):
     # progress dialog
     p_dialog = platformtools.dialog_progress(config.get_localized_string(20000), config.get_localized_string(60062))
 
-    if config.get_setting("original_title_folder", "videolibrary") == 1 and item.infoLabels['originaltitle']:
+    if config.get_setting("original_title_folder", "videolibrary") and item.infoLabels['originaltitle']:
         base_name = item.infoLabels['originaltitle']
     else:
         base_name = item.contentTitle
@@ -140,7 +140,7 @@ def save_movie(item):
     else:
         base_name = filetools.validate_path(base_name.replace('/', '-'))
 
-    if config.get_setting("lowerize_title", "videolibrary") == 0:
+    if config.get_setting("lowerize_title", "videolibrary"):
         base_name = base_name.lower()
 
     for raiz, subcarpetas, ficheros in filetools.walk(MOVIES_PATH):
@@ -465,7 +465,7 @@ def save_tvshow(item, episodelist):
                         + ' / ' + item.infoLabels['code'])
             return 0, 0, -1, path
 
-    if config.get_setting("original_title_folder", "videolibrary") == 1 and item.infoLabels['originaltitle']:
+    if config.get_setting("original_title_folder", "videolibrary") and item.infoLabels['originaltitle']:
         base_name = item.infoLabels['originaltitle']
     elif item.infoLabels['tvshowtitle']:
         base_name = item.infoLabels['tvshowtitle']
@@ -479,7 +479,7 @@ def save_tvshow(item, episodelist):
     else:
         base_name = filetools.validate_path(base_name.replace('/', '-'))
 
-    if config.get_setting("lowerize_title", "videolibrary") == 0:
+    if config.get_setting("lowerize_title", "videolibrary"):
         base_name = base_name.lower()
 
     for raiz, subcarpetas, ficheros in filetools.walk(TVSHOWS_PATH):
