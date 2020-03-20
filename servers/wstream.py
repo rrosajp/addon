@@ -23,7 +23,7 @@ def test_video_exists(page_url):
     page_url = resp.url
     if '/streaming.php' in page_url in page_url:
         code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers['location'].split('/')[-1].replace('.html', '')
-        logger.info('WCODE=' + code)
+        # logger.info('WCODE=' + code)
         page_url = 'https://wstream.video/video.php?file_code=' + code
         data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True).data
 
@@ -58,13 +58,13 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     logger.info("[Wstream] url=" + page_url)
     video_urls = []
     global data, real_url
-    logger.info(data)
+    # logger.info(data)
     sitekey = scrapertools.find_multiple_matches(data, """data-sitekey=['"] *([^"']+)""")
     if sitekey: sitekey = sitekey[-1]
     captcha = platformtools.show_recaptcha(sitekey, page_url) if sitekey else ''
 
     possibleParam = scrapertools.find_multiple_matches(data,r"""<input.*?(?:name=["']([^'"]+).*?value=["']([^'"]*)['"]>|>)""")
-    if possibleParam:
+    if possibleParam and possibleParam[0]:
         post = {param[0]: param[1] for param in possibleParam if param[0]}
         if captcha: post['g-recaptcha-response'] = captcha
         if post:
