@@ -152,6 +152,7 @@ def enable_disable_autorun(is_enabled):
     if is_enabled is False:
         with open(path, append_write) as file: 
             file.write("import xbmc\nxbmc.executebuiltin('XBMC.RunAddon(plugin.video.kod)')")
+        set_setting('autostart', get_localized_string(707431))
     else:
         file = open(path, "r")
         old_content = file.read() 
@@ -159,6 +160,7 @@ def enable_disable_autorun(is_enabled):
         file.close()
         with open(path, "w") as file:
             file.write(new_content)
+        set_setting('autostart', get_localized_string(707432))
     return True
 
 def get_all_settings_addon():
