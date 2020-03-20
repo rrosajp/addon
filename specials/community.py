@@ -187,7 +187,7 @@ def peliculas(item, json='', key='', itemlist=[]):
 
         title = option['title'] if 'title' in option else ''
 
-        if 'tvshows_list' in key:
+        if 'tvshows_list' in key and 'links' not in option:
             action = 'episodios'
 
         # filter elements
@@ -461,17 +461,20 @@ def get_sub_menu(item, json, key, itemlist=[]):
 
 def get_search_menu(item, json='', itemlist=[], channel_name=''):
     support.log()
-    if channel_name:
+    if 'title' in json:
+        title = json['title']
+    elif channel_name:
         title = 'Cerca in ' + channel_name + '...'
     else:
         title = 'Cerca ' + item.fulltitle + '...'
     extra = set_extra_values(item, json, item.path)
+    support.log('EXTRA',extra)
 
     itemlist.append(Item(channel=item.channel,
                          title=support.typo(title,'submenu bold'),
                          fulltitle=title,
                          show=title,
-                         thumbnail=extra.thumb if extra.thumb else get_thumb('search.png'),
+                         thumbnail=extra.thumb,
                          faneart=extra.fanart if extra.fanart else item.fanart,
                          plot=extra.plot,
                          action='search',
@@ -618,7 +621,11 @@ def set_extra_values(item, json, path):
             ret.filterkey = filterkey
 
     if not ret.thumb:
-        ret.thumb = item.thumbnail
+        support.log('STACK=',inspect.stack()[1][3])
+        if 'get_search_menu' in inspect.stack()[1][3]:
+            ret.thumb = get_thumb('search.png')
+        else:
+            ret.thumb = item.thumbnail
     if not ret.fanart:
         ret.fanart = item.fanart
     if not ret.plot:
