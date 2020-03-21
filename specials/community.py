@@ -487,8 +487,8 @@ def get_search_menu(item, json='', itemlist=[], channel_name=''):
     return itemlist
 
 
-def submenu(item, json, key, itemlist = []):
-    support.log()
+def submenu(item, json, key, itemlist = [], filter_list = []):
+    support.log(item)
     import sys
     if sys.version_info[0] >= 3:
         from concurrent import futures
@@ -505,23 +505,41 @@ def submenu(item, json, key, itemlist = []):
     else:
         description = None
 
-    filter_list = []
-    for option in json[key]:
-        if item.filterkey in option and option[item.filterkey]:
-            if type(option[item.filterkey]) == str and option[item.filterkey] not in filter_list:
-                filter_list.append(option[item.filterkey])
-            elif type(option[item.filterkey]) == list:
-                for f in option[item.filterkey]:
-                    if f not in filter_list:
-                        filter_list.append(f)
+    if item.thumb: item.thumbnail = item.thumb
 
-    filter_list.sort()
+    if not filter_list:
+        for option in json[key]:
+            if item.filterkey in option and option[item.filterkey]:
+                if type(option[item.filterkey]) == str and option[item.filterkey] not in filter_list:
+                    filter_list.append(option[item.filterkey])
+                elif type(option[item.filterkey]) == list:
+                    for f in option[item.filterkey]:
+                        if f not in filter_list:
+                            filter_list.append(f)
+
+        filter_list.sort()
+
+    Pagination = int(defp) if defp.isdigit() else ''
+    pag = item.page if item.page else 1
+    filters = []
+    for i, filter in enumerate(filter_list):
+        if Pagination and (pag - 1) * Pagination > i: continue  # pagination
+        if Pagination and i >= pag * Pagination: break
+        filters.append(filter)
 
     with futures.ThreadPoolExecutor() as executor:
-        List = [executor.submit(filter_thread, filter, key, item, description) for filter in filter_list]
+        List = [executor.submit(filter_thread, filter, key, item, description) for filter in filters]
         for res in futures.as_completed(List):
             if res.result():
                 itemlist.append(res.result())
+
+    if Pagination and len(itemlist) >= Pagination:
+        item.title = support.typo(config.get_localized_string(30992), 'color kod bold')
+        item.page = pag + 1
+        item.thumb = item.thumbnail
+        item.thumbnail = support.thumb()
+        itemlist.append(item)
+
     itemlist = sorted(itemlist, key=lambda it: it.title)
     return itemlist
 
@@ -534,6 +552,7 @@ def filter_thread(filter, key, item, description):
     if item.filterkey in ['actors', 'director']:
         dict_ = {'url': 'search/person', 'language': lang, 'query': filter, 'page': 1}
         tmdb_inf = tmdb.discovery(item, dict_=dict_)
+        id = None
         if tmdb_inf.results:
             results = tmdb_inf.results[0]
             id = results['id']
