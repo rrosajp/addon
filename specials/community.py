@@ -530,7 +530,7 @@ def submenu(item, json, key, itemlist = []):
 
 # filter results
 def filter_thread(filter, key, item, description):
-    thumbnail = plot = fanart = None
+    thumbnail = plot = fanart = ''
     if item.filterkey in ['actors', 'director']:
         dict_ = {'url': 'search/person', 'language': lang, 'query': filter, 'page': 1}
         tmdb_inf = tmdb.discovery(item, dict_=dict_)
@@ -555,7 +555,7 @@ def filter_thread(filter, key, item, description):
                 media_type=item.media_type,
                 action='peliculas',
                 thumbnail=thumbnail if thumbnail else item.thumbnail,
-                fanart=thumbnail if thumbnail else item.thumbnail,
+                fanart=fanart if fanart else item.fanart,
                 plot=plot if plot else item.plot,
                 path=item.path,
                 filterkey=item.filterkey,
