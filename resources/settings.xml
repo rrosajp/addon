@@ -2,7 +2,7 @@
 <settings>
     <!-- General -->
     <category label="70168">
-        <setting id="autostart" type="action" label="70706" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAiYXV0b3N0YXJ0IiwNCiAgICAiY2hhbm5lbCI6ICJzZXR0aW5nIg0KfQ==)" default="707432"/>
+        <setting id="autostart" type="action" label="70706" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAiYXV0b3N0YXJ0IiwNCiAgICAiY2hhbm5lbCI6ICJzZXR0aW5nIg0KfQ==)" default="OFF"/>
         <setting type="sep"/>
         <setting id="thumbnail_type" type="select" lvalues="30011|30012|30200" label="30010" default="2"/>
         <setting id="channel_language" type="select" values="auto|all|ita" label="30019" default="all"/>
