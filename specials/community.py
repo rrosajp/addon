@@ -446,7 +446,8 @@ def get_sub_menu(item, json, key, itemlist=[]):
                       action = 'show_menu',
                       menu = level2 if not item.menu else None,
                       filterkey = filterkey,
-                      context = CONTEXT)
+                      context = CONTEXT,
+                      description = extra.description)
             itemlist.append(it)
 
         if 'search' in option:
@@ -468,7 +469,6 @@ def get_search_menu(item, json='', itemlist=[], channel_name=''):
     else:
         title = 'Cerca ' + item.fulltitle + '...'
     extra = set_extra_values(item, json, item.path)
-    support.log('EXTRA',extra)
 
     itemlist.append(Item(channel=item.channel,
                          title=support.typo(title,'submenu bold'),
@@ -488,11 +488,22 @@ def get_search_menu(item, json='', itemlist=[], channel_name=''):
 
 
 def submenu(item, json, key, itemlist = []):
+    support.log()
     import sys
     if sys.version_info[0] >= 3:
         from concurrent import futures
     else:
         from concurrent_py2 import futures
+
+    if item.description:
+        if type(item.description) == dict:
+            description = item.description
+        else:
+            if ':/' in item.description: url = item.description
+            else: url = filetools.join(item.path, item.description)
+            description = load_json(url)
+    else:
+        description = None
 
     filter_list = []
     for option in json[key]:
@@ -507,7 +518,7 @@ def submenu(item, json, key, itemlist = []):
     filter_list.sort()
 
     with futures.ThreadPoolExecutor() as executor:
-        List = [executor.submit(filter_thread, filter, key, item) for filter in filter_list]
+        List = [executor.submit(filter_thread, filter, key, item, description) for filter in filter_list]
         for res in futures.as_completed(List):
             if res.result():
                 itemlist.append(res.result())
@@ -518,9 +529,8 @@ def submenu(item, json, key, itemlist = []):
 ################################   Filter results   ################################
 
 # filter results
-def filter_thread(filter, key, item):
-    thumbnail = ''
-    plot = ''
+def filter_thread(filter, key, item, description):
+    thumbnail = plot = fanart = None
     if item.filterkey in ['actors', 'director']:
         dict_ = {'url': 'search/person', 'language': lang, 'query': filter, 'page': 1}
         tmdb_inf = tmdb.discovery(item, dict_=dict_)
@@ -532,13 +542,21 @@ def filter_thread(filter, key, item):
             json_file = httptools.downloadpage('http://api.themoviedb.org/3/person/'+ str(id) + '?api_key=' + tmdb_api + '&language=en', use_requests=True).data
             plot += jsontools.load(json_file)['biography']
 
+    if description:
+        if filter in description:
+            extra = set_extra_values(item, description[filter], item.path)
+            thumbnail = extra.thumb if extra.thumb else item.thumbnail
+            fanart = extra.fanart if extra.fanart else item.fanart
+            plot = extra.plot if extra.plot else item.plot
+
     item = Item(channel=item.channel,
                 title=support.typo(filter, 'bold'),
                 url=item.url,
                 media_type=item.media_type,
                 action='peliculas',
-                thumbnail=thumbnail,
-                plot=plot,
+                thumbnail=thumbnail if thumbnail else item.thumbnail,
+                fanart=thumbnail if thumbnail else item.thumbnail,
+                plot=plot if plot else item.plot,
                 path=item.path,
                 filterkey=item.filterkey,
                 filter=filter,
@@ -619,9 +637,10 @@ def set_extra_values(item, json, path):
             filterkey = json[key].keys()[0]
             ret.filter = json[key][filterkey]
             ret.filterkey = filterkey
+        elif key == 'description':
+            ret.description = json[key]
 
     if not ret.thumb:
-        support.log('STACK=',inspect.stack()[1][3])
         if 'get_search_menu' in inspect.stack()[1][3]:
             ret.thumb = get_thumb('search.png')
         else:
