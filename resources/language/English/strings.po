@@ -42,7 +42,7 @@ msgid "Automatically update channels"
 msgstr ""
 
 msgctxt "#30005"
-msgid "Play mode"
+msgid "Video quality"
 msgstr ""
 
 msgctxt "#30006"
@@ -50,11 +50,11 @@ msgid "Ask"
 msgstr ""
 
 msgctxt "#30007"
-msgid "Watch in low quality"
+msgid "Low"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Watch in high quality"
+msgid "High"
 msgstr ""
 
 msgctxt "#30010"
@@ -206,7 +206,7 @@ msgid "Unsopported Server"
 msgstr ""
 
 msgctxt "#30067"
-msgid "Video library path"
+msgid "Path"
 msgstr ""
 
 msgctxt "#30068"
@@ -286,7 +286,7 @@ msgid "Adult"
 msgstr ""
 
 msgctxt "#30130"
-msgid "Recent"
+msgid "News"
 msgstr ""
 
 msgctxt "#30131"
@@ -1483,7 +1483,7 @@ msgid "Restart Kodi to apply changes"
 msgstr ""
 
 msgctxt "#60327"
-msgid "Novelties"
+msgid "News"
 msgstr ""
 
 msgctxt "#60328"
@@ -3231,7 +3231,7 @@ msgid "Syncronize with Trakt.tv"
 msgstr ""
 
 msgctxt "#70110"
-msgid "Priority Method"
+msgid "Priority method"
 msgstr ""
 
 msgctxt "#70111"
@@ -3263,7 +3263,7 @@ msgid "Confirm new password"
 msgstr ""
 
 msgctxt "#70118"
-msgid "TV shows folder
+msgid "TV shows folder"
 msgstr ""
 
 msgctxt "#70119"
@@ -3715,7 +3715,7 @@ msgid "Move the downloaded file to the video library"
 msgstr ""
 
 msgctxt "#70232"
-msgid "View downloaded files
+msgid "View downloaded files"
 msgstr ""
 
 msgctxt "#70233"
@@ -3747,7 +3747,7 @@ msgid "Preferred quality"
 msgstr ""
 
 msgctxt "#70241"
-msgid "The highest"
+msgid "Highest"
 msgstr ""
 
 msgctxt "#70242"
@@ -5590,7 +5590,7 @@ msgid "Use your custom channel URLs"
 msgstr ""
 
 msgctxt "#70706"
-msgid "Start KoD at Kodi boot"
+msgid "Launch KoD at Kodi start"
 msgstr ""
 
 msgctxt "#70707"
