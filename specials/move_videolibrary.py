@@ -10,20 +10,26 @@ from xml.dom import minidom
 global p
 p = 0
 progress = platformtools.dialog_progress('Spostamento Videoteca','Spostamento File')
-progress.update(p, '')
+
+
+
 
 def set_videolibrary_path(item):
     log()
+    global p
     previous_path = config.get_setting('videolibrarypath')
     path = xbmcgui.Dialog().browse(3, 'Seleziona la cartella', 'files', '', False, False, config.get_setting('videolibrarypath'))
     log('New Videolibrary path:', path)
     log('Previous Videolibrary path:', previous_path)
     if path != previous_path:
         config.set_setting('videolibrarypath', path)
+        progress.update(p, '')
         set_new_path(path, previous_path)
-        if platformtools.dialog_yesno('Spostare la Videoteca?', 'vuoi postare la videoteca e il relativo contenuto nella nuova posizione?'):
+        if platformtools.dialog_yesno('Spostare la Videoteca?', 'vuoi spostare la videoteca e il relativo contenuto nella nuova posizione?'):
             move_videolibrary(path, previous_path)
+            progress.update(p, 'Spostamento Database')
             move_db(path, previous_path)
+            clear_cache()
         progress.close()
         platformtools.dialog_ok('Spostamento Completato','')
 
@@ -176,3 +182,10 @@ def set_new_path(new, old):
             nodo_type.appendChild(element_default)
             source_nodes.appendChild(nodo_type)
         xmldoc.appendChild(source_nodes)
+
+
+def clear_cache():
+    path = xbmc.translatePath('special://home/cache/archive_cache/')
+    for file in filetools.listdir(path):
+        log(file)
+        filetools.remove(filetools.join(path, file))

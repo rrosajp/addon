@@ -42,20 +42,20 @@ msgid "Automatically update channels"
 msgstr "Aggiorna automaticamente i canali"
 
 msgctxt "#30005"
-msgid "Play mode"
-msgstr "Modalità di riproduzione"
+msgid "Video quality"
+msgstr "Qualità video"
 
 msgctxt "#30006"
 msgid "Ask"
 msgstr "Chiedi"
 
 msgctxt "#30007"
-msgid "Watch in low quality"
-msgstr "Guarda in bassa qualità"
+msgid "Low"
+msgstr "Bassa"
 
 msgctxt "#30008"
-msgid "Watch in high quality"
-msgstr "Guarda in alta qualità"
+msgid "High"
+msgstr "Alta"
 
 msgctxt "#30010"
 msgid "Channel icons view"
@@ -206,8 +206,8 @@ msgid "Unsopported Server"
 msgstr "Server non supportato"
 
 msgctxt "#30067"
-msgid "Video library path"
-msgstr "Percorso videoteca"
+msgid "Path"
+msgstr "Percorso"
 
 msgctxt "#30068"
 msgid "Filter by servers"
@@ -286,7 +286,7 @@ msgid "Adult"
 msgstr "Adulti"
 
 msgctxt "#30130"
-msgid "Recent"
+msgid "News"
 msgstr "Novità"
 
 msgctxt "#30131"
@@ -1482,7 +1482,7 @@ msgid "Restart Kodi to apply changes"
 msgstr "Riavvia Kodi per applicare le modifiche"
 
 msgctxt "#60327"
-msgid "Novelties"
+msgid "News"
 msgstr "Novità"
 
 msgctxt "#60328"
@@ -3230,7 +3230,7 @@ msgid "Syncronize with Trakt.tv"
 msgstr "Sincronizza con Trakt.tv"
 
 msgctxt "#70110"
-msgid "Priority Method"
+msgid "Priority method"
 msgstr "Priorità"
 
 msgctxt "#70111"
@@ -3746,8 +3746,8 @@ msgid "Preferred quality"
 msgstr "Qualità preferita"
 
 msgctxt "#70241"
-msgid "The highest"
-msgstr "La più alta"
+msgid "Highest"
+msgstr "Più alta"
 
 msgctxt "#70242"
 msgid "Choose fastest servers"
@@ -5590,7 +5590,7 @@ msgid "Use your custom channel URLs"
 msgstr "Utilizza URL personalizzati per i canali"
 
 msgctxt "#70706"
-msgid "Start KoD at Kodi boot"
+msgid "Launch KoD at Kodi start"
 msgstr "Esegui KoD all'avvio di Kodi"
 
 msgctxt "#70707"
