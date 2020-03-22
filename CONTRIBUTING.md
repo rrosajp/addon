@@ -1,8 +1,7 @@
 Ciao, grazie per aver preso in considerazione di contribuire a questo progetto!<br>
 Ci sono molti modi per farlo, e per alcuni di essi non è necessario essere uno sviluppatore.
 
-Puoi ad esempio [segnalare i cambiamenti di struttura](#Segnalare i cambiamenti di struttura) dei canali/server, [scrivere guide o registrare video-esempi](#Scrivere guide o registrare video-esempi) su alcune funzionalità "avanzate", dare consigli su funzionalità nuove o per migliorare quelle già presenti. 
-
+Puoi ad esempio [segnalare i cambiamenti di struttura](#segnalare-i-cambiamenti-di-struttura) dei canali/server, [scrivere guide o registrare video-esempi](#scrivere-guide-o-registrare-video-esempi) su alcune funzionalità "avanzate", dare consigli su funzionalità nuove o per migliorare quelle già presenti. 
 
 # Segnalare i cambiamenti di struttura
 KoD, alla fine, non è altro che un browser che estrapola dai siti le info richieste secondo regole ben precise, basate sulla struttura dei siti.<br>
