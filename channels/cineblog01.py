@@ -167,8 +167,30 @@ def peliculas(item):
 @support.scrape
 def episodios(item):
     patronBlock = r'(?P<block><div class="sp-head[a-z ]*?" title="Espandi">\s*(?:STAGION[EI]\s*(?:DA\s*[0-9]+\s*A)?\s*[0-9]+|MINISERIE) - (?P<lang>[^-<]+)(?:- (?P<quality>[^-<]+))?.*?[^<>]*?<\/div>.*?)<div class="spdiv">\[riduci\]<\/div>'
-    patron = '(?:<p>|<strong>)(?P<episode>[0-9]+(?:&#215;|×)[0-9]+)\s*(?P<title2>[^&<]*)?(?:&#8211;|-)?\s*(?P<url>.*?)(?:<\/p>|<br)'
+    # patron = '(?:<p>|<strong>)(?P<episode>[0-9]+(?:&#215;|×)[0-9]+)\s*(?P<title2>[^&<]*)?(?:&#8211;|-)?\s*(?P<url>.*?)(?:<\/p>|<br)'
+    patron = r'(?:/>|<p>|<strong>)(?P<url>.*?(?P<episode>[0-9]+(?:&#215;|ÃÂ)[0-9]+)\s*(?P<title2>.*?)?(?:\s*&#8211;|\s*-|\s*<).*?)(?:<\/p>|<br)'
+    def fullItemlistHook(itemlist):
+        title_dict = {}
+        itlist = []
+        special_list = []
+        for item in itemlist:
+            if re.sub(r'(\[[^\]]+\])','',item.title) in [config.get_localized_string(30161),config.get_localized_string(60355),config.get_localized_string(60357)]:
+                special_list.append(item)
+            else:
+                match = support.match(item.title, patron=r'(\d+.\d+)').match
+                if match not in title_dict:
+                    title_dict[match] = item
+                elif match in title_dict and item.contentLanguage == title_dict[match].contentLanguage \
+                    or item.contentLanguage == 'ITA' and not title_dict[match].contentLanguage \
+                    or title_dict[match].contentLanguage == 'ITA' and not item.contentLanguage:
+                    title_dict[match].url = item.url
+                else:
+                    title_dict[match + '1'] = item
 
+        for key, value in title_dict.items():
+            itlist.append(value)
+
+        return sorted(itlist, key=lambda it: (it.contentLanguage, it.title)) + special_list
     return locals()
 
 
@@ -229,13 +251,11 @@ def findvideos(item):
 
 def findvid_serie(item):
     def load_vid_series(html, item, itemlist, blktxt):
-        logger.info('HTML' + html)
-        patron = r'<a href="([^"]+)"[^=]+="_blank"[^>]+>(?!<!--)(.*?)</a>'
+        support.log('HTML',html)
         # Estrae i contenuti
-        matches = support.match(html, patron=r'<a href="([^"]+)"[^=]+="_blank"[^>]+>(?!<!--)(.*?)</a>').matches
+        matches = support.match(html, patron=r'<a href="([^"]+)"[^=]+="_blank"[^>]+>(?!<!--)(.*?)(?:</a>|<img)').matches
         for url, server in matches:
-            itemlist.append(
-                Item(channel=item.channel,
+            item = Item(channel=item.channel,
                      action="play",
                      title=server,
                      url=url,
@@ -244,7 +264,9 @@ def findvid_serie(item):
                      show=item.show,
                      quality=blktxt,
                      contentType=item.contentType,
-                     folder=False))
+                     folder=False)
+            if 'swzz' in item.url: item.url = support.swzz_get_url(item)
+            itemlist.append(item)
 
     support.log()
 
@@ -252,7 +274,7 @@ def findvid_serie(item):
     lnkblk = []
     lnkblkp = []
 
-    data = item.url
+    data = re.sub(r'((?:<p>|<strong>)?[0-9]+(?:&#215;|Ã)[0-9]+[^<]+)', '' ,item.url)
 
     # Blocks with split
     blk = re.split(r"(?:>\s*)?([A-Za-z\s0-9]*):\s*<", data, re.S)
