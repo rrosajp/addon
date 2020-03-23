@@ -174,10 +174,12 @@ def episodios(item):
         itlist = []
         special_list = []
         for item in itemlist:
+            item.title = re.sub(r'\.(\D)',' \\1', item.title)
             if re.sub(r'(\[[^\]]+\])','',item.title) in [config.get_localized_string(30161),config.get_localized_string(60355),config.get_localized_string(60357)]:
                 special_list.append(item)
             else:
-                match = support.match(item.title, patron=r'(\d+.\d+)').match
+                match = support.match(item.title, patron=r'(\d+.\d+)').match.replace('x','')
+                item.order = match
                 if match not in title_dict:
                     title_dict[match] = item
                 elif match in title_dict and item.contentLanguage == title_dict[match].contentLanguage \
@@ -190,7 +192,7 @@ def episodios(item):
         for key, value in title_dict.items():
             itlist.append(value)
 
-        return sorted(itlist, key=lambda it: (it.contentLanguage, it.title)) + special_list
+        return sorted(itlist, key=lambda it: (it.contentLanguage, int(it.order))) + special_list
     return locals()
 
 
@@ -274,7 +276,7 @@ def findvid_serie(item):
     lnkblk = []
     lnkblkp = []
 
-    data = re.sub(r'((?:<p>|<strong>)?[0-9]+(?:&#215;|Ã)[0-9]+[^<]+)', '' ,item.url)
+    data = re.sub(r'((?:<p>|<strong>)?[^\d]*\d*(?:&#215;|Ã)[0-9]+[^<]+)', '' ,item.url)
 
     # Blocks with split
     blk = re.split(r"(?:>\s*)?([A-Za-z\s0-9]*):\s*<", data, re.S)
