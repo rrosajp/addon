@@ -171,7 +171,7 @@ def peliculas(item, json='', key='', itemlist=[]):
     itlist = filterkey = []
     action = 'findvideos'
 
-    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'search']:
+    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'search'] and not item.filterkey:
         Pagination = int(defp) if defp.isdigit() else ''
     else: Pagination = ''
     pag = item.page if item.page else 1

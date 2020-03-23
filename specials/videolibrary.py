@@ -58,13 +58,13 @@ def list_movies(item, silent=False):
                         xbmc_videolibrary.mark_content_as_watched_on_alfa(nfo_path)
                 except:
                     logger.error(traceback.format_exc())
-                
+
                 head_nfo, new_item = videolibrarytools.read_nfo(nfo_path)
 
                 if not new_item:                        #Si no ha leído bien el .nfo, pasamos a la siguiente
                     logger.error('.nfo erroneo en ' + str(nfo_path))
                     continue
-                
+
                 if len(new_item.library_urls) > 1:
                     multicanal = True
                 else:
@@ -185,9 +185,9 @@ def list_tvshows(item):
                         xbmc_videolibrary.mark_content_as_watched_on_alfa(tvshow_path)
                 except:
                     logger.error(traceback.format_exc())
-                
+
                 head_nfo, item_tvshow = videolibrarytools.read_nfo(tvshow_path)
-                
+
                 if not item_tvshow:                        #Si no ha leído bien el .nfo, pasamos a la siguiente
                     logger.error('.nfo erroneo en ' + str(tvshow_path))
                     continue
@@ -527,7 +527,7 @@ def findvideos(item):
     for nom_canal, json_path in list(list_canales.items()):
         if filtro_canal and filtro_canal != nom_canal.capitalize():
             continue
-        
+
         item_canal = Item()
         item_canal.channel = nom_canal
         ###### Redirección al canal NewPct1.py si es un clone, o a otro canal y url si ha intervención judicial
@@ -536,10 +536,9 @@ def findvideos(item):
         except:
             logger.error(traceback.format_exc())
         nom_canal = item_canal.channel
-            
+
         # Importamos el canal de la parte seleccionada
         try:
-            channel = __import__('channels.%s' % nom_canal, fromlist=["channels.%s" % nom_canal])
             if nom_canal == 'community':
                 channel = __import__('specials.%s' % nom_canal, fromlist=["channels.%s" % nom_canal])
             else:
@@ -620,7 +619,7 @@ def findvideos(item):
     from inspect import stack
     from specials import nextep
     if nextep.check(item) and stack()[1][3] == 'run':
-        nextep.videolibrary(item) 
+        nextep.videolibrary(item)
     return itemlist
 
 
@@ -703,22 +702,22 @@ def update_tvshow(item):
 
 def verify_playcount_series(item, path):
     logger.info()
-    
+
     """
     Este método revisa y repara el PlayCount de una serie que se haya desincronizado de la lista real de episodios en su carpeta.  Las entradas de episodios, temporadas o serie que falten, son creado con la marca de "no visto".  Posteriormente se envia a verificar los contadores de Temporadas y Serie
-    
+
     En el retorno envía de estado de True si se actualizado o False si no, normalmente por error.  Con este estado, el caller puede actualizar el estado de la opción "verify_playcount" en "videolibrary.py".  La intención de este método es la de dar una pasada que repare todos los errores y luego desactivarse.  Se puede volver a activar en el menú de Videoteca de Alfa.
-    
+
     """
     #logger.debug("item:\n" + item.tostring('\n'))
-    
+
     #Si no ha hecho nunca la verificación, lo forzamos
     estado = config.get_setting("verify_playcount", "videolibrary")
     if not estado or estado == False:
         estado = True                                                               #Si no ha hecho nunca la verificación, lo forzamos
     else:
         estado = False
-        
+
     if item.contentType == 'movie':                                                 #Esto es solo para Series
         return (item, False)
     if filetools.exists(path):
@@ -727,7 +726,7 @@ def verify_playcount_series(item, path):
         if not hasattr(it, 'library_playcounts') or not it.library_playcounts:      #Si el .nfo no tiene library_playcounts se lo creamos
             logger.error('** It does not have PlayCount')
             it.library_playcounts = {}
-        
+
         # Obtenemos los archivos de los episodios
         raiz, carpetas_series, ficheros = next(filetools.walk(path))
         # Crear un item en la lista para cada strm encontrado
@@ -770,35 +769,35 @@ def mark_content_as_watched2(item):
     # logger.debug("item:\n" + item.tostring('\n'))
 
     if filetools.exists(item.nfo):
-        head_nfo, it = videolibrarytools.read_nfo(item.nfo) 
-        #logger.debug(it) 
+        head_nfo, it = videolibrarytools.read_nfo(item.nfo)
+        #logger.debug(it)
         name_file = ""
         if item.contentType == 'movie' or item.contentType == 'tvshow':
             name_file = os.path.splitext(filetools.basename(item.nfo))[0]
-            
+
             if name_file != 'tvshow' :
-                it.library_playcounts.update({name_file: item.playcount}) 
+                it.library_playcounts.update({name_file: item.playcount})
 
         if item.contentType == 'episode' or item.contentType == 'tvshow' or item.contentType == 'list' or name_file == 'tvshow':
        # elif item.contentType == 'episode':
             name_file = os.path.splitext(filetools.basename(item.strm_path))[0]
             num_season = name_file [0]
-            item.__setattr__('contentType', 'episode') 
-            item.__setattr__('contentSeason', num_season) 
-            #logger.debug(name_file) 
-         
+            item.__setattr__('contentType', 'episode')
+            item.__setattr__('contentSeason', num_season)
+            #logger.debug(name_file)
+
         else:
             name_file = item.contentTitle
-           # logger.debug(name_file) 
+           # logger.debug(name_file)
 
         if not hasattr(it, 'library_playcounts'):
             it.library_playcounts = {}
-        it.library_playcounts.update({name_file: item.playcount}) 
+        it.library_playcounts.update({name_file: item.playcount})
 
         # se comprueba que si todos los episodios de una temporada están marcados, se marque tb la temporada
         if item.contentType != 'movie':
             it = check_season_playcount(it, item.contentSeason)
-            #logger.debug(it) 
+            #logger.debug(it)
 
         # Guardamos los cambios en item.nfo
         if filetools.write(item.nfo, head_nfo + it.tojson()):
