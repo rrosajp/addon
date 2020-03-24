@@ -24,7 +24,7 @@ def export_videolibrary(item):
         return
     zip_file = xbmc.translatePath(zip_file_folder + "KoD_video_library-" + str(datetime.date.today()) + ".zip")
 
-    p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(80003), config.get_localized_string(20000))
+    p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80003))
     p_dialog.update(0)
 
     if filetools.exists(temp_path):
@@ -46,8 +46,7 @@ def export_videolibrary(item):
     p_dialog.update(100)
     xbmc.sleep(2000)
     p_dialog.close()
-    platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80004), icon=3,
-                                      time=5000, sound=False)
+    platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(80004))
 
 
 def import_videolibrary(item):
@@ -59,7 +58,7 @@ def import_videolibrary(item):
     if not platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(80006)):
         return
 
-    p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(80007), config.get_localized_string(20000))
+    p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80007))
     p_dialog.update(0)
 
     if filetools.exists(temp_path):
@@ -88,8 +87,7 @@ def import_videolibrary(item):
     p_dialog.update(100)
     xbmc.sleep(2000)
     p_dialog.close()
-    platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80008), icon=3,
-                                      time=5000, sound=False)
+    platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(80008))
 
     if platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(80009)):
         import videolibrary_service

@@ -7,14 +7,14 @@ from core.support import log, dbg
 from distutils import dir_util, file_util
 from xml.dom import minidom
 
-global p
+"""global p
 p = 0
-progress = platformtools.dialog_progress('Spostamento Videoteca','Spostamento File')
+progress = platformtools.dialog_progress('Spostamento Videoteca','Spostamento File')"""
 
 
 
 
-def set_videolibrary_path(item):
+"""def set_videolibrary_path(item):
     log()
     global p
     previous_path = config.get_setting('videolibrarypath')
@@ -45,9 +45,57 @@ def move_videolibrary(new, old):
         dir_util.remove_tree(od,1)
         global p
         p += 30
-        progress.update(p, '')
+        progress.update(p)"""
 
-def move_db(new, old):
+def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_folder, current_tvshows_folder, new_tvshows_folder):
+    log()
+    log('current video library path:', current_path)
+    log('new video library path:', new_path)
+    log('current movies folder:', current_movies_folder)
+    log('new movies folder:', new_movies_folder)
+    log('current tvshows folder:', current_tvshows_folder)
+    log('new tvshows folder:', new_tvshows_folder)
+
+    if current_path != new_path or current_movies_folder != new_movies_folder or current_tvshows_folder != new_tvshows_folder:
+        notify = False
+        progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80011))
+        current_path = xbmc.translatePath(current_path)
+        new_path = xbmc.translatePath(new_path)
+        current_movies_path = filetools.join(current_path, current_movies_folder)
+        new_movies_path = filetools.join(new_path, new_movies_folder)
+        current_tvshows_path = os.path.join(current_path, current_tvshows_folder)
+        new_tvshows_path = os.path.join(new_path, new_tvshows_folder)
+
+        config.verify_directories_created()
+        progress.update(10, config.get_localized_string(20000), config.get_localized_string(80012))
+        if current_movies_path != new_movies_path:
+            if filetools.listdir(current_movies_path):
+                dir_util.copy_tree(current_movies_path, new_movies_path)
+                notify = True
+            filetools.rmdirtree(current_movies_path)
+        progress.update(40)
+        if current_tvshows_path != new_tvshows_path:
+            if filetools.listdir(current_tvshows_path):
+                dir_util.copy_tree(current_tvshows_path, new_tvshows_path)
+                notify = True
+            filetools.rmdirtree(current_tvshows_path)
+        progress.update(70)
+        if current_path != new_path and not filetools.listdir(current_path) and not "plugin.video.kod\\videolibrary" in current_path:
+            filetools.rmdirtree(current_path)
+
+        progress.update(90, config.get_localized_string(20000), config.get_localized_string(80013))
+        if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
+            set_new_path(new_path, current_path)
+            update_db(new_path, current_path)
+            clear_cache()
+
+        progress.update(100)
+        progress.close()
+        if notify:
+            platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80014), icon=0,
+                                              time=5000, sound=False)
+
+def update_db(new, old):
     NEW = new
     OLD = old
 
@@ -102,9 +150,9 @@ def move_db(new, old):
             strPath = record[1].replace(OLD, NEW)
             sql = 'UPDATE episode SET c18="%s" WHERE idEpisode=%s' % (strPath, idEpisode)
             nun_records, records = xbmc_videolibrary.execute_sql_kodi(sql)
-    global p
+    """global p
     p += 30
-    progress.update(p, '')
+    progress.update(p)"""
 
 def set_new_path(new, old):
     write = False

@@ -27,10 +27,10 @@
     <!-- Videolibrary -->
     <category label="30131">
         <setting label="30501" type="lsep"/>
-        <setting id="videolibrarypath" type="action" label="30067" action="RunPlugin(plugin://plugin.video.kod/?ew0KCSJjaGFubmVsIjoibW92ZV92aWRlb2xpYnJhcnkiLA0KCSJhY3Rpb24iOiJzZXRfdmlkZW9saWJyYXJ5X3BhdGgiDQp9)" default="special://profile/addon_data/plugin.video.kod/videolibrary"/>
-        <!-- <setting id="videolibrarypath" type="folder" label="30067" default="special://profile/addon_data/plugin.video.kod/videolibrary"/> -->
-        <setting id="folder_tvshows" type="text" label="70118" default="SERIES"/>
-        <setting id="folder_movies" type="text" label="70119" default="CINE"/>
+        <!-- <setting id="videolibrarypath" type="action" label="30067" action="RunPlugin(plugin://plugin.video.kod/?ew0KCSJjaGFubmVsIjoibW92ZV92aWRlb2xpYnJhcnkiLA0KCSJhY3Rpb24iOiJzZXRfdmlkZW9saWJyYXJ5X3BhdGgiDQp9)" default="special://profile/addon_data/plugin.video.kod/videolibrary"/> -->
+        <setting id="videolibrarypath" type="folder" label="30067" default="special://profile/addon_data/plugin.video.kod/videolibrary" option="writeable"/>
+        <setting id="folder_tvshows" type="text" label="70118" default="Serie TV"/>
+        <setting id="folder_movies" type="text" label="70119" default="Film"/>
 
         <setting label="59997" type="lsep"/>
         <setting id="videolibrary_kodi_flag" type="number" label="" default="0" visible="false"/>
