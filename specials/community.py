@@ -14,7 +14,8 @@ from specials import shortcuts
 CONTEXT = shortcuts.context()
 
 info_language = ["de", "en", "es", "fr", "it", "pt"] # from videolibrary.json
-lang = info_language[config.get_setting("info_language", "videolibrary")]
+try: lang = info_language[config.get_setting("info_language", "videolibrary")]
+except: lang = 'it'
 
 defpage = ["", "20", "40", "60", "80", "100"]
 defp = defpage[config.get_setting('pagination','community')]
@@ -558,7 +559,7 @@ def filter_thread(filter, key, item, description):
             id = results['id']
         if id:
             thumbnail = 'http://image.tmdb.org/t/p/original' + results['profile_path'] if results['profile_path'] else item.thumbnail
-            json_file = httptools.downloadpage('http://api.themoviedb.org/3/person/'+ str(id) + '?api_key=' + tmdb_api + '&language=en', use_requests=True).data
+            json_file = httptools.downloadpage('http://api.themoviedb.org/3/person/'+ str(id) + '?api_key=' + tmdb_api + '&language=%s', lang, use_requests=True).data
             plot += jsontools.load(json_file)['biography']
 
     if description:
