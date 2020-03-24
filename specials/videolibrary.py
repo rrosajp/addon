@@ -532,7 +532,7 @@ def findvideos(item):
             
         # Importamos el canal de la parte seleccionada
         try:
-            channel = __import__('channels.%s' % nom_canal, fromlist=["channels.%s" % nom_canal])
+
             if nom_canal == 'community':
                 channel = __import__('specials.%s' % nom_canal, fromlist=["channels.%s" % nom_canal])
             else:
