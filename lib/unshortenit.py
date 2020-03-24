@@ -38,9 +38,10 @@ class UnshortenIt(object):
     _cryptmango_regex = r'cryptmango|xshield\.net'
     _vcrypt_regex = r'vcrypt\.net|vcrypt\.pw'
     _linkup_regex = r'linkup\.pro|buckler.link'
+    _linkhub_regex = r'linkhub\.icu'
 
     listRegex = [_adfly_regex, _linkbucks_regex, _adfocus_regex, _lnxlu_regex, _shst_regex, _hrefli_regex, _anonymz_regex,
-                 _shrink_service_regex, _rapidcrypt_regex, _cryptmango_regex, _vcrypt_regex, _linkup_regex]
+                 _shrink_service_regex, _rapidcrypt_regex, _cryptmango_regex, _vcrypt_regex, _linkup_regex, _linkhub_regex]
 
     _maxretries = 5
 
@@ -48,44 +49,49 @@ class UnshortenIt(object):
     _timeout = 10
 
     def unshorten(self, uri, type=None):
+        code = 0
+        while True:
+            oldUri = uri
+            domain = urlsplit(uri).netloc
+            if not domain:
+                return uri, "No domain found in URI!"
+            had_google_outbound, uri = self._clear_google_outbound_proxy(uri)
 
-        domain = urlsplit(uri).netloc
+            if re.search(self._adfly_regex, domain,
+                         re.IGNORECASE) or type == 'adfly':
+                uri, code = self._unshorten_adfly(uri)
+            if re.search(self._adfocus_regex, domain,
+                         re.IGNORECASE) or type == 'adfocus':
+                uri, code = self._unshorten_adfocus(uri)
+            if re.search(self._linkbucks_regex, domain,
+                         re.IGNORECASE) or type == 'linkbucks':
+                uri, code = self._unshorten_linkbucks(uri)
+            if re.search(self._lnxlu_regex, domain,
+                         re.IGNORECASE) or type == 'lnxlu':
+                uri, code = self._unshorten_lnxlu(uri)
+            if re.search(self._shrink_service_regex, domain, re.IGNORECASE):
+                uri, code = self._unshorten_shrink_service(uri)
+            if re.search(self._shst_regex, domain, re.IGNORECASE):
+                uri, code = self._unshorten_shst(uri)
+            if re.search(self._hrefli_regex, domain, re.IGNORECASE):
+                uri, code = self._unshorten_hrefli(uri)
+            if re.search(self._anonymz_regex, domain, re.IGNORECASE):
+                uri, code = self._unshorten_anonymz(uri)
+            if re.search(self._rapidcrypt_regex, domain, re.IGNORECASE):
+                uri, code = self._unshorten_rapidcrypt(uri)
+            if re.search(self._cryptmango_regex, uri, re.IGNORECASE):
+                uri, code = self._unshorten_cryptmango(uri)
+            if re.search(self._vcrypt_regex, uri, re.IGNORECASE):
+                uri, code = self._unshorten_vcrypt(uri)
+            if re.search(self._linkup_regex, uri, re.IGNORECASE):
+                uri, code = self._unshorten_linkup(uri)
+            if re.search(self._linkhub_regex, uri, re.IGNORECASE):
+                uri, code = self._unshorten_linkhub(uri)
 
-        if not domain:
-            return uri, "No domain found in URI!"
+            if oldUri == uri:
+                break
 
-        had_google_outbound, uri = self._clear_google_outbound_proxy(uri)
-
-        if re.search(self._adfly_regex, domain,
-                     re.IGNORECASE) or type == 'adfly':
-            return self._unshorten_adfly(uri)
-        if re.search(self._adfocus_regex, domain,
-                     re.IGNORECASE) or type == 'adfocus':
-            return self._unshorten_adfocus(uri)
-        if re.search(self._linkbucks_regex, domain,
-                     re.IGNORECASE) or type == 'linkbucks':
-            return self._unshorten_linkbucks(uri)
-        if re.search(self._lnxlu_regex, domain,
-                     re.IGNORECASE) or type == 'lnxlu':
-            return self._unshorten_lnxlu(uri)
-        if re.search(self._shrink_service_regex, domain, re.IGNORECASE):
-            return self._unshorten_shrink_service(uri)
-        if re.search(self._shst_regex, domain, re.IGNORECASE):
-            return self._unshorten_shst(uri)
-        if re.search(self._hrefli_regex, domain, re.IGNORECASE):
-            return self._unshorten_hrefli(uri)
-        if re.search(self._anonymz_regex, domain, re.IGNORECASE):
-            return self._unshorten_anonymz(uri)
-        if re.search(self._rapidcrypt_regex, domain, re.IGNORECASE):
-            return self._unshorten_rapidcrypt(uri)
-        if re.search(self._cryptmango_regex, uri, re.IGNORECASE):
-            return self._unshorten_cryptmango(uri)
-        if re.search(self._vcrypt_regex, uri, re.IGNORECASE):
-            return self._unshorten_vcrypt(uri)
-        if re.search(self._linkup_regex, uri, re.IGNORECASE):
-            return self._unshorten_linkup(uri)
-
-        return uri, 0
+        return uri, code
 
     def unwrap_30x(self, uri, timeout=10):
         def unwrap_30x(uri, timeout=10):
@@ -555,6 +561,19 @@ class UnshortenIt(object):
 
         except Exception as e:
             return uri, str(e)
+
+    def _unshorten_linkhub(self, uri):
+        try:
+            r = httptools.downloadpage(uri, follow_redirect=True, timeout=self._timeout, cookies=False)
+            if 'get/' in r.url:
+                uri = 'https://linkhub.icu/view/' + re.search('\.\./view/([^"]+)', r.data).group(1)
+                logger.info(uri)
+                r = httptools.downloadpage(uri, follow_redirect=True, timeout=self._timeout, cookies=False)
+            uri = re.search('<div id="text-url".*\n\s+<a href="([^"]+)', r.data).group(0)
+            return uri, r.code
+        except Exception as e:
+            return uri, str(e)
+
 
 def unwrap_30x_only(uri, timeout=10):
     unshortener = UnshortenIt()
