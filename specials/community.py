@@ -559,7 +559,8 @@ def filter_thread(filter, key, item, description):
             id = results['id']
         if id:
             thumbnail = 'http://image.tmdb.org/t/p/original' + results['profile_path'] if results['profile_path'] else item.thumbnail
-            json_file = httptools.downloadpage('http://api.themoviedb.org/3/person/'+ str(id) + '?api_key=' + tmdb_api + '&language=%s', lang, use_requests=True).data
+            json_file = httptools.downloadpage('http://api.themoviedb.org/3/person/'+ str(id) + '?api_key=' + tmdb_api + '&language=en', use_requests=True).data
+            support.log(json_file)
             plot += jsontools.load(json_file)['biography']
 
     if description:
