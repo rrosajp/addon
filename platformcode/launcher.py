@@ -178,7 +178,7 @@ def run(item=None):
 
             # Checks if channel exists
             if os.path.isfile(os.path.join(config.get_runtime_path(), 'channels', item.channel + ".py")):
-                                CHANNELS = 'channels'
+                CHANNELS = 'channels'
             elif os.path.isfile(os.path.join(config.get_runtime_path(), 'channels', 'porn', item.channel + ".py")):
                 CHANNELS = 'channels.porn'
             else:
