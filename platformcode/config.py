@@ -172,7 +172,7 @@ def get_all_settings_addon():
     infile.close()
 
     ret = {}
-    matches = scrapertools.find_multiple_matches(data, '<setting id="([^"]*)" value="([^"]*)')
+    matches = scrapertools.find_multiple_matches(data, '<setting id=\"([^\"]+)\"[^>]*>([^<]*)</setting>')
 
     for _id, value in matches:
         ret[_id] = get_setting(_id)
@@ -221,17 +221,20 @@ def open_settings():
 
     # si se ha cambiado la ruta de la videoteca llamamos a comprobar directorios para que lo cree y pregunte
     # automaticamente si configurar la videoteca
-    if settings_pre.get("videolibrarypath", None) != settings_post.get("videolibrarypath", None) or \
+    """if settings_pre.get("videolibrarypath", None) != settings_post.get("videolibrarypath", None) or \
         settings_pre.get("folder_movies", None) != settings_post.get("folder_movies", None) or \
             settings_pre.get("folder_tvshows", None) != settings_post.get("folder_tvshows", None):
-        verify_directories_created()
+        verify_directories_created()"""
+    from specials import move_videolibrary
+    move_videolibrary.move_videolibrary(settings_pre.get("videolibrarypath", None), settings_post.get("videolibrarypath", None),
+                                       settings_pre.get("folder_movies", None), settings_post.get("folder_movies", None),
+                                       settings_pre.get("folder_tvshows", None), settings_post.get("folder_tvshows", None))
 
-    else:
-        # si se ha puesto que se quiere autoconfigurar y se había creado el directorio de la videoteca
-        if not settings_pre.get("videolibrary_kodi", None) and settings_post.get("videolibrary_kodi", None) \
-                and settings_post.get("videolibrary_kodi_flag", None) == 1:
-            from platformcode import xbmc_videolibrary
-            xbmc_videolibrary.ask_set_content(2, silent=True)
+    # si se ha puesto que se quiere autoconfigurar y se había creado el directorio de la videoteca
+    if not settings_pre.get("videolibrary_kodi", None) and settings_post.get("videolibrary_kodi", None) \
+            and settings_post.get("videolibrary_kodi_flag", None) == 1:
+        from platformcode import xbmc_videolibrary
+        xbmc_videolibrary.ask_set_content(2, silent=True)
 
 
 def get_setting(name, channel="", server="", default=None):
@@ -465,8 +468,8 @@ def verify_directories_created():
             logger.debug("Creating %s: %s" % (path, saved_path))
             filetools.mkdir(saved_path)
 
-    config_paths = [["folder_movies", "CINE"],
-                    ["folder_tvshows", "SERIES"]]
+    config_paths = [["folder_movies", "Film"],
+                    ["folder_tvshows", "Serie TV"]]
 
     for path, default in config_paths:
         saved_path = get_setting(path)

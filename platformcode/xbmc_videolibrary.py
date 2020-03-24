@@ -777,7 +777,7 @@ def set_content(content_type, silent=False):
 
     if not continuar:
         heading = config.get_localized_string(70102) % content_type
-    elif content_type == 'SERIES' and not xbmc.getCondVisibility(
+    elif content_type == 'tvshow' and not xbmc.getCondVisibility(
             'System.HasAddon(metadata.tvshows.themoviedb.org)'):
         heading = config.get_localized_string(70103) % content_type
         msg_text = config.get_localized_string(60058)

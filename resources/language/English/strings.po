@@ -6082,3 +6082,23 @@ msgstr ""
 msgctxt "#80009"
 msgid "Would you like to search for new episodes and update video library?"
 msgstr ""
+
+msgctxt "#80010"
+msgid "Select the video library path"
+msgstr ""
+
+msgctxt "#80011"
+msgid "Verifying folders..."
+msgstr ""
+
+msgctxt "#80012"
+msgid "Moving video library..."
+msgstr ""
+
+msgctxt "#80013"
+msgid "Updating database..."
+msgstr ""
+
+msgctxt "#80014"
+msgid "The video library has been moved"
+msgstr ""

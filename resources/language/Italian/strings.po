@@ -6082,3 +6082,23 @@ msgstr "La videoteca è stata importata"
 msgctxt "#80009"
 msgid "Would you like to search for new episodes and update video library?"
 msgstr "Vuoi cercare i nuovi episodi ed aggiornare la videoteca?"
+
+msgctxt "#80010"
+msgid "Select the video library path"
+msgstr "Seleziona il percorso della videoteca"
+
+msgctxt "#80011"
+msgid "Verifying folders..."
+msgstr "Verifica cartelle..."
+
+msgctxt "#80012"
+msgid "Moving video library..."
+msgstr "Spostamento videoteca..."
+
+msgctxt "#80013"
+msgid "Updating database..."
+msgstr "Aggiornamento database..."
+
+msgctxt "#80014"
+msgid "The video library has been moved"
+msgstr "La videoteca è stata spostata"
