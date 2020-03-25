@@ -35,7 +35,8 @@
         <setting label="59997" type="lsep"/>
         <setting id="videolibrary_kodi_flag" type="number" label="" default="0" visible="false"/>
         <setting id="videolibrary_kodi_force" type="bool" label="" default="false" visible="false"/>
-        <setting id="videolibrary_kodi" type="bool" label="70120" enable="lt(-1,2)+eq(0,false)" default="false"/>
+        <setting id="videolibrary_kodi" type="bool" label="70120" default="false"/>
+        <!-- <setting id="videolibrary_kodi" type="bool" label="70120" enable="lt(-1,2)+eq(0,false)" default="false"/> -->
         <setting id="videolibrary_max_quality" type="bool" label="70729" default="false" visible="true"/>
         <setting id="next_ep" type="select" label="70746" lvalues="70752|70747|70748" default="0"/>
         <setting id="next_ep_type" type="select" label="70754" lvalues="70755|70756|70757" default="0" visible="eq(-1,2)" subsetting="true"/>

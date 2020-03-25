@@ -219,22 +219,30 @@ def open_settings():
         set_setting('adult_aux_new_password1', '')
         set_setting('adult_aux_new_password2', '')
 
-    # si se ha cambiado la ruta de la videoteca llamamos a comprobar directorios para que lo cree y pregunte
-    # automaticamente si configurar la videoteca
-    """if settings_pre.get("videolibrarypath", None) != settings_post.get("videolibrarypath", None) or \
-        settings_pre.get("folder_movies", None) != settings_post.get("folder_movies", None) or \
-            settings_pre.get("folder_tvshows", None) != settings_post.get("folder_tvshows", None):
-        verify_directories_created()"""
+
     from specials import move_videolibrary
-    move_videolibrary.move_videolibrary(settings_pre.get("videolibrarypath", None), settings_post.get("videolibrarypath", None),
-                                       settings_pre.get("folder_movies", None), settings_post.get("folder_movies", None),
-                                       settings_pre.get("folder_tvshows", None), settings_post.get("folder_tvshows", None))
 
     # si se ha puesto que se quiere autoconfigurar y se había creado el directorio de la videoteca
     if not settings_pre.get("videolibrary_kodi", None) and settings_post.get("videolibrary_kodi", None) \
             and settings_post.get("videolibrary_kodi_flag", None) == 1:
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.ask_set_content(2, silent=True)
+        xbmc.sleep(2000)
+        xbmc_videolibrary.update(settings_post.get("folder_movies", None))
+        xbmc_videolibrary.update(settings_post.get("folder_tvshows", None))
+    elif settings_pre.get("videolibrary_kodi", None) and not settings_post.get("videolibrary_kodi", None) \
+            and settings_post.get("videolibrary_kodi_flag", None) == 2:
+        move_videolibrary.clear_videolibrary_db()
+
+    # si se ha cambiado la ruta de la videoteca llamamos a comprobar directorios para que lo cree y pregunte
+    # automaticamente si configurar la videoteca
+    """if settings_pre.get("videolibrarypath", None) != settings_post.get("videolibrarypath", None) or \
+        settings_pre.get("folder_movies", None) != settings_post.get("folder_movies", None) or \
+            settings_pre.get("folder_tvshows", None) != settings_post.get("folder_tvshows", None):
+        verify_directories_created()"""
+    move_videolibrary.move_videolibrary(settings_pre.get("videolibrarypath", None), settings_post.get("videolibrarypath", None),
+                                       settings_pre.get("folder_movies", None), settings_post.get("folder_movies", None),
+                                       settings_pre.get("folder_tvshows", None), settings_post.get("folder_tvshows", None))
 
 
 def get_setting(name, channel="", server="", default=None):
