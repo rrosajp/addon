@@ -5,7 +5,6 @@
 
 
 from core import support
-from core.item import Item
 
 host = support.config.get_channel_url()
 headers = [['Referer', host]]

@@ -61,7 +61,7 @@ def hdpass_get_servers(item):
         url = url.replace("&download=1", "")
         if 'hdpass' not in url and 'hdplayer' not in url:
             return itemlist
-    if 'https' not in url:
+    if 'http' not in url:
         url = 'https:' + url
 
     data = httptools.downloadpage(url).data
