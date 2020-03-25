@@ -35,13 +35,14 @@ class UnshortenIt(object):
     _anonymz_regex = r'anonymz\.com'
     _shrink_service_regex = r'shrink-service\.it'
     _rapidcrypt_regex = r'rapidcrypt\.net'
-    _cryptmango_regex = r'cryptmango|xshield\.net'
     _vcrypt_regex = r'vcrypt\.net|vcrypt\.pw'
     _linkup_regex = r'linkup\.pro|buckler.link'
     _linkhub_regex = r'linkhub\.icu'
+    # for services that only include real link inside iframe
+    _simple_iframe_regex = r'cryptmango|xshield\.net|vcrypt\.club'
 
     listRegex = [_adfly_regex, _linkbucks_regex, _adfocus_regex, _lnxlu_regex, _shst_regex, _hrefli_regex, _anonymz_regex,
-                 _shrink_service_regex, _rapidcrypt_regex, _cryptmango_regex, _vcrypt_regex, _linkup_regex, _linkhub_regex]
+                 _shrink_service_regex, _rapidcrypt_regex, _simple_iframe_regex, _vcrypt_regex, _linkup_regex, _linkhub_regex]
 
     _maxretries = 5
 
@@ -79,8 +80,8 @@ class UnshortenIt(object):
                 uri, code = self._unshorten_anonymz(uri)
             if re.search(self._rapidcrypt_regex, domain, re.IGNORECASE):
                 uri, code = self._unshorten_rapidcrypt(uri)
-            if re.search(self._cryptmango_regex, uri, re.IGNORECASE):
-                uri, code = self._unshorten_cryptmango(uri)
+            if re.search(self._simple_iframe_regex, uri, re.IGNORECASE):
+                uri, code = self._unshorten_simple_iframe(uri)
             if re.search(self._vcrypt_regex, uri, re.IGNORECASE):
                 uri, code = self._unshorten_vcrypt(uri)
             if re.search(self._linkup_regex, uri, re.IGNORECASE):
@@ -467,12 +468,12 @@ class UnshortenIt(object):
         except Exception as e:
             return uri, 0
 
-    def _unshorten_cryptmango(self, uri):
+    def _unshorten_simple_iframe(self, uri):
         try:
             r = httptools.downloadpage(uri, timeout=self._timeout, cookies=False)
             html = r.data
 
-            uri = re.findall(r'<iframe src="([^"]+)"[^>]+>', html)[0]
+            uri = re.findall(r'<iframe\s+src="([^"]+)', html)[0]
 
             return uri, r.code
 
