@@ -219,7 +219,9 @@ def open_settings():
         set_setting('adult_aux_new_password1', '')
         set_setting('adult_aux_new_password2', '')
 
+
     from specials import move_videolibrary
+
     # si se ha puesto que se quiere autoconfigurar y se había creado el directorio de la videoteca
     if not settings_pre.get("videolibrary_kodi", None) and settings_post.get("videolibrary_kodi", None) \
             and settings_post.get("videolibrary_kodi_flag", None) == 1:
@@ -228,7 +230,8 @@ def open_settings():
         xbmc.sleep(2000)
         xbmc_videolibrary.update(settings_post.get("folder_movies", None))
         xbmc_videolibrary.update(settings_post.get("folder_tvshows", None))
-    else:
+    elif settings_pre.get("videolibrary_kodi", None) and not settings_post.get("videolibrary_kodi", None) \
+            and settings_post.get("videolibrary_kodi_flag", None) == 2:
         move_videolibrary.clear_videolibrary_db()
 
     # si se ha cambiado la ruta de la videoteca llamamos a comprobar directorios para que lo cree y pregunte
