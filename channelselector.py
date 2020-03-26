@@ -384,7 +384,9 @@ def thumb(item_or_itemlist=None, genre=False, thumb=''):
     import re
     icon_dict = {'channels_movie':['film'],
                  'channels_tvshow':['serie','tv','episodi','episodio','fiction'],
-                 'channels_documentary':['documentari','documentario', 'documentary', 'learning'],
+                 'channels_documentary':['documentari','documentario', 'documentary'],
+                 'channels_teenager':['ragazzi','teenager', 'teen'],
+                 'channels_learning':['learning'],
                  'channels_all':['tutti'],
                  'news':['novità', "novita'", 'aggiornamenti', 'nuovi', 'nuove'],
                  'now_playing':['cinema', 'in sala'],
