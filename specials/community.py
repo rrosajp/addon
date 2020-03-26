@@ -314,7 +314,7 @@ def episodios(item, json ='', key='', itemlist =[]):
         title = ' - ' + option['title'] if 'title' in option else ''
         title = '%sx%s%s' % (season_number, episode_number, title)
         extra = set_extra_values(item, option, item.path)
-        if season_number == int(item.filterseason) or not item.filterseason:
+        if not item.filterseason or season_number == int(item.filterseason):
             itemlist.append(Item(channel = item.channel,
                                  title = set_title(title, extra.language, extra.quality),
                                  fulltitle = item.fulltitle,
