@@ -26,6 +26,7 @@ def mainlist(item):
             ('Documentari {bullet bold}', ['/documentari/index.json', 'menu']),
             ('Programmi TV{bullet bold}', ['/programmi/index.json', 'menu']),
             ('Programmi per Bambini {bullet bold}', ['/bambini/index.json', 'menu']),
+            ('Teen {bullet bold}', ['/teen/index.json', 'learning']),
             ('Learning {bullet bold}', ['/learning/index.json', 'learning']),
             ('Teche Rai {bullet bold storia}', ['/techerai/index.json', 'menu']),
             ('Musica e Teatro {bullet bold}', ['/performing-arts/index.json', 'menu'])
