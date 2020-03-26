@@ -283,7 +283,7 @@ def episodios(item, json ='', key='', itemlist =[]):
     ep = 1
     season = infoLabels['season'] if 'season' in infoLabels else item.contentSeason if item.contentSeason else 1
 
-    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'search']:
+    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'search'] and not show_seasons:
         Pagination = int(defp) if defp.isdigit() else ''
     else: Pagination = ''
     pag = item.page if item.page else 1
@@ -314,7 +314,7 @@ def episodios(item, json ='', key='', itemlist =[]):
         title = ' - ' + option['title'] if 'title' in option else ''
         title = '%sx%s%s' % (season_number, episode_number, title)
         extra = set_extra_values(item, option, item.path)
-        if season_number == item.filterseason or not item.filterseason:
+        if season_number == int(item.filterseason) or not item.filterseason:
             itemlist.append(Item(channel = item.channel,
                                  title = set_title(title, extra.language, extra.quality),
                                  fulltitle = item.fulltitle,
