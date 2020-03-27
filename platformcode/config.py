@@ -221,6 +221,7 @@ def open_settings():
 
 
     from specials import move_videolibrary
+    move_videolibrary.set_new_path(settings_pre.get('downloadpath'), settings_post.get('downloadpath'))
 
     # si se ha puesto que se quiere autoconfigurar y se había creado el directorio de la videoteca
     if not settings_pre.get("videolibrary_kodi", None) and settings_post.get("videolibrary_kodi", None) \

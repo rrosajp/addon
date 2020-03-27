@@ -153,6 +153,7 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
         p += 5
         progress.update(90, config.get_localized_string(20000), config.get_localized_string(80013))
 
+
 def clear_videolibrary_db():
     log()
     progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(60601))
@@ -224,6 +225,8 @@ def clear_videolibrary_db():
 
 def set_new_path(old, new=''):
     log()
+    if new == old: return
+
     SOURCES_PATH = xbmc.translatePath("special://userdata/sources.xml")
     if filetools.isfile(SOURCES_PATH):
         xmldoc = minidom.parse(SOURCES_PATH)
