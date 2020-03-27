@@ -19,6 +19,9 @@ metodos:
 """
 from __future__ import division
 from future import standard_library
+
+from core.item import Item
+
 standard_library.install_aliases()
 from builtins import range
 from builtins import object
@@ -112,9 +115,13 @@ class Downloader(object):
                 self.speed[1], self.speed[2], self.connections[0], self.connections[1])
             line3 = config.get_localized_string(60202) % (self.remaining_time)
 
-            progreso.update(int(self.progress), line1, line2 + line3)
+            progreso.update(int(self.progress), line1, line2 + '\n' + line3)
+            self.__update_json()
+
+        progreso.close()
 
     def start(self):
+        self.__update_json(started=False)
         if self._state == self.states.error: return
         conns = []
         for x in range(self._max_connections):
@@ -187,7 +194,7 @@ class Downloader(object):
 
     # Funciones internas
     def __init__(self, url, path, filename=None, headers=[], resume=True, max_connections=10, block_size=2 ** 17,
-                 part_size=2 ** 24, max_buffer=10):
+                 part_size=2 ** 24, max_buffer=10, json_path=None):
         # Parametros
         self._resume = resume
         self._path = path
@@ -196,6 +203,7 @@ class Downloader(object):
         self._block_size = block_size
         self._part_size = part_size
         self._max_buffer = max_buffer
+        self._json_path = json_path
 
         try:
             import xbmc
@@ -576,3 +584,13 @@ class Downloader(object):
 
             self.__set_part_stopped__(id)
         logger.info("Thread stopped: %s" % threading.current_thread().name)
+
+    def __update_json(self, started=True):
+        item = Item().fromjson(filetools.read(self._json_path))
+        if started and item.downloadStatus == 0:  # stopped
+            logger.info('Download paused')
+            self.stop()
+        elif item.downloadProgress != self.progress or not started:
+            params = {"downloadStatus": 4, "downloadComplete": 0, "downloadProgress": self.progress}
+            item.__dict__.update(params)
+            filetools.write(self._json_path, item.tojson())

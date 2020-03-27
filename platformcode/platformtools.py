@@ -591,7 +591,7 @@ def set_context_commands(item, parent_item):
                     channel="infoplus", action="start", from_channel=item.channel).tourl())))
 
         # Ir al Menu Principal (channel.mainlist)
-        if parent_item.channel not in ["news", "channelselector"] and item.action != "mainlist" \
+        if parent_item.channel not in ["news", "channelselector", "downloads"] and item.action != "mainlist" \
                 and parent_item.action != "mainlist":
             context_commands.insert(0, (config.get_localized_string(60349), "XBMC.Container.Refresh (%s?%s)" %
                                      (sys.argv[0], Item(channel=item.channel, action="mainlist").tourl())))
@@ -666,7 +666,7 @@ def set_context_commands(item, parent_item):
                                          (sys.argv[0], item.clone(action="add_pelicula_to_library",
                                                                   from_action=item.action).tourl())))
 
-        if item.channel not in ["downloads", "videolibrary"] and item.server != 'torrent':
+        if item.channel not in ["downloads", "videolibrary"] and item.server != 'torrent' and config.get_setting('downloadenabled'):
             # Descargar pelicula
             if item.contentType == "movie":
                 context_commands.append((config.get_localized_string(60354), "XBMC.RunPlugin(%s?%s)" %

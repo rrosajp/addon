@@ -15,17 +15,16 @@ import re
 import time
 import unicodedata
 from threading import Thread
-
+import xbmc
 
 from core import filetools, jsontools, scraper, scrapertools, servertools, videolibrarytools, support
 from core.downloader import Downloader
 from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
-from platformcode.launcher import downloaderObj
 
-STATUS_COLORS = {0: "orange", 1: "orange", 2: "green", 3: "red"}
-STATUS_CODES = type("StatusCode", (), {"stoped": 0, "canceled": 1, "completed": 2, "error": 3})
+STATUS_COLORS = {0: "black", 1: "black", 2: "green", 3: "red", 4: "yellow"}
+STATUS_CODES = type("StatusCode", (), {"stoped": 0, "canceled": 1, "completed": 2, "error": 3, "downloading": 4})
 DOWNLOAD_LIST_PATH = config.get_setting("downloadlistpath")
 DOWNLOAD_PATH = config.get_setting("downloadpath")
 STATS_FILE = filetools.join(config.get_data_path(), "servers.json")
@@ -95,13 +94,13 @@ def mainlist(item):
     if 2 in estados:
         itemlist.insert(0, Item(channel=item.channel, action="clean_ready", title=config.get_localized_string(70218),
                                 contentType=item.contentType, contentChannel=item.contentChannel,
-                                contentSerieName=item.contentSerieName, text_color="sandybrown"))
+                                contentSerieName=item.contentSerieName, text_color=STATUS_COLORS[STATUS_CODES.completed]))
 
     # Si hay alguno con error
     if 3 in estados:
         itemlist.insert(0, Item(channel=item.channel, action="restart_error", title=config.get_localized_string(70219),
                                 contentType=item.contentType, contentChannel=item.contentChannel,
-                                contentSerieName=item.contentSerieName, text_color="orange"))
+                                contentSerieName=item.contentSerieName, text_color=STATUS_COLORS[STATUS_CODES.error]))
 
     # Si hay alguno pendiente
     if 1 in estados or 0 in estados:
@@ -113,6 +112,13 @@ def mainlist(item):
         itemlist.insert(0, Item(channel=item.channel, action="clean_all", title=support.typo(config.get_localized_string(70221),'bold'),
                                 contentType=item.contentType, contentChannel=item.contentChannel,
                                 contentSerieName=item.contentSerieName))
+
+    # if there's at least one downloading
+    if 4 in estados:
+        itemlist.insert(0, Item(channel=item.channel, action="stop_all", title=config.get_localized_string(80017),
+                                contentType=item.contentType, contentChannel=item.contentChannel,
+                                contentSerieName=item.contentSerieName,
+                                text_color=STATUS_COLORS[STATUS_CODES.downloading]))
 
     if not item.contentType == "tvshow" and config.get_setting("browser") == True:
         itemlist.insert(0, Item(channel=item.channel, action="browser", title=support.typo(config.get_localized_string(70222),'bold'),url=DOWNLOAD_PATH))
@@ -132,7 +138,6 @@ def settings(item):
 def browser(item):
     logger.info()
     itemlist = []
-    context = [{ 'title': 'cancella', 'channel': 'downloads', 'action': "del_file"}]
 
     for file in filetools.listdir(item.url):
         if file == "list": continue
@@ -145,15 +150,18 @@ def browser(item):
 
 
 def del_file(item):
-    ok = platformtools.dialog_yesno(config.get_localized_string(30039),config.get_localized_string(30040))
+    ok = platformtools.dialog_yesno(config.get_localized_string(30039),config.get_localized_string(30040) % item.title)
     if ok:
         filetools.remove(item.url)
+        xbmc.sleep(100)
         platformtools.itemlist_refresh()
+
 
 def del_dir(item):
     ok = platformtools.dialog_yesno(config.get_localized_string(30037),config.get_localized_string(30038))
     if ok:
         filetools.rmdirtree(item.url)
+        xbmc.sleep(100)
         platformtools.itemlist_refresh()
 
 
@@ -166,7 +174,19 @@ def clean_all(item):
             if not item.contentType == "tvshow" or (
                             item.contentSerieName == download_item.contentSerieName and item.contentChannel == download_item.contentChannel):
                 filetools.remove(filetools.join(DOWNLOAD_LIST_PATH, fichero))
+    xbmc.sleep(100)
+    platformtools.itemlist_refresh()
 
+
+def stop_all(item):
+    logger.info()
+
+    for fichero in sorted(filetools.listdir(DOWNLOAD_LIST_PATH)):
+        if fichero.endswith(".json"):
+            download_item = Item().fromjson(filetools.read(filetools.join(DOWNLOAD_LIST_PATH, fichero)))
+            if download_item.downloadStatus == 4:
+                update_json(filetools.join(DOWNLOAD_LIST_PATH, fichero), {"downloadStatus": STATUS_CODES.stoped})
+    xbmc.sleep(100)
     platformtools.itemlist_refresh()
 
 
@@ -205,6 +225,13 @@ def restart_error(item):
 
 def download_all(item):
     time.sleep(0.5)
+    item.action = "download_all_background"
+    xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?" + item.tourl() + ")")
+    xbmc.sleep(100)
+    platformtools.itemlist_refresh()
+
+
+def download_all_background(item):
     for fichero in sorted(filetools.listdir(DOWNLOAD_LIST_PATH)):
         if fichero.endswith(".json"):
             download_item = Item(path=filetools.join(DOWNLOAD_LIST_PATH, fichero)).fromjson(
@@ -227,28 +254,35 @@ def menu(item):
         servidor = "Auto"
     # Opciones disponibles para el menu
     op = [config.get_localized_string(70225), config.get_localized_string(70226), config.get_localized_string(70227),
-          config.get_localized_string(30165) % (servidor.capitalize())]
+          config.get_localized_string(30165) % (servidor.capitalize()), config.get_localized_string(80015),
+          config.get_localized_string(80016)]
 
     opciones = []
 
     # Opciones para el menu
-    if item.downloadStatus == 0:  # Sin descargar
+    if item.downloadStatus == STATUS_CODES.stoped:
         opciones.append(op[0])  # Descargar
         if not item.server: opciones.append(op[3])  # Elegir Servidor
         opciones.append(op[1])  # Eliminar de la lista
 
-    if item.downloadStatus == 1:  # descarga parcial
+    if item.downloadStatus == STATUS_CODES.canceled:
         opciones.append(op[0])  # Descargar
         if not item.server: opciones.append(op[3])  # Elegir Servidor
         opciones.append(op[2])  # Reiniciar descarga
         opciones.append(op[1])  # Eliminar de la lista
 
-    if item.downloadStatus == 2:  # descarga completada
+    if item.downloadStatus == STATUS_CODES.completed:
+        opciones.append(op[5])  # Play
         opciones.append(op[1])  # Eliminar de la lista
         opciones.append(op[2])  # Reiniciar descarga
 
-    if item.downloadStatus == 3:  # descarga con error
+    if item.downloadStatus == STATUS_CODES.error:  # descarga con error
         opciones.append(op[2])  # Reiniciar descarga
+        opciones.append(op[1])  # Eliminar de la lista
+
+    if item.downloadStatus == STATUS_CODES.downloading:
+        opciones.append(op[5])  # Play
+        opciones.append(op[4])  # pause download
         opciones.append(op[1])  # Eliminar de la lista
 
     # Mostramos el dialogo
@@ -264,8 +298,8 @@ def menu(item):
 
     # Opcion inicaiar descarga
     if opciones[seleccion] == op[0]:
-        th = Thread(target=start_download, args=(item,))
-        th.start()
+        item.action = "start_download"
+        xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?" + item.tourl() + ")")
 
     # Elegir Servidor
     if opciones[seleccion] == op[3]:
@@ -279,6 +313,14 @@ def menu(item):
         update_json(item.path, {"downloadStatus": STATUS_CODES.stoped, "downloadComplete": 0, "downloadProgress": 0,
                                 "downloadServer": {}})
 
+    if opciones[seleccion] == op[4]:
+        update_json(item.path, {"downloadStatus": STATUS_CODES.stoped})
+
+    if opciones[seleccion] == op[5]:
+        platformtools.play_video(Item(channel="downloads", title=item.downloadFilename, action="play",
+                                      url=filetools.join(DOWNLOAD_PATH, item.downloadFilename), infoLabels=item.infoLabels))
+
+    xbmc.sleep(100)
     platformtools.itemlist_refresh()
 
 
@@ -525,7 +567,8 @@ def download_from_url(url, item):
                    max_connections=1 + int(config.get_setting("max_connections", "downloads")),
                    block_size=2 ** (17 + int(config.get_setting("block_size", "downloads"))),
                    part_size=2 ** (20 + int(config.get_setting("part_size", "downloads"))),
-                   max_buffer=2 * int(config.get_setting("max_buffer", "downloads")))
+                   max_buffer=2 * int(config.get_setting("max_buffer", "downloads")),
+                   json_path=item.path)
     d.start_dialog(config.get_localized_string(60332))
 
     # Descarga detenida. Obtenemos el estado:
@@ -830,14 +873,18 @@ def write_json(item):
             item.__dict__.pop(name)
 
     path = filetools.join(config.get_setting("downloadlistpath"), str(time.time()) + ".json")
-    filetools.write(path, item.tojson())
     item.path = path
+    filetools.write(path, item.tojson())
     time.sleep(0.1)
 
 
 def save_download(item):
     logger.info()
+    item.action = "save_download_background"
+    xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?" + item.tourl() + ")")
 
+
+def save_download_background(item):
     # Menu contextual
     if item.from_action and item.from_channel:
         item.channel = item.from_channel
@@ -859,7 +906,6 @@ def save_download(item):
 
     elif item.contentType == "movie":
         save_download_movie(item)
-
     else:
         save_download_video(item)
 

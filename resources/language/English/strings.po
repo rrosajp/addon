@@ -6102,3 +6102,15 @@ msgstr ""
 msgctxt "#80014"
 msgid "The video library has been moved"
 msgstr ""
+
+msgctxt "#80015"
+msgid "Stop download"
+msgstr ""
+
+msgctxt "#80016"
+msgid "Play"
+msgstr ""
+
+msgctxt "#80017"
+msgid "Stop all"
+msgstr ""

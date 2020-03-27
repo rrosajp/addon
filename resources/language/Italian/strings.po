@@ -6102,3 +6102,15 @@ msgstr "Aggiornamento database..."
 msgctxt "#80014"
 msgid "The video library has been moved"
 msgstr "La videoteca è stata spostata"
+
+msgctxt "#80015"
+msgid "Stop download"
+msgstr "Stoppa download"
+
+msgctxt "#80016"
+msgid "Play"
+msgstr "Riproduci"
+
+msgctxt "#80017"
+msgid "Stop all"
+msgstr "Stoppa tutti"
