@@ -235,19 +235,47 @@ def select(item):
 
 
 def episodios(item):
-    support.log()
+    support.log(len(item.url))
     itemlist = []
-    with futures.ThreadPoolExecutor() as executor:
-        itlist = [executor.submit(load_episodes, key, item) for key in item.url]
-        for res in futures.as_completed(itlist):
-            if res.result():
-                itemlist += res.result()
-    if itemlist and itemlist[0].VL:
-        # itemlist.reverse()
-        itemlist = sorted(itemlist, key=lambda it: it.order)
-        support.videolibrary(itemlist, item)
+    if type(item.url) in [list, dict] and len(item.url) > 1 and ('name' in item.url[0] and 'stagione' not in item.url[0]['name'].lower()):
+        for key in item.url:
+            itemlist.append(support.Item(channel = item.channel, title = support.typo(key['name'], 'bold'), fulltitle = item.fulltitle, show = item.show, thumbnail = item.thumbnail,
+                                        fanart = item.fanart, url = getUrl(key['path_id']), plot = item.plot, contentType = 'tvshow',
+                                        action = 'episodios'))
+
+    elif type(item.url) in [list, dict]:
+        with futures.ThreadPoolExecutor() as executor:
+            itlist = [executor.submit(load_episodes, key, item) for key in item.url]
+            for res in futures.as_completed(itlist):
+                if res.result():
+                    itemlist += res.result()
+        if itemlist and itemlist[0].VL:
+            # itemlist.reverse()
+            itemlist = sorted(itemlist, key=lambda it: it.order)
+            support.videolibrary(itemlist, item)
+        else:
+            itemlist = sorted(itemlist, key=lambda it: it.title)
+
     else:
-        itemlist = sorted(itemlist, key=lambda it: it.title)
+        if type(item.url) in [list, dict]: item.url = getUrl(item.url[0]['path_id'])
+        json = current_session.get(item.url).json()['items']
+        for key in json:
+            ep = support.match(key['subtitle'], patron=r'(?:St\s*(\d+))?\s*Ep\s*(\d+)').match
+            if ep:
+                season = '1' if not ep[0] else ep[0]
+                episode = ep[1].zfill(2)
+                title = support.re.sub(r'(?:St\s*\d+)?\s*Ep\s*\d+','',key['subtitle'])
+                title = season + 'x' + episode + (' - ' + title if not title.startswith(' ') else title if title else '')
+            else:
+                title = key['subtitle'].strip()
+            # title = key['subtitle'].strip()
+            if not title:
+                title = key['name']
+            itemlist.append(support.Item(channel = item.channel, title = support.typo(title, 'bold'), fulltitle = item.fulltitle, show = item.show, thumbnail = item.thumbnail,
+                                        fanart = getUrl(key['images']['landscape']), url = key['video_url'], plot = key['description'], contentType = 'episode',
+                                        action = 'findvideos', VL=True if ep else False))
+
+        if itemlist and itemlist[0].VL: support.videolibrary(itemlist, item)
     return itemlist
 
 
@@ -310,11 +338,10 @@ def addinfo(key, item):
 
 def load_episodes(key, item):
     support.log()
-    itemlist=[]
+    itemlist = []
     json = current_session.get(getUrl(key['path_id'])).json()['items']
     order = 0
     for key in json:
-        support.log(key)
         ep = support.match(key['subtitle'], patron=r'(?:St\s*(\d+))?\s*Ep\s*(\d+)').match
         if ep:
             season = '1' if not ep[0] else ep[0]
@@ -323,9 +350,9 @@ def load_episodes(key, item):
             order = int(season + episode)
         else:
             title = key['subtitle'].strip()
-        # title = key['subtitle'].strip()
         if not title:
             title = key['name']
+
         itemlist.append(support.Item(channel = item.channel, title = support.typo(title, 'bold'), fulltitle = item.fulltitle, show = item.show, thumbnail = item.thumbnail,
                                      fanart = getUrl(key['images']['landscape']), url = key['video_url'], plot = key['description'], contentType = 'episode',
                                      action = 'findvideos', VL=True if ep else False, order=order))
