@@ -111,9 +111,6 @@ def findvideos(item):
     log()
     if item.args != 'update':
         data = item.url
-        toUnshorten = scrapertools.find_multiple_matches(data, 'https?://buckler.link/[a-zA-Z0-9]+')
-        for link in toUnshorten:
-            data += '\n' + httptools.downloadpage(link, follow_redirects=False).headers["Location"]
         return support.server(item, data=data)
     else:
         itemlist = []
