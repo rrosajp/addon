@@ -106,19 +106,20 @@ class Downloader(object):
     def start_dialog(self, title=config.get_localized_string(60200)):
         from platformcode import platformtools
         progreso = platformtools.dialog_progress_bg(title, config.get_localized_string(60201))
-        self.start()
-        while self.state == self.states.downloading:
-            time.sleep(0.1)
-            line1 = "%s" % (self.filename)
-            line2 = config.get_localized_string(59983) % (
-                self.progress, self.downloaded[1], self.downloaded[2], self.size[1], self.size[2],
-                self.speed[1], self.speed[2], self.connections[0], self.connections[1])
-            line3 = config.get_localized_string(60202) % (self.remaining_time)
+        try:
+            self.start()
+            while self.state == self.states.downloading:
+                time.sleep(0.2)
+                line1 = "%s" % (self.filename)
+                line2 = config.get_localized_string(59983) % (
+                    self.downloaded[1], self.downloaded[2], self.size[1], self.size[2],
+                    self.speed[1], self.speed[2], self.connections[0], self.connections[1])
+                line3 = config.get_localized_string(60202) % (self.remaining_time)
 
-            progreso.update(int(self.progress), line1, line2 + '\n' + line3)
-            self.__update_json()
-
-        progreso.close()
+                progreso.update(int(self.progress), line1, line2 + line3)
+                self.__update_json()
+        finally:
+            progreso.close()
 
     def start(self):
         self.__update_json(started=False)
@@ -587,10 +588,11 @@ class Downloader(object):
 
     def __update_json(self, started=True):
         item = Item().fromjson(filetools.read(self._json_path))
+        progress = int(self.progress)
         if started and item.downloadStatus == 0:  # stopped
             logger.info('Download paused')
             self.stop()
-        elif item.downloadProgress != self.progress or not started:
-            params = {"downloadStatus": 4, "downloadComplete": 0, "downloadProgress": self.progress}
+        elif item.downloadProgress != progress or not started:
+            params = {"downloadStatus": 4, "downloadComplete": 0, "downloadProgress": progress}
             item.__dict__.update(params)
             filetools.write(self._json_path, item.tojson())

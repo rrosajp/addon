@@ -551,7 +551,7 @@ msgid "torrent"
 msgstr ""
 
 msgctxt "#59983"
-msgid "%.2f%% - %.2f %s of %.2f %s a %.2f %s/s (%d/%d)"
+msgid "%.2f %s of %.2f %s a %.2f %s/s (%d/%d)"
 msgstr ""
 
 msgctxt "#59985"
@@ -991,7 +991,7 @@ msgid "Download starting..."
 msgstr ""
 
 msgctxt "#60202"
-msgid "Remaining time: %s"
+msgid "R.T : %s"
 msgstr ""
 
 msgctxt "#60203"

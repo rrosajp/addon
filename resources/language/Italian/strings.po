@@ -550,8 +550,8 @@ msgid "torrent"
 msgstr "torrent"
 
 msgctxt "#59983"
-msgid "%.2f%% - %.2f %s of %.2f %s a %.2f %s/s (%d/%d)"
-msgstr "%.2f%% - %.2f %s di %.2f %s a %.2f %s/s (%d/%d)"
+msgid "%.2f %s of %.2f %s a %.2f %s/s (%d/%d)"
+msgstr "%.2f %s di %.2f %s a %.2f %s/s (%d/%d)"
 
 msgctxt "#59985"
 msgid "Error in the channel "
@@ -990,8 +990,8 @@ msgid "Download starting..."
 msgstr "Inizio download..."
 
 msgctxt "#60202"
-msgid "Remaining time: %s"
-msgstr "Tempo rimanente: %s"
+msgid "R.T. : %s"
+msgstr "T.R. : %s"
 
 msgctxt "#60203"
 msgid "Downloader %s/%s"
