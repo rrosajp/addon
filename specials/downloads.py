@@ -17,13 +17,19 @@ import unicodedata
 from threading import Thread
 import xbmc
 
+from channelselector import get_thumb
 from core import filetools, jsontools, scraper, scrapertools, servertools, videolibrarytools, support
 from core.downloader import Downloader
 from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
 
-STATUS_COLORS = {0: "black", 1: "black", 2: "green", 3: "red", 4: "yellow"}
+kb = '0xFF65B3DA'
+kg = '0xFF65DAA8'
+kr = '0xFFDA6865'
+ky = '0xFFDAAB65'
+
+STATUS_COLORS = {0: '', 1: '', 2: kg, 3: kr, 4: kb}
 STATUS_CODES = type("StatusCode", (), {"stoped": 0, "canceled": 1, "completed": 2, "error": 3, "downloading": 4})
 DOWNLOAD_LIST_PATH = config.get_setting("downloadlistpath")
 DOWNLOAD_PATH = config.get_setting("downloadpath")
@@ -31,8 +37,8 @@ STATS_FILE = filetools.join(config.get_data_path(), "servers.json")
 
 FOLDER_MOVIES = config.get_setting("folder_movies")
 FOLDER_TVSHOWS = config.get_setting("folder_tvshows")
-TITLE_FILE = "[COLOR %s][%i%%][/COLOR] %s"
-TITLE_TVSHOW = "[COLOR %s][%i%%][/COLOR] %s [%s]"
+TITLE_FILE = "[COLOR %s]| %i%% |[/COLOR] - %s"
+TITLE_TVSHOW = "[COLOR %s]| %i%% |[/COLOR] - %s [%s]"
 
 
 def mainlist(item):
@@ -90,41 +96,47 @@ def mainlist(item):
 
     estados = [i.downloadStatus for i in itemlist]
 
+    # if there's at least one downloading
+    if 4 in estados:
+        itemlist.insert(0, Item(channel=item.channel, action="stop_all", title= support.typo(config.get_localized_string(60222),'bold'),
+                                contentType=item.contentType, contentChannel=item.contentChannel,
+                                contentSerieName=item.contentSerieName, thumbnail=get_thumb('stop.png'),
+                                text_color=STATUS_COLORS[STATUS_CODES.downloading]))
+
     # Si hay alguno completado
     if 2 in estados:
         itemlist.insert(0, Item(channel=item.channel, action="clean_ready", title=config.get_localized_string(70218),
-                                contentType=item.contentType, contentChannel=item.contentChannel,
+                                contentType=item.contentType, contentChannel=item.contentChannel, thumbnail=get_thumb('delete.png'),
                                 contentSerieName=item.contentSerieName, text_color=STATUS_COLORS[STATUS_CODES.completed]))
 
     # Si hay alguno con error
     if 3 in estados:
         itemlist.insert(0, Item(channel=item.channel, action="restart_error", title=config.get_localized_string(70219),
-                                contentType=item.contentType, contentChannel=item.contentChannel,
+                                contentType=item.contentType, contentChannel=item.contentChannel, thumbnail=get_thumb('update.png'),
                                 contentSerieName=item.contentSerieName, text_color=STATUS_COLORS[STATUS_CODES.error]))
 
     # Si hay alguno pendiente
     if 1 in estados or 0 in estados:
         itemlist.insert(0, Item(channel=item.channel, action="download_all", title=support.typo(config.get_localized_string(70220),'bold'),
-                                contentType=item.contentType, contentChannel=item.contentChannel,
+                                contentType=item.contentType, contentChannel=item.contentChannel, thumbnail=get_thumb('downloads.png'),
                                 contentSerieName=item.contentSerieName))
 
     if len(itemlist):
         itemlist.insert(0, Item(channel=item.channel, action="clean_all", title=support.typo(config.get_localized_string(70221),'bold'),
-                                contentType=item.contentType, contentChannel=item.contentChannel,
+                                contentType=item.contentType, contentChannel=item.contentChannel, thumbnail=get_thumb('delete.png'),
                                 contentSerieName=item.contentSerieName))
 
-    # if there's at least one downloading
-    if 4 in estados:
-        itemlist.insert(0, Item(channel=item.channel, action="stop_all", title=config.get_localized_string(60222),
-                                contentType=item.contentType, contentChannel=item.contentChannel,
-                                contentSerieName=item.contentSerieName,
-                                text_color=STATUS_COLORS[STATUS_CODES.downloading]))
-
     if not item.contentType == "tvshow" and config.get_setting("browser") == True:
-        itemlist.insert(0, Item(channel=item.channel, action="browser", title=support.typo(config.get_localized_string(70222),'bold'),url=DOWNLOAD_PATH))
+        itemlist.insert(0, Item(channel=item.channel, action="browser", title=support.typo(config.get_localized_string(70222),'bold'), thumbnail=get_thumb('search.png'), url=DOWNLOAD_PATH))
 
     if not item.contentType == "tvshow":
-        itemlist.append(Item(channel='shortcuts', action="SettingOnPosition", category=4, setting=0, title= support.typo(config.get_localized_string(70288),'bold color kod')))
+        itemlist.append(Item(channel='shortcuts', action="SettingOnPosition", category=4, setting=0, title= support.typo(config.get_localized_string(70288),'bold color kod'), thumbnail=get_thumb('setting_0.png')))
+
+    # Reload
+    if estados:
+        itemlist.insert(0, Item(channel=item.channel, action="reload", title= support.typo(config.get_localized_string(70008),'bold color kod'),
+                                contentType=item.contentType, contentChannel=item.contentChannel, thumbnail=get_thumb('update.png'),
+                                contentSerieName=item.contentSerieName))
 
     return itemlist
 
@@ -176,6 +188,10 @@ def clean_all(item):
                             item.contentSerieName == download_item.contentSerieName and item.contentChannel == download_item.contentChannel):
                 filetools.remove(filetools.join(DOWNLOAD_LIST_PATH, fichero))
     xbmc.sleep(100)
+    platformtools.itemlist_update(item, True)
+
+
+def reload(item):
     platformtools.itemlist_update(item, True)
 
 
@@ -317,9 +333,10 @@ def menu(item):
         update_json(item.path, {"downloadStatus": STATUS_CODES.stoped})
 
     if opciones[seleccion] == op[5]:
-        xbmc.executebuiltin('PlayMedia(' + filetools.join(DOWNLOAD_PATH, item.downloadFilename) + ',resume)')
+        xbmc.executebuiltin('PlayMedia(' + filetools.join(DOWNLOAD_PATH, item.downloadFilename) + ')')
 
-    platformtools.itemlist_update(item, True)
+    if opciones[seleccion] != op[5]:
+        platformtools.itemlist_update(item, True)
 
 
 def move_to_libray(item):
