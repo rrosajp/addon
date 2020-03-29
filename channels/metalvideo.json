@@ -1,0 +1,11 @@
+{
+  "id": "metalvideo",
+  "name": "Metal Video",
+  "active": true,
+  "adult": false,
+  "language": ["all"],
+  "thumbnail": "metalvideo.png",
+  "banner": "metalvideo.png",
+  "categories": ["music"],
+  "settings" :[]
+}

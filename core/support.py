@@ -1029,7 +1029,7 @@ def pagination(itemlist, item, page, perpage, function_level=1):
                  thumbnail=thumb()))
     return itemlist
 
-def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, down_load=True, patronTag=None):
+def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, down_load=True, patronTag=None, video_library=True):
 
     if not data and not itemlist:
         data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
@@ -1069,9 +1069,9 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
 
     if patronTag:
         addQualityTag(item, verifiedItemlist, data, patronTag)
-    return controls(verifiedItemlist, item, AutoPlay, CheckLinks, down_load)
+    return controls(verifiedItemlist, item, AutoPlay, CheckLinks, down_load, video_library)
 
-def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
+def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True, video_library=True):
     from core import jsontools
     from platformcode.config import get_setting
 
@@ -1100,7 +1100,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
     if AutoPlay == True and not 'downloads' in inspect.stack()[3][1] + inspect.stack()[4][1]:
         autoplay.start(itemlist, item)
 
-    if item.contentChannel != 'videolibrary': videolibrary(itemlist, item, function_level=3)
+    if item.contentChannel != 'videolibrary' and video_library: videolibrary(itemlist, item, function_level=3)
     if get_setting('downloadenabled') and down_load == True: download(itemlist, item, function_level=3)
 
     VL = False
