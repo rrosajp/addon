@@ -108,7 +108,7 @@ def getchanneltypes(view="thumb_"):
     logger.info()
 
     # Lista de categorias
-    channel_types = ["movie", "tvshow", "anime", "documentary", "vos", "direct", "live"] # , "torrent"
+    channel_types = ["movie", "tvshow", "anime", "documentary", "vos", "direct", "live", "music"] # , "torrent"
 
     if config.get_setting("adult_mode") != 0:
         channel_types.append("adult")
@@ -407,7 +407,7 @@ def thumb(item_or_itemlist=None, genre=False, thumb=''):
                  'channels_children':['bambini', 'kids'],
                  'horror':['horror'],
                  'lucky': ['fortunato'],
-                 'channels_musical':['musical', 'musica', 'music'],
+                 'channels_music':['musical', 'musica', 'music'],
                  'channels_mistery':['mistero', 'giallo', 'mystery'],
                  'channels_noir':['noir'],
                  'popular' : ['popolari','popolare', 'più visti'],

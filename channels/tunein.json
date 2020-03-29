@@ -1,0 +1,11 @@
+{
+  "id": "tunein",
+  "name": "TuneIn",
+  "active": true,
+  "adult": false,
+  "language": ["all"],
+  "thumbnail": "tunein.png",
+  "banner": "tunein.png",
+  "categories": ["music"],
+  "settings" :[]
+}

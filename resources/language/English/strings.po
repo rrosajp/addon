@@ -317,6 +317,10 @@ msgctxt "#30138"
 msgid "Live"
 msgstr ""
 
+msgctxt "#30139"
+msgid "Music"
+msgstr ""
+
 msgctxt "#30151"
 msgid "Watch the video"
 msgstr ""
