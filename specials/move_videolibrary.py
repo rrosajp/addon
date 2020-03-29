@@ -136,6 +136,16 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
                     strPath = record[1].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
                     sql = 'UPDATE movie SET c22="%s" WHERE idMovie=%s' % (strPath, idMovie)
                     nun_records, records = xbmc_videolibrary.execute_sql_kodi(sql)
+            # search and modify in "movie_view"
+            sql = 'SELECT idMovie, c22, strPath FROM movie_view where c22 LIKE "%s"' % old
+            nun_records, records = xbmc_videolibrary.execute_sql_kodi(sql)
+            if records:
+                for record in records:
+                    idMovie = record[0]
+                    c22 = record[1].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    strPath = record[2].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    sql = 'UPDATE movie_view SET c22="%s", strPath="%s" WHERE idMovie=%s' % (c22, strPath, idMovie)
+                    nun_records, records = xbmc_videolibrary.execute_sql_kodi(sql)
         else:
             # if is Tv Show Folder
             # search and modify in "episode"
@@ -146,6 +156,34 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
                     idEpisode = record[0]
                     strPath = record[1].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
                     sql = 'UPDATE episode SET c18="%s" WHERE idEpisode=%s' % (strPath, idEpisode)
+                    nun_records, records = xbmc_videolibrary.execute_sql_kodi(sql)
+            # search and modify in "episode_view"
+            sql = 'SELECT idEpisode, c18, strPath FROM episode_view where strPath LIKE "%s"' % old
+            nun_records, records = xbmc_videolibrary.execute_sql_kodi(sql)
+            if records:
+                for record in records:
+                    idEpisode = record[0]
+                    c18 = record[1].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    strPath = record[2].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    sql = 'UPDATE episode_view SET c18="%s", strPath="%s" WHERE idEpisode=%s' % (c18, strPath, idEpisode)
+                    nun_records, records = xbmc_videolibrary.execute_sql_kodi(sql)
+            # search and modify in "season_view"
+            sql = 'SELECT idSeason, strPath FROM season_view where strPath LIKE "%s"' % old
+            nun_records, records = xbmc_videolibrary.execute_sql_kodi(sql)
+            if records:
+                for record in records:
+                    idSeason = record[0]
+                    strPath = record[1].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    sql = 'UPDATE season_view SET strPath="%s" WHERE idSeason=%s' % (strPath, idSeason)
+                    nun_records, records = xbmc_videolibrary.execute_sql_kodi(sql)
+            # search and modify in "tvshow_view"
+            sql = 'SELECT idShow, strPath FROM tvshow_view where strPath LIKE "%s"' % old
+            nun_records, records = xbmc_videolibrary.execute_sql_kodi(sql)
+            if records:
+                for record in records:
+                    idShow = record[0]
+                    strPath = record[1].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    sql = 'UPDATE tvshow_view SET strPath="%s" WHERE idShow=%s' % (strPath, idShow)
                     nun_records, records = xbmc_videolibrary.execute_sql_kodi(sql)
         p += 5
         progress.update(p, config.get_localized_string(20000), config.get_localized_string(80013))
@@ -304,5 +342,5 @@ def update_sources(old, new=''):
 def clear_cache():
     path = xbmc.translatePath('special://home/cache/archive_cache/')
     for file in filetools.listdir(path):
-        log(file)
         filetools.remove(filetools.join(path, file))
+    xbmc.executebuiltin('XBMC.ReloadSkin()')
