@@ -910,7 +910,7 @@ def download(itemlist, item, typography='', function_level=1, function=''):
 
     contentSerieName=item.contentSerieName if item.contentSerieName else ''
     contentTitle=item.contentTitle if item.contentTitle else ''
-    serverItemlist = [i.tourl() for i in itemlist]
+    downloadItemlist = [i.tourl() for i in itemlist]
 
     if itemlist and item.contentChannel != 'videolibrary':
         itemlist.append(
@@ -927,7 +927,7 @@ def download(itemlist, item, typography='', function_level=1, function=''):
                  contentTitle=contentTitle,
                  path=item.path,
                  thumbnail=thumb(thumb='downloads.png'),
-                 serverItemlist=serverItemlist
+                 downloadItemlist=downloadItemlist
             ))
         if from_action == 'episodios':
             itemlist.append(
@@ -944,7 +944,7 @@ def download(itemlist, item, typography='', function_level=1, function=''):
                      contentTitle=contentTitle,
                      download='season',
                      thumbnail=thumb(thumb='downloads.png'),
-                     serverItemlist=serverItemlist
+                     downloadItemlist=downloadItemlist
             ))
 
     return itemlist

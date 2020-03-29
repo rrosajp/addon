@@ -537,7 +537,7 @@ def save_tvshow(item, episodelist):
                 item_tvshow.library_filter_show = {item.channel: item.show}
 
     if item.channel != "downloads":
-        item_tvshow.active = 1  # para que se actualice a diario cuando se llame a videolibrary_service
+        item_tvshow.active = 1  # para que se actualice a diario cuando se llame a service
 
     filetools.write(tvshow_path, head_nfo + item_tvshow.tojson())
 
@@ -601,7 +601,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
             nostrm_episodelist.append(season_episode)
     nostrm_episodelist = sorted(set(nostrm_episodelist))
 
-    # Silent es para no mostrar progreso (para videolibrary_service)
+    # Silent es para no mostrar progreso (para service)
     if not silent:
         # progress dialog
         p_dialog = platformtools.dialog_progress(config.get_localized_string(20000), config.get_localized_string(60064))

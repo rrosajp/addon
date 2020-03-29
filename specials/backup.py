@@ -90,8 +90,8 @@ def import_videolibrary(item):
     platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(80008))
 
     if platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(80009)):
-        import videolibrary_service
-        videolibrary_service.check_for_update(overwrite=True)
+        import service
+        service.check_for_update(overwrite=True)
 
     if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
         xbmc_videolibrary.update()

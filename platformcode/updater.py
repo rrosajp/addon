@@ -49,7 +49,7 @@ def loadCommits(page=1):
     return ret
 
 
-# ret -> aggiornato, necessita reload videolibrary_service
+# ret -> aggiornato, necessita reload service
 def check(background=False):
     if not addon.getSetting('addon_update_enabled'):
         return False, False
@@ -109,7 +109,7 @@ def check(background=False):
                         logger.info(file["filename"])
                         if 'resources/language' in file["filename"]:
                             poFilesChanged = True
-                        if 'videolibrary_service.py' in file["filename"]:
+                        if 'service.py' in file["filename"]:
                             serviceChanged = True
                         if file['status'] == 'modified' or file['status'] == 'added':
                             if 'patch' in file:

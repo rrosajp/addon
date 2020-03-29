@@ -1822,11 +1822,11 @@ def redirect_clone_newpct1(item, head_nfo=None, it=None, path=False, overwrite=F
     #     - patron5:      expresión Regex aplicable a la url (opcional)
     #     - content_inc:  contenido al que aplica esta entrada, o * (item.contentType o item.extra)
     #     - content_exc:  contenido que se excluye de esta entrada (item.contentType) (opcional).  opción para 'emerg'
-    #     - ow_force:     indicador para la acción de "videolibrary_service.py".  Puede crear la variable item.ow_force:
-    #                         - force:    indica al canal que analize toda la serie y que videolibrary_service la reescriba
-    #                         - auto:     indica a videolibrary_service que la reescriba
-    #                         - no:       no acción para videolibrary_service, solo redirige en visionado de videolibrary
-    #                         - del:      borra las estrucuturas de un determinado canal en videolibrary_service, quizás creadas por errores de un canal
+    #     - ow_force:     indicador para la acción de "service.py".  Puede crear la variable item.ow_force:
+    #                         - force:    indica al canal que analize toda la serie y que service la reescriba
+    #                         - auto:     indica a service que la reescriba
+    #                         - no:       no acción para service, solo redirige en visionado de videolibrary
+    #                         - del:      borra las estrucuturas de un determinado canal en service, quizás creadas por errores de un canal
     #                         - emerg:    funcionalidad muy similar a la de "del".  se general dinámicamente cada vez que entra un canal con el estado activado en el .json de "emergency_urls".  Permite cargar las urls de emergencia en todos los elementos existentes de la Videoteca para canal afectado
     #     ejemplos:
     #     ('1', 'mejortorrent', 'mejortorrent1', 'http://www.mejortorrent.com/', 'https://mejortorrent1.com/', '(http.?:\/\/.*?\/)', 'http.?:\/\/.*?\/.*?-torrent.?-[^-]+-(?:[^-]+-)([^0-9]+-)', 'http.?:\/\/.*?\/.*?-torrent.?-[^-]+-(?:[^-]+-)[^0-9]+-\\d+-(Temporada-).html', 'http.?:\/\/.*?\/.*?-torrent.?-[^-]+-(?:[^-]+-)[^0-9]+-(\\d+)-', '', 'tvshow, season', '', 'force'),
@@ -1835,7 +1835,7 @@ def redirect_clone_newpct1(item, head_nfo=None, it=None, path=False, overwrite=F
     #     ('1', 'newpct1', '', '', '', '', '', '', '', '', '*', '', 'del'),
     #     ('1', 'torrentrapid', 'torrentrapid', '', '', '', '', '', '', '', '*', '1 ó 2', 'emerg'),
     #
-    # La llamada recibe el parámetro Item, el .nfo y los devuleve actualizados, así como opcionalmente el parámetro "overwrite· que puede forzar la reescritura de todos los archivos de la serie, y el parámetro "path" si viene de videolibrary_service.  Por último, recibe opcionalmente el parámetro "lookup" si se quiere solo averigurar si habrá migración para ese título, pero sin realizarla.
+    # La llamada recibe el parámetro Item, el .nfo y los devuleve actualizados, así como opcionalmente el parámetro "overwrite· que puede forzar la reescritura de todos los archivos de la serie, y el parámetro "path" si viene de service.  Por último, recibe opcionalmente el parámetro "lookup" si se quiere solo averigurar si habrá migración para ese título, pero sin realizarla.
     #
     # """
     # #logger.debug(item)

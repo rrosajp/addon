@@ -622,16 +622,16 @@ msgid "No links available that meets the requirements of the Black list. Try aga
 msgstr "Nessun collegamento disponibile che soddisfi i requisiti della Black list. Riprova modificando il filtro in 'Configurazione Server"
 
 msgctxt "#60003"
-msgid "Connessione con %s"
-msgstr "Connessione con %s"
+msgid ""
+msgstr ""
 
 msgctxt "#60004"
 msgid "No connector for the server %s"
 msgstr "Non c'è nessun connettore per il server %s"
 
 msgctxt "#60005"
-msgid "Connecting with %s"
-msgstr "Connessione con %s"
+msgid ""
+msgstr ""
 
 msgctxt "#60006"
 msgid "An error has occurred in %s"
@@ -3526,8 +3526,8 @@ msgid "Getting episodes..."
 msgstr "Ottenimento episodi..."
 
 msgctxt "#70187"
-msgid "connecting with %s..."
-msgstr "connessione con %s..."
+msgid ""
+msgstr ""
 
 msgctxt "#70188"
 msgid "Obtaining data for the TV show"

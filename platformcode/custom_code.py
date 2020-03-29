@@ -37,7 +37,7 @@ def init():
 
     Los pasos que sigue esta función, son los siguientes:
 
-    1.- La función se llama desde videolibrary_service.py, desde la función inicial:
+    1.- La función se llama desde service.py, desde la función inicial:
             # Copia Custom code a las carpetas de Alfa desde la zona de Userdata
             from platformcode import custom_code
             custom_code.init()

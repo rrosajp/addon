@@ -96,13 +96,6 @@ def mainlist(item):
 
     estados = [i.downloadStatus for i in itemlist]
 
-    # if there's at least one downloading
-    if 4 in estados:
-        itemlist.insert(0, Item(channel=item.channel, action="stop_all", title= support.typo(config.get_localized_string(60222),'bold'),
-                                contentType=item.contentType, contentChannel=item.contentChannel,
-                                contentSerieName=item.contentSerieName, thumbnail=get_thumb('stop.png'),
-                                text_color=STATUS_COLORS[STATUS_CODES.downloading]))
-
     # Si hay alguno completado
     if 2 in estados:
         itemlist.insert(0, Item(channel=item.channel, action="clean_ready", title=config.get_localized_string(70218),
@@ -125,6 +118,13 @@ def mainlist(item):
         itemlist.insert(0, Item(channel=item.channel, action="clean_all", title=support.typo(config.get_localized_string(70221),'bold'),
                                 contentType=item.contentType, contentChannel=item.contentChannel, thumbnail=get_thumb('delete.png'),
                                 contentSerieName=item.contentSerieName))
+
+    # if there's at least one downloading
+    if 4 in estados:
+        itemlist.insert(0, Item(channel=item.channel, action="stop_all", title=config.get_localized_string(60222),
+                                contentType=item.contentType, contentChannel=item.contentChannel,
+                                contentSerieName=item.contentSerieName, thumbnail=get_thumb('stop.png'),
+                                text_color=STATUS_COLORS[STATUS_CODES.downloading]))
 
     if not item.contentType == "tvshow" and config.get_setting("browser") == True:
         itemlist.insert(0, Item(channel=item.channel, action="browser", title=support.typo(config.get_localized_string(70222),'bold'), thumbnail=get_thumb('search.png'), url=DOWNLOAD_PATH))
@@ -179,7 +179,7 @@ def del_dir(item):
 
 def clean_all(item):
     logger.info()
-    stop_all(item)
+    stop_all()
 
     for fichero in sorted(filetools.listdir(DOWNLOAD_LIST_PATH)):
         if fichero.endswith(".json"):
@@ -188,14 +188,14 @@ def clean_all(item):
                             item.contentSerieName == download_item.contentSerieName and item.contentChannel == download_item.contentChannel):
                 filetools.remove(filetools.join(DOWNLOAD_LIST_PATH, fichero))
     xbmc.sleep(100)
-    platformtools.itemlist_update(item, True)
+    platformtools.itemlist_refresh()
 
 
 def reload(item):
-    platformtools.itemlist_update(item, True)
+    platformtools.itemlist_refresh()
 
 
-def stop_all(item):
+def stop_all(item=None):
     logger.info()
 
     for fichero in sorted(filetools.listdir(DOWNLOAD_LIST_PATH)):
@@ -204,7 +204,8 @@ def stop_all(item):
             if download_item.downloadStatus == 4:
                 update_json(filetools.join(DOWNLOAD_LIST_PATH, fichero), {"downloadStatus": STATUS_CODES.stoped})
     xbmc.sleep(100)
-    platformtools.itemlist_update(item, True)
+    if item:
+        platformtools.itemlist_refresh()
 
 
 def clean_ready(item):
@@ -217,7 +218,7 @@ def clean_ready(item):
                 if download_item.downloadStatus == STATUS_CODES.completed:
                     filetools.remove(filetools.join(DOWNLOAD_LIST_PATH, fichero))
 
-    platformtools.itemlist_update(item, True)
+    platformtools.itemlist_refresh()
 
 
 def restart_error(item):
@@ -237,14 +238,14 @@ def restart_error(item):
                     update_json(item.path,
                                 {"downloadStatus": STATUS_CODES.stoped, "downloadComplete": 0, "downloadProgress": 0})
 
-    platformtools.itemlist_update(item, True)
+    platformtools.itemlist_refresh()
 
 
 def download_all(item):
     time.sleep(0.5)
     item.action = "download_all_background"
     xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?" + item.tourl() + ")")
-    platformtools.itemlist_update(item, True)
+    platformtools.itemlist_refresh()
 
 
 def download_all_background(item):
@@ -333,10 +334,10 @@ def menu(item):
         update_json(item.path, {"downloadStatus": STATUS_CODES.stoped})
 
     if opciones[seleccion] == op[5]:
-        xbmc.executebuiltin('PlayMedia(' + filetools.join(DOWNLOAD_PATH, item.downloadFilename) + ')')
+        xbmc.executebuiltin('PlayMedia(' + filetools.join(DOWNLOAD_PATH, item.downloadFilename) + ',resume)')
 
     if opciones[seleccion] != op[5]:
-        platformtools.itemlist_update(item, True)
+        platformtools.itemlist_refresh()
 
 
 def move_to_libray(item):
@@ -584,6 +585,12 @@ def download_from_url(url, item):
                    part_size=2 ** (20 + int(config.get_setting("part_size", "downloads"))),
                    max_buffer=2 * int(config.get_setting("max_buffer", "downloads")),
                    json_path=item.path)
+    dir = filetools.dirname(item.downloadFilename)
+    file = filetools.join(dir, d.filename)
+
+    update_json(item.path, {"downloadUrl": d.download_url, "downloadStatus": STATUS_CODES.downloading, "downloadSize": d.size[0],
+            "downloadProgress": d.progress, "downloadCompleted": d.downloaded[0], "downloadFilename": file})
+
     d.start_dialog(config.get_localized_string(60332))
 
     # Descarga detenida. Obtenemos el estado:
@@ -607,9 +614,6 @@ def download_from_url(url, item):
 
     save_server_statistics(item.server, d.speed[0], d.state != d.states.error)
 
-    dir = filetools.dirname(item.downloadFilename)
-    file = filetools.join(dir, d.filename)
-
     if status == STATUS_CODES.completed:
         move_to_libray(item.clone(downloadFilename=file))
 
@@ -622,30 +626,32 @@ def download_from_server(item):
     unsupported_servers = ["torrent"]
 
     progreso = platformtools.dialog_progress_bg(config.get_localized_string(30101), config.get_localized_string(70178) % item.server)
-    if item.contentChannel == 'community':
-        channel = __import__('specials.%s' % item.contentChannel, None, None, ['specials.%s' % item.contentChannel])
-    else:
-        channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
-    if hasattr(channel, "play") and not item.play_menu:
-
-        progreso.update(50, config.get_localized_string(70178) % item.server, config.get_localized_string(60003) % item.contentChannel)
-        try:
-            itemlist = getattr(channel, "play")(item.clone(channel=item.contentChannel, action=item.contentAction))
-        except:
-            logger.error("Error in the channel %s" % item.contentChannel)
+    try:
+        if item.contentChannel == 'community':
+            channel = __import__('specials.%s' % item.contentChannel, None, None, ['specials.%s' % item.contentChannel])
         else:
-            if len(itemlist) and isinstance(itemlist[0], Item):
-                download_item = item.clone(**itemlist[0].__dict__)
-                download_item.contentAction = download_item.action
-                download_item.infoLabels = item.infoLabels
-                item = download_item
-            elif len(itemlist) and isinstance(itemlist[0], list):
-                item.video_urls = itemlist
-                if not item.server: item.server = "directo"
+            channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
+        if hasattr(channel, "play") and not item.play_menu:
+
+            progreso.update(50, config.get_localized_string(70178) % item.server, config.get_localized_string(70180) % item.contentChannel)
+            try:
+                itemlist = getattr(channel, "play")(item.clone(channel=item.contentChannel, action=item.contentAction))
+            except:
+                logger.error("Error in the channel %s" % item.contentChannel)
             else:
-                logger.info("There is nothing to reproduce")
-                return {"downloadStatus": STATUS_CODES.error}
-    progreso.close()
+                if len(itemlist) and isinstance(itemlist[0], Item):
+                    download_item = item.clone(**itemlist[0].__dict__)
+                    download_item.contentAction = download_item.action
+                    download_item.infoLabels = item.infoLabels
+                    item = download_item
+                elif len(itemlist) and isinstance(itemlist[0], list):
+                    item.video_urls = itemlist
+                    if not item.server: item.server = "directo"
+                else:
+                    logger.info("There is nothing to reproduce")
+                    return {"downloadStatus": STATUS_CODES.error}
+    finally:
+        progreso.close()
     logger.info("contentAction: %s | contentChannel: %s | server: %s | url: %s" % (
         item.contentAction, item.contentChannel, item.server, item.url))
 
@@ -691,9 +697,9 @@ def download_from_best_server(item):
     result = {"downloadStatus": STATUS_CODES.error}
     progreso = platformtools.dialog_progress_bg(config.get_localized_string(30101), config.get_localized_string(70179))
     try:
-        if item.serverItemlist:
+        if item.downloadItemlist:
             logger.info('using cached servers')
-            play_items = [Item().fromurl(i) for i in item.serverItemlist]
+            play_items = [Item().fromurl(i) for i in item.downloadItemlist]
         else:
             if item.contentChannel == 'community':
                 channel = __import__('specials.%s' % item.contentChannel, None, None, ['specials.%s' % item.contentChannel])
@@ -739,42 +745,46 @@ def download_from_best_server(item):
 
 
 def select_server(item):
+    if item.server:
+        return "Auto"
     logger.info(
         "contentAction: %s | contentChannel: %s | url: %s" % (item.contentAction, item.contentChannel, item.url))
-
-    progreso = platformtools.dialog_progress(config.get_localized_string(30101), config.get_localized_string(70179))
-    if item.serverItemlist:
-        logger.info('using cached servers')
-        play_items = [Item().fromurl(i) for i in item.serverItemlist]
-    else:
-        if item.contentChannel == 'community':
-            channel = __import__('specials.%s' % item.contentChannel, None, None, ['specials.%s' % item.contentChannel])
+    progreso = platformtools.dialog_progress_bg(config.get_localized_string(30101), config.get_localized_string(70179))
+    try:
+        if item.downloadItemlist:
+            logger.info('using cached servers')
+            play_items = [Item().fromurl(i) for i in item.downloadItemlist]
         else:
-            channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
-        progreso.update(50, config.get_localized_string(70184), config.get_localized_string(70180) % item.contentChannel)
+            if item.contentChannel == 'community':
+                channel = __import__('specials.%s' % item.contentChannel, None, None, ['specials.%s' % item.contentChannel])
+            else:
+                channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
+            progreso.update(50, config.get_localized_string(70184), config.get_localized_string(70180) % item.contentChannel)
 
-        if hasattr(channel, item.contentAction):
-            play_items = getattr(channel, item.contentAction)(
-                item.clone(action=item.contentAction, channel=item.contentChannel))
-        else:
-            play_items = servertools.find_video_items(item.clone(action=item.contentAction, channel=item.contentChannel))
+            if hasattr(channel, item.contentAction):
+                play_items = getattr(channel, item.contentAction)(
+                    item.clone(action=item.contentAction, channel=item.contentChannel))
+            else:
+                play_items = servertools.find_video_items(item.clone(action=item.contentAction, channel=item.contentChannel))
 
-    play_items = [x for x in play_items if x.action == "play" and not "trailer" in x.title.lower()]
-    progreso.update(100, config.get_localized_string(70183), config.get_localized_string(70181) % len(play_items))
+        play_items = [x for x in play_items if x.action == "play" and not "trailer" in x.title.lower()]
+        progreso.update(100, config.get_localized_string(70183), config.get_localized_string(70181) % len(play_items))
+    finally:
+        progreso.close()
 
     for x, i in enumerate(play_items):
         if not i.server and hasattr(channel, "play"):
             play_items[x] = getattr(channel, "play")(i)
 
     seleccion = platformtools.dialog_select(config.get_localized_string(70192), ["Auto"] + [s.title for s in play_items])
-    if seleccion > 1:
+    if seleccion >= 1:
         update_json(item.path, {
             "downloadServer": {"url": play_items[seleccion - 1].url, "server": play_items[seleccion - 1].server}})
+        return play_items[seleccion - 1]
     elif seleccion == 0:
         update_json(item.path, {"downloadServer": {}})
-
-    # platformtools.itemlist_update(item, True)
-    return play_items[seleccion - 1]
+        return play_items[0]
+    # platformtools.itemlist_refresh()
 
 
 def start_download(item):
@@ -809,13 +819,16 @@ def get_episodes(item):
 
     # El item es uma serie o temporada
     elif item.contentType in ["tvshow", "season"]:
-        # importamos el canal
-        if item.contentChannel == 'community':
-            channel = __import__('specials.%s' % item.contentChannel, None, None, ["specials.%s" % item.contentChannel])
+        if item.downloadItemlist:
+            episodes = [Item().fromurl(i) for i in item.downloadItemlist]
         else:
-            channel = __import__('channels.%s' % item.contentChannel, None, None, ["channels.%s" % item.contentChannel])
-        # Obtenemos el listado de episodios
-        episodes = getattr(channel, item.contentAction)(item)
+            # importamos el canal
+            if item.contentChannel == 'community':
+                channel = __import__('specials.%s' % item.contentChannel, None, None, ["specials.%s" % item.contentChannel])
+            else:
+                channel = __import__('channels.%s' % item.contentChannel, None, None, ["channels.%s" % item.contentChannel])
+            # Obtenemos el listado de episodios
+            episodes = getattr(channel, item.contentAction)(item)
 
     itemlist = []
 
@@ -896,6 +909,12 @@ def write_json(item):
 
 def save_download(item):
     logger.info()
+    show_disclaimer()
+    if item.channel != 'downloads':
+        item.from_channel = item.channel
+        item.from_action = item.action
+
+    item.channel = "downloads"
     item.action = "save_download_background"
     xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?" + item.tourl() + ")")
 
@@ -969,10 +988,13 @@ def save_download_movie(item):
                                 config.get_localized_string(30109))
     else:
         play_item = select_server(item)
-        play_item = item.clone(**play_item.__dict__)
-        play_item.contentAction = play_item.action
-        play_item.infoLabels = item.infoLabels
-        start_download(play_item)
+        if play_item == 'Auto':
+            start_download(item)
+        else:
+            play_item = item.clone(**play_item.__dict__)
+            play_item.contentAction = play_item.action
+            play_item.infoLabels = item.infoLabels
+            start_download(play_item)
 
 
 def save_download_tvshow(item):
@@ -980,25 +1002,26 @@ def save_download_tvshow(item):
         item.contentAction, item.contentChannel, item.contentType, item.contentSerieName))
 
     progreso = platformtools.dialog_progress_bg(config.get_localized_string(30101), config.get_localized_string(70188))
+    try:
+        item.show = item.fulltitle
+        scraper.find_and_set_infoLabels(item)
+        if not item.contentSerieName: item.contentSerieName = item.fulltitle
 
-    item.show = item.fulltitle
-    scraper.find_and_set_infoLabels(item)
-    if not item.contentSerieName: item.contentSerieName = item.fulltitle
+        item.downloadFilename = filetools.validate_path("%s [%s]" % (item.contentSerieName, item.infoLabels['IMDBNumber']))
+        if config.get_setting("lowerize_title", "videolibrary"):
+            item.downloadFilename = item.downloadFilename.lower()
+        progreso.update(0, config.get_localized_string(70186), config.get_localized_string(70180) % item.contentChannel)
 
-    item.downloadFilename = filetools.validate_path("%s [%s]" % (item.contentSerieName, item.infoLabels['IMDBNumber']))
-    if config.get_setting("lowerize_title", "videolibrary"):
-        item.downloadFilename = item.downloadFilename.lower()
-    progreso.update(0, config.get_localized_string(70186), config.get_localized_string(70187) % item.contentChannel)
+        episodes = get_episodes(item)
 
-    episodes = get_episodes(item)
+        progreso.update(0, config.get_localized_string(70190), " ")
 
-    progreso.update(0, config.get_localized_string(70190), " ")
-
-    for x, i in enumerate(episodes):
-        progreso.update(old_div(x * 100, len(episodes)),
-                        "%dx%0.2d: %s" % (i.contentSeason, i.contentEpisodeNumber, i.contentTitle))
-        write_json(i)
-    progreso.close()
+        for x, i in enumerate(episodes):
+            progreso.update(old_div(x * 100, len(episodes)),
+                            "%dx%0.2d: %s" % (i.contentSeason, i.contentEpisodeNumber, i.contentTitle))
+            write_json(i)
+    finally:
+        progreso.close()
 
     if not platformtools.dialog_yesno(config.get_localized_string(30101), config.get_localized_string(70189)):
         platformtools.dialog_ok(config.get_localized_string(30101),
@@ -1007,12 +1030,13 @@ def save_download_tvshow(item):
     else:
         if len(episodes) == 1:
             play_item = select_server(item)
-            play_item = item.clone(**play_item.__dict__)
-            play_item.contentAction = play_item.action
-            play_item.infoLabels = item.infoLabels
-            from core import support
-            support.dbg()
-            start_download(play_item)
+            if play_item == 'Auto':
+                start_download(item)
+            else:
+                play_item = item.clone(**play_item.__dict__)
+                play_item.contentAction = play_item.action
+                play_item.infoLabels = item.infoLabels
+                start_download(play_item)
         else:
             for i in episodes:
                 i.contentChannel = item.contentChannel
@@ -1027,3 +1051,10 @@ def set_movie_title(item):
 
     if not item.contentTitle:
         item.contentTitle = re.sub("\[[^\]]+\]|\([^\)]+\)", "", item.title).strip()
+
+
+def show_disclaimer():
+    line1 = config.get_localized_string(70690)
+    line2 = config.get_localized_string(70691)
+    line3 = config.get_localized_string(70692)
+    platformtools.dialog_ok(config.get_localized_string(20000), line1, line2, line3)

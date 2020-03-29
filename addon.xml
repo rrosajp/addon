@@ -34,6 +34,6 @@
     <forum>https://t.me/kodiondemand</forum>
     <source>https://github.com/kodiondemand/addon</source>
   </extension>
-  <extension point="xbmc.service" library="videolibrary_service.py" start="login|startup">
+  <extension point="xbmc.service" library="service.py" start="login|startup">
   </extension>
 </addon>

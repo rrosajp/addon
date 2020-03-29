@@ -667,8 +667,8 @@ def update_videolibrary(item):
     logger.info()
 
     # Actualizar las series activas sobreescribiendo
-    import videolibrary_service
-    videolibrary_service.check_for_update(overwrite=True)
+    import service
+    service.check_for_update(overwrite=True)
 
     # Eliminar las carpetas de peliculas que no contengan archivo strm
     for raiz, subcarpetas, ficheros in filetools.walk(videolibrarytools.MOVIES_PATH):
@@ -692,8 +692,8 @@ def update_tvshow(item):
     p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), heading)
     p_dialog.update(0, heading, item.contentSerieName)
 
-    import videolibrary_service
-    if videolibrary_service.update(item.path, p_dialog, 1, 1, item, False) and config.is_xbmc() and config.get_setting("videolibrary_kodi"):
+    import service
+    if service.update(item.path, p_dialog, 1, 1, item, False) and config.is_xbmc() and config.get_setting("videolibrary_kodi"):
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.update(folder=filetools.basename(item.path))
 

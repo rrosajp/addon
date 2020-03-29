@@ -798,7 +798,7 @@ def channel_status(item, dict_values):
 
 
 def restore_tools(item):
-    import videolibrary_service
+    import service
     from core import videolibrarytools
     import os
 
@@ -832,7 +832,7 @@ def restore_tools(item):
             # filetools.rmdirtree(path)
 
             # ... y la volvemos a añadir
-            videolibrary_service.update(path, p_dialog, i, t, serie, 3)
+            service.update(path, p_dialog, i, t, serie, 3)
         p_dialog.close()
 
         # movies

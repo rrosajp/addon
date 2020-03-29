@@ -1077,14 +1077,7 @@ def set_opcion(item, seleccion, opciones, video_urls):
     # "Descargar"
     elif opciones[seleccion] == config.get_localized_string(30153):
         from specials import downloads
-        import xbmcaddon
-        import xbmcgui
-        __addon__ = xbmcaddon.Addon()
-        __addonname__ = __addon__.getAddonInfo('name')
-        line1 = config.get_localized_string(70690)
-        line2 = config.get_localized_string(70691)
-        line3 = config.get_localized_string(70692)
-        xbmcgui.Dialog().ok(__addonname__, line1, line2, line3)
+        downloads.show_disclaimer()
 
         if item.contentType == "list" or item.contentType == "tvshow":
             item.contentType = "video"

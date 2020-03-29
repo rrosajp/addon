@@ -382,6 +382,10 @@ if __name__ == "__main__":
     import xbmc
     import time
 
+    # mark as stopped all downloads (if we are here, probably kodi just started)
+    from specials.downloads import stop_all
+    stop_all()
+
     # modo adulto:
     # sistema actual 0: Nunca, 1:Siempre, 2:Solo hasta que se reinicie Kodi
     # si es == 2 lo desactivamos.
