@@ -693,7 +693,7 @@ def update_tvshow(item):
     p_dialog.update(0, heading, item.contentSerieName)
 
     import videolibrary_service
-    if videolibrary_service.update(item.path, p_dialog, 1, 1, item, False) and config.is_xbmc():
+    if videolibrary_service.update(item.path, p_dialog, 1, 1, item, False) and config.is_xbmc() and config.get_setting("videolibrary_kodi"):
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.update(folder=filetools.basename(item.path))
 
@@ -926,10 +926,10 @@ def delete(item):
         if ficheros == []:
             filetools.rmdir(_item.path)
 
-        if config.is_xbmc():
+        if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
             import xbmc
-            # esperamos 3 segundos para dar tiempo a borrar los ficheros
-            xbmc.sleep(3000)
+            # esperamos 5 segundos para dar tiempo a borrar los ficheros
+            xbmc.sleep(5000)
             # TODO mirar por qué no funciona al limpiar en la videoteca de Kodi al añadirle un path
             # limpiamos la videoteca de Kodi
             from platformcode import xbmc_videolibrary

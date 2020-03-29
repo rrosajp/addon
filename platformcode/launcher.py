@@ -84,7 +84,7 @@ def run(item=None):
                 item = Item(channel="channelselector", action="getmainlist", viewmode="movie")
         if not config.get_setting('show_once'):
             from platformcode import xbmc_videolibrary
-            xbmc_videolibrary.ask_set_content(1, config.get_setting('videolibrary_kodi_force'))
+            xbmc_videolibrary.ask_set_content(silent=False)
             config.set_setting('show_once', True)
 
     logger.info(item.tostring())

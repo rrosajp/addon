@@ -115,7 +115,7 @@ def mainlist(item):
 
     # if there's at least one downloading
     if 4 in estados:
-        itemlist.insert(0, Item(channel=item.channel, action="stop_all", title=config.get_localized_string(80017),
+        itemlist.insert(0, Item(channel=item.channel, action="stop_all", title=config.get_localized_string(60222),
                                 contentType=item.contentType, contentChannel=item.contentChannel,
                                 contentSerieName=item.contentSerieName,
                                 text_color=STATUS_COLORS[STATUS_CODES.downloading]))
@@ -254,8 +254,8 @@ def menu(item):
         servidor = "Auto"
     # Opciones disponibles para el menu
     op = [config.get_localized_string(70225), config.get_localized_string(70226), config.get_localized_string(70227),
-          config.get_localized_string(30165) % (servidor.capitalize()), config.get_localized_string(80015),
-          config.get_localized_string(80016)]
+          config.get_localized_string(30165) % (servidor.capitalize()), config.get_localized_string(60220),
+          config.get_localized_string(60221)]
 
     opciones = []
 
@@ -369,14 +369,14 @@ def move_to_libray(item):
                 logger.info('Delete File: ' + str(filetools.join(config.get_videolibrary_path(), FOLDER, path_title, File)))
                 filetools.remove(filetools.join(config.get_videolibrary_path(), FOLDER, path_title, File))
 
-        from platformcode import xbmc_videolibrary
-
-        xbmc_videolibrary.update(FOLDER)
-        if clean == True:
-            import xbmc
-            while xbmc.getCondVisibility('Library.IsScanningVideo()'):
-                xbmc.sleep(500)
-            xbmc_videolibrary.clean()
+        if config.get_setting("videolibrary_kodi"):
+            from platformcode import xbmc_videolibrary
+            xbmc_videolibrary.update(FOLDER)
+            if clean == True:
+                import xbmc
+                while xbmc.getCondVisibility('Library.IsScanningVideo()'):
+                    xbmc.sleep(500)
+                xbmc_videolibrary.clean()
 
     if config.get_setting("library_add") == True and config.get_setting("library_move") == False:
         if filetools.isfile(final_path):

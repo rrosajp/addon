@@ -221,7 +221,7 @@ def save_movie(item):
             if filetools.write(nfo_path, head_nfo + item_nfo.tojson()):
                 #logger.info("FOLDER_MOVIES : %s" % FOLDER_MOVIES)
                 # actualizamos la videoteca de Kodi con la pelicula
-                if config.is_xbmc():
+                if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
                     from platformcode import xbmc_videolibrary
                     xbmc_videolibrary.update()
 
@@ -831,7 +831,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
             fallidos = -1
         else:
             # ... si ha sido correcto actualizamos la videoteca de Kodi
-            if config.is_xbmc() and not silent:
+            if config.is_xbmc() and config.get_setting("videolibrary_kodi") and not silent:
                 from platformcode import xbmc_videolibrary
                 xbmc_videolibrary.update()
 

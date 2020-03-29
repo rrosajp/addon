@@ -229,7 +229,7 @@ def check_for_update(overwrite=True):
                 if serie_actualizada:
                     if config.get_setting("search_new_content", "videolibrary") == 0:
                         # Actualizamos la videoteca de Kodi: Buscar contenido en la carpeta de la serie
-                        if config.is_xbmc():
+                        if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
                             from platformcode import xbmc_videolibrary
                             xbmc_videolibrary.update(folder=filetools.basename(path))
                     else:
@@ -240,7 +240,7 @@ def check_for_update(overwrite=True):
 
             if config.get_setting("search_new_content", "videolibrary") == 1 and update_when_finished:
                 # Actualizamos la videoteca de Kodi: Buscar contenido en todas las series
-                if config.is_xbmc():
+                if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
                     from platformcode import xbmc_videolibrary
                     xbmc_videolibrary.update()
 

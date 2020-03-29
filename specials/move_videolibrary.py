@@ -20,44 +20,41 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
     backup_current_path = current_path
     backup_new_path = new_path
 
-    if current_path != new_path or current_movies_folder != new_movies_folder or current_tvshows_folder != new_tvshows_folder:
-        notify = False
-        progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80011))
-        current_path = xbmc.translatePath(current_path)
-        new_path = xbmc.translatePath(new_path)
-        current_movies_path = filetools.join(current_path, current_movies_folder)
-        new_movies_path = filetools.join(new_path, new_movies_folder)
-        current_tvshows_path = os.path.join(current_path, current_tvshows_folder)
-        new_tvshows_path = os.path.join(new_path, new_tvshows_folder)
+    notify = False
+    progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80011))
+    current_path = xbmc.translatePath(current_path)
+    new_path = xbmc.translatePath(new_path)
+    current_movies_path = filetools.join(current_path, current_movies_folder)
+    new_movies_path = filetools.join(new_path, new_movies_folder)
+    current_tvshows_path = os.path.join(current_path, current_tvshows_folder)
+    new_tvshows_path = os.path.join(new_path, new_tvshows_folder)
 
-        config.verify_directories_created()
-        progress.update(10, config.get_localized_string(20000), config.get_localized_string(80012))
-        if current_movies_path != new_movies_path:
-            if filetools.listdir(current_movies_path):
-                dir_util.copy_tree(current_movies_path, new_movies_path)
-                notify = True
-            filetools.rmdirtree(current_movies_path)
-        progress.update(40)
-        if current_tvshows_path != new_tvshows_path:
-            if filetools.listdir(current_tvshows_path):
-                dir_util.copy_tree(current_tvshows_path, new_tvshows_path)
-                notify = True
-            filetools.rmdirtree(current_tvshows_path)
-        progress.update(70)
-        if current_path != new_path and not filetools.listdir(current_path) and not "plugin.video.kod\\videolibrary" in current_path:
-            filetools.rmdirtree(current_path)
+    config.verify_directories_created()
+    progress.update(10, config.get_localized_string(20000), config.get_localized_string(80012))
+    if current_movies_path != new_movies_path:
+        if filetools.listdir(current_movies_path):
+            dir_util.copy_tree(current_movies_path, new_movies_path)
+            notify = True
+        filetools.rmdirtree(current_movies_path)
+    progress.update(40)
+    if current_tvshows_path != new_tvshows_path:
+        if filetools.listdir(current_tvshows_path):
+            dir_util.copy_tree(current_tvshows_path, new_tvshows_path)
+            notify = True
+        filetools.rmdirtree(current_tvshows_path)
+    progress.update(70)
+    if current_path != new_path and not filetools.listdir(current_path) and not "plugin.video.kod\\videolibrary" in current_path:
+        filetools.rmdirtree(current_path)
 
-        if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
-            set_new_path(backup_current_path, backup_new_path)
-            update_db(backup_current_path, backup_new_path, current_movies_folder, new_movies_folder, current_tvshows_folder, new_tvshows_folder, progress)
-            clear_cache()
-        else:
-            progress.update(90, config.get_localized_string(20000), config.get_localized_string(80013))
+    if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
+        update_sources(backup_current_path, backup_new_path)
+        update_db(backup_current_path, backup_new_path, current_movies_folder, new_movies_folder, current_tvshows_folder, new_tvshows_folder, progress)
+        clear_cache()
 
-        progress.update(100)
-        progress.close()
-        if notify:
-            platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80014), icon=0, time=5000, sound=False)
+    progress.update(100)
+    progress.close()
+    if notify:
+        platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80014), icon=0, time=5000, sound=False)
 
 
 def update_db(current_path, new_path, current_movies_folder, new_movies_folder, current_tvshows_folder, new_tvshows_folder, progress):
@@ -95,7 +92,7 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
         nun_records, records = xbmc_videolibrary.execute_sql_kodi(sql)
 
     p = 80
-    progress.update(90, config.get_localized_string(20000), config.get_localized_string(80013))
+    progress.update(p, config.get_localized_string(20000), config.get_localized_string(80013))
 
     OLD = old
     for OldPath, NewPath in [[current_movies_folder, new_movies_folder], [current_tvshows_folder, new_tvshows_folder]]:
@@ -151,12 +148,12 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
                     sql = 'UPDATE episode SET c18="%s" WHERE idEpisode=%s' % (strPath, idEpisode)
                     nun_records, records = xbmc_videolibrary.execute_sql_kodi(sql)
         p += 5
-        progress.update(90, config.get_localized_string(20000), config.get_localized_string(80013))
+        progress.update(p, config.get_localized_string(20000), config.get_localized_string(80013))
 
 
-def clear_videolibrary_db():
+def clear_db():
     log()
-    progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(60601))
+    progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80025))
     progress.update(0)
 
 
@@ -217,13 +214,13 @@ def clear_videolibrary_db():
             sql = 'DELETE from episode WHERE idEpisode=%s' % idEpisode
             nun_records, records = xbmc_videolibrary.execute_sql_kodi(sql)
     progress.update(80)
-    set_new_path(path)
+    update_sources(path)
     clear_cache()
     progress.update(100)
     progress.close()
 
 
-def set_new_path(old, new=''):
+def update_sources(old, new=''):
     log()
     if new == old: return
 
