@@ -1059,7 +1059,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         item.title = typo(item.contentTitle.strip(),'bold') if item.contentType == 'movie' or (config.get_localized_string(30161) in item.title) else item.title
 
         videoitem.plot= typo(videoitem.title, 'bold') + typo(videoitem.quality, '_ [] bold')
-        videoitem.title = item.title + (typo(videoitem.title, '_ color kod [] bold') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
+        videoitem.title = (item.title  if item.channel not in ['url'] else '') + (typo(videoitem.title, '_ color kod [] bold') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail
@@ -1079,13 +1079,17 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True, vid
     autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
     channel_node = autoplay_node.get(item.channel, {})
     if not channel_node:  # non ha mai aperto il menu del canale quindi in autoplay_data.json non c'e la key
-        channelFile = __import__('channels.' + item.channel, fromlist=["channels.%s" % item.channel])
-        autoplay.init(item.channel, channelFile.list_servers, channelFile.list_quality)
+        try:
+            channelFile = __import__('channels.' + item.channel, fromlist=["channels.%s" % item.channel])
+        except:
+            channelFile = __import__('specials.' + item.channel, fromlist=["specials.%s" % item.channel])
+        if hasattr(channelFile, 'list_servers') and hasattr(channelFile, 'list_quality'):
+            autoplay.init(item.channel, channelFile.list_servers, channelFile.list_quality)
 
     autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
     channel_node = autoplay_node.get(item.channel, {})
     settings_node = channel_node.get('settings', {})
-    AP = get_setting('autoplay') or settings_node['active']
+    AP = get_setting('autoplay') or (settings_node['active'] if 'active' in settings_node else False)
     HS = config.get_setting('hide_servers') or (settings_node['hide_servers'] if 'hide_server' in settings_node else False)
 
     if CL and not AP:
