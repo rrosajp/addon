@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
-#from builtins import str
-from builtins import range
 import sys
+
+# from builtins import str
+from builtins import range
+
 PY3 = False
 VFS = True
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int; VFS = False
@@ -15,7 +17,6 @@ else:
     import urllib
 
 import time
-import threading
 import os
 import traceback
 import re
@@ -31,7 +32,6 @@ from core import filetools
 from core import httptools
 from core import scrapertools
 from core import jsontools
-from core.item import Item
 from platformcode import logger
 from platformcode import config
 from platformcode import platformtools

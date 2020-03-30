@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-
 import sys
+
+from platformcode import config
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
@@ -22,7 +24,7 @@ def test_video_exists(page_url):
     page = httptools.downloadpage(page_url)
     url = page.url
     if "Not Found" in page.data or "/404" in url:
-        return False, "[Vidup] El fichero no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "Vidup"
     return True, ""
 
 

@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-import re
 from core import httptools
 from core import scrapertools
-from platformcode import logger
 from lib import jsunpack
+from platformcode import logger
 
 
 def get_video_url(page_url, video_password):

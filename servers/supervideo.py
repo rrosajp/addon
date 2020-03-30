@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import ast
+
 from core import httptools
 from core import scrapertools
 from lib import jsunpack
 from platformcode import config, logger
-import ast
 
- 
+
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     global data

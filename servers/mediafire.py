@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
 
 
@@ -9,7 +9,7 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url).data
     if "Invalid or Deleted File" in data or "Well, looks like we" in data:
-        return False, "[Mediafire] El archivo no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "Mediafire"
     if "File Removed for Violation" in data:
         return False, "[Mediafire] Archivo eliminado por infracción"
     return True, ""

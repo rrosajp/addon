@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-
 from core import httptools
 from core import scrapertools
 from lib import jsunpack
+from platformcode import config
 from platformcode import logger
 
 
@@ -11,7 +11,7 @@ def test_video_exists(page_url):
     data = httptools.downloadpage(page_url)
 
     if "Object not found" in data.data or "longer exists on our servers" in data.data:
-        return False, "[Fastplay] El archivo no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "Fastplay"
     if data.code == 500:
         return False, "[Fastplay] Error interno del servidor"
     return True, ""

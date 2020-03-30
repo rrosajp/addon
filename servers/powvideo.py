@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-
 import sys
+
+from platformcode import config
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
-
-import re
 
 from core import httptools
 from core import scrapertools
@@ -25,7 +25,7 @@ def test_video_exists(page_url):
     if data == "File was deleted" or data == '':
         return False, "[powvideo] El video ha sido borrado"
     if 'function(p,a,c,k,e,' not in data:
-        return False, "[powvideo] El video no está disponible"
+        return False,  config.get_localized_string(70449) % "powvideo"
     return True, ""
 
 

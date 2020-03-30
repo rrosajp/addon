@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from builtins import range
 import sys
+
+from builtins import range
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 

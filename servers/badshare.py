@@ -2,10 +2,11 @@
 # --------------------------------------------------------
 # Conector Badshare By Alfa development Group
 # --------------------------------------------------------
-
 import re
+
 from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
 
 
@@ -14,7 +15,7 @@ def test_video_exists(page_url):
     global page
     page = httptools.downloadpage(page_url)
     if not page.sucess:
-        return False, "[Badshare] El fichero no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "Badshare"
     return True, ""
 
 

@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-
 import re
 
 from core import httptools
 from core import scrapertools
 from lib import jsunpack
+from platformcode import config
 from platformcode import logger
+
 
 def test_video_exists(page_url):
     data = httptools.downloadpage(page_url).data
     if data == "File was deleted" or data == '':
-        return False, "[mp4upload] El video ha sido borrado"
+        return False,  config.get_localized_string(70449) % "mp4upload"
 
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):

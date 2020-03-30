@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 from core import httptools
 from core import scrapertools
 from lib import jsunpack
@@ -12,7 +13,7 @@ def test_video_exists(page_url):
     if "Video not found..." in data or "Video removed due to copyright" in data:
         return False, config.get_localized_string(70292) % "Thevid"
     if "Video removed for inactivity..." in data:
-        return False, "[Thevid] El video ha sido removido por inactividad"
+        return False,  config.get_localized_string(70449) % "Thevid"
     return True, ""
 
 

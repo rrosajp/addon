@@ -2,9 +2,9 @@
 # --------------------------------------------------------
 # Conector pornhub By Alfa development Group
 # --------------------------------------------------------
-
 from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
 
 
@@ -16,7 +16,7 @@ def test_video_exists(page_url):
        or "removed" in response.data \
        or not "defaultQuality" in response.data \
        or "is no longer available" in response.data:
-        return False, "[pornhub] El fichero no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "pornhub"
     return True, ""
 
 def get_video_url(page_url, user="", password="", video_password=""):

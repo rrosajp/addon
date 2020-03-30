@@ -2,9 +2,9 @@
 # --------------------------------------------------------
 # Conector vidfast By Alfa development Group
 # --------------------------------------------------------
-import re
-from core import httptools, jsontools
+from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
 
 video_urls = []
@@ -16,7 +16,7 @@ def test_video_exists(page_url):
     global data
     data = response.data
     if not response.sucess or "Not Found" in data or "File was deleted" in data or "is no longer available" in data:
-        return False, "[vidfast] El fichero no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "vidfast"
     return True, ""
 
 

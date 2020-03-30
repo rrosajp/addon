@@ -3,8 +3,11 @@
 # Conector javwhores By Alfa development Group
 # --------------------------------------------------------
 import re
+
 from core import httptools
+from platformcode import config
 from platformcode import logger
+
 
 def test_video_exists(page_url):
 
@@ -14,7 +17,7 @@ def test_video_exists(page_url):
        "Not Found" in response.data \
        or "File was deleted" in response.data \
        or "is no longer available" in response.data:
-        return False, "[javwhores] El fichero no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "javwhores"
 
     # global video_url, license_code
     # video_url = scrapertools.find_single_match(response.data, "video_url: '([^']+)'")

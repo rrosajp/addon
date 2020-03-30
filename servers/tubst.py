@@ -2,9 +2,9 @@
 # --------------------------------------------------------
 # Conector tubst By Alfa development Group
 # --------------------------------------------------------
-
 from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
 
 
@@ -12,7 +12,7 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     response = httptools.downloadpage(page_url)
     if not response.sucess or "Not Found" in response.data or "File was deleted" in response.data or "is no longer available" in response.data:
-        return False, "[tubst] El fichero no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "tubst"
     return True, ""
 
 

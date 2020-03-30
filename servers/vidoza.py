@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 from core import httptools
 from core import jsontools
 from core import scrapertools
@@ -11,7 +12,7 @@ def test_video_exists(page_url):
     global data
     data = httptools.downloadpage(page_url).data
     if "Page not found" in data or "File was deleted" in data:
-        return False, "[vidoza] El archivo no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "vidoza"
     elif "processing" in data:
         return False, config.get_localized_string(70449) % "Vidoza"
 

@@ -2,7 +2,9 @@
 # Kodi on Demand - Kodi Addon - Kodi Addon
 # by DrZ3r0 - Fix Alhaziel
 
-import re, json
+import json
+import re
+
 try:
     import urllib.parse as urllib
 except ImportError:

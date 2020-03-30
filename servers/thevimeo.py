@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 # -*- Server Thevimeo -*-
-
 import re
+
 from core import httptools
-from core import scrapertools
-from platformcode import logger
+from platformcode import config
 
 
 def get_source(url):
@@ -18,7 +17,7 @@ def test_video_exists(page_url):
     data = get_source(page_url)
 
     if "File was deleted" in data or "File Not Found" in data:
-        return False, "[Thevimeo] El video ha sido borrado"
+        return False,  config.get_localized_string(70449) % "Thevimeo"
 
     return True, ""
 

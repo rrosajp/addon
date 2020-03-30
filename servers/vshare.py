@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-
 import re
 
 from core import httptools
 from core import scrapertools
 from lib import jsunpack
+from platformcode import config
 from platformcode import logger
 
 
@@ -12,7 +12,7 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     response = httptools.downloadpage(page_url)
     if response.code != 200 or "No longer available!" in response.data:
-        return False, "[vshare] El archivo no existe o ha sido borrado."
+        return False,  config.get_localized_string(70449) % "vshare"
     else:
         return True, ""
 

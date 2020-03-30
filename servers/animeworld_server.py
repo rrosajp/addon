@@ -2,7 +2,6 @@
 import urllib
 
 from core import httptools, jsontools
-from core import scrapertools
 from platformcode import logger
 
 
