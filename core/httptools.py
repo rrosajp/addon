@@ -131,8 +131,6 @@ def save_cookies(alfa_s=False):
     cookies_lock.release()
 
 
-load_cookies()
-
 def random_useragent():
     """
     Based on code from https://github.com/theriley106/RandomHeaders

@@ -161,17 +161,17 @@ def render_items(itemlist, parent_item):
         anime = False
         if 'anime' in channeltools.get_channel_parameters(parent_item.channel)['categories']:
             anime = True
-    try:
-        force_unify = channeltools.get_channel_parameters(parent_item.channel)['force_unify']
-    except:
-        force_unify = False
+    # try:
+    #     force_unify = channeltools.get_channel_parameters(parent_item.channel)['force_unify']
+    # except:
+    force_unify = False
 
     unify_enabled = config.get_setting('unify')
-    try:
-        if channeltools.get_channel_parameters(parent_item.channel)['adult']:
-            unify_enabled = False
-    except:
-        pass
+    # try:
+    #     if channeltools.get_channel_parameters(parent_item.channel)['adult']:
+    #         unify_enabled = False
+    # except:
+    #     pass
     # logger.debug('unify_enabled: %s' % unify_enabled)
 
     # Recorremos el itemlist

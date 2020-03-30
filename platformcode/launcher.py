@@ -17,13 +17,7 @@ else:
 
 import os
 import sys
-import time
 
-from core import channeltools
-from core import scrapertools
-from core import servertools
-from core import videolibrarytools
-from core import trakt_tools
 from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
@@ -162,6 +156,7 @@ def run(item=None):
         else:
             # Entry point for a channel is the "mainlist" action, so here we check parental control
             if item.action == "mainlist":
+                from core import channeltools
                 #updater.checkforupdates() beta version checking for update, still disabled
 
                 # Parental control
@@ -207,6 +202,7 @@ def run(item=None):
             if item.action == "play":
                 #define la info para trakt
                 try:
+                    from core import trakt_tools
                     trakt_tools.set_trakt_info(item)
                 except:
                     pass
@@ -241,6 +237,7 @@ def run(item=None):
 
             # Special action for findvideos, where the plugin looks for known urls
             elif item.action == "findvideos":
+                from core import servertools
 
                 # First checks if channel has a "findvideos" function
                 if hasattr(channel, 'findvideos'):
@@ -263,10 +260,12 @@ def run(item=None):
 
             # Special action for adding a movie to the library
             elif item.action == "add_pelicula_to_library":
+                from core import videolibrarytools
                 videolibrarytools.add_movie(item)
 
             # Special action for adding a serie to the library
             elif item.action == "add_serie_to_library":
+                from core import videolibrarytools
                 videolibrarytools.add_tvshow(item, channel)
 
             # Special action for downloading all episodes from a serie
@@ -279,6 +278,7 @@ def run(item=None):
             # Special action for searching, first asks for the words then call the "search" function
             elif item.action == "search":
                 logger.info("item.action=%s" % item.action.upper())
+                from core import channeltools
 
                 # last_search = ""
                 # last_search_active = config.get_setting("last_search", "search")
@@ -315,6 +315,7 @@ def run(item=None):
                 logger.info("Executing channel '%s' method" % item.action)
                 itemlist = getattr(channel, item.action)(item)
                 if config.get_setting('trakt_sync'):
+                    from core import trakt_tools
                     token_auth = config.get_setting("token_trakt", "trakt")
                     if not token_auth:
                         trakt_tools.auth_trakt()
@@ -346,6 +347,8 @@ def run(item=None):
             platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(30051) % e.code)
     except WebErrorException as e:
         import traceback
+        from core import scrapertools
+
         logger.error(traceback.format_exc())
 
         patron = 'File "' + os.path.join(config.get_runtime_path(), "channels", "").replace("\\", "\\\\") + '([^.]+)\.py"'
@@ -356,6 +359,8 @@ def run(item=None):
             config.get_localized_string(60013) %(e))
     except:
         import traceback
+        from core import scrapertools
+
         logger.error(traceback.format_exc())
 
         patron = 'File "' + os.path.join(config.get_runtime_path(), "channels", "").replace("\\", "\\\\") + '([^.]+)\.py"'
