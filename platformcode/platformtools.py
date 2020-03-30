@@ -999,7 +999,7 @@ def get_dialogo_opciones(item, default_action, strm, autoplay):
     # Si puedes ver el vídeo, presenta las opciones
     if puedes:
         for video_url in video_urls:
-            opciones.append(config.get_localized_string(30151) + " " + video_url[0])
+            opciones.append(config.get_localized_string(60221) + " " + video_url[0])
 
         if item.server == "local":
             opciones.append(config.get_localized_string(30164))

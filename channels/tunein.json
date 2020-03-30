@@ -3,7 +3,7 @@
   "name": "TuneIn",
   "active": true,
   "adult": false,
-  "language": ["all"],
+  "language": ["*"],
   "thumbnail": "tunein.png",
   "banner": "tunein.png",
   "categories": ["music"],
