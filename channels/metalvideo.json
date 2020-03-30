@@ -3,7 +3,7 @@
   "name": "Metal Video",
   "active": true,
   "adult": false,
-  "language": ["all"],
+  "language": ["*"],
   "thumbnail": "metalvideo.png",
   "banner": "metalvideo.png",
   "categories": ["music"],
