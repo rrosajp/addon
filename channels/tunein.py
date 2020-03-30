@@ -20,7 +20,7 @@ def mainlist(item):
     action = 'radio'
     patron = r'text="(?P<title>[^"]+)" URL="(?P<url>[^"]+)"'
     def itemHook(item):
-        item.thumbnail = support.thumb(thumb='channels_musical.png')
+        item.thumbnail = support.thumb(thumb='channels_music.png')
         return item
     def itemlistHook(itemlist):
         itemlist.append(
