@@ -8,7 +8,7 @@ from core.support import typo
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
-import os, traceback
+import xbmc, os, traceback
 
 from channelselector import get_thumb
 from core import filetools
@@ -18,6 +18,7 @@ from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
 from lib import generictools
+from distutils import dir_util
 
 
 def mainlist(item):
@@ -681,6 +682,50 @@ def update_videolibrary(item):
         if ficheros and not strm:
             logger.debug("Deleting deleted movie folder: %s" % raiz)
             filetools.rmdirtree(raiz)
+
+
+def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_folder, current_tvshows_folder, new_tvshows_folder):
+    logger.info()
+
+    backup_current_path = current_path
+    backup_new_path = new_path
+
+    notify = False
+    progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80011))
+    current_path = xbmc.translatePath(current_path)
+    new_path = xbmc.translatePath(new_path)
+    current_movies_path = filetools.join(current_path, current_movies_folder)
+    new_movies_path = filetools.join(new_path, new_movies_folder)
+    current_tvshows_path = os.path.join(current_path, current_tvshows_folder)
+    new_tvshows_path = os.path.join(new_path, new_tvshows_folder)
+
+    config.verify_directories_created()
+    progress.update(10, config.get_localized_string(20000), config.get_localized_string(80012))
+    if current_movies_path != new_movies_path:
+        if filetools.listdir(current_movies_path):
+            dir_util.copy_tree(current_movies_path, new_movies_path)
+            notify = True
+        filetools.rmdirtree(current_movies_path)
+    progress.update(40)
+    if current_tvshows_path != new_tvshows_path:
+        if filetools.listdir(current_tvshows_path):
+            dir_util.copy_tree(current_tvshows_path, new_tvshows_path)
+            notify = True
+        filetools.rmdirtree(current_tvshows_path)
+    progress.update(70)
+    if current_path != new_path and not filetools.listdir(current_path) and not "plugin.video.kod\\videolibrary" in current_path:
+        filetools.rmdirtree(current_path)
+
+    if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
+        from platformcode import xbmc_videolibrary
+        xbmc_videolibrary.update_sources(backup_current_path, backup_new_path)
+        xbmc_videolibrary.update_db(backup_current_path, backup_new_path, current_movies_folder, new_movies_folder, current_tvshows_folder, new_tvshows_folder, progress)
+        xbmc_videolibrary.clear_cache()
+
+    progress.update(100)
+    progress.close()
+    if notify:
+        platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80014), icon=0, time=5000, sound=False)
 
 
 # metodos de menu contextual
