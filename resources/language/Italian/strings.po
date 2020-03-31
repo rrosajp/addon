@@ -6132,8 +6132,8 @@ msgid "You can configure the Kodi video library later from the Settings menu ins
 msgstr "Potrai configurare la libreria di Kodi in seguito dal menu Impostazioni all'interno di KoD"
 
 msgctxt "#80023"
-msgid "Configuration of Kodi video library. You will be asked to configure the information providers for movies and TV shows"
-msgstr "Configurazione della libreria di Kodi. Ti verrà chiesto di configurare i provider delle informazioni per film e serie TV"
+msgid "You will be asked to choose and configure the information providers for movies and TV shows"
+msgstr "Ti verrà chiesto di scegliere e configurare i provider delle informazioni per film e serie TV"
 
 msgctxt "#80024"
 msgid "An error has occurred during the configuration of the Kodi video library. Please check the log and try again from the Settings menu inside KoD"
@@ -6142,3 +6142,11 @@ msgstr "Si è verificato un errore durante la configurazione della libreria di K
 msgctxt "#80025"
 msgid "Cleaning database..."
 msgstr "Pulizia database..."
+
+msgctxt "#80026"
+msgid "Configuration of Kodi video library"
+msgstr "Configurazione della libreria di Kodi"
+
+msgctxt "#80027"
+msgid "You will be asked to configure The Movie Database for movies and The TVDB for TV shows"
+msgstr "Ti verrà chiesto di configurare The Movie Database per i film e The TVDB per le serie TV"
