@@ -1231,16 +1231,16 @@ def ask_set_content(silent=False):
         if set_content("movie", True, custom) and set_content("tvshow", True, custom) and \
                        add_sources(config.get_setting("videolibrarypath")) and \
                        add_sources(config.get_setting("downloadpath")):
-            platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(70104))
+            platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(70104))
             config.set_setting("videolibrary_kodi", True)
             update()
         else:
-            platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(80024))
+            platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(80024))
             config.set_setting("videolibrary_kodi", False)
 
     if not silent:
         if platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(80015)):
-            if not platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(80016), "", "", config.get_localized_string(80017), config.get_localized_string(80018)):
+            if not platformtools.dialog_yesno(config.get_localized_string(80026), config.get_localized_string(80016), "", "", config.get_localized_string(80017), config.get_localized_string(80018)):
                 path = platformtools.dialog_browse(3, config.get_localized_string(80019), config.get_setting("videolibrarypath"))
                 if path != "":
                     config.set_setting("videolibrarypath", path)
@@ -1253,6 +1253,7 @@ def ask_set_content(silent=False):
                 config.verify_directories_created()
                 do_config(True)
             else:
+                platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(80027))
                 do_config(False)
         else:
             # no hemos aceptado
@@ -1260,5 +1261,5 @@ def ask_set_content(silent=False):
             config.set_setting("videolibrary_kodi", False)
 
     else:
-        platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(80023))
+        platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(80023))
         do_config(True)

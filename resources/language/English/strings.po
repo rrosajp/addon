@@ -6132,7 +6132,7 @@ msgid "You can configure the Kodi video library later from the Settings menu ins
 msgstr ""
 
 msgctxt "#80023"
-msgid "Configuration of Kodi video library. You will be asked to configure the information providers for movies and TV shows"
+msgid "You will be asked to choose and configure the information providers for movies and TV shows"
 msgstr ""
 
 msgctxt "#80024"
@@ -6141,4 +6141,12 @@ msgstr ""
 
 msgctxt "#80025"
 msgid "Cleaning database..."
+msgstr ""
+
+msgctxt "#80026"
+msgid "Configuration of Kodi video library"
+msgstr ""
+
+msgctxt "#80027"
+msgid "You will be asked to configure The Movie Database for movies and The TVDB for TV shows"
 msgstr ""
