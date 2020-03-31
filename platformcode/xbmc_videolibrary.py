@@ -796,6 +796,16 @@ def set_content(content_type, silent=False, custom=False):
 
 
 def update_db(current_path, new_path, current_movies_folder, new_movies_folder, current_tvshows_folder, new_tvshows_folder, progress):
+    def path_replace(path, old, new):
+        if new.startswith("special://") or '://' in new: sep = '/'
+        else: sep = os.sep
+
+        path = path.replace(old,new)
+        if sep == '/': path = path.replace('\\','/')
+        else: path = path.replace('/','\\')
+
+        return path
+
     logger.info()
 
     new = new_path
@@ -825,7 +835,7 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
     # change main path
     if records:
         idPath = records[0][0]
-        strPath = records[0][1].replace(current_path, new_path)
+        strPath = path_replace(records[0][1], current_path, new_path)
         sql = 'UPDATE path SET strPath="%s" WHERE idPath=%s' % (strPath, idPath)
         nun_records, records = execute_sql_kodi(sql)
 
@@ -845,7 +855,7 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
         if records:
             for record in records:
                 idPath = record[0]
-                strPath = record[1].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                strPath = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
                 sql = 'UPDATE path SET strPath="%s"WHERE idPath=%s' % (strPath, idPath)
                 nun_records, records = execute_sql_kodi(sql)
 
@@ -858,7 +868,7 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
         if records:
             for record in records:
                 idPath = record[0]
-                strPath = record[1].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                strPath = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
                 sql = 'UPDATE path SET strPath="%s"WHERE idPath=%s' % (strPath, idPath)
                 nun_records, records = execute_sql_kodi(sql)
 
@@ -871,7 +881,7 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
             if records:
                 for record in records:
                     idMovie = record[0]
-                    strPath = record[1].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    strPath = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
                     sql = 'UPDATE movie SET c22="%s" WHERE idMovie=%s' % (strPath, idMovie)
                     nun_records, records = execute_sql_kodi(sql)
             # search and modify in "movie_view"
@@ -880,8 +890,8 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
             if records:
                 for record in records:
                     idMovie = record[0]
-                    c22 = record[1].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
-                    strPath = record[2].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    c22 = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    strPath = path_replace(record[2], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
                     sql = 'UPDATE movie_view SET c22="%s", strPath="%s" WHERE idMovie=%s' % (c22, strPath, idMovie)
                     nun_records, records = execute_sql_kodi(sql)
         else:
@@ -892,7 +902,7 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
             if records:
                 for record in records:
                     idEpisode = record[0]
-                    strPath = record[1].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    strPath = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
                     sql = 'UPDATE episode SET c18="%s" WHERE idEpisode=%s' % (strPath, idEpisode)
                     nun_records, records = execute_sql_kodi(sql)
             # search and modify in "episode_view"
@@ -901,8 +911,8 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
             if records:
                 for record in records:
                     idEpisode = record[0]
-                    c18 = record[1].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
-                    strPath = record[2].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    c18 = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    strPath = path_replace(record[2], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
                     sql = 'UPDATE episode_view SET c18="%s", strPath="%s" WHERE idEpisode=%s' % (c18, strPath, idEpisode)
                     nun_records, records = execute_sql_kodi(sql)
             # search and modify in "season_view"
@@ -911,7 +921,7 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
             if records:
                 for record in records:
                     idSeason = record[0]
-                    strPath = record[1].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    strPath = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
                     sql = 'UPDATE season_view SET strPath="%s" WHERE idSeason=%s' % (strPath, idSeason)
                     nun_records, records = execute_sql_kodi(sql)
             # search and modify in "tvshow_view"
@@ -920,7 +930,7 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
             if records:
                 for record in records:
                     idShow = record[0]
-                    strPath = record[1].replace(filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    strPath = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
                     sql = 'UPDATE tvshow_view SET strPath="%s" WHERE idShow=%s' % (strPath, idShow)
                     nun_records, records = execute_sql_kodi(sql)
         p += 5
@@ -1220,7 +1230,7 @@ def clear_cache():
     path = xbmc.translatePath('special://home/cache/archive_cache/')
     for file in filetools.listdir(path):
         filetools.remove(filetools.join(path, file))
-    xbmc.executebuiltin('XBMC.ReloadSkin()')
+    # xbmc.executebuiltin('XBMC.ReloadSkin()')
 
 
 def ask_set_content(silent=False):
