@@ -936,6 +936,8 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
         p += 5
         progress.update(p, config.get_localized_string(20000), config.get_localized_string(80013))
 
+    xbmc.executebuiltin('XBMC.ReloadSkin()')
+
 
 def clear_db():
     logger.info()
@@ -1001,7 +1003,7 @@ def clear_db():
             nun_records, records = execute_sql_kodi(sql)
     progress.update(80)
     update_sources(path)
-    clear_cache()
+    xbmc.executebuiltin('XBMC.ReloadSkin()')
     progress.update(100)
     progress.close()
 
@@ -1224,13 +1226,6 @@ def update_sources(old, new=''):
             nodo_type.appendChild(element_default)
             source_nodes.appendChild(nodo_type)
         xmldoc.appendChild(source_nodes)
-
-
-def clear_cache():
-    path = xbmc.translatePath('special://home/cache/archive_cache/')
-    for file in filetools.listdir(path):
-        filetools.remove(filetools.join(path, file))
-    # xbmc.executebuiltin('XBMC.ReloadSkin()')
 
 
 def ask_set_content(silent=False):

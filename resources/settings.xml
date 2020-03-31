@@ -31,9 +31,8 @@
         <setting id="videolibrarypath" type="folder" label="30067" default="special://profile/addon_data/plugin.video.kod/videolibrary" option="writeable"/>
         <setting id="folder_tvshows" type="text" label="70118" default="Serie TV"/>
         <setting id="folder_movies" type="text" label="70119" default="Film"/>
-
-        <setting label="59997" type="lsep"/>
         <setting id="videolibrary_kodi" type="bool" label="70120" default="false"/>
+        <setting label="59997" type="lsep"/>
         <setting id="videolibrary_max_quality" type="bool" label="70729" default="false" visible="true"/>
         <setting id="next_ep" type="select" label="70746" lvalues="70752|70747|70748" default="0"/>
         <setting id="next_ep_type" type="select" label="70754" lvalues="70755|70756|70757" default="0" visible="eq(-1,2)" subsetting="true"/>

@@ -720,7 +720,6 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.update_sources(backup_current_path, backup_new_path)
         xbmc_videolibrary.update_db(backup_current_path, backup_new_path, current_movies_folder, new_movies_folder, current_tvshows_folder, new_tvshows_folder, progress)
-        xbmc_videolibrary.clear_cache()
 
     progress.update(100)
     progress.close()
