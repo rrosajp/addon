@@ -51,7 +51,7 @@ def mainlist(item):
     logger.info()
 
     itemlist = []
-    list_canales, any_active = get_channels_list()
+    # list_canales, any_active = get_channels_list()
     channel_language = config.get_setting("channel_language", default="auto")
     if channel_language == 'auto':
         channel_language = auto_filter()

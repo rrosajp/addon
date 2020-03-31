@@ -18,6 +18,8 @@ PLUGIN_NAME = "kod"
 
 __settings__ = xbmcaddon.Addon(id="plugin.video." + PLUGIN_NAME)
 __language__ = __settings__.getLocalizedString
+__version_fix = None
+__dev_mode = None
 
 channels_data = list()
 
@@ -36,19 +38,25 @@ def get_addon_version(with_fix=True):
 
 
 def get_addon_version_fix():
-    if not dev_mode():
-        try:
-            sha = open(os.path.join(get_runtime_path(), 'last_commit.txt')).readline()
-            return sha[:7]
-        except:
-            return '??'
-    else:
-        return 'DEV'
+    global __version_fix
+    ret = __version_fix
+    if not ret:
+        if not dev_mode():
+            try:
+                sha = open(os.path.join(get_runtime_path(), 'last_commit.txt')).readline()
+                ret = sha[:7]
+            except:
+                ret = '??'
+        else:
+            ret = 'DEV'
+    return ret
 
 
 def dev_mode():
-    r = os.path.isdir(get_runtime_path() + '/.git')
-    return r
+    global __dev_mode
+    if not __dev_mode:
+        __dev_mode = os.path.isdir(get_runtime_path() + '/.git')
+    return __dev_mode
 
 
 def get_platform(full_version=False):

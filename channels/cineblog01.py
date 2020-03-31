@@ -12,7 +12,7 @@ from platformcode import logger, config
 
 
 def findhost():
-    permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
+    permUrl = httptools.downloadpage('https://cb01-nuovo-indirizzo.info/', follow_redirects=False, only_headers=True).headers
     if 'google' in permUrl['location']:
         host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
     else:

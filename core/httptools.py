@@ -123,6 +123,7 @@ def load_cookies(alfa_s=False):
             os.remove(cookies_file)
     cookies_lock.release()
 
+load_cookies()
 
 def save_cookies(alfa_s=False):
     cookies_lock.acquire()
@@ -255,7 +256,6 @@ def downloadpage(url, **opt):
 
         """
     url = scrapertools.unescape(url)
-    load_cookies()
     domain = urlparse.urlparse(url).netloc
     global domainCF
     CF = False

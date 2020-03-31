@@ -387,7 +387,8 @@ def scrape(func):
         if not data:
             page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True)
             # if url may be changed and channel has findhost to update
-            if (not page.data or scrapertools.get_domain_from_url(page.url) != scrapertools.get_domain_from_url(item.url)) and 'findhost' in func.__globals__:
+            if 'findhost' in func.__globals__ and (not page.data or scrapertools.get_domain_from_url(page.url).lower() != scrapertools.get_domain_from_url(item.url).lower()):
+                logger.info('running findhost ' + func.__module__)
                 host = func.__globals__['findhost']()
                 parse = list(urlparse.urlparse(item.url))
                 from core import jsontools

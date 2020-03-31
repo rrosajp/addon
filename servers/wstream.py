@@ -24,7 +24,7 @@ def test_video_exists(page_url):
 
     page_url = resp.url
     if '/streaming.php' in page_url in page_url:
-        code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers['location'].split('/')[-1].replace('.html', '')
+        code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False, only_headers=True).headers['location'].split('/')[-1].replace('.html', '')
         # logger.info('WCODE=' + code)
         page_url = 'https://wstream.video/video.php?file_code=' + code
         data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True).data

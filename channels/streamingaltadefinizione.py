@@ -12,7 +12,7 @@ list_servers = ['verystream', 'openload', 'wstream']
 list_quality = ['1080p', 'HD', 'DVDRIP', 'SD', 'CAM']
 
 def findhost():
-    permUrl = httptools.downloadpage('https://www.popcornstream.info', follow_redirects=False).headers
+    permUrl = httptools.downloadpage('https://www.popcornstream.info', follow_redirects=False, only_headers=True).headers
     if 'google' in permUrl['location']:
         host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
         if host[:4] != 'http':
