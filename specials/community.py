@@ -10,9 +10,6 @@ from platformcode import config, platformtools
 from specials import autoplay
 from channelselector import get_thumb
 
-from specials import shortcuts
-CONTEXT = shortcuts.context()
-
 info_language = ["de", "en", "es", "fr", "it", "pt"] # from videolibrary.json
 try: lang = info_language[config.get_setting("info_language", "videolibrary")]
 except: lang = 'it'

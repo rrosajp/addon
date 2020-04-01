@@ -41,6 +41,10 @@ def start():
     from specials.checkhost import test_conn
     import threading
     threading.Thread(target=test_conn, args=(True, not config.get_setting('resolver_dns'), True, [], [], True)).start()
+
+    if not config.dev_mode():
+        from platformcode import updater
+        updater.showSavedChangelog()
     
 def run(item=None):
     logger.info()

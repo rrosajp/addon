@@ -26,9 +26,7 @@ from core import httptools, scrapertools, servertools, tmdb, channeltools
 from core.item import Item
 from lib import unshortenit
 from platformcode import logger, config
-from specials import autoplay, shortcuts
-
-CONTEXT =shortcuts.context()
+from specials import autoplay
 
 def hdpass_get_servers(item):
     def get_hosts(url, quality):
@@ -306,8 +304,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 contentLanguage = lang1,
                 contentEpisodeNumber=episode if episode else '',
                 news= item.news if item.news else '',
-                other = scraped['other'] if scraped['other'] else '',
-                context = CONTEXT
+                other = scraped['other'] if scraped['other'] else ''
             )
 
             # for lg in list(set(listGroups).difference(known_keys)):
@@ -629,8 +626,7 @@ def menuItem(itemlist, filename, title='', action='', url='', contentType='movie
         url = url,
         extra = extra,
         args = args,
-        contentType = contentType,
-        context = CONTEXT
+        contentType = contentType
     ))
 
     # Apply auto Thumbnails at the menus

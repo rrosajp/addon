@@ -1,24 +1,29 @@
 # -*- coding: utf-8 -*-
-
+from core.item import Item
 from platformcode import logger
 
 def context():
 	from platformcode import config
 	context = []
+	# original
+	# if config.get_setting('quick_menu'): context.append((config.get_localized_string(60360).upper(), "XBMC.RunPlugin(plugin://plugin.video.kod/?%s)" % Item(channel='shortcuts', action="shortcut_menu").tourl()))
+	# if config.get_setting('side_menu'): context.append((config.get_localized_string(70737).upper(), "XBMC.RunPlugin(plugin://plugin.video.kod/?%s)" % Item(channel='shortcuts',action="side_menu").tourl()))
+	# if config.get_setting('kod_menu'): context.append((config.get_localized_string(30025), "XBMC.RunPlugin(plugin://plugin.video.kod/?%s)" % Item(channel='shortcuts', action="settings_menu").tourl()))
 
-	if config.get_setting('quick_menu'): context += [{ 'title': config.get_localized_string(60360).upper(), 'channel': 'shortcuts', 'action': "shortcut_menu"}]
-	if config.get_setting('side_menu'): context += [{ 'title': config.get_localized_string(70737).upper(), 'channel': 'shortcuts', 'action': "side_menu"}]
-	if config.get_setting('kod_menu'): context += [{ 'title': config.get_localized_string(30025), 'channel': 'shortcuts', 'action': "settings_menu"}]
+	# pre-serialised
+	if config.get_setting('quick_menu'): context.append((config.get_localized_string(60360).upper(), 'XBMC.RunPlugin(plugin://plugin.video.kod/?ewogICAgImFjdGlvbiI6ICJzaG9ydGN1dF9tZW51IiwgCiAgICAiY2hhbm5lbCI6ICJzaG9ydGN1dHMiLCAKICAgICJpbmZvTGFiZWxzIjoge30KfQ%3D%3D)'))
+	if config.get_setting('side_menu'): context.append((config.get_localized_string(70737).upper(), 'XBMC.RunPlugin(plugin://plugin.video.kod/?ewogICAgImFjdGlvbiI6ICJzaWRlX21lbnUiLCAKICAgICJjaGFubmVsIjogInNob3J0Y3V0cyIsIAogICAgImluZm9MYWJlbHMiOiB7fQp9)'))
+	if config.get_setting('kod_menu'): context.append((config.get_localized_string(30025), 'XBMC.RunPlugin(plugin://plugin.video.kod/?ewogICAgImFjdGlvbiI6ICJzZXR0aW5nc19tZW51IiwgCiAgICAiY2hhbm5lbCI6ICJzaG9ydGN1dHMiLCAKICAgICJpbmZvTGFiZWxzIjoge30KfQ%3D%3D)'))
 
 	return context
 
 def side_menu(item):
-    from specials import side_menu
-    side_menu.open_menu(item)
+	from specials import side_menu
+	side_menu.open_menu(item)
 
 def shortcut_menu(item):
-    from platformcode import keymaptools
-    keymaptools.open_shortcut_menu()
+	from platformcode import keymaptools
+	keymaptools.open_shortcut_menu()
 
 def settings_menu(item):
 	from platformcode import config

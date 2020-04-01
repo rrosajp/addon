@@ -12,9 +12,6 @@ import xbmcaddon
 addon = xbmcaddon.Addon('plugin.video.kod')
 downloadenabled = addon.getSetting('downloadenabled')
 
-from specials import shortcuts
-CONTEXT = shortcuts.context()
-
 def getmainlist(view="thumb_"):
     logger.info()
     itemlist = list()
@@ -22,8 +19,7 @@ def getmainlist(view="thumb_"):
     if config.dev_mode():
         itemlist.append(Item(title="Redirect", channel="checkhost", action="check_channels",
                             thumbnail='',
-                            category=config.get_localized_string(30119), viewmode="thumbnails",
-                            context = CONTEXT))
+                            category=config.get_localized_string(30119), viewmode="thumbnails"))
     # Añade los canales que forman el menú principal
     if addon.getSetting('enable_news_menu') == "true":
         # itemlist.append(Item(title=config.get_localized_string(30130), channel="news", action="mainlist",
@@ -33,13 +29,12 @@ def getmainlist(view="thumb_"):
         itemlist.append(Item(title=config.get_localized_string(30130), channel="news", action="mainlist",
                             thumbnail=get_thumb("news.png", view),
                             category=config.get_localized_string(30119), viewmode="thumbnails",
-                            context=CONTEXT + [{"title": config.get_localized_string(70285), "channel": "shortcuts", "action": "SettingOnPosition", "category":5}]))
+                            context=[{"title": config.get_localized_string(70285), "channel": "shortcuts", "action": "SettingOnPosition", "category":5}]))
 
     if addon.getSetting('enable_channels_menu') == "true":
         itemlist.append(Item(title=config.get_localized_string(30118), channel="channelselector", action="getchanneltypes",
                             thumbnail=get_thumb("channels.png", view), view=view,
-                            category=config.get_localized_string(30119), viewmode="thumbnails",
-                            context = CONTEXT))
+                            category=config.get_localized_string(30119), viewmode="thumbnails"))
 
     if addon.getSetting('enable_search_menu') == "true":
         # itemlist.append(Item(title=config.get_localized_string(30103), channel="search", path='special', action="mainlist",
@@ -50,25 +45,22 @@ def getmainlist(view="thumb_"):
         itemlist.append(Item(title=config.get_localized_string(30103), channel="search", path='special', action="mainlist",
                             thumbnail=get_thumb("search.png", view),
                             category=config.get_localized_string(30119), viewmode="list",
-                            context = CONTEXT + [{"title": config.get_localized_string(60412), "action": "setting_channel_new", "channel": "search"},
+                            context = [{"title": config.get_localized_string(60412), "action": "setting_channel_new", "channel": "search"},
                                                  {"title": config.get_localized_string(70286), "channel": "shortcuts", "action": "SettingOnPosition", "category":3}]))
 
     if addon.getSetting('enable_onair_menu') == "true":
         itemlist.append(Item(channel="filmontv", action="mainlist", title=config.get_localized_string(50001),
-                            thumbnail=get_thumb("on_the_air.png"), viewmode="thumbnails",
-                            context = CONTEXT))
+                            thumbnail=get_thumb("on_the_air.png"), viewmode="thumbnails"))
 
     if addon.getSetting('enable_link_menu') == "true":
         itemlist.append(Item(title=config.get_localized_string(70527), channel="kodfavorites", action="mainlist",
                             thumbnail=get_thumb("mylink.png", view), view=view,
-                            category=config.get_localized_string(70527), viewmode="thumbnails",
-                            context = CONTEXT))
+                            category=config.get_localized_string(70527), viewmode="thumbnails"))
 
     if addon.getSetting('enable_fav_menu') == "true":
         itemlist.append(Item(title=config.get_localized_string(30102), channel="favorites", action="mainlist",
                             thumbnail=get_thumb("favorites.png", view),
-                            category=config.get_localized_string(30102), viewmode="thumbnails",
-                            context = CONTEXT))
+                            category=config.get_localized_string(30102), viewmode="thumbnails"))
 
     if config.get_videolibrary_support() and addon.getSetting('enable_library_menu') == "true":
         # itemlist.append(Item(title=config.get_localized_string(30131), channel="videolibrary", action="mainlist",
@@ -79,7 +71,7 @@ def getmainlist(view="thumb_"):
         itemlist.append(Item(title=config.get_localized_string(30131), channel="videolibrary", action="mainlist",
                              thumbnail=get_thumb("videolibrary.png", view),
                              category=config.get_localized_string(30119), viewmode="thumbnails",
-                             context=CONTEXT + [{"title": config.get_localized_string(70287), "channel": "shortcuts", "action": "SettingOnPosition", "category":2},
+                             context=[{"title": config.get_localized_string(70287), "channel": "shortcuts", "action": "SettingOnPosition", "category":2},
                                                 {"title": config.get_localized_string(60568), "channel": "videolibrary", "action": "update_videolibrary"}]))
     if downloadenabled != "false":
         # itemlist.append(Item(title=config.get_localized_string(30101), channel="downloads", action="mainlist",
@@ -88,7 +80,7 @@ def getmainlist(view="thumb_"):
         #                             "action": "channel_config"}]))
         itemlist.append(Item(title=config.get_localized_string(30101), channel="downloads", action="mainlist",
                             thumbnail=get_thumb("downloads.png", view), viewmode="list",
-                            context=CONTEXT + [{"title": config.get_localized_string(70288), "channel": "shortcuts", "action": "SettingOnPosition", "category":4}]))
+                            context=[{"title": config.get_localized_string(70288), "channel": "shortcuts", "action": "SettingOnPosition", "category":4}]))
 
     thumb_setting = "setting_%s.png" % 0  # config.get_setting("plugin_updates_available")
 
@@ -122,13 +114,13 @@ def getchanneltypes(view="thumb_"):
     title = config.get_localized_string(30121)
     itemlist.append(Item(title=title, channel="channelselector", action="filterchannels", view=view,
                          category=title, channel_type="all", thumbnail=get_thumb("channels_all.png", view),
-                         viewmode="thumbnails", context = CONTEXT))
+                         viewmode="thumbnails"))
 
     for channel_type in channel_types:
         title = config.get_localized_category(channel_type)
         itemlist.append(Item(title=title, channel="channelselector", action="filterchannels", category=title,
                              channel_type=channel_type, viewmode="thumbnails",
-                             thumbnail=get_thumb("channels_%s.png" % channel_type, view), context = CONTEXT))
+                             thumbnail=get_thumb("channels_%s.png" % channel_type, view)))
 
     # itemlist.append(Item(title='Oggi in TV', channel="filmontv", action="mainlist", view=view,
     #                      category=title, channel_type="all", thumbnail=get_thumb("on_the_air.png", view),
@@ -138,7 +130,7 @@ def getchanneltypes(view="thumb_"):
 
     itemlist.append(Item(title=config.get_localized_string(70685), channel="community", action="mainlist", view=view,
                          category=config.get_localized_string(70685), channel_type="all", thumbnail=get_thumb("channels_community.png", view),
-                         viewmode="thumbnails", context = CONTEXT))
+                         viewmode="thumbnails"))
     return itemlist
 
 
@@ -244,7 +236,7 @@ def filterchannels(category, view="thumb_"):
             channelslist.append(Item(title=channel_parameters["title"], channel=channel_parameters["channel"],
                                      action="mainlist", thumbnail=channel_parameters["thumbnail"],
                                      fanart=channel_parameters["fanart"], plot=channel_info, category=channel_parameters["title"],
-                                     language=channel_parameters["language"], viewmode="list", context=CONTEXT + context))
+                                     language=channel_parameters["language"], viewmode="list", context=context))
 
         except:
             logger.error("Se ha producido un error al leer los datos del canal '%s'" % channel)

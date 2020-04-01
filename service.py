@@ -400,7 +400,7 @@ if __name__ == "__main__":
 
     # Verificar quick-fixes al abrirse Kodi, y dejarlo corriendo como Thread
     if not config.dev_mode():
-        updated, needsReload = updater.check()
+        updated, needsReload = updater.check(background=True)
         config.set_setting("updater_last_check", str(time.time()), "videolibrary")
         if needsReload:
             xbmc.executescript(__file__)
