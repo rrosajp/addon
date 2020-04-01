@@ -177,14 +177,15 @@ def render_items(itemlist, parent_item):
         listitem = xbmcgui.ListItem(item.title, offscreen=True)
         listitem.setArt({'icon': icon_image, 'thumb': item.thumbnail, 'poster': item.thumbnail,
                          'fanart': item.fanart if item.fanart else default_fanart})
+
         if config.get_setting("player_mode") == 1 and item.action == "play":
             listitem.setProperty('IsPlayable', 'true')
 
         set_infolabels(listitem, item)
 
         if parent_item.channel != 'special':
-            context_commands = set_context_commands(item, item_url, parent_item, has_extendedinfo=has_extendedinfo,
-                                                    superfavourites=superfavourites) + def_context_commands
+            context_commands = def_context_commands + set_context_commands(item, item_url, parent_item, has_extendedinfo=has_extendedinfo,
+                                                    superfavourites=superfavourites)
         else:
             context_commands = def_context_commands
         # Añadimos el menu contextual
@@ -193,7 +194,7 @@ def render_items(itemlist, parent_item):
         elif parent_item.list_type == '':
             listitem.addContextMenuItems(context_commands, replaceItems=True)
 
-        xbmcplugin.addDirectoryItem(_handle, '%s?%s' % (sys.argv[0], item_url), listitem, item.folder)
+        xbmcplugin.addDirectoryItem(_handle, '%s?%s' % (sys.argv[0], item_url), listitem, item.folder, totalItems=4)
 
     if parent_item.list_type == '':
         breadcrumb = parent_item.category.capitalize()
@@ -207,8 +208,14 @@ def render_items(itemlist, parent_item):
             breadcrumb = config.get_localized_string(70693)
 
     xbmcplugin.setPluginCategory(handle=_handle, category=breadcrumb)
-    xbmcplugin.setContent(handle=_handle, content=breadcrumb)
+    # xbmcplugin.setContent(handle=_handle, content=breadcrumb)
     xbmcplugin.endOfDirectory(_handle)
+    # Fijar la vista
+    if config.get_setting("forceview"):
+        viewmode_id = get_viewmode_id(parent_item)
+        xbmc.executebuiltin("Container.SetViewMode(%s)" % viewmode_id)
+    if parent_item.mode in ['silent', 'get_cached', 'set_cache', 'finish']:
+        xbmc.executebuiltin("Container.SetViewMode(500)")
     logger.info('END render_items')
 
 def render_items_old(itemlist, parent_item):
