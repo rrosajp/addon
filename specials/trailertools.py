@@ -32,7 +32,7 @@ from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
 
-info_language = ["de", "en", "es", "fr", "it", "pt"] # from videolibrary.json
+info_language = ["it", "en", "es", "fr", "de", "pt"] # from videolibrary.json
 def_lang = info_language[config.get_setting("info_language", "videolibrary")]
 
 result = None
@@ -63,7 +63,9 @@ def buscartrailer(item, trailers=[]):
         item.text_color = ""
 
         itemlist = []
-        if item.contentTitle != "":
+        if item.search_title:
+            item.contentTitle = item.search_title
+        elif item.contentTitle != "":
             item.contentTitle = item.contentTitle.strip()
         elif keyboard:
             contentTitle = re.sub('\[\/*(B|I|COLOR)\s*[^\]]*\]', '', item.contentTitle.strip())
@@ -104,22 +106,18 @@ def buscartrailer(item, trailers=[]):
             logger.error(traceback.format_exc())
 
         if item.contextual:
-            title = "[COLOR green]%s[/COLOR]"
+            title = "%s"
         else:
             title = "%s"
-        itemlist.append(item.clone(title=title % config.get_localized_string(70507), action="youtube_search",
-                                   text_color="green"))
-        itemlist.append(item.clone(title=title % config.get_localized_string(70024),
-                                   action="filmaffinity_search", text_color="green"))
+        itemlist.append(item.clone(title=title % config.get_localized_string(70507), action="youtube_search"))
+        itemlist.append(item.clone(title=title % config.get_localized_string(70024), action="filmaffinity_search"))
         # Si se trata de una serie, no se incluye la opción de buscar en Abandomoviez
         if not item.show and not item.infoLabels['tvshowtitle']:
-            itemlist.append(item.clone(title=title % config.get_localized_string(70508),
-                                       action="abandomoviez_search", text_color="green"))
+            itemlist.append(item.clone(title=title % config.get_localized_string(70508), action="abandomoviez_search"))
 
     if item.contextual:
         global window_select, result
-        select = Select("DialogSelect.xml", config.get_runtime_path(), item=item, itemlist=itemlist,
-                        caption=config.get_localized_string(70506) + item.contentTitle)
+        select = Select("DialogSelect.xml", config.get_runtime_path(), item=item, itemlist=itemlist, caption=config.get_localized_string(70506) + item.contentTitle)
         window_select.append(select)
         select.doModal()
 
@@ -155,7 +153,7 @@ def tmdb_trailers(item, tipo="movie"):
     if tmdb_search:
         for result in tmdb_search.get_videos():
             title = result['name'] + " [" + result['size'] + "p] (" + result['language'].replace("en", "ING") \
-                .replace("es", "ESP") + ")  [tmdb/youtube]"
+                .replace("it", "ITA") + ")  [tmdb/youtube]"
             itemlist.append(item.clone(action="play", title=title, url=result['url'], server="youtube"))
 
     return itemlist
@@ -183,10 +181,10 @@ def youtube_search(item):
         scrapedtitle = scrapedtitle.decode('utf8').encode('utf8')
         scrapedtitle = scrapedtitle + " (" + scrapedduration + ")"
         if item.contextual:
-            scrapedtitle = "[COLOR white]%s[/COLOR]" % scrapedtitle
+            scrapedtitle = "%s" % scrapedtitle
         url = urlparse.urljoin('https://www.youtube.com/', scrapedurl)
         itemlist.append(item.clone(title=scrapedtitle, action="play", server="youtube", url=url,
-                                   thumbnail=scrapedthumbnail, text_color="white"))
+                                   thumbnail=scrapedthumbnail))
     next_page = scrapertools.find_single_match(data, '<a href="([^"]+)"[^>]+><span class="yt-uix-button-content">'
                                                      'Siguiente')
     if next_page != "":
@@ -198,11 +196,11 @@ def youtube_search(item):
                                    action="", thumbnail="", text_color=""))
     if keyboard:
         if item.contextual:
-            title = "[COLOR green]%s[/COLOR]"
+            title = "%s"
         else:
             title = "%s"
         itemlist.append(item.clone(title=title % config.get_localized_string(70510), action="manual_search",
-                                   text_color="green", thumbnail="", extra="youtube"))
+                                   thumbnail="", extra="youtube"))
     return itemlist
 
 
@@ -238,7 +236,7 @@ def abandomoviez_search(item):
             scrapedurl = urlparse.urljoin("http://www.abandomoviez.net/%s" % item.prefix, scrapedurl)
             scrapedtitle = scrapertools.htmlclean(scrapedtitle)
             itemlist.append(item.clone(title=scrapedtitle, action="search_links_abando",
-                                       url=scrapedurl, thumbnail=scrapedthumbnail, text_color="white"))
+                                       url=scrapedurl, thumbnail=scrapedthumbnail))
 
         next_page = scrapertools.find_single_match(data, '<a href="([^"]+)">Siguiente')
         if next_page != "":
@@ -252,11 +250,11 @@ def abandomoviez_search(item):
 
         if keyboard:
             if item.contextual:
-                title = "[COLOR green]%s[/COLOR]"
+                title = "%s"
             else:
                 title = "%s"
             itemlist.append(item.clone(title=title % config.get_localized_string(70511),
-                                       action="manual_search", thumbnail="", text_color="green", extra="abandomoviez"))
+                                       action="manual_search", thumbnail="",  extra="abandomoviez"))
 
     return itemlist
 
@@ -283,7 +281,7 @@ def search_links_abando(item):
                 code = scrapertools.find_single_match(trailer_url, 'v=([A-z0-9\-_]+)')
                 thumbnail = "https://img.youtube.com/vi/%s/0.jpg" % code
                 itemlist.append(item.clone(title="Trailer  [youtube]", url=trailer_url, server="youtube",
-                                           thumbnail=thumbnail, action="play", text_color="white"))
+                                           thumbnail=thumbnail, action="play"))
         else:
             for scrapedurl, language, scrapedtitle in matches:
                 if language == "1":
@@ -296,23 +294,23 @@ def search_links_abando(item):
                     i += 1
                     message += ".."
                     progreso.update(10 + (old_div(90 * i, len(matches))), message)
-                    scrapedtitle = "[COLOR white]%s[/COLOR]" % scrapedtitle
+                    scrapedtitle = "%s" % scrapedtitle
                 data_trailer = httptools.downloadpage(scrapedurl).data
                 trailer_url = scrapertools.find_single_match(data_trailer, 'iframe.*?src="([^"]+)"')
                 trailer_url = trailer_url.replace("embed/", "watch?v=")
                 code = scrapertools.find_single_match(trailer_url, 'v=([A-z0-9\-_]+)')
                 thumbnail = "https://img.youtube.com/vi/%s/0.jpg" % code
                 itemlist.append(item.clone(title=scrapedtitle, url=trailer_url, server="youtube", action="play",
-                                           thumbnail=thumbnail, text_color="white"))
+                                           thumbnail=thumbnail))
         if item.contextual:
             progreso.close()
     if keyboard:
         if item.contextual:
-            title = "[COLOR green]%s[/COLOR]"
+            title = "%s"
         else:
             title = "%s"
         itemlist.append(item.clone(title=title % config.get_localized_string(70511),
-                                   action="manual_search", thumbnail="", text_color="green", extra="abandomoviez"))
+                                   action="manual_search", thumbnail="", extra="abandomoviez"))
     return itemlist
 
 
@@ -351,7 +349,7 @@ def filmaffinity_search(item):
             if PY3:
                 scrapedtitle = unicode(scrapedtitle, encoding="utf-8", errors="ignore")
             scrapedtitle = scrapertools.htmlclean(scrapedtitle)
-            itemlist.append(item.clone(title=scrapedtitle, url=scrapedurl, text_color="white",
+            itemlist.append(item.clone(title=scrapedtitle, url=scrapedurl,
                                        action="search_links_filmaff", thumbnail=scrapedthumbnail))
 
         next_page = scrapertools.find_single_match(data, '<a href="([^"]+)">&gt;&gt;</a>')
@@ -366,11 +364,11 @@ def filmaffinity_search(item):
 
         if keyboard:
             if item.contextual:
-                title = "[COLOR green]%s[/COLOR]"
+                title = "%s"
             else:
                 title = "%s"
             itemlist.append(item.clone(title=title % config.get_localized_string(70513),
-                                       action="manual_search", text_color="green", thumbnail="", extra="filmaffinity"))
+                                       action="manual_search", thumbnail="", extra="filmaffinity"))
 
     return itemlist
 
@@ -401,18 +399,18 @@ def search_links_filmaff(item):
             scrapedtitle = scrapertools.htmlclean(scrapedtitle)
             scrapedtitle += "  [" + server + "]"
             if item.contextual:
-                scrapedtitle = "[COLOR white]%s[/COLOR]" % scrapedtitle
+                scrapedtitle = "%s" % scrapedtitle
             itemlist.append(item.clone(title=scrapedtitle, url=trailer_url, server=server, action="play",
-                                       thumbnail=thumbnail, text_color="white"))
+                                       thumbnail=thumbnail))
 
     itemlist = servertools.get_servers_itemlist(itemlist)
     if keyboard:
         if item.contextual:
-            title = "[COLOR green]%s[/COLOR]"
+            title = "%s"
         else:
             title = "%s"
         itemlist.append(item.clone(title=title % config.get_localized_string(70513),
-                                   action="manual_search", thumbnail="", text_color="green", extra="filmaffinity"))
+                                   action="manual_search", thumbnail="", extra="filmaffinity"))
 
     return itemlist
 
@@ -441,7 +439,7 @@ try:
                 self.getControl(99).setVisible(False)
             except:
                 pass
-            self.getControl(1).setLabel("[COLOR orange]" + self.caption + "[/COLOR]")
+            self.getControl(1).setLabel("" + self.caption + "")
             self.getControl(5).setLabel(config.get_localized_string(60495))
             self.items = []
             for item in self.itemlist:

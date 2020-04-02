@@ -786,10 +786,10 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
         #                              (sys.argv[0], Item(channel="setting", action="mainlist").tourl())))
 
         # Buscar Trailer
-        if item.action == "findvideos" or "buscar_trailer" in context:
+        if item.action in ["findvideos", 'episodios', 'check'] or "buscar_trailer" in context:
             context_commands.append(
                 (config.get_localized_string(60359), "XBMC.RunPlugin(%s?%s)" % (sys.argv[0], urllib.urlencode({
-                    'channel': "trailertools", 'action': "buscartrailer", 'contextual': True}))))
+                    'channel': "trailertools", 'action': "buscartrailer", 'search_title': item.fulltitle if item.fulltitle else item.contentTitle, 'contextual': True}))))
 
         if kwargs.get('superfavourites'):
             context_commands.append((config.get_localized_string(60361),
