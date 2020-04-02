@@ -689,7 +689,7 @@ def menu(func):
                 if dictUrl[name] is not None and type(dictUrl[name]) is not str:
                     for sub, var in dictUrl[name]:
                         menuItem(itemlist, filename,
-                             title = sub + ' submenu' + typo(title,'_ {}'),
+                             title = sub + ' submenu  {' + title + '}',
                              url = host + var[0] if len(var) > 0 else '',
                              action = var[1] if len(var) > 1 else 'peliculas',
                              args=var[2] if len(var) > 2 else '',
