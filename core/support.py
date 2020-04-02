@@ -32,7 +32,6 @@ def hdpass_get_servers(item):
     def get_hosts(url, quality):
         ret = []
         page = httptools.downloadpage(url).data
-        log(page)
 
         mir = scrapertools.find_single_match(page, patron_mir)
 

@@ -134,6 +134,7 @@ def render_items(itemlist, parent_item):
     Function used to render itemlist on kodi
     """
     logger.info('START render_items')
+    thumb_type = config.get_setting('video_thumbnail_type')
     from specials import shortcuts
     from core import httptools
     _handle = int(sys.argv[1])
@@ -166,10 +167,12 @@ def render_items(itemlist, parent_item):
             item.folder = False
         if item.fanart == "":
             item.fanart = parent_item.fanart
+        if item.action == 'play' and thumb_type == 1:
+            item.thumbnail = "https://github.com/kodiondemand/media/raw/master/resources/servers/" + item.server.lower() + '.png'
 
         # if cloudflare, cookies are needed to display images taken from site
         # before checking domain (time consuming), checking if tmdb failed (so, images scraped from website are used)
-        if item.action in ['findvideos', 'play'] and not item.infoLabels['tmdb_id'] and scrapertools.get_domain_from_url(item.thumbnail) in httptools.domainCF:
+        if item.action in ['findvideos'] and not item.infoLabels['tmdb_id'] and scrapertools.get_domain_from_url(item.thumbnail) in httptools.domainCF:
             item.thumbnail = httptools.get_url_headers(item.thumbnail)
             item.fanart = httptools.get_url_headers(item.fanart)
 
@@ -183,18 +186,15 @@ def render_items(itemlist, parent_item):
 
         set_infolabels(listitem, item)
 
+        # context menu
         if parent_item.channel != 'special':
             context_commands = def_context_commands + set_context_commands(item, item_url, parent_item, has_extendedinfo=has_extendedinfo,
                                                     superfavourites=superfavourites)
         else:
             context_commands = def_context_commands
-        # Añadimos el menu contextual
-        if config.get_platform(True)['num_version'] >= 17.0 and parent_item.list_type == '':
-            listitem.addContextMenuItems(context_commands)
-        elif parent_item.list_type == '':
-            listitem.addContextMenuItems(context_commands, replaceItems=True)
+        listitem.addContextMenuItems(context_commands)
 
-        xbmcplugin.addDirectoryItem(_handle, '%s?%s' % (sys.argv[0], item_url), listitem, item.folder, totalItems=4)
+        xbmcplugin.addDirectoryItem(_handle, '%s?%s' % (sys.argv[0], item_url), listitem, item.folder)
 
     if parent_item.list_type == '':
         breadcrumb = parent_item.category.capitalize()

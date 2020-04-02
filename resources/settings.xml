@@ -84,7 +84,7 @@
         <setting id="icon_set" type="select" label="70108" values="default|light|dark|alfa|mike" default="default"/>
         <setting id="enable_custom_theme" type="bool" label="70564" default="false"/>
         <setting id="custom_theme" type="folder" label="70565" default="" visible="eq(-1,true)"/>
-        <setting id="video_thumbnail_type" type="select" label="70131" lvalues="70132|70133" default="0"/>
+        <setting id="video_thumbnail_type" type="select" label="70131" lvalues="70132|70133" default="1"/>
         <!-- Contextual -->
         <setting label="30024" type="lsep"/>
         <setting id="quick_menu" type="bool" label="60360" default="false"/>
