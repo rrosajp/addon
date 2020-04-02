@@ -12,7 +12,8 @@ from platformcode import logger, config
 
 
 def test_video_exists(page_url):
-    data = httptools.downloadpage(page_url).data
+    global data
+    data = httptools.downloadpage(page_url, use_requests=True, verify=False).data
     if data == "File was deleted":
         return False, config.get_localized_string(70449) % "Go Unlimited"
     return True, ""
@@ -21,14 +22,19 @@ def test_video_exists(page_url):
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     logger.info("url=" + page_url)
     video_urls = []
-    data = httptools.downloadpage(page_url, use_requests=True, verify=False).data
+    global data
+    # data = httptools.downloadpage(page_url, use_requests=True, verify=False).data
     data = re.sub(r'"|\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
     logger.info('GOUN DATA= '+data)
     packed_data = scrapertools.find_single_match(data, "javascript'>(eval.*?)</script>")
     unpacked = jsunpack.unpack(packed_data)
+    logger.info('GOUN DATA= '+unpacked)
     patron = r"sources..([^\]]+)"
     matches = re.compile(patron, re.DOTALL).findall(unpacked)
+    if not matches:
+        patron= r'src:([^,]+),'
+        matches = re.compile(patron, re.DOTALL).findall(unpacked)
     for url in matches:
-        url += "|Referer=%s" %page_url
-        video_urls.append(['mp4 [Go Unlimited]', url])
+            url += "|Referer=%s" %page_url
+            video_urls.append(['mp4 [Go Unlimited]', url])
     return video_urls
