@@ -33,10 +33,10 @@ list_quality = ['1080p', '720p', '360p']
 
 @support.menu
 def mainlist(item):
-    support.log()
     film = ['',
         ('Novità', ['/nuove-uscite/', 'peliculas', 'news']),
         ('Al Cinema', ['/al-cinema/', 'peliculas', 'cinema']),
+        ('A-Z',['/lista-film/', 'genres', 'az']),
         ('Generi', ['', 'genres', 'genres']),
         ('Anni', ['', 'genres', 'years']),
         ('Qualità', ['', 'genres', 'quality']),
@@ -47,41 +47,35 @@ def mainlist(item):
 
 @support.scrape
 def peliculas(item):
-    support.log()
+    patron = r'<div class="wrapperImage">[ ]?(?:<span class="hd">(?P<quality>[^<>]+))?.+?href="(?P<url>[^"]+)".+?src="(?P<thumb>[^"]+)".+?<h2 class="titleFilm">[^>]+>'\
+             r'(?P<title>.+?)[ ]?(?:|\[(?P<lang>[^\]]+)\])?(?:\((?P<year>\d{4})\))?</a>.*?(?:IMDB\:</strong>[ ](?P<rating>.+?)<|</h2> )'
+    patronBlock = r'h1>(?P<block>.*?)<div class="row ismobile">'
 
-    patron = r'<div class="wrapperImage">[ ]?(?:<span class="hd">(?P<quality>[^<>]+))?.+?'\
-             'href="(?P<url>[^"]+)".+?src="(?P<thumb>[^"]+)".+?<h2 class="titleFilm">[^>]+>'\
-             '(?P<title>.+?)[ ]?(?:|\[(?P<lang>[^\]]+)\])?(?:\((?P<year>\d{4})\))?</a>.*?'\
-             '(?:IMDB\:</strong>[ ](?P<rating>.+?)<|</h2> )'
-    patronBlock = r'<h1 class="titleSection titleLastIns">.+?</h1>(?P<block>.*?)<div class="row ismobile">'
+    if item.args == 'az':
+        patron = r'<img style="[^"]+" src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+><a href="(?P<url>[^"]+)" [^>]+>(?P<title>[^<\[]+)(?:\[(?P<lang>[^\]]+)\]\s*)?<'\
+                 r'[^>]+>[^>]+>[^>]+>[^>]+>\s*(?P<year>\d{4})[^>]+>[^>]+>\s*(?P<quality>[^<]+).*?<span class="label">(?P<ratting>[^<]+)<'
+        patronBlock =''
 
-    if item.args == 'genres':
-        patron = r'<div class="wrapperImage">[ ]?(?:<span class="hd">'\
-                 '(?P<quality>[^<>]+))?.+?href="(?P<url>[^"]+)".+?src="(?P<thumb>[^"]+)"'\
-                 '.+?<h2 class="titleFilm(?:Mobile)?">[^>]+>(?P<title>.+?)[ ]?'\
-                 '(?:|\[(?P<lang>[^\]]+)\])?(?:\((?P<year>\d{4})\))?</a>.*?'\
-                 '(IMDB\:[ ](?P<rating>.+?))<'
+    elif item.args == 'genres':
+        patron = r'<div class="wrapperImage">[ ]?(?:<span class="hd">(?P<quality>[^<>]+))?.+?href="(?P<url>[^"]+)".+?src="(?P<thumb>[^"]+)"'\
+                 r'.+?<h2 class="titleFilm(?:Mobile)?">[^>]+>(?P<title>.+?)[ ]?(?:|\[(?P<lang>[^\]]+)\])?(?:\((?P<year>\d{4})\))?</a>.*?(IMDB\:[ ](?P<rating>.+?))<'
     elif item.args == 'search':
         patronBlock = r'<section id="lastUpdate">(?P<block>.*?)<div class="row ismobile">'
-        patron = r'<a href="(?P<url>[^"]+)">\s*<div class="wrapperImage">(?:<span class="hd">(?P<quality>[^<]+)'\
-                 '<\/span>)?<img[^s]+src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)<[^<]+>'\
-                 '(?:.*?IMDB:\s(\2[^<]+)<\/div>)?'
-    elif not item.args:
+        patron = r'<a href="(?P<url>[^"]+)">\s*<div class="wrapperImage">(?:<span class="hd">(?P<quality>[^<]+)<\/span>)?<img[^s]+src="(?P<thumb>[^"]+)"'\
+                 r'[^>]+>[^>]+>[^>]+>(?P<title>[^<]+)<[^<]+>(?:.*?IMDB:\s(\2[^<]+)<\/div>)?'
+
+    if not item.args:
         patronBlock = r'ULTIMI INSERITI(?P<block>.*?)<div class="sliderLastUpdate ismobile ">'
 
     # nella pagina "CERCA", la voce "SUCCESSIVO" apre la maschera di inserimento dati
     patronNext = r'<a class="next page-numbers" href="([^"]+)">'
 
-    #debug = True
     return locals()
 
 @support.scrape
 def genres(item):
-    support.log('genres', item)
-    #debug = True
-
     action = 'peliculas'
-    patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
+    patronMenu = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
 
     if item.args == 'genres':
         patronBlock = r'<ul class="listSubCat" id="Film">(?P<block>.*)<ul class="listSubCat" id="Anno">'
@@ -93,8 +87,12 @@ def genres(item):
         patronBlock = r'<h3 class="titleSidebox dado">FILM RANDOM</h3>(?P<block>.*)</section>'
         patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<[]+)(?:\[(?P<lang>.+?)\])?<'
         action = 'findvideos'
-
-    item.args = 'genres'
+    elif item.args == 'az':
+        blacklist = ['FILM 4K IN STREAMING']
+        patron = r'<a title="(?P<title>[^"]+)" href="(?P<url>[^"]+)"'
+        item.args = 'az'
+    if not item.args == 'az':
+        item.args = 'genres'
 
     return locals()
 
