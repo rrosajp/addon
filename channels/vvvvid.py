@@ -188,10 +188,14 @@ def episodios(item):
                         url=  host + show_id + '/season/' + str(key['season_id']) + '/',
                         action= 'findvideos',
                         video_id= key['video_id'],
+                        thumbnail= item.thumbnail,
+                        fanart = item.fanart,
+                        plot=item.plot,
                         contentType = item.contentType
                     ))
     autorenumber.renumber(itemlist, item, 'bold')
-    if autorenumber.check(item) == True:
+    if autorenumber.check(item) == True \
+        or support.match(itemlist[0].title, patron=r"(\d+x\d+)").match:
         support.videolibrary(itemlist,item)
     return itemlist
 
