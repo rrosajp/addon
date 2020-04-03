@@ -10,7 +10,7 @@ if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
 import xbmc, os, traceback
 
-from channelselector import get_thumb
+from channelselector import get_thumb, thumb
 from core import filetools
 from core import scrapertools
 from core import videolibrarytools
@@ -380,6 +380,7 @@ def get_seasons(item):
             new_item.infoLabels["playcount"] = 0
             itemlist.insert(0, new_item)
 
+        add_download_items(item, itemlist)
     return itemlist
 
 
@@ -441,7 +442,9 @@ def get_episodes(item):
             # logger.debug("epi:\n" + epi.tostring('\n'))
             itemlist.append(epi)
 
-    return sorted(itemlist, key=lambda it: (int(it.contentSeason), int(it.contentEpisodeNumber)))
+    itemlist = sorted(itemlist, key=lambda it: (int(it.contentSeason), int(it.contentEpisodeNumber)))
+    add_download_items(item, itemlist)
+    return itemlist
 
 
 def findvideos(item):
@@ -449,7 +452,6 @@ def findvideos(item):
     logger.info()
     # logger.debug("item:\n" + item.tostring('\n'))
     videolibrarytools.check_renumber_options(item)
-
     itemlist = []
     list_canales = {}
     item_local = None
@@ -462,8 +464,8 @@ def findvideos(item):
         return []
 
     #content_title = [c for c in item.contentTitle.strip().lower() if c not in ":*?<>|\/"]
-    content_title = "".join(c for c in item.contentTitle.strip().lower() if c not in ":*?<>|\/")
-
+    content_title = str(item.contentSeason) + 'x' + (str(item.contentEpisodeNumber) if item.contentEpisodeNumber > 9  \
+                                                                                else '0' + str(item.contentEpisodeNumber))
     if item.contentType == 'movie':
         item.strm_path = filetools.join(videolibrarytools.MOVIES_PATH, item.strm_path)
         path_dir = filetools.dirname(item.strm_path)
@@ -621,6 +623,7 @@ def findvideos(item):
     from specials import nextep
     if nextep.check(item) and stack()[1][3] == 'run':
         nextep.videolibrary(item)
+    add_download_items(item, itemlist)
     return itemlist
 
 
@@ -1080,3 +1083,34 @@ def check_tvshow_playcount(item, season):
         item.library_playcounts.update({item.title: playcount})
 
     return item
+
+
+def add_download_items(item, itemlist):
+    downloadItem = Item(channel='downloads',
+                        from_channel=item.channel,
+                        title=typo(config.get_localized_string(60355), "color kod bold"),
+                        fulltitle=item.fulltitle,
+                        show=item.fulltitle,
+                        contentType=item.contentType,
+                        contentSerieName=item.contentSerieName,
+                        url=item.url,
+                        action='save_download',
+                        from_action="findvideos",
+                        contentTitle=item.contentTitle,
+                        path=item.path,
+                        thumbnail=thumb(thumb='downloads.png'),
+                        parent=item.tourl())
+    if item.action == 'findvideos':
+        if item.contentType == 'episode':
+            downloadItem.title = typo(config.get_localized_string(60356), "color kod bold")
+        else:  # film
+            downloadItem.title = typo(config.get_localized_string(60354), "color kod bold")
+        downloadItem.downloadItemlist = [i.tourl() for i in itemlist]
+        itemlist.append(downloadItem)
+    else:
+        if item.contentSeason:  # season
+            downloadItem.title = typo(config.get_localized_string(60357), "color kod bold")
+            itemlist.append(downloadItem)
+        else:  # tvshow + not seen
+            itemlist.append(downloadItem)
+            itemlist.append(downloadItem.clone(title=typo(config.get_localized_string(60003), "color kod bold"), unseen=True))
