@@ -1,0 +1,78 @@
+{   
+    "all":{
+        "List": 50,
+        "Poster Wall": 51,
+        "Landscape Wall": 52,
+        "Square Wall": 53,
+        "Banner Wall": 54,
+        "Showcase": 55,
+        "Landscape Showcase": 56,
+        "Square Showcase": 57,
+        "Big Posters": 58,
+        "Lovefilm": 59,
+        "Media Info": 500,
+        "info List": 501,
+        "Episode List": 502,
+        "Square Wall Large": 503
+    },
+    "movie":{
+        "List": 50,
+        "Poster Wall": 51,
+        "Landscape Wall": 52,
+        "Showcase": 55,
+        "Landscape Showcase": 56,
+        "Square Showcase": 57,
+        "Big Posters": 58,
+        "Lovefilm": 59,
+        "Media Info": 500,
+        "info List": 501,
+        "Episode List": 502
+    },
+    "tvshow":{
+        "List": 50,
+        "Poster Wall": 51,
+        "Landscape Wall": 52,
+        "Banner Wall": 54,
+        "Showcase": 55,
+        "Landscape Showcase": 56,
+        "Square Showcase": 57,
+        "Big Posters": 58,
+        "Lovefilm": 59,
+        "Media Info": 500,
+        "info List": 501,
+        "Episode List": 502
+    },
+    "season":{
+        "List": 50,
+        "Poster Wall": 51,
+        "Landscape Wall": 52,
+        "Banner Wall": 54,
+        "Showcase": 55,
+        "Landscape Showcase": 56,
+        "Square Showcase": 57,
+        "Big Posters": 58,
+        "Lovefilm": 59,
+        "Media Info": 500,
+        "info List": 501,
+        "Episode List": 502
+    },
+    "episode":{
+        "List": 50,
+        "Poster Wall": 51,
+        "Landscape Wall": 52,
+        "Banner Wall": 54,
+        "Showcase": 55,
+        "Landscape Showcase": 56,
+        "Square Showcase": 57,
+        "Big Posters": 58,
+        "Lovefilm": 59,
+        "Media Info": 500,
+        "info List": 501,
+        "Episode List": 502
+    },
+    "addon":{
+        "List": 50,
+        "Square Wall": 53,
+        "Square Wall Large": 503
+    }
+}

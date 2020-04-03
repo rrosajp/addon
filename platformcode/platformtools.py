@@ -209,8 +209,9 @@ def render_items(itemlist, parent_item):
 
     xbmcplugin.setPluginCategory(handle=_handle, category=breadcrumb)
     # from core.support import dbg;dbg()
+
     set_view_mode(item, parent_item)
-    
+
     xbmcplugin.endOfDirectory(_handle)
     # Fijar la vista
     if config.get_setting("forceview"):
@@ -222,50 +223,50 @@ def render_items(itemlist, parent_item):
 
 
 def set_view_mode(item, parent_item):
-    # from core.support import dbg;dbg()
-    if (item.contentType in ['movie'] and parent_item.action in ['peliculas']) \
-        or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']):
-        mode = config.get_setting('view_mode_movie')
+    def mode(content, Type):
+        # from core.support import dbg;dbg()
+        mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
         if mode > 0:
-            xbmcplugin.setContent(handle=int(sys.argv[1]), content='movies')
+            xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
             xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
-    elif (item.contentType in ['tvshow'] and parent_item.action in ['peliculas']) \
-         or (item.channel in ['videolibrary'] and parent_item.action in ['list_tvshows']):
-        mode = config.get_setting('view_mode_tvshow')
-        if mode > 0:
-            xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
-            xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
-    elif parent_item.action in ['get_seasons']:
-        mode = config.get_setting('view_mode_season')
-        if mode > 0:
-            xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
-            xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
-    elif parent_item.action in ['episodios', 'get_episodes']:
-        mode = config.get_setting('view_mode_episode')
-        if mode > 0:
-            xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
-            xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
-    elif parent_item.action == 'findvideos':
-        mode = config.get_setting('view_mode_server')
-        if mode > 0:
-            xbmcplugin.setContent(handle=int(sys.argv[1]), content='addons')
-            xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
-    else:
-        mode = config.get_setting('view_mode_addon')
-        if mode > 0:
-            xbmcplugin.setContent(handle=int(sys.argv[1]), content='addons')
-            xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
+            logger.info('TYPE: ' + Type)
         else:
             xbmcplugin.setContent(handle=int(sys.argv[1]), content='')
-    # content = 'movies' if item.contentType in ['movie'] and parent_item.action == 'peliculas'\
-    #      else 'tvshows' if item.contentType in ['tvshow'] and parent_item.action == 'peliculas' \
-    #      else 'tvshows' if parent_item.action == 'episodios' \
-    #      else 'addons' if parent_item.action in ['findvideos'] \
-    #      else 'addons'
+            xbmc.executebuiltin('Container.SetViewMode(%s)' % 55)
+            logger.info('TYPE: ' + 'None')
 
-    # logger.info('Content: ' + content + ' - Action: ' + parent_item.action)
-    # xbmcplugin.setContent(handle=int(sys.argv[1]), content=content)
-    # xbmc.executebuiltin('Container.SetViewMode(%s)')
+    def reset_view_mode():
+        for mode in ['addon','channel','movie','tvshow','season','episode','server']:
+            config.set_setting('view_mode_%s' % mode, config.get_localized_string(70003) + ' , 0')
+
+    if xbmc.getSkinDir() != config.get_setting('skin_name') or not config.get_setting('skin_name'):
+        reset_view_mode()
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content='')
+        xbmc.executebuiltin('Container.SetViewMode(%s)' % 55)
+
+    elif (item.contentType in ['movie'] and parent_item.action in ['peliculas']) \
+        or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']):
+        mode('movie', 'movies')
+
+    elif (item.contentType in ['tvshow'] and parent_item.action in ['peliculas']) \
+         or (item.channel in ['videolibrary'] and parent_item.action in ['list_tvshows']):
+         mode('tvshow', 'tvshow')
+
+    elif parent_item.action in ['get_seasons']:
+        mode('season', 'tvshow')
+
+    elif parent_item.action in ['episodios', 'get_episodes']:
+        mode('episode', 'tvshow')
+
+    elif parent_item.action == 'findvideos':
+        mode('server', 'addons')
+
+    elif parent_item.action == 'mainlist':
+        mode('channel', 'addons')
+
+    else:
+        mode('addon', 'addons')
+
 
 def render_items_old(itemlist, parent_item):
     """

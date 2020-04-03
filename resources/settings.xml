@@ -86,12 +86,15 @@
         <setting id="custom_theme" type="folder" label="70565" default="" visible="eq(-1,true)"/>
         <setting id="video_thumbnail_type" type="select" label="70131" lvalues="70132|70133" default="1"/>
         <!-- View Mode-->
-        <setting id="view_mode_movie" type="action" label="30122" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJ2aWV3X21vZGUiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkidHlwZSI6Im1vdmllIg0KfQ==)" default= 0/>
-        <setting id="view_mode_tvshow" type="action" label="30123" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJ2aWV3X21vZGUiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkidHlwZSI6InR2c2hvdyINCn0=)" default= 0/>
-        <setting id="view_mode_season" type="action" label="30140" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJ2aWV3X21vZGUiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkidHlwZSI6InNlYXNvbiINCn0=)" default= 0/>
-        <setting id="view_mode_episode" type="action" label="70362" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJ2aWV3X21vZGUiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkidHlwZSI6ImVwaXNvZGUiDQp9)" default= 0/>
-        <setting id="view_mode_server" type="action" label="70145" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJ2aWV3X21vZGUiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkidHlwZSI6InNlcnZlciINCn0=)" default= 0/>
-        <setting id="view_mode_addon" type="action" label="Add-On" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJ2aWV3X21vZGUiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkidHlwZSI6ImFkZG9uIg0KfQ==)" default= 0/>
+        <setting label="70754" type="lsep"/>
+        <setting id="skin_name" label='Skin Name' type="text" default="skin.estuary" visible="false"/>>
+        <setting id="view_mode_addon" type="action" label="70009" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJ2aWV3X21vZGUiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkidHlwZSI6ImFkZG9uIg0KfQ==)" default= "Default, 0"/>
+        <setting id="view_mode_channel" type="action" label="30118" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJ2aWV3X21vZGUiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkidHlwZSI6ImNoYW5uZWwiDQp9)" default= "Default, 0"/>
+        <setting id="view_mode_movie" type="action" label="30122" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJ2aWV3X21vZGUiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkidHlwZSI6Im1vdmllIg0KfQ==)" default= "Default, 0"/>
+        <setting id="view_mode_tvshow" type="action" label="30123" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJ2aWV3X21vZGUiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkidHlwZSI6InR2c2hvdyINCn0=)" default= "Default, 0"/>
+        <setting id="view_mode_season" type="action" label="30140" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJ2aWV3X21vZGUiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkidHlwZSI6InNlYXNvbiINCn0=)" default= "Default, 0"/>
+        <setting id="view_mode_episode" type="action" label="70362" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJ2aWV3X21vZGUiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkidHlwZSI6ImVwaXNvZGUiDQp9)" default= "Default, 0"/>
+        <setting id="view_mode_server" type="action" label="70145" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJ2aWV3X21vZGUiLA0KICAgICJjaGFubmVsIjoic2hvcnRjdXRzIiwNCgkidHlwZSI6InNlcnZlciINCn0=)" default= "Default, 0"/>
         <!-- Contextual -->
         <setting label="30024" type="lsep"/>
         <setting id="quick_menu" type="bool" label="60360" default="false"/>
