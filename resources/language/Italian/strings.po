@@ -630,8 +630,8 @@ msgid "No links available that meets the requirements of the Black list. Try aga
 msgstr "Nessun collegamento disponibile che soddisfi i requisiti della Black list. Riprova modificando il filtro in 'Configurazione Server"
 
 msgctxt "#60003"
-msgid ""
-msgstr ""
+msgid "Download unseen episodes"
+msgstr "Scarica episodi non visti"
 
 msgctxt "#60004"
 msgid "No connector for the server %s"

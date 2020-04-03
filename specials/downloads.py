@@ -627,7 +627,7 @@ def download_from_server(item):
 
     progreso = platformtools.dialog_progress_bg(config.get_localized_string(30101), config.get_localized_string(70178) % item.server)
     try:
-        if item.contentChannel == 'community':
+        if item.contentChannel in ['community', 'videolibrary']:
             channel = __import__('specials.%s' % item.contentChannel, None, None, ['specials.%s' % item.contentChannel])
         else:
             channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
@@ -696,12 +696,13 @@ def download_from_best_server(item):
 
     result = {"downloadStatus": STATUS_CODES.error}
     progreso = platformtools.dialog_progress_bg(config.get_localized_string(30101), config.get_localized_string(70179))
+
     try:
         if item.downloadItemlist:
             logger.info('using cached servers')
             play_items = [Item().fromurl(i) for i in item.downloadItemlist]
         else:
-            if item.contentChannel == 'community':
+            if item.contentChannel in ['community', 'videolibrary']:
                 channel = __import__('specials.%s' % item.contentChannel, None, None, ['specials.%s' % item.contentChannel])
             else:
                 channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
@@ -755,7 +756,7 @@ def select_server(item):
             logger.info('using cached servers')
             play_items = [Item().fromurl(i) for i in item.downloadItemlist]
         else:
-            if item.contentChannel == 'community':
+            if item.contentChannel in ['community', 'videolibrary']:
                 channel = __import__('specials.%s' % item.contentChannel, None, None, ['specials.%s' % item.contentChannel])
             else:
                 channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
@@ -823,7 +824,7 @@ def get_episodes(item):
             episodes = [Item().fromurl(i) for i in item.downloadItemlist]
         else:
             # importamos el canal
-            if item.contentChannel == 'community':
+            if item.contentChannel in ['community', 'videolibrary']:
                 channel = __import__('specials.%s' % item.contentChannel, None, None, ["specials.%s" % item.contentChannel])
             else:
                 channel = __import__('channels.%s' % item.contentChannel, None, None, ["channels.%s" % item.contentChannel])
@@ -868,7 +869,7 @@ def get_episodes(item):
 
             episode.downloadFilename = filetools.validate_path(filetools.join(item.downloadFilename, "%dx%0.2d - %s" % (episode.contentSeason, episode.contentEpisodeNumber, episode.contentTitle.strip())))
             if season:
-                if scrapertools.find_single_match(episode.title, r'(\d+)x') == season_number:
+                if int(scrapertools.find_single_match(episode.title, r'(\d+)x')) == int(season_number):
                     itemlist.append(episode)
             else:
                 itemlist.append(episode)
@@ -920,6 +921,8 @@ def save_download(item):
 
 
 def save_download_background(item):
+    logger.info()
+
     # Menu contextual
     if item.from_action and item.from_channel:
         item.channel = item.from_channel
@@ -930,19 +933,47 @@ def save_download_background(item):
     item.contentChannel = item.from_channel if item.from_channel else item.channel
     item.contentAction = item.from_action if item.from_action else item.action
 
-    if item.contentType in ["tvshow", "episode", "season"]:
-        if ('download' in item and item.channel != 'community') or (item.channel == 'community' and config.get_setting('show_seasons',item.channel) == False):
-            heading = config.get_localized_string(70594) # <- Enter the season number
-            item.dlseason = platformtools.dialog_numeric(0, heading, '')
-            if item.dlseason:
-                save_download_tvshow(item)
-        else:
-            save_download_tvshow(item)
+    if item.channel == 'videolibrary':
+        from specials import videolibrary
 
-    elif item.contentType == "movie":
-        save_download_movie(item)
+        parent = Item().fromurl(item.parent)
+        parent.contentChannel = 'videolibrary'
+        if item.downloadItemlist:  # episode
+            parent.downloadItemlist = item.downloadItemlist
+        elif item.unseen:  # unseen episodes
+            parent.downloadItemlist = [i.tourl() for i in videolibrary.get_episodes(parent) if parent.library_playcounts[scrapertools.get_season_and_episode(i.title)] == 0]
+        else:  # tvshow or season
+            parent.downloadItemlist = [i.tourl() for i in videolibrary.get_episodes(parent)]
+
+        if parent.contentType in ["tvshow", "episode", "season"]:
+            if not item.unseen and parent.contentSeason:  # if no season, this is episode view, let's download entire serie
+                parent.dlseason = parent.contentSeason  # this is season view, let's download season
+            save_download_tvshow(parent)
+        elif parent.contentType == "movie":
+            save_download_movie(parent)
     else:
-        save_download_video(item)
+        if item.contentType in ["tvshow", "episode", "season"]:
+            if ('download' in item and item.channel != 'community') or (item.channel == 'community' and config.get_setting('show_seasons',item.channel) == False):
+                heading = config.get_localized_string(70594) # <- Enter the season number
+                item.dlseason = platformtools.dialog_numeric(0, heading, '')
+                if item.dlseason:
+                    save_download_tvshow(item)
+            else:
+                save_download_tvshow(item)
+
+        elif item.contentType == "movie":
+            save_download_movie(item)
+        else:
+            save_download_video(item)
+
+
+def save_download_videolibrary(item):
+    logger.info()
+    show_disclaimer()
+    item.contentChannel = 'videolibrary'
+    item.channel = "downloads"
+    item.action = "save_download_background"
+    xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?" + item.tourl() + ")")
 
 
 def save_download_video(item):

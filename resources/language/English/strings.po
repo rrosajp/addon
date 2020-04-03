@@ -631,7 +631,7 @@ msgid "No links available that meets the requirements of the Black list. Try aga
 msgstr ""
 
 msgctxt "#60003"
-msgid ""
+msgid "Download unseen episodes"
 msgstr ""
 
 msgctxt "#60004"
