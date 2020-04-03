@@ -137,7 +137,7 @@ def findvideos(item):
                  action='episodios',
                  contentTitle=item.contentSerieName,
                  plot = goseries + series + "con tutte le puntate",
-                 thumbnail = support.thumb(thumb='channels_tvshow.png')
+                 thumbnail = support.thumb(thumb='tvshow.png')
                 ))
 
         return itemlist

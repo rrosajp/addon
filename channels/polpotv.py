@@ -4,7 +4,7 @@
 # Canale polpotv
 # ------------------------------------------------------------ 
 
-from core import scrapertools, httptools, support, jsontools
+from core import support, jsontools
 from core.item import Item
 from platformcode import config
 import json, datetime
@@ -50,7 +50,7 @@ def peliculas(item):
     support.log()
     itemlist = []
     
-    data = httptools.downloadpage(item.url, headers=headers).data
+    data = support.match(item.url, headers=headers).data
     json_object = jsontools.load(data)
     for element in json_object['hydra:member']:
         if 'shows' not in item.url:
@@ -70,11 +70,11 @@ def peliculas(item):
 def episodios(item):
     support.log()
     itemlist = []
-    data = httptools.downloadpage(item.url, headers=headers).data
+    data = support.match(item.url, headers=headers).data
     json_object = jsontools.load(data)
     for season in json_object['seasons']:
         seas_url=host+season['@id']+'/releases'
-        itemlist_season=get_season(item.channel, seas_url, season['seasonNumber'])
+        itemlist_season=get_season(item, seas_url, season['seasonNumber'])
         if(len(itemlist_season)>0):
             itemlist.extend(itemlist_season)
 
@@ -82,18 +82,21 @@ def episodios(item):
 
     return itemlist
 
-def get_season(channel, seas_url, seasonNumber):
+def get_season(item, seas_url, seasonNumber):
     support.log()
     itemlist = []
-    data = httptools.downloadpage(seas_url, headers=headers).data
+    data = support.match(seas_url, headers=headers).data
     json_object = jsontools.load(data)
     for episode in json_object['hydra:member']:
         itemlist.append(
-            Item(channel=channel,
+            Item(channel=item.channel,
                  action='findvideos',
                  contentType='episode',
                  title=str(seasonNumber)+"x"+str("%02d"%episode['episodeNumber']),
                  url=seas_url,
+                 thumbnail=item.thumbnail,
+                 fanart=item.fanart,
+                 plot=item.plot,
                  extra=str(len(json_object['hydra:member'])-episode['episodeNumber'])))
     return itemlist[::-1]
 
@@ -102,13 +105,13 @@ def search(item, texto):
     itemlist=[]
     try:
         item.url = host + "/api/movies?originalTitle="+texto+"&translations.name=" +texto
-        data = httptools.downloadpage(item.url, headers=headers).data
+        data = support.match(item.url, headers=headers).data
         json_object = jsontools.load(data)
         for movie in json_object['hydra:member']:
             item.contentType='movie'
             itemlist.extend(get_itemlist_element(movie,item))
         item.url = host + "/api/shows?originalTitle="+texto+"&translations.name=" +texto
-        data = httptools.downloadpage(item.url, headers=headers).data
+        data = support.match(item.url, headers=headers).data
         json_object = jsontools.load(data)
         for tvshow in json_object['hydra:member']:
             item.contentType='tvshow'
@@ -124,7 +127,7 @@ def search(item, texto):
 def search_movie_by_genre(item):
     support.log()
     itemlist = []
-    data = httptools.downloadpage(item.url, headers=headers).data
+    data = support.match(item.url, headers=headers).data
     json_object = jsontools.load(data)
     for genre in json_object['hydra:member']:
         itemlist.append(
@@ -155,7 +158,7 @@ def findvideos(item):
     support.log()
     itemlist = []
     try:
-        data = httptools.downloadpage(item.url, headers=headers).data
+        data = support.match(item.url, headers=headers).data
         json_object = jsontools.load(data)
         array_index=0
         if item.contentType!='movie':

@@ -24,7 +24,7 @@ def mainlist(item):
     patronBlock = r'<ul class="dropdown-menu(?P<block>.*?)</ul> </div'
     patron = r'<a href="(?P<url>[^"]+)"(?: class="")?>(?P<title>[^<]+)<'
     def itemHook(item):
-        item.thumbnail = support.thumb(thumb='channels_music.png')
+        item.thumbnail = support.thumb(thumb='music.png')
         return item
     def itemlistHook(itemlist):
         itemlist.pop(0)

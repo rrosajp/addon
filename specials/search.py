@@ -56,25 +56,25 @@ def mainlist(item):
 def sub_menu(item):
     logger.info()
 
-    itemlist = [Item(channel=item.channel, action='genres_menu', title=config.get_localized_string(70306), mode='movie', thumbnail=get_thumb("channels_movie_genre.png")),
+    itemlist = [Item(channel=item.channel, action='genres_menu', title=config.get_localized_string(70306), mode='movie', thumbnail=get_thumb("movie_genre.png")),
 
-                Item(channel=item.channel, action='years_menu', title=config.get_localized_string(70742), mode='movie', thumbnail=get_thumb("channels_movie_year.png")),
+                Item(channel=item.channel, action='years_menu', title=config.get_localized_string(70742), mode='movie', thumbnail=get_thumb("movie_year.png")),
 
-                Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70307), search_type='list', list_type='movie/popular', mode='movie', thumbnail=get_thumb("channels_movie_popular.png")),
+                Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70307), search_type='list', list_type='movie/popular', mode='movie', thumbnail=get_thumb("movie_popular.png")),
 
-                Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70308), search_type='list', list_type='movie/top_rated', mode='movie', thumbnail=get_thumb("channels_movie_top.png")),
+                Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70308), search_type='list', list_type='movie/top_rated', mode='movie', thumbnail=get_thumb("movie_top.png")),
 
-                Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70309), search_type='list', list_type='movie/now_playing', mode='movie', thumbnail=get_thumb("channels_movie_now_playing.png")),
+                Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70309), search_type='list', list_type='movie/now_playing', mode='movie', thumbnail=get_thumb("movie_now_playing.png")),
 
-                Item(channel=item.channel, action='genres_menu', title=config.get_localized_string(70310), mode='tvshow', thumbnail=get_thumb("channels_tvshow_genre.png")),
+                Item(channel=item.channel, action='genres_menu', title=config.get_localized_string(70310), mode='tvshow', thumbnail=get_thumb("tvshow_genre.png")),
 
-                Item(channel=item.channel, action='years_menu', title=config.get_localized_string(70743), mode='tvshow', thumbnail=get_thumb("channels_tvshow_year.png")),
+                Item(channel=item.channel, action='years_menu', title=config.get_localized_string(70743), mode='tvshow', thumbnail=get_thumb("tvshow_year.png")),
 
                 Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70311), search_type='list', list_type='tv/popular', mode='tvshow', thumbnail=get_thumb("popular.png")),
 
-                Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70312), search_type='list', list_type='tv/on_the_air', mode='tvshow', thumbnail=get_thumb("channels_tvshow_on_the_air.png")),
+                Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70312), search_type='list', list_type='tv/on_the_air', mode='tvshow', thumbnail=get_thumb("tvshow_on_the_air.png")),
 
-                Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70313), search_type='list', list_type='tv/top_rated', mode='tvshow', thumbnail=get_thumb("channels_tvshow_top.png")),
+                Item(channel=item.channel, action='discover_list', title=config.get_localized_string(70313), search_type='list', list_type='tv/top_rated', mode='tvshow', thumbnail=get_thumb("tvshow_top.png")),
 
                 Item(channel="tvmoviedb", action="mainlist", title=config.get_localized_string(70274), thumbnail=get_thumb("search.png"))]
 
@@ -512,11 +512,11 @@ def years_menu(item):
     mode = item.mode.replace('show', '')
 
     par_year = 'primary_release_year'
-    thumb = channelselector.get_thumb('channels_movie_year.png')
+    thumb = channelselector.get_thumb('movie_year.png')
 
     if mode != 'movie':
         par_year = 'first_air_date_year'
-        thumb = channelselector.get_thumb('channels_tvshow_year.png')
+        thumb = channelselector.get_thumb('tvshow_year.png')
 
     c_year = datetime.datetime.now().year + 1
     l_year = c_year - 31
