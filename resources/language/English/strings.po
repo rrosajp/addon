@@ -321,6 +321,10 @@ msgctxt "#30139"
 msgid "Music"
 msgstr ""
 
+msgctxt "#30140"
+msgid "Seasons"
+msgstr ""
+
 msgctxt "#30151"
 msgid "Watch the video"
 msgstr ""

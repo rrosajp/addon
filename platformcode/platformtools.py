@@ -208,7 +208,9 @@ def render_items(itemlist, parent_item):
             breadcrumb = config.get_localized_string(70693)
 
     xbmcplugin.setPluginCategory(handle=_handle, category=breadcrumb)
-    # xbmcplugin.setContent(handle=_handle, content=breadcrumb)
+    # from core.support import dbg;dbg()
+    set_view_mode(item, parent_item)
+    
     xbmcplugin.endOfDirectory(_handle)
     # Fijar la vista
     if config.get_setting("forceview"):
@@ -217,6 +219,53 @@ def render_items(itemlist, parent_item):
     if parent_item.mode in ['silent', 'get_cached', 'set_cache', 'finish']:
         xbmc.executebuiltin("Container.SetViewMode(500)")
     logger.info('END render_items')
+
+
+def set_view_mode(item, parent_item):
+    # from core.support import dbg;dbg()
+    if (item.contentType in ['movie'] and parent_item.action in ['peliculas']) \
+        or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']):
+        mode = config.get_setting('view_mode_movie')
+        if mode > 0:
+            xbmcplugin.setContent(handle=int(sys.argv[1]), content='movies')
+            xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
+    elif (item.contentType in ['tvshow'] and parent_item.action in ['peliculas']) \
+         or (item.channel in ['videolibrary'] and parent_item.action in ['list_tvshows']):
+        mode = config.get_setting('view_mode_tvshow')
+        if mode > 0:
+            xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
+            xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
+    elif parent_item.action in ['get_seasons']:
+        mode = config.get_setting('view_mode_season')
+        if mode > 0:
+            xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
+            xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
+    elif parent_item.action in ['episodios', 'get_episodes']:
+        mode = config.get_setting('view_mode_episode')
+        if mode > 0:
+            xbmcplugin.setContent(handle=int(sys.argv[1]), content='tvshows')
+            xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
+    elif parent_item.action == 'findvideos':
+        mode = config.get_setting('view_mode_server')
+        if mode > 0:
+            xbmcplugin.setContent(handle=int(sys.argv[1]), content='addons')
+            xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
+    else:
+        mode = config.get_setting('view_mode_addon')
+        if mode > 0:
+            xbmcplugin.setContent(handle=int(sys.argv[1]), content='addons')
+            xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
+        else:
+            xbmcplugin.setContent(handle=int(sys.argv[1]), content='')
+    # content = 'movies' if item.contentType in ['movie'] and parent_item.action == 'peliculas'\
+    #      else 'tvshows' if item.contentType in ['tvshow'] and parent_item.action == 'peliculas' \
+    #      else 'tvshows' if parent_item.action == 'episodios' \
+    #      else 'addons' if parent_item.action in ['findvideos'] \
+    #      else 'addons'
+
+    # logger.info('Content: ' + content + ' - Action: ' + parent_item.action)
+    # xbmcplugin.setContent(handle=int(sys.argv[1]), content=content)
+    # xbmc.executebuiltin('Container.SetViewMode(%s)')
 
 def render_items_old(itemlist, parent_item):
     """
@@ -416,11 +465,11 @@ def render_items_old(itemlist, parent_item):
     xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True)
 
     # Fijar la vista
-    if config.get_setting("forceview"):
-        viewmode_id = get_viewmode_id(parent_item)
-        xbmc.executebuiltin("Container.SetViewMode(%s)" % viewmode_id)
-    if parent_item.mode in ['silent', 'get_cached', 'set_cache', 'finish']:
-        xbmc.executebuiltin("Container.SetViewMode(500)")
+    # if config.get_setting("forceview"):
+    #     viewmode_id = get_viewmode_id(parent_item)
+    #     xbmc.executebuiltin("Container.SetViewMode(%s)" % viewmode_id)
+    # if parent_item.mode in ['silent', 'get_cached', 'set_cache', 'finish']:
+    #     xbmc.executebuiltin("Container.SetViewMode(500)")
 
     logger.info('END render_items')
 
