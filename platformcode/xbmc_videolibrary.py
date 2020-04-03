@@ -803,22 +803,23 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
         path = path.replace(old,new)
         if sep == '/': path = path.replace('\\','/')
         else: path = path.replace('/','\\')
+        if path.endswith(sep + sep): path = path[:-1]
 
         return path
 
     logger.info()
 
-    new = new_path
+    # new = new_path
     old = current_path
 
     # rename main path for search in the DB
-    if new.startswith("special://") or scrapertools.find_single_match(new, r'(^\w+:\/\/)'):
-        new = new.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')
-        sep = '/'
-    else:
-        sep = os.sep
-    if not new.endswith(sep):
-        new += sep
+    # if new.startswith("special://") or scrapertools.find_single_match(new, r'(^\w+:\/\/)'):
+    #     new = new.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')
+    #     sep = '/'
+    # else:
+    #     sep = os.sep
+    # if not new.endswith(sep):
+    #     new += sep
 
     if old.startswith("special://") or scrapertools.find_single_match(old, r'(^\w+:\/\/)'):
         old = old.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')

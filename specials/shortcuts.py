@@ -32,73 +32,29 @@ def settings_menu(item):
 def view_mode(item):
 	logger.info(str(item))
 	import xbmc
+	from core import filetools, jsontools, support
 	from platformcode import config, platformtools
-	skin_view_mode ={
-		'skin.estuary':{
-			'movie':{
-				'List': 50,
-				'Poster': 51,
-				# 'IconWall': 52,
-				'Shift': 53,
-				'InfoWall': 54,
-				'WideList': 55,
-				'Wall': 500,
-				# 'Banner': 501,
-				'Fanart': 502
-			},
-			'tvshow':{
-				'List': 50,
-				'Poster': 51,
-				'Shift': 53,
-				'InfoWall': 54,
-				'WideList': 55,
-				'Wall': 500,
-				'Banner': 501,
-				'Fanart': 502
-			},
-			'season':{
-				'List': 50,
-				'Poster': 51,
-				'Shift': 53,
-				'InfoWall': 54,
-				'WideList': 55,
-				'Wall': 500,
-				'Fanart': 502
-			},
-			'episode':{
-				'List': 50,
-				'Poster': 51,
-				'Shift': 53,
-				'InfoWall': 54,
-				'WideList': 55,
-				'Wall': 500,
-				'Banner': 501,
-				'Fanart': 502
-			},
-			'server':{
-				'WideList': 55,
-				'Wall': 500
-			},
-			'addon':{
-				'WideList': 55,
-				'Wall': 500
-			}
-		}
-	}
 
-	list_type = [config.get_localized_string(59992)]
-	skin=xbmc.getSkinDir()
-	skin = skin_view_mode[xbmc.getSkinDir()][item.type]
+	skin_name = xbmc.getSkinDir()
+	config.set_setting('skin_name', skin_name)
 
-	for key in skin:
-		list_type.append(key)
+	path = filetools.join(config.get_runtime_path(), 'resources', 'views', skin_name + '.json')
+	if filetools.isfile(path):
+		json_file = open(path, "r").read()
+		json = jsontools.load(json_file)
 
-	select = platformtools.dialog_select(config.get_localized_string(60552), list_type)
-	if select > 0: 
-		value = skin[list_type[select]]
-	else:
-		value = 0
-	config.set_setting('view_mode_%s' % item.type, value)
+		Type = 'addon'if item.type in ['channel', 'server'] else item.type
+		skin = json[Type]
+
+		list_type = []
+		for key in skin:
+			list_type.append(key)
+		list_type.sort()
+		list_type.insert(0, config.get_localized_string(70003))
+
+		select = platformtools.dialog_select(config.get_localized_string(70754), list_type)
+		value = list_type[select] + ' , ' + str(skin[list_type[select]] if list_type[select] in skin else 0)
+		config.set_setting('view_mode_%s' % item.type, value)
 
 def servers_menu(item):
 	# from core.support import dbg; dbg()

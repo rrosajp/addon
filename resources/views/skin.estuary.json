@@ -1,0 +1,54 @@
+{
+    "all":{
+        "List": 50,
+        "Poster": 51,
+        "Shift": 53,
+        "InfoWall": 54,
+        "WideList": 55,
+        "Wall": 500,
+        "Banner": 501,
+        "Fanart": 502
+    },
+    "movie":{
+        "List": 50,
+        "Poster": 51,
+        "Shift": 53,
+        "InfoWall": 54,
+        "WideList": 55,
+        "Wall": 500,
+        "Fanart": 502
+    },
+    "tvshow":{
+        "List": 50,
+        "Poster": 51,
+        "Shift": 53,
+        "InfoWall": 54,
+        "WideList": 55,
+        "Wall": 500,
+        "Banner": 501,
+        "Fanart": 502
+    },
+    "season":{
+        "List": 50,
+        "Poster": 51,
+        "Shift": 53,
+        "InfoWall": 54,
+        "WideList": 55,
+        "Wall": 500,
+        "Fanart": 502
+    },
+    "episode":{
+        "List": 50,
+        "Poster": 51,
+        "Shift": 53,
+        "InfoWall": 54,
+        "WideList": 55,
+        "Wall": 500,
+        "Banner": 501,
+        "Fanart": 502
+    },
+    "addon":{
+        "WideList": 55,
+        "Wall": 500
+    }
+}
