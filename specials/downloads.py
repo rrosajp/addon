@@ -661,7 +661,7 @@ def download_from_server(item):
 
     if not item.video_urls:
         video_urls, puedes, motivo = servertools.resolve_video_urls_for_playing(item.server, item.url, item.password,
-                                                                                True)
+                                                                                True, True)
     else:
         video_urls, puedes, motivo = item.video_urls, True, ""
 
@@ -941,9 +941,9 @@ def save_download_background(item):
         if item.downloadItemlist:  # episode
             parent.downloadItemlist = item.downloadItemlist
         elif item.unseen:  # unseen episodes
-            parent.downloadItemlist = [i.tourl() for i in videolibrary.get_episodes(parent) if parent.library_playcounts[scrapertools.get_season_and_episode(i.title)] == 0]
+            parent.downloadItemlist = [i.tourl() for i in videolibrary.get_episodes(parent) if i.action == 'findvideos' and  parent.library_playcounts[scrapertools.get_season_and_episode(i.title)] == 0]
         else:  # tvshow or season
-            parent.downloadItemlist = [i.tourl() for i in videolibrary.get_episodes(parent)]
+            parent.downloadItemlist = [i.tourl() for i in videolibrary.get_episodes(parent) if i.action == 'findvideos']
 
         if parent.contentType in ["tvshow", "episode", "season"]:
             if not item.unseen and parent.contentSeason:  # if no season, this is episode view, let's download entire serie
