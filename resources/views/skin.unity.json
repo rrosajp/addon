@@ -1,0 +1,61 @@
+{
+    "all":{
+        "List": 50,
+        "Big List": 51,
+        "Thumbnail": 500,
+        "Poster Wrap": 501,
+        "Fanart": 508,
+        "Media Info": 505,
+        "Media Info 2": 504,
+        "Media Info 3": 503,
+        "Media Info 4": 515,
+        "Wide": 505,
+        "Info": 550,
+        "Info 2": 551
+    },
+    "movie":{
+        "List": 50,
+        "Big List": 51,
+        "Thumbnail": 500,
+        "Poster Wrap": 501,
+        "Fanart": 508,
+        "Media Info": 505,
+        "Media Info 2": 504,
+        "Media Info 3": 503
+    },
+    "tvshow":{
+        "List": 50,
+        "Big List": 51,
+        "Thumbnail": 500,
+        "Poster Wrap": 501,
+        "Fanart": 508,
+        "Media Info": 505,
+        "Media Info 2": 504,
+        "Media Info 3": 503,
+        "Wide": 505
+    },
+    "season":{
+        "List": 50,
+        "Big List": 51,
+        "Thumbnail": 500,
+        "Poster Wrap": 501,
+        "Media Info": 505,
+        "Media Info 2": 504,
+        "Media Info 3": 503
+    },
+    "episode":{
+        "List": 50,
+        "Big List": 51,
+        "Thumbnail": 500,
+        "Media Info": 505,
+        "Media Info 2": 504,
+        "Media Info 3": 503
+    },
+    "addon":{
+        "List": 50,
+        "Big List": 51,
+        "Thumbnail": 500,
+        "Info": 550,
+        "Info 2": 551
+    }
+}

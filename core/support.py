@@ -742,6 +742,12 @@ def typo(string, typography=''):
         VLT = False
     # Otherwise it uses the typographical attributes of the string
     # else:
+    if 'capitalize' in string.lower():
+        string = re.sub(r'\s*capitalize','',string).capitalize()
+    if 'uppercase' in string.lower():
+        string =  re.sub(r'\s*uppercase','',string).upper()
+    if 'lowercase' in string.lower():
+        string =  re.sub(r'\s*lowercase','',string).lower()
     if '[]' in string:
         string = '[' + re.sub(r'\s*\[\]','',string) + ']'
     if '()' in string:
@@ -768,12 +774,6 @@ def typo(string, typography=''):
             string = '[B]' + "•" + '[/B] ' + re.sub(r'\s*bullet','',string)
         else:
             string = re.sub(r'\s*bullet','',string)
-    if 'capitalize' in string.lower():
-        string =  re.sub(r'\s*capitalize','',string).capitalize()
-    if 'uppercase' in string.lower():
-        string =  re.sub(r'\s*uppercase','',string).upper()
-    if 'lowercase' in string.lower():
-        string =  re.sub(r'\s*lowercase','',string).lower()
     if '{}' in string:
         string = re.sub(r'\s*\{\}','',string)
 

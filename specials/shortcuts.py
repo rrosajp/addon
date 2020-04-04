@@ -32,7 +32,8 @@ def settings_menu(item):
 def view_mode(item):
 	logger.info(str(item))
 	import xbmc
-	from core import filetools, jsontools, support
+	from core import filetools, jsontools
+	from core.support import typo
 	from platformcode import config, platformtools
 
 	skin_name = xbmc.getSkinDir()
@@ -55,6 +56,8 @@ def view_mode(item):
 		select = platformtools.dialog_select(config.get_localized_string(70754), list_type)
 		value = list_type[select] + ' , ' + str(skin[list_type[select]] if list_type[select] in skin else 0)
 		config.set_setting('view_mode_%s' % item.type, value)
+	else:
+		platformtools.dialog_ok(config.get_localized_string(30141), config.get_localized_string(30142) % typo(skin_name.replace('skin.','').replace('.',' '), 'capitalize bold'))
 
 def servers_menu(item):
 	# from core.support import dbg; dbg()

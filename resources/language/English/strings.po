@@ -325,6 +325,14 @@ msgctxt "#30140"
 msgid "Seasons"
 msgstr ""
 
+msgctxt "#30141"
+msgid "Skin not supported"
+msgstr ""
+
+msgctxt "#30142"
+msgid "Skin %s is not currently supported"
+msgstr ""
+
 msgctxt "#30151"
 msgid "Watch the video"
 msgstr ""
