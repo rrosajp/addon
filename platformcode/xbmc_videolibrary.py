@@ -812,7 +812,7 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
     new = new_path
     old = current_path
 
-    rename main path for search in the DB
+    # rename main path for search in the DB
     if new.startswith("special://") or scrapertools.find_single_match(new, r'(^\w+:\/\/)'):
         new = new.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')
         sep = '/'
