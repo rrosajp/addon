@@ -171,11 +171,10 @@ def cleantitle(title):
 def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang):
     itemlist = []
     log("scrapeBlock qui")
-    matches = scrapertools.find_multiple_matches_groups(block, patron)
-    log('MATCHES =', matches)
-
     if debug:
         regexDbg(item, patron, headers, block)
+    matches = scrapertools.find_multiple_matches_groups(block, patron)
+    log('MATCHES =', matches)
 
     known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang', 'other']
     # Legenda known_keys per i groups nei patron
@@ -259,7 +258,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 infolabels['plot'] = plot
             if scraped['duration']:
                 matches = scrapertools.find_multiple_matches(scraped['duration'],
-                                                               r'([0-9])\s*?(?:[hH]|:|\.|,|\\|\/|\||\s)\s*?([0-9]+)')
+                                                             r'([0-9])\s*?(?:[hH]|:|\.|,|\\|\/|\||\s)\s*?([0-9]+)')
                 for h, m in matches:
                     scraped['duration'] = int(h) * 60 + int(m)
                 if not matches:

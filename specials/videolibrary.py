@@ -1086,31 +1086,32 @@ def check_tvshow_playcount(item, season):
 
 
 def add_download_items(item, itemlist):
-    downloadItem = Item(channel='downloads',
-                        from_channel=item.channel,
-                        title=typo(config.get_localized_string(60355), "color kod bold"),
-                        fulltitle=item.fulltitle,
-                        show=item.fulltitle,
-                        contentType=item.contentType,
-                        contentSerieName=item.contentSerieName,
-                        url=item.url,
-                        action='save_download',
-                        from_action="findvideos",
-                        contentTitle=item.contentTitle,
-                        path=item.path,
-                        thumbnail=thumb(thumb='downloads.png'),
-                        parent=item.tourl())
-    if item.action == 'findvideos':
-        if item.contentType == 'episode':
-            downloadItem.title = typo(config.get_localized_string(60356), "color kod bold")
-        else:  # film
-            downloadItem.title = typo(config.get_localized_string(60354), "color kod bold")
-        downloadItem.downloadItemlist = [i.tourl() for i in itemlist]
-        itemlist.append(downloadItem)
-    else:
-        if item.contentSeason:  # season
-            downloadItem.title = typo(config.get_localized_string(60357), "color kod bold")
+    if not item.fromLibrary:
+        downloadItem = Item(channel='downloads',
+                            from_channel=item.channel,
+                            title=typo(config.get_localized_string(60355), "color kod bold"),
+                            fulltitle=item.fulltitle,
+                            show=item.fulltitle,
+                            contentType=item.contentType,
+                            contentSerieName=item.contentSerieName,
+                            url=item.url,
+                            action='save_download',
+                            from_action="findvideos",
+                            contentTitle=item.contentTitle,
+                            path=item.path,
+                            thumbnail=thumb(thumb='downloads.png'),
+                            parent=item.tourl())
+        if item.action == 'findvideos':
+            if item.contentType == 'episode':
+                downloadItem.title = typo(config.get_localized_string(60356), "color kod bold")
+            else:  # film
+                downloadItem.title = typo(config.get_localized_string(60354), "color kod bold")
+            downloadItem.downloadItemlist = [i.tourl() for i in itemlist]
             itemlist.append(downloadItem)
-        else:  # tvshow + not seen
-            itemlist.append(downloadItem)
-            itemlist.append(downloadItem.clone(title=typo(config.get_localized_string(60003), "color kod bold"), unseen=True))
+        else:
+            if item.contentSeason:  # season
+                downloadItem.title = typo(config.get_localized_string(60357), "color kod bold")
+                itemlist.append(downloadItem)
+            else:  # tvshow + not seen
+                itemlist.append(downloadItem)
+                itemlist.append(downloadItem.clone(title=typo(config.get_localized_string(60003), "color kod bold"), unseen=True))

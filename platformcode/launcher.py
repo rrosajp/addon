@@ -481,6 +481,7 @@ def play_from_library(item):
         @type item: item
         @param item: elemento con información
     """
+    item.fromLibrary = True
     logger.info()
     # logger.debug("item: \n" + item.tostring('\n'))
 

@@ -813,7 +813,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
             # Descargar pelicula
             if item.contentType == "movie":
                 context_commands.append((config.get_localized_string(60354), "XBMC.RunPlugin(%s?%s&%s)" %
-                                         (sys.argv[0], item_url, 'channel=downloads&action=save_download&from_channel=item.channel&from_action=' + item.action)))
+                                         (sys.argv[0], item_url, 'channel=downloads&action=save_download&from_channel=' + item.channel + 'from_action=' + item.action)))
 
             elif item.contentSerieName:
                 # Descargar serie
