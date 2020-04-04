@@ -29,10 +29,15 @@ def mainlist(item):
 
 
 def search(item, text):
-    logger.info("[vedohd.py] " + item.url + " search " + text)
+    logger.info()
     item.url = item.url + "/?s=" + text
-
-    return support.dooplay_search(item)
+    try:
+        return support.dooplay_search(item)
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("%s" % line)
+        return []
 
 
 def peliculas(item):
