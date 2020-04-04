@@ -126,7 +126,7 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            log('search log:', line)
+            support.log('search log:', line)
         return []
 
 def newest(categoria):

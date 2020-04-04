@@ -38,8 +38,13 @@ def mainlist(item):
 def search(item, text):
     support.log("[streamingaltadefinizione.py] " + item.url + " search " + text)
     item.url = item.url + "/?s=" + text
-
-    return support.dooplay_search(item)
+    try:
+        return support.dooplay_search(item)
+    except:
+        import sys
+        for line in sys.exc_info():
+            support.logger.error("%s" % line)
+        return []
 
 
 @support.scrape
