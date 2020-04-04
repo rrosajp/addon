@@ -238,16 +238,17 @@ def update_renumber_options(item, head_nfo, path):
     from core import jsontools
     # from core.support import dbg;dbg()
     tvshow_path = filetools.join(path, 'tvshow.nfo')
-    for channel in item.channel_prefs:
-        filename = filetools.join(config.get_data_path(), "settings_channels", channel + '_data.json')
+    if item.channel_prefs:
+        for channel in item.channel_prefs:
+            filename = filetools.join(config.get_data_path(), "settings_channels", channel + '_data.json')
 
-        json_file = jsontools.load(filetools.read(filename))
-        if 'TVSHOW_AUTORENUMBER' in json_file:
-            json = json_file['TVSHOW_AUTORENUMBER']
-            if item.fulltitle in json:
-                item.channel_prefs[channel]['TVSHOW_AUTORENUMBER'] = json[item.fulltitle]
-                logger.info('UPDATED=\n' + str(item.channel_prefs))
-                filetools.write(tvshow_path, head_nfo + item.tojson())
+            json_file = jsontools.load(filetools.read(filename))
+            if 'TVSHOW_AUTORENUMBER' in json_file:
+                json = json_file['TVSHOW_AUTORENUMBER']
+                if item.fulltitle in json:
+                    item.channel_prefs[channel]['TVSHOW_AUTORENUMBER'] = json[item.fulltitle]
+                    logger.info('UPDATED=\n' + str(item.channel_prefs))
+                    filetools.write(tvshow_path, head_nfo + item.tojson())
 
 def add_renumber_options(item, head_nfo, path):
     from core import jsontools
