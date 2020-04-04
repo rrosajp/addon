@@ -512,6 +512,8 @@ def update(folder_content=config.get_setting("folder_tvshows"), folder=""):
 
     data = get_data(payload)
 
+    xbmc.executebuiltin('XBMC.ReloadSkin()')
+
 
 def clean(mostrar_dialogo=False):
     """
@@ -795,7 +797,7 @@ def set_content(content_type, silent=False, custom=False):
     return continuar
 
 
-def update_db(current_path, new_path, current_movies_folder, new_movies_folder, current_tvshows_folder, new_tvshows_folder, progress):
+def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvshows_folder, new_tvshows_folder, progress):
     def path_replace(path, old, new):
         if new.startswith("special://") or '://' in new: sep = '/'
         else: sep = os.sep
@@ -803,49 +805,32 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
         path = path.replace(old,new)
         if sep == '/': path = path.replace('\\','/')
         else: path = path.replace('/','\\')
-        # if path.endswith(sep + sep): path = path[:-1]
 
         return path
 
     logger.info()
 
-    new = new_path
-    old = current_path
-
-    # rename main path for search in the DB
-    if new.startswith("special://") or scrapertools.find_single_match(new, r'(^\w+:\/\/)'):
-        new = new.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')
-        sep = '/'
-    else:
-        sep = os.sep
-    if not new.endswith(sep):
-        new += sep
-
-    if old.startswith("special://") or scrapertools.find_single_match(old, r'(^\w+:\/\/)'):
-        old = old.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')
-        sep = '/'
-    else:
-        sep = os.sep
-    if not old.endswith(sep):
-        old += sep
+    if old_path.startswith("special://") or '://' in old_path: sep = '/'
+    else: sep = os.sep
+    if not old_path.endswith(sep):
+        old_path += sep
 
     # search MAIN path in the DB
-    sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % old
+    sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % old_path
     nun_records, records = execute_sql_kodi(sql)
 
     # change main path
     if records:
         idPath = records[0][0]
-        strPath = path_replace(records[0][1], current_path, new_path)
+        strPath = path_replace(records[0][1], old_path, new_path)
         sql = 'UPDATE path SET strPath="%s" WHERE idPath=%s' % (strPath, idPath)
         nun_records, records = execute_sql_kodi(sql)
 
     p = 80
     progress.update(p, config.get_localized_string(20000), config.get_localized_string(80013))
 
-    OLD = old
-    for OldPath, NewPath in [[current_movies_folder, new_movies_folder], [current_tvshows_folder, new_tvshows_folder]]:
-        old = OLD + OldPath
+    for OldFolder, NewFolder in [[old_movies_folder, new_movies_folder], [old_tvshows_folder, new_tvshows_folder]]:
+        old = old_path + OldFolder
         if not old.endswith(sep): old += sep
 
         # Search Main Sub Folder
@@ -856,7 +841,7 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
         if records:
             for record in records:
                 idPath = record[0]
-                strPath = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
                 sql = 'UPDATE path SET strPath="%s"WHERE idPath=%s' % (strPath, idPath)
                 nun_records, records = execute_sql_kodi(sql)
 
@@ -869,12 +854,12 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
         if records:
             for record in records:
                 idPath = record[0]
-                strPath = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
                 sql = 'UPDATE path SET strPath="%s"WHERE idPath=%s' % (strPath, idPath)
                 nun_records, records = execute_sql_kodi(sql)
 
 
-        if OldPath == current_movies_folder:
+        if OldFolder == old_movies_folder:
             # if is Movie Folder
             # search and modify in "movie"
             sql = 'SELECT idMovie, c22 FROM movie where c22 LIKE "%s"' % old
@@ -882,57 +867,19 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
             if records:
                 for record in records:
                     idMovie = record[0]
-                    strPath = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
                     sql = 'UPDATE movie SET c22="%s" WHERE idMovie=%s' % (strPath, idMovie)
                     nun_records, records = execute_sql_kodi(sql)
-            # search and modify in "movie_view"
-            sql = 'SELECT idMovie, c22, strPath FROM movie_view where c22 LIKE "%s"' % old
-            nun_records, records = execute_sql_kodi(sql)
-            if records:
-                for record in records:
-                    idMovie = record[0]
-                    c22 = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
-                    strPath = path_replace(record[2], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
-                    sql = 'UPDATE movie_view SET c22="%s", strPath="%s" WHERE idMovie=%s' % (c22, strPath, idMovie)
-                    nun_records, records = execute_sql_kodi(sql)
         else:
-            # if is Tv Show Folder
+            # if is TV Show Folder
             # search and modify in "episode"
             sql = 'SELECT idEpisode, c18 FROM episode where c18 LIKE "%s"' % old
             nun_records, records = execute_sql_kodi(sql)
             if records:
                 for record in records:
                     idEpisode = record[0]
-                    strPath = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
+                    strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
                     sql = 'UPDATE episode SET c18="%s" WHERE idEpisode=%s' % (strPath, idEpisode)
-                    nun_records, records = execute_sql_kodi(sql)
-            # search and modify in "episode_view"
-            sql = 'SELECT idEpisode, c18, strPath FROM episode_view where strPath LIKE "%s"' % old
-            nun_records, records = execute_sql_kodi(sql)
-            if records:
-                for record in records:
-                    idEpisode = record[0]
-                    c18 = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
-                    strPath = path_replace(record[2], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
-                    sql = 'UPDATE episode_view SET c18="%s", strPath="%s" WHERE idEpisode=%s' % (c18, strPath, idEpisode)
-                    nun_records, records = execute_sql_kodi(sql)
-            # search and modify in "season_view"
-            sql = 'SELECT idSeason, strPath FROM season_view where strPath LIKE "%s"' % old
-            nun_records, records = execute_sql_kodi(sql)
-            if records:
-                for record in records:
-                    idSeason = record[0]
-                    strPath = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
-                    sql = 'UPDATE season_view SET strPath="%s" WHERE idSeason=%s' % (strPath, idSeason)
-                    nun_records, records = execute_sql_kodi(sql)
-            # search and modify in "tvshow_view"
-            sql = 'SELECT idShow, strPath FROM tvshow_view where strPath LIKE "%s"' % old
-            nun_records, records = execute_sql_kodi(sql)
-            if records:
-                for record in records:
-                    idShow = record[0]
-                    strPath = path_replace(record[1], filetools.join(current_path, OldPath), filetools.join(new_path, NewPath))
-                    sql = 'UPDATE tvshow_view SET strPath="%s" WHERE idShow=%s' % (strPath, idShow)
                     nun_records, records = execute_sql_kodi(sql)
         p += 5
         progress.update(p, config.get_localized_string(20000), config.get_localized_string(80013))
@@ -940,30 +887,26 @@ def update_db(current_path, new_path, current_movies_folder, new_movies_folder, 
     xbmc.executebuiltin('XBMC.ReloadSkin()')
 
 
-def clear_db():
+def clean_db():
     logger.info()
+
     progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80025))
     progress.update(0)
 
-
-    config.set_setting('videolibrary_kodi_flag', 1)
     config.set_setting('videolibrary_kodi', False)
     path = config.get_setting('videolibrarypath')
 
     # rename main path for search in the DB
-    if path.startswith("special://") or scrapertools.find_single_match(path, r'(^\w+:\/\/)'):
-        path = path.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')
-        sep = '/'
-    else:
-        sep = os.sep
+    if path.startswith("special://") or '://' in path: sep = '/'
+    else: sep = os.sep
     if not path.endswith(sep):
         path += sep
 
-    # search path in the db
-    sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % path
+    # search main path in the DB
+    sql = 'SELECT idPath FROM path where strPath LIKE "%s"' % path
     nun_records, records = execute_sql_kodi(sql)
 
-    # change main path
+    # delete main path
     if records:
         idPath = records[0][0]
         sql = 'DELETE from path WHERE idPath=%s' % idPath
@@ -971,42 +914,55 @@ def clear_db():
     progress.update(20)
 
     path += '%'
-     # search path in the db
-    sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % path
+    # search sub folders in the DB
+    sql = 'SELECT idPath FROM path where strPath LIKE "%s"' % path
     nun_records, records = execute_sql_kodi(sql)
 
-    # change main path
+    # search TV shows in the DB
+    sql = 'SELECT idShow FROM tvshow_view where strPath LIKE "%s"' % path
+    nun_records, records_tvshow = execute_sql_kodi(sql)
+
+    # delete sub folders and files
     if records:
         for record in records:
             idPath = record[0]
             sql = 'DELETE from path WHERE idPath=%s' % idPath
             nun_records, records = execute_sql_kodi(sql)
-    # search path in the db
-    sql = 'SELECT idMovie, c22 FROM movie where c22 LIKE "%s"' % path
-    nun_records, records = execute_sql_kodi(sql)
+            sql = 'DELETE from files WHERE idPath=%s' % idPath
+            nun_records, records = execute_sql_kodi(sql)
     progress.update(40)
-    # change main path
+
+    # delete TV shows
+    if records_tvshow:
+        for record in records_tvshow:
+            idShow = record[0]
+            sql = 'DELETE from tvshow WHERE idShow=%s' % idShow
+            nun_records, records_tvshow = execute_sql_kodi(sql)
+    progress.update(60)
+
+    # search movies in the DB
+    sql = 'SELECT idMovie FROM movie where c22 LIKE "%s"' % path
+    nun_records, records = execute_sql_kodi(sql)
+    # delete movies
     if records:
         for record in records:
             idMovie = record[0]
             sql = 'DELETE from movie WHERE idMovie=%s' % idMovie
             nun_records, records = execute_sql_kodi(sql)
+    progress.update(80)
 
-    # search path in the db
-    sql = 'SELECT idEpisode, c18 FROM episode where c18 LIKE "%s"' % path
+    # search episodes in the DB
+    sql = 'SELECT idEpisode FROM episode where c18 LIKE "%s"' % path
     nun_records, records = execute_sql_kodi(sql)
-    progress.update(60)
-    # change main path
+    # delete episodes
     if records:
         for record in records:
             idEpisode = record[0]
             sql = 'DELETE from episode WHERE idEpisode=%s' % idEpisode
             nun_records, records = execute_sql_kodi(sql)
-    progress.update(80)
-    update_sources(path)
-    xbmc.executebuiltin('XBMC.ReloadSkin()')
     progress.update(100)
     progress.close()
+    xbmc.executebuiltin('XBMC.ReloadSkin()')
 
 
 def execute_sql_kodi(sql):
@@ -1102,9 +1058,9 @@ def add_sources(path):
         list_path = [p.firstChild.data for p in nodos_paths]
         logger.debug(list_path)
         if path in list_path:
-            logger.debug("La ruta %s ya esta en sources.xml" % path)
+            logger.debug("The path %s already exists in sources.xml" % path)
             return True
-        logger.debug("La ruta %s NO esta en sources.xml" % path)
+        logger.debug("The path %s does not exist in sources.xml" % path)
 
         # Si llegamos aqui es por q el path no esta en sources.xml, asi q lo incluimos
         nodo_source = xmldoc.createElement("source")
@@ -1178,9 +1134,9 @@ def update_sources(old, new=''):
             # create new path
             list_path = [p.firstChild.data for p in paths_node]
             if new in list_path:
-                logger.info("path %s already exists in sources.xml" % new)
+                logger.info("The path %s already exists in sources.xml" % new)
                 return
-            logger.info("path %s does not exist in sources.xml" % new)
+            logger.info("The path %s does not exist in sources.xml" % new)
 
             # if the path does not exist we create one
             source_node = xmldoc.createElement("source")
@@ -1215,18 +1171,9 @@ def update_sources(old, new=''):
                 filetools.write(SOURCES_PATH, '\n'.join([x for x in xmldoc.toprettyxml().encode("utf-8").splitlines() if x.strip()]))
             else:
                 filetools.write(SOURCES_PATH, b'\n'.join([x for x in xmldoc.toprettyxml().encode("utf-8").splitlines() if x.strip()]), vfs=False)
-
+            logger.debug("The path %s has been added to sources.xml" % new)
     else:
-        xmldoc = minidom.Document()
-        source_nodes = xmldoc.createElement("sources")
-
-        for type in ['programs', 'video', 'music', 'picture', 'files']:
-            nodo_type = xmldoc.createElement(type)
-            element_default = xmldoc.createElement("default")
-            element_default.setAttribute("pathversion", "1")
-            nodo_type.appendChild(element_default)
-            source_nodes.appendChild(nodo_type)
-        xmldoc.appendChild(source_nodes)
+        logger.debug("sources.xml not found!")
 
 
 def ask_set_content(silent=False):

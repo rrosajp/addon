@@ -229,7 +229,8 @@ def open_settings():
 
     from specials import videolibrary
     from platformcode import xbmc_videolibrary
-    if settings_pre.get('downloadpath', None) != settings_post.get('downloadpath', None):
+    if settings_pre.get('downloadpath', None) != settings_post.get('downloadpath', None) and \
+                        is_xbmc() and get_setting("videolibrary_kodi"):
         xbmc_videolibrary.update_sources(settings_pre.get('downloadpath', None), settings_post.get('downloadpath', None))
 
     # si se ha cambiado la ruta de la videoteca llamamos a comprobar directorios para que lo cree y pregunte
@@ -245,7 +246,7 @@ def open_settings():
     if not settings_pre.get("videolibrary_kodi", None) and settings_post.get("videolibrary_kodi", None):
         xbmc_videolibrary.ask_set_content(silent=True)
     elif settings_pre.get("videolibrary_kodi", None) and not settings_post.get("videolibrary_kodi", None):
-        xbmc_videolibrary.clear_db()
+        xbmc_videolibrary.clean_db()
 
 
 def get_setting(name, channel="", server="", default=None):
