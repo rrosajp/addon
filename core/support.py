@@ -736,7 +736,10 @@ def typo(string, typography=''):
 
     # If there are no attributes, it applies the default ones
     attribute = ['[]','()','submenu','color','bold','italic','_','--','[B]','[I]','[COLOR]']
-
+    if int(config.get_setting('view_mode_channel').split(',')[-1]) in [0, 50, 55]:
+       VLT = True
+    else:
+        VLT = False
     # Otherwise it uses the typographical attributes of the string
     # else:
     if '[]' in string:
@@ -744,7 +747,10 @@ def typo(string, typography=''):
     if '()' in string:
         string = '(' + re.sub(r'\s*\(\)','',string) + ')'
     if 'submenu' in string:
-        string = "•• " + re.sub(r'\s*submenu','',string)
+        if VLT:
+            string = "•• " + re.sub(r'\s*submenu','',string)
+        else:
+            re.sub(r'\s*submenu','',string)
     if 'color' in string:
         color = scrapertools.find_single_match(string, 'color ([a-z]+)')
         if color == 'kod' or '': color = kod_color
@@ -758,7 +764,10 @@ def typo(string, typography=''):
     if '--' in string:
         string = ' - ' + re.sub(r'\s*--','',string)
     if 'bullet' in string:
-        string = '[B]' + "•" + '[/B] ' + re.sub(r'\s*bullet','',string)
+        if VLT:
+            string = '[B]' + "•" + '[/B] ' + re.sub(r'\s*bullet','',string)
+        else:
+            string = re.sub(r'\s*bullet','',string)
     if 'capitalize' in string.lower():
         string =  re.sub(r'\s*capitalize','',string).capitalize()
     if 'uppercase' in string.lower():

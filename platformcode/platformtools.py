@@ -237,6 +237,7 @@ def set_view_mode(item, parent_item):
 
     def reset_view_mode():
         for mode in ['addon','channel','movie','tvshow','season','episode','server']:
+            config.set_setting('skin_name', xbmc.getSkinDir())
             config.set_setting('view_mode_%s' % mode, config.get_localized_string(70003) + ' , 0')
 
     if xbmc.getSkinDir() != config.get_setting('skin_name') or not config.get_setting('skin_name'):

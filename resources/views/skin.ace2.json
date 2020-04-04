@@ -1,0 +1,44 @@
+{
+    "all":{
+        "Right List": 50,
+        "Frame": 51,
+        "Wall": 56,
+        "Tech": 68,
+        "Sets Plus": 74
+    },
+    "movie":{
+        "Right List": 50,
+        "Frame": 51,
+        "Wall": 56,
+        "Tech": 68,
+        "Sets Plus": 74
+    },
+    "tvshow":{
+        "Right List": 50,
+        "Frame": 51,
+        "Wall": 56,
+        "Tech": 68,
+        "Sets Plus": 74
+    },
+    "season":{
+        "Right List": 50,
+        "Frame": 51,
+        "Wall": 56,
+        "Tech": 68,
+        "Sets Plus": 74
+    },
+    "episode":{
+        "Right List": 50,
+        "Frame": 51,
+        "Wall": 56,
+        "Tech": 68,
+        "Sets Plus": 74
+    },
+    "addon":{
+        "Right List": 50,
+        "Frame": 51,
+        "Wall": 56,
+        "Tech": 68,
+        "Sets Plus": 74
+    }
+}
