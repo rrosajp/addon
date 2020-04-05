@@ -498,6 +498,10 @@ def verify_directories_created():
             # si se crea el directorio
             filetools.mkdir(content_path)
 
+    from platformcode import xbmc_videolibrary
+    xbmc_videolibrary.update_sources(get_setting("videolibrarypath"))
+    xbmc_videolibrary.update_sources(get_setting("downloadpath"))
+
     try:
         from core import scrapertools
         # Buscamos el archivo addon.xml del skin activo
