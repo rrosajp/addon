@@ -43,7 +43,7 @@ HTTPTOOLS_DEFAULT_RANDOM_HEADERS = False
 
 domainCF = list()
 channelsCF = ['guardaserieclick', 'casacinema', 'dreamsub', 'ilgeniodellostreaming', 'piratestreaming', 'altadefinizioneclick', 'altadefinizione01_link']
-otherCF = ['altadefinizione-nuovo.link', 'wstream.video', 'akvideo.stream', 'backin.net']
+otherCF = ['altadefinizione-nuovo.link', 'wstream.video', 'akvideo.stream', 'backin.net', 'vcrypt.net']
 for ch in channelsCF:
     domainCF.append(urlparse.urlparse(config.get_channel_url(name=ch)).hostname)
 domainCF.extend(otherCF)
@@ -259,7 +259,7 @@ def downloadpage(url, **opt):
     domain = urlparse.urlparse(url).netloc
     global domainCF
     CF = False
-    if domain in domainCF:
+    if domain in domainCF or opt.get('cf', False):
         from lib import cloudscraper
         session = cloudscraper.create_scraper()
         CF = True
