@@ -11,10 +11,6 @@
                 "url": "https://wstream.video/video.php?file_code=\\1"
             },
             {
-                "pattern": "wstream\\.video/(?!api)([a-zA-Z0-9/]+.html)",
-                "url": "https://wstream.video/\\1"
-            },
-            {
                 "pattern": "wstream\\.video/(api/vcmod/fastredirect/streaming\\.php\\?id=[$0-9]+)",
                 "url": "https://wstream.video/\\1"
             }
