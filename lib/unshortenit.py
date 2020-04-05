@@ -522,10 +522,10 @@ class UnshortenIt(object):
                     prev_uri = uri
                     uri = r.headers['location']
                     if uri == prev_uri:
+                        logger.info('Use Cloudscraper')
                         uri = httptools.downloadpage(uri, timeout=self._timeout, headers=headers, follow_redirects=False, cf=True).headers['location']
 
             if "4snip" in uri:
-                logger.info('4SNIP: ' + uri)
                 if 'out_generator' in uri:
                     uri = re.findall('url=(.*)$', uri)[0]
                 elif '/decode/' in uri:
