@@ -106,7 +106,7 @@ def episodios(item):
     anime = True
     data = support.match(item, headers=headers).data
     if 'https://vcrypt.net' in data:
-        patron = r'(?:<br /> |<p>)(?P<title>[^<]+)<a href="(?P<url>[^"]+)"'
+        patron = r'(?: /> |<p>)(?P<title>[^<]+)<a (?P<url>.*?)(?:<br|</p)'
     else:
         patron = r'<br />\s*<a href="(?P<url>[^"]+)" target="_blank" rel="noopener[^>]+>(?P<title>[^<]+)</a>'
 
