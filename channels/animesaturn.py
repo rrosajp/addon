@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
 # Canale per AnimeSaturn
-# Thanks to 4l3x87
 # ----------------------------------------------------------
 
 from core import support
 
-# __channel__ = "animesaturn"
-# host = support.config.get_setting("channel_host", __channel__)
 host = support.config.get_channel_url()
 headers={'X-Requested-With': 'XMLHttpRequest'}
 
@@ -31,11 +28,8 @@ def search(item, texto):
     search = texto
     item.contentType = 'tvshow'
     anime = True
-    patron = r'href="(?P<url>[^"]+)"[^>]+>[^>]+>(?P<title>[^<|(]+)(?:(?P<lang>\(([^\)]+)\)))?<|\)'
+    patron = r'<a href="(?P<url>[^"]+)"[^>]+> <span>(?P<title>[^<\(]+)(?:\s*\((?P<year>\d+)\))?(?:\s*\((?P<lang>[A-Za-z-]+)\))?'
     action = 'check'
-    def itemHook(item):
-        item.url = item.url.replace('www.','')
-        return item
     return locals()
 
 
@@ -59,37 +53,52 @@ def newest(categoria):
 
 @support.scrape
 def menu(item):
-    patronMenu = r'u>(?P<title>[^<]+)<u>(?P<url>.*?)</div> </div>'
+    patronMenu = r'<div class="col-md-13 bg-dark-as-box-shadow p-2 text-white text-center">(?P<title>[^"<]+)<(?P<url>.*?)(?:"lista-top"|"clearfix")'
     action = 'peliculas'
-    def itemHook(item):
-        item.url = item.url.replace('www.','')
-        return item
+    item.args = 'top'
     return locals()
 
 
 @support.scrape
 def peliculas(item):
     anime = True
+
     deflang= 'Sub-ITA'
-    if item.args == 'updated':
-        post = "page=" + str(item.page if item.page else 1) if item.page > 1 else None
-        page= support.match(item, patron=r'data-page="(\d+)" title="Next">', post=post, headers=headers).match
-        patron = r'<img alt="[^"]+" src="(?P<thumb>[^"]+)" [^>]+></div></a>\s*<a href="(?P<url>[^"]+)"><div class="testo">(?P<title>[^\(<]+)(?:(?P<lang>\(([^\)]+)\)))?</div></a>\s*<a href="[^"]+"><div class="testo2">[^\d]+(?P<episode>\d+)</div></a>'
-        if page: nextpage = page
-        item.contentType='episode'
-        action = 'findvideos'
-    elif item.args == 'top':
-        data = item.url
-        patron = r'<a href="(?P<url>[^"]+)">[^>]+>(?P<title>[^<\(]+)(?:\((?P<year>[0-9]+)\))?(?:\((?P<lang>[A-Za-z]+)\))?</div></a><div class="numero">(?P<title2>[^<]+)</div>.*?src="(?P<thumb>[^"]+)"'
-        action = 'check'
+    action = 'check'
+
+    page = None
+    post = "page=" + str(item.page if item.page else 1) if item.page > 1 else None
+
+    if item.args == 'top':
+        data=item.url
+        patron = r'light">(?P<title2>[^<]+)</div>\s(?P<title>[^<]+)[^>]+>[^>]+>\s<a href="(?P<url>[^"]+)">(?:<a[^>]+>|\s*)<img alt="[^"]+" src="(?P<thumb>[^"]+)"'
+
     else:
-        pagination = ''
-        if item.args == 'incorso': patron = r'"slider_title"\s*href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)"[^>]+>(?P<title>[^\(<]+)(?:\((?P<year>\d+)\))?</a>'
-        else: patron = r'href="(?P<url>[^"]+)"[^>]+>[^>]+>(?P<title>.+?)(?:\((?P<lang>ITA)\))?(?:(?P<year>\((\d+)\)))?</span>'
-        action = 'check'
-    def itemHook(item):
-        item.url = item.url.replace('www.','')
-        return item
+        data = support.match(item, post=post, headers=headers).data
+        if item.args == 'updated':
+            page= support.match(data, patron=r'data-page="(\d+)" title="Next">').match
+            patron = r'<a href="(?P<url>[^"]+)" title="(?P<title>[^"(]+)(?:\s*\((?P<year>\d+)\))?(?:\s*\((?P<lang>[A-Za-z-]+)\))?"><img src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>\s\s*(?P<type>[^\s]+)\s*(?P<episode>\d+)'
+            typeContentDict = {'Movie':'movie', 'Episodio':'episode'} #item.contentType='episode'
+            action = 'findvideos'
+            def itemlistHook(itemlist):
+                if page:
+                    itemlist.append(
+                        support.Item(channel=item.channel,
+                            action = item.action,
+                            contentType=item.contentType,
+                            title=support.typo(support.config.get_localized_string(30992), 'color kod bold'),
+                            url=item.url,
+                            page= page,
+                            args=item.args,
+                            thumbnail=support.thumb()))
+                    return itemlist
+        else:
+            pagination = ''
+            if item.args == 'incorso':
+                patron = r'<a href="(?P<url>[^"]+)"[^>]+>(?P<title>[^<(]+)(?:\s*\((?P<year>\d+)\))?(?:\s*\((?P<lang>[A-za-z-]+)\))?</a>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>\s*<img width="[^"]+" height="[^"]+" src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<plot>[^<]+)<'
+            else:
+                patron = r'href="(?P<url>[^"]+)"[^>]+>[^>]+>(?P<title>.+?)(?:\((?P<lang>ITA)\))?(?:(?P<year>\((\d+)\)))?</span>'
+
     return locals()
 
 
@@ -110,21 +119,18 @@ def check(item):
 @support.scrape
 def episodios(item):
     if item.contentType != 'movie': anime = True
-    patron = r'<strong" style="[^"]+">(?P<title>[^<]+)</b></strong></td>\s*<td style="[^"]+"><a href="(?P<url>[^"]+)"'
-    def itemHook(item):
-        item.url = item.url.replace('www.','')
-        return item
+    patron = r'<a href="(?P<url>[^"]+)"[^>]+>\s*(?P<title>[^<]+)</a>'
     return locals()
 
 
 def findvideos(item):
     support.log()
     itemlist = []
-    # support.dbg()
-    urls = support.match(item, patron=r'<a href="([^"]+)"><div class="downloadestreaming">', headers=headers, debug=False).matches
-    if urls:
-        links = support.match(urls[0].replace('www.',''), patron=r'(?:<source type="[^"]+"\s*src=|file:\s*)"([^"]+)"', headers=headers, debug=False)
-        for link in links.matches:
+    url = support.match(item, patron=r'<a href="([^"]+)">[^>]+>[^>]+>G', headers=headers, debug=False).match
+    support.log(url)
+    if url:
+        links = support.match(url, patron=r'(?:<source type="[^"]+"\s*src=|file:\s*)"([^"]+)"', headers=headers, debug=False).matches
+        for link in links:
             itemlist.append(
                 support.Item(channel=item.channel,
                             action="play",
@@ -136,7 +142,7 @@ def findvideos(item):
                             show=item.show,
                             contentType=item.contentType,
                             folder=False))
-    return support.server(item, links, itemlist=itemlist)
+    return support.server(item, itemlist=itemlist)
 
 
 
