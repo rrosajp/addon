@@ -721,13 +721,14 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
     if current_path != new_path and not filetools.listdir(current_path) and not "plugin.video.kod\\videolibrary" in current_path:
         filetools.rmdirtree(current_path)
 
+    from platformcode import xbmc_videolibrary
+    xbmc_videolibrary.update_sources(backup_new_path, backup_current_path)
     if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
-        from platformcode import xbmc_videolibrary
-        xbmc_videolibrary.update_sources(backup_current_path, backup_new_path)
         xbmc_videolibrary.update_db(backup_current_path, backup_new_path, current_movies_folder, new_movies_folder, current_tvshows_folder, new_tvshows_folder, progress)
-
-    progress.update(100)
-    progress.close()
+    else:
+        progress.update(100)
+        xbmc.sleep(1000)
+        progress.close()
     if notify:
         platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80014), icon=0, time=5000, sound=False)
 

@@ -884,6 +884,9 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
         p += 5
         progress.update(p, config.get_localized_string(20000), config.get_localized_string(80013))
 
+    progress.update(100)
+    xbmc.sleep(1000)
+    progress.close()
     xbmc.executebuiltin('XBMC.ReloadSkin()')
 
 
@@ -961,6 +964,7 @@ def clean_db():
             sql = 'DELETE from episode WHERE idEpisode=%s' % idEpisode
             nun_records, records = execute_sql_kodi(sql)
     progress.update(100)
+    xbmc.sleep(1000)
     progress.close()
     xbmc.executebuiltin('XBMC.ReloadSkin()')
 
@@ -1030,112 +1034,52 @@ def execute_sql_kodi(sql):
     return nun_records, records
 
 
-def add_sources(path):
+def update_sources(new='', old=''):
     logger.info()
+    if new == old: return True
+
     try:
         SOURCES_PATH = xbmc.translatePath("special://userdata/sources.xml")
-
-        if os.path.exists(SOURCES_PATH):
+        if filetools.isfile(SOURCES_PATH):
             xmldoc = minidom.parse(SOURCES_PATH)
         else:
-            # Crear documento
             xmldoc = minidom.Document()
-            nodo_sources = xmldoc.createElement("sources")
+            source_nodes = xmldoc.createElement("sources")
 
             for type in ['programs', 'video', 'music', 'picture', 'files']:
                 nodo_type = xmldoc.createElement(type)
                 element_default = xmldoc.createElement("default")
                 element_default.setAttribute("pathversion", "1")
                 nodo_type.appendChild(element_default)
-                nodo_sources.appendChild(nodo_type)
-            xmldoc.appendChild(nodo_sources)
-
-        # Buscamos el nodo video
-        nodo_video = xmldoc.childNodes[0].getElementsByTagName("video")[0]
-
-        # Buscamos el path dentro de los nodos_path incluidos en el nodo_video
-        nodos_paths = nodo_video.getElementsByTagName("path")
-        list_path = [p.firstChild.data for p in nodos_paths]
-        logger.debug(list_path)
-        if path in list_path:
-            logger.debug("The path %s already exists in sources.xml" % path)
-            return True
-        logger.debug("The path %s does not exist in sources.xml" % path)
-
-        # Si llegamos aqui es por q el path no esta en sources.xml, asi q lo incluimos
-        nodo_source = xmldoc.createElement("source")
-
-        # Nodo <name>
-        nodo_name = xmldoc.createElement("name")
-        sep = os.sep
-        if path.startswith("special://") or scrapertools.find_single_match(path, '(^\w+:\/\/)'):
-            sep = "/"
-        name = path
-        if path.endswith(sep):
-            name = path[:-1]
-        nodo_name.appendChild(xmldoc.createTextNode(name.rsplit(sep)[-1]))
-        nodo_source.appendChild(nodo_name)
-
-        # Nodo <path>
-        nodo_path = xmldoc.createElement("path")
-        nodo_path.setAttribute("pathversion", "1")
-        nodo_path.appendChild(xmldoc.createTextNode(path))
-        nodo_source.appendChild(nodo_path)
-
-        # Nodo <allowsharing>
-        nodo_allowsharing = xmldoc.createElement("allowsharing")
-        nodo_allowsharing.appendChild(xmldoc.createTextNode('true'))
-        nodo_source.appendChild(nodo_allowsharing)
-
-        # Añadimos <source>  a <video>
-        nodo_video.appendChild(nodo_source)
-
-        # Guardamos los cambios
-        if not PY3:
-            filetools.write(SOURCES_PATH,
-                            '\n'.join([x for x in xmldoc.toprettyxml().encode("utf-8").splitlines() if x.strip()]))
-        else:
-            filetools.write(SOURCES_PATH,
-                            b'\n'.join([x for x in xmldoc.toprettyxml().encode("utf-8").splitlines() if x.strip()]),
-                            vfs=False)
-        logger.debug("The path %s has been added to sources.xml" % path)
-        return True
-    except:
-        logger.debug("An error occurred. The path %s has not been added to sources.xml" % path)
-        return False
-
-def update_sources(old, new=''):
-    logger.info()
-    if new == old: return
-
-    SOURCES_PATH = xbmc.translatePath("special://userdata/sources.xml")
-    if filetools.isfile(SOURCES_PATH):
-        xmldoc = minidom.parse(SOURCES_PATH)
+                source_nodes.appendChild(nodo_type)
+            xmldoc.appendChild(source_nodes)
 
         # collect nodes
         # nodes = xmldoc.getElementsByTagName("video")
         video_node = xmldoc.childNodes[0].getElementsByTagName("video")[0]
         paths_node = video_node.getElementsByTagName("path")
 
-        # delete old path
-        for node in paths_node:
-            if node.firstChild.data == old:
-                parent = node.parentNode
-                remove = parent.parentNode
-                remove.removeChild(parent)
+        if old:
+            # delete old path
+            for node in paths_node:
+                if node.firstChild.data == old:
+                    parent = node.parentNode
+                    remove = parent.parentNode
+                    remove.removeChild(parent)
 
-        # write changes
-        if sys.version_info[0] >= 3: #PY3
-            filetools.write(SOURCES_PATH, '\n'.join([x for x in xmldoc.toprettyxml().encode("utf-8").splitlines() if x.strip()]))
-        else:
-            filetools.write(SOURCES_PATH, b'\n'.join([x for x in xmldoc.toprettyxml().encode("utf-8").splitlines() if x.strip()]), vfs=False)
+            # write changes
+            if sys.version_info[0] >= 3: #PY3
+                filetools.write(SOURCES_PATH, '\n'.join([x for x in xmldoc.toprettyxml().encode("utf-8").splitlines() if x.strip()]))
+            else:
+                filetools.write(SOURCES_PATH, b'\n'.join([x for x in xmldoc.toprettyxml().encode("utf-8").splitlines() if x.strip()]), vfs=False)
+            logger.debug("The path %s has been removed from sources.xml" % old)
 
         if new:
             # create new path
             list_path = [p.firstChild.data for p in paths_node]
             if new in list_path:
                 logger.info("The path %s already exists in sources.xml" % new)
-                return
+                return True
             logger.info("The path %s does not exist in sources.xml" % new)
 
             # if the path does not exist we create one
@@ -1172,8 +1116,10 @@ def update_sources(old, new=''):
             else:
                 filetools.write(SOURCES_PATH, b'\n'.join([x for x in xmldoc.toprettyxml().encode("utf-8").splitlines() if x.strip()]), vfs=False)
             logger.debug("The path %s has been added to sources.xml" % new)
-    else:
-        logger.debug("sources.xml not found!")
+        return True
+    except:
+        logger.debug("An error occurred. The path %s has not been added/updated to sources.xml" % old)
+        return False
 
 
 def ask_set_content(silent=False):
@@ -1182,8 +1128,8 @@ def ask_set_content(silent=False):
 
     def do_config(custom=False):
         if set_content("movie", True, custom) and set_content("tvshow", True, custom) and \
-                       add_sources(config.get_setting("videolibrarypath")) and \
-                       add_sources(config.get_setting("downloadpath")):
+                       update_sources(config.get_setting("videolibrarypath")) and \
+                       update_sources(config.get_setting("downloadpath")):
             platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(70104))
             config.set_setting("videolibrary_kodi", True)
             update()
