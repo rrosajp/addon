@@ -27,10 +27,10 @@ def mainlist(item):
     itemlist = list()
     itemlist.append(Item(channel=item.channel, action="list_movies", title=config.get_localized_string(60509),
                          category=config.get_localized_string(70270),
-                         thumbnail=get_thumb("videolibrary_movie.png")))
+                         thumbnail=get_thumb("add_to_videolibrary.png")))
     itemlist.append(Item(channel=item.channel, action="list_tvshows", title=config.get_localized_string(60600),
                          category=config.get_localized_string(70271),
-                         thumbnail=get_thumb("videolibrary_tvshow.png")))
+                         thumbnail=get_thumb("add_to_videolibrary.png")))
     itemlist.append(Item(channel='shortcuts', action="SettingOnPosition", category=2, setting=0, title=typo(config.get_localized_string(70287),'bold color kod')))
 
     return itemlist
