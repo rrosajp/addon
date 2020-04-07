@@ -98,13 +98,13 @@ def mainlist(item):
     set_category_context(new_item)
     itemlist.append(new_item)
 
-    if channel_language == "all":
-        # if list_canales['Italiano']:
-        thumbnail = get_thumb("channels_italian.png")
-        new_item = Item(channel=item.channel, action="novedades", extra="italiano", title=config.get_localized_string(70563),
-                        thumbnail=thumbnail)
-        set_category_context(new_item)
-        itemlist.append(new_item)
+    # if channel_language == "all":
+    #     # if list_canales['Italiano']:
+    #     thumbnail = get_thumb("italian.png")
+    #     new_item = Item(channel=item.channel, action="novedades", extra="italiano", title=config.get_localized_string(70563),
+    #                     thumbnail=thumbnail)
+    #     set_category_context(new_item)
+    #     itemlist.append(new_item)
 
     # if list_canales['Torrent']:
     # thumbnail = get_thumb("channels_torrent.png")
@@ -118,9 +118,9 @@ def mainlist(item):
                     thumbnail=thumbnail)
     set_category_context(new_item)
     itemlist.append(new_item)
-
+    thumbnail = get_thumb("setting_0.png")
     itemlist.append(Item(channel='shortcuts', action="SettingOnPosition", category=5, setting=0,
-                         title=typo(config.get_localized_string(70285), 'bold color kod')))
+                         title=typo(config.get_localized_string(70285), 'bold color kod'), thumbnail=thumbnail))
 
     return itemlist
 

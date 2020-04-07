@@ -482,6 +482,7 @@ class UnshortenIt(object):
 
 
     def _unshorten_vcrypt(self, uri):
+        uri = uri.replace('.net','.pw')
         try:
             headers = {}
             if 'myfoldersakstream.php' in uri or '/verys/' in uri:

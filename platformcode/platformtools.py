@@ -153,7 +153,7 @@ def render_items(itemlist, parent_item):
         return
     # if there's no item, add "no elements" item
     if not len(itemlist):
-        itemlist.append(Item(title=config.get_localized_string(60347)))
+        itemlist.append(Item(title=config.get_localized_string(60347), thumbnail=get_thumb('nofolder.png')))
 
     for item in itemlist:
         item_url = item.tourl()
@@ -293,7 +293,7 @@ def render_items_old(itemlist, parent_item):
 
     # Si no hay ningun item, mostramos un aviso
     if not len(itemlist):
-        itemlist.append(Item(title=config.get_localized_string(60347)))
+        itemlist.append(Item(title=config.get_localized_string(60347), thumbnail=get_thumb('nofolder.png')))
 
     genre = False
     if 'nero' in parent_item.title:
@@ -353,9 +353,9 @@ def render_items_old(itemlist, parent_item):
             item.thumbnail = get_thumb("next.png")
         elif 'add' in item.action:
             if 'pelicula' in item.action:
-                item.thumbnail = get_thumb("videolibrary_movie.png")
+                item.thumbnail = get_thumb("add_to_videolibrary.png")
             elif 'serie' in item.action:
-                item.thumbnail = get_thumb("videolibrary_tvshow.png")
+                item.thumbnail = get_thumb("add_to_videolibrary.png")
 
         if (unify_enabled or force_unify) and parent_item.channel not in ['kodfavourites']:
             # Formatear titulo con unify

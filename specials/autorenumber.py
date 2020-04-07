@@ -52,7 +52,7 @@ TAG_TYPE = "Type"
 
 def renumber(itemlist, item='', typography=''):
     log()
-    dict_series = load(itemlist[0])
+    dict_series = load(itemlist[0]) if len(itemlist) > 0 else {}
 
     if item:
         item.channel = item.from_channel if item.from_channel else item.channel
