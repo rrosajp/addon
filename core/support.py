@@ -297,7 +297,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 infoLabels=infolabels,
                 thumbnail=item.thumbnail if function == 'episodios' and not scraped["thumb"] else scraped["thumb"] if scraped["thumb"] else '',
                 args=item.args,
-                contentSerieName= scraped['title'] if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
+                contentSerieName= scraped['title'] if scraped['title'] else item.fulltitle if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
                 contentTitle= scraped['title'] if item.contentType or CT == 'movie' else '',
                 contentLanguage = lang1,
                 contentEpisodeNumber=episode if episode else '',
@@ -970,6 +970,13 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
         contentType = 'tvshow'
 
     function = function if function else inspect.stack()[function_level][3]
+    # go up until find findvideos/episodios
+    while function not in ['findvideos', 'episodios']:
+        function_level += 1
+        try:
+            function = inspect.stack()[function_level][3]
+        except:
+            break
 
     if not typography: typography = 'color kod bold'
 

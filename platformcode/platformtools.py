@@ -627,43 +627,6 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
     else:
         context = []
 
-    # if config.get_setting("faster_item_serialization"):
-    #     # logger.info("Reducing serialization!")
-    #     itemBK = item
-    #     item = Item()
-    #     item.action = itemBK.action
-    #     item.channel = itemBK.channel
-    #     infoLabels = {}
-    #     if itemBK.infoLabels["year"]:       infoLabels["year"] = itemBK.infoLabels["year"]
-    #     if itemBK.infoLabels["imdb_id"]:    infoLabels["imdb_id"] = itemBK.infoLabels["imdb_id"]
-    #     if itemBK.infoLabels["tmdb_id"]:    infoLabels["tmdb_id"] = itemBK.infoLabels["tmdb_id"]
-    #     if itemBK.infoLabels["tvdb_id"]:    infoLabels["tvdb_id"] = itemBK.infoLabels["tvdb_id"]
-    #     if itemBK.infoLabels["noscrap_id"]: infoLabels["noscrap_id"] = itemBK.infoLabels["noscrap_id"]
-    #     if len(infoLabels) > 0:             item.infoLabels = infoLabels
-    #
-    #     if itemBK.thumbnail:                item.thumbnail = itemBK.thumbnail
-    #     if itemBK.extra:                    item.extra = itemBK.extra
-    #     if itemBK.contentEpisodeNumber:     item.contentEpisodeNumber = itemBK.contentEpisodeNumber
-    #     if itemBK.contentEpisodeTitle:      item.contentEpisodeTitle = itemBK.contentEpisodeTitle
-    #     if itemBK.contentPlot:              item.contentPlot = itemBK.contentPlot
-    #     if itemBK.contentQuality:           item.contentQuality = itemBK.contentQuality
-    #     if itemBK.contentSeason:            item.contentSeason = itemBK.contentSeason
-    #     if itemBK.contentSerieName:         item.contentSerieName = itemBK.contentSerieName
-    #     if itemBK.contentThumbnail:         item.contentThumbnail = itemBK.contentThumbnail
-    #     if itemBK.contentTitle:             item.contentTitle = itemBK.contentTitle
-    #     if itemBK.contentType:              item.contentType = itemBK.contentType
-    #     if itemBK.duration:                 item.duration = itemBK.duration
-    #     if itemBK.plot:                     item.plot = itemBK.plot
-    #     if itemBK.quality:                  item.quality = itemBK.quality
-    #     if itemBK.show:                     item.show = itemBK.show
-    #     if itemBK.title:                    item.title = itemBK.title
-    #     if itemBK.viewcontent:              item.viewcontent = itemBK.viewcontent
-
-    # itemJson = item.tojson()
-    # logger.info("Elemento: {0} bytes".format(len(itemJson)))
-    # logger.info(itemJson)
-    # logger.info("--------------------------------------------------------------")
-
     # Opciones segun item.context
     for command in context:
         # Predefinidos
@@ -813,7 +776,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
             # Descargar pelicula
             if item.contentType == "movie":
                 context_commands.append((config.get_localized_string(60354), "XBMC.RunPlugin(%s?%s&%s)" %
-                                         (sys.argv[0], item_url, 'channel=downloads&action=save_download&from_channel=' + item.channel + 'from_action=' + item.action)))
+                                         (sys.argv[0], item_url, 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' + item.action)))
 
             elif item.contentSerieName:
                 # Descargar serie
