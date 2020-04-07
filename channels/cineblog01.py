@@ -152,7 +152,7 @@ def peliculas(item):
         action = 'findvideos'
     else:
         # debug = True
-        patron = r'div class="card-image">.*?<img src="(?P<thumb>[^ ]+)" alt.*?<a href="(?P<url>[^ >]+)">(?P<title>.*?)(?:&#.*?)?(?P<lang>(?:[Ss][Uu][Bb]-)?[Ii][Tt][Aa])?<\/a>.*?(?:<strong><span style="[^"]+">(?P<genre>[^<>0-9(]+)\((?P<year>[0-9]{4}).*?</(?:p|div)>(?P<plot>.*?))?</div'
+        patron = r'div class="card-image">.*?<img src="(?P<thumb>[^ ]+)" alt.*?<a href="(?P<url>[^ >]+)">(?P<title>.*?)(?P<lang>(?:[Ss][Uu][Bb]-)?[Ii][Tt][Aa])?<\/a>.*?(?:<strong><span style="[^"]+">(?P<genre>[^<>0-9(]+)\((?P<year>[0-9]{4}).*?</(?:p|div)>(?P<plot>.*?))?</div'
         action = 'episodios'
         item.contentType = 'tvshow'
 
@@ -169,30 +169,26 @@ def episodios(item):
     patronBlock = r'(?P<block><div class="sp-head[a-z ]*?" title="Espandi">\s*(?:STAGION[EI]\s*(?:DA\s*[0-9]+\s*A)?\s*[0-9]+|MINISERIE) - (?P<lang>[^-<]+)(?:- (?P<quality>[^-<]+))?.*?[^<>]*?<\/div>.*?)<div class="spdiv">\[riduci\]<\/div>'
     # patron = '(?:<p>|<strong>)(?P<episode>[0-9]+(?:&#215;|×)[0-9]+)\s*(?P<title2>[^&<]*)?(?:&#8211;|-)?\s*(?P<url>.*?)(?:<\/p>|<br)'
     patron = r'(?:/>|<p>|<strong>)(?P<url>.*?(?P<episode>[0-9]+(?:&#215;|ÃÂ)[0-9]+)\s*(?P<title2>.*?)?(?:\s*&#8211;|\s*-|\s*<).*?)(?:<\/p>|<br)'
-    def fullItemlistHook(itemlist):
+    def itemlistHook(itemlist):
         title_dict = {}
         itlist = []
-        special_list = []
         for item in itemlist:
             item.title = re.sub(r'\.(\D)',' \\1', item.title)
-            if re.sub(r'(\[[^\]]+\])','',item.title) in [config.get_localized_string(30161),config.get_localized_string(60355),config.get_localized_string(60357)]:
-                special_list.append(item)
+            match = support.match(item.title, patron=r'(\d+.\d+)').match.replace('x','')
+            item.order = match
+            if match not in title_dict:
+                title_dict[match] = item
+            elif match in title_dict and item.contentLanguage == title_dict[match].contentLanguage \
+                or item.contentLanguage == 'ITA' and not title_dict[match].contentLanguage \
+                or title_dict[match].contentLanguage == 'ITA' and not item.contentLanguage:
+                title_dict[match].url = item.url
             else:
-                match = support.match(item.title, patron=r'(\d+.\d+)').match.replace('x','')
-                item.order = match
-                if match not in title_dict:
-                    title_dict[match] = item
-                elif match in title_dict and item.contentLanguage == title_dict[match].contentLanguage \
-                    or item.contentLanguage == 'ITA' and not title_dict[match].contentLanguage \
-                    or title_dict[match].contentLanguage == 'ITA' and not item.contentLanguage:
-                    title_dict[match].url = item.url
-                else:
-                    title_dict[match + '1'] = item
+                title_dict[match + '1'] = item
 
         for key, value in title_dict.items():
             itlist.append(value)
 
-        return sorted(itlist, key=lambda it: (it.contentLanguage, int(it.order))) + special_list
+        return sorted(itlist, key=lambda it: (it.contentLanguage, int(it.order)))
     return locals()
 
 
