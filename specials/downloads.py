@@ -341,18 +341,15 @@ def menu(item):
 
 
 def move_to_libray(item):
-    title = item.fulltitle
-    if config.get_setting("lowerize_title", "videolibrary"):
-        title = title.lower()
 
     if item.contentType == 'movie':
         FOLDER = FOLDER_MOVIES
-        path_title = "%s [%s]" % (title, item.infoLabels['IMDBNumber'])
+        path_title = "%s [%s]" % (item.contentTitle.strip() if item.contentTitle else item.fulltitle.strip() , item.infoLabels['IMDBNumber'])
         move_path = filetools.join(config.get_videolibrary_path(), FOLDER, path_title)
 
     else:
         FOLDER = FOLDER_TVSHOWS
-        path_title = "%s [%s]" % (title, item.infoLabels['IMDBNumber'])
+        path_title = os.path.dirname(item.downloadFilename)
         move_path = filetools.join(config.get_videolibrary_path(), FOLDER)
 
     download_path = filetools.join(config.get_setting("downloadpath"), item.downloadFilename)
@@ -382,6 +379,7 @@ def move_to_libray(item):
         for File in list_item:
             filename = File.lower()
             name = name.lower()
+
             if filename.startswith(name) and (filename.endswith('.strm') or filename.endswith('.json') or filename.endswith('.nfo')):
                 clean = True
                 logger.info('Delete File: ' + str(filetools.join(config.get_videolibrary_path(), FOLDER, path_title, File)))
@@ -808,7 +806,7 @@ def start_download(item):
 def get_episodes(item):
     logger.info("contentAction: %s | contentChannel: %s | contentType: %s" % (
         item.contentAction, item.contentChannel, item.contentType))
-        
+
     if 'dlseason' in item:
         season = True
         season_number = item.dlseason
