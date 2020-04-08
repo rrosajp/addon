@@ -1034,6 +1034,28 @@ def execute_sql_kodi(sql):
     return nun_records, records
 
 
+def check_sources(new_movies_path='', new_tvshows_path=''):
+    logger.info()
+
+    try:
+        SOURCES_PATH = xbmc.translatePath("special://userdata/sources.xml")
+        if filetools.isfile(SOURCES_PATH):
+            xmldoc = minidom.parse(SOURCES_PATH)
+
+            # collect nodes
+            # nodes = xmldoc.getElementsByTagName("video")
+            video_node = xmldoc.childNodes[0].getElementsByTagName("video")[0]
+            paths_node = video_node.getElementsByTagName("path")
+
+            # check paths
+            list_path = [p.firstChild.data for p in paths_node]
+            if new_movies_path in list_path or new_tvshows_path in list_path:
+                return True
+        return False
+    except:
+        return True
+
+
 def update_sources(new='', old=''):
     logger.info()
     if new == old: return True

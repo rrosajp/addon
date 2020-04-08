@@ -28,9 +28,9 @@ VIDEOLIBRARY_PATH = config.get_videolibrary_path()
 MOVIES_PATH = filetools.join(VIDEOLIBRARY_PATH, FOLDER_MOVIES)
 TVSHOWS_PATH = filetools.join(VIDEOLIBRARY_PATH, FOLDER_TVSHOWS)
 
-if not FOLDER_MOVIES or not FOLDER_TVSHOWS or not VIDEOLIBRARY_PATH \
+"""if not FOLDER_MOVIES or not FOLDER_TVSHOWS or not VIDEOLIBRARY_PATH \
         or not filetools.exists(MOVIES_PATH) or not filetools.exists(TVSHOWS_PATH):
-    config.verify_directories_created()
+    config.verify_directories_created()"""
 
 addon_name = "plugin://plugin.video.%s/" % config.PLUGIN_NAME
 

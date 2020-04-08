@@ -6178,3 +6178,7 @@ msgstr ""
 msgctxt "#80027"
 msgid "You will be asked to configure The Movie Database for movies and The TVDB for TV shows"
 msgstr ""
+
+msgctxt "#80028"
+msgid "The path and/or the folders you selected are already used by the Kodi library. Please select other ones"
+msgstr ""

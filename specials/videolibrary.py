@@ -704,6 +704,17 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
     current_tvshows_path = os.path.join(current_path, current_tvshows_folder)
     new_tvshows_path = os.path.join(new_path, new_tvshows_folder)
 
+    from platformcode import xbmc_videolibrary
+    if xbmc_videolibrary.check_sources(new_movies_path+'\\', new_tvshows_path+'\\'):
+        config.set_setting("videolibrarypath", current_path)
+        config.set_setting("folder_movies", current_movies_folder)
+        config.set_setting("folder_tvshows", current_tvshows_folder)
+        progress.update(100)
+        xbmc.sleep(1000)
+        progress.close()
+        platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(80028))
+        return
+
     config.verify_directories_created()
     progress.update(10, config.get_localized_string(20000), config.get_localized_string(80012))
     if current_movies_path != new_movies_path:
@@ -721,7 +732,6 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
     if current_path != new_path and not filetools.listdir(current_path) and not "plugin.video.kod\\videolibrary" in current_path:
         filetools.rmdirtree(current_path)
 
-    from platformcode import xbmc_videolibrary
     xbmc_videolibrary.update_sources(backup_new_path, backup_current_path)
     if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
         xbmc_videolibrary.update_db(backup_current_path, backup_new_path, current_movies_folder, new_movies_folder, current_tvshows_folder, new_tvshows_folder, progress)
