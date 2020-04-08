@@ -152,7 +152,7 @@ def peliculas(item):
         action = 'findvideos'
     else:
         # debug = True
-        patron = r'div class="card-image">.*?<img src="(?P<thumb>[^ ]+)" alt.*?<a href="(?P<url>[^ >]+)">(?P<title>.*?)(?P<lang>(?:[Ss][Uu][Bb]-)?[Ii][Tt][Aa])?<\/a>.*?(?:<strong><span style="[^"]+">(?P<genre>[^<>0-9(]+)\((?P<year>[0-9]{4}).*?</(?:p|div)>(?P<plot>.*?))?</div'
+        patron = r'div class="card-image">.*?<img src="(?P<thumb>[^ ]+)" alt.*?<a href="(?P<url>[^ >]+)">(?P<title>.*?)(?: &#8211; (?:[SS]tagione \d|\d).*?)?(?P<lang>(?:[Ss][Uu][Bb]-)?[Ii][Tt][Aa])?<\/a>.*?(?:<strong><span style="[^"]+">(?P<genre>[^<>0-9(]+)\((?P<year>[0-9]{4}).*?</(?:p|div)>(?P<plot>.*?))?</div'
         action = 'episodios'
         item.contentType = 'tvshow'
 
