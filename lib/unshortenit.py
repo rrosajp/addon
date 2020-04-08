@@ -482,6 +482,7 @@ class UnshortenIt(object):
 
 
     def _unshorten_vcrypt(self, uri):
+        uri = uri.replace('.net','.pw')
         try:
             headers = {}
             if 'myfoldersakstream.php' in uri or '/verys/' in uri:
@@ -519,12 +520,18 @@ class UnshortenIt(object):
                     uri = ''
                     logger.info('IP bannato da vcrypt, aspetta un ora')
                 else:
+                    prev_uri = uri
                     uri = r.headers['location']
+                    if uri == prev_uri:
+                        logger.info('Use Cloudscraper')
+                        uri = httptools.downloadpage(uri, timeout=self._timeout, headers=headers, follow_redirects=False, cf=True).headers['location']
+
             if "4snip" in uri:
                 if 'out_generator' in uri:
                     uri = re.findall('url=(.*)$', uri)[0]
                 elif '/decode/' in uri:
-                    uri = decrypt(uri.split('/')[-1])
+                    uri = httptools.downloadpage(uri, follow_redirects=True).url
+                    # uri = decrypt(uri.split('/')[-1])
 
             return uri, r.code if r else 200
         except Exception as e:

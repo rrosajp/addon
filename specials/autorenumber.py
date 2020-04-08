@@ -52,11 +52,16 @@ TAG_TYPE = "Type"
 
 def renumber(itemlist, item='', typography=''):
     log()
-    dict_series = load(itemlist[0])
+    dict_series = load(itemlist[0]) if len(itemlist) > 0 else {}
 
     if item:
         item.channel = item.from_channel if item.from_channel else item.channel
         title = item.fulltitle.rstrip()
+        if item.channel in item.channel_prefs and TAG_TVSHOW_RENUMERATE in item.channel_prefs[item.channel] and title not in dict_series:
+            from core.videolibrarytools import check_renumber_options
+            from specials.videolibrary import update_videolibrary
+            check_renumber_options(item)
+            update_videolibrary(item)
 
         if inspect.stack()[2][3] == 'find_episodes':
             return itemlist
