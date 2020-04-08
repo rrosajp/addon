@@ -78,15 +78,15 @@ msgid "Password"
 msgstr ""
 
 msgctxt "#30017"
-msgid "Download path"
+msgid "Download path*"
 msgstr ""
 
 msgctxt "#30018"
-msgid "Download list path"
+msgid "Download list path*"
 msgstr ""
 
 msgctxt "#30019"
-msgid "Filter channels by language"
+msgid "Channels language"
 msgstr ""
 
 msgctxt "#30020"
@@ -206,7 +206,7 @@ msgid "Unsopported Server"
 msgstr ""
 
 msgctxt "#30067"
-msgid "Path"
+msgid "Path*"
 msgstr ""
 
 msgctxt "#30068"
@@ -1563,7 +1563,7 @@ msgid "Information"
 msgstr ""
 
 msgctxt "#60349"
-msgid "Go to the Main Menu"
+msgid "Go to the main menu"
 msgstr ""
 
 msgctxt "#60350"
@@ -1583,7 +1583,7 @@ msgid "Add movie to video library"
 msgstr ""
 
 msgctxt "#60354"
-msgid "Download Movie"
+msgid "Download movie"
 msgstr ""
 
 msgctxt "#60355"
@@ -1591,19 +1591,19 @@ msgid "Download TV show"
 msgstr ""
 
 msgctxt "#60356"
-msgid "Download Episode"
+msgid "Download episode"
 msgstr ""
 
 msgctxt "#60357"
-msgid "Download Season"
+msgid "Download season"
 msgstr ""
 
 msgctxt "#60358"
-msgid "Open Configuration"
+msgid "Open configuration"
 msgstr ""
 
 msgctxt "#60359"
-msgid "Search Trailer"
+msgid "Search trailer"
 msgstr ""
 
 msgctxt "#60360"
@@ -1611,7 +1611,7 @@ msgid "Show quick menu"
 msgstr ""
 
 msgctxt "#60361"
-msgid "Super Favourites Menu"
+msgid "Super favourites menu"
 msgstr ""
 
 msgctxt "#60362"
@@ -1819,8 +1819,8 @@ msgid "Channels included in the global search "
 msgstr ""
 
 msgctxt "#60422"
-msgid "Search "
-msgstr ""
+msgid "Channels search"
+msgstr "Ricerca canali"
 
 msgctxt "#60423"
 msgid "Search"
@@ -2851,7 +2851,7 @@ msgid "Reload"
 msgstr ""
 
 msgctxt "#70009"
-msgid "Classic Menu"
+msgid "Main menu"
 msgstr ""
 
 msgctxt "#70010"
@@ -2927,7 +2927,7 @@ msgid "Search engine settings"
 msgstr ""
 
 msgctxt "#70028"
-msgid "Most Popular"
+msgid "Most popular"
 msgstr ""
 
 msgctxt "#70029"
@@ -3215,7 +3215,7 @@ msgid "Video library %s configured"
 msgstr ""
 
 msgctxt "#70104"
-msgid "The Kodi video library has been configured correctly"
+msgid "The Kodi video library has been successfully configured"
 msgstr ""
 
 msgctxt "#70105"
@@ -3271,15 +3271,15 @@ msgid "Confirm new password"
 msgstr ""
 
 msgctxt "#70118"
-msgid "TV shows folder"
+msgid "TV shows folder*"
 msgstr ""
 
 msgctxt "#70119"
-msgid "Movies folder"
+msgid "Movies folder*"
 msgstr ""
 
 msgctxt "#70120"
-msgid "Add KoD content to Kodi video library"
+msgid "Add KoD content to Kodi video library*"
 msgstr ""
 
 msgctxt "#70121"
@@ -3407,11 +3407,11 @@ msgid "Show ExtendedInfo"
 msgstr ""
 
 msgctxt "#70153"
-msgid "KoD shortcut"
+msgid "Shortcut"
 msgstr ""
 
 msgctxt "#70154"
-msgid "TMDB search options"
+msgid "TMDB search"
 msgstr ""
 
 msgctxt "#70155"
@@ -5003,15 +5003,15 @@ msgid "Select color:"
 msgstr ""
 
 msgctxt "#70559"
-msgid "Now in Theatres "
+msgid "Now in theatres "
 msgstr ""
 
 msgctxt "#70560"
-msgid "Movies by Genre"
+msgid "Movies by genre"
 msgstr ""
 
 msgctxt "#70561"
-msgid "Search Similar"
+msgid "Search similar"
 msgstr ""
 
 msgctxt "#70562"
@@ -5083,7 +5083,7 @@ msgid "Torrents"
 msgstr ""
 
 msgctxt "#70579"
-msgid "KoD update"
+msgid "Updates"
 msgstr ""
 
 msgctxt "#70580"
@@ -5478,7 +5478,7 @@ msgid "KoD updates"
 msgstr ""
 
 msgctxt "#70675"
-msgid "Error checking updates"
+msgid "Impossible to check the updates"
 msgstr ""
 
 msgctxt "#70676"
@@ -5630,11 +5630,11 @@ msgid "Modify "
 msgstr " "
 
 msgctxt "#70715"
-msgid "Customized homepage"
+msgid "Customized main menu"
 msgstr ""
 
 msgctxt "#70716"
-msgid "Homepage categories"
+msgid "Main menu items"
 msgstr ""
 
 msgctxt "#70717"
@@ -5786,7 +5786,7 @@ msgid "Playback"
 msgstr ""
 
 msgctxt "#70754"
-msgid "Display mode"
+msgid "View types"
 msgstr ""
 
 msgctxt "#70755"
@@ -5913,14 +5913,30 @@ msgctxt "#70785"
 msgid "Install Quasar"
 msgstr ""
 
+msgctxt "#70786"
+msgid "Autostart"
+msgstr ""
+
+msgctxt "#70787"
+msgid "Network"
+msgstr ""
+
+msgctxt "#70788"
+msgid "Logging"
+msgstr ""
+
+msgctxt "#70789"
+msgid "* Change by opening the settings from the main menu of KoD"
+msgstr ""
+
 
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
-msgid "Enable DNS Check Alert"
+msgid "Enable DNS check alert"
 msgstr ""
 
 msgctxt "#707402"
-msgid "Connection or DNS problems"
+msgid "Connection or DNS problem"
 msgstr ""
 
 msgctxt "#707403"
