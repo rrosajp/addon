@@ -52,8 +52,11 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                 keys = json.loads(data)
 
                 for key in keys:
-                    video_urls.append(['%s [%sp]' % (key['type'].replace('video/', ''), key['label']),
-                                       key['src'].replace('https', 'http') + '|' + _headers])
+                    if 'label' in key:
+                        video_urls.append(['%s [%sp]' % (key['type'].replace('video/', ''), key['label']),
+                                          key['src'].replace('https', 'http') + '|' + _headers])
+                    else:
+                        video_urls.append([key['src'].split('.')[-1], key['src'].replace('https', 'http') + '|' + _headers])
             except:
                 pass
 

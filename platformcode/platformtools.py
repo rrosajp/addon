@@ -213,12 +213,6 @@ def render_items(itemlist, parent_item):
     set_view_mode(item, parent_item)
 
     xbmcplugin.endOfDirectory(_handle)
-    # Fijar la vista
-    if config.get_setting("forceview"):
-        viewmode_id = get_viewmode_id(parent_item)
-        xbmc.executebuiltin("Container.SetViewMode(%s)" % viewmode_id)
-    if parent_item.mode in ['silent', 'get_cached', 'set_cache', 'finish']:
-        xbmc.executebuiltin("Container.SetViewMode(500)")
     logger.info('END render_items')
 
 
