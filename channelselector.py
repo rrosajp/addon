@@ -121,14 +121,14 @@ def getchanneltypes(view="thumb_"):
     itemlist = list()
     title = config.get_localized_string(30121)
     itemlist.append(Item(title=title, channel="channelselector", action="filterchannels", view=view,
-                         category=title, channel_type="all", thumbnail=get_thumb("channels_all.png", view),
+                         category=title, channel_type="all", thumbnail=get_thumb("all.png", view),
                          viewmode="thumbnails", context = CONTEXT))
 
     for channel_type in channel_types:
         title = config.get_localized_category(channel_type)
         itemlist.append(Item(title=title, channel="channelselector", action="filterchannels", category=title,
                              channel_type=channel_type, viewmode="thumbnails",
-                             thumbnail=get_thumb("channels_%s.png" % channel_type, view), context = CONTEXT))
+                             thumbnail=get_thumb("%s.png" % channel_type, view), context = CONTEXT))
 
     # itemlist.append(Item(title='Oggi in TV', channel="filmontv", action="mainlist", view=view,
     #                      category=title, channel_type="all", thumbnail=get_thumb("on_the_air.png", view),
@@ -137,7 +137,7 @@ def getchanneltypes(view="thumb_"):
 
 
     itemlist.append(Item(title=config.get_localized_string(70685), channel="community", action="mainlist", view=view,
-                         category=config.get_localized_string(70685), channel_type="all", thumbnail=get_thumb("channels_community.png", view),
+                         category=config.get_localized_string(70685), channel_type="all", thumbnail=get_thumb("community.png", view),
                          viewmode="thumbnails", context = CONTEXT))
     return itemlist
 
@@ -382,45 +382,45 @@ def auto_filter(auto_lang=False):
 
 def thumb(item_or_itemlist=None, genre=False, thumb=''):
     import re
-    icon_dict = {'channels_movie':['film'],
-                 'channels_tvshow':['serie','tv','episodi','episodio','fiction'],
-                 'channels_documentary':['documentari','documentario', 'documentary'],
-                 'channels_teenager':['ragazzi','teenager', 'teen'],
-                 'channels_learning':['learning'],
-                 'channels_all':['tutti'],
+    icon_dict = {'movie':['film'],
+                 'tvshow':['serie','tv','episodi','episodio','fiction'],
+                 'documentary':['documentari','documentario', 'documentary'],
+                 'teenager':['ragazzi','teenager', 'teen'],
+                 'learning':['learning'],
+                 'all':['tutti'],
                  'news':['novità', "novita'", 'aggiornamenti', 'nuovi', 'nuove'],
                  'now_playing':['cinema', 'in sala'],
-                 'channels_anime':['anime'],
+                 'anime':['anime'],
                  'genres':['genere', 'generi', 'categorie', 'categoria'],
-                 'channels_animation': ['animazione', 'cartoni', 'cartoon', 'animation'],
-                 'channels_action':['azione', 'arti marziali', 'action'],
-                 'channels_adventure': ['avventura', 'adventure'],
-                 'channels_biographical':['biografico'],
-                 'channels_comedy':['comico','commedia', 'demenziale', 'comedy'],
-                 'channels_adult':['erotico', 'hentai', 'harem', 'ecchi'],
-                 'channels_drama':['drammatico', 'drama'],
-                 'channels_syfy':['fantascienza', 'science fiction'],
-                 'channels_fantasy':['fantasy', 'magia'],
-                 'channels_crime':['gangster','poliziesco', 'crime', 'crimine'],
-                 'channels_grotesque':['grottesco'],
-                 'channels_war':['guerra', 'war'],
-                 'channels_children':['bambini', 'kids'],
+                 'animation': ['animazione', 'cartoni', 'cartoon', 'animation'],
+                 'action':['azione', 'arti marziali', 'action'],
+                 'adventure': ['avventura', 'adventure'],
+                 'biographical':['biografico'],
+                 'comedy':['comico','commedia', 'demenziale', 'comedy'],
+                 'adult':['erotico', 'hentai', 'harem', 'ecchi'],
+                 'drama':['drammatico', 'drama'],
+                 'syfy':['fantascienza', 'science fiction'],
+                 'fantasy':['fantasy', 'magia'],
+                 'crime':['gangster','poliziesco', 'crime', 'crimine'],
+                 'grotesque':['grottesco'],
+                 'war':['guerra', 'war'],
+                 'children':['bambini', 'kids'],
                  'horror':['horror'],
                  'lucky': ['fortunato'],
-                 'channels_musical':['musical', 'musica', 'music'],
-                 'channels_mistery':['mistero', 'giallo', 'mystery'],
-                 'channels_noir':['noir'],
+                 'musical':['musical', 'musica', 'music'],
+                 'mistery':['mistero', 'giallo', 'mystery'],
+                 'noir':['noir'],
                  'popular' : ['popolari','popolare', 'più visti'],
                  'thriller':['thriller'],
                  'top_rated' : ['fortunato', 'votati'],
                  'on_the_air' : ['corso', 'onda', 'diretta', 'dirette'],
-                 'channels_western':['western'],
-                 'channels_vos':['sub','sub-ita'],
-                 'channels_romance':['romantico','sentimentale', 'romance'],
-                 'channels_family':['famiglia','famiglie', 'family'],
-                 'channels_historical':['storico', 'history', 'storia'],
-                 'channels_az':['lettera','lista','alfabetico','a-z'],
-                 'channels_year':['anno', 'anni'],
+                 'western':['western'],
+                 'vos':['sub','sub-ita'],
+                 'romance':['romantico','sentimentale', 'romance'],
+                 'family':['famiglia','famiglie', 'family'],
+                 'historical':['storico', 'history', 'storia'],
+                 'az':['lettera','lista','alfabetico','a-z'],
+                 'year':['anno', 'anni'],
                  'update':['replay', 'update'],
                  'autoplay':[config.get_localized_string(60071)]
                 }
