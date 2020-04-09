@@ -14,7 +14,6 @@ from past.utils import old_div
 import re
 import time
 import unicodedata
-from threading import Thread
 import xbmc
 
 from channelselector import get_thumb
@@ -180,6 +179,9 @@ def del_dir(item):
 def clean_all(item):
     logger.info()
     stop_all()
+    removeFiles = False
+    if platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(30300)):
+        removeFiles = True
 
     for fichero in sorted(filetools.listdir(DOWNLOAD_LIST_PATH)):
         if fichero.endswith(".json"):
@@ -187,6 +189,9 @@ def clean_all(item):
             if not item.contentType == "tvshow" or (
                             item.contentSerieName == download_item.contentSerieName and item.contentChannel == download_item.contentChannel):
                 filetools.remove(filetools.join(DOWNLOAD_LIST_PATH, fichero))
+                if removeFiles:
+                    filetools.remove(filetools.join(DOWNLOAD_PATH, download_item.downloadFilename))
+
     xbmc.sleep(100)
     platformtools.itemlist_refresh()
 
@@ -231,9 +236,9 @@ def restart_error(item):
                             item.contentSerieName == download_item.contentSerieName and item.contentChannel == download_item.contentChannel):
                 if download_item.downloadStatus == STATUS_CODES.error:
                     if filetools.isfile(
-                            filetools.join(config.get_setting("downloadpath"), download_item.downloadFilename)):
+                            filetools.join(DOWNLOAD_PATH, download_item.downloadFilename)):
                         filetools.remove(
-                            filetools.join(config.get_setting("downloadpath"), download_item.downloadFilename))
+                            filetools.join(DOWNLOAD_PATH, download_item.downloadFilename))
 
                     update_json(item.path,
                                 {"downloadStatus": STATUS_CODES.stoped, "downloadComplete": 0, "downloadProgress": 0})
@@ -312,6 +317,8 @@ def menu(item):
     # Opcion Eliminar
     if opciones[seleccion] == op[1]:
         filetools.remove(item.path)
+        if platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(30300)):
+            filetools.remove(filetools.join(DOWNLOAD_PATH, item.downloadFilename))
 
     # Opcion inicaiar descarga
     if opciones[seleccion] == op[0]:
@@ -324,8 +331,8 @@ def menu(item):
 
     # Reiniciar descarga
     if opciones[seleccion] == op[2]:
-        if filetools.isfile(filetools.join(config.get_setting("downloadpath"), item.downloadFilename)):
-            filetools.remove(filetools.join(config.get_setting("downloadpath"), item.downloadFilename))
+        if filetools.isfile(filetools.join(DOWNLOAD_PATH, item.downloadFilename)):
+            filetools.remove(filetools.join(DOWNLOAD_PATH, item.downloadFilename))
 
         update_json(item.path, {"downloadStatus": STATUS_CODES.stoped, "downloadComplete": 0, "downloadProgress": 0,
                                 "downloadServer": {}})
@@ -355,7 +362,7 @@ def move_to_libray(item):
         path_title = "%s [%s]" % (title, item.infoLabels['IMDBNumber'])
         move_path = filetools.join(config.get_videolibrary_path(), FOLDER)
 
-    download_path = filetools.join(config.get_setting("downloadpath"), item.downloadFilename)
+    download_path = filetools.join(DOWNLOAD_PATH, item.downloadFilename)
     library_path = filetools.join(move_path, *filetools.split(item.downloadFilename))
     final_path = download_path
 
@@ -569,7 +576,7 @@ def download_from_url(url, item):
         return {"downloadStatus": STATUS_CODES.error}
 
     # Obtenemos la ruta de descarga y el nombre del archivo
-    item.downloadFilename = item.downloadFilename.replace('/','-')
+    item.downloadFilename = item.downloadFilename
     download_path = filetools.dirname(filetools.join(DOWNLOAD_PATH, item.downloadFilename))
     file_name = filetools.basename(filetools.join(DOWNLOAD_PATH, item.downloadFilename))
 
@@ -784,7 +791,7 @@ def select_server(item):
         return play_items[seleccion - 1]
     elif seleccion == 0:
         update_json(item.path, {"downloadServer": {}})
-        return play_items[0]
+        return 'Auto'
     # platformtools.itemlist_refresh()
 
 
@@ -902,7 +909,7 @@ def write_json(item):
         if name in item.__dict__:
             item.__dict__.pop(name)
 
-    path = filetools.join(config.get_setting("downloadlistpath"), str(time.time()) + ".json")
+    path = filetools.join(DOWNLOAD_LIST_PATH, str(time.time()) + ".json")
     item.path = path
     filetools.write(path, item.tojson())
     time.sleep(0.1)
@@ -922,7 +929,6 @@ def save_download(item):
 
 def save_download_background(item):
     logger.info()
-
     # Menu contextual
     if item.from_action and item.from_channel:
         item.channel = item.from_channel

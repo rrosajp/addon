@@ -13,8 +13,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.0.4\n"
-"Last-Translator: MrTruth\n"
-"Last-Translator: Angedam\n"
 "Language: en_EN\n"
 
 msgctxt "#20000"
@@ -375,7 +373,7 @@ msgid "Square"
 msgstr ""
 
 msgctxt "#30300"
-msgid "Faster context menus"
+msgid "Delete also downloaded files?"
 msgstr ""
 
 msgctxt "#30501"

@@ -294,6 +294,8 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
             logger.info("Servidor importado: %s" % server_module)
         except:
             server_module = None
+            if muestra_dialogo:
+                progreso.close()
             logger.error("No se ha podido importar el servidor: %s" % server)
             import traceback
             logger.error(traceback.format_exc())
@@ -307,6 +309,8 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
                 if not video_exists:
                     error_messages.append(message)
                     logger.info("test_video_exists dice que el video no existe")
+                    if muestra_dialogo:
+                        progreso.close()
                 else:
                     logger.info("test_video_exists dice que el video SI existe")
             except:
