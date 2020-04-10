@@ -105,7 +105,7 @@ msgstr "NO"
 
 msgctxt "#30024"
 msgid "Contextual menu"
-msgstr "Menù contestuale"
+msgstr "Menu contestuale"
 
 msgctxt "#30025"
 msgid "Show KoD settings"
@@ -1561,7 +1561,7 @@ msgstr "Informazione"
 
 msgctxt "#60349"
 msgid "Go to the main menu"
-msgstr "Andare al menù principale"
+msgstr "Andare al menu principale"
 
 msgctxt "#60350"
 msgid "Search in other channels"
@@ -1604,12 +1604,12 @@ msgid "Search trailer"
 msgstr "Cerca trailer"
 
 msgctxt "#60360"
-msgid "Show quick menu"
-msgstr "Mostra menù rapido"
+msgid "Quick menu"
+msgstr "Menu rapido"
 
 msgctxt "#60361"
 msgid "Super favourites menu"
-msgstr "Menù super favoriti"
+msgstr "Menu super favoriti"
 
 msgctxt "#60362"
 msgid "You can't watch this video because..."
@@ -2849,7 +2849,7 @@ msgstr "Ricarica"
 
 msgctxt "#70009"
 msgid "Main menu"
-msgstr "Menù principale"
+msgstr "Menu principale"
 
 msgctxt "#70010"
 msgid "Where To Search"
@@ -5441,7 +5441,7 @@ msgstr "Non hai selezionato nessuna sezione da mostrare nella pagina iniziale"
 
 msgctxt "#70666"
 msgid "Use the context menu to define one"
-msgstr "Usa il menù contestuale per aggiungerne una"
+msgstr "Usa il menu contestuale per aggiungerne una"
 
 msgctxt "#70667"
 msgid "KoD is already updated"
@@ -5629,11 +5629,11 @@ msgstr "Modifica "
 
 msgctxt "#70715"
 msgid "Customized main menu"
-msgstr "Menù principale personalizzato"
+msgstr "Menu principale personalizzato"
 
 msgctxt "#70716"
 msgid "Main menu items"
-msgstr "Elementi menù principale"
+msgstr "Elementi menu principale"
 
 msgctxt "#70717"
 msgid "Are all the special episodes present?"
@@ -5716,8 +5716,8 @@ msgid "Completed TV show"
 msgstr "Serie TV completa"
 
 msgctxt "#70737"
-msgid "Show side menu"
-msgstr "Mostra menù laterale"
+msgid "Side menu"
+msgstr "Menu laterale"
 
 msgctxt "#70738"
 msgid "Ready channels %d/%d"
@@ -5925,7 +5925,7 @@ msgstr "Logging"
 
 msgctxt "#70789"
 msgid "* Change by opening the settings from the main menu of KoD"
-msgstr "* Cambia aprendo le impostazioni dal menù principale di KoD"
+msgstr "* Cambia aprendo le impostazioni dal menu principale di KoD"
 
 
 # DNS start [ settings and declaration ]
