@@ -165,8 +165,10 @@ def dirette(item):
     onAir = current_session.get(onair).json()['on_air']
     for i, key in enumerate(json):
         itemlist.append(support.Item(channel = item.channel, title = support.typo(key['channel'], 'bold'), fulltitle = key['channel'], show = key['channel'],
-                                     thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"), fanart = getUrl(onAir[i]['currentItem']['image']), url = key['video']['contentUrl'],
+                                     thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"),forcethumb=True , fanart = getUrl(onAir[i]['currentItem']['image']), url = key['video']['contentUrl'],
                                      plot = support.typo(onAir[i]['currentItem']['name'],'bold')+ '\n\n' + onAir[i]['currentItem']['description'], action = 'play'))
+    for item in itemlist:
+        support.log(item)
     return itemlist
 
 

@@ -45,7 +45,7 @@ def start():
     if not config.dev_mode():
         from platformcode import updater
         updater.showSavedChangelog()
-    
+
 def run(item=None):
     logger.info()
     if not item:
