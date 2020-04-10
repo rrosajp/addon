@@ -6180,3 +6180,11 @@ msgstr "Ti verrà chiesto di configurare The Movie Database per i film e The TVD
 msgctxt "#80028"
 msgid "The selected folders are already used by the Kodi library. Please change them"
 msgstr "Le cartelle selezionate sono già utilizzate dalla libreria di Kodi. Si prega di cambiarle"
+
+msgctxt "#80029"
+msgid "The selected folders are already used by the Kodi library. Please change them"
+msgstr "Le cartelle selezionate sono già utilizzate dalla libreria di Kodi. Si prega di cambiarle dal menu impostazioni all'interno di KoD"
+
+msgctxt "#80030"
+msgid "The default path and folders will be used. You will be asked to choose and configure the information providers for movies and TV shows"
+msgstr "Verranno utilizzati il percorso e le cartelle predefiniti. Ti verrà chiesto di scegliere e configurare i provider delle informazioni per film e serie TV"

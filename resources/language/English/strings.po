@@ -6154,7 +6154,7 @@ msgid "Folder name for TV shows"
 msgstr ""
 
 msgctxt "#80022"
-msgid "You can configure the Kodi video library later from the Settings menu inside KoD"
+msgid "You can configure the Kodi video library later from the settings menu inside KoD"
 msgstr ""
 
 msgctxt "#80023"
@@ -6162,7 +6162,7 @@ msgid "You will be asked to choose and configure the information providers for m
 msgstr ""
 
 msgctxt "#80024"
-msgid "An error has occurred during the configuration of the Kodi video library. Please check the log and try again from the Settings menu inside KoD"
+msgid "An error has occurred during the configuration of the Kodi video library. Please check the log and try again from the settings menu inside KoD"
 msgstr ""
 
 msgctxt "#80025"
@@ -6179,4 +6179,12 @@ msgstr ""
 
 msgctxt "#80028"
 msgid "The selected folders are already used by the Kodi library. Please change them"
+msgstr ""
+
+msgctxt "#80029"
+msgid "The selected folders are already used by the Kodi library. Please change them from the settings menu inside KoD"
+msgstr ""
+
+msgctxt "#80030"
+msgid "The default path and folders will be used. You will be asked to choose and configure the information providers for movies and TV shows"
 msgstr ""
