@@ -47,10 +47,17 @@ class XBMCPlayer(xbmc.Player):
 
 xbmc_player = XBMCPlayer()
 
+def makeMessage(line1, line2, line3):
+    message = line1
+    if line2:
+        message += '\n' + line2
+    if line3:
+        message += '\n' + line3
+    return message
 
 def dialog_ok(heading, line1, line2="", line3=""):
     dialog = xbmcgui.Dialog()
-    return dialog.ok(heading, line1, line2, line3)
+    return dialog.ok(heading, makeMessage(line1, line2, line3))
 
 
 def dialog_notification(heading, message, icon=0, time=5000, sound=True):
@@ -62,12 +69,14 @@ def dialog_notification(heading, message, icon=0, time=5000, sound=True):
         dialog_ok(heading, message)
 
 
-def dialog_yesno(heading, line1, line2="", line3="", nolabel="No", yeslabel="Si", autoclose=""):
+def dialog_yesno(heading, line1, line2="", line3="", nolabel="No", yeslabel="Si", autoclose=0, customlabel=None):
+    # customlabel only on kodi 19
     dialog = xbmcgui.Dialog()
+
     if autoclose:
-        return dialog.yesno(heading, line1, line2, line3, nolabel, yeslabel, autoclose)
+        return dialog.yesno(heading, makeMessage(line1, line2, line3), nolabel=nolabel, yeslabel=yeslabel, customlabel=customlabel, autoclose=autoclose)
     else:
-        return dialog.yesno(heading, line1, line2, line3, nolabel, yeslabel)
+        return dialog.yesno(heading, makeMessage(line1, line2, line3), nolabel=nolabel, yeslabel=yeslabel, customlabel=customlabel)
 
 
 def dialog_select(heading, _list):
@@ -80,7 +89,7 @@ def dialog_multiselect(heading, _list, autoclose=0, preselect=[], useDetails=Fal
 
 def dialog_progress(heading, line1, line2=" ", line3=" "):
     dialog = xbmcgui.DialogProgress()
-    dialog.create(heading, line1, line2, line3)
+    dialog.create(heading, makeMessage(line1, line2, line3))
     return dialog
 
 
@@ -172,12 +181,12 @@ def render_items(itemlist, parent_item):
 
         # if cloudflare, cookies are needed to display images taken from site
         # before checking domain (time consuming), checking if tmdb failed (so, images scraped from website are used)
-        if item.action in ['findvideos'] and not item.infoLabels['tmdb_id'] and scrapertools.get_domain_from_url(item.thumbnail) in httptools.domainCF:
+        if item.action in ['findvideos'] and not item.infoLabels['tmdb_id'] and item.channel in httptools.channelsCF:
             item.thumbnail = httptools.get_url_headers(item.thumbnail)
             item.fanart = httptools.get_url_headers(item.fanart)
 
         icon_image = "DefaultFolder.png" if item.folder else "DefaultVideo.png"
-        listitem = xbmcgui.ListItem(item.title, offscreen=True)
+        listitem = xbmcgui.ListItem(item.title)
         listitem.setArt({'icon': icon_image, 'thumb': item.thumbnail, 'poster': item.thumbnail,
                          'fanart': item.fanart if item.fanart else default_fanart})
 
@@ -208,7 +217,6 @@ def render_items(itemlist, parent_item):
             breadcrumb = config.get_localized_string(70693)
 
     xbmcplugin.setPluginCategory(handle=_handle, category=breadcrumb)
-    # from core.support import dbg;dbg()
 
     set_view_mode(item, parent_item)
 
@@ -218,7 +226,6 @@ def render_items(itemlist, parent_item):
 
 def set_view_mode(item, parent_item):
     def mode(content, Type):
-        # from core.support import dbg;dbg()
         mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
         if mode > 0:
             xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
