@@ -1605,7 +1605,7 @@ msgid "Search trailer"
 msgstr ""
 
 msgctxt "#60360"
-msgid "Show quick menu"
+msgid "Quick menu"
 msgstr ""
 
 msgctxt "#60361"
@@ -5716,7 +5716,7 @@ msgid "Completed TV show"
 msgstr ""
 
 msgctxt "#70737"
-msgid "Show side menu"
+msgid "Side menu"
 msgstr ""
 
 msgctxt "#70738"
