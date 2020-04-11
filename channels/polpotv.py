@@ -207,7 +207,7 @@ def get_itemlist_element(element,item):
         next_action='findvideos'
         quality=support.typo(element['lastQuality'].upper(), '_ [] color kod bold')
         url="%s%s/releases"
-        infoLabels['tmdbid']=element['tmdbId']
+        infoLabels['tmdb_id']=element['tmdbId']
     else:
         next_action='episodios'
         quality=''
@@ -226,4 +226,8 @@ def get_itemlist_element(element,item):
              url=url %(host,element['@id'] ),
              infoLabels=infoLabels,
              extra=item.extra))
+
+    if item.contentType=='movie':
+        for item in itemlist:
+            item= support.tmdb.find_and_set_infoLabels(item)
     return itemlist
