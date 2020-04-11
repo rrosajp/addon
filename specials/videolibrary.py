@@ -711,10 +711,10 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
             filetools.rmdir(new_movies_path)
         if not tvshows_path:
             filetools.rmdir(new_tvshows_path)
-        config.set_setting("videolibrarypath", current_path)
+        config.set_setting("videolibrarypath", backup_current_path)
         config.set_setting("folder_movies", current_movies_folder)
         config.set_setting("folder_tvshows", current_tvshows_folder)
-        xbmc_videolibrary.update_sources(current_path, new_path)
+        xbmc_videolibrary.update_sources(backup_current_path, backup_new_path)
         progress.update(100)
         xbmc.sleep(1000)
         progress.close()

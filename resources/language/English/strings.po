@@ -6178,11 +6178,11 @@ msgid "You will be asked to configure The Movie Database for movies and The TVDB
 msgstr ""
 
 msgctxt "#80028"
-msgid "The selected folders are already used by the Kodi library. Please change them"
+msgid "The selected folders are already used by the Kodi library. Please change them properly"
 msgstr ""
 
 msgctxt "#80029"
-msgid "The selected folders are already used by the Kodi library. Please change them from the settings menu inside KoD"
+msgid "The selected folders are already used by the Kodi library. Please change them properly from the settings menu inside KoD"
 msgstr ""
 
 msgctxt "#80030"
