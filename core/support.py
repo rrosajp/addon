@@ -37,15 +37,15 @@ def hdpass_get_servers(item):
 
         for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
             ret.append(Item(channel=item.channel,
-                                 action="play",
-                                 fulltitle=item.fulltitle,
-                                 quality=quality,
-                                 show=item.show,
-                                 thumbnail=item.thumbnail,
-                                 contentType=item.contentType,
-                                 title=srv,
-                                 server=srv,
-                                 url=mir_url))
+                            action="play",
+                            fulltitle=item.fulltitle,
+                            quality=quality,
+                            show=item.show,
+                            thumbnail=item.thumbnail,
+                            contentType=item.contentType,
+                            title=srv,
+                            server=srv,
+                            url=mir_url.replace('&amp;','&')))
         return ret
     # Carica la pagina
     itemlist = []
