@@ -5476,7 +5476,7 @@ msgid "KoD updates"
 msgstr ""
 
 msgctxt "#70675"
-msgid "Impossible to check the updates"
+msgid "Unable to check the updates"
 msgstr ""
 
 msgctxt "#70676"
@@ -6187,4 +6187,24 @@ msgstr ""
 
 msgctxt "#80030"
 msgid "The default path and folders will be used. You will be asked to choose and configure the information providers for movies and TV shows"
+msgstr ""
+
+msgctxt "#80031"
+msgid "Unable to connect to github. This is probably due to a lack of connection or github is currently offline. Please check and try again"
+msgstr ""
+
+msgctxt "#80032"
+msgid "Installation in progress..."
+msgstr ""
+
+msgctxt "#80033"
+msgid "Choose the version of KoD to install"
+msgstr ""
+
+msgctxt "#80034"
+msgid "release (stable version)"
+msgstr ""
+
+msgctxt "#80035"
+msgid "master (beta version under development)"
 msgstr ""
