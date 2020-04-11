@@ -614,7 +614,7 @@ def download_from_url(url, item):
         logger.info("Downloaded correctly")
         status = STATUS_CODES.completed
 
-        if item.downloadSize and item.downloadSize != d.size[0]:
+        if (item.downloadSize and item.downloadSize != d.size[0]) or d.size[0] < 5000000:  # if size don't correspond or file is too little (gounlimited for example send a little video to say the server is overloaded)
             status = STATUS_CODES.error
 
     save_server_statistics(item.server, d.speed[0], d.state != d.states.error)
