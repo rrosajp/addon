@@ -1105,9 +1105,9 @@ def update_sources(new='', old=''):
 
         # write changes
         if sys.version_info[0] >= 3: #PY3
-            filetools.write(SOURCES_PATH, '\n'.join([x for x in xmldoc.toprettyxml().encode("utf-8").splitlines() if x.strip()]))
+            filetools.write(SOURCES_PATH, '\n'.join([x for x in xmldoc.toprettyxml().splitlines() if x.strip()]))
         else:
-            filetools.write(SOURCES_PATH, b'\n'.join([x for x in xmldoc.toprettyxml().encode("utf-8").splitlines() if x.strip()]), vfs=False)
+            filetools.write(SOURCES_PATH, '\n'.join([x for x in xmldoc.toprettyxml().splitlines() if x.strip()]), vfs=False)
         logger.debug("The path %s has been removed from sources.xml" % old)
 
     if new:
@@ -1167,29 +1167,42 @@ def ask_set_content(silent=False):
             platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(80024))
             config.set_setting("videolibrary_kodi", False)
 
+    # configuration during installation
     if not silent:
+        # ask to configure Kodi video library
         if platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(80015)):
+            # ask for custom or default settings
             if not platformtools.dialog_yesno(config.get_localized_string(80026), config.get_localized_string(80016), "", "", config.get_localized_string(80017), config.get_localized_string(80018)):
+                # input path and folders
                 path = platformtools.dialog_browse(3, config.get_localized_string(80019), config.get_setting("videolibrarypath"))
-                if path != "":
-                    update_sources(path, config.get_setting("videolibrarypath"))
-                    config.set_setting("videolibrarypath", path)
-                folder = platformtools.dialog_input(config.get_setting("folder_movies"), config.get_localized_string(80020))
-                if folder != "":
-                    config.set_setting("folder_movies", folder)
-                folder = platformtools.dialog_input(config.get_setting("folder_tvshows"), config.get_localized_string(80021))
-                if folder != "":
-                    config.set_setting("folder_tvshows", folder)
-                config.verify_directories_created()
-                do_config(True)
+                movies_folder = platformtools.dialog_input(config.get_setting("folder_movies"), config.get_localized_string(80020))
+                tvshows_folder = platformtools.dialog_input(config.get_setting("folder_tvshows"), config.get_localized_string(80021))
+
+                if path != "" and movies_folder != "" and tvshows_folder != "":
+                    movies_path, tvshows_path = check_sources(filetools.join(path, movies_folder), filetools.join(path, tvshows_folder))
+                    # configure later
+                    if movies_path or tvshows_path:
+                        platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(80029))
+                    # set path and folders
+                    else:
+                        update_sources(path, config.get_setting("videolibrarypath"))
+                        config.set_setting("videolibrarypath", path)
+                        config.set_setting("folder_movies", movies_folder)
+                        config.set_setting("folder_tvshows", tvshows_folder)
+                        config.verify_directories_created()
+                        do_config(True)
+                # default path and folders
+                else:
+                    platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(80030))
+                    do_config(True)
+            # default settings
             else:
                 platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(80027))
                 do_config(False)
+        # configure later
         else:
-            # no hemos aceptado
             platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(80022))
-            config.set_setting("videolibrary_kodi", False)
-
+    # configuration from the settings menu
     else:
         platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(80023))
         do_config(True)
