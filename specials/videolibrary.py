@@ -79,7 +79,7 @@ def list_movies(item, silent=False):
                 for canal_org in new_item.library_urls:
                     canal = generictools.verify_channel(canal_org)
                     try:
-                        if canal == 'community':
+                        if canal in ['community', 'downloads']:
                             channel_verify = __import__('specials.%s' % canal, fromlist=["channels.%s" % canal])
                         else:
                             channel_verify = __import__('channels.%s' % canal, fromlist=["channels.%s" % canal])
