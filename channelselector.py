@@ -382,58 +382,57 @@ def auto_filter(auto_lang=False):
 
 def thumb(item_or_itemlist=None, genre=False, thumb=''):
     import re
-    icon_dict = {'movie':['film'],
-                 'tvshow':['serie','tv','episodi','episodio','fiction'],
+    icon_dict = {'movie':['film', 'movie'],
+                 'tvshow':['serie','tv','episodi','episodio','fiction', 'show'],
                  'documentary':['documentari','documentario', 'documentary'],
                  'teenager':['ragazzi','teenager', 'teen'],
                  'learning':['learning'],
-                 'all':['tutti'],
-                 'news':['novità', "novita'", 'aggiornamenti', 'nuovi', 'nuove'],
+                 'all':['tutti', 'all'],
+                 'news':['novità', "novita'", 'aggiornamenti', 'nuovi', 'nuove', 'new', 'newest', 'news'],
                  'now_playing':['cinema', 'in sala'],
                  'anime':['anime'],
-                 'genres':['genere', 'generi', 'categorie', 'categoria'],
+                 'genres':['genere', 'generi', 'categorie', 'categoria', 'category'],
                  'animation': ['animazione', 'cartoni', 'cartoon', 'animation'],
                  'action':['azione', 'arti marziali', 'action'],
                  'adventure': ['avventura', 'adventure'],
-                 'biographical':['biografico'],
-                 'comedy':['comico','commedia', 'demenziale', 'comedy'],
-                 'adult':['erotico', 'hentai', 'harem', 'ecchi'],
+                 'biographical':['biografico', 'biographical'],
+                 'comedy':['comico', 'commedia', 'demenziale', 'comedy'],
+                 'adult':['erotico', 'hentai', 'harem', 'ecchi', 'adult'],
                  'drama':['drammatico', 'drama'],
-                 'syfy':['fantascienza', 'science fiction'],
-                 'fantasy':['fantasy', 'magia'],
+                 'syfy':['fantascienza', 'science fiction', 'syfy'],
+                 'fantasy':['fantasy', 'magia', 'magic'],
                  'crime':['gangster','poliziesco', 'crime', 'crimine'],
-                 'grotesque':['grottesco'],
+                 'grotesque':['grottesco', 'grotesque'],
                  'war':['guerra', 'war'],
                  'children':['bambini', 'kids'],
                  'horror':['horror'],
-                 'lucky': ['fortunato'],
-                 'musical':['musical', 'musica', 'music'],
+                 'music':['musical', 'musica', 'music'],
                  'mistery':['mistero', 'giallo', 'mystery'],
                  'noir':['noir'],
                  'popular' : ['popolari','popolare', 'più visti'],
                  'thriller':['thriller'],
-                 'top_rated' : ['fortunato', 'votati'],
+                 'top_rated' : ['fortunato', 'votati', 'lucky'],
                  'on_the_air' : ['corso', 'onda', 'diretta', 'dirette'],
                  'western':['western'],
                  'vos':['sub','sub-ita'],
                  'romance':['romantico','sentimentale', 'romance'],
-                 'family':['famiglia','famiglie', 'family'],
+                 'family':['famiglia','famiglie', 'family', 'historical'],
                  'historical':['storico', 'history', 'storia'],
-                 'az':['lettera','lista','alfabetico','a-z'],
-                 'year':['anno', 'anni'],
+                 'az':['lettera','lista','alfabetico','a-z', 'alphabetical'],
+                 'year':['anno', 'anni', 'year'],
                  'update':['replay', 'update'],
                  'autoplay':[config.get_localized_string(60071)]
                 }
 
     suffix_dict = {'_hd':['hd','altadefinizione','alta definizione'],
                 '_4k':['4K'],
-                '_az':['lettera','lista','alfabetico','a-z'],
-                '_year':['anno', 'anni'],
+                '_az':['lettera','lista','alfabetico','a-z', 'alphabetical'],
+                '_year':['anno', 'anni', 'year'],
                 '_genre':['genere', 'generi', 'categorie', 'categoria']}
 
-    search = ['cerca']
+    search = ['cerca', 'search']
 
-    search_suffix ={'_movie':['film'],
+    search_suffix ={'_movie':['film', 'movie'],
                     '_tvshow':['serie','tv', 'fiction']}
 
     def autoselect_thumb(item, genre):
@@ -446,7 +445,7 @@ def thumb(item_or_itemlist=None, genre=False, thumb=''):
                             thumb = thumb + suffix
                     item.thumbnail = get_thumb(thumb + '.png')
                 elif any( word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
-                    if thumb == 'channels_movie' or thumb == 'channels_tvshow':
+                    if thumb == 'movie' or thumb == 'tvshow':
                         for suffix, titles in suffix_dict.items():
                             if any( word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
                                 thumb = thumb + suffix
