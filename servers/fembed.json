@@ -5,7 +5,7 @@
     "patterns": [
       {
         "pattern": "(?:fembed|divload|cercafilm|sonline|verystream|).(?:com|net|pro|info)/((?:f|v)/[A-z0-9_-]+)",
-        "url": "https://www.feurl.com\\1"
+        "url": "https://www.feurl.com/\\1"
       }
     ]
   },
