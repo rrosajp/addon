@@ -755,7 +755,7 @@ def typo(string, typography=''):
         if VLT:
             string = "•• " + re.sub(r'\s*submenu','',string)
         else:
-            re.sub(r'\s*submenu','',string)
+            string = re.sub(r'\s*submenu','',string)
     if 'color' in string:
         color = scrapertools.find_single_match(string, 'color ([a-z]+)')
         if color == 'kod' or '': color = kod_color
