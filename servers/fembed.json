@@ -4,12 +4,8 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "((?:fembed|divload|cercafilm|sonline).(?:com|net|pro)/(?:f|v)/[A-z0-9_-]+)",
-        "url": "https://www.\\1"
-      },
-      {
-        "pattern": "(verystream.info/v/[A-z0-9_-]+)",
-        "url": "https://www.\\1"
+        "pattern": "(?:fembed|divload|cercafilm|sonline|verystream|).(?:com|net|pro|info)/((?:f|v)/[A-z0-9_-]+)",
+        "url": "https://www.feurl.com\\1"
       }
     ]
   },
