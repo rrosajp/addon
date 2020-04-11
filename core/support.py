@@ -48,7 +48,7 @@ def hdpass_get_servers(item):
                                  contentType=item.contentType,
                                  title=srv,
                                  server=srv,
-                                 url=mir_url))
+                                 url=mir_url.replace('&amp;','&')))
         return ret
     # Carica la pagina
     itemlist = []
