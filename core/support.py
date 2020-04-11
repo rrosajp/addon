@@ -165,6 +165,7 @@ def scrapeLang(scraped, lang, longtitle):
 
 def cleantitle(title):
     if type(title) != str: title.decode('UTF-8')
+    title = scrapertools.decodeHtmlentities(title)
     cleantitle = title.replace('"', "'").replace('×', 'x').replace('–', '-').strip()
     return cleantitle
 
