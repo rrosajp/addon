@@ -181,7 +181,7 @@ def render_items(itemlist, parent_item):
             item.folder = False
         if item.fanart == "":
             item.fanart = parent_item.fanart
-        if item.action == 'play' and thumb_type == 1:
+        if item.action == 'play' and thumb_type == 1 and not item.forcethumb:
             item.thumbnail = "https://github.com/kodiondemand/media/raw/master/resources/servers/" + item.server.lower() + '.png'
 
         # if cloudflare, cookies are needed to display images taken from site

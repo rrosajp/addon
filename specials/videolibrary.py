@@ -705,10 +705,16 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
     new_tvshows_path = os.path.join(new_path, new_tvshows_folder)
 
     from platformcode import xbmc_videolibrary
-    if xbmc_videolibrary.check_sources(new_movies_path+'\\', new_tvshows_path+'\\'):
+    movies_path, tvshows_path = xbmc_videolibrary.check_sources(new_movies_path, new_tvshows_path)
+    if movies_path or tvshows_path:
+        if not movies_path:
+            filetools.rmdir(new_movies_path)
+        if not tvshows_path:
+            filetools.rmdir(new_tvshows_path)
         config.set_setting("videolibrarypath", current_path)
         config.set_setting("folder_movies", current_movies_folder)
         config.set_setting("folder_tvshows", current_tvshows_folder)
+        xbmc_videolibrary.update_sources(current_path, new_path)
         progress.update(100)
         xbmc.sleep(1000)
         progress.close()
