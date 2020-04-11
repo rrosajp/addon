@@ -206,7 +206,7 @@ def list_tvshows(item):
                 for canal in item_tvshow.library_urls:
                     canal = generictools.verify_channel(canal)
                     try:
-                        if canal == 'community':
+                        if canal in ['community', 'downloads']:
                             channel_verify = __import__('specials.%s' % canal, fromlist=["channels.%s" % canal])
                         else:
                             channel_verify = __import__('channels.%s' % canal, fromlist=["channels.%s" % canal])
