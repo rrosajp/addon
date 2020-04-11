@@ -37,36 +37,31 @@ list_quality = ['default']
 def mainlist(item):
     if conn_id:
         anime = ['anime/',
-                ('In Evidenza',['anime/', 'peliculas', 'channel/10005/last/']),
                 ('Popolari',['anime/', 'peliculas', 'channel/10002/last/']),
                 ('Nuove Uscite',['anime/', 'peliculas', 'channel/10007/last/']),
                 ('Generi',['anime/', 'peliculas', 'channel/10004/last/?category=']),
                 ('A-Z',['anime/', 'peliculas', 'channel/10003/last/?filter='])
                 ]
         film =  ['film/',
-                ('In Evidenza',['film/', 'peliculas', 'channel/10005/last/']),
                 ('Popolari',['film/', 'peliculas', 'channel/10002/last/']),
                 ('Nuove Uscite',['film/', 'peliculas', 'channel/10007/last/']),
                 ('Generi',['film/', 'peliculas', 'channel/10004/last/?category=']),
                 ('A-Z',['film/', 'peliculas', 'channel/10003/last/?filter=']),
                 ]
         tvshow = ['series/',
-                ('In Evidenza',['series/', 'peliculas', 'channel/10005/last/']),
                 ('Popolari',['series/', 'peliculas', 'channel/10002/last/']),
                 ('Nuove Uscite',['series/', 'peliculas', 'channel/10007/last/']),
                 ('Generi',['series/', 'peliculas', 'channel/10004/last/?category=']),
                 ('A-Z',['series/', 'peliculas', 'channel/10003/last/?filter='])
                 ]
-        show = [('Show bold {tv}',['show/', 'peliculas', 'channel/10005/last/', 'tvshow']),
-                ('In Evidenza submenu {tv}',['show/', 'peliculas', 'channel/10005/last/', 'tvshow']),
+        show = [('Show bold {tv}',['show/', 'peliculas', '', 'tvshow']),
                 ('Popolari submenu {tv}',['show/', 'peliculas', 'channel/10002/last/', 'tvshow']),
                 ('Nuove Uscite submenu {tv}',['show/', 'peliculas', 'channel/10007/last/', 'tvshow']),
                 ('Generi submenu {tv}',['show/', 'peliculas', 'channel/10004/last/?category=', 'tvshow']),
                 ('A-Z submenu {tv}',['show/', 'peliculas', 'channel/10003/last/?filter=', 'tvshow']),
                 ('Cerca Show... bold submenu {tv}', ['show/', 'search', '', 'tvshow'])
                 ]
-        kids = [('Kids bold',['kids/', 'peliculas', 'channel/10005/last/', 'tvshow']),
-                ('In Evidenza submenu {kids}',['kids/', 'peliculas', 'channel/10005/last/', 'tvshow']),
+        kids = [('Kids bold',['kids/', 'peliculas', '', 'tvshow']),
                 ('Popolari submenu {kids}',['kids/', 'peliculas', 'channel/10002/last/', 'tvshow']),
                 ('Nuove Uscite submenu {kids}',['kids/', 'peliculas', 'channel/10007/last/', 'tvshow']),
                 ('Generi submenu {kids}',['kids/', 'peliculas', 'channel/10004/last/?category=', 'tvshow']),
@@ -76,6 +71,7 @@ def mainlist(item):
     else:
         Top = [("Visibile solo dall'Italia bold",[])]
     return locals()
+
 
 def search(item, text):
     support.log(text)
@@ -93,6 +89,7 @@ def search(item, text):
             return []
     return itemlist
 
+
 def newest(categoria):
     item = Item()
     item.args = 'channel/10007/last/'
@@ -108,29 +105,15 @@ def newest(categoria):
     return peliculas(item)
 
 
-def dl_pages(name,item):
-    itemlist = []
-    url =  item.url + 'channel/10003/last/?filter=' + str(name)
-    json_file = current_session.get(url, headers=headers, params=payload).json()
-    if 'data' in json_file:
-        json_file = current_session.get(url, headers=headers, params=payload).json()
-        make_itemlist(itemlist, item, json_file)
-    return itemlist
-
 def peliculas(item):
     itemlist = []
     if not item.args:
-        json_file = current_session.get(item.url + 'channels', headers=headers, params=payload).json()
-        names = [i['filter'] for i in json_file['data'] if 'filter' in i][0]
-        with futures.ThreadPoolExecutor() as executor:
-            json_file = [executor.submit(dl_pages, name, item,) for name in names]
-            for res in futures.as_completed(json_file):
-                if res.result():
-                    itemlist += res.result()
-        itemlist = sorted(itemlist, key=lambda it: it.fulltitle)
+        json_file =loadjs(item.url + 'channel/10005/last/')
+        support.log(json_file)
+        make_itemlist(itemlist, item, json_file)
 
     elif ('=' not in item.args) and ('=' not in item.url):
-        json_file = current_session.get(item.url + item.args, headers=headers, params=payload).json()
+        json_file=loadjs(item.url + item.args)
         make_itemlist(itemlist, item, json_file)
 
     elif '=' in item.args:
@@ -148,11 +131,15 @@ def peliculas(item):
                         contentType = item.contentType))
 
     else :
-        json_file = current_session.get(item.url, headers=headers, params=payload).json()
+        json_file=loadjs(item.url)
         make_itemlist(itemlist, item, json_file)
-    if item.contentType != 'movie': autorenumber.renumber(itemlist)
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+    if 'category' in item.args:
+        support.thumb(itemlist,genre=True)
+    elif not 'filter' in item.args:
+        if item.contentType != 'movie': autorenumber.renumber(itemlist)
+        tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
     return itemlist
+
 
 def episodios(item):
     itemlist = []
@@ -242,3 +229,17 @@ def make_itemlist(itemlist, item, data):
                     infoLabels=infoLabels
             ))
     return itemlist
+
+def loadjs(url):
+    if '?category' not in url:
+        url += '?full=true'
+    support.log('Json URL;',url)
+    json = current_session.get(url, headers=headers, params=payload).json()
+    return json
+
+
+def encode(text):
+    if sys.version_info[0] >= 3:
+        return text
+    else:
+        return text.encode('utf8')
