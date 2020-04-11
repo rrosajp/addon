@@ -183,19 +183,24 @@ def findvideos(item):
         item.data = data
         return episodios(item)
 
-    if 'protectlink' in data:
-        urls = scrapertools.find_multiple_matches(data, r'<iframe src="[^=]+=(.*?)"')
-        support.log("SONO QUI: ", urls)
-        for url in urls:
-            url = url.decode('base64')
-            # tiro via l'ultimo carattere perchè non c'entra
-            url, c = unshorten_only(url)
-            if 'nodmca' in url:
-                page = httptools.downloadpage(url, headers=headers).data
-                url = '\t' + scrapertools.find_single_match(page, '<meta name="og:url" content="([^=]+)">')
-            if url:
-                listurl.add(url)
-    data += '\n'.join(listurl)
+    # if 'protectlink' in data:
+    #     urls = scrapertools.find_multiple_matches(data, r'<iframe src="[^=]+=(.*?)"')
+    #     support.log("SONO QUI: ", urls)
+    #     for url in urls:
+    #         url = url.decode('base64')
+    #         # tiro via l'ultimo carattere perchè non c'entra
+    #         url, c = unshorten_only(url)
+    #         if 'nodmca' in url:
+    #             page = httptools.downloadpage(url, headers=headers).data
+    #             url = '\t' + scrapertools.find_single_match(page, '<meta name="og:url" content="([^=]+)">')
+    #         if url:
+    #             listurl.add(url)
+    # data += '\n'.join(listurl)
+    log(data)
+    urls = support.match(data, patron=r'<iframe.*?src="([^"]+)"').matches
+    if item.otherLinks:
+        urls += support.match(item.otherLinks, patron=r'href="([^"]+)').matches
+    log('URLS',urls)
 
-    itemlist = support.server(item, data + item.otherLinks, patronTag='Keywords:\s*<span>([^<]+)')
+    itemlist = support.server(item, urls)
     return itemlist
