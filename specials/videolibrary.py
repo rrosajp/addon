@@ -749,6 +749,31 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
         platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80014), icon=0, time=5000, sound=False)
 
 
+def delete_videolibrary(item):
+    logger.info()
+
+    if not platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(80037)):
+        return
+
+    p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80038))
+    p_dialog.update(0)
+
+    filetools.rmdirtree(videolibrarytools.MOVIES_PATH)
+    p_dialog.update(40)
+    filetools.rmdirtree(videolibrarytools.TVSHOWS_PATH)
+    p_dialog.update(80)
+    if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
+        from platformcode import xbmc_videolibrary
+        xbmc_videolibrary.clean(config.get_setting('videolibrarypath'))
+
+    p_dialog.update(90)
+    config.verify_directories_created()
+    p_dialog.update(100)
+    xbmc.sleep(1000)
+    p_dialog.close()
+    platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80039), icon=0, time=5000, sound=False)
+
+
 # metodos de menu contextual
 def update_tvshow(item):
     logger.info()
