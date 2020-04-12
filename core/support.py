@@ -36,6 +36,7 @@ def hdpass_get_servers(item):
         mir = scrapertools.find_single_match(page, patron_mir)
 
         for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
+            mir_url = scrapertools.decodeHtmlentities(mir_url)
             ret.append(Item(channel=item.channel,
                             action="play",
                             fulltitle=item.fulltitle,
@@ -45,7 +46,7 @@ def hdpass_get_servers(item):
                             contentType=item.contentType,
                             title=srv,
                             server=srv,
-                            url=mir_url.replace('&amp;','&')))
+                            url= mir_url))
         return ret
     # Carica la pagina
     itemlist = []
@@ -71,6 +72,7 @@ def hdpass_get_servers(item):
     with futures.ThreadPoolExecutor() as executor:
         thL = []
         for res_url, res_video in scrapertools.find_multiple_matches(res, patron_option):
+            res_url = scrapertools.decodeHtmlentities(res_url)
             thL.append(executor.submit(get_hosts, res_url, res_video))
         for res in futures.as_completed(thL):
             if res.result():
@@ -165,6 +167,7 @@ def scrapeLang(scraped, lang, longtitle):
 
 def cleantitle(title):
     if type(title) != str: title.decode('UTF-8')
+    title = scrapertools.decodeHtmlentities(title)
     cleantitle = title.replace('"', "'").replace('×', 'x').replace('–', '-').strip()
     return cleantitle
 
@@ -297,8 +300,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 infoLabels=infolabels,
                 thumbnail=item.thumbnail if function == 'episodios' and not scraped["thumb"] else scraped["thumb"] if scraped["thumb"] else '',
                 args=item.args,
-                contentSerieName= scraped['title'] if scraped['title'] else item.fulltitle if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
-                contentTitle= scraped['title'] if item.contentType or CT == 'movie' else '',
+                contentSerieName= title if title else item.fulltitle if item.contentType or CT != 'movie' and function != 'episodios' else item.fulltitle if function == 'episodios' else '',
+                contentTitle= title if item.contentType or CT == 'movie' else '',
                 contentLanguage = lang1,
                 contentEpisodeNumber=episode if episode else '',
                 news= item.news if item.news else '',
