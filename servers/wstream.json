@@ -8,11 +8,11 @@
         "patterns": [
             {
                 "pattern": "wstream\\.video(?!<)(?:=|/)(?:video[a-zA-Z0-9.?_]*|embed[a-zA-Z0-9]*|)?(?!api|swembedid)(?:-|/|=)?(?:[a-z0-9A-Z]+/)?([a-z0-9A-Z]+)",
-                "url": "https://wstream.video/video.php?file_code=\\1"
+                "url": "http://116.202.226.34/video.php?file_code=\\1"
             },
             {
                 "pattern": "wstream\\.video/(api/vcmod/fastredirect/streaming\\.php\\?id=[$0-9]+)",
-                "url": "https://wstream.video/\\1"
+                "url": "http://116.202.226.34/\\1"
             }
         ],
         "ignore_urls": []
