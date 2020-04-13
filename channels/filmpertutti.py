@@ -65,11 +65,10 @@ def peliculas(item):
 
 @support.scrape
 def episodios(item):
-
     data = support.match(item.url, headers=headers).data
     if 'accordion-item' in data:
         patronBlock = r'<span class="season[^>]*>\d+[^>]+>[^>]+>[^>]+>[^>]+>\D*(?:STAGIONE|Stagione)[ -]+(?P<lang>[a-zA-Z\- ]+)[^<]*</span>(?P<block>.*?)<div id="(?:season|disqus)'
-        patron = r'<img src="(?P<thumb>[^"]+)">.*?<li class="season-no">(?P<episode>[^<]+)<\/li>(?P<url>.*?javascript:;">(?P<title>[^<]+).*?</tbody>)'
+        patron = r'<img src="(?P<thumb>[^"]+)">.*?<li class="season-no">(?P<season>\d+)(?:&#215;|×|x)(?P<episode>\d+)[^<]+<\/li>(?P<url>.*?javascript:;">(?P<title>[^<]+).*?</tbody>)'
     else:
         patronBlock = r'(?:STAGIONE|Stagione)(?:<[^>]+>)?\s*(?:(?P<lang>[A-Za-z- ]+))?(?P<block>.*?)(?:&nbsp;|<strong>|<div class="addtoany)'
         patron = r'(?:/>|p>)\s*(?P<season>\d+)(?:&#215;|×|x)(?P<episode>\d+)[^<]+(?P<url>.*?)(?:<br|</p)'
