@@ -948,7 +948,6 @@ def save_download_background(item):
             parent.downloadItemlist = [i.tourl() for i in videolibrary.get_episodes(parent) if i.action == 'findvideos' and  parent.library_playcounts[scrapertools.get_season_and_episode(i.title)] == 0]
         else:  # tvshow or season
             parent.downloadItemlist = [i.tourl() for i in videolibrary.get_episodes(parent) if i.action == 'findvideos']
-
         if parent.contentType in ["tvshow", "episode", "season"]:
             if not item.unseen and parent.contentSeason:  # if no season, this is episode view, let's download entire serie
                 parent.dlseason = parent.contentSeason  # this is season view, let's download season
@@ -1064,14 +1063,15 @@ def save_download_tvshow(item):
                                 config.get_localized_string(30109))
     else:
         if len(episodes) == 1:
-            play_item = select_server(item)
-            if play_item == 'Auto':
-                start_download(item)
-            else:
-                play_item = item.clone(**play_item.__dict__)
-                play_item.contentAction = play_item.action
-                play_item.infoLabels = item.infoLabels
-                start_download(play_item)
+            play_item = select_server(episodes[0])
+            if play_item:  # not pressed cancel
+                if play_item == 'Auto':
+                    start_download(episodes[0])
+                else:
+                    play_item = episodes[0].clone(**play_item.__dict__)
+                    play_item.contentAction = play_item.action
+                    play_item.infoLabels = episodes[0].infoLabels
+                    start_download(play_item)
         else:
             for i in episodes:
                 i.contentChannel = item.contentChannel
