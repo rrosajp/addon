@@ -205,6 +205,8 @@ class Downloader(object):
         self._part_size = part_size
         self._max_buffer = max_buffer
         self._json_path = json_path
+        self._json_text = ''
+        self._json_item = Item()
 
         try:
             import xbmc
@@ -587,12 +589,18 @@ class Downloader(object):
         logger.info("Thread stopped: %s" % threading.current_thread().name)
 
     def __update_json(self, started=True):
-        item = Item().fromjson(filetools.read(self._json_path))
+        text = filetools.read(self._json_path)
+        # load item only if changed
+        if self._json_text != text:
+            self._json_text = text
+            self._json_item = Item().fromjson(text)
+            logger.info('item loaded')
         progress = int(self.progress)
-        if started and item.downloadStatus == 0:  # stopped
+        if started and self._json_item.downloadStatus == 0:  # stopped
             logger.info('Download paused')
             self.stop()
-        elif item.downloadProgress != progress or not started:
+        elif self._json_item.downloadProgress != progress or not started:
             params = {"downloadStatus": 4, "downloadComplete": 0, "downloadProgress": progress}
-            item.__dict__.update(params)
-            filetools.write(self._json_path, item.tojson())
+            self._json_item.__dict__.update(params)
+            self._json_text = self._json_item.tojson()
+            filetools.write(self._json_path, self._json_text)
