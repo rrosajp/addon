@@ -113,15 +113,15 @@ msgstr "Mostra impostazioni KoD"
 
 msgctxt "#30026"
 msgid "Direct"
-msgstr "Direct"
+msgstr "Diretta"
 
 msgctxt "#30027"
 msgid "SetResolvedUrl"
-msgstr "SetResolvedUrl"
+msgstr "Segnalibro"
 
 msgctxt "#30028"
-msgid "Built-In"
-msgstr "Built-In"
+msgid "Built-in"
+msgstr "Built-in"
 
 msgctxt "#30029"
 msgid "Download and play"
@@ -6208,3 +6208,19 @@ msgstr "release (versione stabile)"
 msgctxt "#80035"
 msgid "master (beta version under development)"
 msgstr "master (versione beta in fase di sviluppo)"
+
+msgctxt "#80036"
+msgid "Delete video library"
+msgstr "Elimina videoteca"
+
+msgctxt "#80037"
+msgid "Attention, the entire video library will be deleted. Proceed anyway?"
+msgstr "Attenzione, l'intera videoteca verrà eliminata. Procedere comunque?"
+
+msgctxt "#80038"
+msgid "Deleting video library..."
+msgstr "Eliminazione videoteca..."
+
+msgctxt "#80039"
+msgid "The video library has been deleted"
+msgstr "La videoteca è stata eliminata"

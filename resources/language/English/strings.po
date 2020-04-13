@@ -120,7 +120,7 @@ msgid "SetResolvedUrl"
 msgstr ""
 
 msgctxt "#30028"
-msgid "Built-In"
+msgid "Built-in"
 msgstr ""
 
 msgctxt "#30029"
@@ -6095,7 +6095,7 @@ msgstr ""
 
 msgctxt "#80007"
 msgid "Importing video library..."
-msgstr "Importazione videoteca..."
+msgstr ""
 
 msgctxt "#80008"
 msgid "The video library has been imported"
@@ -6207,4 +6207,20 @@ msgstr ""
 
 msgctxt "#80035"
 msgid "master (beta version under development)"
+msgstr ""
+
+msgctxt "#80036"
+msgid "Delete video library"
+msgstr ""
+
+msgctxt "#80037"
+msgid "Attention, the entire video library will be deleted. Proceed anyway?"
+msgstr ""
+
+msgctxt "#80038"
+msgid "Deleting video library..."
+msgstr ""
+
+msgctxt "#80039"
+msgid "The video library has been deleted"
 msgstr ""

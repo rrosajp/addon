@@ -515,15 +515,19 @@ def update(folder_content=config.get_setting("folder_tvshows"), folder=""):
     xbmc.executebuiltin('XBMC.ReloadSkin()')
 
 
-def clean(mostrar_dialogo=False):
+def clean(path=''):
     """
     limpia la libreria de elementos que no existen
     @param mostrar_dialogo: muestra el cuadro de progreso mientras se limpia la videoteca
     @type mostrar_dialogo: bool
     """
     logger.info()
+
+    if path:
+        clean_db(path)
+        return True
     payload = {"jsonrpc": "2.0", "method": "VideoLibrary.Clean", "id": 1,
-               "params": {"showdialogs": mostrar_dialogo}}
+               "params": {"showdialogs": False}}
     data = get_data(payload)
 
     if data.get('result', False) == 'OK':
@@ -810,13 +814,18 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
 
     logger.info()
 
-    if old_path.startswith("special://") or '://' in old_path: sep = '/'
+    sql_old_path = old_path
+    if sql_old_path.startswith("special://"):
+        sql_old_path = sql_old_path.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')
+        sep = '/'
+    elif '://' in sql_old_path:
+        sep = '/'
     else: sep = os.sep
-    if not old_path.endswith(sep):
-        old_path += sep
+    if not sql_old_path.endswith(sep):
+        sql_old_path += sep
 
     # search MAIN path in the DB
-    sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % old_path
+    sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % sql_old_path
     nun_records, records = execute_sql_kodi(sql)
 
     # change main path
@@ -830,11 +839,11 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
     progress.update(p, config.get_localized_string(20000), config.get_localized_string(80013))
 
     for OldFolder, NewFolder in [[old_movies_folder, new_movies_folder], [old_tvshows_folder, new_tvshows_folder]]:
-        old = old_path + OldFolder
-        if not old.endswith(sep): old += sep
+        sql_old_folder = sql_old_path + OldFolder
+        if not sql_old_folder.endswith(sep): sql_old_folder += sep
 
         # Search Main Sub Folder
-        sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % old
+        sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % sql_old_folder
         nun_records, records = execute_sql_kodi(sql)
 
         # Change Main Sub Folder
@@ -842,12 +851,12 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
             for record in records:
                 idPath = record[0]
                 strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
-                sql = 'UPDATE path SET strPath="%s"WHERE idPath=%s' % (strPath, idPath)
+                sql = 'UPDATE path SET strPath="%s" WHERE idPath=%s' % (strPath, idPath)
                 nun_records, records = execute_sql_kodi(sql)
 
         # Search if Sub Folder exixt in all paths
-        old += '%'
-        sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % old
+        sql_old_folder += '%'
+        sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % sql_old_folder
         nun_records, records = execute_sql_kodi(sql)
 
         #Change Sub Folder in all paths
@@ -855,14 +864,14 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
             for record in records:
                 idPath = record[0]
                 strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
-                sql = 'UPDATE path SET strPath="%s"WHERE idPath=%s' % (strPath, idPath)
+                sql = 'UPDATE path SET strPath="%s" WHERE idPath=%s' % (strPath, idPath)
                 nun_records, records = execute_sql_kodi(sql)
 
 
         if OldFolder == old_movies_folder:
             # if is Movie Folder
             # search and modify in "movie"
-            sql = 'SELECT idMovie, c22 FROM movie where c22 LIKE "%s"' % old
+            sql = 'SELECT idMovie, c22 FROM movie where c22 LIKE "%s"' % sql_old_folder
             nun_records, records = execute_sql_kodi(sql)
             if records:
                 for record in records:
@@ -873,7 +882,7 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
         else:
             # if is TV Show Folder
             # search and modify in "episode"
-            sql = 'SELECT idEpisode, c18 FROM episode where c18 LIKE "%s"' % old
+            sql = 'SELECT idEpisode, c18 FROM episode where c18 LIKE "%s"' % sql_old_folder
             nun_records, records = execute_sql_kodi(sql)
             if records:
                 for record in records:
@@ -890,61 +899,39 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
     xbmc.executebuiltin('XBMC.ReloadSkin()')
 
 
-def clean_db():
+def clean_db(path=''):
     logger.info()
 
-    progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80025))
-    progress.update(0)
-
-    config.set_setting('videolibrary_kodi', False)
-    path = config.get_setting('videolibrarypath')
-
-    # rename main path for search in the DB
-    if path.startswith("special://") or '://' in path: sep = '/'
+    if path.startswith("special://"):
+        path = path.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')
+        sep = '/'
+    elif '://' in path:
+        sep = '/'
     else: sep = os.sep
     if not path.endswith(sep):
         path += sep
 
-    # search main path in the DB
+    progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80025))
+    progress.update(0)
+    idParentPath = 0
+    # search video library path in the DB
     sql = 'SELECT idPath FROM path where strPath LIKE "%s"' % path
     nun_records, records = execute_sql_kodi(sql)
-
-    # delete main path
+    # delete video library path
     if records:
         idPath = records[0][0]
-        sql = 'DELETE from path WHERE idPath=%s' % idPath
-        nun_records, records = execute_sql_kodi(sql)
-    progress.update(20)
-
-    path += '%'
-    # search sub folders in the DB
-    sql = 'SELECT idPath FROM path where strPath LIKE "%s"' % path
-    nun_records, records = execute_sql_kodi(sql)
-
-    # search TV shows in the DB
-    sql = 'SELECT idShow FROM tvshow_view where strPath LIKE "%s"' % path
-    nun_records, records_tvshow = execute_sql_kodi(sql)
-
-    # delete sub folders and files
-    if records:
-        for record in records:
-            idPath = record[0]
+        idParentPath = idPath
+        if not config.get_setting("videolibrary_kodi"):
             sql = 'DELETE from path WHERE idPath=%s' % idPath
             nun_records, records = execute_sql_kodi(sql)
-            sql = 'DELETE from files WHERE idPath=%s' % idPath
-            nun_records, records = execute_sql_kodi(sql)
-    progress.update(40)
 
-    # delete TV shows
-    if records_tvshow:
-        for record in records_tvshow:
-            idShow = record[0]
-            sql = 'DELETE from tvshow WHERE idShow=%s' % idShow
-            nun_records, records_tvshow = execute_sql_kodi(sql)
-    progress.update(60)
+    progress.update(10)
+    movies_path = path + config.get_setting("folder_movies")
+    if not movies_path.endswith(sep): movies_path += sep
+    movies_path += '%'
 
     # search movies in the DB
-    sql = 'SELECT idMovie FROM movie where c22 LIKE "%s"' % path
+    sql = 'SELECT idMovie FROM movie where c22 LIKE "%s"' % movies_path
     nun_records, records = execute_sql_kodi(sql)
     # delete movies
     if records:
@@ -952,10 +939,38 @@ def clean_db():
             idMovie = record[0]
             sql = 'DELETE from movie WHERE idMovie=%s' % idMovie
             nun_records, records = execute_sql_kodi(sql)
-    progress.update(80)
 
+    progress.update(28)
+    # search movies path and folders in the DB
+    sql = 'SELECT idPath, idParentPath FROM path where strPath LIKE "%s"' % movies_path
+    nun_records, records = execute_sql_kodi(sql)
+    # delete movies path and folders
+    if records:
+        for record in records:
+            if record[1] == idParentPath and config.get_setting("videolibrary_kodi"):
+                continue
+            idPath = record[0]
+            sql = 'DELETE from path WHERE idPath=%s' % idPath
+            nun_records, records = execute_sql_kodi(sql)
+
+    progress.update(46)
+    tvshows_path = path + config.get_setting("folder_tvshows")
+    if not tvshows_path.endswith(sep): tvshows_path += sep
+    tvshows_path += '%'
+
+    # search TV shows in the DB
+    sql = 'SELECT idShow FROM tvshow_view where strPath LIKE "%s"' % tvshows_path
+    nun_records, records = execute_sql_kodi(sql)
+    # delete TV shows
+    if records:
+        for record in records:
+            idShow = record[0]
+            sql = 'DELETE from tvshow WHERE idShow=%s' % idShow
+            nun_records, records = execute_sql_kodi(sql)
+
+    progress.update(64)
     # search episodes in the DB
-    sql = 'SELECT idEpisode FROM episode where c18 LIKE "%s"' % path
+    sql = 'SELECT idEpisode FROM episode where c18 LIKE "%s"' % tvshows_path
     nun_records, records = execute_sql_kodi(sql)
     # delete episodes
     if records:
@@ -963,6 +978,20 @@ def clean_db():
             idEpisode = record[0]
             sql = 'DELETE from episode WHERE idEpisode=%s' % idEpisode
             nun_records, records = execute_sql_kodi(sql)
+
+    progress.update(82)
+    # search TV shows path and folders in the DB
+    sql = 'SELECT idPath, idParentPath FROM path where strPath LIKE "%s"' % tvshows_path
+    nun_records, records = execute_sql_kodi(sql)
+    # delete tvshows path and folders
+    if records:
+        for record in records:
+            if record[1] == idParentPath and config.get_setting("videolibrary_kodi"):
+                continue
+            idPath = record[0]
+            sql = 'DELETE from path WHERE idPath=%s' % idPath
+            nun_records, records = execute_sql_kodi(sql)
+
     progress.update(100)
     xbmc.sleep(1000)
     progress.close()
