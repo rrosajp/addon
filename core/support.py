@@ -598,7 +598,7 @@ def swzz_get_url(item):
             if not "vcrypt" in data:
                 data = httptools.downloadpage(data).data
         logger.debug("##### play /link/ data ##\n%s\n##" % data)
-    elif 'https://stayonline.pro' in item.url:
+    elif 'stayonline.pro' in item.url:
         # dbg()
         id = item.url.split('/')[-2]
         reqUrl = 'https://stayonline.pro/ajax/linkView.php'
