@@ -2,7 +2,7 @@
 # ------------------------------------------------------------
 # KoD - XBMC Plugin
 # Canale polpotv
-# ------------------------------------------------------------ 
+# ------------------------------------------------------------
 
 from core import support, jsontools
 from core.item import Item
@@ -42,14 +42,14 @@ def newest(categoria):
         item.contentType = 'movie'
         item.url = host + '/api/movies'
     elif categoria == 'series':
-        item.contentType = 'tvshow'      
+        item.contentType = 'tvshow'
         item.url = host+'/api/shows'
     return peliculas(item)
 
 def peliculas(item):
     support.log()
     itemlist = []
-    
+
     data = support.match(item.url, headers=headers).data
     json_object = jsontools.load(data)
     for element in json_object['hydra:member']:
@@ -79,6 +79,7 @@ def episodios(item):
             itemlist.extend(itemlist_season)
 
     support.videolibrary(itemlist, item, 'color kod bold')
+    support.download(itemlist, item)
 
     return itemlist
 
@@ -92,6 +93,9 @@ def get_season(item, seas_url, seasonNumber):
             Item(channel=item.channel,
                  action='findvideos',
                  contentType='episode',
+                 fulltitle=item.fulltitle,
+                 show=item.show,
+                 contentSerieName=item.contentSerieName,
                  title=str(seasonNumber)+"x"+str("%02d"%episode['episodeNumber']),
                  url=seas_url,
                  thumbnail=item.thumbnail,
@@ -115,7 +119,7 @@ def search(item, texto):
         json_object = jsontools.load(data)
         for tvshow in json_object['hydra:member']:
             item.contentType='tvshow'
-            itemlist.extend(get_itemlist_element(tvshow,item))            
+            itemlist.extend(get_itemlist_element(tvshow,item))
         return itemlist
     # Continua la ricerca in caso di errore
     except:
@@ -168,7 +172,10 @@ def findvideos(item):
                 Item(
                     channel=item.channel,
                     action="play",
+                    title='Direct',
                     thumbnail=item.thumbnail,
+                    fulltitle = item.fulltitle,
+                    search = item.search,
                     url=video['src'],
                     server='directo',
                     quality=str(video['size'])+ 'p',
