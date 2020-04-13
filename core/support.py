@@ -596,6 +596,7 @@ def swzz_get_url(item):
                 data = httptools.downloadpage(data).data
         logger.debug("##### play /link/ data ##\n%s\n##" % data)
     elif 'https://stayonline.pro' in item.url:
+        # dbg()
         id = item.url.split('/')[-2]
         reqUrl = 'https://stayonline.pro/ajax/linkView.php'
         p = urlencode({"id": id})
@@ -604,11 +605,13 @@ def swzz_get_url(item):
             import json
             data = json.loads(data)['data']['value']
         except:
+            data = scrapertools.find_single_match(data, r'"value"\s*:\s*"([^"]+)"')
+        else:
             return ''
     else:
         data = item.url
 
-    return data
+    return data.replace('\\','')
 
 
 def menuItem(itemlist, filename, title='', action='', url='', contentType='movie', args=[]):
