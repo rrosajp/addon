@@ -32,7 +32,7 @@
         <setting id="folder_tvshows" type="text" label="70118" default="Serie TV"/>
         <setting id="folder_movies" type="text" label="70119" default="Film"/>
         <setting id="videolibrary_kodi" type="bool" label="70120" default="false"/>
-        <setting id="settings_kod" type="text" label="70789"/>
+        <setting id="settings_kod" type="action" label="70789" action=""/>
         <setting label="59997" type="lsep"/>
         <setting id="videolibrary_max_quality" type="bool" label="70729" default="false" visible="true"/>
         <setting id="next_ep" type="select" label="70746" lvalues="70752|70747|70748" default="0"/>
@@ -95,7 +95,7 @@
         <setting id="downloadenabled" type="bool" label="70689" default="false"/>
         <setting id="downloadpath" type="folder" label="30017" visible="eq(-1,true)" default="special://profile/addon_data/plugin.video.kod/downloads/" subsetting="true" option="writeable"/>
         <setting id="downloadlistpath" type="folder" label="30018" visible="eq(-2,true)" default="special://profile/addon_data/plugin.video.kod/downloads/list/" subsetting="true"/>
-        <setting id="settings_kod1" type="text" label="70789" visible="eq(-3,true)"/>
+        <setting id="settings_kod1" type="action" label="70789" action="" visible="eq(-3,true)"/>
         <setting id="library_add" type="bool" label="70230" default="false"/>
         <setting id="library_move" type="bool" label="70231" default="false" visible="eq(-1,true)" subsetting="true"/>
         <setting id="browser" type="bool" label="70232" default="true"/>
