@@ -1006,7 +1006,7 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
                         action=action,
                         extra=extra,
                         path=item.path,
-                        thumbnail=get_thumb('videolibrary_%s.png') % contentType
+                        thumbnail=get_thumb('add_to_videolibrary.png')
                         ))
 
     return itemlist

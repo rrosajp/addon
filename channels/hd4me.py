@@ -9,7 +9,7 @@ from core import httptools, support
 host = support.config.get_channel_url()
 headers = [['Referer', host]]
 
-list_servers = ['mixdrop','vidoza','cloudvideo','vup','supervideo','gounlimited']
+list_servers = ['mega']
 list_quality = ['default']
 
 @support.menu
@@ -43,7 +43,7 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            logger.error("search except: %s" % line)
+            support.logger.error("search except: %s" % line)
         return []
 
 
