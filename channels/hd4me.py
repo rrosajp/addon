@@ -3,15 +3,10 @@
 # Canale per HD4ME
 # ------------------------------------------------------------
 
-from core import scrapertools, httptools, support
-from core.item import Item
-from platformcode import config, logger
-
-#impostati dinamicamente da findhost()
+from core import httptools, support
 
 
-# host = config.get_channel_url(findhost)
-host = 'https://hd4me.net'
+host = support.config.get_channel_url()
 headers = [['Referer', host]]
 
 list_servers = ['mixdrop','vidoza','cloudvideo','vup','supervideo','gounlimited']
