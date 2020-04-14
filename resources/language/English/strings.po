@@ -3277,7 +3277,7 @@ msgid "Movies folder*"
 msgstr ""
 
 msgctxt "#70120"
-msgid "Add KoD content to Kodi video library*"
+msgid "Add KoD contents to Kodi video library*"
 msgstr ""
 
 msgctxt "#70121"
@@ -3717,7 +3717,7 @@ msgid "Add completed downloads to the video library "
 msgstr ""
 
 msgctxt "#70231"
-msgid "Move the downloaded file to the video library"
+msgid "Move downloaded files to the video library*"
 msgstr ""
 
 msgctxt "#70232"
@@ -5924,7 +5924,7 @@ msgid "Logging"
 msgstr ""
 
 msgctxt "#70789"
-msgid "* Change by opening the settings from the KoD main menu"
+msgid "* Change by opening the settings from KoD main menu"
 msgstr ""
 
 
@@ -6223,4 +6223,8 @@ msgstr ""
 
 msgctxt "#80039"
 msgid "The video library has been deleted"
+msgstr ""
+
+msgctxt "#80040"
+msgid "In order to watch the downloaded files that have been moved to the video library, you have first to enable the option to add KoD contents to Kodi video library"
 msgstr ""

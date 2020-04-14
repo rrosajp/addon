@@ -3276,8 +3276,8 @@ msgid "Movies folder*"
 msgstr "Cartella film*"
 
 msgctxt "#70120"
-msgid "Add KoD content to Kodi video library*"
-msgstr "Aggiungi i contenuti di KoD alla videoteca di Kodi*"
+msgid "Add KoD contents to Kodi video library*"
+msgstr "Aggiungi la videoteca di KoD alla libreria di Kodi*"
 
 msgctxt "#70121"
 msgid "Activate"
@@ -3716,8 +3716,8 @@ msgid "Add completed downloads to the video library "
 msgstr "Aggiungi download completi alla videoteca"
 
 msgctxt "#70231"
-msgid "Move the downloaded file to the video library"
-msgstr "Sposta i files scaricati nella videoteca"
+msgid "Move downloaded files to the video library*"
+msgstr "Sposta i file scaricati nella videoteca*"
 
 msgctxt "#70232"
 msgid "View downloaded files"
@@ -5924,7 +5924,7 @@ msgid "Logging"
 msgstr "Logging"
 
 msgctxt "#70789"
-msgid "* Change by opening the settings from the KoD main menu"
+msgid "* Change by opening the settings from KoD main menu"
 msgstr "* Cambia aprendo le impostazioni dal menu principale di KoD"
 
 
@@ -6224,3 +6224,7 @@ msgstr "Eliminazione videoteca..."
 msgctxt "#80039"
 msgid "The video library has been deleted"
 msgstr "La videoteca è stata eliminata"
+
+msgctxt "#80040"
+msgid "In order to watch the downloaded files that have been moved to the video library, you have first to enable the option to add KoD contents to Kodi video library"
+msgstr "Per guardare i file scaricati che sono stati spostati nella videoteca, devi prima abilitare l'opzione per aggiungere la videoteca di KoD alla libreria di Kodi"

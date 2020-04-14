@@ -363,7 +363,44 @@ def move_to_libray(item):
     library_path = filetools.join(move_path, *filetools.split(item.downloadFilename))
     final_path = download_path
 
-    if config.get_setting("library_add") == True and config.get_setting("library_move") == True:
+    if not filetools.isdir(filetools.dirname(library_path)):
+        filetools.mkdir(filetools.dirname(library_path))
+
+    if filetools.isfile(library_path) and filetools.isfile(download_path):
+        filetools.remove(library_path)
+
+    if filetools.isfile(download_path):
+        if filetools.move(download_path, library_path):
+            final_path = library_path
+
+        if len(filetools.listdir(filetools.dirname(download_path))) == 0:
+            filetools.rmdir(filetools.dirname(download_path))
+
+    logger.info('ITEM = ' + str(item))
+    name = item.contentTitle if item.contentType == 'movie' else str(item.infoLabels['season']) + 'x' + str(item.infoLabels['episode']).zfill(2)
+    list_item = filetools.listdir(filetools.join(config.get_videolibrary_path(), FOLDER, path_title))
+
+    clean = False
+    for File in list_item:
+        filename = File.lower()
+        name = name.lower()
+
+        if filename.startswith(name) and (filename.endswith('.strm') or filename.endswith('.json') or filename.endswith('.nfo')):
+            clean = True
+            file_path = filetools.join(config.get_videolibrary_path(), FOLDER, path_title, File)
+            logger.info('Delete File: ' + str(file_path))
+            filetools.remove(file_path)
+            if file_path.endswith('.strm'):
+                file_strm_path = file_path
+
+    if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
+        from platformcode import xbmc_videolibrary
+        if clean == True:
+            import xbmc
+            xbmc_videolibrary.clean(file_strm_path)
+        xbmc_videolibrary.update(FOLDER, path_title)
+
+    """if config.get_setting("library_add") == True and config.get_setting("library_move") == True:
         if not filetools.isdir(filetools.dirname(library_path)):
             filetools.mkdir(filetools.dirname(library_path))
 
@@ -413,7 +450,7 @@ def move_to_libray(item):
                                     action="findvideos", infoLabels=item.infoLabels, url=final_path)
                 tvshow = Item(channel="downloads", contentType="tvshow",
                               infoLabels={"tmdb_id": item.infoLabels["tmdb_id"]})
-                videolibrarytools.save_tvshow(tvshow, [library_item])
+                videolibrarytools.save_tvshow(tvshow, [library_item])"""
 
 
 def update_json(path, params):
@@ -619,7 +656,7 @@ def download_from_url(url, item):
 
     save_server_statistics(item.server, d.speed[0], d.state != d.states.error)
 
-    if status == STATUS_CODES.completed:
+    if status == STATUS_CODES.completed and config.get_setting("library_move") == True:
         move_to_libray(item.clone(downloadFilename=file))
 
     return {"downloadUrl": d.download_url, "downloadStatus": status, "downloadSize": d.size[0],

@@ -1018,13 +1018,8 @@ def delete(item):
             filetools.rmdir(_item.path)
 
         if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
-            import xbmc
-            # esperamos 5 segundos para dar tiempo a borrar los ficheros
-            xbmc.sleep(5000)
-            # TODO mirar por qué no funciona al limpiar en la videoteca de Kodi al añadirle un path
-            # limpiamos la videoteca de Kodi
             from platformcode import xbmc_videolibrary
-            xbmc_videolibrary.clean()
+            xbmc_videolibrary.clean(_item.path)
 
         logger.info("All links removed")
         platformtools.itemlist_refresh()

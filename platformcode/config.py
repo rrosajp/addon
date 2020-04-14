@@ -247,6 +247,12 @@ def open_settings():
     elif settings_pre.get("videolibrary_kodi", None) and not settings_post.get("videolibrary_kodi", None):
         xbmc_videolibrary.clean(get_setting('videolibrarypath'))
 
+    if not settings_pre.get("library_move", None) and settings_post.get("library_move", None):
+        if settings_post.get("library_move", None) and not get_setting("videolibrary_kodi"):
+            from platformcode import platformtools
+            platformtools.dialog_ok(get_localized_string(20000), get_localized_string(80040))
+            set_setting("library_move", False)
+
 
 def get_setting(name, channel="", server="", default=None):
     """
