@@ -1241,7 +1241,9 @@ def addQualityTag(item, itemlist, data, patron):
 
     if qualityStr:
         try:
-            audio, video = qualityStr.split('.')
+            splitted = qualityStr.split('.')
+            video = splitted[-1]
+            audio = splitted[-2]
             descr = typo(video + ': ', 'color kod') + defQualVideo.get(video.upper(), '') + '\n' +\
                     typo(audio + ': ', 'color kod') + defQualAudio.get(audio.upper(), '')
         except:
