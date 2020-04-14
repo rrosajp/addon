@@ -923,22 +923,31 @@ def download(itemlist, item, typography='', function_level=1, function=''):
     downloadItemlist = [i.tourl() for i in itemlist]
 
     if itemlist and item.contentChannel != 'videolibrary':
-        itemlist.append(
-            Item(channel='downloads',
-                 from_channel=item.channel,
-                 title=title,
-                 fulltitle=item.fulltitle,
-                 show=item.fulltitle,
-                 contentType=item.contentType,
-                 contentSerieName=contentSerieName,
-                 url=item.url,
-                 action='save_download',
-                 from_action=from_action,
-                 contentTitle=contentTitle,
-                 path=item.path,
-                 thumbnail=thumb(thumb='downloads.png'),
-                 downloadItemlist=downloadItemlist
-            ))
+        show = True
+        # do not show if we are on findvideos and there are no valid servers
+        if from_action == 'findvideos':
+            for i in itemlist:
+                if i.action == 'play':
+                    break
+            else:
+                show = False
+        if show:
+            itemlist.append(
+                Item(channel='downloads',
+                     from_channel=item.channel,
+                     title=title,
+                     fulltitle=item.fulltitle,
+                     show=item.fulltitle,
+                     contentType=item.contentType,
+                     contentSerieName=contentSerieName,
+                     url=item.url,
+                     action='save_download',
+                     from_action=from_action,
+                     contentTitle=contentTitle,
+                     path=item.path,
+                     thumbnail=thumb(thumb='downloads.png'),
+                     downloadItemlist=downloadItemlist
+                ))
         if from_action == 'episodios':
             itemlist.append(
                 Item(channel='downloads',
