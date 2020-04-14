@@ -116,7 +116,7 @@ class Downloader(object):
                     self.speed[1], self.speed[2], self.connections[0], self.connections[1])
                 line3 = config.get_localized_string(60202) % (self.remaining_time)
 
-                progreso.update(int(self.progress), line1, line2 + line3)
+                progreso.update(int(self.progress), line1, line2 + " " + line3)
                 self.__update_json()
         finally:
             progreso.close()
@@ -266,7 +266,7 @@ class Downloader(object):
         self.__get_download_info__()
 
         try:
-            logger.info("Descarga inicializada: Partes: %s | Ruta: %s | Archivo: %s | Tamaño: %s" % \
+            logger.info("Download started: Parts: %s | Path: %s | File: %s | Size: %s" % \
                     (str(len(self._download_info["parts"])), self._pathencode('utf-8'), \
                     self._filenameencode('utf-8'), str(self._download_info["size"])))
         except:

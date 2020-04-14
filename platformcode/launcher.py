@@ -518,7 +518,7 @@ def play_from_library(item):
         item.show_server = True
 
         from specials import videolibrary, autoplay
-        p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(70004))
+        p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(60683))
         p_dialog.update(0, '')
 
         itemlist = videolibrary.findvideos(item)

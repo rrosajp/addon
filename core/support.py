@@ -1179,7 +1179,7 @@ def channel_config(item, itemlist):
     itemlist.append(
         Item(channel='setting',
              action="channel_config",
-             title=typo("Configurazione Canale color kod bold"),
+             title=typo(config.get_localized_string(60587), 'color kod bold'),
              config=item.channel,
              folder=False,
              thumbnail=get_thumb('setting_0.png'))

@@ -509,15 +509,11 @@ msgid "Path: "
 msgstr ""
 
 msgctxt "#50005"
-msgid "Delete This Channel?"
+msgid "Delete this channel?"
 msgstr ""
 
 msgctxt "#59970"
 msgid "Synchronization with Trakt started"
-msgstr ""
-
-msgctxt "#59971"
-msgid "Kodi video library configuration"
 msgstr ""
 
 msgctxt "#59972"
@@ -1009,11 +1005,11 @@ msgid "Downloader %s/%s"
 msgstr ""
 
 msgctxt "#60204"
-msgid "Speed Meter"
+msgid "Speed meter"
 msgstr ""
 
 msgctxt "#60205"
-msgid "File Writer"
+msgid "File writer"
 msgstr ""
 
 msgctxt "#60206"
@@ -1685,7 +1681,7 @@ msgid "Summary:"
 msgstr ""
 
 msgctxt "#60389"
-msgid "Video library update..."
+msgid "Updating %s [%s]..."
 msgstr ""
 
 msgctxt "#60390"
@@ -2449,7 +2445,7 @@ msgid "Restoring movies video library"
 msgstr ""
 
 msgctxt "#60587"
-msgid "Video library update...."
+msgid "Channel configuration"
 msgstr ""
 
 msgctxt "#60588"
@@ -2809,7 +2805,7 @@ msgid "TV show"
 msgstr ""
 
 msgctxt "#60683"
-msgid "anime"
+msgid "Loading streams..."
 msgstr ""
 
 msgctxt "#70000"

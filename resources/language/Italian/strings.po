@@ -508,16 +508,12 @@ msgid "Path: "
 msgstr "Percorso: "
 
 msgctxt "#50005"
-msgid "Delete This Channel?"
-msgstr "Eliminare Questo Canale?"
+msgid "Delete this channel?"
+msgstr "Eliminare questo canale?"
 
 msgctxt "#59970"
 msgid "Synchronization with Trakt started"
 msgstr "Sincronizzazione con Trakt iniziata"
-
-msgctxt "#59971"
-msgid "Kodi video library configuration"
-msgstr "Configurazione videoteca Kodi"
 
 msgctxt "#59972"
 msgid "Search for: '%s' | Found: %d vídeos | Time: %2.f seconds"
@@ -1008,11 +1004,11 @@ msgid "Downloader %s/%s"
 msgstr "Downloader %s/%s"
 
 msgctxt "#60204"
-msgid "Speed Meter"
+msgid "Speed meter"
 msgstr "Misuratore di velocità"
 
 msgctxt "#60205"
-msgid "File Writer"
+msgid "File writer"
 msgstr "Scrittura File"
 
 msgctxt "#60206"
@@ -1449,7 +1445,7 @@ msgstr " KB/s "
 
 msgctxt "#60316"
 msgid "MB of "
-msgstr "MB de "
+msgstr "MB di "
 
 msgctxt "#60317"
 msgid "MB"
@@ -1684,8 +1680,8 @@ msgid "Summary:"
 msgstr "Riassunto:"
 
 msgctxt "#60389"
-msgid "Video library update..."
-msgstr "Aggiornamento videoteca..."
+msgid "Updating %s [%s]..."
+msgstr "Aggiornamento %s [%s]..."
 
 msgctxt "#60390"
 msgid "AutoPlay configuration"
@@ -2448,8 +2444,8 @@ msgid "Restoring movies video library"
 msgstr "Ripristino videoteca film"
 
 msgctxt "#60587"
-msgid "Video library update...."
-msgstr "Aggiornamento videoteca...."
+msgid "Channel configuration"
+msgstr "Configurazione canale"
 
 msgctxt "#60588"
 msgid " - Settings created"
@@ -2808,8 +2804,8 @@ msgid "TV show"
 msgstr "Serie TV"
 
 msgctxt "#60683"
-msgid "anime"
-msgstr "anime"
+msgid "Loading streams..."
+msgstr "Caricamento stream..."
 
 msgctxt "#70000"
 msgid "Options"

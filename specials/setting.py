@@ -859,9 +859,9 @@ def restore_tools(item):
                 filetools.rmdirtree(path)
 
                 import math
-                heading = config.get_localized_string(60587)
+                heading = config.get_localized_string(20000)
 
-                p_dialog2.update(int(math.ceil((i + 1) * t)), heading, "%s: %s" % (movie.contentTitle,
+                p_dialog2.update(int(math.ceil((i + 1) * t)), heading, config.get_localized_string(60389) % (movie.contentTitle,
                                                                                    movie.channel.capitalize()))
                 # ... y la volvemos a añadir
                 videolibrarytools.save_movie(movie)
