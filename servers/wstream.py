@@ -17,17 +17,17 @@ headers = [['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
-    resp = httptools.downloadpage(page_url, headers=headers)
+    resp = httptools.downloadpage(page_url.replace('wstream.video', '116.202.226.34'), headers=headers, verify=False)
 
     global data, real_url
     data = resp.data
 
     page_url = resp.url.replace('wstream.video', '116.202.226.34')
     if '/streaming.php' in page_url in page_url:
-        code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False, only_headers=True).headers['location'].split('/')[-1].replace('.html', '')
+        code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False, only_headers=True, verify=False).headers['location'].split('/')[-1].replace('.html', '')
         # logger.info('WCODE=' + code)
         page_url = 'https://116.202.226.34/video.php?file_code=' + code
-        data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True).data
+        data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True, verify=False).data
 
     real_url = page_url
     if "Not Found" in data or "File was deleted" in data:
@@ -42,7 +42,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         global data,headers
         page_url = scrapertools.find_single_match(data, r"""<center><a href='(https?:\/\/wstream[^']+)'\s*title='bkg'""")
         if page_url:
-            data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True, post={'g-recaptcha-response': captcha}).data
+            data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True, post={'g-recaptcha-response': captcha}, verify=False).data
 
     def getSources(data):
         possibileSources = scrapertools.find_multiple_matches(data, r'sources:\s*(\[[^\]]+\])')
@@ -74,11 +74,13 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     captcha = platformtools.show_recaptcha(sitekey, page_url.replace('116.202.226.34', 'wstream.video')) if sitekey else ''
 
     possibleParam = scrapertools.find_multiple_matches(data,r"""<input.*?(?:name=["']([^'"]+).*?value=["']([^'"]*)['"]>|>)""")
+    from core import support
+    support.dbg()
     if possibleParam and possibleParam[0]:
         post = {param[0]: param[1] for param in possibleParam if param[0]}
         if captcha: post['g-recaptcha-response'] = captcha
         if post:
-            data = httptools.downloadpage(real_url, headers=headers, post=post, follow_redirects=True).data
+            data = httptools.downloadpage(real_url, headers=headers, post=post, follow_redirects=True, verify=False).data
         elif captcha:
             int_bckup_method()
     elif captcha:
