@@ -778,7 +778,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
                 context_commands.append((config.get_localized_string(60353), "XBMC.RunPlugin(%s?%s&%s)" %
                                          (sys.argv[0], item_url, 'action=add_pelicula_to_library&from_action=' + item.action)))
         
-        if item.channel not in ["downloads", "videolibrary"] and item.server != 'torrent' and parent_item.action != 'mainlist' and config.get_setting('downloadenabled'):
+        if item.channel not in ["downloads"] and item.server != 'torrent' and parent_item.action != 'mainlist' and config.get_setting('downloadenabled'):
             # Descargar pelicula
             if item.contentType == "movie":
                 context_commands.append((config.get_localized_string(60354), "XBMC.RunPlugin(%s?%s&%s)" %

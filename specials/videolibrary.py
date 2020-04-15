@@ -52,10 +52,9 @@ def list_movies(item, silent=False):
     for raiz, subcarpetas, ficheros in filetools.walk(videolibrarytools.MOVIES_PATH):
         local_movie = False
         for f in ficheros:
-            # from core.support import dbg;dbg()
             if f.split('.')[-1] not in ['nfo','json','strm']:
                 local_movie = True
-
+        for f in ficheros:
             if f.endswith(".nfo"):
                 nfo_path = filetools.join(raiz, f)
 
@@ -1130,7 +1129,12 @@ def check_tvshow_playcount(item, season):
 
 
 def add_download_items(item, itemlist):
-    if not item.fromLibrary:
+    localOnly = True
+    for i in itemlist:
+        if i.contentChannel != 'local':
+            localOnly = False
+            break
+    if not item.fromLibrary and not localOnly:
         downloadItem = Item(channel='downloads',
                             from_channel=item.channel,
                             title=typo(config.get_localized_string(60355), "color kod bold"),
