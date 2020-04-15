@@ -74,8 +74,6 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     captcha = platformtools.show_recaptcha(sitekey, page_url.replace('116.202.226.34', 'wstream.video')) if sitekey else ''
 
     possibleParam = scrapertools.find_multiple_matches(data,r"""<input.*?(?:name=["']([^'"]+).*?value=["']([^'"]*)['"]>|>)""")
-    from core import support
-    support.dbg()
     if possibleParam and possibleParam[0]:
         post = {param[0]: param[1] for param in possibleParam if param[0]}
         if captcha: post['g-recaptcha-response'] = captcha
