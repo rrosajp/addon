@@ -94,11 +94,11 @@
     <category label="30153">
         <setting id="downloadenabled" type="bool" label="70689" default="false"/>
         <setting id="downloadpath" type="folder" label="30017" visible="eq(-1,true)" default="special://profile/addon_data/plugin.video.kod/downloads/" option="writeable"/>
-        <setting id="downloadlistpath" type="folder" label="30018" visible="eq(-2,true)" default="special://profile/addon_data/plugin.video.kod/downloads/list/" option="writeable"/>
+        <setting id="settings_kod1" type="action" label="70789" action="" visible="eq(-2,true)"/>
+        <setting id="downloadlistpath" type="folder" label="30018" visible="eq(-3,true)" default="special://profile/addon_data/plugin.video.kod/downloads/list/" option="writeable"/>
         <!-- <setting id="library_add" type="bool" label="70230" default="false"/>
         <setting id="library_move" type="bool" label="70231" default="false" visible="eq(-1,true)" subsetting="true"/> -->
-        <setting id="library_move" type="bool" label="70231" visible="eq(-3,true)" default="true"/>
-        <setting id="settings_kod1" type="action" label="70789" action="" visible="eq(-4,true)"/>
+        <setting id="library_move" type="bool" label="70231" visible="eq(-4,true)" default="true"/>
         <setting id="browser" type="bool" label="70232" visible="eq(-5,true)" default="true"/>
         <setting id="server_speed" type="bool" label="70242" visible="eq(-6,true)" default="true"/>
         <setting id="quality" type="select" label="70240" lvalues="70241|70763|70764|70765" visible="eq(-7,true)" default="0"/>
