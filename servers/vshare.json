@@ -20,7 +20,7 @@
   "id": [
     "vshare"
   ],
-  "name": "vshare",
+  "name": "VideoShare",
   "settings": [
     {
       "default": false,

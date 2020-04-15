@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-
 import re
+
 from core import httptools, scrapertools
 from lib import jsunpack
+from platformcode import config
 from platformcode import logger
 
 data = ""
@@ -11,7 +12,7 @@ def test_video_exists(page_url):
     global data
     data = resp.data
     if resp.code == 404 or '<b>File Not Found</b>' in resp.data or "<b>File is no longer available" in resp.data:
-        return False, "[flix555] El video no está disponible"
+        return False,  config.get_localized_string(70449) % "flix555"
     return True, ""
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):

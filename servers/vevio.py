@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
@@ -20,7 +21,7 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url).data
     if "File was deleted" in data or "Page Cannot Be Found" in data or "<title>Video not found" in data:
-        return False, "[vevio] El archivo ha sido eliminado o no existe"
+        return False,  config.get_localized_string(70449) % "vevio"
     return True, ""
 
 

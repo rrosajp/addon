@@ -2,9 +2,9 @@
 # --------------------------------------------------------
 # Conector uploadmp4 By Alfa development Group
 # --------------------------------------------------------
-
 from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
 
 
@@ -12,7 +12,7 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url).data
     if "no longer exists" in data:
-        return False, "[uploadmp4] El video ha sido borrado"
+        return False,  config.get_localized_string(70449) % "uploadmp4"
     return True, ""
 
 

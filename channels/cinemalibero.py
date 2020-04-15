@@ -12,18 +12,19 @@ from platformcode import config
 list_servers = ['akstream', 'wstream', 'backin', 'clipwatching', 'cloudvideo', 'verystream', 'onlystream', 'mixdrop']
 list_quality = ['default']
 
-def findhost():
-    permUrl = httptools.downloadpage('https://www.cinemalibero.online/', follow_redirects=False).headers
-    try:
-        import urlparse
-    except:
-        import urllib.parse as urlparse
-    p = list(urlparse.urlparse(permUrl['location'].replace('https://www.google.com/search?q=site:', '')))
-    if not p[0]:
-        p[0] = 'https'
-    return urlparse.urlunparse(p)
+# rimanda a .today che contiene tutti link a .plus
+# def findhost():
+#     permUrl = httptools.downloadpage('https://www.cinemalibero.online/', follow_redirects=False).headers
+#     try:
+#         import urlparse
+#     except:
+#         import urllib.parse as urlparse
+#     p = list(urlparse.urlparse(permUrl['location'].replace('https://www.google.com/search?q=site:', '')))
+#     if not p[0]:
+#         p[0] = 'https'
+#     return urlparse.urlunparse(p)
 
-host = config.get_channel_url(findhost)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 
 @support.menu

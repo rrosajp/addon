@@ -2,11 +2,13 @@
 # --------------------------------------------------------
 # Conector UpVID By Alfa development Group
 # --------------------------------------------------------
+import base64
+import re
 
-import re, base64
 from core import httptools
 from core import scrapertools
 from lib.aadecode import decode as aadecode
+from platformcode import config
 from platformcode import logger
 
 
@@ -14,9 +16,9 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url)
     if data.code == 404:
-        return False, "[upvid] El archivo no existe o ha sido borrado"
+        return False, config.get_localized_string(70449) % "upvid"
     if "<title>video is no longer available" in data.data:
-        return False, "[upvid] El archivo no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "upvid"
     return True, ""
 
 

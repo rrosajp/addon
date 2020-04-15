@@ -2,9 +2,9 @@
 # --------------------------------------------------------
 # Conector tusfiles By Alfa development Group
 # --------------------------------------------------------
-
 from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
 
 
@@ -12,7 +12,7 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url).data
     if "no longer exists" in data or "to copyright issues" in data:
-        return False, "[tusfiles] El video ha sido borrado"
+        return False,  config.get_localized_string(70449) % "tusfiles"
     return True, ""
 
 

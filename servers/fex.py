@@ -2,9 +2,10 @@
 # -*- Server Fex -*-
 # -*- Created for Alfa-addon -*-
 # -*- By the Alfa Develop Group -*-
-
 from core import httptools
+from platformcode import config
 from platformcode import logger
+
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
@@ -12,7 +13,7 @@ def test_video_exists(page_url):
     data = httptools.downloadpage(page_url, follow_redirects=False)
 
     if data.code == 404:
-        return False, "[Fex] El archivo no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "Fex"
 
     return True, ""
 

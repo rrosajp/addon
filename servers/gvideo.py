@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-
 import sys
+
+from platformcode import config
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
@@ -25,7 +27,7 @@ def test_video_exists(page_url):
     page = response
 
     if "no+existe" in response.data or 'no existe.</p>' in response.data:
-        return False, "[gvideo] El video no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "gvideo"
     if "Se+ha+excedido+el" in response.data:
         return False, "[gvideo] Se ha excedido el número de reproducciones permitidas"
     if "No+tienes+permiso" in response.data:

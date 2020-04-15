@@ -3,6 +3,7 @@ import time
 
 from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
 
 headers = {'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Mobile Safari/537.36'}
@@ -12,7 +13,7 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url).data
     if "Archive no Encontrado" in data:
-        return False, "[bdupload] El fichero ha sido borrado"
+        return False,  config.get_localized_string(70449) % "bdupload"
 
     return True, ""
 

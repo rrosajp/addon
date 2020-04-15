@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
 
 
@@ -9,7 +10,7 @@ def test_video_exists(page_url):
     global data
     data = httptools.downloadpage(page_url).data
     if "<h2>WE ARE SORRY</h2>" in data or '<title>404 Not Found</title>' in data:
-        return False, "[tube8] El fichero no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "tube8"
     return True, ""
 
 

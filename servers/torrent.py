@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
-#from builtins import str
-from builtins import range
 import sys
+
+# from builtins import str
+from builtins import range
+
 PY3 = False
 VFS = True
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int; VFS = False
@@ -15,7 +17,6 @@ else:
     import urllib
 
 import time
-import threading
 import os
 import traceback
 import re
@@ -31,7 +32,6 @@ from core import filetools
 from core import httptools
 from core import scrapertools
 from core import jsontools
-from core.item import Item
 from platformcode import logger
 from platformcode import config
 from platformcode import platformtools
@@ -459,7 +459,7 @@ def bt_client(mediaurl, xlistitem, rar_files, subtitle=None, password=None, item
                     break
 
                 else:
-                    if platformtools.dialog_yesno(msg_header, config.get_localized_string(30031), config.get_localized_string(30032)):
+                    if not platformtools.dialog_yesno(msg_header, config.get_localized_string(30031), config.get_localized_string(30032)):
                         dp_cerrado = False
                         progreso = platformtools.dialog_progress(msg_header, '')
                         break
@@ -675,8 +675,7 @@ def mark_auto_as_watched(item):
         #logger.debug("Llamado el marcado")
 
 
-def wait_for_download(item, mediaurl, rar_files, torr_client, password='', size='', \
-                      rar_control={}):
+def wait_for_download(item, mediaurl, rar_files, torr_client, password='', size='', rar_control={}):
     logger.info()
 
     from subprocess import Popen, PIPE, STDOUT

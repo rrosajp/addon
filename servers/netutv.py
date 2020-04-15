@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-
 import sys
+
+from platformcode import config
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
@@ -30,7 +32,7 @@ def test_video_exists(page_url):
     page_url = page_url.replace("/watch_video.php?v=", "/player/embed_player.php?vid=")
     data = httptools.downloadpage(page_url).data
     if "var userid = '';" in data.lower():
-        return False, "[netutv] El archivo no existe o  ha sido borrado"
+        return False,  config.get_localized_string(70449) % "netutv"
     return True, ""
 
 

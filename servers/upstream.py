@@ -5,7 +5,6 @@
 
 from core import httptools
 from core import scrapertools
-from lib import jsunpack
 from platformcode import logger, config
 
 

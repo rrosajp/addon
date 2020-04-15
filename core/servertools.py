@@ -220,7 +220,7 @@ def get_server_from_url(url):
     return devuelve
 
 
-def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialogo=False):
+def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialogo=False, background_dialog=False):
     """
     Función para obtener la url real del vídeo
     @param server: Servidor donde está alojado el vídeo
@@ -231,6 +231,8 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
     @type video_password: str
     @param muestra_dialogo: Muestra el diálogo de progreso
     @type muestra_dialogo: bool
+    @type background_dialog: bool
+    @param background_dialog: if progress dialog should be in background
 
     @return: devuelve la url del video
     @rtype: list
@@ -261,7 +263,7 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
         if server_parameters:
             # Muestra un diágo de progreso
             if muestra_dialogo:
-                progreso = platformtools.dialog_progress(config.get_localized_string(20000),
+                progreso = (platformtools.dialog_progress_bg if background_dialog else platformtools.dialog_progress)(config.get_localized_string(20000),
                                                          config.get_localized_string(70180) % server_parameters["name"])
 
             # Cuenta las opciones disponibles, para calcular el porcentaje
@@ -292,6 +294,8 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
             logger.info("Servidor importado: %s" % server_module)
         except:
             server_module = None
+            if muestra_dialogo:
+                progreso.close()
             logger.error("No se ha podido importar el servidor: %s" % server)
             import traceback
             logger.error(traceback.format_exc())
@@ -305,6 +309,8 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
                 if not video_exists:
                     error_messages.append(message)
                     logger.info("test_video_exists dice que el video no existe")
+                    if muestra_dialogo:
+                        progreso.close()
                 else:
                     logger.info("test_video_exists dice que el video SI existe")
             except:

@@ -2,12 +2,15 @@
 
 #from builtins import str
 import sys
+
+from core.support import typo
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
-import os, traceback
+import xbmc, os, traceback
 
-from channelselector import get_thumb
+from channelselector import get_thumb, thumb
 from core import filetools
 from core import scrapertools
 from core import videolibrarytools
@@ -15,6 +18,7 @@ from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
 from lib import generictools
+from distutils import dir_util
 
 
 def mainlist(item):
@@ -27,6 +31,9 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, action="list_tvshows", title=config.get_localized_string(60600),
                          category=config.get_localized_string(70271),
                          thumbnail=get_thumb("videolibrary_tvshow.png")))
+    itemlist.append(Item(channel='shortcuts', action="SettingOnPosition",
+                         category=2, setting=0, title=typo(config.get_localized_string(70287),'bold color kod'),
+                         thumbnail = get_thumb("setting_0.png")))
 
     return itemlist
 
@@ -43,10 +50,17 @@ def list_movies(item, silent=False):
     dead_list = []
     zombie_list = []
     for raiz, subcarpetas, ficheros in filetools.walk(videolibrarytools.MOVIES_PATH):
-        for f in ficheros:
-            if f.endswith(".nfo"):
-                nfo_path = filetools.join(raiz, f)
+        for s in subcarpetas:
+            nfo_path = filetools.join(raiz, s, s + ".nfo")
+            logger.debug(nfo_path)
 
+            local_movie = False
+            for f in filetools.listdir(filetools.join(raiz, s)):
+                if f.split('.')[-1] not in ['nfo','json','strm']:
+                    local_movie = True
+                    break
+
+            if filetools.exists(nfo_path):
                 #Sincronizamos las películas vistas desde la videoteca de Kodi con la de Alfa
                 try:
                     if config.is_xbmc():                #Si es Kodi, lo hacemos
@@ -54,13 +68,13 @@ def list_movies(item, silent=False):
                         xbmc_videolibrary.mark_content_as_watched_on_alfa(nfo_path)
                 except:
                     logger.error(traceback.format_exc())
-                
+
                 head_nfo, new_item = videolibrarytools.read_nfo(nfo_path)
 
                 if not new_item:                        #Si no ha leído bien el .nfo, pasamos a la siguiente
                     logger.error('.nfo erroneo en ' + str(nfo_path))
                     continue
-                
+
                 if len(new_item.library_urls) > 1:
                     multicanal = True
                 else:
@@ -72,7 +86,7 @@ def list_movies(item, silent=False):
                 for canal_org in new_item.library_urls:
                     canal = generictools.verify_channel(canal_org)
                     try:
-                        if canal == 'community':
+                        if canal in ['community', 'downloads']:
                             channel_verify = __import__('specials.%s' % canal, fromlist=["channels.%s" % canal])
                         else:
                             channel_verify = __import__('channels.%s' % canal, fromlist=["channels.%s" % canal])
@@ -81,7 +95,7 @@ def list_movies(item, silent=False):
                         dead_item = Item(multicanal=multicanal,
                                          contentType='movie',
                                          dead=canal,
-                                         path=raiz,
+                                         path=filetools.join(raiz, s),
                                          nfo=nfo_path,
                                          library_urls=new_item.library_urls,
                                          infoLabels={'title': new_item.contentTitle})
@@ -111,14 +125,15 @@ def list_movies(item, silent=False):
 
 
                 new_item.nfo = nfo_path
-                new_item.path = raiz
+                new_item.path = filetools.join(raiz, s)
                 new_item.thumbnail = new_item.contentThumbnail
+                new_item.extra = filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_movies"), s)
                 # new_item.text_color = "blue"
                 strm_path = new_item.strm_path.replace("\\", "/").rstrip("/")
                 if '/' in new_item.path:
                     new_item.strm_path = strm_path
-
-                if not filetools.exists(filetools.join(new_item.path, filetools.basename(strm_path))):
+                logger.info('EXIST'+ str(local_movie))
+                if not filetools.exists(filetools.join(new_item.path, filetools.basename(strm_path))) and local_movie == False:
                     # Si se ha eliminado el strm desde la bilbioteca de kodi, no mostrarlo
                     continue
 
@@ -168,12 +183,11 @@ def list_tvshows(item):
     zombie_list = []
     # Obtenemos todos los tvshow.nfo de la videoteca de SERIES recursivamente
     for raiz, subcarpetas, ficheros in filetools.walk(videolibrarytools.TVSHOWS_PATH):
-        for f in ficheros:
+        for s in subcarpetas:
+            tvshow_path = filetools.join(raiz, s, "tvshow.nfo")
+            logger.debug(tvshow_path)
 
-            if f == "tvshow.nfo":
-                tvshow_path = filetools.join(raiz, f)
-                # logger.debug(tvshow_path)
-
+            if filetools.exists(tvshow_path):
                 #Sincronizamos los episodios vistos desde la videoteca de Kodi con la de Alfa
                 try:
                     if config.is_xbmc():                #Si es Kodi, lo hacemos
@@ -181,9 +195,9 @@ def list_tvshows(item):
                         xbmc_videolibrary.mark_content_as_watched_on_alfa(tvshow_path)
                 except:
                     logger.error(traceback.format_exc())
-                
+
                 head_nfo, item_tvshow = videolibrarytools.read_nfo(tvshow_path)
-                
+
                 if not item_tvshow:                        #Si no ha leído bien el .nfo, pasamos a la siguiente
                     logger.error('.nfo erroneo en ' + str(tvshow_path))
                     continue
@@ -199,7 +213,7 @@ def list_tvshows(item):
                 for canal in item_tvshow.library_urls:
                     canal = generictools.verify_channel(canal)
                     try:
-                        if canal == 'community':
+                        if canal in ['community', 'downloads']:
                             channel_verify = __import__('specials.%s' % canal, fromlist=["channels.%s" % canal])
                         else:
                             channel_verify = __import__('channels.%s' % canal, fromlist=["channels.%s" % canal])
@@ -208,7 +222,7 @@ def list_tvshows(item):
                         dead_item = Item(multicanal=multicanal,
                                          contentType='tvshow',
                                          dead=canal,
-                                         path=raiz,
+                                         path=filetools.join(raiz, s),
                                          nfo=tvshow_path,
                                          library_urls=item_tvshow.library_urls,
                                          infoLabels={'title': item_tvshow.contentTitle})
@@ -240,8 +254,9 @@ def list_tvshows(item):
 
                 try:                        #A veces da errores aleatorios, por no encontrar el .nfo.  Probablemente problemas de timing
                     item_tvshow.title = item_tvshow.contentTitle
-                    item_tvshow.path = raiz
+                    item_tvshow.path = filetools.join(raiz, s)
                     item_tvshow.nfo = tvshow_path
+                    item_tvshow.extra = filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows"), s)
                     # Menu contextual: Marcar como visto/no visto
                     visto = item_tvshow.library_playcounts.get(item_tvshow.contentTitle, 0)
                     item_tvshow.infoLabels["playcount"] = visto
@@ -318,6 +333,8 @@ def get_seasons(item):
     itemlist = []
     dict_temp = {}
 
+    videolibrarytools.check_renumber_options(item)
+
     raiz, carpetas_series, ficheros = next(filetools.walk(item.path))
 
     # Menu contextual: Releer tvshow.nfo
@@ -373,6 +390,7 @@ def get_seasons(item):
             new_item.infoLabels["playcount"] = 0
             itemlist.insert(0, new_item)
 
+        add_download_items(item, itemlist)
     return itemlist
 
 
@@ -389,7 +407,7 @@ def get_episodes(item):
 
     # Crear un item en la lista para cada strm encontrado
     for i in ficheros:
-        if i.endswith('.strm'):
+        if i.split('.')[-1] not in  ['json','nfo']: #i.endswith('.strm'):
             season_episode = scrapertools.get_season_and_episode(i)
             if not season_episode:
                 # El fichero no incluye el numero de temporada y episodio
@@ -400,7 +418,7 @@ def get_episodes(item):
                 continue
 
             # Obtener los datos del season_episode.nfo
-            nfo_path = filetools.join(raiz, i).replace('.strm', '.nfo')
+            nfo_path = filetools.join(raiz, '%sx%s.nfo' % (season, episode))#.replace('.strm', '.nfo')
             head_nfo, epi = videolibrarytools.read_nfo(nfo_path)
 
             # Fijar el titulo del capitulo si es posible
@@ -434,14 +452,16 @@ def get_episodes(item):
             # logger.debug("epi:\n" + epi.tostring('\n'))
             itemlist.append(epi)
 
-    return sorted(itemlist, key=lambda it: (int(it.contentSeason), int(it.contentEpisodeNumber)))
+    itemlist = sorted(itemlist, key=lambda it: (int(it.contentSeason), int(it.contentEpisodeNumber)))
+    add_download_items(item, itemlist)
+    return itemlist
 
 
 def findvideos(item):
     from specials import autoplay
     logger.info()
     # logger.debug("item:\n" + item.tostring('\n'))
-
+    videolibrarytools.check_renumber_options(item)
     itemlist = []
     list_canales = {}
     item_local = None
@@ -454,8 +474,8 @@ def findvideos(item):
         return []
 
     #content_title = [c for c in item.contentTitle.strip().lower() if c not in ":*?<>|\/"]
-    content_title = "".join(c for c in item.contentTitle.strip().lower() if c not in ":*?<>|\/")
-
+    content_title = str(item.contentSeason) + 'x' + (str(item.contentEpisodeNumber) if item.contentEpisodeNumber > 9  \
+                                                                                else '0' + str(item.contentEpisodeNumber))
     if item.contentType == 'movie':
         item.strm_path = filetools.join(videolibrarytools.MOVIES_PATH, item.strm_path)
         path_dir = filetools.dirname(item.strm_path)
@@ -520,7 +540,7 @@ def findvideos(item):
     for nom_canal, json_path in list(list_canales.items()):
         if filtro_canal and filtro_canal != nom_canal.capitalize():
             continue
-        
+
         item_canal = Item()
         item_canal.channel = nom_canal
         ###### Redirección al canal NewPct1.py si es un clone, o a otro canal y url si ha intervención judicial
@@ -529,10 +549,9 @@ def findvideos(item):
         except:
             logger.error(traceback.format_exc())
         nom_canal = item_canal.channel
-            
+
         # Importamos el canal de la parte seleccionada
         try:
-
             if nom_canal == 'community':
                 channel = __import__('specials.%s' % nom_canal, fromlist=["channels.%s" % nom_canal])
             else:
@@ -613,7 +632,8 @@ def findvideos(item):
     from inspect import stack
     from specials import nextep
     if nextep.check(item) and stack()[1][3] == 'run':
-        nextep.videolibrary(item) 
+        nextep.videolibrary(item)
+    add_download_items(item, itemlist)
     return itemlist
 
 
@@ -661,8 +681,8 @@ def update_videolibrary(item):
     logger.info()
 
     # Actualizar las series activas sobreescribiendo
-    import videolibrary_service
-    videolibrary_service.check_for_update(overwrite=True)
+    import service
+    service.check_for_update(overwrite=True)
 
     # Eliminar las carpetas de peliculas que no contengan archivo strm
     for raiz, subcarpetas, ficheros in filetools.walk(videolibrarytools.MOVIES_PATH):
@@ -677,6 +697,91 @@ def update_videolibrary(item):
             filetools.rmdirtree(raiz)
 
 
+def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_folder, current_tvshows_folder, new_tvshows_folder):
+    logger.info()
+
+    backup_current_path = current_path
+    backup_new_path = new_path
+
+    notify = False
+    progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80011))
+    current_path = xbmc.translatePath(current_path)
+    new_path = xbmc.translatePath(new_path)
+    current_movies_path = filetools.join(current_path, current_movies_folder)
+    new_movies_path = filetools.join(new_path, new_movies_folder)
+    current_tvshows_path = os.path.join(current_path, current_tvshows_folder)
+    new_tvshows_path = os.path.join(new_path, new_tvshows_folder)
+
+    from platformcode import xbmc_videolibrary
+    movies_path, tvshows_path = xbmc_videolibrary.check_sources(new_movies_path, new_tvshows_path)
+    if movies_path or tvshows_path:
+        if not movies_path:
+            filetools.rmdir(new_movies_path)
+        if not tvshows_path:
+            filetools.rmdir(new_tvshows_path)
+        config.set_setting("videolibrarypath", backup_current_path)
+        config.set_setting("folder_movies", current_movies_folder)
+        config.set_setting("folder_tvshows", current_tvshows_folder)
+        xbmc_videolibrary.update_sources(backup_current_path, backup_new_path)
+        progress.update(100)
+        xbmc.sleep(1000)
+        progress.close()
+        platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(80028))
+        return
+
+    config.verify_directories_created()
+    progress.update(10, config.get_localized_string(20000), config.get_localized_string(80012))
+    if current_movies_path != new_movies_path:
+        if filetools.listdir(current_movies_path):
+            dir_util.copy_tree(current_movies_path, new_movies_path)
+            notify = True
+        filetools.rmdirtree(current_movies_path)
+    progress.update(40)
+    if current_tvshows_path != new_tvshows_path:
+        if filetools.listdir(current_tvshows_path):
+            dir_util.copy_tree(current_tvshows_path, new_tvshows_path)
+            notify = True
+        filetools.rmdirtree(current_tvshows_path)
+    progress.update(70)
+    if current_path != new_path and not filetools.listdir(current_path) and not "plugin.video.kod\\videolibrary" in current_path:
+        filetools.rmdirtree(current_path)
+
+    xbmc_videolibrary.update_sources(backup_new_path, backup_current_path)
+    if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
+        xbmc_videolibrary.update_db(backup_current_path, backup_new_path, current_movies_folder, new_movies_folder, current_tvshows_folder, new_tvshows_folder, progress)
+    else:
+        progress.update(100)
+        xbmc.sleep(1000)
+        progress.close()
+    if notify:
+        platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80014), icon=0, time=5000, sound=False)
+
+
+def delete_videolibrary(item):
+    logger.info()
+
+    if not platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(80037)):
+        return
+
+    p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80038))
+    p_dialog.update(0)
+
+    filetools.rmdirtree(videolibrarytools.MOVIES_PATH)
+    p_dialog.update(40)
+    filetools.rmdirtree(videolibrarytools.TVSHOWS_PATH)
+    p_dialog.update(80)
+    if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
+        from platformcode import xbmc_videolibrary
+        xbmc_videolibrary.clean(config.get_setting('videolibrarypath'))
+
+    p_dialog.update(90)
+    config.verify_directories_created()
+    p_dialog.update(100)
+    xbmc.sleep(1000)
+    p_dialog.close()
+    platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80039), icon=0, time=5000, sound=False)
+
+
 # metodos de menu contextual
 def update_tvshow(item):
     logger.info()
@@ -686,8 +791,8 @@ def update_tvshow(item):
     p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), heading)
     p_dialog.update(0, heading, item.contentSerieName)
 
-    import videolibrary_service
-    if videolibrary_service.update(item.path, p_dialog, 1, 1, item, False) and config.is_xbmc():
+    import service
+    if service.update(item.path, p_dialog, 1, 1, item, False) and config.is_xbmc() and config.get_setting("videolibrary_kodi"):
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.update(folder=filetools.basename(item.path))
 
@@ -696,22 +801,22 @@ def update_tvshow(item):
 
 def verify_playcount_series(item, path):
     logger.info()
-    
+
     """
     Este método revisa y repara el PlayCount de una serie que se haya desincronizado de la lista real de episodios en su carpeta.  Las entradas de episodios, temporadas o serie que falten, son creado con la marca de "no visto".  Posteriormente se envia a verificar los contadores de Temporadas y Serie
-    
+
     En el retorno envía de estado de True si se actualizado o False si no, normalmente por error.  Con este estado, el caller puede actualizar el estado de la opción "verify_playcount" en "videolibrary.py".  La intención de este método es la de dar una pasada que repare todos los errores y luego desactivarse.  Se puede volver a activar en el menú de Videoteca de Alfa.
-    
+
     """
     #logger.debug("item:\n" + item.tostring('\n'))
-    
+
     #Si no ha hecho nunca la verificación, lo forzamos
     estado = config.get_setting("verify_playcount", "videolibrary")
     if not estado or estado == False:
         estado = True                                                               #Si no ha hecho nunca la verificación, lo forzamos
     else:
         estado = False
-        
+
     if item.contentType == 'movie':                                                 #Esto es solo para Series
         return (item, False)
     if filetools.exists(path):
@@ -720,7 +825,7 @@ def verify_playcount_series(item, path):
         if not hasattr(it, 'library_playcounts') or not it.library_playcounts:      #Si el .nfo no tiene library_playcounts se lo creamos
             logger.error('** It does not have PlayCount')
             it.library_playcounts = {}
-        
+
         # Obtenemos los archivos de los episodios
         raiz, carpetas_series, ficheros = next(filetools.walk(path))
         # Crear un item en la lista para cada strm encontrado
@@ -763,35 +868,35 @@ def mark_content_as_watched2(item):
     # logger.debug("item:\n" + item.tostring('\n'))
 
     if filetools.exists(item.nfo):
-        head_nfo, it = videolibrarytools.read_nfo(item.nfo) 
-        #logger.debug(it) 
+        head_nfo, it = videolibrarytools.read_nfo(item.nfo)
+        #logger.debug(it)
         name_file = ""
         if item.contentType == 'movie' or item.contentType == 'tvshow':
             name_file = os.path.splitext(filetools.basename(item.nfo))[0]
-            
+
             if name_file != 'tvshow' :
-                it.library_playcounts.update({name_file: item.playcount}) 
+                it.library_playcounts.update({name_file: item.playcount})
 
         if item.contentType == 'episode' or item.contentType == 'tvshow' or item.contentType == 'list' or name_file == 'tvshow':
        # elif item.contentType == 'episode':
             name_file = os.path.splitext(filetools.basename(item.strm_path))[0]
             num_season = name_file [0]
-            item.__setattr__('contentType', 'episode') 
-            item.__setattr__('contentSeason', num_season) 
-            #logger.debug(name_file) 
-         
+            item.__setattr__('contentType', 'episode')
+            item.__setattr__('contentSeason', num_season)
+            #logger.debug(name_file)
+
         else:
             name_file = item.contentTitle
-           # logger.debug(name_file) 
+           # logger.debug(name_file)
 
         if not hasattr(it, 'library_playcounts'):
             it.library_playcounts = {}
-        it.library_playcounts.update({name_file: item.playcount}) 
+        it.library_playcounts.update({name_file: item.playcount})
 
         # se comprueba que si todos los episodios de una temporada están marcados, se marque tb la temporada
         if item.contentType != 'movie':
             it = check_season_playcount(it, item.contentSeason)
-            #logger.debug(it) 
+            #logger.debug(it)
 
         # Guardamos los cambios en item.nfo
         if filetools.write(item.nfo, head_nfo + it.tojson()):
@@ -920,14 +1025,9 @@ def delete(item):
         if ficheros == []:
             filetools.rmdir(_item.path)
 
-        if config.is_xbmc():
-            import xbmc
-            # esperamos 3 segundos para dar tiempo a borrar los ficheros
-            xbmc.sleep(3000)
-            # TODO mirar por qué no funciona al limpiar en la videoteca de Kodi al añadirle un path
-            # limpiamos la videoteca de Kodi
+        if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
             from platformcode import xbmc_videolibrary
-            xbmc_videolibrary.clean()
+            xbmc_videolibrary.clean(_item.extra)
 
         logger.info("All links removed")
         platformtools.itemlist_refresh()
@@ -1030,3 +1130,40 @@ def check_tvshow_playcount(item, season):
         item.library_playcounts.update({item.title: playcount})
 
     return item
+
+
+def add_download_items(item, itemlist):
+    localOnly = True
+    for i in itemlist:
+        if i.contentChannel != 'local':
+            localOnly = False
+            break
+    if not item.fromLibrary and not localOnly:
+        downloadItem = Item(channel='downloads',
+                            from_channel=item.channel,
+                            title=typo(config.get_localized_string(60355), "color kod bold"),
+                            fulltitle=item.fulltitle,
+                            show=item.fulltitle,
+                            contentType=item.contentType,
+                            contentSerieName=item.contentSerieName,
+                            url=item.url,
+                            action='save_download',
+                            from_action="findvideos",
+                            contentTitle=item.contentTitle,
+                            path=item.path,
+                            thumbnail=thumb(thumb='downloads.png'),
+                            parent=item.tourl())
+        if item.action == 'findvideos':
+            if item.contentType == 'episode':
+                downloadItem.title = typo(config.get_localized_string(60356), "color kod bold")
+            else:  # film
+                downloadItem.title = typo(config.get_localized_string(60354), "color kod bold")
+            downloadItem.downloadItemlist = [i.tourl() for i in itemlist]
+            itemlist.append(downloadItem)
+        else:
+            if item.contentSeason:  # season
+                downloadItem.title = typo(config.get_localized_string(60357), "color kod bold")
+                itemlist.append(downloadItem)
+            else:  # tvshow + not seen
+                itemlist.append(downloadItem)
+                itemlist.append(downloadItem.clone(title=typo(config.get_localized_string(60003), "color kod bold"), unseen=True))

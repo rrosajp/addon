@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-
 import sys
+
+from platformcode import config
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
@@ -23,7 +25,7 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
 
     data = get_data(page_url.replace(".org", ".me"))
-    if "File Not Found" in data: return False, "[Clicknupload] El archivo no existe o ha sido borrado"
+    if "File Not Found" in data: return False,  config.get_localized_string(70449) % "Clicknupload"
 
     return True, ""
 

@@ -152,8 +152,8 @@ def episodios(item):
         episodes.append(episode['episodes'])
     for episode in episodes:
         for key in episode:
-            if 'stagione' in key['title'].encode('utf8').lower():
-                match = support.match(key['title'].encode('utf8'), patron=r'[Ss]tagione\s*(\d+) - [Ee]pisodio\s*(\d+)').match
+            if 'stagione' in encode(key['title']).lower():
+                match = support.match(encode(key['title']), patron=r'[Ss]tagione\s*(\d+) - [Ee]pisodio\s*(\d+)').match
                 title = match[0]+'x'+match[1] + ' - ' + item.fulltitle
                 make_item = True
             elif int(key['season_id']) == int(season_id):
@@ -175,10 +175,14 @@ def episodios(item):
                         url=  host + show_id + '/season/' + str(key['season_id']) + '/',
                         action= 'findvideos',
                         video_id= key['video_id'],
+                        thumbnail= item.thumbnail,
+                        fanart = item.fanart,
+                        plot=item.plot,
                         contentType = item.contentType
                     ))
     autorenumber.renumber(itemlist, item, 'bold')
-    if autorenumber.check(item) == True:
+    if autorenumber.check(item) == True \
+        or support.match(itemlist[0].title, patron=r"(\d+x\d+)").match:
         support.videolibrary(itemlist,item)
     return itemlist
 
@@ -211,10 +215,10 @@ def make_itemlist(itemlist, item, data):
     search = item.search if item.search else ''
     infoLabels = {}
     for key in data['data']:
-        if search.lower() in key['title'].encode('utf8').lower():
+        if search.lower() in encode(key['title']).lower():
             infoLabels['year'] = key['date_published']
             infoLabels['title'] = infoLabels['tvshowtitle'] = key['title']
-            title = key['title'].encode('utf8')
+            title = encode(key['title'])
             itemlist.append(
                 Item(
                     channel = item.channel,

@@ -44,8 +44,7 @@ def get_channel_parameters(channel_name):
                 channel_parameters["adult"] = channel_parameters.get("adult", False)
                 logger.info(channel_parameters["adult"])
                 if channel_parameters["adult"]:
-                    channel_parameters["update_url"] = channel_parameters.get("update_url",
-                                                                              DEFAULT_UPDATE_URL + 'porn/')
+                    channel_parameters["update_url"] = channel_parameters.get("update_url", DEFAULT_UPDATE_URL + 'porn/')
                 else:
                     channel_parameters["update_url"] = channel_parameters.get("update_url", DEFAULT_UPDATE_URL)
                 channel_parameters["language"] = channel_parameters.get("language", ["all"])

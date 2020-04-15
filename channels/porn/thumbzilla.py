@@ -44,42 +44,42 @@ def mainlist(item):
     logger.info()
     itemlist = []
     itemlist.append(Item(channel=__channel__, action="videos", title="Más Calientes", url=host,
-                         viewmode="movie", thumbnail=get_thumb("channels_adult.png")))
+                         viewmode="movie", thumbnail=get_thumb("adult.png")))
 
     itemlist.append(Item(channel=__channel__, title="Nuevas", url=host + '/newest',
                          action="videos", viewmode="movie_with_plot", viewcontent='movies',
-                         thumbnail=get_thumb("channels_adult.png")))
+                         thumbnail=get_thumb("adult.png")))
 
     itemlist.append(Item(channel=__channel__, title="Tendencias", url=host + '/tending',
                          action="videos", viewmode="movie_with_plot", viewcontent='movies',
-                         thumbnail=get_thumb("channels_adult.png")))
+                         thumbnail=get_thumb("adult.png")))
 
     itemlist.append(Item(channel=__channel__, title="Mejores Videos", url=host + '/top',
                          action="videos", viewmode="movie_with_plot", viewcontent='movies',
-                         thumbnail=get_thumb("channels_adult.png")))
+                         thumbnail=get_thumb("adult.png")))
 
     itemlist.append(Item(channel=__channel__, title="Populares", url=host + '/popular',
                          action="videos", viewmode="movie_with_plot", viewcontent='movies',
-                         thumbnail=get_thumb("channels_adult.png")))
+                         thumbnail=get_thumb("adult.png")))
 
     itemlist.append(Item(channel=__channel__, title="Videos en HD", url=host + '/hd',
                          action="videos", viewmode="movie_with_plot", viewcontent='movies',
-                         thumbnail=get_thumb("channels_adult.png")))
+                         thumbnail=get_thumb("adult.png")))
 
     itemlist.append(Item(channel=__channel__, title="Caseros", url=host + '/hd',
                          action="videos", viewmode="movie_with_plot", viewcontent='homemade',
-                         thumbnail=get_thumb("channels_adult.png")))
+                         thumbnail=get_thumb("adult.png")))
  
     itemlist.append(Item(channel=__channel__, title="PornStar", action="catalogo",
                          url=host + '/pornstars/', viewmode="movie_with_plot", viewcontent='movies',
-                         thumbnail=get_thumb("channels_adult.png")))
+                         thumbnail=get_thumb("adult.png")))
  
     itemlist.append(Item(channel=__channel__, title="Categorías", action="categorias",
                          url=host + '/categories/', viewmode="movie_with_plot", viewcontent='movies',
-                         thumbnail=get_thumb("channels_adult.png")))
+                         thumbnail=get_thumb("adult.png")))
 
     itemlist.append(Item(channel=__channel__, title="Buscador", action="search", url=host,
-                         thumbnail=get_thumb("channels_adult.png"), extra="buscar"))
+                         thumbnail=get_thumb("adult.png"), extra="buscar"))
     return itemlist
 
 

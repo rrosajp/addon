@@ -58,7 +58,6 @@ def learning(item):
     itemlist =[]
     json = current_session.get(item.url).json()['contents']
     for key in json:
-        support.log(key['name'])
         itemlist.append(support.Item(channel = item.channel, title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'],
                                      url = key['contents'], thumbnail = item.thumbnail, action = 'peliculas', args = item.args))
     return itemlist
@@ -117,7 +116,6 @@ def replay(item):
     support.log()
     itemlist = []
     json = current_session.get(item.url).json()[item.fulltitle][0]['palinsesto'][0]['programmi']
-    # support.log(json)
     for key in json:
         support.log('KEY=',key)
         if key and key['pathID']: itemlist.append(support.Item(channel = item.channel, thumbnail = getUrl(key['images']['landscape']), fanart = getUrl(key['images']['landscape']), url = getUrl(key['pathID']),
@@ -165,13 +163,13 @@ def dirette(item):
     onAir = current_session.get(onair).json()['on_air']
     for i, key in enumerate(json):
         itemlist.append(support.Item(channel = item.channel, title = support.typo(key['channel'], 'bold'), fulltitle = key['channel'], show = key['channel'],
-                                     thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"), fanart = getUrl(onAir[i]['currentItem']['image']), url = key['video']['contentUrl'],
+                                     thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"),forcethumb=True , fanart = getUrl(onAir[i]['currentItem']['image']), url = key['video']['contentUrl'],
                                      plot = support.typo(onAir[i]['currentItem']['name'],'bold')+ '\n\n' + onAir[i]['currentItem']['description'], action = 'play'))
     return itemlist
 
 
 def peliculas(item):
-    support.log(item.url)
+    support.log()
     itemlist = []
     keys = []
     key_list = []
@@ -235,7 +233,7 @@ def select(item):
 
 
 def episodios(item):
-    support.log(len(item.url))
+    support.log()
     itemlist = []
     if type(item.url) in [list, dict] and len(item.url) > 1 and ('name' in item.url[0] and 'stagione' not in item.url[0]['name'].lower()):
         for key in item.url:

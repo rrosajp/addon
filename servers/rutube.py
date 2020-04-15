@@ -2,8 +2,10 @@
 # -*- Server Rutube -*-
 # -*- Created for Alfa-addon -*-
 # -*- By the Alfa Develop Group -*-
-
 import sys
+
+from platformcode import config
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
@@ -17,7 +19,6 @@ else:
 import re
 
 from core import httptools
-from core import scrapertools
 from platformcode import logger
 from core import jsontools
 
@@ -33,7 +34,7 @@ def test_video_exists(page_url):
     data = get_source(page_url)
 
     if "File was deleted" in data or "File Not Found" in data:
-        return False, "[Rutube] El video ha sido borrado"
+        return False,  config.get_localized_string(70449) % "Rutube"
 
     return True, ""
 

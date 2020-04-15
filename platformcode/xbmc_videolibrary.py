@@ -20,6 +20,7 @@ from core import jsontools
 from platformcode import config, logger
 from platformcode import platformtools
 from core import scrapertools
+from xml.dom import minidom
 
 
 def mark_auto_as_watched(item):
@@ -511,22 +512,7 @@ def update(folder_content=config.get_setting("folder_tvshows"), folder=""):
 
     data = get_data(payload)
 
-
-def clean(mostrar_dialogo=False):
-    """
-    limpia la libreria de elementos que no existen
-    @param mostrar_dialogo: muestra el cuadro de progreso mientras se limpia la videoteca
-    @type mostrar_dialogo: bool
-    """
-    logger.info()
-    payload = {"jsonrpc": "2.0", "method": "VideoLibrary.Clean", "id": 1,
-               "params": {"showdialogs": mostrar_dialogo}}
-    data = get_data(payload)
-
-    if data.get('result', False) == 'OK':
-        return True
-
-    return False
+    xbmc.executebuiltin('XBMC.ReloadSkin()')
 
 
 def search_library_path():
@@ -538,26 +524,26 @@ def search_library_path():
     return None
 
 
-def set_content(content_type, silent=False):
+def set_content(content_type, silent=False, custom=False):
     """
     Procedimiento para auto-configurar la videoteca de kodi con los valores por defecto
     @type content_type: str ('movie' o 'tvshow')
     @param content_type: tipo de contenido para configurar, series o peliculas
     """
+    logger.info()
     continuar = True
     msg_text = ""
     videolibrarypath = config.get_setting("videolibrarypath")
-    forced = config.get_setting('videolibrary_kodi_force')
 
     if content_type == 'movie':
         scraper = [config.get_localized_string(70093), config.get_localized_string(70096)]
-        if forced:
+        if not custom:
             seleccion = 0 # tmdb
         else:
             seleccion = platformtools.dialog_select(config.get_localized_string(70094), scraper)
 
 
-    # Instalar The Movie Database
+        # Instalar The Movie Database
         if seleccion == -1 or seleccion == 0:
             if not xbmc.getCondVisibility('System.HasAddon(metadata.themoviedb.org)'):
                 if not silent:
@@ -577,9 +563,8 @@ def set_content(content_type, silent=False):
                 continuar = (install and xbmc.getCondVisibility('System.HasAddon(metadata.themoviedb.org)'))
                 if not continuar:
                     msg_text = config.get_localized_string(60047)
-
             if continuar:
-                xbmc.executebuiltin('xbmc.addon.opensettings(metadata.themoviedb.org)', True)
+                xbmc.executebuiltin('Addon.OpenSettings(metadata.themoviedb.org)', True)
 
         # Instalar Universal Movie Scraper
         elif seleccion == 1:
@@ -603,11 +588,11 @@ def set_content(content_type, silent=False):
                 if not continuar:
                     msg_text = config.get_localized_string(70097)
             if continuar:
-                xbmc.executebuiltin('xbmc.addon.opensettings(metadata.universal)', True)
+                xbmc.executebuiltin('Addon.OpenSettings(metadata.universal)', True)
 
     else:  # SERIES
         scraper = [config.get_localized_string(70098), config.get_localized_string(70093)]
-        if forced:
+        if not custom:
             seleccion = 0 # tvdb
         else:
             seleccion = platformtools.dialog_select(config.get_localized_string(70107), scraper)
@@ -631,9 +616,9 @@ def set_content(content_type, silent=False):
 
                 continuar = (install and xbmc.getCondVisibility('System.HasAddon(metadata.tvdb.com)'))
                 if not continuar:
-                    msg_text = config.get_localized_string(70099)
+                    msg_text = config.get_localized_string(60049)
             if continuar:
-                xbmc.executebuiltin('xbmc.addon.opensettings(metadata.tvdb.com)', True)
+                xbmc.executebuiltin('Addon.OpenSettings(metadata.tvdb.com)', True)
 
         # Instalar The Movie Database
         elif seleccion == 1:
@@ -641,7 +626,7 @@ def set_content(content_type, silent=False):
                 continuar = False
                 if not silent:
                     # Preguntar si queremos instalar metadata.tvshows.themoviedb.org
-                    install = platformtools.dialog_yesno(config.get_localized_string(70100))
+                    install = platformtools.dialog_yesno(config.get_localized_string(60050))
                 else:
                     install = True
 
@@ -656,9 +641,9 @@ def set_content(content_type, silent=False):
 
                 continuar = (install and continuar)
                 if not continuar:
-                    msg_text = config.get_localized_string(60047)
+                    msg_text = config.get_localized_string(60051)
             if continuar:
-                xbmc.executebuiltin('xbmc.addon.opensettings(metadata.tvshows.themoviedb.org)', True)
+                xbmc.executebuiltin('Addon.OpenSettings(metadata.tvshows.themoviedb.org)', True)
 
     idPath = 0
     idParentPath = 0
@@ -719,6 +704,9 @@ def set_content(content_type, silent=False):
             elif seleccion == 1: 
                 strScraper = 'metadata.universal'
                 path_settings = xbmc.translatePath("special://profile/addon_data/metadata.universal/settings.xml")
+            if not os.path.exists(path_settings):
+                logger.info("%s: %s" % (content_type, path_settings + " doesn't exist"))
+                return continuar
             settings_data = filetools.read(path_settings)
             strSettings = ' '.join(settings_data.split()).replace("> <", "><")
             strSettings = strSettings.replace("\"","\'")
@@ -735,6 +723,9 @@ def set_content(content_type, silent=False):
             elif seleccion == 1: 
                 strScraper = 'metadata.tvshows.themoviedb.org'
                 path_settings = xbmc.translatePath("special://profile/addon_data/metadata.tvshows.themoviedb.org/settings.xml")
+            if not os.path.exists(path_settings):
+                logger.info("%s: %s" % (content_type, path_settings + " doesn't exist"))
+                return continuar
             settings_data = filetools.read(path_settings)
             strSettings = ' '.join(settings_data.split()).replace("> <", "><")
             strSettings = strSettings.replace("\"","\'")
@@ -777,16 +768,258 @@ def set_content(content_type, silent=False):
 
     if not continuar:
         heading = config.get_localized_string(70102) % content_type
-    elif content_type == 'SERIES' and not xbmc.getCondVisibility(
+    elif content_type == 'tvshow' and not xbmc.getCondVisibility(
             'System.HasAddon(metadata.tvshows.themoviedb.org)'):
         heading = config.get_localized_string(70103) % content_type
         msg_text = config.get_localized_string(60058)
     else:
         heading = config.get_localized_string(70103) % content_type
         msg_text = config.get_localized_string(70104)
-    platformtools.dialog_notification(heading, msg_text, icon=1, time=3000)
 
     logger.info("%s: %s" % (heading, msg_text))
+    return continuar
+
+
+def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvshows_folder, new_tvshows_folder, progress):
+    def path_replace(path, old, new):
+        if new.startswith("special://") or '://' in new: sep = '/'
+        else: sep = os.sep
+
+        path = path.replace(old,new)
+        if sep == '/': path = path.replace('\\','/')
+        else: path = path.replace('/','\\')
+
+        return path
+
+    logger.info()
+
+    sql_old_path = old_path
+    if sql_old_path.startswith("special://"):
+        sql_old_path = sql_old_path.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')
+        sep = '/'
+    elif '://' in sql_old_path:
+        sep = '/'
+    else: sep = os.sep
+    if not sql_old_path.endswith(sep):
+        sql_old_path += sep
+
+    # search MAIN path in the DB
+    sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % sql_old_path
+    nun_records, records = execute_sql_kodi(sql)
+
+    # change main path
+    if records:
+        idPath = records[0][0]
+        strPath = path_replace(records[0][1], old_path, new_path)
+        sql = 'UPDATE path SET strPath="%s" WHERE idPath=%s' % (strPath, idPath)
+        nun_records, records = execute_sql_kodi(sql)
+
+    p = 80
+    progress.update(p, config.get_localized_string(20000), config.get_localized_string(80013))
+
+    for OldFolder, NewFolder in [[old_movies_folder, new_movies_folder], [old_tvshows_folder, new_tvshows_folder]]:
+        sql_old_folder = sql_old_path + OldFolder
+        if not sql_old_folder.endswith(sep): sql_old_folder += sep
+
+        # Search Main Sub Folder
+        sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % sql_old_folder
+        nun_records, records = execute_sql_kodi(sql)
+
+        # Change Main Sub Folder
+        if records:
+            for record in records:
+                idPath = record[0]
+                strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
+                sql = 'UPDATE path SET strPath="%s" WHERE idPath=%s' % (strPath, idPath)
+                nun_records, records = execute_sql_kodi(sql)
+
+        # Search if Sub Folder exixt in all paths
+        sql_old_folder += '%'
+        sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % sql_old_folder
+        nun_records, records = execute_sql_kodi(sql)
+
+        #Change Sub Folder in all paths
+        if records:
+            for record in records:
+                idPath = record[0]
+                strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
+                sql = 'UPDATE path SET strPath="%s" WHERE idPath=%s' % (strPath, idPath)
+                nun_records, records = execute_sql_kodi(sql)
+
+
+        if OldFolder == old_movies_folder:
+            # if is Movie Folder
+            # search and modify in "movie"
+            sql = 'SELECT idMovie, c22 FROM movie where c22 LIKE "%s"' % sql_old_folder
+            nun_records, records = execute_sql_kodi(sql)
+            if records:
+                for record in records:
+                    idMovie = record[0]
+                    strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
+                    sql = 'UPDATE movie SET c22="%s" WHERE idMovie=%s' % (strPath, idMovie)
+                    nun_records, records = execute_sql_kodi(sql)
+        else:
+            # if is TV Show Folder
+            # search and modify in "episode"
+            sql = 'SELECT idEpisode, c18 FROM episode where c18 LIKE "%s"' % sql_old_folder
+            nun_records, records = execute_sql_kodi(sql)
+            if records:
+                for record in records:
+                    idEpisode = record[0]
+                    strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
+                    sql = 'UPDATE episode SET c18="%s" WHERE idEpisode=%s' % (strPath, idEpisode)
+                    nun_records, records = execute_sql_kodi(sql)
+        p += 5
+        progress.update(p, config.get_localized_string(20000), config.get_localized_string(80013))
+
+    progress.update(100)
+    xbmc.sleep(1000)
+    progress.close()
+    xbmc.executebuiltin('XBMC.ReloadSkin()')
+
+
+def clean(path=''):
+    def sql_format(path):
+        if path.startswith("special://"):
+            path = path.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')
+            sep = '/'
+        elif '://' in path:
+            sep = '/'
+        else: sep = os.sep
+
+        if sep == '/': path = path.replace('\\','/')
+        else: path = path.replace('/','\\')
+
+        return path, sep
+
+    logger.info()
+
+    idParentPath = 0
+    sql_path = ''
+    sql_movies_path = ''
+    sql_tvshows_path = ''
+    sql_episodes_path = ''
+
+    path, sep = sql_format(path)
+    movies_folder = config.get_setting("folder_movies")
+    tvshows_folder = config.get_setting("folder_tvshows")
+
+    # delete episode/movie (downloads.py move_to_libray)
+    if path.endswith(".strm"):
+        if movies_folder in path:
+            sql_movies_path = path
+        else:
+            sql_episodes_path = path
+    # delete movie
+    elif movies_folder in path:
+        if not path.endswith(sep): path += sep
+
+        sql_movies_path = path + '%'
+    # delete tvshow
+    elif tvshows_folder in path:
+        if not path.endswith(sep): path += sep
+
+        sql_tvshows_path = path + '%'
+
+        sql_episodes_path = sql_tvshows_path
+    # delete video library
+    else:
+        if not path.endswith(sep): path += sep
+
+        sql_path = path
+
+        sql_movies_path = sql_path + movies_folder
+        if not sql_movies_path.endswith(sep): sql_movies_path += sep
+        sql_movies_path += '%'
+
+        sql_tvshows_path = sql_path + tvshows_folder
+        if not sql_tvshows_path.endswith(sep): sql_tvshows_path += sep
+        sql_tvshows_path += '%'
+
+        sql_episodes_path = sql_tvshows_path
+
+    progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80025))
+    progress.update(0)
+    if sql_path:
+        # search video library path in the DB
+        sql = 'SELECT idPath FROM path where strPath LIKE "%s"' % sql_path
+        nun_records, records = execute_sql_kodi(sql)
+        # delete video library path
+        if records:
+            idPath = records[0][0]
+            idParentPath = idPath
+            if not config.get_setting("videolibrary_kodi"):
+                sql = 'DELETE from path WHERE idPath=%s' % idPath
+                nun_records, records = execute_sql_kodi(sql)
+
+    progress.update(10)
+    if sql_movies_path:
+        # search movies in the DB
+        sql = 'SELECT idMovie FROM movie where c22 LIKE "%s"' % sql_movies_path
+        nun_records, records = execute_sql_kodi(sql)
+        # delete movies
+        if records:
+            for record in records:
+                idMovie = record[0]
+                sql = 'DELETE from movie WHERE idMovie=%s' % idMovie
+                nun_records, records = execute_sql_kodi(sql)
+
+    progress.update(28)
+    if sql_movies_path:
+        # search movies path and folders in the DB
+        sql = 'SELECT idPath, idParentPath FROM path where strPath LIKE "%s"' % sql_movies_path
+        nun_records, records = execute_sql_kodi(sql)
+        # delete movies path and folders
+        if records:
+            for record in records:
+                if record[1] == idParentPath and config.get_setting("videolibrary_kodi"):
+                    continue
+                idPath = record[0]
+                sql = 'DELETE from path WHERE idPath=%s' % idPath
+                nun_records, records = execute_sql_kodi(sql)
+
+    progress.update(46)
+    if sql_tvshows_path:
+        # search TV shows in the DB
+        sql = 'SELECT idShow FROM tvshow_view where strPath LIKE "%s"' % sql_tvshows_path
+        nun_records, records = execute_sql_kodi(sql)
+        # delete TV shows
+        if records:
+            for record in records:
+                idShow = record[0]
+                sql = 'DELETE from tvshow WHERE idShow=%s' % idShow
+                nun_records, records = execute_sql_kodi(sql)
+
+    progress.update(64)
+    if sql_episodes_path:
+        # search episodes in the DB
+        sql = 'SELECT idEpisode FROM episode where c18 LIKE "%s"' % sql_episodes_path
+        nun_records, records = execute_sql_kodi(sql)
+        # delete episodes
+        if records:
+            for record in records:
+                idEpisode = record[0]
+                sql = 'DELETE from episode WHERE idEpisode=%s' % idEpisode
+                nun_records, records = execute_sql_kodi(sql)
+
+    progress.update(82)
+    if sql_tvshows_path:
+        # search TV shows path and folders in the DB
+        sql = 'SELECT idPath, idParentPath FROM path where strPath LIKE "%s"' % sql_tvshows_path
+        nun_records, records = execute_sql_kodi(sql)
+        # delete tvshows path and folders
+        if records:
+            for record in records:
+                if record[1] == idParentPath and config.get_setting("videolibrary_kodi"):
+                    continue
+                idPath = record[0]
+                sql = 'DELETE from path WHERE idPath=%s' % idPath
+                nun_records, records = execute_sql_kodi(sql)
+
+    progress.update(100)
+    xbmc.sleep(1000)
+    progress.close()
+    xbmc.executebuiltin('XBMC.ReloadSkin()')
 
 
 def execute_sql_kodi(sql):
@@ -854,101 +1087,175 @@ def execute_sql_kodi(sql):
     return nun_records, records
 
 
-def add_sources(path):
+def check_sources(new_movies_path='', new_tvshows_path=''):
+    def format_path(path):
+        if path.startswith("special://") or '://' in path: sep = '/'
+        else: sep = os.sep
+        if not path.endswith(sep): path += sep
+        return path
+
     logger.info()
-    from xml.dom import minidom
+
+    new_movies_path = format_path(new_movies_path)
+    new_tvshows_path = format_path(new_tvshows_path)
 
     SOURCES_PATH = xbmc.translatePath("special://userdata/sources.xml")
-
-    if os.path.exists(SOURCES_PATH):
+    if filetools.isfile(SOURCES_PATH):
         xmldoc = minidom.parse(SOURCES_PATH)
+
+        video_node = xmldoc.childNodes[0].getElementsByTagName("video")[0]
+        paths_node = video_node.getElementsByTagName("path")
+        list_path = [p.firstChild.data for p in paths_node]
+
+        return new_movies_path in list_path, new_tvshows_path in list_path
     else:
-        # Crear documento
         xmldoc = minidom.Document()
-        nodo_sources = xmldoc.createElement("sources")
+        source_nodes = xmldoc.createElement("sources")
 
         for type in ['programs', 'video', 'music', 'picture', 'files']:
             nodo_type = xmldoc.createElement(type)
             element_default = xmldoc.createElement("default")
             element_default.setAttribute("pathversion", "1")
             nodo_type.appendChild(element_default)
-            nodo_sources.appendChild(nodo_type)
-        xmldoc.appendChild(nodo_sources)
+            source_nodes.appendChild(nodo_type)
+        xmldoc.appendChild(source_nodes)
 
-    # Buscamos el nodo video
-    nodo_video = xmldoc.childNodes[0].getElementsByTagName("video")[0]
-
-    # Buscamos el path dentro de los nodos_path incluidos en el nodo_video
-    nodos_paths = nodo_video.getElementsByTagName("path")
-    list_path = [p.firstChild.data for p in nodos_paths]
-    logger.debug(list_path)
-    if path in list_path:
-        logger.debug("La ruta %s ya esta en sources.xml" % path)
-        return
-    logger.debug("La ruta %s NO esta en sources.xml" % path)
-
-    # Si llegamos aqui es por q el path no esta en sources.xml, asi q lo incluimos
-    nodo_source = xmldoc.createElement("source")
-
-    # Nodo <name>
-    nodo_name = xmldoc.createElement("name")
-    sep = os.sep
-    if path.startswith("special://") or scrapertools.find_single_match(path, '(^\w+:\/\/)'):
-        sep = "/"
-    name = path
-    if path.endswith(sep):
-        name = path[:-1]
-    nodo_name.appendChild(xmldoc.createTextNode(name.rsplit(sep)[-1]))
-    nodo_source.appendChild(nodo_name)
-
-    # Nodo <path>
-    nodo_path = xmldoc.createElement("path")
-    nodo_path.setAttribute("pathversion", "1")
-    nodo_path.appendChild(xmldoc.createTextNode(path))
-    nodo_source.appendChild(nodo_path)
-
-    # Nodo <allowsharing>
-    nodo_allowsharing = xmldoc.createElement("allowsharing")
-    nodo_allowsharing.appendChild(xmldoc.createTextNode('true'))
-    nodo_source.appendChild(nodo_allowsharing)
-
-    # Añadimos <source>  a <video>
-    nodo_video.appendChild(nodo_source)
-
-    # Guardamos los cambios
-    if not PY3:
-        filetools.write(SOURCES_PATH,
-                        '\n'.join([x for x in xmldoc.toprettyxml().encode("utf-8").splitlines() if x.strip()]))
-    else:
-        filetools.write(SOURCES_PATH,
-                        b'\n'.join([x for x in xmldoc.toprettyxml().encode("utf-8").splitlines() if x.strip()]),
-                        vfs=False)
+        return False, False
 
 
-def ask_set_content(flag, silent=False):
+
+def update_sources(new='', old=''):
     logger.info()
-    logger.debug("videolibrary_kodi_flag %s" % config.get_setting("videolibrary_kodi_flag"))
+    if new == old: return
+
+    SOURCES_PATH = xbmc.translatePath("special://userdata/sources.xml")
+    if filetools.isfile(SOURCES_PATH):
+        xmldoc = minidom.parse(SOURCES_PATH)
+    else:
+        xmldoc = minidom.Document()
+        source_nodes = xmldoc.createElement("sources")
+
+        for type in ['programs', 'video', 'music', 'picture', 'files']:
+            nodo_type = xmldoc.createElement(type)
+            element_default = xmldoc.createElement("default")
+            element_default.setAttribute("pathversion", "1")
+            nodo_type.appendChild(element_default)
+            source_nodes.appendChild(nodo_type)
+        xmldoc.appendChild(source_nodes)
+
+    # collect nodes
+    # nodes = xmldoc.getElementsByTagName("video")
+    video_node = xmldoc.childNodes[0].getElementsByTagName("video")[0]
+    paths_node = video_node.getElementsByTagName("path")
+
+    if old:
+        # delete old path
+        for node in paths_node:
+            if node.firstChild.data == old:
+                parent = node.parentNode
+                remove = parent.parentNode
+                remove.removeChild(parent)
+
+        # write changes
+        if sys.version_info[0] >= 3: #PY3
+            filetools.write(SOURCES_PATH, '\n'.join([x for x in xmldoc.toprettyxml().splitlines() if x.strip()]))
+        else:
+            filetools.write(SOURCES_PATH, '\n'.join([x for x in xmldoc.toprettyxml().splitlines() if x.strip()]), vfs=False)
+        logger.debug("The path %s has been removed from sources.xml" % old)
+
+    if new:
+        # create new path
+        list_path = [p.firstChild.data for p in paths_node]
+        if new in list_path:
+            logger.info("The path %s already exists in sources.xml" % new)
+            return
+        logger.info("The path %s does not exist in sources.xml" % new)
+
+        # if the path does not exist we create one
+        source_node = xmldoc.createElement("source")
+
+        # <name> Node
+        name_node = xmldoc.createElement("name")
+        sep = os.sep
+        if new.startswith("special://") or scrapertools.find_single_match(new, r'(^\w+:\/\/)'):
+            sep = "/"
+        name = new
+        if new.endswith(sep):
+            name = new[:-1]
+        name_node.appendChild(xmldoc.createTextNode(name.rsplit(sep)[-1]))
+        source_node.appendChild(name_node)
+
+        # <path> Node
+        path_node = xmldoc.createElement("path")
+        path_node.setAttribute("pathversion", "1")
+        path_node.appendChild(xmldoc.createTextNode(new))
+        source_node.appendChild(path_node)
+
+        # <allowsharing> Node
+        allowsharing_node = xmldoc.createElement("allowsharing")
+        allowsharing_node.appendChild(xmldoc.createTextNode('true'))
+        source_node.appendChild(allowsharing_node)
+
+        # Añadimos <source>  a <video>
+        video_node.appendChild(source_node)
+
+        # write changes
+        if sys.version_info[0] >= 3: #PY3
+            filetools.write(SOURCES_PATH, '\n'.join([x for x in xmldoc.toprettyxml().splitlines() if x.strip()]))
+        else:
+            filetools.write(SOURCES_PATH, '\n'.join([x for x in xmldoc.toprettyxml().splitlines() if x.strip()]), vfs=False)
+        logger.debug("The path %s has been added to sources.xml" % new)
+
+
+def ask_set_content(silent=False):
+    logger.info()
     logger.debug("videolibrary_kodi %s" % config.get_setting("videolibrary_kodi"))
 
-    def do_config():
-        logger.debug("hemos aceptado")
-        config.set_setting("videolibrary_kodi", True)
-        set_content("movie", silent=True)
-        set_content("tvshow", silent=True)
-        add_sources(config.get_setting("videolibrarypath"))
-        add_sources(config.get_setting("downloadpath"))
-
-    if not silent:
-        heading = config.get_localized_string(59971)
-        linea1 = config.get_localized_string(70105)
-        linea2 = config.get_localized_string(70106)
-        if platformtools.dialog_yesno(heading, linea1, linea2):
-            do_config()
+    def do_config(custom=False):
+        if set_content("movie", True, custom) and set_content("tvshow", True, custom):
+            platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(70104))
+            config.set_setting("videolibrary_kodi", True)
+            update()
         else:
-            # no hemos aceptado
+            platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(80024))
             config.set_setting("videolibrary_kodi", False)
 
-    else:
-        do_config()
+    # configuration during installation
+    if not silent:
+        # ask to configure Kodi video library
+        if platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(80015)):
+            # ask for custom or default settings
+            if not platformtools.dialog_yesno(config.get_localized_string(80026), config.get_localized_string(80016), "", "", config.get_localized_string(80017), config.get_localized_string(80018)):
+                # input path and folders
+                path = platformtools.dialog_browse(3, config.get_localized_string(80019), config.get_setting("videolibrarypath"))
+                movies_folder = platformtools.dialog_input(config.get_setting("folder_movies"), config.get_localized_string(80020))
+                tvshows_folder = platformtools.dialog_input(config.get_setting("folder_tvshows"), config.get_localized_string(80021))
 
-    config.set_setting("videolibrary_kodi_flag", flag)
+                if path != "" and movies_folder != "" and tvshows_folder != "":
+                    movies_path, tvshows_path = check_sources(filetools.join(path, movies_folder), filetools.join(path, tvshows_folder))
+                    # configure later
+                    if movies_path or tvshows_path:
+                        platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(80029))
+                    # set path and folders
+                    else:
+                        update_sources(path, config.get_setting("videolibrarypath"))
+                        config.set_setting("videolibrarypath", path)
+                        config.set_setting("folder_movies", movies_folder)
+                        config.set_setting("folder_tvshows", tvshows_folder)
+                        config.verify_directories_created()
+                        do_config(True)
+                # default path and folders
+                else:
+                    platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(80030))
+                    do_config(True)
+            # default settings
+            else:
+                platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(80027))
+                do_config(False)
+        # configure later
+        else:
+            platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(80022))
+    # configuration from the settings menu
+    else:
+        platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(80023))
+        do_config(True)

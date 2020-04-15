@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Ringraziamo Icarus crew
 # Canale per cinetecadibologna
 # ------------------------------------------------------------
 from core.item import Item

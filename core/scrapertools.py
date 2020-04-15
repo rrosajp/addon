@@ -120,7 +120,7 @@ def unescape(text):
                 pass
         return text  # leave as is
 
-    return re.sub("&#?\w+;", fixup, text)
+    return re.sub("&#?\w+;", str(fixup), str(text))
 
     # Convierte los codigos html "&ntilde;" y lo reemplaza por "ñ" caracter unicode utf-8
 
@@ -418,14 +418,14 @@ def get_season_and_episode(title):
     """
     filename = ""
 
-    patrons = ["(\d+)x(\d+)", "(?:s|t)(\d+)e(\d+)",
-               "(?:season|temp\w*)\s*(\d+)\s*(?:capitulo|epi\w*)\s*(\d+)"]
+    patrons = ["(\d+)\s*[x-]\s*(\d+)", "(\d+)\s*×\s*(\d+)", "(?:[Ss]|[Tt])(\d+)(?:[Ee]|Ep\.)(\d+)",
+               "(?:[Ss]tag|[Ss]eason|[Ss]tagione\w*)\s*(\d+)\s*(?:[Ee]pi|[Ee]pisode|[Ee]pisodio\w*)\s*(\d+)"]
 
     for patron in patrons:
         try:
             matches = re.compile(patron, re.I).search(title)
             if matches:
-                filename = matches.group(1) + "x" + matches.group(2).zfill(2)
+                filename =  str(int(matches.group(1))) + "x" + str(int(matches.group(2))).zfill(2)
                 break
         except:
             pass
