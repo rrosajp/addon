@@ -669,7 +669,7 @@ def download_from_url(url, item):
 
     save_server_statistics(item.server, d.speed[0], d.state != d.states.error)
 
-    if status == STATUS_CODES.completed and config.get_setting("videolibrary_kodi") and config.get_setting("library_move"):
+    if status == STATUS_CODES.completed and config.get_setting("library_move"):
         move_to_libray(item.clone(downloadFilename=file))
 
     return {"downloadUrl": d.download_url, "downloadStatus": status, "downloadSize": d.size[0],
@@ -861,7 +861,7 @@ def start_download(item):
     else:
         ret = download_from_best_server(item)
 
-    if ret["downloadStatus"] == STATUS_CODES.completed and config.get_setting("videolibrary_kodi") and config.get_setting("library_move"):
+    if ret["downloadStatus"] == STATUS_CODES.completed and config.get_setting("library_move"):
         filetools.remove(item.path)
     else:
         update_json(item.path, ret)
