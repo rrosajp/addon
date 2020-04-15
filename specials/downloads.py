@@ -29,7 +29,7 @@ kr = '0xFFDA6865'
 ky = '0xFFDAAB65'
 
 STATUS_COLORS = {0: '', 1: '', 2: kg, 3: kr, 4: kb}
-STATUS_CODES = type("StatusCode", (), {"stoped": 0, "canceled": 1, "completed": 2, "error": 3, "downloading": 4})
+STATUS_CODES = type("StatusCode", (), {"stoped": 0, "canceled": 1, "completed": 2, "error": 3, "downloading": 4 })
 DOWNLOAD_LIST_PATH = config.get_setting("downloadlistpath")
 DOWNLOAD_PATH = config.get_setting("downloadpath")
 STATS_FILE = filetools.join(config.get_data_path(), "servers.json")
@@ -348,6 +348,7 @@ def menu(item):
 
 
 def move_to_libray(item):
+    logger.info()
 
     if item.contentType == 'movie':
         FOLDER = FOLDER_MOVIES
@@ -363,6 +364,20 @@ def move_to_libray(item):
     library_path = filetools.join(move_path, *filetools.split(item.downloadFilename))
     final_path = download_path
 
+    if item.contentType == "movie" and item.infoLabels["tmdb_id"]:
+        contentTitle = item.contentTitle if item.contentTitle else item.fulltitle
+        library_item = Item(title= filetools.split(item.downloadFilename)[-1], channel="downloads", contentTitle = contentTitle,
+                            fulltitle = item.fulltitle,action="findvideos", infoLabels=item.infoLabels, url=library_path)
+        videolibrarytools.save_movie(library_item)
+
+    elif item.contentType == "episode" and item.infoLabels["tmdb_id"]:
+        contentSerieName = item.contentSerieName if item.contentSerieName else item.fulltitle
+        library_item = Item(title=filetools.split(item.downloadFilename)[-1], channel="downloads", contentSerieName = contentSerieName,
+                            fulltitle = item.fulltitle, action="findvideos", infoLabels=item.infoLabels, url=library_path)
+        tvshow = Item(channel="downloads", contentType="tvshow", contentSerieName = contentSerieName,
+                        fulltitle = item.fulltitle, infoLabels={"tmdb_id": item.infoLabels["tmdb_id"]})
+        videolibrarytools.save_tvshow(tvshow, [library_item])
+
     if not filetools.isdir(filetools.dirname(library_path)):
         filetools.mkdir(filetools.dirname(library_path))
 
@@ -376,7 +391,6 @@ def move_to_libray(item):
         if len(filetools.listdir(filetools.dirname(download_path))) == 0:
             filetools.rmdir(filetools.dirname(download_path))
 
-    logger.info('ITEM = ' + str(item))
     name = item.contentTitle if item.contentType == 'movie' else str(item.infoLabels['season']) + 'x' + str(item.infoLabels['episode']).zfill(2)
     list_item = filetools.listdir(filetools.join(config.get_videolibrary_path(), FOLDER, path_title))
 
@@ -385,7 +399,7 @@ def move_to_libray(item):
         filename = File.lower()
         name = name.lower()
 
-        if filename.startswith(name) and (filename.endswith('.strm') or filename.endswith('.json') or filename.endswith('.nfo')):
+        if filename.startswith(name) and (filename.endswith('.strm') or (filename.endswith('.json') and 'downloads' not in filename)):
             clean = True
             file_path = filetools.join(config.get_videolibrary_path(), FOLDER, path_title, File)
             logger.info('Delete File: ' + str(file_path))
@@ -396,7 +410,6 @@ def move_to_libray(item):
     if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
         from platformcode import xbmc_videolibrary
         if clean == True:
-            import xbmc
             xbmc_videolibrary.clean(file_strm_path)
         xbmc_videolibrary.update(FOLDER, path_title)
 
@@ -667,7 +680,11 @@ def download_from_server(item):
     logger.info(item.tostring())
     unsupported_servers = ["torrent"]
 
+    if item.contentChannel == 'local':
+        return {"downloadStatus": STATUS_CODES.completed}
+
     progreso = platformtools.dialog_progress_bg(config.get_localized_string(30101), config.get_localized_string(70178) % item.server)
+
     try:
         if item.contentChannel in ['community', 'videolibrary']:
             channel = __import__('specials.%s' % item.contentChannel, None, None, ['specials.%s' % item.contentChannel])
@@ -877,7 +894,6 @@ def get_episodes(item):
 
     # Tenemos las lista, ahora vamos a comprobar
     for episode in episodes:
-        # from core.support import dbg;dbg()
         # Si partiamos de un item que ya era episodio estos datos ya están bien, no hay que modificarlos
         if item.contentType != "episode":
             episode.contentAction = episode.action
@@ -951,7 +967,6 @@ def write_json(item):
 
 
 def save_download(item):
-    logger.info()
     show_disclaimer()
     if item.channel != 'downloads':
         item.from_channel = item.channel
@@ -983,6 +998,7 @@ def save_download_background(item):
             parent.downloadItemlist = item.downloadItemlist
         elif item.unseen:  # unseen episodes
             parent.downloadItemlist = [i.tourl() for i in videolibrary.get_episodes(parent) if i.action == 'findvideos' and  parent.library_playcounts[scrapertools.get_season_and_episode(i.title)] == 0]
+
         else:  # tvshow or season
             parent.downloadItemlist = [i.tourl() for i in videolibrary.get_episodes(parent) if i.action == 'findvideos']
         if parent.contentType in ["tvshow", "episode", "season"]:

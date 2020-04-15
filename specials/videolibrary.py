@@ -50,7 +50,12 @@ def list_movies(item, silent=False):
     dead_list = []
     zombie_list = []
     for raiz, subcarpetas, ficheros in filetools.walk(videolibrarytools.MOVIES_PATH):
+        local_movie = False
         for f in ficheros:
+            # from core.support import dbg;dbg()
+            if f.split('.')[-1] not in ['nfo','json','strm']:
+                local_movie = True
+
             if f.endswith(".nfo"):
                 nfo_path = filetools.join(raiz, f)
 
@@ -124,8 +129,8 @@ def list_movies(item, silent=False):
                 strm_path = new_item.strm_path.replace("\\", "/").rstrip("/")
                 if '/' in new_item.path:
                     new_item.strm_path = strm_path
-
-                if not filetools.exists(filetools.join(new_item.path, filetools.basename(strm_path))):
+                logger.info('EXIST'+ str(local_movie))
+                if not filetools.exists(filetools.join(new_item.path, filetools.basename(strm_path))) and local_movie == False:
                     # Si se ha eliminado el strm desde la bilbioteca de kodi, no mostrarlo
                     continue
 
@@ -399,7 +404,7 @@ def get_episodes(item):
 
     # Crear un item en la lista para cada strm encontrado
     for i in ficheros:
-        if i.endswith('.strm'):
+        if i.split('.')[-1] not in  ['json','nfo']: #i.endswith('.strm'):
             season_episode = scrapertools.get_season_and_episode(i)
             if not season_episode:
                 # El fichero no incluye el numero de temporada y episodio
@@ -410,7 +415,7 @@ def get_episodes(item):
                 continue
 
             # Obtener los datos del season_episode.nfo
-            nfo_path = filetools.join(raiz, i).replace('.strm', '.nfo')
+            nfo_path = filetools.join(raiz, '%sx%s.nfo' % (season, episode))#.replace('.strm', '.nfo')
             head_nfo, epi = videolibrarytools.read_nfo(nfo_path)
 
             # Fijar el titulo del capitulo si es posible
