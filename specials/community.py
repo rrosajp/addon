@@ -103,8 +103,11 @@ def show_menu(item):
                 itemlist += episodios(item, json, key)
             elif key in ['links']:
                 itemlist += findvideos(item)
+            elif key in ['search'] and 'url' in json['search']:
+                search_json = json['search']
+                itemlist += get_search_menu(item, search_json)
 
-        if 'channel_name' in json:
+        if 'channel_name' in json and not 'disable_search' in json:
             if 'search' in json and 'url' in json['search']:
                 search_json = json['search']
                 itemlist += get_search_menu(item, search_json, channel_name=json['channel_name'])
