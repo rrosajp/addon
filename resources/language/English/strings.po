@@ -80,7 +80,7 @@ msgid "Download path*"
 msgstr ""
 
 msgctxt "#30018"
-msgid "Download list path*"
+msgid "Download list path"
 msgstr ""
 
 msgctxt "#30019"
@@ -3713,7 +3713,7 @@ msgid "Add completed downloads to the video library "
 msgstr ""
 
 msgctxt "#70231"
-msgid "Move downloaded files to the video library*"
+msgid "Move downloaded files to the video library"
 msgstr ""
 
 msgctxt "#70232"
@@ -6219,8 +6219,4 @@ msgstr ""
 
 msgctxt "#80039"
 msgid "The video library has been deleted"
-msgstr ""
-
-msgctxt "#80040"
-msgid "In order to watch the downloaded files that have been moved to the video library, you have first to enable the option to add KoD contents to Kodi video library"
 msgstr ""
