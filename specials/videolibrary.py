@@ -50,14 +50,17 @@ def list_movies(item, silent=False):
     dead_list = []
     zombie_list = []
     for raiz, subcarpetas, ficheros in filetools.walk(videolibrarytools.MOVIES_PATH):
-        local_movie = False
-        for f in ficheros:
-            if f.split('.')[-1] not in ['nfo','json','strm']:
-                local_movie = True
-        for f in ficheros:
-            if f.endswith(".nfo"):
-                nfo_path = filetools.join(raiz, f)
+        for s in subcarpetas:
+            nfo_path = filetools.join(raiz, s, s + ".nfo")
+            logger.debug(nfo_path)
 
+            local_movie = False
+            for f in filetools.listdir(filetools.join(raiz, s)):
+                if f.split('.')[-1] not in ['nfo','json','strm']:
+                    local_movie = True
+                    break
+
+            if filetools.exists(nfo_path):
                 #Sincronizamos las películas vistas desde la videoteca de Kodi con la de Alfa
                 try:
                     if config.is_xbmc():                #Si es Kodi, lo hacemos
@@ -92,7 +95,7 @@ def list_movies(item, silent=False):
                         dead_item = Item(multicanal=multicanal,
                                          contentType='movie',
                                          dead=canal,
-                                         path=raiz,
+                                         path=filetools.join(raiz, s),
                                          nfo=nfo_path,
                                          library_urls=new_item.library_urls,
                                          infoLabels={'title': new_item.contentTitle})
@@ -122,8 +125,9 @@ def list_movies(item, silent=False):
 
 
                 new_item.nfo = nfo_path
-                new_item.path = raiz
+                new_item.path = filetools.join(raiz, s)
                 new_item.thumbnail = new_item.contentThumbnail
+                new_item.extra = filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_movies"), s)
                 # new_item.text_color = "blue"
                 strm_path = new_item.strm_path.replace("\\", "/").rstrip("/")
                 if '/' in new_item.path:
@@ -179,12 +183,11 @@ def list_tvshows(item):
     zombie_list = []
     # Obtenemos todos los tvshow.nfo de la videoteca de SERIES recursivamente
     for raiz, subcarpetas, ficheros in filetools.walk(videolibrarytools.TVSHOWS_PATH):
-        for f in ficheros:
+        for s in subcarpetas:
+            tvshow_path = filetools.join(raiz, s, "tvshow.nfo")
+            logger.debug(tvshow_path)
 
-            if f == "tvshow.nfo":
-                tvshow_path = filetools.join(raiz, f)
-                # logger.debug(tvshow_path)
-
+            if filetools.exists(tvshow_path):
                 #Sincronizamos los episodios vistos desde la videoteca de Kodi con la de Alfa
                 try:
                     if config.is_xbmc():                #Si es Kodi, lo hacemos
@@ -219,7 +222,7 @@ def list_tvshows(item):
                         dead_item = Item(multicanal=multicanal,
                                          contentType='tvshow',
                                          dead=canal,
-                                         path=raiz,
+                                         path=filetools.join(raiz, s),
                                          nfo=tvshow_path,
                                          library_urls=item_tvshow.library_urls,
                                          infoLabels={'title': item_tvshow.contentTitle})
@@ -251,8 +254,9 @@ def list_tvshows(item):
 
                 try:                        #A veces da errores aleatorios, por no encontrar el .nfo.  Probablemente problemas de timing
                     item_tvshow.title = item_tvshow.contentTitle
-                    item_tvshow.path = raiz
+                    item_tvshow.path = filetools.join(raiz, s)
                     item_tvshow.nfo = tvshow_path
+                    item_tvshow.extra = filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows"), s)
                     # Menu contextual: Marcar como visto/no visto
                     visto = item_tvshow.library_playcounts.get(item_tvshow.contentTitle, 0)
                     item_tvshow.infoLabels["playcount"] = visto
@@ -1023,7 +1027,7 @@ def delete(item):
 
         if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
             from platformcode import xbmc_videolibrary
-            xbmc_videolibrary.clean(_item.path)
+            xbmc_videolibrary.clean(_item.extra)
 
         logger.info("All links removed")
         platformtools.itemlist_refresh()

@@ -401,7 +401,7 @@ def move_to_libray(item):
 
         if filename.startswith(name) and (filename.endswith('.strm') or (filename.endswith('.json') and 'downloads' not in filename)):
             clean = True
-            file_path = filetools.join(config.get_videolibrary_path(), FOLDER, path_title, File)
+            file_path = filetools.join(config.get_setting("videolibrarypath"), FOLDER, path_title, File)
             logger.info('Delete File: ' + str(file_path))
             filetools.remove(file_path)
             if file_path.endswith('.strm'):
