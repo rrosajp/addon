@@ -11,16 +11,16 @@ from lib import unshortenit
 from platformcode import logger, config
 
 
-def findhost():
-    permUrl = httptools.downloadpage('https://www.cb01.uno/', follow_redirects=False).headers
-    if 'google' in permUrl['location']:
-        host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-    else:
-        host = permUrl['location']
-    return host
+# def findhost():
+#     permUrl = httptools.downloadpage('https://cb01-nuovo-indirizzo.info/', follow_redirects=False, only_headers=True).headers
+#     if 'google' in permUrl['location']:
+#         host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+#     else:
+#         host = permUrl['location']
+#     return host
 
 
-host = config.get_channel_url(findhost)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 
 list_servers = ['mixdrop', 'akstream', 'wstream', 'backin']
@@ -47,7 +47,7 @@ def mainlist(item):
               ('Ultime Aggiornate', ['/serietv/', 'peliculas', 'newest'])
               ]
     docu = [('Documentari bullet bold', ['/category/documentario/', 'peliculas']),
-            ('HD submenu', ['category/hd-alta-definizione/documentario-hd/', 'peliculas'])
+            ('HD submenu {documentari}', ['category/hd-alta-definizione/documentario-hd/', 'peliculas'])
             ]
 
     return locals()
@@ -152,7 +152,7 @@ def peliculas(item):
         action = 'findvideos'
     else:
         # debug = True
-        patron = r'div class="card-image">.*?<img src="(?P<thumb>[^ ]+)" alt.*?<a href="(?P<url>[^ >]+)">(?P<title>.*?)(?P<lang>(?:[Ss][Uu][Bb]-)?[Ii][Tt][Aa])?<\/a>.*?(?:<strong><span style="[^"]+">(?P<genre>[^<>0-9(]+)\((?P<year>[0-9]{4}).*?</(?:p|div)>(?P<plot>.*?))?</div'
+        patron = r'div class="card-image">.*?<img src="(?P<thumb>[^ ]+)" alt.*?<a href="(?P<url>[^ >]+)">(?P<title>.*?)(?: &#8211; (?:[SS]tagione \d|\d).*?)?(?P<lang>(?:[Ss][Uu][Bb]-)?[Ii][Tt][Aa])?<\/a>.*?(?:<strong><span style="[^"]+">(?P<genre>[^<>0-9(]+)\((?P<year>[0-9]{4}).*?</(?:p|div)>(?P<plot>.*?))?</div'
         action = 'episodios'
         item.contentType = 'tvshow'
 
