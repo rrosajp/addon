@@ -62,36 +62,6 @@ def menu(item):
     return locals()
 
 
-# @support.scrape
-# def newest(categoria):
-#
-#     # debug = True
-#     patron = r'<a href="?(?P<url>[^">]+)"?>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N|SUB-ITA)\])?\s*(?:\[(?P<quality>HD|SD|HD/3D)\])?\s*\((?P<year>[0-9]{4})\)<\/a>'
-
-#     if type(categoria) != Item:
-#         item = Item()
-#     else:
-#         item = categoria
-#         categoria = 'series' if item.contentType != 'movie' else 'movie'
-#     pagination = 20
-
-#     if categoria == 'series':
-#         item.contentType = 'tvshow'
-#         action = 'episodios'
-#         item.url = host + 'serietv/aggiornamento-quotidiano-serie-tv/'
-#         patronBlock = r'<article class="sequex-post-content">(?P<block>.*?)</article>'
-#         patron = '<a href="(?P<url>[^"]+)".*?>(?P<title>[^<([|]+).*?(?P<lang>ITA|SUB-ITA)?</a'
-#     else:
-#         item.contentType = 'movie'
-#         item.url = host + '/lista-film-ultimi-100-film-aggiunti/'
-#         patronBlock = r'Ultimi 100 film aggiunti:(?P<block>.*?)<\/td>'
-#     # else:
-#     #     patronBlock = r'Ultimi 100 film Aggiornati:(?P<block>.*?)<\/td>'
-#     #     item = categoria
-
-#     return locals()
-
-
 def newest(categoria):
     support.log(categoria)
 
@@ -135,7 +105,7 @@ def peliculas(item):
                  'Aggiornamento Quotidiano Serie TV', 'OSCAR 2019 ▶ CB01.UNO: Vota il tuo film preferito! 🎬',
                  'Openload: la situazione. Benvenuto Verystream', 'Openload: lo volete ancora?',
                  'OSCAR 2020 &#x25b6; VOTA IL TUO FILM PREFERITO! &#x1f3ac;']
-    # debug = True
+
     if 'newest' in item.args:
         if '/serietv/' not in item.url:
             pagination = ''
@@ -146,19 +116,16 @@ def peliculas(item):
             patronBlock = r'Ultime SerieTv aggiornate(?P<block>.*?)Lista'
             patron = r'src="(?P<thumb>[^"]+)" alt="(?P<title>.*?)(?: &#8211; \d+&#215;\d+)?(?:"| &#8211; )(?:(?P<lang>Sub-ITA|ITA))?[^>]*>[^>]+>[^>]+><a href="(?P<url>[^"]+)".*?<div class="rpwe-summary">.*?\((?P<year>\d{4})[^\)]*\) (?P<plot>[^<]+)<'
             action = 'episodios'
+
     elif '/serietv/' not in item.url:
         patron = r'<div class="card-image">\s<a[^>]+>\s*<img src="(?P<thumb>[^" ]+)" alt[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+><a href="?(?P<url>[^" >]+)(?:\/|"|\s+)>(?P<title>[^<[(]+)(?:\[(?P<quality>[A-Za-z0-9/-]+)])? (?:\((?P<year>[0-9]{4})\))?[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<genre>[^<>&Ã¢ÂÂ]+)(?:[^ ]+\s*DURATA\s*(?P<duration>[0-9]+)[^>]+>[^>]+>[^>]+>(?P<plot>[^<>]+))?'
-        # patron = r'<div class="?card-image"?>.*?<img src="?(?P<thumb>[^" ]+)"? alt.*?<a href="?(?P<url>[^" >]+)(?:\/|"|\s+)>(?P<title>[^<[(]+)(?:\[(?P<quality>[A-Za-z0-9/-]+)])? (?:\((?P<year>[0-9]{4})\))?.*?<strong>(?P<genre>[^<>&–]+).*?DURATA (?P<duration>[0-9]+).*?<br(?: /)?>(?P<plot>[^<>]+)'
         action = 'findvideos'
+
     else:
-        # debug = True
-        patron = r'div class="card-image">.*?<img src="(?P<thumb>[^ ]+)" alt.*?<a href="(?P<url>[^ >]+)">(?P<title>.*?)(?: &#8211; (?:[SS]tagione \d|\d).*?)?(?P<lang>(?:[Ss][Uu][Bb]-)?[Ii][Tt][Aa])?<\/a>.*?(?:<strong><span style="[^"]+">(?P<genre>[^<>0-9(]+)\((?P<year>[0-9]{4}).*?</(?:p|div)>(?P<plot>.*?))?</div'
+        patron = r'div class="card-image">.*?<img src="(?P<thumb>[^ ]+)" alt.*?<a href="(?P<url>[^ >]+)">(?P<title>.*?)(?: &#8211;\s*(?:[SS]tagione \d|\d).*?)?(?P<lang>(?:[Ss][Uu][Bb]-)?[Ii][Tt][Aa])?<\/a>.*?(?:<strong><span style="[^"]+">(?P<genre>[^<>0-9(]+)\((?P<year>[0-9]{4}).*?</(?:p|div)>(?P<plot>.*?))?</div'
         action = 'episodios'
         item.contentType = 'tvshow'
 
-    # patronBlock=[r'<div class="?sequex-page-left"?>(?P<block>.*?)<aside class="?sequex-page-right"?>',
-    #                                           '<div class="?card-image"?>.*?(?=<div class="?card-image"?>|<div class="?rating"?>)']
-    # if 'newest' not in item.args: 
     patronNext = '<a class="?page-link"? href="?([^>]+)"?><i class="fa fa-angle-right">'
 
     return locals()
@@ -167,7 +134,6 @@ def peliculas(item):
 @support.scrape
 def episodios(item):
     patronBlock = r'(?P<block><div class="sp-head[a-z ]*?" title="Espandi">\s*(?:STAGION[EI]\s*(?:DA\s*[0-9]+\s*A)?\s*[0-9]+|MINISERIE) - (?P<lang>[^-<]+)(?:- (?P<quality>[^-<]+))?.*?[^<>]*?<\/div>.*?)<div class="spdiv">\[riduci\]<\/div>'
-    # patron = '(?:<p>|<strong>)(?P<episode>[0-9]+(?:&#215;|×)[0-9]+)\s*(?P<title2>[^&<]*)?(?:&#8211;|-)?\s*(?P<url>.*?)(?:<\/p>|<br)'
     patron = r'(?:/>|<p>|<strong>)(?P<url>.*?(?P<episode>[0-9]+(?:&#215;|ÃÂ)[0-9]+)\s*(?P<title2>.*?)?(?:\s*&#8211;|\s*-|\s*<).*?)(?:<\/p>|<br)'
     def itemlistHook(itemlist):
         title_dict = {}
@@ -254,15 +220,15 @@ def findvid_serie(item):
         matches = support.match(html, patron=r'<a href="([^"]+)"[^=]+="_blank"[^>]+>(?!<!--)(.*?)(?:</a>|<img)').matches
         for url, server in matches:
             item = Item(channel=item.channel,
-                     action="play",
-                     title=server,
-                     url=url,
-                     server=server,
-                     fulltitle=item.fulltitle,
-                     show=item.show,
-                     quality=blktxt,
-                     contentType=item.contentType,
-                     folder=False)
+                        action="play",
+                        title=server,
+                        url=url,
+                        server=server,
+                        fulltitle=item.fulltitle,
+                        show=item.show,
+                        quality=blktxt,
+                        contentType=item.contentType,
+                        folder=False)
             if 'swzz' in item.url: item.url = support.swzz_get_url(item)
             itemlist.append(item)
 
