@@ -1,0 +1,67 @@
+{
+    "all":{
+        "List": 50,
+        "Large List": 52,
+        "Low List": 54,
+        "Banner List": 56,
+        "Panel": 51,
+        "Big Panel": 55,
+        "Icons": 53,
+        "Poster Showcase": 59,
+        "Card List": 5050
+    },
+    "movie":{
+        "List": 50,
+        "Large List": 52,
+        "Low List": 54,
+        "Banner List": 56,
+        "Panel": 51,
+        "Big Panel": 55,
+        "Icons": 53,
+        "Poster Showcase": 59,
+        "Card List": 5050
+    },
+    "tvshow":{
+        "List": 50,
+        "Large List": 52,
+        "Low List": 54,
+        "Banner List": 56,
+        "Panel": 51,
+        "Big Panel": 55,
+        "Icons": 53,
+        "Poster Showcase": 59,
+        "Card List": 5050
+    },
+    "season":{
+        "List": 50,
+        "Large List": 52,
+        "Low List": 54,
+        "Banner List": 56,
+        "Panel": 51,
+        "Big Panel": 55,
+        "Icons": 53,
+        "Poster Showcase": 59,
+        "Card List": 5050
+    },
+    "episode":{
+        "List": 50,
+        "Large List": 52,
+        "Low List": 54,
+        "Banner List": 56,
+        "Panel": 51,
+        "Big Panel": 55,
+        "Icons": 53,
+        "Poster Showcase": 59,
+        "Card List": 5050
+    },
+    "addon":{
+        "List": 50,
+        "Large List": 52,
+        "Low List": 54,
+        "Panel": 51,
+        "Big Panel": 55,
+        "Icons": 53,
+        "Fanart": 58,
+        "Card List": 5050
+    }
+}
