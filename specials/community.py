@@ -9,6 +9,7 @@ from core.item import Item
 from platformcode import config, platformtools
 from specials import autoplay
 from channelselector import get_thumb
+from collections import OrderedDict
 
 info_language = ["de", "en", "es", "fr", "it", "pt"] # from videolibrary.json
 try: lang = info_language[config.get_setting("info_language", "videolibrary")]
@@ -588,7 +589,6 @@ def filter_thread(filter, key, item, description):
 # for load json from item or url
 def load_json(item):
     support.log()
-    from collections import OrderedDict
 
     url = item.url if type(item) == Item else item
     try:
