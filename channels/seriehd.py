@@ -136,6 +136,7 @@ def menu(item):
 
 
 def findvideos(item):
+    item.url = item.url.replace('&amp;', '&')
     support.log(item)
     if item.args == 'last':
         url = support.match(item, patron = r'<iframe id="iframeVid" width="[^"]+" height="[^"]+" src="([^"]+)" allowfullscreen').match
