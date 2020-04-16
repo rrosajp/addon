@@ -257,13 +257,13 @@ def set_view_mode(item, parent_item):
 
     elif (item.contentType in ['tvshow'] and parent_item.action in ['peliculas']) \
          or (item.channel in ['videolibrary'] and parent_item.action in ['list_tvshows']):
-         mode('tvshow', 'tvshow')
+         mode('tvshow', 'tvshows')
 
     elif parent_item.action in ['get_seasons']:
-        mode('season', 'tvshow')
+        mode('season', 'tvshows')
 
     elif parent_item.action in ['episodios', 'get_episodes']:
-        mode('episode', 'tvshow')
+        mode('episode', 'tvshows')
 
     elif parent_item.action == 'findvideos':
         mode('server', 'addons')
