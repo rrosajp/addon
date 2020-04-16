@@ -179,7 +179,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
     matches = scrapertools.find_multiple_matches_groups(block, patron)
     log('MATCHES =', matches)
 
-    known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang', 'other']
+    known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang', 'other', 'size', 'seed']
     # Legenda known_keys per i groups nei patron
     # known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality',
     #                'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
@@ -246,6 +246,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         longtitle = title + (s if title and title2 else '') + title2
         longtitle = typo(longtitle, 'bold')
         longtitle += typo(quality, '_ [] color kod') if quality else ''
+        longtitle += typo(scraped['size'], '_ [] color kod') if scraped['size'] else ''
+        longtitle += typo(scraped['seed']+ ' SEEDS', '_ [] color kod') if scraped['seed'] else ''
 
         lang1, longtitle = scrapeLang(scraped, lang, longtitle)
 
