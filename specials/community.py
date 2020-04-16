@@ -16,13 +16,13 @@ except: lang = 'it'
 
 defpage = ["", "20", "40", "60", "80", "100"]
 defp = defpage[config.get_setting('pagination','community')]
+disable_pagination = False
 show_seasons = config.get_setting('show_seasons','community')
 
 list_servers = ['directo', 'akstream', 'wstream', 'backin', 'cloudvideo', 'clipwatching', 'fembed', 'gounlimited', 'mega', 'mixdrop']
 list_quality = ['SD', '720', '1080', '4k']
 
 tmdb_api = 'a1ab8b8669da03637a4b98fa39c39228'
-
 
 def mainlist(item):
     support.log()
@@ -89,6 +89,9 @@ def show_menu(item):
             json = item.url
         else:
             json = load_json(item)
+        if 'disable_pagination' in json:
+            item.disable_pagination = True
+        # support.dbg()
         for key in json:
             if key == 'menu':
                 get_menu(item, json, key, itemlist)
@@ -104,13 +107,15 @@ def show_menu(item):
                 search_json = json['search']
                 itemlist += get_search_menu(item, search_json)
 
+
+
         if 'channel_name' in json and not 'disable_search' in json:
             if 'search' in json and 'url' in json['search']:
                 search_json = json['search']
                 itemlist += get_search_menu(item, search_json, channel_name=json['channel_name'])
             else:
                 itemlist += get_search_menu(item, json, channel_name=json['channel_name'])
-
+    support.log('PAGINATION:', disable_pagination)
     return itemlist
 
 
@@ -160,7 +165,7 @@ def global_search(item, text):
 
 def peliculas(item, json='', key='', itemlist=[]):
     item.plot = item.thumb = item.fanart =''
-    support.log()
+    support.log('PAGINATION:', item.disable_pagination)
     if not json:
         key = item.key
         json = load_json(item)[key]
@@ -172,7 +177,7 @@ def peliculas(item, json='', key='', itemlist=[]):
     itlist = filterkey = []
     action = 'findvideos'
 
-    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'search'] and not item.filterkey:
+    if inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'search'] and not item.filterkey and not item.disable_pagination:
         Pagination = int(defp) if defp.isdigit() else ''
     else: Pagination = ''
     pag = item.page if item.page else 1
@@ -258,7 +263,7 @@ def get_seasons(item):
         for item in itemlist:
             itlist = episodios(item)
         itemlist = itlist
-        if inspect.stack()[2][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest'] and defpage:
+        if inspect.stack()[2][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest'] and defp and not itemdisable_pagination:
             itemlist = pagination(item, itemlist)
     return itemlist
 
@@ -350,7 +355,7 @@ def episodios(item, json ='', key='', itemlist =[]):
                                     filterseason=str(season),
                                     path=item.path))
 
-        elif defpage and inspect.stack()[1][3] not in ['get_seasons']:
+        elif defp and inspect.stack()[1][3] not in ['get_seasons'] and not item.disable_pagination:
             if Pagination and len(itemlist) >= Pagination:
                 if inspect.stack()[1][3] != 'get_newest':
                     item.title = support.typo(config.get_localized_string(30992), 'color kod bold')
@@ -583,6 +588,7 @@ def filter_thread(filter, key, item, description):
 # for load json from item or url
 def load_json(item):
     support.log()
+    from collections import OrderedDict
 
     url = item.url if type(item) == Item else item
     try:
@@ -591,7 +597,7 @@ def load_json(item):
         else:
             json_file = open(url, "r").read()
 
-        json = jsontools.load(json_file)
+        json = jsontools.load(json_file, object_pairs_hook=OrderedDict)
 
     except:
         json = {}
