@@ -2,10 +2,11 @@
 # --------------------------------------------------------
 # Conector Idtbox By Alfa development Group
 # --------------------------------------------------------
-
 import re
-from core import httptools, scrapertools
-from platformcode import logger, platformtools
+
+from core import httptools
+from platformcode import config
+from platformcode import logger
 
 data = ""
 def test_video_exists(page_url):
@@ -14,7 +15,7 @@ def test_video_exists(page_url):
     data = httptools.downloadpage(page_url)
 
     if not data.sucess or "Not Found" in data.data or "File was deleted" in data.data or "is no longer available" in data.data:
-        return False, "[Idtbox] El archivo no existe o  ha sido borrado"
+        return False,  config.get_localized_string(70449) % "Idtbox"
     
     data = data.data
     return True, ""

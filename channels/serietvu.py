@@ -108,39 +108,28 @@ def newest(categoria):
 
 
 def findvideos(item):
-    log()
+    log(item)
     if item.args != 'update':
-        data = item.url
-        toUnshorten = scrapertools.find_multiple_matches(data, 'https?://buckler.link/[a-zA-Z0-9]+')
-        for link in toUnshorten:
-            data += '\n' + httptools.downloadpage(link, follow_redirects=False).headers["Location"]
-        return support.server(item, data=data)
+        return support.server(item, data=item.url)
     else:
         itemlist = []
         item.infoLabels['mediatype'] = 'episode'
 
-        data = httptools.downloadpage(item.url, headers=headers).data
-        data = re.sub('\n|\t', ' ', data)
-        data = re.sub(r'>\s+<', '> <', data)
-        url_video = scrapertools.find_single_match(data, r'<div class="item"> <a data-id="[^"]+" data-href="([^"]+)" data-original="[^"]+"[^>]+> <div> <div class="title">Episodio \d+', -1)
-        url_serie = scrapertools.find_single_match(data, r'<link rel="canonical" href="([^"]+)"\s?/>')
-        goseries = support.typo(">> Vai alla Serie:", ' bold')
-        series = support.typo(item.contentSerieName, ' bold color kod')
+        data = support.match(item).data
+        urls_video = support.match(data, patron=r'<a data-id="[^"]+" data-(href=".*?)</iframe>').matches[-1]
+        url_serie = support.match(data, patron=r'<link rel="canonical" href="([^"]+)"\s?/>').match
 
-        itemlist = support.server(item, data=url_video)
+        itemlist = support.server(item, data=urls_video)
 
         itemlist.append(
             Item(channel=item.channel,
-                 title=goseries + series,
+                 title=support.typo("Vai alla Serie Completa: " + item.fulltitle, ' bold'),
                  fulltitle=item.fulltitle,
                  show=item.show,
                  contentType='tvshow',
-                 contentSerieName=item.contentSerieName,
                  url=url_serie,
                  action='episodios',
-                 contentTitle=item.contentSerieName,
-                 plot = goseries + series + "con tutte le puntate",
-                 thumbnail = support.thumb(thumb='channels_tvshow.png')
+                 thumbnail = support.thumb(thumb='tvshow.png')
                 ))
 
         return itemlist

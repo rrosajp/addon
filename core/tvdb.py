@@ -25,11 +25,9 @@ from platformcode import platformtools
 HOST = "https://api.thetvdb.com"
 HOST_IMAGE = "http://thetvdb.com/banners/"
 
-import xbmcaddon
-addon = xbmcaddon.Addon('metadata.tvdb.com')
-
 TOKEN = config.get_setting("tvdb_token", default="")
-DEFAULT_LANG = addon.getSetting('language')
+info_language = ["de", "en", "es", "fr", "it", "pt"] # from videolibrary.json
+DEFAULT_LANG = info_language[config.get_setting("info_language", "videolibrary")]
 DEFAULT_HEADERS = {
     'Content-Type': 'application/json',
     'Accept': 'application/json, application/vnd.thetvdb.v2.1.1',

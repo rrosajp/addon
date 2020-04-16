@@ -4,9 +4,9 @@
 # Conector para videobin
 # https://github.com/alfa-addon
 # ------------------------------------------------------------
-
 from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
 
 
@@ -14,7 +14,7 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url).data
     if "borrado" in data or "Deleted" in data:
-        return False, "[videobin] El fichero ha sido borrado"
+        return False,  config.get_localized_string(70449) % "videobin"
 
     return True, ""
 

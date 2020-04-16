@@ -17,13 +17,7 @@ else:
 
 import os
 import sys
-import time
 
-from core import channeltools
-from core import scrapertools
-from core import servertools
-from core import videolibrarytools
-from core import trakt_tools
 from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
@@ -47,14 +41,23 @@ def start():
     from specials.checkhost import test_conn
     import threading
     threading.Thread(target=test_conn, args=(True, not config.get_setting('resolver_dns'), True, [], [], True)).start()
-    
+
+    if not config.dev_mode():
+        from platformcode import updater
+        updater.showSavedChangelog()
+
 def run(item=None):
     logger.info()
     if not item:
         # Extract item from sys.argv
         if sys.argv[2]:
-            item = Item().fromurl(sys.argv[2])
-
+            sp = sys.argv[2].split('&')
+            url = sp[0]
+            item = Item().fromurl(url)
+            if len(sp) > 1:
+                for e in sp[1:]:
+                    key, val = e.split('=')
+                    item.__setattr__(key, val)
         # If no item, this is mainlist
         else:
             if config.get_setting("start_page"):
@@ -84,7 +87,7 @@ def run(item=None):
                 item = Item(channel="channelselector", action="getmainlist", viewmode="movie")
         if not config.get_setting('show_once'):
             from platformcode import xbmc_videolibrary
-            xbmc_videolibrary.ask_set_content(1, config.get_setting('videolibrary_kodi_force'))
+            xbmc_videolibrary.ask_set_content(silent=False)
             config.set_setting('show_once', True)
 
     logger.info(item.tostring())
@@ -162,6 +165,7 @@ def run(item=None):
         else:
             # Entry point for a channel is the "mainlist" action, so here we check parental control
             if item.action == "mainlist":
+                from core import channeltools
                 #updater.checkforupdates() beta version checking for update, still disabled
 
                 # Parental control
@@ -207,6 +211,7 @@ def run(item=None):
             if item.action == "play":
                 #define la info para trakt
                 try:
+                    from core import trakt_tools
                     trakt_tools.set_trakt_info(item)
                 except:
                     pass
@@ -241,6 +246,7 @@ def run(item=None):
 
             # Special action for findvideos, where the plugin looks for known urls
             elif item.action == "findvideos":
+                from core import servertools
 
                 # First checks if channel has a "findvideos" function
                 if hasattr(channel, 'findvideos'):
@@ -263,10 +269,12 @@ def run(item=None):
 
             # Special action for adding a movie to the library
             elif item.action == "add_pelicula_to_library":
+                from core import videolibrarytools
                 videolibrarytools.add_movie(item)
 
             # Special action for adding a serie to the library
             elif item.action == "add_serie_to_library":
+                from core import videolibrarytools
                 videolibrarytools.add_tvshow(item, channel)
 
             # Special action for downloading all episodes from a serie
@@ -279,6 +287,7 @@ def run(item=None):
             # Special action for searching, first asks for the words then call the "search" function
             elif item.action == "search":
                 logger.info("item.action=%s" % item.action.upper())
+                from core import channeltools
 
                 # last_search = ""
                 # last_search_active = config.get_setting("last_search", "search")
@@ -315,6 +324,7 @@ def run(item=None):
                 logger.info("Executing channel '%s' method" % item.action)
                 itemlist = getattr(channel, item.action)(item)
                 if config.get_setting('trakt_sync'):
+                    from core import trakt_tools
                     token_auth = config.get_setting("token_trakt", "trakt")
                     if not token_auth:
                         trakt_tools.auth_trakt()
@@ -346,6 +356,8 @@ def run(item=None):
             platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(30051) % e.code)
     except WebErrorException as e:
         import traceback
+        from core import scrapertools
+
         logger.error(traceback.format_exc())
 
         patron = 'File "' + os.path.join(config.get_runtime_path(), "channels", "").replace("\\", "\\\\") + '([^.]+)\.py"'
@@ -356,6 +368,8 @@ def run(item=None):
             config.get_localized_string(60013) %(e))
     except:
         import traceback
+        from core import scrapertools
+
         logger.error(traceback.format_exc())
 
         patron = 'File "' + os.path.join(config.get_runtime_path(), "channels", "").replace("\\", "\\\\") + '([^.]+)\.py"'
@@ -467,6 +481,7 @@ def play_from_library(item):
         @type item: item
         @param item: elemento con información
     """
+    item.fromLibrary = True
     logger.info()
     # logger.debug("item: \n" + item.tostring('\n'))
 
@@ -503,7 +518,7 @@ def play_from_library(item):
         item.show_server = True
 
         from specials import videolibrary, autoplay
-        p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(70004))
+        p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(60683))
         p_dialog.update(0, '')
 
         itemlist = videolibrary.findvideos(item)

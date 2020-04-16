@@ -51,10 +51,10 @@ def download_and_play(url, file_name, download_path):
 
         while not cancelled and download_thread.isAlive():
             dialog.update(download_thread.get_progress(), config.get_localized_string(60313),
-                          "Velocidad: " + str(int(old_div(download_thread.get_speed(), 1024))) + " KB/s " + str(
-                              download_thread.get_actual_size()) + "MB de " + str(
+                          config.get_localized_string(60314) + str(int(old_div(download_thread.get_speed(), 1024))) + " KB/s " + str(
+                              download_thread.get_actual_size()) + config.get_localized_string(60316) + str(
                               download_thread.get_total_size()) + "MB",
-                          "Tiempo restante: " + str(downloadtools.sec_to_hms(download_thread.get_remaining_time())))
+                          config.get_localized_string(60202) % (str(downloadtools.sec_to_hms(download_thread.get_remaining_time()))))
             xbmc.sleep(1000)
 
             if dialog.iscanceled():
@@ -296,7 +296,7 @@ class DownloadThread(threading.Thread):
                     logger.info("Detectado fichero force_stop, se interrumpe la descarga")
                     f.close()
 
-                    xbmc.executebuiltin((u'XBMC.Notification("Cancelado", "Descarga en segundo plano cancelada", 300)'))
+                    xbmc.executebuiltin("XBMC.Notification(%s,%s,300)" % (config.get_localized_string(60319),config.get_localized_string(60320)))
 
                     return
 

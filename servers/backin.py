@@ -12,7 +12,7 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
 
     if 'http://' in page_url:  # fastids
-        page_url = httptools.downloadpage(page_url, follow_redirects=False).headers['location']
+        page_url = httptools.downloadpage(page_url, follow_redirects=False, only_headers=True).headers['location']
         page_url = scrapertools.find_single_match(page_url, 'backin.net/([a-zA-Z0-9]+)')
     global data
     data = httptools.downloadpage("http://backin.net/stream-%s-500x400.html" % page_url).data

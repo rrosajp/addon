@@ -22,8 +22,8 @@ else:
     menu_node = {'categoria actual':config.get_setting('category')}
     jsontools.update_node(menu_node, 'menu_settings_data.json', "menu")
 
-addon = xbmcaddon.Addon('metadata.themoviedb.org')
-def_lang = addon.getSetting('language')
+info_language = ["de", "en", "es", "fr", "it", "pt"] # from videolibrary.json
+def_lang = info_language[config.get_setting("info_language", "videolibrary")]
 
 ACTION_SHOW_FULLSCREEN = 36
 ACTION_GESTURE_SWIPE_LEFT = 511

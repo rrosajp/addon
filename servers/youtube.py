@@ -215,7 +215,7 @@ def extract_videos(video_id):
                         url = re.search('url=(.*)', opt["cipher"]).group(1)
                         s = cipher.get('s')
                         url = "%s&sig=%s" % (urllib.unquote(url), signature([s]))
-                        video_urls.append(["%s" % itag_list.get(opt["itag"], "video"), url])
+                        video_urls.append(["%s" % itag_list.get(opt["itag"], "audio"), url])
                     elif opt["itag"] in itag_list:
                         video_urls.append(["%s" % itag_list.get(opt["itag"], "video"), opt["url"]])
 

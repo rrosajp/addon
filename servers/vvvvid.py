@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import re
+
+import requests
+
 from core import httptools
 from lib import vvvvid_decoder
 from platformcode import logger
-import requests
-import re
 
 # Creating persistent session
 current_session = requests.Session()

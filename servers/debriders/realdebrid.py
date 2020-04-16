@@ -14,7 +14,6 @@ else:
 import time
 
 from core import httptools
-from core import scrapertools
 from platformcode import config, logger
 from platformcode import platformtools
 

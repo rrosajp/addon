@@ -19,6 +19,9 @@ metodos:
 """
 from __future__ import division
 from future import standard_library
+
+from core.item import Item
+
 standard_library.install_aliases()
 from builtins import range
 from builtins import object
@@ -102,22 +105,24 @@ class Downloader(object):
     # Funciones
     def start_dialog(self, title=config.get_localized_string(60200)):
         from platformcode import platformtools
-        progreso = platformtools.dialog_progress(title, config.get_localized_string(60201))
-        self.start()
-        while self.state == self.states.downloading and not progreso.iscanceled():
-            time.sleep(0.1)
-            line1 = "%s" % (self.filename)
-            line2 = config.get_localized_string(59983) % (
-                self.progress, self.downloaded[1], self.downloaded[2], self.size[1], self.size[2],
-                self.speed[1], self.speed[2], self.connections[0], self.connections[1])
-            line3 = config.get_localized_string(60202) % (self.remaining_time)
+        progreso = platformtools.dialog_progress_bg(title, config.get_localized_string(60201))
+        try:
+            self.start()
+            while self.state == self.states.downloading:
+                time.sleep(0.2)
+                line1 = "%s" % (self.filename)
+                line2 = config.get_localized_string(59983) % (
+                    self.downloaded[1], self.downloaded[2], self.size[1], self.size[2],
+                    self.speed[1], self.speed[2], self.connections[0], self.connections[1])
+                line3 = config.get_localized_string(60202) % (self.remaining_time)
 
-            progreso.update(int(self.progress), line1, line2, line3)
-        if self.state == self.states.downloading:
-            self.stop()
-        progreso.close()
+                progreso.update(int(self.progress), line1, line2 + " " + line3)
+                self.__update_json()
+        finally:
+            progreso.close()
 
     def start(self):
+        self.__update_json(started=False)
         if self._state == self.states.error: return
         conns = []
         for x in range(self._max_connections):
@@ -190,7 +195,7 @@ class Downloader(object):
 
     # Funciones internas
     def __init__(self, url, path, filename=None, headers=[], resume=True, max_connections=10, block_size=2 ** 17,
-                 part_size=2 ** 24, max_buffer=10):
+                 part_size=2 ** 24, max_buffer=10, json_path=None):
         # Parametros
         self._resume = resume
         self._path = path
@@ -199,6 +204,9 @@ class Downloader(object):
         self._block_size = block_size
         self._part_size = part_size
         self._max_buffer = max_buffer
+        self._json_path = json_path
+        self._json_text = ''
+        self._json_item = Item()
 
         try:
             import xbmc
@@ -258,7 +266,7 @@ class Downloader(object):
         self.__get_download_info__()
 
         try:
-            logger.info("Descarga inicializada: Partes: %s | Ruta: %s | Archivo: %s | Tamaño: %s" % \
+            logger.info("Download started: Parts: %s | Path: %s | File: %s | Size: %s" % \
                     (str(len(self._download_info["parts"])), self._pathencode('utf-8'), \
                     self._filenameencode('utf-8'), str(self._download_info["size"])))
         except:
@@ -579,3 +587,20 @@ class Downloader(object):
 
             self.__set_part_stopped__(id)
         logger.info("Thread stopped: %s" % threading.current_thread().name)
+
+    def __update_json(self, started=True):
+        text = filetools.read(self._json_path)
+        # load item only if changed
+        if self._json_text != text:
+            self._json_text = text
+            self._json_item = Item().fromjson(text)
+            logger.info('item loaded')
+        progress = int(self.progress)
+        if started and self._json_item.downloadStatus == 0:  # stopped
+            logger.info('Download paused')
+            self.stop()
+        elif self._json_item.downloadProgress != progress or not started:
+            params = {"downloadStatus": 4, "downloadComplete": 0, "downloadProgress": progress}
+            self._json_item.__dict__.update(params)
+            self._json_text = self._json_item.tojson()
+            filetools.write(self._json_path, self._json_text)

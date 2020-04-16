@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
 
 
@@ -13,7 +13,7 @@ def test_video_exists(page_url):
     if "please+try+again+later." in data:
         return False, "[Downace] Error de downace, no se puede generar el enlace al video"
     if "File has been removed due to inactivity" in data:
-        return False, "[Downace] El archivo ha sido removido por inactividad"
+        return False,  config.get_localized_string(70449) % "Downace"
     return True, ""
 
 

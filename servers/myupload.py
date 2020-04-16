@@ -2,10 +2,13 @@
 # --------------------------------------------------------
 # Conector myupload By Alfa development Group
 # --------------------------------------------------------
+import base64
+
 from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
-import base64
+
 
 def test_video_exists(page_url):
 
@@ -15,7 +18,7 @@ def test_video_exists(page_url):
        "Not Found" in response.data \
        or "File was deleted" in response.data \
        or "is no longer available" in response.data:
-        return False, "[myupload] El fichero no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "myupload"
     return True, ""
 
 

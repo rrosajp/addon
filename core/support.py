@@ -26,9 +26,7 @@ from core import httptools, scrapertools, servertools, tmdb, channeltools
 from core.item import Item
 from lib import unshortenit
 from platformcode import logger, config
-from specials import autoplay, shortcuts
-
-CONTEXT =shortcuts.context()
+from specials import autoplay
 
 def hdpass_get_servers(item):
     def get_hosts(url, quality):
@@ -40,15 +38,15 @@ def hdpass_get_servers(item):
         for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
             mir_url = scrapertools.decodeHtmlentities(mir_url)
             ret.append(Item(channel=item.channel,
-                                 action="play",
-                                 fulltitle=item.fulltitle,
-                                 quality=quality,
-                                 show=item.show,
-                                 thumbnail=item.thumbnail,
-                                 contentType=item.contentType,
-                                 title=srv,
-                                 server=srv,
-                                 url= mir_url))
+                            action="play",
+                            fulltitle=item.fulltitle,
+                            quality=quality,
+                            show=item.show,
+                            thumbnail=item.thumbnail,
+                            contentType=item.contentType,
+                            title=srv,
+                            server=srv,
+                            url= mir_url))
         return ret
     # Carica la pagina
     itemlist = []
@@ -176,11 +174,10 @@ def cleantitle(title):
 def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang):
     itemlist = []
     log("scrapeBlock qui")
-    matches = scrapertools.find_multiple_matches_groups(block, patron)
-    log('MATCHES =', matches)
-
     if debug:
         regexDbg(item, patron, headers, block)
+    matches = scrapertools.find_multiple_matches_groups(block, patron)
+    log('MATCHES =', matches)
 
     known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang', 'other']
     # Legenda known_keys per i groups nei patron
@@ -264,7 +261,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 infolabels['plot'] = plot
             if scraped['duration']:
                 matches = scrapertools.find_multiple_matches(scraped['duration'],
-                                                               r'([0-9])\s*?(?:[hH]|:|\.|,|\\|\/|\||\s)\s*?([0-9]+)')
+                                                             r'([0-9])\s*?(?:[hH]|:|\.|,|\\|\/|\||\s)\s*?([0-9]+)')
                 for h, m in matches:
                     scraped['duration'] = int(h) * 60 + int(m)
                 if not matches:
@@ -308,8 +305,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 contentLanguage = lang1,
                 contentEpisodeNumber=episode if episode else '',
                 news= item.news if item.news else '',
-                other = scraped['other'] if scraped['other'] else '',
-                context = CONTEXT
+                other = scraped['other'] if scraped['other'] else ''
             )
 
             # for lg in list(set(listGroups).difference(known_keys)):
@@ -389,7 +385,8 @@ def scrape(func):
         if not data:
             page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True)
             # if url may be changed and channel has findhost to update
-            if (not page.data or scrapertools.get_domain_from_url(page.url) != scrapertools.get_domain_from_url(item.url)) and 'findhost' in func.__globals__:
+            if 'findhost' in func.__globals__ and (not page.data or scrapertools.get_domain_from_url(page.url).lower() != scrapertools.get_domain_from_url(item.url).lower()):
+                logger.info('running findhost ' + func.__module__)
                 host = func.__globals__['findhost']()
                 parse = list(urlparse.urlparse(item.url))
                 from core import jsontools
@@ -633,8 +630,7 @@ def menuItem(itemlist, filename, title='', action='', url='', contentType='movie
         url = url,
         extra = extra,
         args = args,
-        contentType = contentType,
-        context = CONTEXT
+        contentType = contentType
     ))
 
     # Apply auto Thumbnails at the menus
@@ -697,7 +693,7 @@ def menu(func):
                 if dictUrl[name] is not None and type(dictUrl[name]) is not str:
                     for sub, var in dictUrl[name]:
                         menuItem(itemlist, filename,
-                             title = sub + ' submenu' + typo(title,'_ {}'),
+                             title = sub + ' submenu  {' + title + '}',
                              url = host + var[0] if len(var) > 0 else '',
                              action = var[1] if len(var) > 1 else 'peliculas',
                              args=var[2] if len(var) > 2 else '',
@@ -745,15 +741,27 @@ def typo(string, typography=''):
 
     # If there are no attributes, it applies the default ones
     attribute = ['[]','()','submenu','color','bold','italic','_','--','[B]','[I]','[COLOR]']
-
+    if int(config.get_setting('view_mode_channel').split(',')[-1]) in [0, 50, 55]:
+       VLT = True
+    else:
+        VLT = False
     # Otherwise it uses the typographical attributes of the string
     # else:
+    if 'capitalize' in string.lower():
+        string = re.sub(r'\s*capitalize','',string).capitalize()
+    if 'uppercase' in string.lower():
+        string =  re.sub(r'\s*uppercase','',string).upper()
+    if 'lowercase' in string.lower():
+        string =  re.sub(r'\s*lowercase','',string).lower()
     if '[]' in string:
         string = '[' + re.sub(r'\s*\[\]','',string) + ']'
     if '()' in string:
         string = '(' + re.sub(r'\s*\(\)','',string) + ')'
     if 'submenu' in string:
-        string = "•• " + re.sub(r'\s*submenu','',string)
+        if VLT:
+            string = "•• " + re.sub(r'\s*submenu','',string)
+        else:
+            string = re.sub(r'\s*submenu','',string)
     if 'color' in string:
         color = scrapertools.find_single_match(string, 'color ([a-z]+)')
         if color == 'kod' or '': color = kod_color
@@ -767,13 +775,10 @@ def typo(string, typography=''):
     if '--' in string:
         string = ' - ' + re.sub(r'\s*--','',string)
     if 'bullet' in string:
-        string = '[B]' + "•" + '[/B] ' + re.sub(r'\s*bullet','',string)
-    if 'capitalize' in string.lower():
-        string =  re.sub(r'\s*capitalize','',string).capitalize()
-    if 'uppercase' in string.lower():
-        string =  re.sub(r'\s*uppercase','',string).upper()
-    if 'lowercase' in string.lower():
-        string =  re.sub(r'\s*lowercase','',string).lower()
+        if VLT:
+            string = '[B]' + "•" + '[/B] ' + re.sub(r'\s*bullet','',string)
+        else:
+            string = re.sub(r'\s*bullet','',string)
     if '{}' in string:
         string = re.sub(r'\s*\{\}','',string)
 
@@ -915,23 +920,34 @@ def download(itemlist, item, typography='', function_level=1, function=''):
 
     contentSerieName=item.contentSerieName if item.contentSerieName else ''
     contentTitle=item.contentTitle if item.contentTitle else ''
+    downloadItemlist = [i.tourl() for i in itemlist]
 
     if itemlist and item.contentChannel != 'videolibrary':
-        itemlist.append(
-            Item(channel='downloads',
-                 from_channel=item.channel,
-                 title=title,
-                 fulltitle=item.fulltitle,
-                 show=item.fulltitle,
-                 contentType=item.contentType,
-                 contentSerieName=contentSerieName,
-                 url=item.url,
-                 action='save_download',
-                 from_action=from_action,
-                 contentTitle=contentTitle,
-                 path=item.path,
-                 thumbnail=thumb(thumb='downloads.png')
-            ))
+        show = True
+        # do not show if we are on findvideos and there are no valid servers
+        if from_action == 'findvideos':
+            for i in itemlist:
+                if i.action == 'play':
+                    break
+            else:
+                show = False
+        if show:
+            itemlist.append(
+                Item(channel='downloads',
+                     from_channel=item.channel,
+                     title=title,
+                     fulltitle=item.fulltitle,
+                     show=item.fulltitle,
+                     contentType=item.contentType,
+                     contentSerieName=contentSerieName,
+                     url=item.url,
+                     action='save_download',
+                     from_action=from_action,
+                     contentTitle=contentTitle,
+                     path=item.path,
+                     thumbnail=thumb(thumb='downloads.png'),
+                     downloadItemlist=downloadItemlist
+                ))
         if from_action == 'episodios':
             itemlist.append(
                 Item(channel='downloads',
@@ -946,8 +962,9 @@ def download(itemlist, item, typography='', function_level=1, function=''):
                      from_action=from_action,
                      contentTitle=contentTitle,
                      download='season',
-                     thumbnail=thumb(thumb='downloads.png')
-                ))
+                     thumbnail=thumb(thumb='downloads.png'),
+                     downloadItemlist=downloadItemlist
+            ))
 
     return itemlist
 
@@ -985,18 +1002,20 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
     if (function == 'findvideos' and contentType == 'movie') \
         or (function == 'episodios' and contentType != 'movie'):
         if config.get_videolibrary_support() and len(itemlist) > 0:
+            from  channelselector import get_thumb
             itemlist.append(
                 Item(channel=item.channel,
                         title=title,
                         fulltitle=item.fulltitle,
                         show=item.fulltitle,
                         contentType=contentType,
+                        contentTitle=contentTitle,
                         contentSerieName=contentSerieName,
                         url=item.url,
                         action=action,
                         extra=extra,
-                        contentTitle=contentTitle,
-                        path=item.path
+                        path=item.path,
+                        thumbnail=get_thumb('add_to_videolibrary.png')
                         ))
 
     return itemlist
@@ -1038,7 +1057,7 @@ def pagination(itemlist, item, page, perpage, function_level=1):
                  thumbnail=thumb()))
     return itemlist
 
-def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, down_load=True, patronTag=None):
+def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, down_load=True, patronTag=None, video_library=True):
 
     if not data and not itemlist:
         data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
@@ -1068,7 +1087,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         item.title = typo(item.contentTitle.strip(),'bold') if item.contentType == 'movie' or (config.get_localized_string(30161) in item.title) else item.title
 
         videoitem.plot= typo(videoitem.title, 'bold') + typo(videoitem.quality, '_ [] bold')
-        videoitem.title = item.title + (typo(videoitem.title, '_ color kod [] bold') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
+        videoitem.title = (item.title  if item.channel not in ['url'] else '') + (typo(videoitem.title, '_ color kod [] bold') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail
@@ -1078,9 +1097,9 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
 
     if patronTag:
         addQualityTag(item, verifiedItemlist, data, patronTag)
-    return controls(verifiedItemlist, item, AutoPlay, CheckLinks, down_load)
+    return controls(verifiedItemlist, item, AutoPlay, CheckLinks, down_load, video_library)
 
-def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
+def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True, video_library=True):
     from core import jsontools
     from platformcode.config import get_setting
 
@@ -1088,13 +1107,17 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
     autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
     channel_node = autoplay_node.get(item.channel, {})
     if not channel_node:  # non ha mai aperto il menu del canale quindi in autoplay_data.json non c'e la key
-        channelFile = __import__('channels.' + item.channel, fromlist=["channels.%s" % item.channel])
-        autoplay.init(item.channel, channelFile.list_servers, channelFile.list_quality)
+        try:
+            channelFile = __import__('channels.' + item.channel, fromlist=["channels.%s" % item.channel])
+        except:
+            channelFile = __import__('specials.' + item.channel, fromlist=["specials.%s" % item.channel])
+        if hasattr(channelFile, 'list_servers') and hasattr(channelFile, 'list_quality'):
+            autoplay.init(item.channel, channelFile.list_servers, channelFile.list_quality)
 
     autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
     channel_node = autoplay_node.get(item.channel, {})
     settings_node = channel_node.get('settings', {})
-    AP = get_setting('autoplay') or settings_node['active']
+    AP = get_setting('autoplay') or (settings_node['active'] if 'active' in settings_node else False)
     HS = config.get_setting('hide_servers') or (settings_node['hide_servers'] if 'hide_server' in settings_node else False)
 
     if CL and not AP:
@@ -1109,7 +1132,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True):
     if AutoPlay == True and not 'downloads' in inspect.stack()[3][1] + inspect.stack()[4][1]:
         autoplay.start(itemlist, item)
 
-    if item.contentChannel != 'videolibrary': videolibrary(itemlist, item, function_level=3)
+    if item.contentChannel != 'videolibrary' and video_library: videolibrary(itemlist, item, function_level=3)
     if get_setting('downloadenabled') and down_load == True: download(itemlist, item, function_level=3)
 
     VL = False
@@ -1156,7 +1179,7 @@ def channel_config(item, itemlist):
     itemlist.append(
         Item(channel='setting',
              action="channel_config",
-             title=typo("Configurazione Canale color kod bold"),
+             title=typo(config.get_localized_string(60587), 'color kod bold'),
              config=item.channel,
              folder=False,
              thumbnail=get_thumb('setting_0.png'))
@@ -1197,6 +1220,8 @@ def addQualityTag(item, itemlist, data, patron):
         "DLMux": "si tratta di un 720p o 1080p reperiti dalla versione americana di iTunes americano. La qualità è paragonabile a quella di un BluRayRip e permette di fruire di episodi televisivi, senza il fastidioso bollo distintivo della rete che trasmette.",
         "DVD5": "il film è in formato DVD Single Layer, nel quale vengono mantenute tutte le caratteristiche del DVD originale: tra queste il menu multilingue, i sottotitoli e i contenuti speciali, se presenti. Il video è codificato nel formato DVD originale MPEG-2.",
         "DVD9": "ha le stesse caratteristiche del DVD5, ma le dimensioni del file sono di un DVD Dual Layer (8,5 GB).",
+        "HDTS": "viene utilizzata una videocamera professionale ad alta definizione posizionata in modo fisso. La qualità audio video è buona.",
+        "DVDMUX": "indica una buona qualità video, l’audio è stato aggiunto da una sorgente diversa per una migliore qualità.",
     }
 
     defQualAudio = {
@@ -1206,6 +1231,7 @@ def addQualityTag(item, itemlist, data, patron):
         "DD": "audio ricavato dai dischi DTS cinema. L’audio è di buona qualità, ma potreste riscontrare il fatto che non potrebbe essere più riproducibile.",
         "AC3": "audio in Dolby Digital puo' variare da 2.0 a 5.1 canali in alta qualità.",
         "MP3": "codec per compressione audio utilizzato MP3.",
+        "RESYNC": "il film è stato lavorato e re sincronizzato con una traccia audio. A volte potresti riscontrare una mancata sincronizzazione tra audio e video.",
     }
     qualityStr = scrapertools.find_single_match(data, patron).strip()
     if PY3:
@@ -1215,7 +1241,9 @@ def addQualityTag(item, itemlist, data, patron):
 
     if qualityStr:
         try:
-            audio, video = qualityStr.split('.')
+            splitted = qualityStr.split('.')
+            video = splitted[-1]
+            audio = splitted[-2]
             descr = typo(video + ': ', 'color kod') + defQualVideo.get(video.upper(), '') + '\n' +\
                     typo(audio + ': ', 'color kod') + defQualAudio.get(audio.upper(), '')
         except:

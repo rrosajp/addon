@@ -4,6 +4,7 @@
 # --------------------------------------------------------
 from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
 
 server = {'1': 'http://www.mangovideo.pw/contents/videos/', '7' : 'http://server9.mangovideo.pw/contents/videos/',
@@ -22,7 +23,7 @@ def test_video_exists(page_url):
        "Not Found" in response.data \
        or "File was deleted" in response.data \
        or "is no longer available" in response.data:
-        return False, "[mangovideo] El fichero no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "mangovideo"
     return True, ""
 
 

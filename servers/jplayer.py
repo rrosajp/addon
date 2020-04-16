@@ -2,8 +2,10 @@
 # --------------------------------------------------------
 # Conector jplayer By Alfa development Group
 # --------------------------------------------------------
-
 import sys
+
+from platformcode import config
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
@@ -16,7 +18,6 @@ else:
 
 from core import httptools
 from core import jsontools
-from core import scrapertools
 from platformcode import logger
 
 
@@ -24,7 +25,7 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url).data
     if "no longer exists" in data or "to copyright issues" in data:
-        return False, "[jplayer] El video ha sido borrado"
+        return False,  config.get_localized_string(70449) % "jplayer"
     return True, ""
 
 

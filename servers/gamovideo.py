@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-
 import sys
+
+from platformcode import config
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
@@ -32,13 +34,13 @@ def test_video_exists(page_url):
     global DATA
     DATA = data
     if "images/proced.png" in data:
-        return False, "[Gamovideo] El archivo no existe o ha sido borrado"
+        return False, config.get_localized_string(70449) % "Gamovideo"
     if "File was deleted" in data or ("Not Found"  in data and not "|mp4|" in data) or "File was locked by administrator" in data:
-        return False, "[Gamovideo] El archivo no existe o ha sido borrado"
+        return False, config.get_localized_string(70449) % "Gamovideo"
     if "Video is processing now" in data:
         return False, "[Gamovideo] El video está procesándose en estos momentos. Inténtelo mas tarde."
     if "File is awaiting for moderation" in data:
-        return False, "[Gamovideo] El video está esperando por moderación."
+        return False,  config.get_localized_string(70449) % "Gamovideo"
 
     return True, ""
 

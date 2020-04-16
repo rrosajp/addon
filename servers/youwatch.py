@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
 
 
@@ -9,12 +9,12 @@ def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url).data
     if "File Not Found" in data:
-        return False, "[Youwatch] El archivo no existe o ha sido borrado"
+        return False, config.get_localized_string(70449) % "Youwatch"
 
     url_redirect = scrapertools.find_single_match(data, '<iframe src="([^"]+)"')
     data = httptools.downloadpage(url_redirect).data
     if "We're sorry, this video is no longer available" in data:
-        return False, "[Youwatch] El archivo no existe o ha sido borrado"
+        return False,  config.get_localized_string(70449) % "Youwatch"
 
     return True, ""
 

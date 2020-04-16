@@ -1,6 +1,5 @@
-<addon id="plugin.video.kod" name="Kodi on Demand" provider-name="KOD Team" version="0.8.1">
+<addon id="plugin.video.kod" name="Kodi on Demand" provider-name="KoD Team" version="0.9">
   <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.libtorrent" optional="true"/>
     <import addon="metadata.themoviedb.org"/>
     <import addon="metadata.tvdb.com"/>
@@ -19,11 +18,14 @@
       <screenshot>resources/media/themes/ss/2.png</screenshot>
       <screenshot>resources/media/themes/ss/3.png</screenshot>
     </assets>
-      <news>- riorganizzate le impostazioni
-- aggiunte descrizioni tag qualità su cb01 (presto anche sugli altri)
-- aggiunto il supporto alle serie di polpotv
-- fixato server mystream
-- fix Rinumerazione per episodi Nuovi</news>
+      <news>- Nuova sezione Musica
+- Download in Background
+- Download dalla Videoteca e supporto file locali
+- Backup e cancellazione della Videoteca
+- Spostamento della Videoteca
+- Migliorata integrazione con libreria di Kodi
+- Gestione delle Viste Preferite
+- Nuovo layout impostazioni</news>
     <description lang="it">Naviga velocemente sul web e guarda i contenuti presenti</description>
     <disclaimer>[COLOR red]The owners and submitters to this addon do not host or distribute any of the content displayed by these addons nor do they have any affiliation with the content providers.[/COLOR]
     [COLOR yellow]Kodi © is a registered trademark of the XBMC Foundation. We are not connected to or in any other way affiliated with Kodi, Team Kodi, or the XBMC Foundation. Furthermore, any software, addons, or products offered by us will receive no support in official Kodi channels, including the Kodi forums and various social networks.[/COLOR]</disclaimer>
@@ -33,6 +35,6 @@
     <forum>https://t.me/kodiondemand</forum>
     <source>https://github.com/kodiondemand/addon</source>
   </extension>
-  <extension library="videolibrary_service.py" point="xbmc.service" start="login|startup">
+  <extension library="service.py" point="xbmc.service" start="login|startup">
   </extension>
 </addon>

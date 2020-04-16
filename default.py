@@ -14,10 +14,6 @@ logger.info("init...")
 librerias = xbmc.translatePath(os.path.join(config.get_runtime_path(), 'lib'))
 sys.path.insert(0, librerias)
 
-if not config.dev_mode():
-    from platformcode import updater
-    updater.showSavedChangelog()
-
 from platformcode import launcher
 
 if sys.argv[2] == "":

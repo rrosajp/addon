@@ -1,0 +1,50 @@
+{
+    "all":{
+        "List": 50,
+        "MultiSort": 589,
+        "MultiWall": 587,
+        "Shelf 3D": 595,
+        "List 3D": 596,
+        "Fanart 3D": 593,
+        "Triple 3D": 590,
+        "Wall 3D": 586,
+        "Banner 3D": 594,
+        "MultiWall 3D": 587
+    },
+    "movie":{
+        "List": 50,
+        "MultiSort": 589,
+        "MultiWall": 587,
+        "Shelf 3D": 595,
+        "List 3D": 596,
+        "Fanart 3D": 593,
+        "Triple 3D": 590,
+        "Wall 3D": 586,
+        "Banner 3D": 594,
+        "MultiWall 3D": 587
+    },
+    "tvshow":{
+        "List": 50,
+        "MultiWall": 587,
+        "Shelf 3D": 595,
+        "List 3D": 596,
+        "Fanart 3D": 593,
+        "Triple 3D": 590,
+        "Wall 3D": 586,
+        "Banner 3D": 594,
+        "MultiWall 3D": 587
+    },
+    "season":{
+        "List": 50,
+        "Shelf 3D": 595,
+        "List 3D": 596,
+        "Wall 3D": 586
+    },
+    "episode":{
+        "List": 50,
+        "List 3D": 596
+    },
+    "addon":{
+        "List": 50
+    }
+}

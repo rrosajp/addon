@@ -100,9 +100,11 @@ def channel_config(item):
 
 def autostart(item):  # item necessario launcher.py linea 265
     if config.enable_disable_autorun(AUTOSTART):
-        xbmcgui.Dialog().ok(config.get_localized_string(20000), config.get_localized_string(70709))
+        logger.info('AUTOSTART ENABLED')
+        # xbmcgui.Dialog().ok(config.get_localized_string(20000), config.get_localized_string(70709))
     else:
-        xbmcgui.Dialog().ok(config.get_localized_string(20000), config.get_localized_string(70710))
+        logger.info('AUTOSTART ENABLED')
+        # xbmcgui.Dialog().ok(config.get_localized_string(20000), config.get_localized_string(70710))
 
 
 def setting_torrent(item):
@@ -445,7 +447,7 @@ def submenu_tools(item):
                              thumbnail=get_thumb("setting_0.png")))
         itemlist.append(Item(channel=CHANNELNAME, title=config.get_localized_string(60566) + ":", action="", folder=False,
                              text_bold=True, thumbnail=get_thumb("videolibrary.png")))
-        itemlist.append(Item(channel=CHANNELNAME, action="overwrite_tools", folder=False,
+        itemlist.append(Item(channel=CHANNELNAME, action="restore_tools", folder=False,
                              thumbnail=get_thumb("videolibrary.png"),
                              title="- " + config.get_localized_string(60567)))
         itemlist.append(Item(channel="videolibrary", action="update_videolibrary", folder=False,
@@ -795,8 +797,8 @@ def channel_status(item, dict_values):
         platformtools.dialog_notification(config.get_localized_string(60579), config.get_localized_string(60580))
 
 
-def overwrite_tools(item):
-    import videolibrary_service
+def restore_tools(item):
+    import service
     from core import videolibrarytools
     import os
 
@@ -830,7 +832,7 @@ def overwrite_tools(item):
             # filetools.rmdirtree(path)
 
             # ... y la volvemos a añadir
-            videolibrary_service.update(path, p_dialog, i, t, serie, 3)
+            service.update(path, p_dialog, i, t, serie, 3)
         p_dialog.close()
 
         # movies
@@ -857,9 +859,9 @@ def overwrite_tools(item):
                 filetools.rmdirtree(path)
 
                 import math
-                heading = config.get_localized_string(60587)
+                heading = config.get_localized_string(20000)
 
-                p_dialog2.update(int(math.ceil((i + 1) * t)), heading, "%s: %s" % (movie.contentTitle,
+                p_dialog2.update(int(math.ceil((i + 1) * t)), heading, config.get_localized_string(60389) % (movie.contentTitle,
                                                                                    movie.channel.capitalize()))
                 # ... y la volvemos a añadir
                 videolibrarytools.save_movie(movie)

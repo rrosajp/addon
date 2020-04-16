@@ -2,10 +2,11 @@
 # -*- Server Filebebo -*-
 # -*- Created for Alfa-addon -*-
 # -*- By the Alfa Develop Group -*-
-
 import re
+
 from core import httptools
 from core import scrapertools
+from platformcode import config
 from platformcode import logger
 
 
@@ -20,7 +21,7 @@ def test_video_exists(page_url):
     data = get_source(page_url)
 
     if "File was deleted" in data or "File Not Found" in data:
-        return False, "[Filebebo] El video ha sido borrado"
+        return False,  config.get_localized_string(70449) % "Filebebo"
 
     return True, ""
 

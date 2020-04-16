@@ -5,7 +5,7 @@ import shutil
 from lib.six import BytesIO
 
 from core import filetools
-from platformcode import logger, platformtools
+from platformcode import config, logger, platformtools
 import json
 import xbmc
 import re
@@ -19,6 +19,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 addon = xbmcaddon.Addon('plugin.video.kod')
+addonname = addon.getAddonInfo('name')
 
 _hdr_pat = re.compile("^@@ -(\d+),?(\d+)? \+(\d+),?(\d+)? @@.*")
 
@@ -43,13 +44,13 @@ def loadCommits(page=1):
         except:
             xbmc.sleep(1000)
     else:
-        platformtools.dialog_notification('Kodi on Demand', 'impossibile controllare gli aggiornamenti')
+        platformtools.dialog_notification(addonname, config.get_localized_string(70675))
         ret = None
 
     return ret
 
 
-# ret -> aggiornato, necessita reload videolibrary_service
+# ret -> aggiornato, necessita reload service
 def check(background=False):
     if not addon.getSetting('addon_update_enabled'):
         return False, False
@@ -109,7 +110,7 @@ def check(background=False):
                         logger.info(file["filename"])
                         if 'resources/language' in file["filename"]:
                             poFilesChanged = True
-                        if 'videolibrary_service.py' in file["filename"]:
+                        if 'service.py' in file["filename"]:
                             serviceChanged = True
                         if file['status'] == 'modified' or file['status'] == 'added':
                             if 'patch' in file:

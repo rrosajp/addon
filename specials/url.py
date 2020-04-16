@@ -27,10 +27,8 @@ def search(item, text):
     itemlist = []
 
     if "server" in item.args:
-        itemlist = servertools.find_video_items(data=text)
-        for item in itemlist:
-            item.channel = "url"
-            item.action = "play"
+        from core.support import server
+        itemlist = server(item, text)
     elif "direct" in item.args:
         itemlist.append(Item(channel=item.channel, action="play", url=text, server="directo", title=config.get_localized_string(60092)))
     else:

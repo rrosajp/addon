@@ -130,7 +130,7 @@ def save_movie(item):
     # progress dialog
     p_dialog = platformtools.dialog_progress(config.get_localized_string(20000), config.get_localized_string(60062))
 
-    if config.get_setting("original_title_folder", "videolibrary") == 1 and item.infoLabels['originaltitle']:
+    if config.get_setting("original_title_folder", "videolibrary") and item.infoLabels['originaltitle']:
         base_name = item.infoLabels['originaltitle']
     else:
         base_name = item.contentTitle
@@ -140,7 +140,7 @@ def save_movie(item):
     else:
         base_name = filetools.validate_path(base_name.replace('/', '-'))
 
-    if config.get_setting("lowerize_title", "videolibrary") == 0:
+    if config.get_setting("lowerize_title", "videolibrary"):
         base_name = base_name.lower()
 
     for raiz, subcarpetas, ficheros in filetools.walk(MOVIES_PATH):
@@ -221,7 +221,7 @@ def save_movie(item):
             if filetools.write(nfo_path, head_nfo + item_nfo.tojson()):
                 #logger.info("FOLDER_MOVIES : %s" % FOLDER_MOVIES)
                 # actualizamos la videoteca de Kodi con la pelicula
-                if config.is_xbmc():
+                if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
                     from platformcode import xbmc_videolibrary
                     xbmc_videolibrary.update()
 
@@ -234,12 +234,55 @@ def save_movie(item):
     p_dialog.close()
     return 0, 0, -1
 
+def update_renumber_options(item, head_nfo, path):
+    from core import jsontools
+    # from core.support import dbg;dbg()
+    tvshow_path = filetools.join(path, 'tvshow.nfo')
+    if filetools.isfile(tvshow_path) and item.channel_prefs:
+        for channel in item.channel_prefs:
+            filename = filetools.join(config.get_data_path(), "settings_channels", channel + '_data.json')
+
+            json_file = jsontools.load(filetools.read(filename))
+            if 'TVSHOW_AUTORENUMBER' in json_file:
+                json = json_file['TVSHOW_AUTORENUMBER']
+                if item.fulltitle in json:
+                    item.channel_prefs[channel]['TVSHOW_AUTORENUMBER'] = json[item.fulltitle]
+                    logger.info('UPDATED=\n' + str(item.channel_prefs))
+                    filetools.write(tvshow_path, head_nfo + item.tojson())
+
+def add_renumber_options(item, head_nfo, path):
+    from core import jsontools
+    # from core.support import dbg;dbg()
+    ret = None
+    filename = filetools.join(config.get_data_path(), "settings_channels", item.channel + '_data.json')
+    json_file = jsontools.load(filetools.read(filename))
+    if 'TVSHOW_AUTORENUMBER' in json_file:
+        json = json_file['TVSHOW_AUTORENUMBER']
+        if item.fulltitle in json:
+            ret = json[item.fulltitle]
+    return ret
+
+def check_renumber_options(item):
+    from specials.autorenumber import load, write
+    for key in item.channel_prefs:
+        if 'TVSHOW_AUTORENUMBER' in item.channel_prefs[key]:
+            item.channel = key
+            json = load(item)
+            if not json or item.fulltitle not in json:
+                json[item.fulltitle] = item.channel_prefs[key]['TVSHOW_AUTORENUMBER']
+                write(item, json)
+
+    # head_nfo, tvshow_item = read_nfo(filetools.join(item.context[0]['nfo']))
+    # if tvshow_item['channel_prefs'][item.fullti]
+
+
 def filter_list(episodelist, action=None, path=None):
     # if path: path = path.decode('utf8')
     # import xbmc
     # if xbmc.getCondVisibility('system.platform.windows') > 0: path = path.replace('smb:','').replace('/','\\')
     channel_prefs = {}
     lang_sel = quality_sel = show_title = channel =''
+    # from core.support import dbg;dbg()
     if action:
         tvshow_path = filetools.join(path, "tvshow.nfo")
         head_nfo, tvshow_item = read_nfo(tvshow_path)
@@ -253,7 +296,12 @@ def filter_list(episodelist, action=None, path=None):
                     filetools.remove(filetools.join(path, File))
         if channel not in tvshow_item.channel_prefs:
             tvshow_item.channel_prefs[channel] = {}
+
         channel_prefs = tvshow_item.channel_prefs[channel]
+
+        renumber = add_renumber_options(episodelist[0], head_nfo, tvshow_path)
+        if renumber:
+            channel_prefs['TVSHOW_AUTORENUMBER'] = renumber
 
         if action == 'get_seasons':
             if 'favourite_language' not in channel_prefs:
@@ -418,7 +466,7 @@ def save_tvshow(item, episodelist):
                         + ' / ' + item.infoLabels['code'])
             return 0, 0, -1, path
 
-    if config.get_setting("original_title_folder", "videolibrary") == 1 and item.infoLabels['originaltitle']:
+    if config.get_setting("original_title_folder", "videolibrary") and item.infoLabels['originaltitle']:
         base_name = item.infoLabels['originaltitle']
     elif item.infoLabels['tvshowtitle']:
         base_name = item.infoLabels['tvshowtitle']
@@ -432,7 +480,7 @@ def save_tvshow(item, episodelist):
     else:
         base_name = filetools.validate_path(base_name.replace('/', '-'))
 
-    if config.get_setting("lowerize_title", "videolibrary") == 0:
+    if config.get_setting("lowerize_title", "videolibrary"):
         base_name = base_name.lower()
 
     for raiz, subcarpetas, ficheros in filetools.walk(TVSHOWS_PATH):
@@ -490,7 +538,7 @@ def save_tvshow(item, episodelist):
                 item_tvshow.library_filter_show = {item.channel: item.show}
 
     if item.channel != "downloads":
-        item_tvshow.active = 1  # para que se actualice a diario cuando se llame a videolibrary_service
+        item_tvshow.active = 1  # para que se actualice a diario cuando se llame a service
 
     filetools.write(tvshow_path, head_nfo + item_tvshow.tojson())
 
@@ -554,7 +602,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
             nostrm_episodelist.append(season_episode)
     nostrm_episodelist = sorted(set(nostrm_episodelist))
 
-    # Silent es para no mostrar progreso (para videolibrary_service)
+    # Silent es para no mostrar progreso (para service)
     if not silent:
         # progress dialog
         p_dialog = platformtools.dialog_progress(config.get_localized_string(20000), config.get_localized_string(60064))
@@ -571,16 +619,11 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
 
     new_episodelist = []
     # Obtenemos el numero de temporada y episodio y descartamos los q no lo sean
-    tags = []
-    if config.get_setting("enable_filter", "videolibrary"):
-        tags = [x.strip() for x in config.get_setting("filters", "videolibrary").lower().split(",")]
 
     for e in episodelist:
         headers = {}
         if e.headers:
             headers = e.headers
-        if tags != [] and tags != None and any(tag in e.title.lower() for tag in tags):
-            continue
 
         try:
             season_episode = scrapertools.get_season_and_episode(e.title)
@@ -659,7 +702,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
         json_path = filetools.join(path, ("%s [%s].json" % (season_episode, e.channel)).lower())
 
         if season_episode in nostrm_episodelist:
-            logger.error('Error in the structure of the Video Library: Seriese ' + serie.contentSerieName + ' ' + season_episode)
+            logger.info('Skipped: Serie ' + serie.contentSerieName + ' ' + season_episode + ' available as local content')
             continue
         strm_exists = strm_path in ficheros
         nfo_exists = nfo_path in ficheros
@@ -789,7 +832,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
             fallidos = -1
         else:
             # ... si ha sido correcto actualizamos la videoteca de Kodi
-            if config.is_xbmc() and not silent:
+            if config.is_xbmc() and config.get_setting("videolibrary_kodi") and not silent:
                 from platformcode import xbmc_videolibrary
                 xbmc_videolibrary.update()
 
@@ -834,11 +877,11 @@ def add_movie(item):
     insertados, sobreescritos, fallidos = save_movie(new_item)
 
     if fallidos == 0:
-        platformtools.dialog_ok(config.get_localized_string(30131), new_item.contentTitle,
-                                config.get_localized_string(30135))  # 'se ha añadido a la videoteca'
+        platformtools.dialog_ok(config.get_localized_string(30131),
+                                config.get_localized_string(30135) % new_item.contentTitle)  # 'se ha añadido a la videoteca'
     else:
         platformtools.dialog_ok(config.get_localized_string(30131),
-                                config.get_localized_string(60066))  #"ERROR, la pelicula NO se ha añadido a la videoteca")
+                                config.get_localized_string(60066) % new_item.contentTitle)  #"ERROR, la pelicula NO se ha añadido a la videoteca")
 
 
 def add_tvshow(item, channel=None):
@@ -906,20 +949,20 @@ def add_tvshow(item, channel=None):
     insertados, sobreescritos, fallidos, path = save_tvshow(item, itemlist)
 
     if not insertados and not sobreescritos and not fallidos:
-        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60067))
-        logger.error("The %s series could not be added to the video library. Could not get any episode" % item.show)
+        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60067) % item.show)
+        logger.error("La serie %s no se ha podido añadir a la videoteca. No se ha podido obtener ningun episodio" % item.show)
 
     elif fallidos == -1:
-        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60068))
-        logger.error("The %s series could not be added to the video library" % item.show)
+        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60068) % item.show)
+        logger.error("La serie %s no se ha podido añadir a la videoteca" % item.show)
 
     elif fallidos > 0:
-        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60069))
-        logger.error("Could not add %s episodes of the %s series to the video library" % (fallidos, item.show))
+        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60069) % item.show)
+        logger.error("No se han podido añadir %s episodios de la serie %s a la videoteca" % (fallidos, item.show))
 
     else:
-        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60070))
-        logger.info("%s episodes of the %s series have been added to the video library" % (insertados, item.show))
+        platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60070) % item.show)
+        logger.info("Se han añadido %s episodios de la serie %s a la videoteca" % (insertados, item.show))
         if config.is_xbmc():
             if config.get_setting("sync_trakt_new_tvshow", "videolibrary"):
                 import xbmc

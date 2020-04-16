@@ -18,6 +18,8 @@ PLUGIN_NAME = "kod"
 
 __settings__ = xbmcaddon.Addon(id="plugin.video." + PLUGIN_NAME)
 __language__ = __settings__.getLocalizedString
+__version_fix = None
+__dev_mode = None
 
 channels_data = list()
 
@@ -36,19 +38,25 @@ def get_addon_version(with_fix=True):
 
 
 def get_addon_version_fix():
-    if not dev_mode():
-        try:
-            sha = open(os.path.join(get_runtime_path(), 'last_commit.txt')).readline()
-            return sha[:7]
-        except:
-            return '??'
-    else:
-        return 'DEV'
+    global __version_fix
+    ret = __version_fix
+    if not ret:
+        if not dev_mode():
+            try:
+                sha = open(os.path.join(get_runtime_path(), 'last_commit.txt')).readline()
+                ret = sha[:7]
+            except:
+                ret = '??'
+        else:
+            ret = 'DEV'
+    return ret
 
 
 def dev_mode():
-    r = os.path.isdir(get_runtime_path() + '/.git')
-    return r
+    global __dev_mode
+    if not __dev_mode:
+        __dev_mode = os.path.isdir(get_runtime_path() + '/.git')
+    return __dev_mode
 
 
 def get_platform(full_version=False):
@@ -152,6 +160,7 @@ def enable_disable_autorun(is_enabled):
     if is_enabled is False:
         with open(path, append_write) as file: 
             file.write("import xbmc\nxbmc.executebuiltin('XBMC.RunAddon(plugin.video.kod)')")
+        set_setting('autostart', 'On')
     else:
         file = open(path, "r")
         old_content = file.read() 
@@ -159,6 +168,7 @@ def enable_disable_autorun(is_enabled):
         file.close()
         with open(path, "w") as file:
             file.write(new_content)
+        set_setting('autostart', 'Off')
     return True
 
 def get_all_settings_addon():
@@ -170,7 +180,7 @@ def get_all_settings_addon():
     infile.close()
 
     ret = {}
-    matches = scrapertools.find_multiple_matches(data, '<setting id="([^"]*)" value="([^"]*)')
+    matches = scrapertools.find_multiple_matches(data, '<setting id=\"([^\"]+)\"[^>]*>([^<]*)</setting>')
 
     for _id, value in matches:
         ret[_id] = get_setting(_id)
@@ -217,19 +227,25 @@ def open_settings():
         set_setting('adult_aux_new_password1', '')
         set_setting('adult_aux_new_password2', '')
 
+    from specials import videolibrary
+    from platformcode import xbmc_videolibrary
+    if settings_pre.get('downloadpath', None) != settings_post.get('downloadpath', None):
+        xbmc_videolibrary.update_sources(settings_post.get('downloadpath', None), settings_pre.get('downloadpath', None))
+
     # si se ha cambiado la ruta de la videoteca llamamos a comprobar directorios para que lo cree y pregunte
     # automaticamente si configurar la videoteca
     if settings_pre.get("videolibrarypath", None) != settings_post.get("videolibrarypath", None) or \
-        settings_pre.get("folder_movies", None) != settings_post.get("folder_movies", None) or \
-            settings_pre.get("folder_tvshows", None) != settings_post.get("folder_tvshows", None):
-        verify_directories_created()
+                        settings_pre.get("folder_movies", None) != settings_post.get("folder_movies", None) or \
+                        settings_pre.get("folder_tvshows", None) != settings_post.get("folder_tvshows", None):
+        videolibrary.move_videolibrary(settings_pre.get("videolibrarypath", None), settings_post.get("videolibrarypath", None),
+                                       settings_pre.get("folder_movies", None), settings_post.get("folder_movies", None),
+                                       settings_pre.get("folder_tvshows", None), settings_post.get("folder_tvshows", None))
 
-    else:
-        # si se ha puesto que se quiere autoconfigurar y se había creado el directorio de la videoteca
-        if not settings_pre.get("videolibrary_kodi", None) and settings_post.get("videolibrary_kodi", None) \
-                and settings_post.get("videolibrary_kodi_flag", None) == 1:
-            from platformcode import xbmc_videolibrary
-            xbmc_videolibrary.ask_set_content(2, silent=True)
+    # si se ha puesto que se quiere autoconfigurar y se había creado el directorio de la videoteca
+    if not settings_pre.get("videolibrary_kodi", None) and settings_post.get("videolibrary_kodi", None):
+        xbmc_videolibrary.ask_set_content(silent=True)
+    elif settings_pre.get("videolibrary_kodi", None) and not settings_post.get("videolibrary_kodi", None):
+        xbmc_videolibrary.clean(get_setting('videolibrarypath'))
 
 
 def get_setting(name, channel="", server="", default=None):
@@ -378,8 +394,10 @@ def get_localized_string(code):
 def get_localized_category(categ):
     categories = {'movie': get_localized_string(30122), 'tvshow': get_localized_string(30123),
                   'anime': get_localized_string(30124), 'documentary': get_localized_string(30125),
-                  'vos': get_localized_string(30136), 'sub-ita': get_localized_string(70566), 'adult': get_localized_string(30126),
-                  'direct': get_localized_string(30137), 'torrent': get_localized_string(70015), 'live': get_localized_string(30138)}
+                  'vos': get_localized_string(30136), 'sub-ita': get_localized_string(70566),
+                  'adult': get_localized_string(30126), 'direct': get_localized_string(30137),
+                  'torrent': get_localized_string(70015), 'live': get_localized_string(30138),
+                  'music': get_localized_string(30139) }
     return categories[categ] if categ in categories else categ
 
 
@@ -463,8 +481,8 @@ def verify_directories_created():
             logger.debug("Creating %s: %s" % (path, saved_path))
             filetools.mkdir(saved_path)
 
-    config_paths = [["folder_movies", "CINE"],
-                    ["folder_tvshows", "SERIES"]]
+    config_paths = [["folder_movies", "Film"],
+                    ["folder_tvshows", "Serie TV"]]
 
     for path, default in config_paths:
         saved_path = get_setting(path)
@@ -479,6 +497,10 @@ def verify_directories_created():
 
             # si se crea el directorio
             filetools.mkdir(content_path)
+
+    from platformcode import xbmc_videolibrary
+    xbmc_videolibrary.update_sources(get_setting("videolibrarypath"))
+    xbmc_videolibrary.update_sources(get_setting("downloadpath"))
 
     try:
         from core import scrapertools

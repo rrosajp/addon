@@ -1,0 +1,45 @@
+{
+    "all":{
+        "List": 50,
+        "Icons": 52,
+        "Banner": 53,
+        "Wrap": 54,
+        "Coverflow": 57,
+        "Wall": 58
+    },
+    "movie":{
+        "List": 50,
+        "Icons": 52,
+        "Wrap": 54,
+        "Coverflow": 57,
+        "Wall": 58
+    },
+    "tvshow":{
+        "List": 50,
+        "Icons": 52,
+        "Banner": 53,
+        "Wrap": 54,
+        "Coverflow": 57,
+        "Wall": 58
+    },
+    "season":{
+        "List": 50,
+        "Icons": 52,
+        "Wrap": 54,
+        "Coverflow": 57,
+        "Wall": 58
+    },
+    "episode":{
+        "List": 50,
+        "Icons": 52,
+        "Wrap": 54,
+        "Coverflow": 57
+    },
+    "addon":{
+        "List": 50,
+        "Icons": 52,
+        "Wrap": 54,
+        "Coverflow": 57,
+        "Wall": 58
+    }
+}
