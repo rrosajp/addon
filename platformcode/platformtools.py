@@ -252,7 +252,8 @@ def set_view_mode(item, parent_item):
         xbmc.executebuiltin('Container.SetViewMode(%s)' % 55)
 
     elif (item.contentType in ['movie'] and parent_item.action in ['peliculas']) \
-        or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']):
+        or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']) \
+        or parent_item.action in ['now_on_tv', 'now_on_misc', 'now_on_misc_film']:
         mode('movie', 'movies')
 
     elif (item.contentType in ['tvshow'] and parent_item.action in ['peliculas']) \
