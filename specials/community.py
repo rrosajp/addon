@@ -264,7 +264,7 @@ def get_seasons(item):
         for item in itemlist:
             itlist = episodios(item)
         itemlist = itlist
-        if inspect.stack()[2][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest'] and defp and not itemdisable_pagination:
+        if inspect.stack()[2][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes', 'get_newest'] and defp and not item.disable_pagination:
             itemlist = pagination(item, itemlist)
     return itemlist
 
