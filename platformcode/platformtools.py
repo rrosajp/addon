@@ -233,13 +233,11 @@ def set_view_mode(item, parent_item):
     def mode(content, Type):
         mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
         if mode > 0:
-            xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
-            xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
-            logger.info('TYPE: ' + Type)
-        else:
-            xbmcplugin.setContent(handle=int(sys.argv[1]), content='')
-            xbmc.executebuiltin('Container.SetViewMode(%s)' % 55)
-            logger.info('TYPE: ' + 'None')
+            logger.info('default mode')
+            mode = 55
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
+        xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
+        logger.info('TYPE: ' + Type + ' - ' + 'CONTENT: ' + content)
 
     def reset_view_mode():
         for mode in ['addon','channel','movie','tvshow','season','episode','server']:
