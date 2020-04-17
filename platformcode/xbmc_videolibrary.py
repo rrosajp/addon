@@ -878,7 +878,7 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
     xbmc.executebuiltin('XBMC.ReloadSkin()')
 
 
-def clean(path=''):
+def clean(path_list=[]):
     def sql_format(path):
         if path.startswith("special://"):
             path = path.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')
@@ -894,127 +894,125 @@ def clean(path=''):
 
     logger.info()
 
-    idParentPath = 0
-    sql_path = ''
-    sql_movies_path = ''
-    sql_tvshows_path = ''
-    sql_episodes_path = ''
-
-    path, sep = sql_format(path)
-    movies_folder = config.get_setting("folder_movies")
-    tvshows_folder = config.get_setting("folder_tvshows")
-
-    # delete episode/movie (downloads.py move_to_libray)
-    if path.endswith(".strm"):
-        if movies_folder in path:
-            sql_movies_path = path
-        else:
-            sql_episodes_path = path
-    # delete movie
-    elif movies_folder in path:
-        if not path.endswith(sep): path += sep
-
-        sql_movies_path = path + '%'
-    # delete tvshow
-    elif tvshows_folder in path:
-        if not path.endswith(sep): path += sep
-
-        sql_tvshows_path = path + '%'
-
-        sql_episodes_path = sql_tvshows_path
-    # delete video library
-    else:
-        if not path.endswith(sep): path += sep
-
-        sql_path = path
-
-        sql_movies_path = sql_path + movies_folder
-        if not sql_movies_path.endswith(sep): sql_movies_path += sep
-        sql_movies_path += '%'
-
-        sql_tvshows_path = sql_path + tvshows_folder
-        if not sql_tvshows_path.endswith(sep): sql_tvshows_path += sep
-        sql_tvshows_path += '%'
-
-        sql_episodes_path = sql_tvshows_path
-
     progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80025))
     progress.update(0)
-    if sql_path:
-        # search video library path in the DB
-        sql = 'SELECT idPath FROM path where strPath LIKE "%s"' % sql_path
-        nun_records, records = execute_sql_kodi(sql)
-        # delete video library path
-        if records:
-            idPath = records[0][0]
-            idParentPath = idPath
-            if not config.get_setting("videolibrary_kodi"):
-                sql = 'DELETE from path WHERE idPath=%s' % idPath
-                nun_records, records = execute_sql_kodi(sql)
 
-    progress.update(10)
-    if sql_movies_path:
-        # search movies in the DB
-        sql = 'SELECT idMovie FROM movie where c22 LIKE "%s"' % sql_movies_path
-        nun_records, records = execute_sql_kodi(sql)
-        # delete movies
-        if records:
-            for record in records:
-                idMovie = record[0]
-                sql = 'DELETE from movie WHERE idMovie=%s' % idMovie
-                nun_records, records = execute_sql_kodi(sql)
+    for path in path_list:
 
-    progress.update(28)
-    if sql_movies_path:
-        # search movies path and folders in the DB
-        sql = 'SELECT idPath, idParentPath FROM path where strPath LIKE "%s"' % sql_movies_path
-        nun_records, records = execute_sql_kodi(sql)
-        # delete movies path and folders
-        if records:
-            for record in records:
-                if record[1] == idParentPath and config.get_setting("videolibrary_kodi"):
-                    continue
-                idPath = record[0]
-                sql = 'DELETE from path WHERE idPath=%s' % idPath
-                nun_records, records = execute_sql_kodi(sql)
+        idParentPath = 0
+        sql_path = ''
+        sql_movies_path = ''
+        sql_tvshows_path = ''
+        sql_episodes_path = ''
 
-    progress.update(46)
-    if sql_tvshows_path:
-        # search TV shows in the DB
-        sql = 'SELECT idShow FROM tvshow_view where strPath LIKE "%s"' % sql_tvshows_path
-        nun_records, records = execute_sql_kodi(sql)
-        # delete TV shows
-        if records:
-            for record in records:
-                idShow = record[0]
-                sql = 'DELETE from tvshow WHERE idShow=%s' % idShow
-                nun_records, records = execute_sql_kodi(sql)
+        path, sep = sql_format(path)
+        movies_folder = config.get_setting("folder_movies")
+        tvshows_folder = config.get_setting("folder_tvshows")
 
-    progress.update(64)
-    if sql_episodes_path:
-        # search episodes in the DB
-        sql = 'SELECT idEpisode FROM episode where c18 LIKE "%s"' % sql_episodes_path
-        nun_records, records = execute_sql_kodi(sql)
-        # delete episodes
-        if records:
-            for record in records:
-                idEpisode = record[0]
-                sql = 'DELETE from episode WHERE idEpisode=%s' % idEpisode
-                nun_records, records = execute_sql_kodi(sql)
+        # delete episode/movie (downloads.py move_to_libray)
+        if path.endswith(".strm"):
+            if movies_folder in path:
+                sql_movies_path = path
+            else:
+                sql_episodes_path = path
+        # delete movie
+        elif movies_folder in path:
+            if not path.endswith(sep): path += sep
 
-    progress.update(82)
-    if sql_tvshows_path:
-        # search TV shows path and folders in the DB
-        sql = 'SELECT idPath, idParentPath FROM path where strPath LIKE "%s"' % sql_tvshows_path
-        nun_records, records = execute_sql_kodi(sql)
-        # delete tvshows path and folders
-        if records:
-            for record in records:
-                if record[1] == idParentPath and config.get_setting("videolibrary_kodi"):
-                    continue
-                idPath = record[0]
-                sql = 'DELETE from path WHERE idPath=%s' % idPath
-                nun_records, records = execute_sql_kodi(sql)
+            sql_movies_path = path + '%'
+        # delete tvshow
+        elif tvshows_folder in path:
+            if not path.endswith(sep): path += sep
+
+            sql_tvshows_path = path + '%'
+
+            sql_episodes_path = sql_tvshows_path
+        # delete video library
+        else:
+            if not path.endswith(sep): path += sep
+
+            sql_path = path
+
+            sql_movies_path = sql_path + movies_folder
+            if not sql_movies_path.endswith(sep): sql_movies_path += sep
+            sql_movies_path += '%'
+
+            sql_tvshows_path = sql_path + tvshows_folder
+            if not sql_tvshows_path.endswith(sep): sql_tvshows_path += sep
+            sql_tvshows_path += '%'
+
+            sql_episodes_path = sql_tvshows_path
+
+        if sql_path:
+            # search video library path in the DB
+            sql = 'SELECT idPath FROM path where strPath LIKE "%s"' % sql_path
+            nun_records, records = execute_sql_kodi(sql)
+            # delete video library path
+            if records:
+                idPath = records[0][0]
+                idParentPath = idPath
+                if not config.get_setting("videolibrary_kodi"):
+                    sql = 'DELETE from path WHERE idPath=%s' % idPath
+                    nun_records, records = execute_sql_kodi(sql)
+
+        if sql_movies_path:
+            # search movies in the DB
+            sql = 'SELECT idMovie FROM movie where c22 LIKE "%s"' % sql_movies_path
+            nun_records, records = execute_sql_kodi(sql)
+            # delete movies
+            if records:
+                for record in records:
+                    idMovie = record[0]
+                    sql = 'DELETE from movie WHERE idMovie=%s' % idMovie
+                    nun_records, records = execute_sql_kodi(sql)
+
+        if sql_movies_path:
+            # search movies path and folders in the DB
+            sql = 'SELECT idPath, idParentPath FROM path where strPath LIKE "%s"' % sql_movies_path
+            nun_records, records = execute_sql_kodi(sql)
+            # delete movies path and folders
+            if records:
+                for record in records:
+                    if record[1] == idParentPath and config.get_setting("videolibrary_kodi"):
+                        continue
+                    idPath = record[0]
+                    sql = 'DELETE from path WHERE idPath=%s' % idPath
+                    nun_records, records = execute_sql_kodi(sql)
+
+        if sql_tvshows_path:
+            # search TV shows in the DB
+            sql = 'SELECT idShow FROM tvshow_view where strPath LIKE "%s"' % sql_tvshows_path
+            nun_records, records = execute_sql_kodi(sql)
+            # delete TV shows
+            if records:
+                for record in records:
+                    idShow = record[0]
+                    sql = 'DELETE from tvshow WHERE idShow=%s' % idShow
+                    nun_records, records = execute_sql_kodi(sql)
+
+        if sql_episodes_path:
+            # search episodes in the DB
+            sql = 'SELECT idEpisode FROM episode where c18 LIKE "%s"' % sql_episodes_path
+            nun_records, records = execute_sql_kodi(sql)
+            # delete episodes
+            if records:
+                for record in records:
+                    idEpisode = record[0]
+                    sql = 'DELETE from episode WHERE idEpisode=%s' % idEpisode
+                    nun_records, records = execute_sql_kodi(sql)
+
+        if sql_tvshows_path:
+            # search TV shows path and folders in the DB
+            sql = 'SELECT idPath, idParentPath FROM path where strPath LIKE "%s"' % sql_tvshows_path
+            nun_records, records = execute_sql_kodi(sql)
+            # delete tvshows path and folders
+            if records:
+                for record in records:
+                    if record[1] == idParentPath and config.get_setting("videolibrary_kodi"):
+                        continue
+                    idPath = record[0]
+                    sql = 'DELETE from path WHERE idPath=%s' % idPath
+                    nun_records, records = execute_sql_kodi(sql)
 
     progress.update(100)
     xbmc.sleep(1000)

@@ -73,7 +73,9 @@ def import_videolibrary(item):
     filetools.rmdirtree(videolibrarytools.TVSHOWS_PATH)
     p_dialog.update(50)
     if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
-        xbmc_videolibrary.clean(config.get_setting('videolibrarypath'))
+        strm_list = []
+        strm_list.append(config.get_setting('videolibrarypath'))
+        xbmc_videolibrary.clean(strm_list)
 
     config.verify_directories_created()
     if filetools.exists(movies_path):

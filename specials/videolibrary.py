@@ -772,7 +772,9 @@ def delete_videolibrary(item):
     p_dialog.update(80)
     if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
         from platformcode import xbmc_videolibrary
-        xbmc_videolibrary.clean(config.get_setting('videolibrarypath'))
+        strm_list = []
+        strm_list.append(config.get_setting('videolibrarypath'))
+        xbmc_videolibrary.clean(strm_list)
 
     p_dialog.update(90)
     config.verify_directories_created()
@@ -1027,7 +1029,9 @@ def delete(item):
 
         if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
             from platformcode import xbmc_videolibrary
-            xbmc_videolibrary.clean(_item.extra)
+            strm_list = []
+            strm_list.append(_item.extra)
+            xbmc_videolibrary.clean(strm_list)
 
         logger.info("All links removed")
         platformtools.itemlist_refresh()
@@ -1042,8 +1046,12 @@ def delete(item):
     if item.multicanal:
         # Obtener listado de canales
         if item.dead == '':
-            opciones = [config.get_localized_string(70086) % k.capitalize() for k in list(item.library_urls.keys()) if
-                        k != "downloads"]
+            opciones = []
+            channels = []
+            for k in list(item.library_urls.keys()):
+                if k != "downloads":
+                    opciones.append(config.get_localized_string(70086) % k.capitalize())
+                    channels.append(k)
             opciones.insert(0, heading)
 
             index = platformtools.dialog_select(config.get_localized_string(30163), opciones)
@@ -1055,16 +1063,33 @@ def delete(item):
             elif index > 0:
                 # Seleccionado Eliminar canal X
                 canal = opciones[index].replace(config.get_localized_string(70079), "").lower()
+                channels.remove(canal)
             else:
                 return
         else:
             canal = item.dead
 
         num_enlaces = 0
+        strm_list = []
         for fd in filetools.listdir(item.path):
             if fd.endswith(canal + '].json') or scrapertools.find_single_match(fd, '%s]_\d+.torrent' % canal):
                 if filetools.remove(filetools.join(item.path, fd)):
                     num_enlaces += 1
+                    # Remove strm and nfo if no other channel
+                    episode = fd.replace(' [' + canal + '].json', '')
+                    found_ch = False
+                    for ch in channels:
+                        if filetools.exists(filetools.join(item.path, episode + ' [' + ch + '].json')):
+                            found_ch = True
+                            break
+                    if found_ch == False:
+                        filetools.remove(filetools.join(item.path, episode + '.nfo'))
+                        filetools.remove(filetools.join(item.path, episode + '.strm'))
+                        strm_list.append(filetools.join(item.extra, episode + '.strm'))
+
+        if config.is_xbmc() and config.get_setting("videolibrary_kodi") and strm_list:
+            from platformcode import xbmc_videolibrary
+            xbmc_videolibrary.clean(strm_list)
 
         if num_enlaces > 0:
             # Actualizar .nfo
