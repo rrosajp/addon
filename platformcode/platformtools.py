@@ -265,13 +265,13 @@ def set_view_mode(item, parent_item):
         mode('episode', 'tvshows')
 
     elif parent_item.action == 'findvideos':
-        mode('server', 'addons')
+        mode('server', 'movies')
 
     elif parent_item.action == 'mainlist':
-        mode('channel', 'addons')
+        mode('channel', '')
 
     else:
-        mode('addon', 'addons')
+        mode('addon', '')
 
 
 def render_items_old(itemlist, parent_item):
