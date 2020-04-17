@@ -174,7 +174,7 @@ def check(background=False):
                 'w')  # il file di tracking viene eliminato, lo ricreo
         if addon.getSetting("addon_update_message"):
             if background:
-                platformtools.dialog_notification(config.get_localized_string(20000), 'Aggiornato fino al commit ' + commits[0]['sha'][:7] + '\napri il menu principale per vedere il changelog')
+                platformtools.dialog_notification(config.get_localized_string(20000), 'Aggiornato fino al commit ' + commits[0]['sha'][:7] + '\napri il menu principale per vedere il changelog', time=3000, sound=False)
                 with open(xbmc.translatePath(changelogFile), 'a+') as fileC:
                     fileC.write(changelog)
             elif changelog:
