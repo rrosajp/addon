@@ -34,6 +34,16 @@ def download(item=None):
 def extract():
     import zipfile
     support.log('Estraggo Quasar in:', quasar_path)
+    with open(filename, 'r+b') as f:
+        data = f.read()
+        pos = data.find(b'\x50\x4b\x05\x06')  # End of central directory signature
+        if pos > 0:
+            f.seek(pos + 20)  # +20: see secion V.I in 'ZIP format' link above.
+            hash = f.read()[2:]
+            f.seek(pos + 20)
+            f.truncate()
+            f.write(
+                b'\x00\x00')  # Zip file comment length: 0 byte length; tell zip applications to stop reading.
     with zipfile.ZipFile(filename, 'r') as zip_ref:
         zip_ref.extractall(xbmc.translatePath("special://home/addons/"))
 
