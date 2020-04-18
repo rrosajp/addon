@@ -1179,7 +1179,6 @@ def set_opcion(item, seleccion, opciones, video_urls):
     # "Descargar"
     elif opciones[seleccion] == config.get_localized_string(30153):
         from specials import downloads
-        downloads.show_disclaimer()
 
         if item.contentType == "list" or item.contentType == "tvshow":
             item.contentType = "video"
