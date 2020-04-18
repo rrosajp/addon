@@ -216,7 +216,6 @@ def sync_trakt_kodi(silent=True):
         if notificacion:
             platformtools.dialog_notification(config.get_localized_string(20000),
                                               config.get_localized_string(60045),
-                                              icon=0,
                                               time=2000)
 
 

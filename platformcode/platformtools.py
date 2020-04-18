@@ -38,6 +38,8 @@ from platformcode import logger
 from platformcode import config
 from platformcode import unify
 
+addon = xbmcaddon.Addon('plugin.video.kod')
+addon_icon = os.path.join( addon.getAddonInfo( "path" ), "logo.png" )
 
 class XBMCPlayer(xbmc.Player):
 
@@ -60,10 +62,10 @@ def dialog_ok(heading, line1, line2="", line3=""):
     return dialog.ok(heading, makeMessage(line1, line2, line3))
 
 
-def dialog_notification(heading, message, icon=0, time=5000, sound=True):
+def dialog_notification(heading, message, icon=3, time=5000, sound=True):
     dialog = xbmcgui.Dialog()
     try:
-        l_icono = xbmcgui.NOTIFICATION_INFO, xbmcgui.NOTIFICATION_WARNING, xbmcgui.NOTIFICATION_ERROR
+        l_icono = xbmcgui.NOTIFICATION_INFO, xbmcgui.NOTIFICATION_WARNING, xbmcgui.NOTIFICATION_ERROR, addon_icon
         dialog.notification(heading, message, l_icono[icon], time, sound)
     except:
         dialog_ok(heading, message)

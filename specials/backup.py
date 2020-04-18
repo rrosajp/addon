@@ -46,7 +46,7 @@ def export_videolibrary(item):
     p_dialog.update(100)
     xbmc.sleep(1000)
     p_dialog.close()
-    platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80004), icon=0, time=5000, sound=False)
+    platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80004), time=5000, sound=False)
 
 
 def import_videolibrary(item):
@@ -89,7 +89,7 @@ def import_videolibrary(item):
     p_dialog.update(100)
     xbmc.sleep(1000)
     p_dialog.close()
-    platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80008), icon=0, time=5000, sound=False)
+    platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80008), time=5000, sound=False)
 
     if platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(80009)):
         import service

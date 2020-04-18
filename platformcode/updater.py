@@ -174,11 +174,11 @@ def check(background=False):
                 'w')  # il file di tracking viene eliminato, lo ricreo
         if addon.getSetting("addon_update_message"):
             if background:
-                platformtools.dialog_notification(config.get_localized_string(20000), 'Aggiornato fino al commit ' + commits[0]['sha'][:7] + '\napri il menu principale per vedere il changelog', time=3000, sound=False)
+                platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80040) % commits[0]['sha'][:7], time=3000, sound=False)
                 with open(xbmc.translatePath(changelogFile), 'a+') as fileC:
                     fileC.write(changelog)
             elif changelog:
-                platformtools.dialog_ok('Kodi on Demand', 'Aggiornamenti applicati:\n' + changelog)
+                platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(80041) + changelog)
 
         localCommitFile.seek(0)
         localCommitFile.truncate()

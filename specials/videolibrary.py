@@ -754,7 +754,7 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
         xbmc.sleep(1000)
         progress.close()
     if notify:
-        platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80014), icon=0, time=5000, sound=False)
+        platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80014), time=5000, sound=False)
 
 
 def delete_videolibrary(item):
@@ -781,7 +781,7 @@ def delete_videolibrary(item):
     p_dialog.update(100)
     xbmc.sleep(1000)
     p_dialog.close()
-    platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80039), icon=0, time=5000, sound=False)
+    platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80039), time=5000, sound=False)
 
 
 # metodos de menu contextual
