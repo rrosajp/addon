@@ -38,6 +38,8 @@ from platformcode import logger
 from platformcode import config
 from platformcode import unify
 
+addon = xbmcaddon.Addon('plugin.video.kod')
+addon_icon = os.path.join( addon.getAddonInfo( "path" ), "logo.png" )
 
 class XBMCPlayer(xbmc.Player):
 
@@ -60,10 +62,10 @@ def dialog_ok(heading, line1, line2="", line3=""):
     return dialog.ok(heading, makeMessage(line1, line2, line3))
 
 
-def dialog_notification(heading, message, icon=0, time=5000, sound=True):
+def dialog_notification(heading, message, icon=3, time=5000, sound=True):
     dialog = xbmcgui.Dialog()
     try:
-        l_icono = xbmcgui.NOTIFICATION_INFO, xbmcgui.NOTIFICATION_WARNING, xbmcgui.NOTIFICATION_ERROR
+        l_icono = xbmcgui.NOTIFICATION_INFO, xbmcgui.NOTIFICATION_WARNING, xbmcgui.NOTIFICATION_ERROR, addon_icon
         dialog.notification(heading, message, l_icono[icon], time, sound)
     except:
         dialog_ok(heading, message)
@@ -232,14 +234,14 @@ def render_items(itemlist, parent_item):
 def set_view_mode(item, parent_item):
     def mode(content, Type):
         mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
-        if mode > 0:
-            xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
-            xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
-            logger.info('TYPE: ' + Type)
-        else:
-            xbmcplugin.setContent(handle=int(sys.argv[1]), content='')
-            xbmc.executebuiltin('Container.SetViewMode(%s)' % 55)
-            logger.info('TYPE: ' + 'None')
+        if mode == 0:
+            logger.info('default mode')
+            mode = 55
+        elif not Type:
+            Type = 'addons'
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
+        xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
+        logger.info('TYPE: ' + Type + ' - ' + 'CONTENT: ' + content)
 
     def reset_view_mode():
         for mode in ['addon','channel','movie','tvshow','season','episode','server']:
@@ -267,13 +269,13 @@ def set_view_mode(item, parent_item):
         mode('episode', 'tvshows')
 
     elif parent_item.action == 'findvideos':
-        mode('server', 'addons')
+        mode('server', '')
 
     elif parent_item.action == 'mainlist':
-        mode('channel', 'addons')
+        mode('channel', '')
 
     else:
-        mode('addon', 'addons')
+        mode('addon', '')
 
 
 def render_items_old(itemlist, parent_item):
@@ -778,7 +780,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
             elif item.action in ["detail", "findvideos"] and item.contentType == 'movie' and item.contentTitle:
                 context_commands.append((config.get_localized_string(60353), "XBMC.RunPlugin(%s?%s&%s)" %
                                          (sys.argv[0], item_url, 'action=add_pelicula_to_library&from_action=' + item.action)))
-        
+
         if item.channel not in ["downloads"] and item.server != 'torrent' and parent_item.action != 'mainlist' and config.get_setting('downloadenabled'):
             # Descargar pelicula
             if item.contentType == "movie":
@@ -1177,7 +1179,6 @@ def set_opcion(item, seleccion, opciones, video_urls):
     # "Descargar"
     elif opciones[seleccion] == config.get_localized_string(30153):
         from specials import downloads
-        downloads.show_disclaimer()
 
         if item.contentType == "list" or item.contentType == "tvshow":
             item.contentType = "video"
