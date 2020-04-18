@@ -191,6 +191,9 @@ def clean_all(item):
                 filetools.remove(filetools.join(DOWNLOAD_LIST_PATH, fichero))
                 if removeFiles:
                     filetools.remove(filetools.join(DOWNLOAD_PATH, download_item.downloadFilename))
+                    dirName = filetools.join(DOWNLOAD_PATH, filetools.dirname(download_item.downloadFilename))
+                    if len(filetools.listdir(dirName)) == 0:
+                        filetools.rmdir(dirName)
 
     xbmc.sleep(100)
     platformtools.itemlist_refresh()
@@ -208,7 +211,7 @@ def stop_all(item=None):
             download_item = Item().fromjson(filetools.read(filetools.join(DOWNLOAD_LIST_PATH, fichero)))
             if download_item.downloadStatus == 4:
                 update_json(filetools.join(DOWNLOAD_LIST_PATH, fichero), {"downloadStatus": STATUS_CODES.stoped})
-    xbmc.sleep(100)
+    xbmc.sleep(300)
     if item:
         platformtools.itemlist_refresh()
 
