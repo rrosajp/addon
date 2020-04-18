@@ -5923,6 +5923,65 @@ msgctxt "#70789"
 msgid "* Change by opening the settings from KoD main menu"
 msgstr "* Cambia aprendo le impostazioni dal menu principale di KoD"
 
+msgctxt "#70790"
+msgid "RAR download in progress"
+msgstr "Download RAR in corso"
+
+msgctxt "#70791"
+msgid "A RAR file was detected in the download, but you have not installed the UnRAR extractor.\nDo you want to download it anyway?"
+msgstr "Un file RAR è stato rilevato nel download, ma non hai installato l'estrattore UnRAR.\nVuoi scaricarlo in ogni caso?"
+
+msgctxt "#70792"
+msgid "Delete downloaded files?"
+msgstr "Cancellare i file scaricati?"
+
+msgctxt "#70793"
+msgid "Starting extraction..."
+msgstr "Avvio dell'estrazione..."
+
+msgctxt "#70794"
+msgid "Enter the password (Look in %s)"
+msgstr "Inserisci la password (Cerca in %s)"
+
+msgctxt "#70795"
+msgid "Extracted"
+msgstr "Estratto"
+
+msgctxt "#70796"
+msgid "Error opening RAR File"
+msgstr "Errore durante l'apertura del file RAR"
+
+msgctxt "#70797"
+msgid "The RAR file is empty"
+msgstr "Il file RAR è vuoto"
+
+msgctxt "#70798"
+msgid "Or does not contain valid archives"
+msgstr "O non contiene archivi validi"
+
+msgctxt "#70799"
+msgid "Extraction error"
+msgstr "Errore di estrazione"
+
+msgctxt "#70800"
+msgid "Archive with errors"
+msgstr "Archivio con errori"
+
+msgctxt "#70801"
+msgid "Extract without playing"
+msgstr "Estrarre senza riprodurre"
+
+msgctxt "#70802"
+msgid "Wait some minutes..."
+msgstr "Aspetta qualche minuto..."
+
+msgctxt "#70803"
+msgid "Extracting files..."
+msgstr "Estrazione dei files..."
+
+msgctxt "#70804"
+msgid "Next extraction..."
+msgstr "Estrazione successiva..."
 
 # DNS start [ settings and declaration ]
 msgctxt "#707401"

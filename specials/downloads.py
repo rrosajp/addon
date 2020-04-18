@@ -786,7 +786,13 @@ def select_server(item):
         if not i.server and hasattr(channel, "play"):
             play_items[x] = getattr(channel, "play")(i)
 
-    seleccion = platformtools.dialog_select(config.get_localized_string(70192), ["Auto"] + [s.title for s in play_items])
+    if len(play_items) == 1:
+        # if there is only one server select it
+        seleccion = 1
+    else:
+        # altrimenti mostra la finestra di selezione
+        seleccion = platformtools.dialog_select(config.get_localized_string(70192), ["Auto"] + [s.title for s in play_items])
+
     if seleccion >= 1:
         update_json(item.path, {
             "downloadServer": {"url": play_items[seleccion - 1].url, "server": play_items[seleccion - 1].server}})
