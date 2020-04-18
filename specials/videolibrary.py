@@ -1034,6 +1034,7 @@ def delete(item):
             xbmc_videolibrary.clean(strm_list)
 
         logger.info("All links removed")
+        xbmc.sleep(1000)
         platformtools.itemlist_refresh()
 
     # logger.info(item.contentTitle)
@@ -1058,6 +1059,7 @@ def delete(item):
 
             if index == 0:
                 # Seleccionado Eliminar pelicula/serie
+                canal = None
                 delete_all(item)
 
             elif index > 0:
@@ -1069,44 +1071,44 @@ def delete(item):
         else:
             canal = item.dead
 
-        num_enlaces = 0
-        strm_list = []
-        for fd in filetools.listdir(item.path):
-            if fd.endswith(canal + '].json') or scrapertools.find_single_match(fd, '%s]_\d+.torrent' % canal):
-                if filetools.remove(filetools.join(item.path, fd)):
-                    num_enlaces += 1
-                    # Remove strm and nfo if no other channel
-                    episode = fd.replace(' [' + canal + '].json', '')
-                    found_ch = False
-                    for ch in channels:
-                        if filetools.exists(filetools.join(item.path, episode + ' [' + ch + '].json')):
-                            found_ch = True
-                            break
-                    if found_ch == False:
-                        filetools.remove(filetools.join(item.path, episode + '.nfo'))
-                        filetools.remove(filetools.join(item.path, episode + '.strm'))
-                        strm_list.append(filetools.join(item.extra, episode + '.strm'))
+        if canal:
+            num_enlaces = 0
+            strm_list = []
+            for fd in filetools.listdir(item.path):
+                if fd.endswith(canal + '].json') or scrapertools.find_single_match(fd, '%s]_\d+.torrent' % canal):
+                    if filetools.remove(filetools.join(item.path, fd)):
+                        num_enlaces += 1
+                        # Remove strm and nfo if no other channel
+                        episode = fd.replace(' [' + canal + '].json', '')
+                        found_ch = False
+                        for ch in channels:
+                            if filetools.exists(filetools.join(item.path, episode + ' [' + ch + '].json')):
+                                found_ch = True
+                                break
+                        if found_ch == False:
+                            filetools.remove(filetools.join(item.path, episode + '.nfo'))
+                            filetools.remove(filetools.join(item.path, episode + '.strm'))
+                            strm_list.append(filetools.join(item.extra, episode + '.strm'))
 
-        if config.is_xbmc() and config.get_setting("videolibrary_kodi") and strm_list:
-            from platformcode import xbmc_videolibrary
-            xbmc_videolibrary.clean(strm_list)
+            if config.is_xbmc() and config.get_setting("videolibrary_kodi") and strm_list:
+                from platformcode import xbmc_videolibrary
+                xbmc_videolibrary.clean(strm_list)
 
-        if num_enlaces > 0:
-            # Actualizar .nfo
-            head_nfo, item_nfo = videolibrarytools.read_nfo(item.nfo)
-            del item_nfo.library_urls[canal]
-            if item_nfo.emergency_urls and item_nfo.emergency_urls.get(canal, False):
-                del item_nfo.emergency_urls[canal]
-            filetools.write(item.nfo, head_nfo + item_nfo.tojson())
+            if num_enlaces > 0:
+                # Actualizar .nfo
+                head_nfo, item_nfo = videolibrarytools.read_nfo(item.nfo)
+                del item_nfo.library_urls[canal]
+                if item_nfo.emergency_urls and item_nfo.emergency_urls.get(canal, False):
+                    del item_nfo.emergency_urls[canal]
+                filetools.write(item.nfo, head_nfo + item_nfo.tojson())
 
-        msg_txt = config.get_localized_string(70087) % (num_enlaces, canal)
-        logger.info(msg_txt)
-        platformtools.dialog_notification(heading, msg_txt)
-        platformtools.itemlist_refresh()
+            msg_txt = config.get_localized_string(70087) % (num_enlaces, canal)
+            logger.info(msg_txt)
+            platformtools.dialog_notification(heading, msg_txt)
+            platformtools.itemlist_refresh()
 
     else:
-        if platformtools.dialog_yesno(heading,
-                                      config.get_localized_string(70088) % item.infoLabels['title']):
+        if platformtools.dialog_yesno(heading, config.get_localized_string(70088) % item.infoLabels['title']):
             delete_all(item)
 
 
