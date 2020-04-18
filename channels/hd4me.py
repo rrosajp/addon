@@ -22,8 +22,11 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     # debug = True
-    patron = r'<a href="(?P<url>[^"]+)" rel="[^"]+" title="(?P<title>[^\(]+)(?!\()\s*\((?P<year>\d+)\)\s\D+(?P<quality>\d+p) ... (?P<lang>[^ ]+).*?<img id="cov" src="(?P<thumb>[^"]+)"'
-    patronNext = r'rel="next" href="([^"]+)"'
+    if item.args == 'alternative':
+        patron = r'<a title="(?P<title>[^\(]+)\(\s*(?P<year>\d+)\)\s\D+(?P<quality>\d+p) ... (?P<lang>[^ ]+).*?[^"]+"\s*href="(?P<url>[^"]+)'
+    else:
+        patron = r'<a href="(?P<url>[^"]+)" rel="[^"]+" title="(?P<title>[^\(]+)(?!\()\s*\((?P<year>\d+)\)\s\D+(?P<quality>\d+p) ... (?P<lang>[^ ]+).*?<img id="cov" src="(?P<thumb>[^"]+)"'
+        patronNext = r'rel="next" href="([^"]+)"'
     return locals()
 
 @support.scrape
@@ -31,6 +34,10 @@ def genre(item):
     action = 'peliculas'
     blacklist =['prova ']
     patronMenu = r'<a href="(?P<url>[^"]+)" class="menu-link\s*sub-menu-link">(?P<title>[^<]+)<'
+    def itemHook(item):
+        if item.fulltitle in ['Classici Disney', 'Studio Ghibli', 'Pixar']:
+            item.args = 'alternative'
+        return item
     return locals()
 
 
