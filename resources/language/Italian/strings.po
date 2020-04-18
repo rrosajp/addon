@@ -6220,3 +6220,11 @@ msgstr "Eliminazione videoteca..."
 msgctxt "#80039"
 msgid "The video library has been deleted"
 msgstr "La videoteca è stata eliminata"
+
+msgctxt "#80040"
+msgid "Add-on updated to commit %s"
+msgstr "Add-on aggiornato al commit %s"
+
+msgctxt "#80041"
+msgid "Latest updates:\n"
+msgstr "Ultimi aggiornamenti:\n"

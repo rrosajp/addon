@@ -410,60 +410,10 @@ def move_to_libray(item):
     if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
         from platformcode import xbmc_videolibrary
         if clean == True:
-            xbmc_videolibrary.clean(file_strm_path)
+            strm_list = []
+            strm_list.append(file_strm_path)
+            xbmc_videolibrary.clean(strm_list)
         xbmc_videolibrary.update(FOLDER, path_title)
-
-    """if config.get_setting("library_add") == True and config.get_setting("library_move") == True:
-        if not filetools.isdir(filetools.dirname(library_path)):
-            filetools.mkdir(filetools.dirname(library_path))
-
-        if filetools.isfile(library_path) and filetools.isfile(download_path):
-            filetools.remove(library_path)
-
-        if filetools.isfile(download_path):
-            if filetools.move(download_path, library_path):
-                final_path = library_path
-
-            if len(filetools.listdir(filetools.dirname(download_path))) == 0:
-                filetools.rmdir(filetools.dirname(download_path))
-
-
-        logger.info('ITEM = ' + str(item))
-        name = item.contentTitle if item.contentType == 'movie' else str(item.infoLabels['season']) + 'x' + str(item.infoLabels['episode']).zfill(2)
-        list_item = filetools.listdir(filetools.join(config.get_videolibrary_path(), FOLDER, path_title))
-
-        clean = False
-        for File in list_item:
-            filename = File.lower()
-            name = name.lower()
-
-            if filename.startswith(name) and (filename.endswith('.strm') or filename.endswith('.json') or filename.endswith('.nfo')):
-                clean = True
-                logger.info('Delete File: ' + str(filetools.join(config.get_videolibrary_path(), FOLDER, path_title, File)))
-                filetools.remove(filetools.join(config.get_videolibrary_path(), FOLDER, path_title, File))
-
-        if config.get_setting("videolibrary_kodi"):
-            from platformcode import xbmc_videolibrary
-            xbmc_videolibrary.update(FOLDER)
-            if clean == True:
-                import xbmc
-                while xbmc.getCondVisibility('Library.IsScanningVideo()'):
-                    xbmc.sleep(500)
-                xbmc_videolibrary.clean()
-
-    if config.get_setting("library_add") == True and config.get_setting("library_move") == False:
-        if filetools.isfile(final_path):
-            if item.contentType == "movie" and item.infoLabels["tmdb_id"]:
-                library_item = Item(title=config.get_localized_string(70228) % item.downloadFilename, channel="downloads",
-                                    action="findvideos", infoLabels=item.infoLabels, url=final_path)
-                videolibrarytools.save_movie(library_item)
-
-            elif item.contentType == "episode" and item.infoLabels["tmdb_id"]:
-                library_item = Item(title=config.get_localized_string(70228) % item.downloadFilename, channel="downloads",
-                                    action="findvideos", infoLabels=item.infoLabels, url=final_path)
-                tvshow = Item(channel="downloads", contentType="tvshow",
-                              infoLabels={"tmdb_id": item.infoLabels["tmdb_id"]})
-                videolibrarytools.save_tvshow(tvshow, [library_item])"""
 
 
 def update_json(path, params):
