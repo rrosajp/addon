@@ -69,7 +69,7 @@ if DOWNLOAD_LIMIT:
 else:
     DOWNLOAD_LIMIT = 0
 UPLOAD_LIMIT = 100 * 1024
-msg_header = 'KoD Client Torrent MCT'
+msg_header = 'MCT Client Torrent'
 
 
 def play(url, xlistitem={}, is_view=None, subtitle="", password="", item=None):

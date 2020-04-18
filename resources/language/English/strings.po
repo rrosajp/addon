@@ -5923,6 +5923,65 @@ msgctxt "#70789"
 msgid "* Change by opening the settings from KoD main menu"
 msgstr ""
 
+msgctxt "#70790"
+msgid "RAR download in progress"
+msgstr ""
+
+msgctxt "#70791"
+msgid "A RAR file was detected in the download, but you have not installed the UnRAR extractor.\nDo you want to download it anyway?"
+msgstr ""
+
+msgctxt "#70792"
+msgid "Delete downloaded files?"
+msgstr ""
+
+msgctxt "#70793"
+msgid "Starting extraction..."
+msgstr ""
+
+msgctxt "#70794"
+msgid "Enter the password (Look in %s)"
+msgstr ""
+
+msgctxt "#70795"
+msgid "Extracted"
+msgstr ""
+
+msgctxt "#70796"
+msgid "Error opening RAR File"
+msgstr ""
+
+msgctxt "#70797"
+msgid "The RAR file is empty"
+msgstr ""
+
+msgctxt "#70798"
+msgid "Or does not contain valid archives"
+msgstr ""
+
+msgctxt "#70799"
+msgid "Extraction error"
+msgstr ""
+
+msgctxt "#70800"
+msgid "Archive with errors"
+msgstr ""
+
+msgctxt "#70801"
+msgid "Extract without playing"
+msgstr ""
+
+msgctxt "#70802"
+msgid "Wait some minutes..."
+msgstr ""
+
+msgctxt "#70803"
+msgid "Extracting files..."
+msgstr ""
+
+msgctxt "#70804"
+msgid "Next extraction..."
+msgstr ""
 
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
