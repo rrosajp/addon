@@ -8,12 +8,11 @@ standard_library.install_aliases()
 import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
-    
+
 import os
 import threading
 import time
 import re
-import inspect
 
 import xbmc
 from core import filetools
@@ -334,7 +333,7 @@ def mark_season_as_watched_on_kodi(item, value=1):
 def mark_content_as_watched_on_alfa(path):
     from specials import videolibrary
     from core import videolibrarytools
-    
+
     """
         marca toda la serie o película como vista o no vista en la Videoteca de Alfa basado en su estado en la Videoteca de Kodi
         @type str: path
@@ -342,7 +341,7 @@ def mark_content_as_watched_on_alfa(path):
         """
     logger.info()
     #logger.debug("path: " + path)
-    
+
     FOLDER_MOVIES = config.get_setting("folder_movies")
     FOLDER_TVSHOWS = config.get_setting("folder_tvshows")
     VIDEOLIBRARY_PATH = config.get_videolibrary_config_path()
@@ -353,7 +352,7 @@ def mark_content_as_watched_on_alfa(path):
     # en caso de compartir BBDD esta funcionalidad no funcionara
     #if config.get_setting("db_mode", "videolibrary"):
     #    return
-    
+
     path2 = ''
     if "special://" in VIDEOLIBRARY_PATH:
         if FOLDER_TVSHOWS in path:
@@ -376,7 +375,7 @@ def mark_content_as_watched_on_alfa(path):
             path2 = path1.replace("\\", "/")                            #Formato no Windows
         else:
             path2 = path2.replace(nfo_name, '')
-        
+
     else:
         contentType = "movie_view"                                      #Marco la tabla de BBDD de Kodi Video
         path1 = path.replace("\\\\", "\\")                              #Formato Windows
@@ -386,7 +385,7 @@ def mark_content_as_watched_on_alfa(path):
         path1 = path1.replace(nfo_name, '')                             #para la SQL solo necesito la carpeta
         path2 = path2.replace(nfo_name, '')                             #para la SQL solo necesito la carpeta
     path2 = filetools.remove_smb_credential(path2)                      #Si el archivo está en un servidor SMB, quitamos las credenciales
-    
+
     #Ejecutmos la sentencia SQL
     sql = 'select strFileName, playCount from %s where (strPath like "%s" or strPath like "%s")' % (contentType, path1, path2)
     nun_records = 0
@@ -395,7 +394,7 @@ def mark_content_as_watched_on_alfa(path):
     if nun_records == 0:                                                #hay error?
         logger.error("Error en la SQL: " + sql + ": 0 registros")
         return                                                          #salimos: o no está catalogado en Kodi, o hay un error en la SQL
-    
+
     for title, playCount in records:                                    #Ahora recorremos todos los registros obtenidos
         if contentType == "episode_view":
             title_plain = title.replace('.strm', '')                    #Si es Serie, quitamos el sufijo .strm
@@ -419,10 +418,10 @@ def mark_content_as_watched_on_alfa(path):
                 item = videolibrary.check_season_playcount(item, season_num)    #llamamos al método que actualiza Temps. y Series
 
     filetools.write(path, head_nfo + item.tojson())
-    
+
     #logger.debug(item)
-    
-    
+
+
 def get_data(payload):
     """
     obtiene la información de la llamada JSON-RPC con la información pasada en payload
@@ -701,7 +700,7 @@ def set_content(content_type, silent=False, custom=False):
             if seleccion == -1 or seleccion == 0:
                 strScraper = 'metadata.themoviedb.org'
                 path_settings = xbmc.translatePath("special://profile/addon_data/metadata.themoviedb.org/settings.xml")
-            elif seleccion == 1: 
+            elif seleccion == 1:
                 strScraper = 'metadata.universal'
                 path_settings = xbmc.translatePath("special://profile/addon_data/metadata.universal/settings.xml")
             if not os.path.exists(path_settings):
@@ -720,7 +719,7 @@ def set_content(content_type, silent=False, custom=False):
             if seleccion == -1 or seleccion == 0:
                 strScraper = 'metadata.tvdb.com'
                 path_settings = xbmc.translatePath("special://profile/addon_data/metadata.tvdb.com/settings.xml")
-            elif seleccion == 1: 
+            elif seleccion == 1:
                 strScraper = 'metadata.tvshows.themoviedb.org'
                 path_settings = xbmc.translatePath("special://profile/addon_data/metadata.tvshows.themoviedb.org/settings.xml")
             if not os.path.exists(path_settings):
@@ -1015,7 +1014,6 @@ def clean(path_list=[]):
                     nun_records, records = execute_sql_kodi(sql)
 
     progress.update(100)
-    # xbmc.sleep(5000 if inspect.stack()[1][3] == 'move_to_libray' else 1000)
     xbmc.sleep(1000)
     progress.close()
     xbmc.executebuiltin('XBMC.ReloadSkin()')
