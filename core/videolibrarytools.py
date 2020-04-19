@@ -593,15 +593,6 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     raiz, carpetas_series, ficheros = next(filetools.walk(path))
     ficheros = [filetools.join(path, f) for f in ficheros]
 
-    nostrm_episodelist = []
-    for root, folders, files in filetools.walk(path):
-        for file in files:
-            season_episode = scrapertools.get_season_and_episode(file)
-            if season_episode == "" or filetools.exists(filetools.join(path, "%s.strm" % season_episode)):
-                continue
-            nostrm_episodelist.append(season_episode)
-    nostrm_episodelist = sorted(set(nostrm_episodelist))
-
     # Silent es para no mostrar progreso (para service)
     if not silent:
         # progress dialog
@@ -679,6 +670,8 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     except:
         t = 0
 
+    local_episodelist = get_local_content(path)
+
     last_season_episode = ''
     for i, e in enumerate(scraper.sort_episode_list(new_episodelist)):
         if not silent:
@@ -701,7 +694,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
         nfo_path = filetools.join(path, "%s.nfo" % season_episode)
         json_path = filetools.join(path, ("%s [%s].json" % (season_episode, e.channel)).lower())
 
-        if season_episode in nostrm_episodelist:
+        if season_episode in local_episodelist:
             logger.info('Skipped: Serie ' + serie.contentSerieName + ' ' + season_episode + ' available as local content')
             continue
         strm_exists = strm_path in ficheros
@@ -842,6 +835,21 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     logger.debug("%s [%s]: inserted= %s, overwritten= %s, failed= %s" %
                  (serie.contentSerieName, serie.channel, insertados, sobreescritos, fallidos))
     return insertados, sobreescritos, fallidos
+
+
+def get_local_content(path):
+    logger.info()
+
+    local_episodelist = []
+    for root, folders, files in filetools.walk(path):
+        for file in files:
+            season_episode = scrapertools.get_season_and_episode(file)
+            if season_episode == "" or filetools.exists(filetools.join(path, "%s.strm" % season_episode)):
+                continue
+            local_episodelist.append(season_episode)
+    local_episodelist = sorted(set(local_episodelist))
+
+    return local_episodelist
 
 
 def add_movie(item):

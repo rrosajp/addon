@@ -511,7 +511,7 @@ def update(folder_content=config.get_setting("folder_tvshows"), folder=""):
 
     data = get_data(payload)
 
-    xbmc.executebuiltin('XBMC.ReloadSkin()')
+    #xbmc.executebuiltin('XBMC.ReloadSkin()')
 
 
 def search_library_path():

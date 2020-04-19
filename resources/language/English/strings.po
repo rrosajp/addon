@@ -697,7 +697,7 @@ msgid "Delete movie/channel"
 msgstr ""
 
 msgctxt "#60019"
-msgid "Delete this movie"
+msgid "Delete movie"
 msgstr ""
 
 msgctxt "#60020"
@@ -789,7 +789,7 @@ msgid "Delete TV show"
 msgstr ""
 
 msgctxt "#60042"
-msgid "Delete only the links of %s"
+msgid "Delete links of %s"
 msgstr ""
 
 msgctxt "#60043"
@@ -3121,7 +3121,11 @@ msgid "Show only links of "
 msgstr ""
 
 msgctxt "#70079"
-msgid "Remove only links of "
+msgid "Delete ony the links of "
+msgstr ""
+
+msgctxt "#70081"
+msgid "The folder also contains local or downloaded video files. Do you want to delete them?"
 msgstr ""
 
 msgctxt "#70082"
@@ -3141,7 +3145,7 @@ msgid "Delete TV show"
 msgstr ""
 
 msgctxt "#70086"
-msgid "Remove only links of %s"
+msgid "Delete only the links of %s"
 msgstr ""
 
 msgctxt "#70087"

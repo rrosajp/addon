@@ -696,8 +696,8 @@ msgid "Delete movie/channel"
 msgstr "Elimina film/canale"
 
 msgctxt "#60019"
-msgid "Delete this movie"
-msgstr "Elimina questo film"
+msgid "Delete movie"
+msgstr "Elimina film"
 
 msgctxt "#60020"
 msgid "Mark TV show as not watched"
@@ -781,15 +781,15 @@ msgstr "Errore nel canale %s"
 
 msgctxt "#60040"
 msgid "Delete movie"
-msgstr "Rimuovere film"
+msgstr "Elimina film"
 
 msgctxt "#60041"
 msgid "Delete TV show"
-msgstr "Rimuovere serie TV"
+msgstr "Elimina serie TV"
 
 msgctxt "#60042"
-msgid "Delete only the links of %s"
-msgstr "Rimuovere solo i link dei %s"
+msgid "Delete links of %s"
+msgstr "Elimina link di %s"
 
 msgctxt "#60043"
 msgid "Delete %s links of channel %s"
@@ -3120,8 +3120,12 @@ msgid "Show only links of "
 msgstr "Mostra solo link di "
 
 msgctxt "#70079"
-msgid "Remove only links of "
-msgstr "Rimuovere solo i collegamenti di "
+msgid "Delete only the links of "
+msgstr "Elimina solo i link di "
+
+msgctxt "#70081"
+msgid "The folder also contains local or downloaded video files. Do you want to delete them?"
+msgstr "La cartella contiene anche file video locali o scaricati. Vuoi eliminarli?"
 
 msgctxt "#70082"
 msgid "Global Search"
@@ -3140,12 +3144,12 @@ msgid "Delete TV show"
 msgstr "Elimina serie TV"
 
 msgctxt "#70086"
-msgid "Remove only links of %s"
-msgstr "Rimuovere solo i collegamenti di %s"
+msgid "Delete only the links of %s"
+msgstr "Elimina solo i link di %s"
 
 msgctxt "#70087"
 msgid "Deleted %s links from canal %s"
-msgstr "Eliminati %s links del canale %s"
+msgstr "Eliminati %s link del canale %s"
 
 msgctxt "#70088"
 msgid "Are you sure you want to delete '%s' from video library?"

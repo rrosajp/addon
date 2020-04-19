@@ -1026,6 +1026,13 @@ def delete(item):
         raiz, carpeta_serie, ficheros = next(filetools.walk(_item.path))
         if ficheros == []:
             filetools.rmdir(_item.path)
+        else:
+            if _item.contentType == 'movie':
+                heading = config.get_localized_string(70084)
+            else:
+                heading = config.get_localized_string(70085)
+            if platformtools.dialog_yesno(heading, config.get_localized_string(70081)):
+                filetools.rmdirtree(_item.path)
 
         if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
             from platformcode import xbmc_videolibrary
