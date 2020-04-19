@@ -407,7 +407,7 @@ def get_episodes(item):
 
     # Crear un item en la lista para cada strm encontrado
     for i in ficheros:
-        if i.split('.')[-1] not in  ['json','nfo']: #i.endswith('.strm'):
+        if i.split('.')[-1] not in ['json','nfo']: #i.endswith('.strm'):
             season_episode = scrapertools.get_season_and_episode(i)
             if not season_episode:
                 # El fichero no incluye el numero de temporada y episodio
@@ -419,38 +419,39 @@ def get_episodes(item):
 
             # Obtener los datos del season_episode.nfo
             nfo_path = filetools.join(raiz, '%sx%s.nfo' % (season, episode))#.replace('.strm', '.nfo')
-            head_nfo, epi = videolibrarytools.read_nfo(nfo_path)
+            if filetools.isfile(nfo_path):
+                head_nfo, epi = videolibrarytools.read_nfo(nfo_path)
 
-            # Fijar el titulo del capitulo si es posible
-            if epi.contentTitle:
-                title_episodie = epi.contentTitle.strip()
-            else:
-                title_episodie = config.get_localized_string(60031) % \
-                                 (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2))
+                # Fijar el titulo del capitulo si es posible
+                if epi.contentTitle:
+                    title_episodie = epi.contentTitle.strip()
+                else:
+                    title_episodie = config.get_localized_string(60031) % \
+                                    (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2))
 
-            epi.contentTitle = "%sx%s" % (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2))
-            epi.title = "%sx%s - %s" % (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2), title_episodie)
+                epi.contentTitle = "%sx%s" % (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2))
+                epi.title = "%sx%s - %s" % (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2), title_episodie)
 
-            if item_nfo.library_filter_show:
-                epi.library_filter_show = item_nfo.library_filter_show
+                if item_nfo.library_filter_show:
+                    epi.library_filter_show = item_nfo.library_filter_show
 
-            # Menu contextual: Marcar episodio como visto o no
-            visto = item_nfo.library_playcounts.get(season_episode, 0)
-            epi.infoLabels["playcount"] = visto
-            if visto > 0:
-                texto = config.get_localized_string(60032)
-                value = 0
-            else:
-                texto = config.get_localized_string(60033)
-                value = 1
-            epi.context = [{"title": texto,
-                            "action": "mark_content_as_watched",
-                            "channel": "videolibrary",
-                            "playcount": value,
-                            "nfo": item.nfo}]
+                # Menu contextual: Marcar episodio como visto o no
+                visto = item_nfo.library_playcounts.get(season_episode, 0)
+                epi.infoLabels["playcount"] = visto
+                if visto > 0:
+                    texto = config.get_localized_string(60032)
+                    value = 0
+                else:
+                    texto = config.get_localized_string(60033)
+                    value = 1
+                epi.context = [{"title": texto,
+                                "action": "mark_content_as_watched",
+                                "channel": "videolibrary",
+                                "playcount": value,
+                                "nfo": item.nfo}]
 
-            # logger.debug("epi:\n" + epi.tostring('\n'))
-            itemlist.append(epi)
+                # logger.debug("epi:\n" + epi.tostring('\n'))
+                itemlist.append(epi)
 
     itemlist = sorted(itemlist, key=lambda it: (int(it.contentSeason), int(it.contentEpisodeNumber)))
     add_download_items(item, itemlist)
