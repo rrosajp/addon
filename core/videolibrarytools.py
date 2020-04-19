@@ -1053,8 +1053,8 @@ def emergency_urls(item, channel=None, path=None, headers={}):
                 for url in item_res.emergency_urls[0]:                      #Recorremos las urls de emergencia...
                     torrents_path = re.sub(r'(?:\.\w+$)', '_%s.torrent' % str(i).zfill(2), path)
                     path_real = ''
-                    # if magnet_caching_e or not url.startswith('magnet'):
-                    #     path_real = torrent.caching_torrents(url, referer, post, torrents_path=torrents_path, headers=headers)  #...  para descargar los .torrents
+                    if magnet_caching_e or not url.startswith('magnet'):
+                        path_real = torrent.caching_torrents(url, referer, post, torrents_path=torrents_path, headers=headers)  #...  para descargar los .torrents
                     if path_real:                                           #Si ha tenido éxito...
                         item_res.emergency_urls[0][i-1] = path_real.replace(videolibrary_path, '')  #se guarda el "path" relativo
                     i += 1

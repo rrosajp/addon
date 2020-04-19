@@ -110,41 +110,41 @@ def autostart(item):  # item necessario launcher.py linea 265
 def setting_torrent(item):
     logger.info()
 
-    # LIBTORRENT_PATH = config.get_setting("libtorrent_path", server="torrent", default="")
-    # LIBTORRENT_ERROR = config.get_setting("libtorrent_error", server="torrent", default="")
+    LIBTORRENT_PATH = config.get_setting("libtorrent_path", server="torrent", default="")
+    LIBTORRENT_ERROR = config.get_setting("libtorrent_error", server="torrent", default="")
     default = config.get_setting("torrent_client", server="torrent", default=0)
-    # BUFFER = config.get_setting("mct_buffer", server="torrent", default="50")
-    # DOWNLOAD_PATH = config.get_setting("mct_download_path", server="torrent", default=config.get_setting("downloadpath"))
-    # if not DOWNLOAD_PATH: DOWNLOAD_PATH = filetools.join(config.get_data_path(), 'downloads')
-    # BACKGROUND = config.get_setting("mct_background_download", server="torrent", default=True)
-    # RAR = config.get_setting("mct_rar_unpack", server="torrent", default=True)
-    # DOWNLOAD_LIMIT = config.get_setting("mct_download_limit", server="torrent", default="")
-    # BUFFER_BT = config.get_setting("bt_buffer", server="torrent", default="50")
-    # DOWNLOAD_PATH_BT = config.get_setting("bt_download_path", server="torrent", default=config.get_setting("downloadpath"))
-    # if not DOWNLOAD_PATH_BT: DOWNLOAD_PATH_BT = filetools.join(config.get_data_path(), 'downloads')
-    # MAGNET2TORRENT = config.get_setting("magnet2torrent", server="torrent", default=False)
+    BUFFER = config.get_setting("mct_buffer", server="torrent", default="50")
+    DOWNLOAD_PATH = config.get_setting("mct_download_path", server="torrent", default=config.get_setting("downloadpath"))
+    if not DOWNLOAD_PATH: DOWNLOAD_PATH = filetools.join(config.get_data_path(), 'downloads')
+    BACKGROUND = config.get_setting("mct_background_download", server="torrent", default=True)
+    RAR = config.get_setting("mct_rar_unpack", server="torrent", default=True)
+    DOWNLOAD_LIMIT = config.get_setting("mct_download_limit", server="torrent", default="")
+    BUFFER_BT = config.get_setting("bt_buffer", server="torrent", default="50")
+    DOWNLOAD_PATH_BT = config.get_setting("bt_download_path", server="torrent", default=config.get_setting("downloadpath"))
+    if not DOWNLOAD_PATH_BT: DOWNLOAD_PATH_BT = filetools.join(config.get_data_path(), 'downloads')
+    MAGNET2TORRENT = config.get_setting("magnet2torrent", server="torrent", default=False)
 
-    torrent_options = [config.get_localized_string(30006)]#, config.get_localized_string(70254), config.get_localized_string(70255)]
+    torrent_options = [config.get_localized_string(30006), config.get_localized_string(70254), config.get_localized_string(70255)]
     torrent_options.extend(platformtools.torrent_client_installed())
     
 
     list_controls = [
-        # {
-        #     "id": "libtorrent_path",
-        #     "type": "text",
-        #     "label": "Libtorrent path",
-        #     "default": LIBTORRENT_PATH,
-        #     "enabled": True,
-        #     "visible": False
-        # },
-        # {
-        #     "id": "libtorrent_error",
-        #     "type": "text",
-        #     "label": "libtorrent error",
-        #     "default": LIBTORRENT_ERROR,
-        #     "enabled": True,
-        #     "visible": False
-        # },
+        {
+            "id": "libtorrent_path",
+            "type": "text",
+            "label": "Libtorrent path",
+            "default": LIBTORRENT_PATH,
+            "enabled": True,
+            "visible": False
+        },
+        {
+            "id": "libtorrent_error",
+            "type": "text",
+            "label": "libtorrent error",
+            "default": LIBTORRENT_ERROR,
+            "enabled": True,
+            "visible": False
+        },
         {
             "id": "list_torrent",
             "type": "list",
@@ -154,70 +154,70 @@ def setting_torrent(item):
             "visible": True,
             "lvalues": torrent_options
         },
-        # {
-        #     "id": "mct_buffer",
-        #     "type": "text",
-        #     "label": "MCT - " + config.get_localized_string(70758),
-        #     "default": BUFFER,
-        #     "enabled": True,
-        #     "visible": "eq(-1,%s)" % torrent_options[2]
-        # },
-        # {
-        #     "id": "mct_download_path",
-        #     "type": "text",
-        #     "label": "MCT - " + config.get_localized_string(30017),
-        #     "default": DOWNLOAD_PATH,
-        #     "enabled": True,
-        #     "visible": "eq(-2,%s)" % torrent_options[2]
-        # },
-        # {
-        #     "id": "bt_buffer",
-        #     "type": "text",
-        #     "label": "BT - " + config.get_localized_string(70758),
-        #     "default": BUFFER_BT,
-        #     "enabled": True,
-        #     "visible": "eq(-3,%s)" % torrent_options[1]
-        # },
-        # {
-        #     "id": "bt_download_path",
-        #     "type": "text",
-        #     "label": "BT - " + config.get_localized_string(30017),
-        #     "default": DOWNLOAD_PATH_BT,
-        #     "enabled": True,
-        #     "visible": "eq(-4,%s)" % torrent_options[1]
-        # },
-        # {
-        #     "id": "mct_download_limit",
-        #     "type": "text",
-        #     "label": config.get_localized_string(70759),
-        #     "default": DOWNLOAD_LIMIT,
-        #     "enabled": True,
-        #     "visible": "eq(-5,%s) | eq(-5,%s)" % (torrent_options[1], torrent_options[2])
-        # },
-        # {
-        #     "id": "mct_rar_unpack",
-        #     "type": "bool",
-        #     "label": config.get_localized_string(70760),
-        #     "default": RAR,
-        #     "enabled": True,
-        #     "visible": True
-        # },
-        # {
-        #     "id": "mct_background_download",
-        #     "type": "bool",
-        #     "label": config.get_localized_string(70761),
-        #     "default": BACKGROUND,
-        #     "enabled": True,
-        #     "visible": True
-        # },
-        # {
-        #     "id": "magnet2torrent",
-        #     "type": "bool",
-        #     "label": config.get_localized_string(70762),
-        #     "default": MAGNET2TORRENT,
-        #     "enabled": True,
-        #     "visible": True
-        # }
+        {
+            "id": "mct_buffer",
+            "type": "text",
+            "label": "MCT - " + config.get_localized_string(70758),
+            "default": BUFFER,
+            "enabled": True,
+            "visible": "eq(-1,%s)" % torrent_options[2]
+        },
+        {
+            "id": "mct_download_path",
+            "type": "text",
+            "label": "MCT - " + config.get_localized_string(30017),
+            "default": DOWNLOAD_PATH,
+            "enabled": True,
+            "visible": "eq(-2,%s)" % torrent_options[2]
+        },
+        {
+            "id": "bt_buffer",
+            "type": "text",
+            "label": "BT - " + config.get_localized_string(70758),
+            "default": BUFFER_BT,
+            "enabled": True,
+            "visible": "eq(-3,%s)" % torrent_options[1]
+        },
+        {
+            "id": "bt_download_path",
+            "type": "text",
+            "label": "BT - " + config.get_localized_string(30017),
+            "default": DOWNLOAD_PATH_BT,
+            "enabled": True,
+            "visible": "eq(-4,%s)" % torrent_options[1]
+        },
+        {
+            "id": "mct_download_limit",
+            "type": "text",
+            "label": config.get_localized_string(70759),
+            "default": DOWNLOAD_LIMIT,
+            "enabled": True,
+            "visible": "eq(-5,%s) | eq(-5,%s)" % (torrent_options[1], torrent_options[2])
+        },
+        {
+            "id": "mct_rar_unpack",
+            "type": "bool",
+            "label": config.get_localized_string(70760),
+            "default": RAR,
+            "enabled": True,
+            "visible": True
+        },
+        {
+            "id": "mct_background_download",
+            "type": "bool",
+            "label": config.get_localized_string(70761),
+            "default": BACKGROUND,
+            "enabled": True,
+            "visible": True
+        },
+        {
+            "id": "magnet2torrent",
+            "type": "bool",
+            "label": config.get_localized_string(70762),
+            "default": MAGNET2TORRENT,
+            "enabled": True,
+            "visible": True
+        }
     ]
 
     platformtools.show_channel_settings(list_controls=list_controls, callback='save_setting_torrent', item=item,
@@ -227,22 +227,22 @@ def setting_torrent(item):
 def save_setting_torrent(item, dict_data_saved):
     if dict_data_saved and "list_torrent" in dict_data_saved:
         config.set_setting("torrent_client", dict_data_saved["list_torrent"], server="torrent")
-    # if dict_data_saved and "mct_buffer" in dict_data_saved:
-    #     config.set_setting("mct_buffer", dict_data_saved["mct_buffer"], server="torrent")
-    # if dict_data_saved and "mct_download_path" in dict_data_saved:
-    #     config.set_setting("mct_download_path", dict_data_saved["mct_download_path"], server="torrent")
-    # if dict_data_saved and "mct_background_download" in dict_data_saved:
-    #     config.set_setting("mct_background_download", dict_data_saved["mct_background_download"], server="torrent")
-    # if dict_data_saved and "mct_rar_unpack" in dict_data_saved:
-    #     config.set_setting("mct_rar_unpack", dict_data_saved["mct_rar_unpack"], server="torrent")
-    # if dict_data_saved and "mct_download_limit" in dict_data_saved:
-    #     config.set_setting("mct_download_limit", dict_data_saved["mct_download_limit"], server="torrent")
-    # if dict_data_saved and "bt_buffer" in dict_data_saved:
-    #     config.set_setting("bt_buffer", dict_data_saved["bt_buffer"], server="torrent")
-    # if dict_data_saved and "bt_download_path" in dict_data_saved:
-    #     config.set_setting("bt_download_path", dict_data_saved["bt_download_path"], server="torrent")
-    # if dict_data_saved and "magnet2torrent" in dict_data_saved:
-    #     config.set_setting("magnet2torrent", dict_data_saved["magnet2torrent"], server="torrent")
+    if dict_data_saved and "mct_buffer" in dict_data_saved:
+        config.set_setting("mct_buffer", dict_data_saved["mct_buffer"], server="torrent")
+    if dict_data_saved and "mct_download_path" in dict_data_saved:
+        config.set_setting("mct_download_path", dict_data_saved["mct_download_path"], server="torrent")
+    if dict_data_saved and "mct_background_download" in dict_data_saved:
+        config.set_setting("mct_background_download", dict_data_saved["mct_background_download"], server="torrent")
+    if dict_data_saved and "mct_rar_unpack" in dict_data_saved:
+        config.set_setting("mct_rar_unpack", dict_data_saved["mct_rar_unpack"], server="torrent")
+    if dict_data_saved and "mct_download_limit" in dict_data_saved:
+        config.set_setting("mct_download_limit", dict_data_saved["mct_download_limit"], server="torrent")
+    if dict_data_saved and "bt_buffer" in dict_data_saved:
+        config.set_setting("bt_buffer", dict_data_saved["bt_buffer"], server="torrent")
+    if dict_data_saved and "bt_download_path" in dict_data_saved:
+        config.set_setting("bt_download_path", dict_data_saved["bt_download_path"], server="torrent")
+    if dict_data_saved and "magnet2torrent" in dict_data_saved:
+        config.set_setting("magnet2torrent", dict_data_saved["magnet2torrent"], server="torrent")
 
 def menu_servers(item):
     logger.info()
