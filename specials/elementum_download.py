@@ -73,7 +73,7 @@ def get_platform():
             ret["arch"] = "arm"
             if "64" in platform.machine() and ret["auto_arch"] == "64-bit":
                 ret["arch"] = "arm"
-                ret["arch"] = "x64"
+                # ret["arch"] = "x64"
     elif xbmc.getCondVisibility("system.platform.linux"):
         ret["os"] = "linux"
         if "aarch" in platform.machine() or "arm64" in platform.machine():
