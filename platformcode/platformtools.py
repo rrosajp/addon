@@ -1107,10 +1107,8 @@ def get_dialogo_opciones(item, default_action, strm, autoplay):
             opciones.append(config.get_localized_string(30164))
         else:
             # "Descargar"
-            import xbmcaddon
-            addon = xbmcaddon.Addon('plugin.video.kod')
-            downloadenabled = addon.getSetting('downloadenabled')
-            if downloadenabled != "false":
+            downloadenabled = config.get_setting('downloadenabled')
+            if downloadenabled != "false" and item.channel != 'videolibrary':
                 opcion = config.get_localized_string(30153)
                 opciones.append(opcion)
 
