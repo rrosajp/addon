@@ -61,8 +61,7 @@ def mainlist(item):
                 # Comprobamos que la serie no este ya en el itemlist
                 if not [x for x in itemlist if x.contentSerieName == i.contentSerieName and x.contentChannel == i.contentChannel]:
 
-                    title = TITLE_TVSHOW % (
-                        STATUS_COLORS[i.downloadStatus], i.downloadProgress, i.contentSerieName, i.contentChannel)
+                    title = TITLE_TVSHOW % (STATUS_COLORS[i.downloadStatus], i.downloadProgress, i.contentSerieName, i.contentChannel)
 
                     itemlist.append(Item(title=title, channel="downloads", action="mainlist", contentType="tvshow",
                                          contentSerieName=i.contentSerieName, contentChannel=i.contentChannel,
@@ -78,8 +77,7 @@ def mainlist(item):
                         STATUS_CODES.completed, STATUS_CODES.stoped]:
                         s.downloadStatus = i.downloadStatus
 
-                    s.title = TITLE_TVSHOW % (
-                        STATUS_COLORS[s.downloadStatus], downloadProgress, i.contentSerieName, i.contentChannel)
+                    s.title = TITLE_TVSHOW % (STATUS_COLORS[s.downloadStatus], downloadProgress, i.contentSerieName, i.contentChannel)
 
             # Peliculas
             elif i.contentType == "movie" or i.contentType == "video":
@@ -89,8 +87,7 @@ def mainlist(item):
         # Listado dentro de una serie
         else:
             if i.contentType == "episode" and i.contentSerieName == item.contentSerieName and i.contentChannel == item.contentChannel:
-                i.title = TITLE_FILE % (STATUS_COLORS[i.downloadStatus], i.downloadProgress,
-                                        "%dx%0.2d: %s" % (i.contentSeason, i.contentEpisodeNumber, i.contentTitle))
+                i.title = TITLE_FILE % (STATUS_COLORS[i.downloadStatus], i.downloadProgress, "%dx%0.2d: %s" % (i.contentSeason, i.contentEpisodeNumber, i.contentTitle))
                 itemlist.append(i)
 
     estados = [i.downloadStatus for i in itemlist]
@@ -186,8 +183,7 @@ def clean_all(item):
     for fichero in sorted(filetools.listdir(DOWNLOAD_LIST_PATH)):
         if fichero.endswith(".json"):
             download_item = Item().fromjson(filetools.read(filetools.join(DOWNLOAD_LIST_PATH, fichero)))
-            if not item.contentType == "tvshow" or (
-                            item.contentSerieName == download_item.contentSerieName and item.contentChannel == download_item.contentChannel):
+            if not item.contentType == "tvshow" or ( item.contentSerieName == download_item.contentSerieName and item.contentChannel == download_item.contentChannel):
                 filetools.remove(filetools.join(DOWNLOAD_LIST_PATH, fichero))
                 if removeFiles:
                     filetools.remove(filetools.join(DOWNLOAD_PATH, download_item.downloadFilename))
@@ -221,8 +217,7 @@ def clean_ready(item):
     for fichero in sorted(filetools.listdir(DOWNLOAD_LIST_PATH)):
         if fichero.endswith(".json"):
             download_item = Item().fromjson(filetools.read(filetools.join(DOWNLOAD_LIST_PATH, fichero)))
-            if not item.contentType == "tvshow" or (
-                            item.contentSerieName == download_item.contentSerieName and item.contentChannel == download_item.contentChannel):
+            if not item.contentType == "tvshow" or ( item.contentSerieName == download_item.contentSerieName and item.contentChannel == download_item.contentChannel):
                 if download_item.downloadStatus == STATUS_CODES.completed:
                     filetools.remove(filetools.join(DOWNLOAD_LIST_PATH, fichero))
 
@@ -235,8 +230,7 @@ def restart_error(item):
         if fichero.endswith(".json"):
             download_item = Item().fromjson(filetools.read(filetools.join(DOWNLOAD_LIST_PATH, fichero)))
 
-            if not item.contentType == "tvshow" or (
-                            item.contentSerieName == download_item.contentSerieName and item.contentChannel == download_item.contentChannel):
+            if not item.contentType == "tvshow" or ( item.contentSerieName == download_item.contentSerieName and item.contentChannel == download_item.contentChannel):
                 if download_item.downloadStatus == STATUS_CODES.error:
                     if filetools.isfile(
                             filetools.join(DOWNLOAD_PATH, download_item.downloadFilename)):
@@ -262,8 +256,7 @@ def download_all_background(item):
             download_item = Item(path=filetools.join(DOWNLOAD_LIST_PATH, fichero)).fromjson(
                 filetools.read(filetools.join(DOWNLOAD_LIST_PATH, fichero)))
 
-            if not item.contentType == "tvshow" or (
-                            item.contentSerieName == download_item.contentSerieName and item.contentChannel == download_item.contentChannel):
+            if not item.contentType == "tvshow" or ( item.contentSerieName == download_item.contentSerieName and item.contentChannel == download_item.contentChannel):
                 if download_item.downloadStatus in [STATUS_CODES.stoped, STATUS_CODES.canceled]:
                     res = start_download(download_item)
                     # platformtools.itemlist_refresh()
@@ -503,8 +496,7 @@ def get_match_list(data, match_list, order_list=None, only_ascii=False, ignoreca
     # Si ascii = True, eliminamos todos los accentos y Ñ
     if only_ascii:
         data = ''.join((c for c in unicodedata.normalize('NFD', data) if unicodedata.category(c) != 'Mn'))
-        match_dict = dict((''.join((c for c in unicodedata.normalize('NFD', key) if unicodedata.category(c) != 'Mn')),
-                           match_dict[key]) for key in match_dict)
+        match_dict = dict((''.join((c for c in unicodedata.normalize('NFD', key) if unicodedata.category(c) != 'Mn')), match_dict[key]) for key in match_dict)
 
     # Ordenamos el listado de mayor tamaño a menor y buscamos.
     for match in sorted(match_dict, key=lambda x: len(x), reverse=True):
@@ -918,8 +910,7 @@ def write_json(item):
     if not item.contentThumbnail:
         item.contentThumbnail = item.thumbnail
 
-    for name in ["text_bold", "text_color", "text_italic", "context", "totalItems", "viewmode", "title", "contentTitle",
-                 "thumbnail"]:
+    for name in ["text_bold", "text_color", "text_italic", "context", "totalItems", "viewmode", "title", "contentTitle", "thumbnail"]:
         if name in item.__dict__:
             item.__dict__.pop(name)
 
@@ -1006,15 +997,13 @@ def save_download_video(item):
     write_json(item)
 
     if not platformtools.dialog_yesno(config.get_localized_string(30101), config.get_localized_string(70189)):
-        platformtools.dialog_ok(config.get_localized_string(30101), item.contentTitle,
-                                config.get_localized_string(30109))
+        platformtools.dialog_ok(config.get_localized_string(30101), item.contentTitle, config.get_localized_string(30109))
     else:
         start_download(item)
 
 
 def save_download_movie(item):
-    logger.info("contentAction: %s | contentChannel: %s | contentTitle: %s" % (
-        item.contentAction, item.contentChannel, item.contentTitle))
+    logger.info("contentAction: %s | contentChannel: %s | contentTitle: %s" % ( item.contentAction, item.contentChannel, item.contentTitle))
 
     progreso = platformtools.dialog_progress_bg(config.get_localized_string(30101), config.get_localized_string(70191))
 
@@ -1027,7 +1016,7 @@ def save_download_movie(item):
 
     progreso.update(0, config.get_localized_string(60062))
 
-    item.downloadFilename = filetools.validate_path("%s [%s] [%s]" % (item.contentTitle.strip(), item.contentChannel, item.infoLabels['IMDBNumber']))
+    item.downloadFilename = filetools.validate_path("%s [%s]" % (item.contentTitle.strip(), item.infoLabels['IMDBNumber']))
 
     write_json(item)
 
@@ -1055,11 +1044,15 @@ def save_download_tvshow(item):
     try:
         item.show = item.fulltitle
         scraper.find_and_set_infoLabels(item)
+
         if not item.contentSerieName: item.contentSerieName = item.fulltitle
 
-        item.downloadFilename = filetools.validate_path("%s [%s]" % (item.contentSerieName, item.infoLabels['IMDBNumber']))
+        if item.strm_path: item.downloadFilename = filetools.validate_path(item.strm_path.split(os.sep)[-2])
+        else: item.downloadFilename = filetools.validate_path("%s [%s]" % (item.contentSerieName, item.infoLabels['IMDBNumber']))
+
         if config.get_setting("lowerize_title", "videolibrary"):
             item.downloadFilename = item.downloadFilename.lower()
+
         progreso.update(0, config.get_localized_string(70186), config.get_localized_string(70180) % item.contentChannel)
 
         episodes = get_episodes(item)
@@ -1067,8 +1060,7 @@ def save_download_tvshow(item):
         progreso.update(0, config.get_localized_string(70190), " ")
 
         for x, i in enumerate(episodes):
-            progreso.update(old_div(x * 100, len(episodes)),
-                            "%dx%0.2d: %s" % (i.contentSeason, i.contentEpisodeNumber, i.contentTitle))
+            progreso.update(old_div(x * 100, len(episodes)), "%dx%0.2d: %s" % (i.contentSeason, i.contentEpisodeNumber, i.contentTitle))
             write_json(i)
     finally:
         progreso.close()
