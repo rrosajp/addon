@@ -946,7 +946,10 @@ def save_download_background(item):
     if item.channel == 'videolibrary':
         from specials import videolibrary
 
-        parent = Item().fromurl(item.parent)
+        if not item.parent:
+            parent = item
+        else:
+            parent = Item().fromurl(item.parent)
         parent.contentChannel = 'videolibrary'
         if item.downloadItemlist:  # episode
             parent.downloadItemlist = item.downloadItemlist
