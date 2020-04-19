@@ -459,7 +459,7 @@ def scrape(func):
             if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
                 # item.fulltitle = item.infoLabels["title"]
                 videolibrary(itemlist, item, function=function)
-            if config.get_setting('downloadenabled') and (function == 'episodios' or function == 'findvideos'):
+            if function == 'episodios' or function == 'findvideos':
                 download(itemlist, item, function=function)
 
         if 'patronMenu' in args and itemlist:
@@ -906,69 +906,70 @@ def match_dbg(data, patron):
 
 
 def download(itemlist, item, typography='', function_level=1, function=''):
-    if not typography: typography = 'color kod bold'
+    if config.get_setting('downloadenabled'):
+        if not typography: typography = 'color kod bold'
 
-    if item.contentType == 'movie':
-        from_action = 'findvideos'
-        title = typo(config.get_localized_string(60354), typography)
-    elif item.contentType == 'episode':
-        from_action = 'findvideos'
-        title = typo(config.get_localized_string(60356), typography) + ' - ' + item.title
-    else:
-        from_action = 'episodios'
-        title = typo(config.get_localized_string(60355), typography)
+        if item.contentType == 'movie':
+            from_action = 'findvideos'
+            title = typo(config.get_localized_string(60354), typography)
+        elif item.contentType == 'episode':
+            from_action = 'findvideos'
+            title = typo(config.get_localized_string(60356), typography) + ' - ' + item.title
+        else:
+            from_action = 'episodios'
+            title = typo(config.get_localized_string(60355), typography)
 
-    function = function if function else inspect.stack()[function_level][3]
+        function = function if function else inspect.stack()[function_level][3]
 
-    contentSerieName=item.contentSerieName if item.contentSerieName else ''
-    contentTitle=item.contentTitle if item.contentTitle else ''
-    downloadItemlist = [i.tourl() for i in itemlist]
+        contentSerieName=item.contentSerieName if item.contentSerieName else ''
+        contentTitle=item.contentTitle if item.contentTitle else ''
+        downloadItemlist = [i.tourl() for i in itemlist]
 
-    if itemlist and item.contentChannel != 'videolibrary':
-        show = True
-        # do not show if we are on findvideos and there are no valid servers
-        if from_action == 'findvideos':
-            for i in itemlist:
-                if i.action == 'play':
-                    break
-            else:
-                show = False
-        if show:
-            itemlist.append(
-                Item(channel='downloads',
-                     from_channel=item.channel,
-                     title=title,
-                     fulltitle=item.fulltitle,
-                     show=item.fulltitle,
-                     contentType=item.contentType,
-                     contentSerieName=contentSerieName,
-                     url=item.url,
-                     action='save_download',
-                     from_action=from_action,
-                     contentTitle=contentTitle,
-                     path=item.path,
-                     thumbnail=thumb(thumb='downloads.png'),
-                     downloadItemlist=downloadItemlist
+        if itemlist and item.contentChannel != 'videolibrary':
+            show = True
+            # do not show if we are on findvideos and there are no valid servers
+            if from_action == 'findvideos':
+                for i in itemlist:
+                    if i.action == 'play':
+                        break
+                else:
+                    show = False
+            if show:
+                itemlist.append(
+                    Item(channel='downloads',
+                         from_channel=item.channel,
+                         title=title,
+                         fulltitle=item.fulltitle,
+                         show=item.fulltitle,
+                         contentType=item.contentType,
+                         contentSerieName=contentSerieName,
+                         url=item.url,
+                         action='save_download',
+                         from_action=from_action,
+                         contentTitle=contentTitle,
+                         path=item.path,
+                         thumbnail=thumb(thumb='downloads.png'),
+                         downloadItemlist=downloadItemlist
+                    ))
+            if from_action == 'episodios':
+                itemlist.append(
+                    Item(channel='downloads',
+                         from_channel=item.channel,
+                         title=typo(config.get_localized_string(60357),typography),
+                         fulltitle=item.fulltitle,
+                         show=item.fulltitle,
+                         contentType=item.contentType,
+                         contentSerieName=contentSerieName,
+                         url=item.url,
+                         action='save_download',
+                         from_action=from_action,
+                         contentTitle=contentTitle,
+                         download='season',
+                         thumbnail=thumb(thumb='downloads.png'),
+                         downloadItemlist=downloadItemlist
                 ))
-        if from_action == 'episodios':
-            itemlist.append(
-                Item(channel='downloads',
-                     from_channel=item.channel,
-                     title=typo(config.get_localized_string(60357),typography),
-                     fulltitle=item.fulltitle,
-                     show=item.fulltitle,
-                     contentType=item.contentType,
-                     contentSerieName=contentSerieName,
-                     url=item.url,
-                     action='save_download',
-                     from_action=from_action,
-                     contentTitle=contentTitle,
-                     download='season',
-                     thumbnail=thumb(thumb='downloads.png'),
-                     downloadItemlist=downloadItemlist
-            ))
 
-    return itemlist
+        return itemlist
 
 
 def videolibrary(itemlist, item, typography='', function_level=1, function=''):
@@ -1135,7 +1136,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True, vid
         autoplay.start(itemlist, item)
 
     if item.contentChannel != 'videolibrary' and video_library: videolibrary(itemlist, item, function_level=3)
-    if get_setting('downloadenabled') and down_load == True: download(itemlist, item, function_level=3)
+    if down_load == True: download(itemlist, item, function_level=3)
 
     VL = False
     try:
