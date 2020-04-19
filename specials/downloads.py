@@ -357,14 +357,14 @@ def move_to_libray(item):
         move_path = filetools.join(config.get_videolibrary_path(), FOLDER)
 
     download_path = filetools.join(DOWNLOAD_PATH, item.downloadFilename)
-    library_path = filetools.join(move_path, *filetools.split(item.downloadFilename))
+    library_path = filetools.join(move_path, *filetools.split(item.downloadFilename)) 
     final_path = download_path
 
     if item.contentType == "movie" and item.infoLabels["tmdb_id"]:
         contentTitle = item.contentTitle if item.contentTitle else item.fulltitle
         library_item = Item(title= filetools.split(item.downloadFilename)[-1], channel="downloads", contentTitle = contentTitle,
                             fulltitle = item.fulltitle,action="findvideos", infoLabels=item.infoLabels, url=library_path)
-        videolibrarytools.save_movie(library_item)
+        videolibrarytools.save_movie(library_item, silent=True)
 
     elif item.contentType == "episode" and item.infoLabels["tmdb_id"]:
         contentSerieName = item.contentSerieName if item.contentSerieName else item.fulltitle
@@ -372,7 +372,7 @@ def move_to_libray(item):
                             fulltitle = item.fulltitle, action="findvideos", infoLabels=item.infoLabels, url=library_path)
         tvshow = Item(channel="downloads", contentType="tvshow", contentSerieName = contentSerieName,
                         fulltitle = item.fulltitle, infoLabels={"tmdb_id": item.infoLabels["tmdb_id"]})
-        videolibrarytools.save_tvshow(tvshow, [library_item])
+        videolibrarytools.save_tvshow(tvshow, [library_item], silent=True)
 
     if not filetools.isdir(filetools.dirname(library_path)):
         filetools.mkdir(filetools.dirname(library_path))

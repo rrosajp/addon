@@ -1015,7 +1015,8 @@ def clean(path_list=[]):
                     nun_records, records = execute_sql_kodi(sql)
 
     progress.update(100)
-    xbmc.sleep(5000 if inspect.stack()[1][3] == 'move_to_libray' else 1000)
+    # xbmc.sleep(5000 if inspect.stack()[1][3] == 'move_to_libray' else 1000)
+    xbmc.sleep(1000)
     progress.close()
     xbmc.executebuiltin('XBMC.ReloadSkin()')
 
