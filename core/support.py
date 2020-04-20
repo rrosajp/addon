@@ -179,7 +179,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
     matches = scrapertools.find_multiple_matches_groups(block, patron)
     log('MATCHES =', matches)
 
-    known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang', 'other']
+    known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang', 'other', 'size', 'seed']
     # Legenda known_keys per i groups nei patron
     # known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality',
     #                'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang']
@@ -246,6 +246,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         longtitle = title + (s if title and title2 else '') + title2
         longtitle = typo(longtitle, 'bold')
         longtitle += typo(quality, '_ [] color kod') if quality else ''
+        longtitle += typo(scraped['size'], '_ [] color kod') if scraped['size'] else ''
+        longtitle += typo(scraped['seed']+ ' SEEDS', '_ [] color kod') if scraped['seed'] else ''
 
         lang1, longtitle = scrapeLang(scraped, lang, longtitle)
 
@@ -457,7 +459,7 @@ def scrape(func):
             if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
                 # item.fulltitle = item.infoLabels["title"]
                 videolibrary(itemlist, item, function=function)
-            if config.get_setting('downloadenabled') and (function == 'episodios' or function == 'findvideos'):
+            if function == 'episodios' or function == 'findvideos':
                 download(itemlist, item, function=function)
 
         if 'patronMenu' in args and itemlist:
@@ -904,69 +906,70 @@ def match_dbg(data, patron):
 
 
 def download(itemlist, item, typography='', function_level=1, function=''):
-    if not typography: typography = 'color kod bold'
+    if config.get_setting('downloadenabled'):
+        if not typography: typography = 'color kod bold'
 
-    if item.contentType == 'movie':
-        from_action = 'findvideos'
-        title = typo(config.get_localized_string(60354), typography)
-    elif item.contentType == 'episode':
-        from_action = 'findvideos'
-        title = typo(config.get_localized_string(60356), typography) + ' - ' + item.title
-    else:
-        from_action = 'episodios'
-        title = typo(config.get_localized_string(60355), typography)
+        if item.contentType == 'movie':
+            from_action = 'findvideos'
+            title = typo(config.get_localized_string(60354), typography)
+        elif item.contentType == 'episode':
+            from_action = 'findvideos'
+            title = typo(config.get_localized_string(60356), typography) + ' - ' + item.title
+        else:
+            from_action = 'episodios'
+            title = typo(config.get_localized_string(60355), typography)
 
-    function = function if function else inspect.stack()[function_level][3]
+        function = function if function else inspect.stack()[function_level][3]
 
-    contentSerieName=item.contentSerieName if item.contentSerieName else ''
-    contentTitle=item.contentTitle if item.contentTitle else ''
-    downloadItemlist = [i.tourl() for i in itemlist]
+        contentSerieName=item.contentSerieName if item.contentSerieName else ''
+        contentTitle=item.contentTitle if item.contentTitle else ''
+        downloadItemlist = [i.tourl() for i in itemlist]
 
-    if itemlist and item.contentChannel != 'videolibrary':
-        show = True
-        # do not show if we are on findvideos and there are no valid servers
-        if from_action == 'findvideos':
-            for i in itemlist:
-                if i.action == 'play':
-                    break
-            else:
-                show = False
-        if show:
-            itemlist.append(
-                Item(channel='downloads',
-                     from_channel=item.channel,
-                     title=title,
-                     fulltitle=item.fulltitle,
-                     show=item.fulltitle,
-                     contentType=item.contentType,
-                     contentSerieName=contentSerieName,
-                     url=item.url,
-                     action='save_download',
-                     from_action=from_action,
-                     contentTitle=contentTitle,
-                     path=item.path,
-                     thumbnail=thumb(thumb='downloads.png'),
-                     downloadItemlist=downloadItemlist
+        if itemlist and item.contentChannel != 'videolibrary':
+            show = True
+            # do not show if we are on findvideos and there are no valid servers
+            if from_action == 'findvideos':
+                for i in itemlist:
+                    if i.action == 'play':
+                        break
+                else:
+                    show = False
+            if show:
+                itemlist.append(
+                    Item(channel='downloads',
+                         from_channel=item.channel,
+                         title=title,
+                         fulltitle=item.fulltitle,
+                         show=item.fulltitle,
+                         contentType=item.contentType,
+                         contentSerieName=contentSerieName,
+                         url=item.url,
+                         action='save_download',
+                         from_action=from_action,
+                         contentTitle=contentTitle,
+                         path=item.path,
+                         thumbnail=thumb(thumb='downloads.png'),
+                         downloadItemlist=downloadItemlist
+                    ))
+            if from_action == 'episodios':
+                itemlist.append(
+                    Item(channel='downloads',
+                         from_channel=item.channel,
+                         title=typo(config.get_localized_string(60357),typography),
+                         fulltitle=item.fulltitle,
+                         show=item.fulltitle,
+                         contentType=item.contentType,
+                         contentSerieName=contentSerieName,
+                         url=item.url,
+                         action='save_download',
+                         from_action=from_action,
+                         contentTitle=contentTitle,
+                         download='season',
+                         thumbnail=thumb(thumb='downloads.png'),
+                         downloadItemlist=downloadItemlist
                 ))
-        if from_action == 'episodios':
-            itemlist.append(
-                Item(channel='downloads',
-                     from_channel=item.channel,
-                     title=typo(config.get_localized_string(60357),typography),
-                     fulltitle=item.fulltitle,
-                     show=item.fulltitle,
-                     contentType=item.contentType,
-                     contentSerieName=contentSerieName,
-                     url=item.url,
-                     action='save_download',
-                     from_action=from_action,
-                     contentTitle=contentTitle,
-                     download='season',
-                     thumbnail=thumb(thumb='downloads.png'),
-                     downloadItemlist=downloadItemlist
-            ))
 
-    return itemlist
+        return itemlist
 
 
 def videolibrary(itemlist, item, typography='', function_level=1, function=''):
@@ -1133,7 +1136,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True, vid
         autoplay.start(itemlist, item)
 
     if item.contentChannel != 'videolibrary' and video_library: videolibrary(itemlist, item, function_level=3)
-    if get_setting('downloadenabled') and down_load == True: download(itemlist, item, function_level=3)
+    if down_load == True: download(itemlist, item, function_level=3)
 
     VL = False
     try:
@@ -1192,67 +1195,76 @@ def extract_wrapped(decorated):
     return next((c for c in closure if isinstance(c, FunctionType)), None)
 
 def addQualityTag(item, itemlist, data, patron):
-    defQualVideo = {
-        "CAM": "metodo di ripresa che indica video di bassa qualità",
-        "TS": "questo metodo di ripresa effettua la ripresa su un tre piedi. Qualità sufficiente.",
-        "TC": "abbreviazione di TeleCine. Il metodo di ripresa del film è basato su una macchina capace di riversare le Super-8, o 35mm. La qualità è superiore a quella offerta da CAM e TS.",
-        "R5": "la qualità video di un R5 è pari a quella di un dvd, può contenere anche sottotitoli. Se è presente la dicitura LINE.ITALIAN è in italiano, altrimenti sarà disponibile in una lingua asiatica o russa.",
-        "R6": "video proveniente dall’Asia.",
-        "FS": "video a schermo pieno, cioè FullScreen, quindi con un rapporto di 4:3.",
-        "WS": "video WideScreen, cioè rapporto 16:9.",
-        "VHSSCR": "video estratto da una videocassetta VHS.",
-        "DVDRIP": "la fonte video proviene da un DVD, la qualità è buona.",
-        "DVDSCR": "la fonte video proviene da un DVD. Tali filmati, di solito, appartengono a copie promozionali.",
-        "HDTVRIP": "video copiato e registrato da televisori in HD e che, per questo, restituiscono una qualità eccellente.",
-        "PD": "video registrato da Tv satellitare, qualità accettabile.",
-        "TV": "video registrato da Tv satellitare, qualità accettabile.",
-        "SAT": "video registrato da Tv satellitare, qualità accettabile.",
-        "DVBRIP": "video registrato da Tv satellitare, qualità accettabile.",
-        "TVRIP": "ripping simile al SAT RIP, solo che, in questo caso, la qualità del vide può variare a seconda dei casi.",
-        "VHSRIP": "video registrato da videocassetta. Qualità variabile.",
-        "BRRIP": "indica che il video è stato preso da una fonte BluRay. Nella maggior parte dei casi, avremo un video ad alta definizione.",
-        "BDRIP": "indica che il video è stato preso da una fonte BluRay. Nella maggior parte dei casi, avremo un video ad alta definizione.",
-        "DTTRIP": "video registrato da un canale digitale terreste. Qualità sufficiente.",
-        "HQ": "video in alta qualità.",
-        "WEBRIP": "in questo caso, i film sono estratti da portali relativi a canali televisivi o di video sharing come YouTube. La qualità varia dall’SD al 1080p.",
-        "WEB-DL": "si tratta di un 720p o 1080p reperiti dalla versione americana di iTunes americano. La qualità è paragonabile a quella di un BluRayRip e permette di fruire di episodi televisivi, senza il fastidioso bollo distintivo della rete che trasmette.",
-        "WEBDL": "si tratta di un 720p o 1080p reperiti dalla versione americana di iTunes americano. La qualità è paragonabile a quella di un BluRayRip e permette di fruire di episodi televisivi, senza il fastidioso bollo distintivo della rete che trasmette.",
-        "DLMux": "si tratta di un 720p o 1080p reperiti dalla versione americana di iTunes americano. La qualità è paragonabile a quella di un BluRayRip e permette di fruire di episodi televisivi, senza il fastidioso bollo distintivo della rete che trasmette.",
-        "DVD5": "il film è in formato DVD Single Layer, nel quale vengono mantenute tutte le caratteristiche del DVD originale: tra queste il menu multilingue, i sottotitoli e i contenuti speciali, se presenti. Il video è codificato nel formato DVD originale MPEG-2.",
-        "DVD9": "ha le stesse caratteristiche del DVD5, ma le dimensioni del file sono di un DVD Dual Layer (8,5 GB).",
-        "HDTS": "viene utilizzata una videocamera professionale ad alta definizione posizionata in modo fisso. La qualità audio video è buona.",
-        "DVDMUX": "indica una buona qualità video, l’audio è stato aggiunto da una sorgente diversa per una migliore qualità.",
-    }
+    if itemlist:
+        defQualVideo = {
+            "CAM": "metodo di ripresa che indica video di bassa qualità",
+            "TS": "questo metodo di ripresa effettua la ripresa su un tre piedi. Qualità sufficiente.",
+            "TC": "abbreviazione di TeleCine. Il metodo di ripresa del film è basato su una macchina capace di riversare le Super-8, o 35mm. La qualità è superiore a quella offerta da CAM e TS.",
+            "R5": "la qualità video di un R5 è pari a quella di un dvd, può contenere anche sottotitoli. Se è presente la dicitura LINE.ITALIAN è in italiano, altrimenti sarà disponibile in una lingua asiatica o russa.",
+            "R6": "video proveniente dall’Asia.",
+            "FS": "video a schermo pieno, cioè FullScreen, quindi con un rapporto di 4:3.",
+            "WS": "video WideScreen, cioè rapporto 16:9.",
+            "VHSSCR": "video estratto da una videocassetta VHS.",
+            "DVDRIP": "la fonte video proviene da un DVD, la qualità è buona.",
+            "DVDSCR": "la fonte video proviene da un DVD. Tali filmati, di solito, appartengono a copie promozionali.",
+            "HDTVRIP": "video copiato e registrato da televisori in HD e che, per questo, restituiscono una qualità eccellente.",
+            "PD": "video registrato da Tv satellitare, qualità accettabile.",
+            "TV": "video registrato da Tv satellitare, qualità accettabile.",
+            "SAT": "video registrato da Tv satellitare, qualità accettabile.",
+            "DVBRIP": "video registrato da Tv satellitare, qualità accettabile.",
+            "TVRIP": "ripping simile al SAT RIP, solo che, in questo caso, la qualità del vide può variare a seconda dei casi.",
+            "VHSRIP": "video registrato da videocassetta. Qualità variabile.",
+            "BRRIP": "indica che il video è stato preso da una fonte BluRay. Nella maggior parte dei casi, avremo un video ad alta definizione.",
+            "BDRIP": "indica che il video è stato preso da una fonte BluRay. Nella maggior parte dei casi, avremo un video ad alta definizione.",
+            "DTTRIP": "video registrato da un canale digitale terreste. Qualità sufficiente.",
+            "HQ": "video in alta qualità.",
+            "WEBRIP": "in questo caso, i film sono estratti da portali relativi a canali televisivi o di video sharing come YouTube. La qualità varia dall’SD al 1080p.",
+            "WEB-DL": "si tratta di un 720p o 1080p reperiti dalla versione americana di iTunes americano. La qualità è paragonabile a quella di un BluRayRip e permette di fruire di episodi televisivi, senza il fastidioso bollo distintivo della rete che trasmette.",
+            "WEBDL": "si tratta di un 720p o 1080p reperiti dalla versione americana di iTunes americano. La qualità è paragonabile a quella di un BluRayRip e permette di fruire di episodi televisivi, senza il fastidioso bollo distintivo della rete che trasmette.",
+            "DLMux": "si tratta di un 720p o 1080p reperiti dalla versione americana di iTunes americano. La qualità è paragonabile a quella di un BluRayRip e permette di fruire di episodi televisivi, senza il fastidioso bollo distintivo della rete che trasmette.",
+            "DVD5": "il film è in formato DVD Single Layer, nel quale vengono mantenute tutte le caratteristiche del DVD originale: tra queste il menu multilingue, i sottotitoli e i contenuti speciali, se presenti. Il video è codificato nel formato DVD originale MPEG-2.",
+            "DVD9": "ha le stesse caratteristiche del DVD5, ma le dimensioni del file sono di un DVD Dual Layer (8,5 GB).",
+            "HDTS": "viene utilizzata una videocamera professionale ad alta definizione posizionata in modo fisso. La qualità audio video è buona.",
+            "DVDMUX": "indica una buona qualità video, l’audio è stato aggiunto da una sorgente diversa per una migliore qualità.",
+        }
 
-    defQualAudio = {
-        "MD": "l’audio è stato registrato via microfono, quindi la qualità è scarsa.",
-        "DTS": "audio ricavato dai dischi DTS2, quindi la qualità audio è elevata.",
-        "LD": "l’audio è stato registrato tramite jack collegato alla macchina da presa, pertanto di discreta qualità.",
-        "DD": "audio ricavato dai dischi DTS cinema. L’audio è di buona qualità, ma potreste riscontrare il fatto che non potrebbe essere più riproducibile.",
-        "AC3": "audio in Dolby Digital puo' variare da 2.0 a 5.1 canali in alta qualità.",
-        "MP3": "codec per compressione audio utilizzato MP3.",
-        "RESYNC": "il film è stato lavorato e re sincronizzato con una traccia audio. A volte potresti riscontrare una mancata sincronizzazione tra audio e video.",
-    }
-    qualityStr = scrapertools.find_single_match(data, patron).strip()
-    if PY3:
-        qualityStr = qualityStr.encode('ascii', 'ignore')
-    else:
-        qualityStr = qualityStr.decode('unicode_escape').encode('ascii', 'ignore')
+        defQualAudio = {
+            "MD": "l’audio è stato registrato via microfono, quindi la qualità è scarsa.",
+            "DTS": "audio ricavato dai dischi DTS2, quindi la qualità audio è elevata.",
+            "LD": "l’audio è stato registrato tramite jack collegato alla macchina da presa, pertanto di discreta qualità.",
+            "DD": "audio ricavato dai dischi DTS cinema. L’audio è di buona qualità, ma potreste riscontrare il fatto che non potrebbe essere più riproducibile.",
+            "AC3": "audio in Dolby Digital puo' variare da 2.0 a 5.1 canali in alta qualità.",
+            "MP3": "codec per compressione audio utilizzato MP3.",
+            "RESYNC": "il film è stato lavorato e re sincronizzato con una traccia audio. A volte potresti riscontrare una mancata sincronizzazione tra audio e video.",
+        }
+        qualityStr = scrapertools.find_single_match(data, patron).strip().upper()
+        if PY3:
+            qualityStr = qualityStr.encode('ascii', 'ignore')
+        else:
+            qualityStr = qualityStr.decode('unicode_escape').encode('ascii', 'ignore')
 
-    if qualityStr:
-        try:
-            splitted = qualityStr.split('.')
-            video = splitted[-1]
-            audio = splitted[-2]
-            descr = typo(video + ': ', 'color kod') + defQualVideo.get(video.upper(), '') + '\n' +\
-                    typo(audio + ': ', 'color kod') + defQualAudio.get(audio.upper(), '')
-        except:
-            descr = ''
-        itemlist.insert(0,
-                        Item(channel=item.channel,
-                             action="",
-                             title=typo(qualityStr, '[] color kod bold'),
-                             plot=descr,
-                             folder=False))
-    else:
-        log('nessun tag qualità trovato')
+        if qualityStr:
+            try:
+                video, audio, descr = None, None, ''
+                for tag in defQualVideo:
+                    if tag in qualityStr:
+                        video = tag
+                        break
+                for tag in defQualAudio:
+                    if tag in qualityStr:
+                        audio = tag
+                        break
+                if video:
+                    descr += typo(video + ': ', 'color kod') + defQualVideo.get(video, '') + '\n'
+                if audio:
+                    descr += typo(audio + ': ', 'color kod') + defQualAudio.get(audio, '') + '\n'
+            except:
+                descr = ''
+            itemlist.insert(0,
+                            Item(channel=item.channel,
+                                 action="",
+                                 title=typo(qualityStr, '[] color kod bold'),
+                                 plot=descr,
+                                 folder=False))
+        else:
+            log('nessun tag qualità trovato')

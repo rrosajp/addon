@@ -696,8 +696,8 @@ msgid "Delete movie/channel"
 msgstr "Elimina film/canale"
 
 msgctxt "#60019"
-msgid "Delete this movie"
-msgstr "Elimina questo film"
+msgid "Delete movie"
+msgstr "Elimina film"
 
 msgctxt "#60020"
 msgid "Mark TV show as not watched"
@@ -781,15 +781,15 @@ msgstr "Errore nel canale %s"
 
 msgctxt "#60040"
 msgid "Delete movie"
-msgstr "Rimuovere film"
+msgstr "Elimina film"
 
 msgctxt "#60041"
 msgid "Delete TV show"
-msgstr "Rimuovere serie TV"
+msgstr "Elimina serie TV"
 
 msgctxt "#60042"
-msgid "Delete only the links of %s"
-msgstr "Rimuovere solo i link dei %s"
+msgid "Delete links of %s"
+msgstr "Elimina link di %s"
 
 msgctxt "#60043"
 msgid "Delete %s links of channel %s"
@@ -3120,8 +3120,12 @@ msgid "Show only links of "
 msgstr "Mostra solo link di "
 
 msgctxt "#70079"
-msgid "Remove only links of "
-msgstr "Rimuovere solo i collegamenti di "
+msgid "Delete only the links of "
+msgstr "Elimina solo i link di "
+
+msgctxt "#70081"
+msgid "The folder also contains local or downloaded video files. Do you want to delete them?"
+msgstr "La cartella contiene anche file video locali o scaricati. Vuoi eliminarli?"
 
 msgctxt "#70082"
 msgid "Global Search"
@@ -3140,12 +3144,12 @@ msgid "Delete TV show"
 msgstr "Elimina serie TV"
 
 msgctxt "#70086"
-msgid "Remove only links of %s"
-msgstr "Rimuovere solo i collegamenti di %s"
+msgid "Delete only the links of %s"
+msgstr "Elimina solo i link di %s"
 
 msgctxt "#70087"
 msgid "Deleted %s links from canal %s"
-msgstr "Eliminati %s links del canale %s"
+msgstr "Eliminati %s link del canale %s"
 
 msgctxt "#70088"
 msgid "Are you sure you want to delete '%s' from video library?"
@@ -5892,20 +5896,20 @@ msgid "Do you want to call Elementum Settings to temporarily switch to Use Files
 msgstr "Vuoi aprire i settaggi di Elementum per passare temporaneamente a usare i file?"
 
 msgctxt "#70782"
-msgid "Your device is not compatible with the Internal Client, do you want to use Quasar for Torrents?"
-msgstr "Il tuo dispositivo non è compatibile con il Client Interno, Vuoi usare Quasar per i Torrent?"
+msgid "You must install an external Client to take advantage of the torrent support. Do you want to install Elementum?"
+msgstr "Per poter usufruire del supporto torrent devi installare un Client esterno. Vuoi installare Elementum?"
 
 msgctxt "#70783"
-msgid "Quasar installed and configured, enjoy!"
-msgstr "Quasar installato e configurato, buona Visione!"
+msgid "Elementum is installed on your device, but is not active. Do you want to activate it?"
+msgstr "Elementum è installato sul tuo dispositivo, ma non è attivo. Vuoi Attivarlo?"
 
 msgctxt "#70784"
 msgid "Attention!"
 msgstr "Attenzione!"
 
 msgctxt "#70785"
-msgid "Install Quasar"
-msgstr "Installa Quasar"
+msgid "Install Elementum"
+msgstr "Installa Elementum"
 
 msgctxt "#70786"
 msgid "Autostart"
@@ -5923,6 +5927,65 @@ msgctxt "#70789"
 msgid "* Change by opening the settings from KoD main menu"
 msgstr "* Cambia aprendo le impostazioni dal menu principale di KoD"
 
+msgctxt "#70790"
+msgid "RAR download in progress"
+msgstr "Download RAR in corso"
+
+msgctxt "#70791"
+msgid "A RAR file was detected in the download, but you have not installed the UnRAR extractor.\nDo you want to download it anyway?"
+msgstr "Un file RAR è stato rilevato nel download, ma non hai installato l'estrattore UnRAR.\nVuoi scaricarlo in ogni caso?"
+
+msgctxt "#70792"
+msgid "Delete downloaded files?"
+msgstr "Cancellare i file scaricati?"
+
+msgctxt "#70793"
+msgid "Starting extraction..."
+msgstr "Avvio dell'estrazione..."
+
+msgctxt "#70794"
+msgid "Enter the password (Look in %s)"
+msgstr "Inserisci la password (Cerca in %s)"
+
+msgctxt "#70795"
+msgid "Extracted"
+msgstr "Estratto"
+
+msgctxt "#70796"
+msgid "Error opening RAR File"
+msgstr "Errore durante l'apertura del file RAR"
+
+msgctxt "#70797"
+msgid "The RAR file is empty"
+msgstr "Il file RAR è vuoto"
+
+msgctxt "#70798"
+msgid "Or does not contain valid archives"
+msgstr "O non contiene archivi validi"
+
+msgctxt "#70799"
+msgid "Extraction error"
+msgstr "Errore di estrazione"
+
+msgctxt "#70800"
+msgid "Archive with errors"
+msgstr "Archivio con errori"
+
+msgctxt "#70801"
+msgid "Extract without playing"
+msgstr "Estrarre senza riprodurre"
+
+msgctxt "#70802"
+msgid "Wait some minutes..."
+msgstr "Aspetta qualche minuto..."
+
+msgctxt "#70803"
+msgid "Extracting files..."
+msgstr "Estrazione dei files..."
+
+msgctxt "#70804"
+msgid "Next extraction..."
+msgstr "Estrazione successiva..."
 
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
@@ -6220,3 +6283,11 @@ msgstr "Eliminazione videoteca..."
 msgctxt "#80039"
 msgid "The video library has been deleted"
 msgstr "La videoteca è stata eliminata"
+
+msgctxt "#80040"
+msgid "Add-on updated to commit %s"
+msgstr "Add-on aggiornato al commit %s"
+
+msgctxt "#80041"
+msgid "Latest updates:\n"
+msgstr "Ultimi aggiornamenti:\n"

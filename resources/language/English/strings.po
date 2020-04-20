@@ -697,7 +697,7 @@ msgid "Delete movie/channel"
 msgstr ""
 
 msgctxt "#60019"
-msgid "Delete this movie"
+msgid "Delete movie"
 msgstr ""
 
 msgctxt "#60020"
@@ -789,7 +789,7 @@ msgid "Delete TV show"
 msgstr ""
 
 msgctxt "#60042"
-msgid "Delete only the links of %s"
+msgid "Delete links of %s"
 msgstr ""
 
 msgctxt "#60043"
@@ -3121,7 +3121,11 @@ msgid "Show only links of "
 msgstr ""
 
 msgctxt "#70079"
-msgid "Remove only links of "
+msgid "Delete ony the links of "
+msgstr ""
+
+msgctxt "#70081"
+msgid "The folder also contains local or downloaded video files. Do you want to delete them?"
 msgstr ""
 
 msgctxt "#70082"
@@ -3141,7 +3145,7 @@ msgid "Delete TV show"
 msgstr ""
 
 msgctxt "#70086"
-msgid "Remove only links of %s"
+msgid "Delete only the links of %s"
 msgstr ""
 
 msgctxt "#70087"
@@ -5892,19 +5896,19 @@ msgid "Do you want to call Elementum Settings to temporarily switch to Use Files
 msgstr ""
 
 msgctxt "#70782"
-msgid "Your device is not compatible with the Internal Client, do you want to use Quasar for Torrents?"
+msgid "You must install an external Client to take advantage of the torrent support. Do you want to install Elementum?"
 msgstr ""
 
 msgctxt "#70783"
-msgid "Quasar installed and configured, enjoy!"
+msgid "Elementum is installed on your device, but is not active. Do you want to activate it?"
 msgstr ""
 
 msgctxt "#70784"
-msgid "Attention!!"
+msgid "Attention!"
 msgstr "Attenzione!"
 
 msgctxt "#70785"
-msgid "Install Quasar"
+msgid "Install Elementum"
 msgstr ""
 
 msgctxt "#70786"
@@ -5923,6 +5927,65 @@ msgctxt "#70789"
 msgid "* Change by opening the settings from KoD main menu"
 msgstr ""
 
+msgctxt "#70790"
+msgid "RAR download in progress"
+msgstr ""
+
+msgctxt "#70791"
+msgid "A RAR file was detected in the download, but you have not installed the UnRAR extractor.\nDo you want to download it anyway?"
+msgstr ""
+
+msgctxt "#70792"
+msgid "Delete downloaded files?"
+msgstr ""
+
+msgctxt "#70793"
+msgid "Starting extraction..."
+msgstr ""
+
+msgctxt "#70794"
+msgid "Enter the password (Look in %s)"
+msgstr ""
+
+msgctxt "#70795"
+msgid "Extracted"
+msgstr ""
+
+msgctxt "#70796"
+msgid "Error opening RAR File"
+msgstr ""
+
+msgctxt "#70797"
+msgid "The RAR file is empty"
+msgstr ""
+
+msgctxt "#70798"
+msgid "Or does not contain valid archives"
+msgstr ""
+
+msgctxt "#70799"
+msgid "Extraction error"
+msgstr ""
+
+msgctxt "#70800"
+msgid "Archive with errors"
+msgstr ""
+
+msgctxt "#70801"
+msgid "Extract without playing"
+msgstr ""
+
+msgctxt "#70802"
+msgid "Wait some minutes..."
+msgstr ""
+
+msgctxt "#70803"
+msgid "Extracting files..."
+msgstr ""
+
+msgctxt "#70804"
+msgid "Next extraction..."
+msgstr ""
 
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
@@ -6219,4 +6282,12 @@ msgstr ""
 
 msgctxt "#80039"
 msgid "The video library has been deleted"
+msgstr ""
+
+msgctxt "#80040"
+msgid "Add-on updated to commit %s"
+msgstr ""
+
+msgctxt "#80041"
+msgid "Latest updates:\n"
 msgstr ""

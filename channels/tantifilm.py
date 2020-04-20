@@ -203,4 +203,5 @@ def findvideos(item):
     log('URLS',urls)
 
     itemlist = support.server(item, urls)
+    support.addQualityTag(item, itemlist, data, 'Keywords:\s*(?:<span>)?([^<]+)')
     return itemlist

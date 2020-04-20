@@ -363,7 +363,7 @@ def get_seasons(item):
         # Creamos un item por cada temporada
         for season, title in list(dict_temp.items()):
             new_item = item.clone(action="get_episodes", title=title, contentSeason=season,
-                                  filtrar_season=True)
+                                  filtrar_season=True, channel='videolibrary')
 
             # Menu contextual: Marcar la temporada como vista o no
             visto = item_nfo.library_playcounts.get("season %s" % season, 0)
@@ -407,7 +407,7 @@ def get_episodes(item):
 
     # Crear un item en la lista para cada strm encontrado
     for i in ficheros:
-        if i.split('.')[-1] not in  ['json','nfo']: #i.endswith('.strm'):
+        if i.split('.')[-1] not in ['json','nfo']: #i.endswith('.strm'):
             season_episode = scrapertools.get_season_and_episode(i)
             if not season_episode:
                 # El fichero no incluye el numero de temporada y episodio
@@ -419,38 +419,39 @@ def get_episodes(item):
 
             # Obtener los datos del season_episode.nfo
             nfo_path = filetools.join(raiz, '%sx%s.nfo' % (season, episode))#.replace('.strm', '.nfo')
-            head_nfo, epi = videolibrarytools.read_nfo(nfo_path)
+            if filetools.isfile(nfo_path):
+                head_nfo, epi = videolibrarytools.read_nfo(nfo_path)
 
-            # Fijar el titulo del capitulo si es posible
-            if epi.contentTitle:
-                title_episodie = epi.contentTitle.strip()
-            else:
-                title_episodie = config.get_localized_string(60031) % \
-                                 (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2))
+                # Fijar el titulo del capitulo si es posible
+                if epi.contentTitle:
+                    title_episodie = epi.contentTitle.strip()
+                else:
+                    title_episodie = config.get_localized_string(60031) % \
+                                    (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2))
 
-            epi.contentTitle = "%sx%s" % (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2))
-            epi.title = "%sx%s - %s" % (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2), title_episodie)
+                epi.contentTitle = "%sx%s" % (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2))
+                epi.title = "%sx%s - %s" % (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2), title_episodie)
 
-            if item_nfo.library_filter_show:
-                epi.library_filter_show = item_nfo.library_filter_show
+                if item_nfo.library_filter_show:
+                    epi.library_filter_show = item_nfo.library_filter_show
 
-            # Menu contextual: Marcar episodio como visto o no
-            visto = item_nfo.library_playcounts.get(season_episode, 0)
-            epi.infoLabels["playcount"] = visto
-            if visto > 0:
-                texto = config.get_localized_string(60032)
-                value = 0
-            else:
-                texto = config.get_localized_string(60033)
-                value = 1
-            epi.context = [{"title": texto,
-                            "action": "mark_content_as_watched",
-                            "channel": "videolibrary",
-                            "playcount": value,
-                            "nfo": item.nfo}]
+                # Menu contextual: Marcar episodio como visto o no
+                visto = item_nfo.library_playcounts.get(season_episode, 0)
+                epi.infoLabels["playcount"] = visto
+                if visto > 0:
+                    texto = config.get_localized_string(60032)
+                    value = 0
+                else:
+                    texto = config.get_localized_string(60033)
+                    value = 1
+                epi.context = [{"title": texto,
+                                "action": "mark_content_as_watched",
+                                "channel": "videolibrary",
+                                "playcount": value,
+                                "nfo": item.nfo}]
 
-            # logger.debug("epi:\n" + epi.tostring('\n'))
-            itemlist.append(epi)
+                # logger.debug("epi:\n" + epi.tostring('\n'))
+                itemlist.append(epi)
 
     itemlist = sorted(itemlist, key=lambda it: (int(it.contentSeason), int(it.contentEpisodeNumber)))
     add_download_items(item, itemlist)
@@ -754,7 +755,7 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
         xbmc.sleep(1000)
         progress.close()
     if notify:
-        platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80014), icon=0, time=5000, sound=False)
+        platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80014), time=5000, sound=False)
 
 
 def delete_videolibrary(item):
@@ -772,14 +773,16 @@ def delete_videolibrary(item):
     p_dialog.update(80)
     if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
         from platformcode import xbmc_videolibrary
-        xbmc_videolibrary.clean(config.get_setting('videolibrarypath'))
+        strm_list = []
+        strm_list.append(config.get_setting('videolibrarypath'))
+        xbmc_videolibrary.clean(strm_list)
 
     p_dialog.update(90)
     config.verify_directories_created()
     p_dialog.update(100)
     xbmc.sleep(1000)
     p_dialog.close()
-    platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80039), icon=0, time=5000, sound=False)
+    platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80039), time=5000, sound=False)
 
 
 # metodos de menu contextual
@@ -1024,12 +1027,22 @@ def delete(item):
         raiz, carpeta_serie, ficheros = next(filetools.walk(_item.path))
         if ficheros == []:
             filetools.rmdir(_item.path)
+        else:
+            if _item.contentType == 'movie':
+                heading = config.get_localized_string(70084)
+            else:
+                heading = config.get_localized_string(70085)
+            if platformtools.dialog_yesno(heading, config.get_localized_string(70081)):
+                filetools.rmdirtree(_item.path)
 
         if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
             from platformcode import xbmc_videolibrary
-            xbmc_videolibrary.clean(_item.extra)
+            strm_list = []
+            strm_list.append(_item.extra)
+            xbmc_videolibrary.clean(strm_list)
 
         logger.info("All links removed")
+        xbmc.sleep(1000)
         platformtools.itemlist_refresh()
 
     # logger.info(item.contentTitle)
@@ -1042,46 +1055,68 @@ def delete(item):
     if item.multicanal:
         # Obtener listado de canales
         if item.dead == '':
-            opciones = [config.get_localized_string(70086) % k.capitalize() for k in list(item.library_urls.keys()) if
-                        k != "downloads"]
+            opciones = []
+            channels = []
+            for k in list(item.library_urls.keys()):
+                if k != "downloads":
+                    opciones.append(config.get_localized_string(70086) % k.capitalize())
+                    channels.append(k)
             opciones.insert(0, heading)
 
             index = platformtools.dialog_select(config.get_localized_string(30163), opciones)
 
             if index == 0:
                 # Seleccionado Eliminar pelicula/serie
+                canal = None
                 delete_all(item)
 
             elif index > 0:
                 # Seleccionado Eliminar canal X
                 canal = opciones[index].replace(config.get_localized_string(70079), "").lower()
+                channels.remove(canal)
             else:
                 return
         else:
             canal = item.dead
 
-        num_enlaces = 0
-        for fd in filetools.listdir(item.path):
-            if fd.endswith(canal + '].json') or scrapertools.find_single_match(fd, '%s]_\d+.torrent' % canal):
-                if filetools.remove(filetools.join(item.path, fd)):
-                    num_enlaces += 1
+        if canal:
+            num_enlaces = 0
+            strm_list = []
+            for fd in filetools.listdir(item.path):
+                if fd.endswith(canal + '].json') or scrapertools.find_single_match(fd, '%s]_\d+.torrent' % canal):
+                    if filetools.remove(filetools.join(item.path, fd)):
+                        num_enlaces += 1
+                        # Remove strm and nfo if no other channel
+                        episode = fd.replace(' [' + canal + '].json', '')
+                        found_ch = False
+                        for ch in channels:
+                            if filetools.exists(filetools.join(item.path, episode + ' [' + ch + '].json')):
+                                found_ch = True
+                                break
+                        if found_ch == False:
+                            filetools.remove(filetools.join(item.path, episode + '.nfo'))
+                            filetools.remove(filetools.join(item.path, episode + '.strm'))
+                            strm_list.append(filetools.join(item.extra, episode + '.strm'))
 
-        if num_enlaces > 0:
-            # Actualizar .nfo
-            head_nfo, item_nfo = videolibrarytools.read_nfo(item.nfo)
-            del item_nfo.library_urls[canal]
-            if item_nfo.emergency_urls and item_nfo.emergency_urls.get(canal, False):
-                del item_nfo.emergency_urls[canal]
-            filetools.write(item.nfo, head_nfo + item_nfo.tojson())
+            if config.is_xbmc() and config.get_setting("videolibrary_kodi") and strm_list:
+                from platformcode import xbmc_videolibrary
+                xbmc_videolibrary.clean(strm_list)
 
-        msg_txt = config.get_localized_string(70087) % (num_enlaces, canal)
-        logger.info(msg_txt)
-        platformtools.dialog_notification(heading, msg_txt)
-        platformtools.itemlist_refresh()
+            if num_enlaces > 0:
+                # Actualizar .nfo
+                head_nfo, item_nfo = videolibrarytools.read_nfo(item.nfo)
+                del item_nfo.library_urls[canal]
+                if item_nfo.emergency_urls and item_nfo.emergency_urls.get(canal, False):
+                    del item_nfo.emergency_urls[canal]
+                filetools.write(item.nfo, head_nfo + item_nfo.tojson())
+
+            msg_txt = config.get_localized_string(70087) % (num_enlaces, canal)
+            logger.info(msg_txt)
+            platformtools.dialog_notification(heading, msg_txt)
+            platformtools.itemlist_refresh()
 
     else:
-        if platformtools.dialog_yesno(heading,
-                                      config.get_localized_string(70088) % item.infoLabels['title']):
+        if platformtools.dialog_yesno(heading, config.get_localized_string(70088) % item.infoLabels['title']):
             delete_all(item)
 
 
@@ -1133,37 +1168,38 @@ def check_tvshow_playcount(item, season):
 
 
 def add_download_items(item, itemlist):
-    localOnly = True
-    for i in itemlist:
-        if i.contentChannel != 'local':
-            localOnly = False
-            break
-    if not item.fromLibrary and not localOnly:
-        downloadItem = Item(channel='downloads',
-                            from_channel=item.channel,
-                            title=typo(config.get_localized_string(60355), "color kod bold"),
-                            fulltitle=item.fulltitle,
-                            show=item.fulltitle,
-                            contentType=item.contentType,
-                            contentSerieName=item.contentSerieName,
-                            url=item.url,
-                            action='save_download',
-                            from_action="findvideos",
-                            contentTitle=item.contentTitle,
-                            path=item.path,
-                            thumbnail=thumb(thumb='downloads.png'),
-                            parent=item.tourl())
-        if item.action == 'findvideos':
-            if item.contentType == 'episode':
-                downloadItem.title = typo(config.get_localized_string(60356), "color kod bold")
-            else:  # film
-                downloadItem.title = typo(config.get_localized_string(60354), "color kod bold")
-            downloadItem.downloadItemlist = [i.tourl() for i in itemlist]
-            itemlist.append(downloadItem)
-        else:
-            if item.contentSeason:  # season
-                downloadItem.title = typo(config.get_localized_string(60357), "color kod bold")
+    if config.get_setting('downloadenabled'):
+        localOnly = True
+        for i in itemlist:
+            if i.contentChannel != 'local':
+                localOnly = False
+                break
+        if not item.fromLibrary and not localOnly:
+            downloadItem = Item(channel='downloads',
+                                from_channel=item.channel,
+                                title=typo(config.get_localized_string(60355), "color kod bold"),
+                                fulltitle=item.fulltitle,
+                                show=item.fulltitle,
+                                contentType=item.contentType,
+                                contentSerieName=item.contentSerieName,
+                                url=item.url,
+                                action='save_download',
+                                from_action="findvideos",
+                                contentTitle=item.contentTitle,
+                                path=item.path,
+                                thumbnail=thumb(thumb='downloads.png'),
+                                parent=item.tourl())
+            if item.action == 'findvideos':
+                if item.contentType == 'episode':
+                    downloadItem.title = typo(config.get_localized_string(60356), "color kod bold")
+                else:  # film
+                    downloadItem.title = typo(config.get_localized_string(60354), "color kod bold")
+                downloadItem.downloadItemlist = [i.tourl() for i in itemlist]
                 itemlist.append(downloadItem)
-            else:  # tvshow + not seen
-                itemlist.append(downloadItem)
-                itemlist.append(downloadItem.clone(title=typo(config.get_localized_string(60003), "color kod bold"), unseen=True))
+            else:
+                if item.contentSeason:  # season
+                    downloadItem.title = typo(config.get_localized_string(60357), "color kod bold")
+                    itemlist.append(downloadItem)
+                else:  # tvshow + not seen
+                    itemlist.append(downloadItem)
+                    itemlist.append(downloadItem.clone(title=typo(config.get_localized_string(60003), "color kod bold"), unseen=True))

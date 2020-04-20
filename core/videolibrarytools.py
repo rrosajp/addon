@@ -75,7 +75,7 @@ def read_nfo(path_nfo, item=None):
     return head_nfo, it
 
 
-def save_movie(item):
+def save_movie(item, silent=False):
     """
     guarda en la libreria de peliculas el elemento item, con los valores que contiene.
     @type item: item
@@ -128,7 +128,8 @@ def save_movie(item):
     _id = item.infoLabels['code'][0]
 
     # progress dialog
-    p_dialog = platformtools.dialog_progress(config.get_localized_string(20000), config.get_localized_string(60062))
+    if not silent:
+        p_dialog = platformtools.dialog_progress(config.get_localized_string(20000), config.get_localized_string(60062))
 
     if config.get_setting("original_title_folder", "videolibrary") and item.infoLabels['originaltitle']:
         base_name = item.infoLabels['originaltitle']
@@ -215,23 +216,24 @@ def save_movie(item):
             logger.error(traceback.format_exc())
 
         if filetools.write(json_path, item.tojson()):
-            p_dialog.update(100, config.get_localized_string(60062), item.contentTitle)
+            if not silent: p_dialog.update(100, config.get_localized_string(60062), item.contentTitle)
             item_nfo.library_urls[item.channel] = item.url
 
             if filetools.write(nfo_path, head_nfo + item_nfo.tojson()):
                 #logger.info("FOLDER_MOVIES : %s" % FOLDER_MOVIES)
                 # actualizamos la videoteca de Kodi con la pelicula
-                if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
+                if config.is_xbmc() and config.get_setting("videolibrary_kodi") and not silent:
                     from platformcode import xbmc_videolibrary
                     xbmc_videolibrary.update()
 
-                p_dialog.close()
+                if not silent: p_dialog.close()
                 return insertados, sobreescritos, fallidos
 
     # Si llegamos a este punto es por q algo ha fallado
     logger.error("Could not save %s in the video library" % item.contentTitle)
-    p_dialog.update(100, config.get_localized_string(60063), item.contentTitle)
-    p_dialog.close()
+    if not silent:
+        p_dialog.update(100, config.get_localized_string(60063), item.contentTitle)
+        p_dialog.close()
     return 0, 0, -1
 
 def update_renumber_options(item, head_nfo, path):
@@ -419,7 +421,7 @@ def filter_list(episodelist, action=None, path=None):
 
     return episodelist
 
-def save_tvshow(item, episodelist):
+def save_tvshow(item, episodelist, silent=False):
     """
     guarda en la libreria de series la serie con todos los capitulos incluidos en la lista episodelist
     @type item: item
@@ -549,7 +551,7 @@ def save_tvshow(item, episodelist):
     # Guardar los episodios
     '''import time
     start_time = time.time()'''
-    insertados, sobreescritos, fallidos = save_episodes(path, episodelist, item)
+    insertados, sobreescritos, fallidos = save_episodes(path, episodelist, item, silent=silent)
     '''msg = "Insertados: %d | Sobreescritos: %d | Fallidos: %d | Tiempo: %2.2f segundos" % \
           (insertados, sobreescritos, fallidos, time.time() - start_time)
     logger.debug(msg)'''
@@ -588,19 +590,9 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     sobreescritos = 0
     fallidos = 0
     news_in_playcounts = {}
-
     # Listamos todos los ficheros de la serie, asi evitamos tener que comprobar si existe uno por uno
     raiz, carpetas_series, ficheros = next(filetools.walk(path))
     ficheros = [filetools.join(path, f) for f in ficheros]
-
-    nostrm_episodelist = []
-    for root, folders, files in filetools.walk(path):
-        for file in files:
-            season_episode = scrapertools.get_season_and_episode(file)
-            if season_episode == "" or filetools.exists(filetools.join(path, "%s.strm" % season_episode)):
-                continue
-            nostrm_episodelist.append(season_episode)
-    nostrm_episodelist = sorted(set(nostrm_episodelist))
 
     # Silent es para no mostrar progreso (para service)
     if not silent:
@@ -654,7 +646,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
                 e = emergency_urls(e, channel, json_path, headers=headers)  #generamos las urls
                 if e.emergency_urls:                                        #Si ya tenemos urls...
                     emergency_urls_succ = True                              #... es un éxito y vamos a marcar el .nfo
-            
+
             if not e.infoLabels["tmdb_id"] or (serie.infoLabels["tmdb_id"] and e.infoLabels["tmdb_id"] != serie.infoLabels["tmdb_id"]):                                                    #en series multicanal, prevalece el infolabels...
                 e.infoLabels = serie.infoLabels                             #... del canal actual y no el del original
             e.contentSeason, e.contentEpisodeNumber = season_episode.split("x")
@@ -679,6 +671,8 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     except:
         t = 0
 
+    local_episodelist = get_local_content(path)
+
     last_season_episode = ''
     for i, e in enumerate(scraper.sort_episode_list(new_episodelist)):
         if not silent:
@@ -701,7 +695,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
         nfo_path = filetools.join(path, "%s.nfo" % season_episode)
         json_path = filetools.join(path, ("%s [%s].json" % (season_episode, e.channel)).lower())
 
-        if season_episode in nostrm_episodelist:
+        if season_episode in local_episodelist:
             logger.info('Skipped: Serie ' + serie.contentSerieName + ' ' + season_episode + ' available as local content')
             continue
         strm_exists = strm_path in ficheros
@@ -842,6 +836,21 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     logger.debug("%s [%s]: inserted= %s, overwritten= %s, failed= %s" %
                  (serie.contentSerieName, serie.channel, insertados, sobreescritos, fallidos))
     return insertados, sobreescritos, fallidos
+
+
+def get_local_content(path):
+    logger.info()
+
+    local_episodelist = []
+    for root, folders, files in filetools.walk(path):
+        for file in files:
+            season_episode = scrapertools.get_season_and_episode(file)
+            if season_episode == "" or filetools.exists(filetools.join(path, "%s.strm" % season_episode)):
+                continue
+            local_episodelist.append(season_episode)
+    local_episodelist = sorted(set(local_episodelist))
+
+    return local_episodelist
 
 
 def add_movie(item):

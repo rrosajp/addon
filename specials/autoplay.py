@@ -450,9 +450,8 @@ def init(channel, list_servers, list_quality, reset=False):
             if not result:
                 heading = config.get_localized_string(60077)
                 msj = config.get_localized_string(60078)
-                icon = 1
 
-                platformtools.dialog_notification(heading, msj, icon, sound=False)
+                platformtools.dialog_notification(heading, msj, sound=False)
 
     return result
 

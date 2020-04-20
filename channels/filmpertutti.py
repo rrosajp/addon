@@ -155,6 +155,6 @@ def newest(categoria):
 def findvideos(item):
     if item.contentType == 'movie':
         data = httptools.downloadpage(item.url).data
-        return support.server(item, data=data)
+        return support.server(item, data=data, patronTag='Versione: <[^>]+>([^<]+)')
     else:
         return support.server(item, item.url)
