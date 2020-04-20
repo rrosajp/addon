@@ -1236,7 +1236,7 @@ def addQualityTag(item, itemlist, data, patron):
         "MP3": "codec per compressione audio utilizzato MP3.",
         "RESYNC": "il film è stato lavorato e re sincronizzato con una traccia audio. A volte potresti riscontrare una mancata sincronizzazione tra audio e video.",
     }
-    qualityStr = scrapertools.find_single_match(data, patron).strip()
+    qualityStr = scrapertools.find_single_match(data, patron).strip().upper()
     if PY3:
         qualityStr = qualityStr.encode('ascii', 'ignore')
     else:
@@ -1244,11 +1244,19 @@ def addQualityTag(item, itemlist, data, patron):
 
     if qualityStr:
         try:
-            splitted = qualityStr.split('.')
-            video = splitted[-1]
-            audio = splitted[-2]
-            descr = typo(video + ': ', 'color kod') + defQualVideo.get(video.upper(), '') + '\n' +\
-                    typo(audio + ': ', 'color kod') + defQualAudio.get(audio.upper(), '')
+            video, audio, descr = None, None, ''
+            for tag in defQualVideo:
+                if tag in qualityStr:
+                    video = tag
+                    break
+            for tag in defQualAudio:
+                if tag in qualityStr:
+                    audio = tag
+                    break
+            if video:
+                descr += typo(video + ': ', 'color kod') + defQualVideo.get(video, '') + '\n'
+            if audio:
+                descr += typo(audio + ': ', 'color kod') + defQualAudio.get(audio, '') + '\n'
         except:
             descr = ''
         itemlist.insert(0,
