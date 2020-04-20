@@ -5900,8 +5900,8 @@ msgid "You must install an external Client to take advantage of the torrent supp
 msgstr "Per poter usufruire del support torrent devi installare un Client esterno. Vuoi installare Elementum?"
 
 msgctxt "#70783"
-msgid "Elementum installed and configured, enjoy!"
-msgstr "Elementum installato e configurato, buona Visione!"
+msgid "Elementum is installed on your device, but is not active. Do you want to activate it?"
+msgstr "Elementum è installato sul tuo dispositivo, ma non è attivo. Vuoi Attivarlo?"
 
 msgctxt "#70784"
 msgid "Attention!"

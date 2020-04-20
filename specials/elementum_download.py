@@ -1,59 +1,78 @@
 
 from core import filetools, downloadtools, support
 from platformcode import config, platformtools, updater
-from time import sleep
-
-import xbmc, xbmcaddon, os, sys, platform
+import xbmc, xbmcaddon, sys, platform
 
 host = 'https://github.com'
 elementum_url = host + '/elgatito/plugin.video.elementum/releases'
 filename = filetools.join(config.get_data_path(),'elementum.zip')
-addon_path = xbmc.translatePath("special://home/addons/")
+addon_path = xbmc.translatePath('special://home/addons/')
+setting_path = xbmc.translatePath('special://profile/addon_data/')
 elementum_path = filetools.join(addon_path,'plugin.video.elementum')
+elementum_setting = filetools.join(setting_path,'plugin.video.elementum')
+elementum_setting_file = filetools.join(elementum_setting,'settings.xml')
+kod_setting_file = filetools.join(addon_path,'plugin.video.kod', 'resources', 'settings', 'elementum', 'settings.xml')
 
 
 def download(item=None):
-    if filetools.exists(elementum_path):
-        xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "plugin.video.elementum", "enabled": false }}')
-        sleep(1)
-        filetools.rmdirtree(elementum_path)
 
-    if filetools.exists(filename):
-        filetools.remove(filename)
-        return download()
+    if filetools.exists(elementum_path):
+        if platformtools.dialog_yesno(config.get_localized_string(70784), config.get_localized_string(70783)):
+            setting()
+            return True
+
     else:
-        platform = get_platform()
-        support.log('OS:', platform)
-        support.log('Extract IN:', elementum_path)
-        url = support.match(elementum_url, patronBlock=r'<div class="release-entry">(.*?)<!-- /.release-body -->', patron=r'<a href="([a-zA-Z0-9/\.-]+%s.zip)' % platform).match
-        support.log('URL:', url)
-        if url:
-            downloadtools.downloadfile(host + url, filename)
-            extract()
+        if platformtools.dialog_yesno(config.get_localized_string(70784), config.get_localized_string(70782)):
+            pform = get_platform()
+            url = support.match(elementum_url, patronBlock=r'<div class="release-entry">(.*?)<!-- /.release-body -->', patron=r'<a href="([a-zA-Z0-9/\.-]+%s.zip)' % pform).match
+            support.log('OS:', pform)
+            support.log('Extract IN:', elementum_path)
+            support.log('URL:', url)
+            if url:
+                downloadtools.downloadfile(host + url, filename)
+                extract()
+                xbmc.sleep(1000)
+                setting()
+            return True
+
+    return False
+
 
 def extract():
     import zipfile
     support.log('Estraggo Elementum in:', elementum_path)
     with zipfile.ZipFile(filename, 'r') as zip_ref:
-        zip_ref.extractall(xbmc.translatePath("special://home/addons/"))
+        zip_ref.extractall(xbmc.translatePath(addon_path))
 
+
+def setting():
+    # support.dbg()
     xbmc.executebuiltin('UpdateLocalAddons')
-    if platformtools.dialog_ok('Elementum', config.get_localized_string(70783)):
-        if filetools.exists(filename):
-            filetools.remove(filename)
+
+    if filetools.isfile(elementum_setting_file):
         xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "plugin.video.elementum", "enabled": true }}')
-        xbmc.executebuiltin('UpdateLocalAddons')
-        updater.refreshLang()
+        Continue = True
+        while Continue: #xbmc.sleep(1000)
+            try:
+                __settings__ = xbmcaddon.Addon(id="plugin.video.elementum")
+                __settings__.setSetting('skip_burst_search', 'true')
+                __settings__.setSetting('greeting_enabled', 'false')
+                __settings__.setSetting('do_not_disturb', 'true')
+                Continue = False
+            except:
+                Continue = True
+    else:
+        if not filetools.exists(elementum_path):
+            filetools.mkdir(elementum_path)
+        filetools.copy(kod_setting_file, elementum_setting_file)
+        xbmc.sleep(1000)
+        xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "plugin.video.elementum", "enabled": true }}')
+    updater.refreshLang()
 
-        elementum_settings = filetools.join(config.get_data_path().replace('kod','elementum'),'settings.xml')
-        if filetools.isfile(elementum_settings):
-            xbmcaddon.Addon(id="plugin.video.elementum").setSetting('skip_burst_search',True)
-            xbmcaddon.Addon(id="plugin.video.elementum").setSetting('greeting_enabled',False)
-            xbmcaddon.Addon(id="plugin.video.elementum").setSetting('do_not_disturb',True)
-        else:
-            settings_file = filetools.join(config.get_runtime_path(), 'resources', 'settings', 'elementum', 'settings.xml')
-            filetools.copy(settings_file, elementum_settings)
-
+    if filetools.exists(filename):
+        filetools.remove(filename)
+    if platformtools.dialog_ok('Elementum', config.get_localized_string(70783)):
+        return
 
 
 def get_platform():
