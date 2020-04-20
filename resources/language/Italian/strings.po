@@ -5897,7 +5897,7 @@ msgstr "Vuoi aprire i settaggi di Elementum per passare temporaneamente a usare 
 
 msgctxt "#70782"
 msgid "You must install an external Client to take advantage of the torrent support. Do you want to install Elementum?"
-msgstr "Per poter usufruire del support torrent devi installare un Client esterno. Vuoi installare Elementum?"
+msgstr "Per poter usufruire del supporto torrent devi installare un Client esterno. Vuoi installare Elementum?"
 
 msgctxt "#70783"
 msgid "Elementum is installed on your device, but is not active. Do you want to activate it?"

@@ -61,6 +61,10 @@ trackers = [
 
 # Returns an array of possible video url's from the page_url
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
+    torrent_options = platformtools.torrent_client_installed(show_tuple=True)
+    if len(torrent_options) == 0:
+        from specials import elementum_download
+        elementum_download.download()
     logger.info("server=torrent, the url is the good")
 
     if page_url.startswith("magnet:"):

@@ -19,7 +19,7 @@ def download(item=None):
     if filetools.exists(elementum_path):
         if platformtools.dialog_yesno(config.get_localized_string(70784), config.get_localized_string(70783)):
             setting()
-            return True
+            platformtools.dialog_ok('Elementum', config.get_localized_string(70783))
 
     else:
         if platformtools.dialog_yesno(config.get_localized_string(70784), config.get_localized_string(70782)):
@@ -33,9 +33,6 @@ def download(item=None):
                 extract()
                 xbmc.sleep(1000)
                 setting()
-            return True
-
-    return False
 
 
 def extract():
@@ -48,11 +45,11 @@ def extract():
 def setting():
     # support.dbg()
     xbmc.executebuiltin('UpdateLocalAddons')
-
+    xbmc.sleep(1000)
     if filetools.isfile(elementum_setting_file):
         xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "plugin.video.elementum", "enabled": true }}')
         Continue = True
-        while Continue: #xbmc.sleep(1000)
+        while Continue:
             try:
                 __settings__ = xbmcaddon.Addon(id="plugin.video.elementum")
                 __settings__.setSetting('skip_burst_search', 'true')
@@ -60,19 +57,20 @@ def setting():
                 __settings__.setSetting('do_not_disturb', 'true')
                 Continue = False
             except:
-                Continue = True
+                support.log('RIPROVO')
+                xbmc.sleep(100)
     else:
         if not filetools.exists(elementum_path):
             filetools.mkdir(elementum_path)
         filetools.copy(kod_setting_file, elementum_setting_file)
         xbmc.sleep(1000)
         xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "plugin.video.elementum", "enabled": true }}')
+
+
     updater.refreshLang()
 
     if filetools.exists(filename):
         filetools.remove(filename)
-    if platformtools.dialog_ok('Elementum', config.get_localized_string(70783)):
-        return
 
 
 def get_platform():

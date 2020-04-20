@@ -1358,12 +1358,6 @@ def play_torrent(item, xlistitem, mediaurl):
     torrent_client = config.get_setting("torrent_client", server="torrent")
 
     # Si es Libtorrent y no está soportado, se ofrecen alternativas, si las hay...
-    if len(torrent_options) == 0:
-        from specials import elementum_download
-        if elementum_download.download():
-            torrent_options = torrent_client_installed(show_tuple=True)
-        else:
-            return
 
     if len(torrent_options) > 1:
         selection = dialog_select(config.get_localized_string(70193), [opcion[0] for opcion in torrent_options])
