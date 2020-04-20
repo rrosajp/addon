@@ -171,6 +171,7 @@ def render_items(itemlist, parent_item):
     if not len(itemlist):
         itemlist.append(Item(title=config.get_localized_string(60347), thumbnail=get_thumb('nofolder.png')))
 
+    dirItems = []
     for item in itemlist:
         item_url = item.tourl()
 
@@ -210,7 +211,8 @@ def render_items(itemlist, parent_item):
             context_commands = def_context_commands
         listitem.addContextMenuItems(context_commands)
 
-        xbmcplugin.addDirectoryItem(_handle, '%s?%s' % (sys.argv[0], item_url), listitem, item.folder)
+        dirItems.append(('%s?%s' % (sys.argv[0], item_url), listitem, item.folder))
+    xbmcplugin.addDirectoryItems(_handle, dirItems)
 
     if parent_item.list_type == '':
         breadcrumb = parent_item.category.capitalize()
@@ -225,7 +227,7 @@ def render_items(itemlist, parent_item):
 
     xbmcplugin.setPluginCategory(handle=_handle, category=breadcrumb)
 
-    set_view_mode(item, parent_item)
+    set_view_mode(itemlist[0], parent_item)
 
     xbmcplugin.endOfDirectory(_handle)
     logger.info('END render_items')
@@ -265,7 +267,7 @@ def set_view_mode(item, parent_item):
     elif parent_item.action in ['get_seasons']:
         mode('season', 'tvshows')
 
-    elif parent_item.action in ['episodios', 'get_episodes']:
+    elif parent_item.action in ['episodios', 'get_episodes'] or item.contentType == 'episode':
         mode('episode', 'tvshows')
 
     elif parent_item.action == 'findvideos':
