@@ -250,18 +250,23 @@ def set_view_mode(item, parent_item):
             config.set_setting('skin_name', xbmc.getSkinDir())
             config.set_setting('view_mode_%s' % mode, config.get_localized_string(70003) + ' , 0')
 
-    parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'channel_search', 'newest']
+    parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'channel_search', 'newest', 'discover_list', 'new_search']
 
     if xbmc.getSkinDir() != config.get_setting('skin_name') or not config.get_setting('skin_name'):
         reset_view_mode()
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='')
         xbmc.executebuiltin('Container.SetViewMode(%s)' % 55)
 
+    elif parent_item.action == 'findvideos':
+        mode('server', '')
+
+    elif parent_item.action == 'mainlist':
+        mode('channel', '')
 
     elif (item.contentType in ['movie'] and parent_item.action in parent_actions ) \
         or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']) \
         or (parent_item.channel in ['favorites'] and parent_item.action in ['mainlist']) \
-        or parent_item.action in ['now_on_tv', 'now_on_misc', 'now_on_misc_film', 'new_search', 'mostrar_perfil']:
+        or parent_item.action in ['now_on_tv', 'now_on_misc', 'now_on_misc_film', 'mostrar_perfil']:
         mode('movie', 'movies')
 
     elif (item.contentType in ['tvshow'] and parent_item.action in parent_actions ) \
@@ -273,12 +278,6 @@ def set_view_mode(item, parent_item):
 
     elif parent_item.action in ['episodios', 'get_episodes'] or item.contentType == 'episode':
         mode('episode', 'tvshows')
-
-    elif parent_item.action == 'findvideos':
-        mode('server', '')
-
-    elif parent_item.action == 'mainlist':
-        mode('channel', '')
 
     else:
         mode('addon', '')

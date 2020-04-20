@@ -156,6 +156,7 @@ def new_search(item):
                             thumbnail=thumbnail,
                             fanart=fanart,
                             mode=item.mode,
+                            contentType=item.mode,
                             infoLabels=result)
 
             if item.mode == 'movie':
@@ -629,7 +630,7 @@ def discover_list(item):
             new_item = Item(channel='search', title=typo(title, 'bold'), infoLabels=elem,
                             action='channel_search', text=title,
                             thumbnail=thumbnail, fanart=fanart,
-                            context='', mode=mode,
+                            context='', mode=mode, contentType=mode,
                             release_date=year)
 
             if tvshow:
