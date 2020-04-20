@@ -5896,20 +5896,20 @@ msgid "Do you want to call Elementum Settings to temporarily switch to Use Files
 msgstr "Vuoi aprire i settaggi di Elementum per passare temporaneamente a usare i file?"
 
 msgctxt "#70782"
-msgid "Your device is not compatible with the Internal Client, do you want to use Quasar for Torrents?"
-msgstr "Il tuo dispositivo non è compatibile con il Client Interno, Vuoi usare Quasar per i Torrent?"
+msgid "You must install an external Client to take advantage of the torrent support. Do you want to install Elementum?"
+msgstr "Per poter usufruire del support torrent devi installare un Client esterno. Vuoi installare Elementum?"
 
 msgctxt "#70783"
-msgid "Quasar installed and configured, enjoy!"
-msgstr "Quasar installato e configurato, buona Visione!"
+msgid "Elementum installed and configured, enjoy!"
+msgstr "Elementum installato e configurato, buona Visione!"
 
 msgctxt "#70784"
 msgid "Attention!"
 msgstr "Attenzione!"
 
 msgctxt "#70785"
-msgid "Install Quasar"
-msgstr "Installa Quasar"
+msgid "Install Elementum"
+msgstr "Installa Elementum"
 
 msgctxt "#70786"
 msgid "Autostart"

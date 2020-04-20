@@ -6,17 +6,17 @@ from time import sleep
 import xbmc, xbmcaddon, os, sys, platform
 
 host = 'https://github.com'
-quasar_url = host + '/scakemyer/plugin.video.quasar/releases'
-filename = filetools.join(config.get_data_path(),'quasar.zip')
+elementum_url = host + '/elgatito/plugin.video.elementum/releases'
+filename = filetools.join(config.get_data_path(),'elementum.zip')
 addon_path = xbmc.translatePath("special://home/addons/")
-quasar_path = filetools.join(addon_path,'plugin.video.quasar')
+elementum_path = filetools.join(addon_path,'plugin.video.elementum')
 
 
 def download(item=None):
-    if filetools.exists(quasar_path):
-        xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "plugin.video.quasar", "enabled": false }}')
+    if filetools.exists(elementum_path):
+        xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "plugin.video.elementum", "enabled": false }}')
         sleep(1)
-        filetools.rmdirtree(quasar_path)
+        filetools.rmdirtree(elementum_path)
 
     if filetools.exists(filename):
         filetools.remove(filename)
@@ -24,8 +24,8 @@ def download(item=None):
     else:
         platform = get_platform()
         support.log('OS:', platform)
-        support.log('Extract IN:', quasar_path)
-        url = support.match(quasar_url, patronBlock=r'<div class="release-entry">(.*?)<!-- /.release-body -->', patron=r'<a href="([a-zA-Z0-9/\.-]+%s.zip)' % platform).match
+        support.log('Extract IN:', elementum_path)
+        url = support.match(elementum_url, patronBlock=r'<div class="release-entry">(.*?)<!-- /.release-body -->', patron=r'<a href="([a-zA-Z0-9/\.-]+%s.zip)' % platform).match
         support.log('URL:', url)
         if url:
             downloadtools.downloadfile(host + url, filename)
@@ -33,19 +33,27 @@ def download(item=None):
 
 def extract():
     import zipfile
-    support.log('Estraggo Quasar in:', quasar_path)
+    support.log('Estraggo Elementum in:', elementum_path)
     with zipfile.ZipFile(filename, 'r') as zip_ref:
         zip_ref.extractall(xbmc.translatePath("special://home/addons/"))
 
     xbmc.executebuiltin('UpdateLocalAddons')
-    if platformtools.dialog_ok('Quasar', config.get_localized_string(70783)):
+    if platformtools.dialog_ok('Elementum', config.get_localized_string(70783)):
         if filetools.exists(filename):
             filetools.remove(filename)
-        xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "plugin.video.quasar", "enabled": true }}')
-        updater.refreshLang()
-        xbmcaddon.Addon(id="plugin.video.quasar").setSetting('download_path', config.get_setting('downloadpath'))
+        xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "plugin.video.elementum", "enabled": true }}')
         xbmc.executebuiltin('UpdateLocalAddons')
-        sleep(2)
+        updater.refreshLang()
+
+        elementum_settings = filetools.join(config.get_data_path().replace('kod','elementum'),'settings.xml')
+        if filetools.isfile(elementum_settings):
+            xbmcaddon.Addon(id="plugin.video.elementum").setSetting('skip_burst_search',True)
+            xbmcaddon.Addon(id="plugin.video.elementum").setSetting('greeting_enabled',False)
+            xbmcaddon.Addon(id="plugin.video.elementum").setSetting('do_not_disturb',True)
+        else:
+            settings_file = filetools.join(config.get_runtime_path(), 'resources', 'settings', 'elementum', 'settings.xml')
+            filetools.copy(settings_file, elementum_settings)
+
 
 
 def get_platform():
@@ -64,8 +72,7 @@ def get_platform():
         if "arm" in platform.machine() or "aarch" in platform.machine():
             ret["arch"] = "arm"
             if "64" in platform.machine() and ret["auto_arch"] == "64-bit":
-                ret["arch"] = "arm"
-                #ret["arch"] = "x64"                #The binary is corrupted in install package
+                ret["arch"] = "arm64"
     elif xbmc.getCondVisibility("system.platform.linux"):
         ret["os"] = "linux"
         if "aarch" in platform.machine() or "arm64" in platform.machine():
