@@ -363,7 +363,7 @@ def get_seasons(item):
         # Creamos un item por cada temporada
         for season, title in list(dict_temp.items()):
             new_item = item.clone(action="get_episodes", title=title, contentSeason=season,
-                                  filtrar_season=True)
+                                  filtrar_season=True, channel='videolibrary')
 
             # Menu contextual: Marcar la temporada como vista o no
             visto = item_nfo.library_playcounts.get("season %s" % season, 0)
