@@ -16,15 +16,23 @@ list_quality = ['default']
 def mainlist(item):
 
     menu = [
-        ('Film BDRiP', ['/categoria.php?active=0&category=1&order=data&by=DESC&page=', 'peliculas', [0, 'movie']]),
-        ('Film DVD', ['/categoria.php?active=0&category=20&order=data&by=DESC&page=', 'peliculas', [0, 'movie']]),
-        ('Film Screener', ['/categoria.php?active=0&category=19&order=data&by=DESC&page=', 'peliculas', [0, 'movie']]),
+        ('BDRiP {film}', ['/categoria.php?active=0&category=1&order=data&by=DESC&page=', 'peliculas', [0, 'movie']]),
+        ('Cerca BDRiP... submenu {film}', ['/categoria.php?active=0&category=1&order=data&by=DESC&argh.php?search=', 'search', 'search']),
+        ('DVD {film}', ['/categoria.php?active=0&category=20&order=data&by=DESC&page=', 'peliculas', [0, 'movie']]),
+        ('Cerca DVD... submenu {film}', ['/categoria.php?active=0&category=20&order=data&by=DESC&argh.php?search=', 'search', 'search']),
+        ('Screener {film}', ['/categoria.php?active=0&category=19&order=data&by=DESC&page=', 'peliculas', [0, 'movie']]),
+        ('Cerca Screener.. submenu {film}', ['/categoria.php?active=0&category=19&order=data&by=DESC&argh.php?search=', 'search', 'search']),
         ('Serie TV', ['/categoria.php?active=0&category=15&order=data&by=DES&page=', 'peliculas', [0 , 'tvshow']]),
+        ('Cerca Serie TV.. submenu', ['/categoria.php?active=0&category=15&order=data&by=DESC&argh.php?search=', 'search', 'search']),
         ('Anime', ['/categoria.php?active=0&category=5&order=data&by=DESC&page=', 'peliculas', [0, 'anime']]),
+        ('Cerca Anime.. submenu', ['/categoria.php?active=0&category=5&order=data&by=DESC&argh.php?search=', 'search', 'search']),
         ('Musica', ['/categoria.php?active=0&category=2&order=data&by=DESC&page=', 'peliculas', [0, 'music']]),
+        ('Cerca Musica.. submenu', ['/categoria.php?active=0&category=2&order=data&by=DESC&argh.php?search=', 'search', 'search']),
         ('Audiolibri {musica}', ['/categoria.php?active=0&category=18&order=data&by=DESC&page=', 'peliculas', [0, 'music']]),
+        ('Cerca Audiolibri.. submenu', ['/categoria.php?active=0&category=18&order=data&by=DESC&argh.php?search=', 'search', 'search']),
         ('Altro {film}', ['/categoria.php?active=0&category=4&order=data&by=DESC&page=', 'peliculas', [0, 'movie']]),
-        ('Cerca... submenu', ['/argh.php?search=', 'search', 'search'])
+        ('Cerca altro.. submenu', ['/categoria.php?active=0&category=4&order=data&by=DESC&argh.php?search=', 'search', 'search']),
+        ('Cerca Tutto... color kod bold', ['/argh.php?search=', 'search', 'search'])
     ]
 
     return locals()
@@ -70,4 +78,5 @@ def search(item, text):
 
 
 def findvideos(item):
-    return support.server(item, support.match(item.url, patron=r'"(magnet[^"]+)').match)
+    video_library = True if 'movie' in item.args else False
+    return support.server(item, support.match(item.url, patron=r'"(magnet[^"]+)').match,down_load=False, video_library=video_library)
