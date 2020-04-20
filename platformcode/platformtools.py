@@ -1118,7 +1118,7 @@ def get_dialogo_opciones(item, default_action, strm, autoplay):
         else:
             # "Descargar"
             downloadenabled = config.get_setting('downloadenabled')
-            if downloadenabled != "false" and item.channel != 'videolibrary':
+            if downloadenabled != False and item.channel != 'videolibrary':
                 opcion = config.get_localized_string(30153)
                 opciones.append(opcion)
 
