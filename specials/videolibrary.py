@@ -32,7 +32,7 @@ def mainlist(item):
                          category=config.get_localized_string(70271),
                          thumbnail=get_thumb("videolibrary_tvshow.png")))
     itemlist.append(Item(channel='shortcuts', action="SettingOnPosition",
-                         category=2, setting=0, title=typo(config.get_localized_string(70287),'bold color kod'),
+                         category=2, setting=1, title=typo(config.get_localized_string(70287),'bold color kod'),
                          thumbnail = get_thumb("setting_0.png")))
 
     return itemlist
