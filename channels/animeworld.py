@@ -22,42 +22,47 @@ def order():
 @support.menu
 def mainlist(item):
     anime=['/filter?sort=',
-           ('ITA',['/filter?language[]=1&sort=', 'build_menu', '1']),
-           ('SUB-ITA',['/filter?language[]=0&sort=', 'build_menu', '0']),
+           ('ITA',['/filter?language[]=1&sort=', 'menu', '1']),
+           ('SUB-ITA',['/filter?language[]=0&sort=', 'menu', '0']),
            ('In Corso', ['/ongoing', 'peliculas','noorder']),
            ('Ultimi Episodi', ['/updated', 'peliculas', 'updated']),
            ('Nuove Aggiunte',['/newest', 'peliculas','noorder' ]),
            ('Generi',['','genres',])]
     return locals()
 
-
+@support.scrape
 def genres(item):
-    support.log()
-    itemlist = []
-    matches = support.match(item, patron=r'<input.*?name="([^"]+)" value="([^"]+)"\s*>[^>]+>([^<]+)<\/label>' , patronBlock=r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> Generi <span.[^>]+>(.*?)</ul>', headers=headers).matches
-    for name, value, title in matches:
-        support.menuItem(itemlist, __channel__, support.typo(title, 'bold'), 'peliculas', host + '/filter?' + name + '=' + value + '&sort=' + order(), 'tvshow', args='sub')
-    return itemlist
+    action = 'peliculas'
+    patronBlock = r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> Generi <span.[^>]+>(?P<block>.*?)</ul>'
+    patronMenu = r'<input.*?name="(?P<name>[^"]+)" value="(?P<value>[^"]+)"\s*>[^>]+>(?P<title>[^<]+)<\/label>'
+    def itemHook(item):
+        item.url = host + '/filter?' + item.name + '=' + item.value + '&sort='
+        return item
+    return locals()
 
 
-def build_menu(item):
-    support.log()
-    itemlist = []
-    support.menuItem(itemlist, __channel__, 'Tutti bold', 'peliculas', item.url , 'tvshow' , args=item.args)
-    matches = support.match(item, patron=r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> (.*?) <span.[^>]+>(.*?)</ul>', patronBlock=r'<form class="filters.*?>(.*?)</form>', headers=headers).matches
-    for title, html in matches:
-        if title not in 'Lingua Ordine':
-            support.menuItem(itemlist, __channel__, title + ' submenu bold', 'build_sub_menu', html, 'tvshow', args=item.args)
-    return itemlist
+@support.scrape
+def menu(item):
+    action = 'submenu'
+    patronBlock=r'<form class="filters.*?>(?P<block>.*?)</form>'
+    patronMenu=r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> (?P<title>.*?) <span.[^>]+>(?P<url>.*?)</ul>'
+    def itemlistHook(itemlist):
+        item.title = support.typo('Tutti','bold')
+        item.action = 'peliculas'
+        itemlist.insert(0, item)
+        return itemlist
+    return locals()
 
 
-def build_sub_menu(item):
-    support.log()
-    itemlist = []
-    matches = support.re.compile(r'<input.*?name="([^"]+)" value="([^"]+)"\s*>[^>]+>([^<]+)<\/label>', support.re.DOTALL).findall(item.url)
-    for name, value, title in matches:
-        support.menuItem(itemlist, __channel__, support.typo(title, 'bold'), 'peliculas', host + '/filter?' + name + '=' + value + '&language[]=' + item.args + '&sort=', 'tvshow', args='sub')
-    return itemlist
+@support.scrape
+def submenu(item):
+    action = 'peliculas'
+    data = item.url
+    patronMenu = r'<input.*?name="(?P<name>[^"]+)" value="(?P<value>[^"]+)"\s*>[^>]+>(?P<title>[^<]+)<\/label>'
+    def itemHook(item):
+        item.url = host + '/filter?' + item.name + '=' + item.value + '&language[]=' + item.args + '&sort='
+        return item
+    return locals()
 
 
 def newest(categoria):
@@ -94,7 +99,6 @@ def search(item, texto):
 @support.scrape
 def peliculas(item):
     anime=True
-
     if item.args == 'updated':
         item.contentType='episode'
         patron=r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?[^>]+>[^>]+>\s*<div class="ep">[^\d]+(?P<episode>\d+)[^<]*</div>'
@@ -108,7 +112,7 @@ def peliculas(item):
     patronNext=r'href="([^"]+)" rel="next"'
     type_content_dict={'movie':['movie', 'special']}
     type_action_dict={'findvideos':['movie', 'special']}
-    check_lang = item.url
+    check_lang = item.url.replace('%5B0%5D','[]')
     def itemHook(item):
         if not item.contentLanguage:
             if 'language[]=1' in check_lang:
@@ -118,8 +122,6 @@ def peliculas(item):
                 item.contentLanguage = 'Sub-ITA'
                 item.title += support.typo(item.contentLanguage,'_ [] color kod')
         return item
-
-
     return locals()
 
 
