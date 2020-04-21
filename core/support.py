@@ -453,14 +453,14 @@ def scrape(func):
         if anime:
             if function == 'episodios' or item.action == 'episodios': autorenumber.renumber(itemlist, item, 'bold')
             else: autorenumber.renumber(itemlist)
-        if anime and autorenumber.check(item) == False and len(itemlist)>0 and not scrapertools.find_single_match(itemlist[0].title, r'(\d+.\d+)'):
-            pass
-        else:
-            if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
-                # item.fulltitle = item.infoLabels["title"]
-                videolibrary(itemlist, item, function=function)
-            if function == 'episodios' or function == 'findvideos':
-                download(itemlist, item, function=function)
+        # if anime and autorenumber.check(item) == False and len(itemlist)>0 and not scrapertools.find_single_match(itemlist[0].title, r'(\d+.\d+)'):
+        #     pass
+        # else:
+        if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
+            # item.fulltitle = item.infoLabels["title"]
+            videolibrary(itemlist, item, function=function)
+        if function == 'episodios' or function == 'findvideos':
+            download(itemlist, item, function=function)
 
         if 'patronMenu' in args and itemlist:
             itemlist = thumb(itemlist, genre=True)
@@ -1008,18 +1008,18 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
             from  channelselector import get_thumb
             itemlist.append(
                 Item(channel=item.channel,
-                        title=title,
-                        fulltitle=item.fulltitle,
-                        show=item.fulltitle,
-                        contentType=contentType,
-                        contentTitle=contentTitle,
-                        contentSerieName=contentSerieName,
-                        url=item.url,
-                        action=action,
-                        extra=extra,
-                        path=item.path,
-                        thumbnail=get_thumb('add_to_videolibrary.png')
-                        ))
+                     title=title,
+                     fulltitle=item.fulltitle,
+                     show=item.fulltitle,
+                     contentType=contentType,
+                     contentTitle=contentTitle,
+                     contentSerieName=contentSerieName,
+                     url=item.url,
+                     action=action,
+                     extra=extra,
+                     path=item.path,
+                     thumbnail=get_thumb('add_to_videolibrary.png')
+                    ))
 
     return itemlist
 

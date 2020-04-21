@@ -922,7 +922,7 @@ def add_tvshow(item, channel=None):
 
     else:
         # Esta marca es porque el item tiene algo más aparte en el atributo "extra"
-        item.action = item.extra
+        item.action = item.extra if item.extra else item.action
         if isinstance(item.extra, str) and "###" in item.extra:
             item.action = item.extra.split("###")[0]
             item.extra = item.extra.split("###")[1]
@@ -951,7 +951,17 @@ def add_tvshow(item, channel=None):
         #    del item.tmdb_stat          #Limpiamos el status para que no se grabe en la Videoteca
 
         # Obtiene el listado de episodios
+
         itemlist = getattr(channel, item.action)(item)
+        if itemlist and not scrapertools.find_single_match(itemlist[0].title, r'(\d+.\d+)'):
+            from specials.autorenumber import select_type, renumber, check
+            if not check(item):
+                action = item.action
+                select_type(item)
+                item.action = action
+                return add_tvshow(item, channel)
+            else:
+                itemlist = renumber(itemlist)
 
     global magnet_caching
     magnet_caching = False

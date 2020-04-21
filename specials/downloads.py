@@ -847,6 +847,14 @@ def get_episodes(item):
 
     itemlist = []
 
+    if episodes and not scrapertools.find_single_match(episodes[0].title, r'(\d+.\d+)'):
+        from specials.autorenumber import select_type, renumber, check
+        if not check(item):
+            select_type(item)
+            return get_episodes(item)
+        else:
+            renumber(episodes, item)
+
     # Tenemos las lista, ahora vamos a comprobar
     for episode in episodes:
         # Si partiamos de un item que ya era episodio estos datos ya están bien, no hay que modificarlos

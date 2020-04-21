@@ -775,8 +775,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
                                                                   action="set_custom_start",
                                                                   parent=item.tourl()).tourl())))
 
-        if (item.channel != "videolibrary" and not config.get_localized_string(70585) in str(item.context)) \
-            or (item.channel != "videolibrary" and config.get_localized_string(70585) in str(item.context) and config.get_localized_string(70714) in str(item.context)):
+        if item.channel != "videolibrary":
             # Añadir Serie a la videoteca
             if item.action in ["episodios", "get_episodios", "get_seasons"] and item.contentSerieName:
                 context_commands.append((config.get_localized_string(60352), "XBMC.RunPlugin(%s?%s&%s)" %
@@ -785,7 +784,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
             elif item.action in ["detail", "findvideos"] and item.contentType == 'movie' and item.contentTitle:
                 context_commands.append((config.get_localized_string(60353), "XBMC.RunPlugin(%s?%s&%s)" %
                                          (sys.argv[0], item_url, 'action=add_pelicula_to_library&from_action=' + item.action)))
-        
+
         if not item.local and item.channel not in ["downloads"] and item.server != 'torrent' and parent_item.action != 'mainlist' and config.get_setting('downloadenabled'):
             # Descargar pelicula
             if item.contentType == "movie":
