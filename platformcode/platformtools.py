@@ -135,7 +135,12 @@ def dialog_browse(_type, heading, default=""):
 
 
 def itemlist_refresh():
+    pos = Item().fromurl(xbmc.getInfoLabel('ListItem.FileNameAndPath')).pos + 1
     xbmc.executebuiltin("Container.Refresh")
+    win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+    cid = win.getFocusId()
+    ctl = win.getControl(cid)
+    ctl.selectItem(pos)
 
 
 def itemlist_update(item, replace=False):
@@ -172,7 +177,8 @@ def render_items(itemlist, parent_item):
         itemlist.append(Item(title=config.get_localized_string(60347), thumbnail=get_thumb('nofolder.png')))
 
     dirItems = []
-    for item in itemlist:
+    for n, item in enumerate(itemlist):
+        item.pos = n
         item_url = item.tourl()
 
         if item.category == "":
