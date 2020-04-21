@@ -142,7 +142,7 @@ def semiautomatic_config_item(item):
     # Configurazione Semi Automatica, utile in caso la numerazione automatica fallisca
 
     tvdb.find_and_set_infoLabels(item)
-    item.channel = item.from_channel
+    item.channel = item.from_channel if item.from_channel else item.channel
     dict_series = load(item)
     title = item.fulltitle.rstrip()
 
@@ -416,8 +416,9 @@ def make_list(itemlist, item, typography, dict_series, ID, Season, Episode, Mode
         addiction = 0
         for item in itemlist:
             # Otiene Numerazione Episodi
-            if config.get_localized_string(30992) not in item.title:
-                episode = int(scrapertools.find_single_match(item.title, r'\d+'))
+            scraped_ep = scrapertools.find_single_match(re.sub(r'\[[^\]]+\]','',item.title), r'\d+')
+            if scraped_ep:
+                episode = int(scraped_ep)
                 number = episode + FirstOfSeason - addiction
                 count = number + addiction
                 # Crea Dizionario Episodi
