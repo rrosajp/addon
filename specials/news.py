@@ -119,7 +119,7 @@ def mainlist(item):
     set_category_context(new_item)
     itemlist.append(new_item)
     thumbnail = get_thumb("setting_0.png")
-    itemlist.append(Item(channel='shortcuts', action="SettingOnPosition", category=5, setting=0,
+    itemlist.append(Item(channel='shortcuts', action="SettingOnPosition", category=7, setting=1,
                          title=typo(config.get_localized_string(70285), 'bold color kod'), thumbnail=thumbnail))
 
     return itemlist
