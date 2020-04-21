@@ -407,7 +407,8 @@ def get_episodes(item):
 
     # Crear un item en la lista para cada strm encontrado
     for i in ficheros:
-        if i.split('.')[-1] not in ['json','nfo']: #i.endswith('.strm'):
+        ext = i.split('.')[-1]
+        if ext not in ['json','nfo']: #i.endswith('.strm'):
             season_episode = scrapertools.get_season_and_episode(i)
             if not season_episode:
                 # El fichero no incluye el numero de temporada y episodio
@@ -416,7 +417,6 @@ def get_episodes(item):
             # Si hay q filtrar por temporada, ignoramos los capitulos de otras temporadas
             if item.filtrar_season and int(season) != int(item.contentSeason):
                 continue
-
             # Obtener los datos del season_episode.nfo
             nfo_path = filetools.join(raiz, '%sx%s.nfo' % (season, episode))#.replace('.strm', '.nfo')
             if filetools.isfile(nfo_path):
@@ -449,8 +449,8 @@ def get_episodes(item):
                                 "channel": "videolibrary",
                                 "playcount": value,
                                 "nfo": item.nfo}]
-
-                # logger.debug("epi:\n" + epi.tostring('\n'))
+                if ext != 'strm':
+                    epi.local = True
                 itemlist.append(epi)
 
     itemlist = sorted(itemlist, key=lambda it: (int(it.contentSeason), int(it.contentEpisodeNumber)))
