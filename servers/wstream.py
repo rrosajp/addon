@@ -65,7 +65,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                         video_urls.append([filetype, key.replace('https', 'http') + '|' + _headers])
                     else:
                         if not 'src' in key and 'file' in key: key['src'] = key['file']
-                        if key['file'].split('.')[-1] == 'mpd': pass
+                        if key['src'].split('.')[-1] == 'mpd': pass
                         video_urls.append([key['src'].split('.')[-1], key['src'].replace('https', 'http') + '|' + _headers])
             except:
                 pass
