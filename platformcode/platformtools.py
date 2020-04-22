@@ -135,12 +135,15 @@ def dialog_browse(_type, heading, default=""):
 
 
 def itemlist_refresh():
-    pos = Item().fromurl(xbmc.getInfoLabel('ListItem.FileNameAndPath')).pos + 1
+    pos = Item().fromurl(xbmc.getInfoLabel('ListItem.FileNameAndPath')).itemlistPosition
+    logger.info('Current position: ' + str(pos))
     xbmc.executebuiltin("Container.Refresh")
-    win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
-    cid = win.getFocusId()
-    ctl = win.getControl(cid)
-    ctl.selectItem(pos)
+
+    while Item().fromurl(xbmc.getInfoLabel('ListItem.FileNameAndPath')).itemlistPosition != pos:
+        win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+        cid = win.getFocusId()
+        ctl = win.getControl(cid)
+        ctl.selectItem(pos)
 
 
 def itemlist_update(item, replace=False):
@@ -178,7 +181,7 @@ def render_items(itemlist, parent_item):
 
     dirItems = []
     for n, item in enumerate(itemlist):
-        item.pos = n
+        item.itemlistPosition = n + 1
         item_url = item.tourl()
 
         if item.category == "":
@@ -239,54 +242,60 @@ def render_items(itemlist, parent_item):
     logger.info('END render_items')
 
 
-def set_view_mode(item, parent_item):
-    def mode(content, Type):
-        mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
-        if mode == 0:
-            logger.info('default mode')
-            mode = 55
-        elif not Type:
-            Type = 'addons'
-        xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
-        xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
-        logger.info('TYPE: ' + Type + ' - ' + 'CONTENT: ' + content)
+def getCurrentView(item=None, parent_item=None):
+    if not parent_item:
+        parent_item = Item().fromurl(xbmc.getInfoLabel('Container.FolderPath'))
+    if not item:
+        item = Item().fromurl(xbmc.getInfoLabel('Container.ListItem(1).FileNameAndPath'))
+    parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'channel_search', 'newest', 'discover_list', 'new_search']
 
+    if parent_item.action == 'findvideos':
+        return 'server', ''
+
+    elif parent_item.action == 'mainlist':
+        return 'channel', ''
+
+    elif (item.contentType in ['movie'] and parent_item.action in parent_actions) \
+            or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']) \
+            or (parent_item.channel in ['favorites'] and parent_item.action in ['mainlist']) \
+            or parent_item.action in ['now_on_tv', 'now_on_misc', 'now_on_misc_film', 'mostrar_perfil']:
+        return 'movie', 'movies'
+
+    elif (item.contentType in ['tvshow'] and parent_item.action in parent_actions) \
+            or (item.channel in ['videolibrary'] and parent_item.action in ['list_tvshows']):
+        return 'tvshow', 'tvshows'
+
+    elif parent_item.action in ['get_seasons']:
+        return 'season', 'tvshows'
+
+    elif parent_item.action in ['episodios', 'get_episodes'] or item.contentType == 'episode':
+        return 'episode', 'tvshows'
+
+    else:
+        return 'addon', ''
+
+
+def set_view_mode(item, parent_item):
     def reset_view_mode():
         for mode in ['addon','channel','movie','tvshow','season','episode','server']:
             config.set_setting('skin_name', xbmc.getSkinDir())
             config.set_setting('view_mode_%s' % mode, config.get_localized_string(70003) + ' , 0')
-
-    parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'channel_search', 'newest', 'discover_list', 'new_search']
 
     if xbmc.getSkinDir() != config.get_setting('skin_name') or not config.get_setting('skin_name'):
         reset_view_mode()
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='')
         xbmc.executebuiltin('Container.SetViewMode(%s)' % 55)
 
-    elif parent_item.action == 'findvideos':
-        mode('server', '')
-
-    elif parent_item.action == 'mainlist':
-        mode('channel', '')
-
-    elif (item.contentType in ['movie'] and parent_item.action in parent_actions ) \
-        or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']) \
-        or (parent_item.channel in ['favorites'] and parent_item.action in ['mainlist']) \
-        or parent_item.action in ['now_on_tv', 'now_on_misc', 'now_on_misc_film', 'mostrar_perfil']:
-        mode('movie', 'movies')
-
-    elif (item.contentType in ['tvshow'] and parent_item.action in parent_actions ) \
-        or (item.channel in ['videolibrary'] and parent_item.action in ['list_tvshows']):
-        mode('tvshow', 'tvshows')
-
-    elif parent_item.action in ['get_seasons']:
-        mode('season', 'tvshows')
-
-    elif parent_item.action in ['episodios', 'get_episodes'] or item.contentType == 'episode':
-        mode('episode', 'tvshows')
-
-    else:
-        mode('addon', '')
+    content, Type = getCurrentView(item, parent_item)
+    mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
+    if mode == 0:
+        logger.info('default mode')
+        mode = 55
+    elif not Type:
+        Type = 'addons'
+    xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
+    xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
+    logger.info('TYPE: ' + Type + ' - ' + 'CONTENT: ' + content)
 
 
 def render_items_old(itemlist, parent_item):

@@ -376,6 +376,25 @@ def callCloudflare():
             httptools.downloadpage(url)
 
 
+def viewmodeMonitor():
+    import xbmcgui
+
+    while True:
+        time.sleep(0.5)
+        try:
+            currentModeName = xbmc.getInfoLabel('Container.Viewmode')
+            win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+            currentMode = int(win.getFocusId())
+            if currentModeName and 'plugin.video.kod' in xbmc.getInfoLabel('Container.FolderPath') and currentMode < 1000 and currentMode > 50:  # inside addon and in itemlist view
+                content, Type = platformtools.getCurrentView()
+                defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
+                if currentMode != defaultMode:
+                    logger.info('viewmode changed: ' + currentModeName + '-' + str(currentMode) + ' - content: ' + content)
+                    config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
+        except:
+            logger.error(traceback.print_exc())
+
+
 if __name__ == "__main__":
     # threading.Thread(target=callCloudflare())
     # Se ejecuta en cada inicio
@@ -412,6 +431,8 @@ if __name__ == "__main__":
     # Copia Custom code a las carpetas de Alfa desde la zona de Userdata
     from platformcode import custom_code
     custom_code.init()
+    from threading import Thread
+    Thread(target=viewmodeMonitor).start()
 
     if not config.get_setting("update", "videolibrary") == 2:
         check_for_update(overwrite=False)
@@ -432,3 +453,4 @@ if __name__ == "__main__":
         while not xbmc.abortRequested:
             monitor_update()
             xbmc.sleep(3600)
+
