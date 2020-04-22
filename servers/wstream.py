@@ -45,6 +45,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True, post={'g-recaptcha-response': captcha}, verify=False).data
 
     def getSources(data):
+        # from core.support import dbg;dbg()
         possibileSources = scrapertools.find_multiple_matches(data, r'sources:\s*(\[[^\]]+\])')
         for data in possibileSources:
             try:
@@ -58,6 +59,10 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                             key['src'] = key['file']
                         video_urls.append(['%s [%s]' % (key['type'].replace('video/', ''), key['label']),
                                           key['src'].replace('https', 'http') + '|' + _headers])
+                    elif type(key) != str:
+                        filetype = key.split('.')[-1]
+                        if '?' in filetype: filetype = filetype.split('?')[0]
+                        video_urls.append([filetype, key.replace('https', 'http') + '|' + _headers])
                     else:
                         if not 'src' in key and 'file' in key: key['src'] = key['file']
                         if key['file'].split('.')[-1] == 'mpd': pass
@@ -69,6 +74,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     video_urls = []
     global data, real_url
     # logger.info(data)
+    # from core.support import dbg;dbg()
     sitekey = scrapertools.find_multiple_matches(data, """data-sitekey=['"] *([^"']+)""")
     if sitekey: sitekey = sitekey[-1]
     captcha = platformtools.show_recaptcha(sitekey, page_url.replace('116.202.226.34', 'wstream.video')) if sitekey else ''
