@@ -59,7 +59,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                             key['src'] = key['file']
                         video_urls.append(['%s [%s]' % (key['type'].replace('video/', ''), key['label']),
                                           key['src'].replace('https', 'http') + '|' + _headers])
-                    elif type(key) != str:
+                    elif type(key) != dict:
                         filetype = key.split('.')[-1]
                         if '?' in filetype: filetype = filetype.split('?')[0]
                         video_urls.append([filetype, key.replace('https', 'http') + '|' + _headers])
