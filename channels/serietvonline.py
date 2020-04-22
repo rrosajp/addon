@@ -61,7 +61,6 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     support.log()
-    #findhost()
 
     blacklist = ['DMCA', 'Contatti', 'Attenzione NON FARTI OSCURARE', 'Lista Cartoni Animati e Anime']
     patronBlock = r'<h1>.+?</h1>(?P<block>.*?)<div class="footer_c">'
@@ -92,7 +91,6 @@ def peliculas(item):
             patron = r'href="(?P<url>[^"]+)"[^>]+>(?P<title>.*?)[ ]?(?P<year>\d+)?(?: Streaming | MD iSTANCE )?<'
             patronBlock = r'Lista dei film disponibili in streaming e anche in download\.</p>(?P<block>.*?)<div class="footer_c">'
         else:
-            #patronBlock = r'<h1>Ultimi film aggiunti</h1>(?P<block>.*?)<div class="footer_c">'
             patron = r'<tr><td><a href="(?P<url>[^"]+)"(?:|.+?)?>(?:&nbsp;&nbsp;)?[ ]?(?P<title>.*?)[ ]?(?P<quality>HD)?[ ]?(?P<year>\d+)?(?: | HD | Streaming | MD(?: iSTANCE)? )?</a>'
 
     def itemHook(item):
@@ -105,22 +103,22 @@ def peliculas(item):
             item.contentType = 'tvshow'
             item.action = 'episodios'
         return item
-
-    #support.regexDbg(item, patronBlock, headers)
-    #debug = True
     return locals()
 
 
 @support.scrape
 def episodios(item):
     support.log()
-    #findhost()
 
     action = 'findvideos'
     patronBlock = r'<table>(?P<block>.*?)<\/table>'
     patron = r'<tr><td>(?:[^<]+)[ ](?:Parte)?(?P<episode>\d+x\d+|\d+)(?:|[ ]?(?P<title2>.+?)?(?:avi)?)<(?P<url>.*?)</td><tr>'
-
-    #debug = True
+    def itemlistHook(itemlist):
+        for i, item in enumerate(itemlist):
+            ep = support.match(item.title, patron=r'\d+x(\d+)').match
+            if ep == '00':
+                item.title = item.title.replace('x00', 'x' + str(i+1).zfill(2)).replace('- ..','')
+        return itemlist
     return locals()
 
 
