@@ -21,7 +21,7 @@ def findhost():
         host = permUrl['location']
     return host
 
-host = config.get_channel_url(findhost)
+host = config.get_channel_url()
 headers = [['Referer', host]]
 
 @support.menu
