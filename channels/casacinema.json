@@ -3,7 +3,6 @@
     "name": "Casacinema",
     "language": ["ita", "sub-ita"],
     "active": true,
-    "adult": false,
     "thumbnail": "casacinema.png",
     "banner": "casacinema.png",
     "categories": ["tvshow", "movie","vos"],

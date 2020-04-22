@@ -325,30 +325,6 @@ def monitor_update():
                 xbmc.executescript(__file__)
                 exit(0)
 
-# def get_channel_json():
-#     import urllib, os, xbmc
-#     addon = config.get_addon_core()
-#     ROOT_DIR = config.get_runtime_path()
-#     LOCAL_FILE = os.path.join(ROOT_DIR, "channels.json")
-#
-#     if os.path.exists(LOCAL_FILE):
-#         os.remove(LOCAL_FILE)
-#     urllib.urlretrieve("https://raw.githubusercontent.com/kodiondemand/addon/master/channels.json", LOCAL_FILE)
-#
-#     if addon.getSetting("use_custom_url") != "true":
-#         channels_path = os.path.join(ROOT_DIR, "channels", '*.json')
-#         channel_files = sorted(glob.glob(channels_path), key=lambda x: os.path.basename(x))
-#         for channel_file in channel_files:
-#             if channel_file:
-#                 try: import json
-#                 except: import simplejson as json
-#                 with open(LOCAL_FILE) as f:
-#                     data = json.load(f)
-#                     try:
-#                         if data[channel_file]:
-#                             config.set_setting(name=data[channel_file], value="value", channel=channel_file)
-#                     except: pass #channel not in json
-
 # always bypass al websites that use cloudflare at startup, so there's no need to wait 5 seconds when opened
 def callCloudflare():
     from core import httptools, support
@@ -405,12 +381,6 @@ if __name__ == "__main__":
     from specials.downloads import stop_all
     stop_all()
 
-    # modo adulto:
-    # sistema actual 0: Nunca, 1:Siempre, 2:Solo hasta que se reinicie Kodi
-    # si es == 2 lo desactivamos.
-    if config.get_setting("adult_mode") == 2:
-        config.set_setting("adult_mode", 0)
-
     update_wait = [0, 10000, 20000, 30000, 60000]
     wait = update_wait[int(config.get_setting("update_wait", "videolibrary"))]
     if wait > 0:
@@ -424,9 +394,6 @@ if __name__ == "__main__":
         if needsReload:
             xbmc.executescript(__file__)
             exit(0)
-
-    if xbmc.getCondVisibility('System.HasAddon(repository.kod)'):
-        filetools.rmdirtree(xbmc.translatePath('special://home/addons/repository.kod'))
 
     # Copia Custom code a las carpetas de Alfa desde la zona de Userdata
     from platformcode import custom_code

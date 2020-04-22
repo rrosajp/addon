@@ -102,9 +102,6 @@ def getchanneltypes(view="thumb_"):
     # Lista de categorias
     channel_types = ["movie", "tvshow", "anime", "documentary", "vos", "direct", "live", "torrent",  "music"]
 
-    if config.get_setting("adult_mode") != 0:
-        channel_types.append("adult")
-
     # channel_language = config.get_setting("channel_language", default="all")
     channel_language = auto_filter()
     logger.info("channel_language=%s" % channel_language)
@@ -145,11 +142,7 @@ def filterchannels(category, view="thumb_"):
         category = "all"
         appenddisabledchannels = True
 
-    # Lee la lista de canales
-    if category != 'adult':
-        channel_path = os.path.join(config.get_runtime_path(), 'channels', '*.json')
-    else:
-        channel_path = os.path.join(config.get_runtime_path(), 'channels', 'porn', '*.json')
+    channel_path = os.path.join(config.get_runtime_path(), 'channels', '*.json')
     logger.info("channel_path = %s" % channel_path)
 
     channel_files = glob.glob(channel_path)
@@ -201,10 +194,6 @@ def filterchannels(category, view="thumb_"):
                 # no se muestra
                 if not appenddisabledchannels:
                     continue
-
-            # Se salta el canal para adultos si el modo adultos está desactivado
-            if channel_parameters["adult"] and config.get_setting("adult_mode") == 0:
-                continue
 
             # Se salta el canal si está en un idioma filtrado
             # Se muestran todos los canales si se elige "all" en el filtrado de idioma
@@ -319,9 +308,9 @@ def set_channel_info(parameters):
         #     lang = 'ita'
 
         if lang in lang_dict:
-            if language != '' and language != '*' and not parameters['adult']:
+            if language != '' and language != '*':
                 language = '%s, %s' % (language, lang_dict[lang])
-            elif not parameters['adult']:
+            else:
                 language = lang_dict[lang]
         if lang == '*':
             break

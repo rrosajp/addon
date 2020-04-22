@@ -21,10 +21,9 @@ se vanno cancellati tutti deve rimanere la voce:
     "name": "Nome del canale visualizzato in KOD",
     "language": ["ita", "sub-ita"],
     "active": false,
-    "adult": false,
     "thumbnail": "",
     "banner": "",
-    "categories": ["movie", "tvshow", "anime", "vos", "documentary", "adult"],
+    "categories": ["movie", "tvshow", "anime", "vos", "documentary"],
     "not_active": ["include_in_newest"],
     "settings": [
 		{

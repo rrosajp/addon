@@ -193,40 +193,6 @@ def open_settings():
     __settings__.openSettings()
     settings_post = get_all_settings_addon()
 
-    # cb_validate_config (util para validar cambios realizados en el cuadro de dialogo)
-    if settings_post.get('adult_aux_intro_password', None):
-        # Hemos accedido a la seccion de Canales para adultos
-        from platformcode import platformtools
-        if 'adult_password' not in settings_pre:
-            adult_password = set_setting('adult_password', '0000')
-        else:
-            adult_password = settings_pre['adult_password']
-
-        if settings_post['adult_aux_intro_password'] == adult_password:
-            # La contraseña de acceso es correcta
-
-            # Cambio de contraseña
-            if settings_post['adult_aux_new_password1']:
-                if settings_post['adult_aux_new_password1'] == settings_post['adult_aux_new_password2']:
-                    set_setting('adult_password', settings_post['adult_aux_new_password1'])
-                else:
-                    platformtools.dialog_ok(get_localized_string(60305),
-                                            get_localized_string(60306),
-                                            get_localized_string(60307))
-
-        else:
-            platformtools.dialog_ok(get_localized_string(60305), get_localized_string(60309),
-                                    get_localized_string(60310))
-
-            # Deshacer cambios
-            set_setting("adult_mode", settings_pre.get("adult_mode", 0))
-            set_setting("adult_request_password", settings_pre.get("adult_request_password", True))
-
-        # Borramos settings auxiliares
-        set_setting('adult_aux_intro_password', '')
-        set_setting('adult_aux_new_password1', '')
-        set_setting('adult_aux_new_password2', '')
-
     from specials import videolibrary
     from platformcode import xbmc_videolibrary
     if settings_pre.get('downloadpath', None) != settings_post.get('downloadpath', None):
@@ -310,15 +276,11 @@ def get_setting(name, channel="", server="", default=None):
             return False
         else:
             # special case return as str
-            if name in ["adult_password", "adult_aux_intro_password", "adult_aux_new_password1",
-                        "adult_aux_new_password2"]:
-                return value
-            else:
-                try:
-                    value = int(value)
-                except ValueError:
-                    pass
-                return value
+            try:
+                value = int(value)
+            except ValueError:
+                pass
+            return value
 
 
 def set_setting(name, value, channel="", server=""):
@@ -397,9 +359,9 @@ def get_localized_category(categ):
     categories = {'movie': get_localized_string(30122), 'tvshow': get_localized_string(30123),
                   'anime': get_localized_string(30124), 'documentary': get_localized_string(30125),
                   'vos': get_localized_string(30136), 'sub-ita': get_localized_string(70566),
-                  'adult': get_localized_string(30126), 'direct': get_localized_string(30137),
-                  'torrent': get_localized_string(70015), 'live': get_localized_string(30138),
-                  'music': get_localized_string(30139) }
+                  'direct': get_localized_string(30137), 'torrent': get_localized_string(70015),
+                  'live': get_localized_string(30138), 'music': get_localized_string(30139)
+    }
     return categories[categ] if categ in categories else categ
 
 

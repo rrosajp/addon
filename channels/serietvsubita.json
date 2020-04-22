@@ -2,7 +2,6 @@
     "id": "serietvsubita",
     "name": "Serie TV Sub ITA",
     "active": true,
-    "adult": false,
     "language": ["ita"],
     "thumbnail": "serietvsubita.png",
     "banner": "serietvsubita.png",

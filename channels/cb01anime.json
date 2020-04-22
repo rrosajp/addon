@@ -3,7 +3,6 @@
 	"name": "Cb01anime",
 	"language": ["ita", "vos", "sub-ita"],
 	"active": true,
-	"adult": false,
 	"thumbnail": "cb01anime.png",
 	"banner": "cb01anime.png",
 	"categories": ["anime"],

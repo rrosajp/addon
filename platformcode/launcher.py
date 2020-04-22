@@ -163,17 +163,6 @@ def run(item=None):
                                             config.get_localized_string(70740) % short)
         # Action in certain channel specified in "action" and "channel" parameters
         else:
-            # Entry point for a channel is the "mainlist" action, so here we check parental control
-            if item.action == "mainlist":
-                from core import channeltools
-                #updater.checkforupdates() beta version checking for update, still disabled
-
-                # Parental control
-                # If it is an adult channel, and user has configured pin, asks for it
-                if channeltools.is_adult(item.channel) and config.get_setting("adult_request_password"):
-                    tecleado = platformtools.dialog_input("", config.get_localized_string(60334), True)
-                    if tecleado is None or tecleado != config.get_setting("adult_password"):
-                        return
             # # Actualiza el canal individual
             # if (item.action == "mainlist" and item.channel != "channelselector" and
             #             config.get_setting("check_for_channel_updates") == True):
@@ -183,16 +172,10 @@ def run(item=None):
             # Checks if channel exists
             if os.path.isfile(os.path.join(config.get_runtime_path(), 'channels', item.channel + ".py")):
                 CHANNELS = 'channels'
-            elif os.path.isfile(os.path.join(config.get_runtime_path(), 'channels', 'porn', item.channel + ".py")):
-                CHANNELS = 'channels.porn'
             else:
                 CHANNELS = 'specials'
 
-            if CHANNELS != 'channels.porn':
-                channel_file = os.path.join(config.get_runtime_path(), CHANNELS, item.channel + ".py")
-            else:
-                channel_file = os.path.join(config.get_runtime_path(), 'channels', 'porn',
-                                                         item.channel + ".py")
+            channel_file = os.path.join(config.get_runtime_path(), CHANNELS, item.channel + ".py")
 
             logger.info("channel_file= " + channel_file + ' - ' + CHANNELS + ' - ' + item.channel)
 

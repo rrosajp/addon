@@ -155,10 +155,6 @@ def get_channels_list():
         if not channel_parameters["active"]:
             continue
 
-        # No incluir si es un canal para adultos, y el modo adulto está desactivado
-        if channel_parameters["adult"] and config.get_setting("adult_mode") == 0:
-            continue
-
         # No incluir si el canal es en un idioma filtrado
         if channel_language != "all" and channel_language not in str(channel_parameters["language"]) \
                 and "*" not in channel_parameters["language"]:
@@ -628,10 +624,6 @@ def setting_channel(item):
 
         # No incluir si es un canal inactivo
         if not channel_parameters["active"]:
-            continue
-
-        # No incluir si es un canal para adultos, y el modo adulto está desactivado
-        if channel_parameters["adult"] and config.get_setting("adult_mode") == 0:
             continue
 
         # No incluir si el canal es en un idioma filtrado

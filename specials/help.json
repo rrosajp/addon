@@ -2,6 +2,5 @@
   "id": "help",
   "name": "Ayuda",
   "active": false,
-  "adult": false,
   "language": ["*"]
 }

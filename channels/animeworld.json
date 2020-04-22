@@ -2,7 +2,6 @@
     "id": "animeworld",
     "name": "AnimeWorld",
     "active": true,
-    "adult": false,
     "language": ["ita", "sub-ita"],
     "thumbnail": "animeworld.png",
     "banner": "animeworld.png",

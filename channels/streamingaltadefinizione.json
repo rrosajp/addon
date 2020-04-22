@@ -3,7 +3,6 @@
     "name": "Popcorn Stream",
     "language": ["ita"],
     "active": true,
-    "adult": false,
     "thumbnail": "popcornstream.png",
     "banner": "popcornstream.png",
     "categories": ["movie","tvshow","anime"],

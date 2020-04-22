@@ -2,7 +2,6 @@
     "id": "animesaturn",
     "name": "AnimeSaturn",
     "active": true,
-    "adult": false,
     "language": ["ita"],
     "thumbnail": "animesaturn.png",
     "banner": "animesaturn.png",

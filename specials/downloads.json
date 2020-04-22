@@ -2,7 +2,6 @@
   "id": "downloads",
   "name": "Descargas",
   "active": false,
-  "adult": false,
   "language": ["*"],
   "categories": [
     "movie"

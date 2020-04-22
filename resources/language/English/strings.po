@@ -28,7 +28,7 @@ msgid "Check for updates"
 msgstr ""
 
 msgctxt "#30002"
-msgid "Enable adult mode"
+msgid ""
 msgstr ""
 
 msgctxt "#30003"
@@ -280,7 +280,7 @@ msgid "Documentaries"
 msgstr ""
 
 msgctxt "#30126"
-msgid "Adult"
+msgid ""
 msgstr ""
 
 msgctxt "#30130"
@@ -1401,7 +1401,7 @@ msgid "The unzipped %s file already exists, or you want to overwrite it.?"
 msgstr ""
 
 msgctxt "#60305"
-msgid "Adult channels"
+msgid ""
 msgstr ""
 
 msgctxt "#60306"
@@ -1413,7 +1413,7 @@ msgid "Use 'Preferences' to change your password"
 msgstr ""
 
 msgctxt "#60308"
-msgid "Adult channels"
+msgid ""
 msgstr ""
 
 msgctxt "#60309"
@@ -1517,7 +1517,7 @@ msgid "Configuration"
 msgstr ""
 
 msgctxt "#60334"
-msgid "Password for adult channels"
+msgid ""
 msgstr ""
 
 msgctxt "#60335"
@@ -3257,7 +3257,7 @@ msgid "Only until Kodi restarts"
 msgstr ""
 
 msgctxt "#70115"
-msgid "Request password to open adult channels"
+msgid ""
 msgstr ""
 
 msgctxt "#70116"

@@ -2,7 +2,6 @@
     "id": "mondoserietv",
     "name": "MondoSerieTV",
     "active": true,
-    "adult": false,
     "language": ["ita"],
     "thumbnail": "mondoserietv.png",
     "bannermenu": "mondoserietv.png",
