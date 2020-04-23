@@ -11,16 +11,20 @@ from lib import unshortenit
 from platformcode import logger, config
 
 
-# def findhost():
-#     permUrl = httptools.downloadpage('https://cb01-nuovo-indirizzo.info/', follow_redirects=False, only_headers=True).headers
-#     if 'google' in permUrl['location']:
-#         host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
-#     else:
-#         host = permUrl['location']
-#     return host
+def findhost():
+    page = httptools.downloadpage('https://cb01-nuovo-indirizzo.info/', follow_redirects=False)
+    permUrl = page.headers
+    if 'location' in permUrl:
+        if 'google' in permUrl['location']:
+            host = permUrl['location'].replace('https://www.google.it/search?q=site:', '')
+        else:
+            host = permUrl['location']
+    else:
+        host = support.match(page.data, patron=r'<a href="([^"]+)" title="nuovo indirizzo cb01').match
+    return host
 
 
-host = config.get_channel_url()
+host = config.get_channel_url(findhost)
 headers = [['Referer', host]]
 
 list_servers = ['mixdrop', 'akstream', 'wstream', 'backin']
