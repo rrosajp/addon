@@ -6,6 +6,7 @@
 import traceback
 
 from platformcode import logger
+from inspect import stack
 
 try:
     import json
@@ -43,6 +44,7 @@ def load(*args, **kwargs):
     except:
         logger.error("**NOT** able to load the JSON")
         logger.error(traceback.format_exc())
+        logger.error('ERROR STACK ' + str(stack()[1][3]))
         value = {}
 
     return value
