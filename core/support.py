@@ -125,9 +125,9 @@ def regexDbg(item, patron, headers, data=''):
             html = data
         headers = {'content-type': 'application/json'}
         data = {
-            'regex': patron,
+            'regex': patron.decode('utf-8'),
             'flags': 'gm',
-            'testString': html,
+            'testString': html.decode('utf-8'),
             'delimiter': '"""',
             'flavor': 'python'
         }
