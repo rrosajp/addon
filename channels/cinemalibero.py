@@ -88,7 +88,7 @@ def peliculas(item):
 @support.scrape
 def episodios(item):
     data=item.data
-    # debug=True
+    # debugBlock=True
     if item.args == 'anime':
         support.log("Anime :", item)
         # blacklist = ['Clipwatching', 'Verystream', 'Easybytez', 'Flix555', 'Cloudvideo']
@@ -97,7 +97,7 @@ def episodios(item):
         item.contentType = 'tvshow'
     else:# item.extra == 'serie':
         support.log("Serie :", item)
-        patron = r'(?:>| )(?P<episode>\d+(?:x|×|&#215;)\d+)[;]?[ ]?(?:(?P<title>[^<–-]+)(?P<url>.*?)|(\2[ ])(?:<(\3.*?)))(?:</a><br />|</a></p>|$)'
+        patron = r'(?:>| )(?P<episode>\d+(?:x|×|&#215;)\d+)[;]?[ ]?(?:(?P<title>[^<–-]+)(?P<url>.*?)|(\2[ ])(?:<(\3.*?)))(?:</a><br /|</a></p|$)'
         patronBlock = r'>(?:[^<]+[Ss]tagione\s|[Ss]tagione [Uu]nica)(?:(?P<lang>iTA|ITA|Sub-ITA|Sub-iTA))?.*?</strong>(?P<block>.+?)(?:<strong|<div class="at-below)'
         item.contentType = 'tvshow'
     def itemHook(item):
