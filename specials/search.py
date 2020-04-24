@@ -114,7 +114,6 @@ def new_search(item):
 
     itemlist = []
     if config.get_setting('last_search'):
-    # if channeltools.get_channel_setting('last_search', 'search'):
         last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
     else:
         last_search = ''
