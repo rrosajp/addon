@@ -272,17 +272,7 @@ def run(item=None):
                 logger.info("item.action=%s" % item.action.upper())
                 from core import channeltools
 
-                # last_search = ""
-                # last_search_active = config.get_setting("last_search", "search")
-                # if last_search_active:
-                #     try:
-                #         current_saved_searches_list = list(config.get_setting("saved_searches_list", "search"))
-                #         last_search = current_saved_searches_list[0]
-                #     except:
-                #         pass
-
-                # last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
-                if channeltools.get_channel_setting('last_search', 'search'):
+                if config.get_setting('last_search'):
                     last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
                 else:
                     last_search = ''
