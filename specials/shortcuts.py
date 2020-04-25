@@ -29,36 +29,6 @@ def settings_menu(item):
 	from platformcode import config
 	config.open_settings()
 
-def view_mode(item):
-	logger.info(str(item))
-	import xbmc
-	from core import filetools, jsontools
-	from core.support import typo
-	from platformcode import config, platformtools
-
-	skin_name = xbmc.getSkinDir()
-	config.set_setting('skin_name', skin_name)
-
-	path = filetools.join(config.get_runtime_path(), 'resources', 'views', skin_name + '.json')
-	if filetools.isfile(path):
-		json_file = open(path, "r").read()
-		json = jsontools.load(json_file)
-
-		Type = 'addon'if item.type in ['channel', 'server'] else item.type
-		skin = json[Type]
-
-		list_type = []
-		for key in skin:
-			list_type.append(key)
-		list_type.sort()
-		list_type.insert(0, config.get_localized_string(70003))
-
-		select = platformtools.dialog_select(config.get_localized_string(70754), list_type)
-		value = list_type[select] + ' , ' + str(skin[list_type[select]] if list_type[select] in skin else 0)
-		config.set_setting('view_mode_%s' % item.type, value)
-	else:
-		platformtools.dialog_ok(config.get_localized_string(30141), config.get_localized_string(30142) % typo(skin_name.replace('skin.','').replace('.',' '), 'capitalize bold'))
-
 def servers_menu(item):
 	# from core.support import dbg; dbg()
 	from core import servertools

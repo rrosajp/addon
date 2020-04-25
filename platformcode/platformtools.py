@@ -291,8 +291,6 @@ def set_view_mode(item, parent_item):
     if mode == 0:
         logger.info('default mode')
         mode = 55
-    elif not Type:
-        Type = 'addons'
     xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
     xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
     logger.info('TYPE: ' + Type + ' - ' + 'CONTENT: ' + content)
