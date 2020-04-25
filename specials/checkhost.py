@@ -20,7 +20,7 @@ LIST_SITE = ['http://www.ansa.it/', 'https://www.google.it']#, 'https://www.goog
 
 # lista di siti che non verranno raggiunti con i DNS del gestore
 
-LST_SITE_CHCK_DNS = ['https://casacinema.space', 'https://documentari-streaming-da.com']
+LST_SITE_CHCK_DNS = ['https://www.casacinema.me/', 'https://cb01-nuovo-indirizzo.info/']
                      #'https://www.italia-film.pw', 'https://www.cb01.uno/',] # tolti
 
 class Kdicc():
@@ -224,25 +224,24 @@ def test_conn(is_exit, check_dns, view_msg,
             exit()
     # se ha i DNS filtrati lo comunico all'utente
     if check_dns == True:
-        if ktest.check_Dns():
-            if not ktest.check_Dns():
-                if view_msg == True:
-                    ktest.view_Advise(config.get_localized_string(70722))
+        if not ktest.check_Dns():
+            if view_msg == True:
+                ktest.view_Advise(config.get_localized_string(70722))
 
     xbmc.log("############ Inizio Check DNS ############", level=xbmc.LOGNOTICE)
     xbmc.log("## IP: %s" %  (ktest.ip_addr), level=xbmc.LOGNOTICE)
     xbmc.log("## DNS: %s" %  (ktest.dns), level=xbmc.LOGNOTICE)
     xbmc.log("############ Fine Check DNS ############", level=xbmc.LOGNOTICE)
-    if check_dns == True:
-        if ktest.check_Ip() == True and ktest.check_Adsl() == True and ktest.check_Dns() == True:
-            return True
-        else:
-            return False
-    else:
-        if ktest.check_Ip() == True and ktest.check_Adsl() == True:
-            return True
-        else:
-            return False
+    # if check_dns == True:
+    #     if ktest.check_Ip() == True and ktest.check_Adsl() == True and ktest.check_Dns() == True:
+    #         return True
+    #     else:
+    #         return False
+    # else:
+    #     if ktest.check_Ip() == True and ktest.check_Adsl() == True:
+    #         return True
+    #     else:
+    #         return False
 
 # def per la creazione del file channels.json
 def check_channels(inutile=''):
