@@ -383,7 +383,7 @@ def downloadpage(url, **opt):
 
     response_code = req.status_code
 
-    response['data'] = req.content
+    response['data'] = req.content if req.content else ''
     response['url'] = req.url
 
     if type(response['data']) != str:

@@ -383,11 +383,43 @@ def scrape(func):
         pag = item.page if item.page else 1  # pagination
         matches = []
 
-        log('PATRON= ', patron)
-        if not data:
-            page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True)
+        for n in range(2):
+            log('PATRON= ', patron)
+            if not data:
+                page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True)
+                data = page.data.replace("'", '"')
+                data = re.sub('\n|\t', ' ', data)
+                data = re.sub(r'>\s+<', '> <', data)
+                # replace all ' with " and eliminate newline, so we don't need to worry about
+
+            if patronBlock:
+                if debugBlock:
+                    regexDbg(item, patronBlock, headers, data)
+                blocks = scrapertools.find_multiple_matches_groups(data, patronBlock)
+                block = ""
+                for bl in blocks:
+                    # log(len(blocks),bl)
+                    if 'season' in bl and bl['season']:
+                        item.season = bl['season']
+                    blockItemlist, blockMatches = scrapeBlock(item, args, bl['block'], patron, headers, action, pagination, debug,
+                                                typeContentDict, typeActionDict, blacklist, search, pag, function, lang)
+                    for it in blockItemlist:
+                        if 'lang' in bl:
+                            it.contentLanguage, it.title = scrapeLang(bl, it.contentLanguage, it.title)
+                        if 'quality' in bl and bl['quality']:
+                            it.quality = bl['quality'].strip()
+                            it.title = it.title + typo(bl['quality'].strip(), '_ [] color kod')
+                    itemlist.extend(blockItemlist)
+                    matches.extend(blockMatches)
+            elif patron:
+                itemlist, matches = scrapeBlock(item, args, data, patron, headers, action, pagination, debug, typeContentDict,
+                                       typeActionDict, blacklist, search, pag, function, lang)
+
+            if 'itemlistHook' in args:
+                itemlist = args['itemlistHook'](itemlist)
+
             # if url may be changed and channel has findhost to update
-            if 'findhost' in func.__globals__ and (not page.data or scrapertools.get_domain_from_url(page.url).lower() != scrapertools.get_domain_from_url(item.url).lower()):
+            if 'findhost' in func.__globals__ and not itemlist:
                 logger.info('running findhost ' + func.__module__)
                 host = func.__globals__['findhost']()
                 parse = list(urlparse.urlparse(item.url))
@@ -395,37 +427,12 @@ def scrape(func):
                 jsontools.update_node(host, func.__module__.split('.')[-1], 'url')
                 parse[1] = scrapertools.get_domain_from_url(host)
                 item.url = urlparse.urlunparse(parse)
-                page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True)
-            data = page.data.replace("'", '"')
-            data = re.sub('\n|\t', ' ', data)
-            data = re.sub(r'>\s+<', '> <', data)
-            # replace all ' with " and eliminate newline, so we don't need to worry about
+                data = None
+                itemlist = []
+                matches = []
+            else:
+                break
 
-        if patronBlock:
-            if debugBlock:
-                regexDbg(item, patronBlock, headers, data)
-            blocks = scrapertools.find_multiple_matches_groups(data, patronBlock)
-            block = ""
-            for bl in blocks:
-                # log(len(blocks),bl)
-                if 'season' in bl and bl['season']:
-                    item.season = bl['season']
-                blockItemlist, blockMatches = scrapeBlock(item, args, bl['block'], patron, headers, action, pagination, debug,
-                                            typeContentDict, typeActionDict, blacklist, search, pag, function, lang)
-                for it in blockItemlist:
-                    if 'lang' in bl:
-                        it.contentLanguage, it.title = scrapeLang(bl, it.contentLanguage, it.title)
-                    if 'quality' in bl and bl['quality']:
-                        it.quality = bl['quality'].strip()
-                        it.title = it.title + typo(bl['quality'].strip(), '_ [] color kod')
-                itemlist.extend(blockItemlist)
-                matches.extend(blockMatches)
-        elif patron:
-            itemlist, matches = scrapeBlock(item, args, data, patron, headers, action, pagination, debug, typeContentDict,
-                                   typeActionDict, blacklist, search, pag, function, lang)
-
-        if 'itemlistHook' in args:
-            itemlist = args['itemlistHook'](itemlist)
 
         if (pagination and len(matches) <= pag * pagination) or not pagination: # next page with pagination
             if patronNext and inspect.stack()[1][3] != 'newest':
