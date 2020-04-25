@@ -22,8 +22,7 @@ from core.item import Item
 
 
 def findhost():
-    data = httptools.downloadpage('https://serietvonline.me/').data
-    host = scrapertools.find_single_match(data, r'<a class="pure-button pure-button-primary" title=\'serie tv online\' href="([^"]+)">')
+    host = support.match('https://t.me/s/serietvonlineITA', patron=r'<a href="([^"]+)" target="_blank"').matches[-1]
     return host
 
 host = config.get_channel_url(findhost)
