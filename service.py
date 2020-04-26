@@ -3,7 +3,7 @@
 # Service for updating new episodes on library series
 # ------------------------------------------------------------
 
-import datetime, imp, math, threading, traceback, sys, glob
+import datetime, imp, math, threading, traceback, sys, glob, time
 
 from platformcode import config
 try:
@@ -14,8 +14,6 @@ except:
     import os
     librerias = os.path.join(config.get_runtime_path(), 'lib')
     sys.path.append(librerias)
-
-
 
 
 from core import channeltools, filetools, videolibrarytools
@@ -354,17 +352,23 @@ def callCloudflare():
 
 def viewmodeMonitor():
     import xbmcgui
-
     while True:
+        start = time.time()
         time.sleep(0.5)
         try:
             currentModeName = xbmc.getInfoLabel('Container.Viewmode')
             win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
             currentMode = int(win.getFocusId())
             if currentModeName and 'plugin.video.kod' in xbmc.getInfoLabel('Container.FolderPath') and currentMode < 1000 and currentMode > 50:  # inside addon and in itemlist view
-                content, Type = platformtools.getCurrentView()
+                content, Type, mode = platformtools.getCurrentView()
                 defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
                 if currentMode != defaultMode:
+                    if content in ['addon', 'server', 'channel'] and currentMode != 55 and Type == '':
+                        config.set_setting('view_mode_time', str(time.time()))
+                        xbmc.executebuiltin("Container.Refresh")
+                    if content in ['addon', 'server', 'channel'] and currentMode == 55 and time.time() - float(config.get_setting('view_mode_time')) > 3:
+                        xbmc.executebuiltin("Container.Refresh")
+
                     logger.info('viewmode changed: ' + currentModeName + '-' + str(currentMode) + ' - content: ' + content)
                     config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
         except:

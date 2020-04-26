@@ -129,6 +129,7 @@
         <setting id="enable_library_menu" label="30131" type="bool" default="true"/>
         <!-- View Mode (hidden)-->
         <setting id="skin_name" label='Skin Name' type="text" default="skin.estuary" visible="false"/>
+        <setting id="view_mode_time" type="text" label="time" default='0' visible="false"/>
         <setting id="view_mode_addon" type="action" label="70009" default= "Default, 0" visible="false"/>
         <setting id="view_mode_channel" type="action" label="30118" default= "Default, 0" visible="false"/>
         <setting id="view_mode_movie" type="action" label="30122" default= "Default, 0" visible="false"/>
