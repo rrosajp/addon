@@ -6,6 +6,9 @@ import inspect
 import os
 import re
 import sys
+
+from lib.PTN import PTN
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 if PY3:
@@ -171,7 +174,7 @@ def cleantitle(title):
     cleantitle = title.replace('"', "'").replace('×', 'x').replace('–', '-').strip()
     return cleantitle
 
-def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang):
+def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang, ptn):
     itemlist = []
     log("scrapeBlock qui")
     if debug:
@@ -240,17 +243,6 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         Type = scraped['type'] if scraped['type'] else ''
         plot = cleantitle(scraped["plot"]) if scraped["plot"] else ''
 
-        # make formatted Title [longtitle]
-        s = ' - '
-        title = episode + (s if episode and title else '') + title
-        longtitle = title + (s if title and title2 else '') + title2
-        longtitle = typo(longtitle, 'bold')
-        longtitle += typo(quality, '_ [] color kod') if quality else ''
-        longtitle += typo(scraped['size'], '_ [] color kod') if scraped['size'] else ''
-        longtitle += typo(scraped['seed']+ ' SEEDS', '_ [] color kod') if scraped['seed'] else ''
-
-        lang1, longtitle = scrapeLang(scraped, lang, longtitle)
-
         # if title is set, probably this is a list of episodes or video sources
         # necessaria l'aggiunta di == scraped["title"] altrimenti non prende i gruppi dopo le categorie
         if item.infoLabels["title"] == scraped["title"]:
@@ -274,6 +266,28 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 infolabels['genere'] = ", ".join(genres)
             if scraped["rating"]:
                 infolabels['rating'] = scrapertools.decodeHtmlentities(scraped["rating"])
+
+        # make formatted Title [longtitle]
+        s = ' - '
+        title = episode + (s if episode and title else '') + title
+        longtitle = title + (s if title and title2 else '') + title2
+
+        lang1, longtitle = scrapeLang(scraped, lang, longtitle)
+
+        if ptn:
+            titlePTN = PTN().parse(title)
+            title = titlePTN.get('title', '')
+            if titlePTN.get('quality', '') or titlePTN.get('resolution', ''):
+                quality = titlePTN.get('quality', '') + " " + titlePTN.get('resolution', '')
+            if not scraped['year']:
+                infolabels['year'] = titlePTN.get('year', '')
+            if titlePTN.get('episode', None) and titlePTN.get('season', None):
+                longtitle = title + ' - ' + str(titlePTN.get('episode')) + 'x' + str(titlePTN.get('season'))
+
+        longtitle = typo(longtitle, 'bold')
+        longtitle += typo(quality, '_ [] color kod') if quality else ''
+        longtitle += typo(scraped['size'], '_ [] color kod') if scraped['size'] else ''
+        longtitle += typo(scraped['seed'] + ' SEEDS', '_ [] color kod') if scraped['seed'] else ''
 
         AC = CT = ''
         if typeContentDict:
@@ -380,6 +394,7 @@ def scrape(func):
         if 'pagination' in args and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
         lang = args['deflang'] if 'deflang' in args else ''
+        ptn = args.get('ptn', False)
         pag = item.page if item.page else 1  # pagination
         matches = []
 
@@ -402,7 +417,7 @@ def scrape(func):
                     if 'season' in bl and bl['season']:
                         item.season = bl['season']
                     blockItemlist, blockMatches = scrapeBlock(item, args, bl['block'], patron, headers, action, pagination, debug,
-                                                typeContentDict, typeActionDict, blacklist, search, pag, function, lang)
+                                                typeContentDict, typeActionDict, blacklist, search, pag, function, lang, ptn)
                     for it in blockItemlist:
                         if 'lang' in bl:
                             it.contentLanguage, it.title = scrapeLang(bl, it.contentLanguage, it.title)
@@ -413,7 +428,7 @@ def scrape(func):
                     matches.extend(blockMatches)
             elif patron:
                 itemlist, matches = scrapeBlock(item, args, data, patron, headers, action, pagination, debug, typeContentDict,
-                                       typeActionDict, blacklist, search, pag, function, lang)
+                                       typeActionDict, blacklist, search, pag, function, lang, ptn)
 
             if 'itemlistHook' in args:
                 itemlist = args['itemlistHook'](itemlist)

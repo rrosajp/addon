@@ -40,9 +40,11 @@ def mainlist(item):
 
 @support.scrape
 def peliculas(item):
+    ptn = True
     patron = r'>(?P<quality>[^"<]+)</td> <TD[^>]+><A class="tab" HREF="(?P<url>[^"]+)"\s*>(?P<title>[^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<size>[^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<seed>[^<]+)'
     def itemHook(item):
-        item.title = item.title.replace('.',' ')
+        # item.title = item.title.replace('.',' ')
+        item.contentType = item.args[1]
         thumb = (item.args[1] if type(item.args) == list else item.args) + '.png'
         item.thumbnail = support.thumb(thumb=thumb)
         return item
