@@ -360,6 +360,9 @@ def move_to_libray(item):
     library_path = filetools.join(move_path, *filetools.split(item.downloadFilename)) 
     final_path = download_path
 
+    if not filetools.isdir(filetools.dirname(library_path)):
+        filetools.mkdir(filetools.dirname(library_path))
+
     if item.contentType == "movie" and item.infoLabels["tmdb_id"]:
         contentTitle = item.contentTitle if item.contentTitle else item.fulltitle
         library_item = Item(title= filetools.split(item.downloadFilename)[-1], channel="downloads", contentTitle = contentTitle,
@@ -373,9 +376,6 @@ def move_to_libray(item):
         tvshow = Item(channel="downloads", contentType="tvshow", contentSerieName = contentSerieName,
                         fulltitle = item.fulltitle, infoLabels={"tmdb_id": item.infoLabels["tmdb_id"]})
         videolibrarytools.save_tvshow(tvshow, [library_item], silent=True)
-
-    if not filetools.isdir(filetools.dirname(library_path)):
-        filetools.mkdir(filetools.dirname(library_path))
 
     if filetools.isfile(library_path) and filetools.isfile(download_path):
         filetools.remove(library_path)
@@ -564,8 +564,9 @@ def sort_method(item):
 
 def download_from_url(url, item):
     logger.info("Attempting to download: %s" % (url))
-    if url.lower().endswith(".m3u8") or url.lower().startswith("rtmp"):
+    if url.lower().split('|')[0].endswith(".m3u8") or url.lower().startswith("rtmp"):
         save_server_statistics(item.server, 0, False)
+        platformtools.dialog_notification('m3u8 Download',config.get_localized_string(60364), sound=False)
         return {"downloadStatus": STATUS_CODES.error}
 
     # Obtenemos la ruta de descarga y el nombre del archivo
@@ -659,13 +660,19 @@ def download_from_server(item):
     logger.info("contentAction: %s | contentChannel: %s | server: %s | url: %s" % (
         item.contentAction, item.contentChannel, item.server, item.url))
 
+    if item.server == 'torrent':
+        import xbmcgui
+        xlistitem = xbmcgui.ListItem(path=item.url)
+        xlistitem.setArt({'icon': item.thumbnail, 'thumb': item.thumbnail, 'poster': item.thumbnail, 'fanart': item.thumbnail})
+        platformtools.set_infolabels(xlistitem, item)
+        platformtools.play_torrent(item, xlistitem, item.url)
+
     if not item.server or not item.url or not item.contentAction == "play" or item.server in unsupported_servers:
         logger.error("The Item does not contain the necessary parameters.")
         return {"downloadStatus": STATUS_CODES.error}
 
     if not item.video_urls:
-        video_urls, puedes, motivo = servertools.resolve_video_urls_for_playing(item.server, item.url, item.password,
-                                                                                True, True)
+        video_urls, puedes, motivo = servertools.resolve_video_urls_for_playing(item.server, item.url, item.password, True, True)
     else:
         video_urls, puedes, motivo = item.video_urls, True, ""
 
