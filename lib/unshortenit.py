@@ -13,7 +13,7 @@ import time
 import urllib
 from base64 import b64decode
 
-from core import httptools
+from core import httptools, scrapertools
 from platformcode import config, logger
 
 
@@ -38,11 +38,14 @@ class UnshortenIt(object):
     _vcrypt_regex = r'vcrypt\.net|vcrypt\.pw'
     _linkup_regex = r'linkup\.pro|buckler.link'
     _linkhub_regex = r'linkhub\.icu'
+    _swzz_regex = r'swzz\.xyz'
+    _stayonline_regex = r'stayonline\.pro'
     # for services that only include real link inside iframe
     _simple_iframe_regex = r'cryptmango|xshield\.net|vcrypt\.club'
 
     listRegex = [_adfly_regex, _linkbucks_regex, _adfocus_regex, _lnxlu_regex, _shst_regex, _hrefli_regex, _anonymz_regex,
-                 _shrink_service_regex, _rapidcrypt_regex, _simple_iframe_regex, _vcrypt_regex, _linkup_regex, _linkhub_regex]
+                 _shrink_service_regex, _rapidcrypt_regex, _simple_iframe_regex, _vcrypt_regex, _linkup_regex, _linkhub_regex,
+                 _swzz_regex, _stayonline_regex]
 
     _maxretries = 5
 
@@ -88,9 +91,15 @@ class UnshortenIt(object):
                 uri, code = self._unshorten_linkup(uri)
             if re.search(self._linkhub_regex, uri, re.IGNORECASE):
                 uri, code = self._unshorten_linkhub(uri)
+            if re.search(self._swzz_regex, uri, re.IGNORECASE):
+                uri, code = self._unshorten_swzz(uri)
+            if re.search(self._stayonline_regex, uri, re.IGNORECASE):
+                uri, code = self._unshorten_stayonline(uri)
 
             if oldUri == uri:
                 break
+
+            logger.info(uri)
 
         return uri, code
 
@@ -582,6 +591,59 @@ class UnshortenIt(object):
         except Exception as e:
             return uri, str(e)
 
+    def _unshorten_swzz(self, uri):
+        try:
+            r = httptools.downloadpage(uri)
+            if r.url != uri:
+                return r.url, r.code
+            data = r.data
+            if "link =" in data or 'linkId = ' in data:
+                uri = scrapertools.find_single_match(data, 'link(?:Id)? = "([^"]+)"')
+                if 'http' not in data:
+                    uri = 'https:' + uri
+            else:
+                match = scrapertools.find_single_match(data, r'<meta name="og:url" content="([^"]+)"')
+                match = scrapertools.find_single_match(data, r'URL=([^"]+)">') if not match else match
+
+                if not match:
+                    from lib import jsunpack
+
+                    try:
+                        data = scrapertools.find_single_match(data.replace('\n', ''),
+                                                              r"(eval\s?\(function\(p,a,c,k,e,d.*?)</script>")
+                        data = jsunpack.unpack(data)
+
+                        logger.debug("##### play /link/ unpack ##\n%s\n##" % data)
+                    except:
+                        logger.debug("##### The content is yet unpacked ##\n%s\n##" % data)
+
+                    uri = scrapertools.find_single_match(data, r'var link(?:\s)?=(?:\s)?"([^"]+)";')
+                else:
+                    uri = match
+            if uri.startswith('/'):
+                uri = "http://swzz.xyz" + uri
+                if not "vcrypt" in data:
+                    uri = httptools.downloadpage(data).data
+            return uri, r.code
+        except Exception as e:
+            return uri, str(e)
+
+    def _unshorten_stayonline(self, uri):
+        try:
+            id = uri.split('/')[-2]
+            reqUrl = 'https://stayonline.pro/ajax/linkView.php'
+            p = urllib.urlencode({"id": id})
+            r = httptools.downloadpage(reqUrl, post=p)
+            data = r.data
+            try:
+                import json
+                uri = json.loads(data)['data']['value']
+            except:
+                uri = scrapertools.find_single_match(data, r'"value"\s*:\s*"([^"]+)"')
+            return uri, r.code
+        except Exception as e:
+            return uri, str(e)
+
 
 def unwrap_30x_only(uri, timeout=10):
     unshortener = UnshortenIt()
@@ -612,6 +674,7 @@ def findlinks(text):
         regex = '(?:https?://(?:[\w\d]+\.)?)?(?:' + regex + ')/[a-zA-Z0-9_=/]+'
         for match in re.findall(regex, text):
             matches.append(match)
+    logger.info('matches=' + str(matches))
     if len(matches) == 1:
         text += '\n' + unshorten(matches[0])[0]
     elif matches:
