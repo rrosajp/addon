@@ -244,9 +244,11 @@ def render_items(itemlist, parent_item):
 
 def getCurrentView(item=None, parent_item=None):
     if not parent_item:
-        parent_item = Item().fromurl(xbmc.getInfoLabel('Container.FolderPath'))
+        info = xbmc.getInfoLabel('Container.FolderPath')
+        parent_item = Item().fromurl(info) if info else Item()
     if not item:
-        item = Item().fromurl(xbmc.getInfoLabel('Container.ListItem(1).FileNameAndPath'))
+        info = xbmc.getInfoLabel('Container.ListItem(1).FileNameAndPath')
+        item = Item().fromurl(info) if info else Item()
     parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'channel_search', 'newest', 'discover_list', 'new_search']
     mode = None
 
@@ -1353,9 +1355,9 @@ def torrent_client_installed(show_tuple=False):
     for client in torrent_clients:
         if xbmc.getCondVisibility('System.HasAddon("%s")' % client["id"]):
             if show_tuple:
-                torrent_options.append([config.get_localized_string(60366) % client["name"], client["url"]])
+                torrent_options.append([client["name"], client["url"]])
             else:
-                torrent_options.append(config.get_localized_string(60366) % client["name"])
+                torrent_options.append(client["name"])
     return torrent_options
 
 
@@ -1492,20 +1494,33 @@ def play_torrent(item, xlistitem, mediaurl):
     if selection >= 0:
 
         mediaurl = urllib.quote_plus(item.url)
+        torr_client = torrent_options[selection][0]
+        torr_setting = xbmcaddon.Addon(id="plugin.video.%s" %torr_client)
+
         # Llamada con más parámetros para completar el título
-        if ("quasar" in torrent_options[selection][1] or "elementum" in torrent_options[selection][1]) and item.infoLabels['tmdb_id']:
-            if item.contentType == 'episode' and "elementum" not in torrent_options[selection][1]:
-                mediaurl += "&episode=%s&library=&season=%s&show=%s&tmdb=%s&type=episode" % (
-                item.infoLabels['episode'], item.infoLabels['season'], item.infoLabels['tmdb_id'],
-                item.infoLabels['tmdb_id'])
+        if torr_client in ['quasar', 'elementum'] and item.infoLabels['tmdb_id']:
+            if item.contentType == 'episode' and "elementum" not in torr_client:
+                mediaurl += "&episode=%s&library=&season=%s&show=%s&tmdb=%s&type=episode" % (item.infoLabels['episode'], item.infoLabels['season'], item.infoLabels['tmdb_id'], item.infoLabels['tmdb_id'])
             elif item.contentType == 'movie':
                 mediaurl += "&library=&tmdb=%s&type=movie" % (item.infoLabels['tmdb_id'])
 
-        xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
+        if torr_client in ['quasar', 'elementum'] and item.downloadFilename:
+            if torr_client == 'elementum':
+                config.set_setting('elementumtype', torr_setting.getSetting('download_storage'))
+                config.set_setting('elementumdl', torr_setting.getSetting('download_path'))
+                torr_setting.setSetting('download_storage', '0')
+                torr_setting.setSetting('download_path', config.get_setting('downloadpath'))
+                xbmc.sleep(1000)
+            torrent.call_torrent_via_web(urllib.quote_plus(item.url), torr_client)
+        else:
+            if torr_client == 'elementum':
+                if config.get_setting('elementumtype'): torr_setting.setSetting('download_storage', config.get_setting('elementumtype'))
+                if config.get_setting('elementumdl'): torr_setting.setSetting('download_path', config.get_setting('elementumdl'))
+                xbmc.sleep(1000)
+            xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
 
         # Si es un archivo RAR, monitorizamos el cliente Torrent hasta que haya descargado el archivo,
         # y después lo extraemos, incluso con RAR's anidados y con contraseña
-        torr_client = torrent_options[selection][0].capitalize()
         if 'RAR-' in size and torr_client in ['quasar', 'elementum'] and UNRAR:
             rar_file, save_path_videos, folder_torr = torrent.wait_for_download(item, mediaurl, rar_files, torr_client)  # Esperamos mientras se descarga el RAR
             if rar_file and save_path_videos:  # Si se ha descargado el RAR...
