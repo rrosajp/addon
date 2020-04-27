@@ -350,10 +350,9 @@ def callCloudflare():
             httptools.downloadpage(url)
 
 
-def viewmodeMonitor():
+def viewmodeMonitor(monitor):
     import xbmcgui
-    while True:
-        start = time.time()
+    while not monitor.abortRequested():
         time.sleep(0.5)
         try:
             currentModeName = xbmc.getInfoLabel('Container.Viewmode')
@@ -402,8 +401,6 @@ if __name__ == "__main__":
     # Copia Custom code a las carpetas de Alfa desde la zona de Userdata
     from platformcode import custom_code
     custom_code.init()
-    from threading import Thread
-    Thread(target=viewmodeMonitor).start()
 
     if not config.get_setting("update", "videolibrary") == 2:
         check_for_update(overwrite=False)
@@ -414,6 +411,10 @@ if __name__ == "__main__":
         monitor = xbmc.Monitor()  # For Kodi >= 14
     else:
         monitor = None  # For Kodi < 14
+
+    from threading import Thread
+
+    Thread(target=viewmodeMonitor, args=(monitor,)).start()
 
     if monitor:
         while not monitor.abortRequested():
