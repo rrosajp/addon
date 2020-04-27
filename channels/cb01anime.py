@@ -6,7 +6,7 @@
 
 from core import support
 
-host = support.config.get_channel_url() + '/anime'
+host = support.config.get_channel_url() + '/cb01-anime-cartoon'
 
 Blacklist = ['AVVISO IMPORTANTE – CB01.ROCKS', 'Lista Alfabetica Completa Anime/Cartoon', 'CB01.UNO ▶ TROVA L’INDIRIZZO UFFICIALE','Lista Richieste Up &amp; Re-Up']
 list_servers = ['verystream', 'openload', 'streamango', 'thevideome']
@@ -28,6 +28,9 @@ def menu(item):
     patronBlock = r'<select name="select%s"(?P<block>.*?)</select>' % item.args
     patronMenu = r'<option value="(?P<url>[^"]+)">(?P<title>[^<]+)</option>'
     action = 'peliculas'
+    def itemHook(item):
+        item.url = item.url.replace('cb01-anime/','cb01-anime-cartoon/')
+        return item
     return locals()
 
 
@@ -59,8 +62,7 @@ def peliculas(item):
     blacklist = Blacklist
     item.contentType = 'tvshow'
     if item.args == 'newest':
-        # data = support.match(item).data
-        patron = r'<div id="blockvids"><ul><li><a href="(?P<url>[^"]+)"[^>]+><img src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^\[]+)\[(?P<lang>[^\]]+)\]'
+        patron = r'<div id="blockvids">\s*<ul>\s*<li>\s*<a href="(?P<url>[^"]+)"[^>]+><img src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<title>[^\[]+)\[(?P<lang>[^\]]+)\]'
     else:
         patron = r'<div class="span4">\s*<a href="(?P<url>[^"]+)"><img src="(?P<thumb>[^"]+)"[^>]+><\/a>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+> <h1>(?P<title>[^<\[]+)(?:\[(?P<lang>[^\]]+)\])?</h1></a>.*?-->(?:.*?<br />)?\s*(?P<plot>[^<]+)'
         patronNext = r'<link rel="next" href="([^"]+)"'
