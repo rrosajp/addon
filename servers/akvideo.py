@@ -24,7 +24,7 @@ def test_video_exists(page_url):
             return False, config.get_localized_string(70449) % "Akvideo"
 
     if 'video.php?file_code=' in page.url:
-        data = httptools.downloadpage(page.url.replace('video.php?file_code=', 'video/'), headers=headers)
+        page = httptools.downloadpage(page.url.replace('video.php?file_code=', 'video/'), headers=headers)
     data = page.data
 
     # ID, code = scrapertools.find_single_match(data, r"""input\D*id=(?:'|")([^'"]+)(?:'|").*?value='([a-z0-9]+)""")
