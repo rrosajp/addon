@@ -275,14 +275,17 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         lang1, longtitle = scrapeLang(scraped, lang, longtitle)
 
         if ptn:
-            titlePTN = PTN().parse(title)
-            title = titlePTN.get('title', '')
+            titlePTN = PTN().parse(title.replace('.',' '))
+            title = longtitle = titlePTN.get('title', '')
+            log('TITOLO',title)
             if titlePTN.get('quality', '') or titlePTN.get('resolution', ''):
                 quality = titlePTN.get('quality', '') + " " + titlePTN.get('resolution', '')
             if not scraped['year']:
                 infolabels['year'] = titlePTN.get('year', '')
             if titlePTN.get('episode', None) and titlePTN.get('season', None):
-                longtitle = title + ' - ' + str(titlePTN.get('episode')) + 'x' + str(titlePTN.get('season'))
+                longtitle = str(titlePTN.get('season'))  + 'x' + str(titlePTN.get('episode')).zfill(2) + s + title
+            elif titlePTN.get('season', None):
+                longtitle = config.get_localized_string(60027) % str(titlePTN.get('season')) + s + title
 
         longtitle = typo(longtitle, 'bold')
         longtitle += typo(quality, '_ [] color kod') if quality else ''
