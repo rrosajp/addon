@@ -1505,7 +1505,7 @@ def play_torrent(item, xlistitem, mediaurl):
                 mediaurl += "&library=&tmdb=%s&type=movie" % (item.infoLabels['tmdb_id'])
 
         if torr_client in ['quasar', 'elementum'] and item.downloadFilename:
-            if torr_client == 'elementum':
+            # if torr_client == 'elementum':
                 # config.set_setting('elementumtype', torr_setting.getSetting('download_storage'))
                 # config.set_setting('elementumdl', torr_setting.getSetting('download_path'))
                 # torr_setting.setSetting('download_storage', '0')
@@ -1513,7 +1513,7 @@ def play_torrent(item, xlistitem, mediaurl):
                 # xbmc.sleep(1000)
             torrent.call_torrent_via_web(urllib.quote_plus(item.url), torr_client)
         else:
-            if torr_client == 'elementum':
+            # if torr_client == 'elementum':
                 # if config.get_setting('elementumtype'): torr_setting.setSetting('download_storage', config.get_setting('elementumtype'))
                 # if config.get_setting('elementumdl'): torr_setting.setSetting('download_path', config.get_setting('elementumdl'))
                 # xbmc.sleep(1000)
