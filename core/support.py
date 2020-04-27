@@ -573,13 +573,16 @@ def dooplay_menu(item, type):
 
 def swzz_get_url(item):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:59.0) Gecko/20100101 Firefox/59.0'}
-
+    # dbg()
     if "/link/" in item.url:
         data = httptools.downloadpage(item.url, headers=headers).data
         if "link =" in data:
             data = scrapertools.find_single_match(data, 'link = "([^"]+)"')
             if 'http' not in data:
                 data = 'https:' + data
+        elif 'linkId = ' in data:
+            id = scrapertools.find_single_match(data, 'linkId = "([^"]+)"')
+            data = stayonline(id)
         else:
             match = scrapertools.find_single_match(data, r'<meta name="og:url" content="([^"]+)"')
             match = scrapertools.find_single_match(data, r'URL=([^"]+)">') if not match else match
@@ -604,23 +607,25 @@ def swzz_get_url(item):
             if not "vcrypt" in data:
                 data = httptools.downloadpage(data).data
         logger.debug("##### play /link/ data ##\n%s\n##" % data)
+
     elif 'stayonline.pro' in item.url:
-        # dbg()
         id = item.url.split('/')[-2]
-        reqUrl = 'https://stayonline.pro/ajax/linkView.php'
-        p = urlencode({"id": id})
-        data = httptools.downloadpage(reqUrl, post=p).data
-        try:
-            import json
-            data = json.loads(data)['data']['value']
-        except:
-            data = scrapertools.find_single_match(data, r'"value"\s*:\s*"([^"]+)"')
-        else:
-            return ''
+        data = stayonline(id)
     else:
         data = item.url
 
     return data.replace('\\','')
+
+def stayonline(id):
+    reqUrl = 'https://stayonline.pro/ajax/linkView.php'
+    p = urlencode({"id": id})
+    data = httptools.downloadpage(reqUrl, post=p).data
+    try:
+        import json
+        data = json.loads(data)['data']['value']
+    except:
+        data = scrapertools.find_single_match(data, r'"value"\s*:\s*"([^"]+)"')
+    return data
 
 
 def menuItem(itemlist, filename, title='', action='', url='', contentType='movie', args=[]):
