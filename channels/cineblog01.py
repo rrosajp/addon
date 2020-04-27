@@ -259,34 +259,4 @@ def findvid_serie(item):
 
 def play(item):
     support.log()
-    itemlist = []
-    ### Handling new cb01 wrapper
-    if host[9:] + "/film/" in item.url:
-        iurl = httptools.downloadpage(item.url, only_headers=True, follow_redirects=False).headers.get("location", "")
-        support.log("/film/ wrapper: ", iurl)
-        if iurl:
-            item.url = iurl
-
-    if '/goto/' in item.url:
-        item.url = item.url.split('/goto/')[-1].decode('base64')
-
-    item.url = item.url.replace('http://cineblog01.uno', 'http://k4pp4.pw')
-
-    logger.debug("##############################################################")
-    if "go.php" in item.url:
-        data = httptools.downloadpage(item.url).data
-        if "window.location.href" in data:
-            try:
-                data = scrapertools.find_single_match(data, 'window.location.href = "([^"]+)";')
-            except IndexError:
-                data = httptools.downloadpage(item.url, only_headers=True, follow_redirects=False).headers.get(
-                    "location", "")
-            data, c = unshortenit.unwrap_30x_only(data)
-        else:
-            data = scrapertools.find_single_match(data, r'<a href="([^"]+)".*?class="btn-wrapper">.*?licca.*?</a>')
-
-        logger.debug("##### play go.php data ##\n%s\n##" % data)
-    else:
-        data = support.swzz_get_url(item)
-
-    return servertools.find_video_items(data=data)
+    return servertools.find_video_items(data=item.url)
