@@ -82,6 +82,7 @@ def show_channels(item):
 def show_menu(item):
     support.log()
     itemlist = []
+    # support.dbg()
 
     if item.menu: # if second level menu
         get_sub_menu(item, item.menu, 'level2', itemlist)
@@ -596,8 +597,10 @@ def load_json(item):
             json_file = httptools.downloadpage(url).data
         else:
             json_file = open(url, "r").read()
-
-        json = jsontools.load(json_file, object_pairs_hook=OrderedDict)
+        if item.filterkey:
+            json = jsontools.load(json_file)
+        else:
+            json = jsontools.load(json_file, object_pairs_hook=OrderedDict)
 
     except:
         json = {}
