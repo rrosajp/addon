@@ -5,7 +5,11 @@
 
 from core import support
 
-host = support.config.get_channel_url()
+def findhost():
+    data = support.httptools.downloadpage('https://lagazzettadelcorsaro.com/').data
+    return support.scrapertools.find_single_match(data, '<li><a href="([^"]+)')
+
+host = support.config.get_channel_url(findhost)
 # host = 'https://ilcorsaronero.xyz'
 headers = [['Referer', host]]
 
@@ -16,23 +20,23 @@ list_quality = ['default']
 def mainlist(item):
 
     menu = [
-        ('BDRiP {film}', ['/categoria.php?active=0&category=1&order=data&by=DESC&page=', 'peliculas', [0, 'movie']]),
-        ('Cerca BDRiP... submenu {film}', ['/categoria.php?active=0&category=1&order=data&by=DESC&argh.php?search=', 'search', 'search']),
-        ('DVD {film}', ['/categoria.php?active=0&category=20&order=data&by=DESC&page=', 'peliculas', [0, 'movie']]),
-        ('Cerca DVD... submenu {film}', ['/categoria.php?active=0&category=20&order=data&by=DESC&argh.php?search=', 'search', 'search']),
-        ('Screener {film}', ['/categoria.php?active=0&category=19&order=data&by=DESC&page=', 'peliculas', [0, 'movie']]),
-        ('Cerca Screener.. submenu {film}', ['/categoria.php?active=0&category=19&order=data&by=DESC&argh.php?search=', 'search', 'search']),
-        ('Serie TV', ['/categoria.php?active=0&category=15&order=data&by=DES&page=', 'peliculas', [0 , 'tvshow']]),
-        ('Cerca Serie TV.. submenu', ['/categoria.php?active=0&category=15&order=data&by=DESC&argh.php?search=', 'search', 'search']),
-        ('Anime', ['/categoria.php?active=0&category=5&order=data&by=DESC&page=', 'peliculas', [0, 'anime']]),
-        ('Cerca Anime.. submenu', ['/categoria.php?active=0&category=5&order=data&by=DESC&argh.php?search=', 'search', 'search']),
-        ('Musica', ['/categoria.php?active=0&category=2&order=data&by=DESC&page=', 'peliculas', [0, 'music']]),
-        ('Cerca Musica.. submenu', ['/categoria.php?active=0&category=2&order=data&by=DESC&argh.php?search=', 'search', 'search']),
-        ('Audiolibri {musica}', ['/categoria.php?active=0&category=18&order=data&by=DESC&page=', 'peliculas', [0, 'music']]),
-        ('Cerca Audiolibri.. submenu', ['/categoria.php?active=0&category=18&order=data&by=DESC&argh.php?search=', 'search', 'search']),
-        ('Altro {film}', ['/categoria.php?active=0&category=4&order=data&by=DESC&page=', 'peliculas', [0, 'movie']]),
-        ('Cerca altro.. submenu', ['/categoria.php?active=0&category=4&order=data&by=DESC&argh.php?search=', 'search', 'search']),
-        ('Cerca Tutto... color kod bold', ['/argh.php?search=', 'search', 'search'])
+        ('BDRiP {film}', ['/categoria.php?active=0&category=1&order=data&by=DESC&page=', 'peliculas', [0, 'movie', True]]),
+        ('Cerca BDRiP... submenu {film}', ['/categoria.php?active=0&category=1&order=data&by=DESC&argh.php?search=', 'search', ['search', 'movie', True]]),
+        ('DVD {film}', ['/categoria.php?active=0&category=20&order=data&by=DESC&page=', 'peliculas', [0, 'movie', True]]),
+        ('Cerca DVD... submenu {film}', ['/categoria.php?active=0&category=20&order=data&by=DESC&argh.php?search=', 'search', ['search', 'movie', True]]),
+        ('Screener {film}', ['/categoria.php?active=0&category=19&order=data&by=DESC&page=', 'peliculas', [0, 'movie', True]]),
+        ('Cerca Screener.. submenu {film}', ['/categoria.php?active=0&category=19&order=data&by=DESC&argh.php?search=', 'search', ['search', 'movie', True]]),
+        ('Serie TV', ['/categoria.php?active=0&category=15&order=data&by=DES&page=', 'peliculas', [0 , 'tvshow', True]]),
+        ('Cerca Serie TV.. submenu', ['/categoria.php?active=0&category=15&order=data&by=DESC&argh.php?search=', 'search', ['search', 'tvshow',True]]),
+        ('Anime', ['/categoria.php?active=0&category=5&order=data&by=DESC&page=', 'peliculas', [0, 'anime', True]]),
+        ('Cerca Anime.. submenu', ['/categoria.php?active=0&category=5&order=data&by=DESC&argh.php?search=', 'search', ['search', 'anime', True]]),
+        ('Musica', ['/categoria.php?active=0&category=2&order=data&by=DESC&page=', 'peliculas', [0, 'music', False]]),
+        ('Cerca Musica.. submenu', ['/categoria.php?active=0&category=2&order=data&by=DESC&argh.php?search=', 'search', ['search', 'music', False]]),
+        ('Audiolibri {musica}', ['/categoria.php?active=0&category=18&order=data&by=DESC&page=', 'peliculas', [0, 'music', False]]),
+        ('Cerca Audiolibri.. submenu', ['/categoria.php?active=0&category=18&order=data&by=DESC&argh.php?search=', 'search', ['search', 'music', False]]),
+        ('Altro {film}', ['/categoria.php?active=0&category=4&order=data&by=DESC&page=', 'peliculas', [0, 'movie', False]]),
+        ('Cerca altro.. submenu', ['/categoria.php?active=0&category=4&order=data&by=DESC&argh.php?search=', 'search', ['search', 'movie', False]]),
+        ('Cerca Tutto... color kod bold', ['/argh.php?search=', 'search', ['search', 'all', False]])
     ]
 
     return locals()
@@ -40,8 +44,8 @@ def mainlist(item):
 
 @support.scrape
 def peliculas(item):
-    sceneTitle = True
-    if item.args[1] in ['tvshow', 'anime']:
+    sceneTitle = item.args[2]
+    if item.args[1] in ['tvshow', 'anime', 'music']:
         patron = r'>[^"<]+'
     else:
         patron = r'>(?P<quality>[^"<]+)'
