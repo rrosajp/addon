@@ -7,7 +7,7 @@ import os
 import re
 import sys
 
-from lib.PTN import PTN
+from lib.guessit import guessit
 
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
@@ -174,7 +174,7 @@ def cleantitle(title):
     cleantitle = title.replace('"', "'").replace('×', 'x').replace('–', '-').strip()
     return cleantitle
 
-def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang, ptn):
+def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang, sceneTitle):
     itemlist = []
     log("scrapeBlock qui")
     if debug:
@@ -270,24 +270,39 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         # make formatted Title [longtitle]
         s = ' - '
         title = episode + (s if episode and title else '') + title
-        longtitle = title + (s if title and title2 else '') + title2
+        longtitle = title + (s if title and title2 else '') + title2 + '\n'
 
-        lang1, longtitle = scrapeLang(scraped, lang, longtitle)
-
-        if ptn:
-            titlePTN = PTN().parse(title.replace('.',' '))
-            title = longtitle = titlePTN.get('title', '')
+        if sceneTitle:
+            parsedTitle = guessit(title)
+            title = longtitle = parsedTitle.get('title', '')
             log('TITOLO',title)
-            if titlePTN.get('quality', '') or titlePTN.get('resolution', ''):
-                quality = titlePTN.get('quality', '') + " " + titlePTN.get('resolution', '')
+            if parsedTitle.get('source'):
+                quality = str(parsedTitle.get('source'))
+                if parsedTitle.get('screen_size'):
+                    quality += ' ' + str(parsedTitle.get('screen_size', ''))
             if not scraped['year']:
-                infolabels['year'] = titlePTN.get('year', '')
-            if titlePTN.get('episode', None) and titlePTN.get('season', None):
-                longtitle = str(titlePTN.get('season'))  + 'x' + str(titlePTN.get('episode')).zfill(2) + s + title
-            elif titlePTN.get('season', None):
-                longtitle = config.get_localized_string(60027) % str(titlePTN.get('season')) + s + title
+                infolabels['year'] = parsedTitle.get('year', '')
+            if parsedTitle.get('episode') and parsedTitle.get('season'):
+                longtitle = title + s
+
+                if type(parsedTitle.get('season')) == list:
+                    longtitle += str(parsedTitle.get('season')[0]) + '-' + str(parsedTitle.get('season')[-1])
+                else:
+                    longtitle += str(parsedTitle.get('season'))
+
+                if type(parsedTitle.get('episode')) == list:
+                     longtitle += 'x' + str(parsedTitle.get('episode')[0]).zfill(2) + '-' + str(parsedTitle.get('episode')[-1]).zfill(2)
+                else:
+                    longtitle += 'x' + str(parsedTitle.get('episode')).zfill(2)
+            elif parsedTitle.get('season') and type(parsedTitle.get('season')) == list:
+                longtitle += s + config.get_localized_string(30140) + " " +str(parsedTitle.get('season')[0]) + '-' + str(parsedTitle.get('season')[-1])
+            elif parsedTitle.get('season'):
+                longtitle += s + config.get_localized_string(60027) % str(parsedTitle.get('season'))
+            if parsedTitle.get('episode_title'):
+                longtitle += s + parsedTitle.get('episode_title')
 
         longtitle = typo(longtitle, 'bold')
+        lang1, longtitle = scrapeLang(scraped, lang, longtitle)
         longtitle += typo(quality, '_ [] color kod') if quality else ''
         longtitle += typo(scraped['size'], '_ [] color kod') if scraped['size'] else ''
         longtitle += typo(scraped['seed'] + ' SEEDS', '_ [] color kod') if scraped['seed'] else ''
@@ -397,7 +412,7 @@ def scrape(func):
         if 'pagination' in args and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
         lang = args['deflang'] if 'deflang' in args else ''
-        ptn = args.get('ptn', False)
+        sceneTitle = args.get('sceneTitle')
         pag = item.page if item.page else 1  # pagination
         matches = []
 
@@ -420,7 +435,7 @@ def scrape(func):
                     if 'season' in bl and bl['season']:
                         item.season = bl['season']
                     blockItemlist, blockMatches = scrapeBlock(item, args, bl['block'], patron, headers, action, pagination, debug,
-                                                typeContentDict, typeActionDict, blacklist, search, pag, function, lang, ptn)
+                                                typeContentDict, typeActionDict, blacklist, search, pag, function, lang, sceneTitle)
                     for it in blockItemlist:
                         if 'lang' in bl:
                             it.contentLanguage, it.title = scrapeLang(bl, it.contentLanguage, it.title)
@@ -431,7 +446,7 @@ def scrape(func):
                     matches.extend(blockMatches)
             elif patron:
                 itemlist, matches = scrapeBlock(item, args, data, patron, headers, action, pagination, debug, typeContentDict,
-                                       typeActionDict, blacklist, search, pag, function, lang, ptn)
+                                       typeActionDict, blacklist, search, pag, function, lang, sceneTitle)
 
             if 'itemlistHook' in args:
                 itemlist = args['itemlistHook'](itemlist)

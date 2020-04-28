@@ -40,13 +40,18 @@ def mainlist(item):
 
 @support.scrape
 def peliculas(item):
-    ptn = True
-    patron = r'>(?P<quality>[^"<]+)</td> <TD[^>]+><A class="tab" HREF="(?P<url>[^"]+)"\s*>(?P<title>[^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<size>[^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<seed>[^<]+)'
+    sceneTitle = True
+    if item.args[1] in ['tvshow', 'anime']:
+        patron = r'>[^"<]+'
+    else:
+        patron = r'>(?P<quality>[^"<]+)'
+    patron += '</td> <TD[^>]+><A class="tab" HREF="(?P<url>[^"]+)"\s*>(?P<title>[^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<size>[^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<seed>[^<]+)'
     def itemHook(item):
         # item.title = item.title.replace('.',' ')
         item.contentType = item.args[1]
         thumb = (item.args[1] if type(item.args) == list else item.args) + '.png'
         item.thumbnail = support.thumb(thumb=thumb)
+
         return item
     if 'search' not in item.args:
         support.log('OK')
@@ -58,7 +63,7 @@ def peliculas(item):
                             contentType=item.contentType,
                             title=support.typo(support.config.get_localized_string(30992), 'color kod bold'),
                             url=item.url,
-                            args=item.args[0] + 1,
+                            args=[item.args[0] + 1, item.args[1]],
                             thumbnail=support.thumb()))
             return itemlist
     return locals()
