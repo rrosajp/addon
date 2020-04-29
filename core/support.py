@@ -7,8 +7,6 @@ import os
 import re
 import sys
 
-from lib.guessit import guessit
-
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 if PY3:
@@ -273,6 +271,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         longtitle = title + (s if title and title2 else '') + title2 + '\n'
 
         if sceneTitle:
+            from lib.guessit import guessit
             parsedTitle = guessit(title)
             title = longtitle = parsedTitle.get('title', '')
             log('TITOLO',title)

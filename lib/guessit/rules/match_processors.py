@@ -1,7 +1,7 @@
 """
 Match processors
 """
-from guessit.rules.common import seps
+from common import seps
 
 
 def strip(match, chars=seps):
