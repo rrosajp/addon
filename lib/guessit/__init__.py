@@ -3,7 +3,7 @@
 """
 Extracts as much information as possible from a video file.
 """
-import monkeypatch as _monkeypatch
+from . import monkeypatch as _monkeypatch
 
 from .api import guessit, GuessItApi
 from .options import ConfigurationException
