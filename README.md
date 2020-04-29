@@ -12,4 +12,3 @@ Nota: KoD attualmente funziona con Kodi fino alla versione 18 (Python 2).
 
 ### Come contribuire o fare segnalazioni?
 Ti piace il progetto e vuoi dare una mano? Leggi [qui](https://github.com/kodiondemand/addon/blob/master/CONTRIBUTING.md)
-
