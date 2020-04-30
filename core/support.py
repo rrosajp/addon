@@ -7,6 +7,7 @@ import os
 import re
 import sys
 
+import lib.babelfish
 from lib.guessit import guessit
 
 PY3 = False
