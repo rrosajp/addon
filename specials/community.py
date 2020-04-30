@@ -82,7 +82,7 @@ def show_channels(item):
 def show_menu(item):
     support.log()
     itemlist = []
-    # support.dbg()
+
 
     if item.menu: # if second level menu
         get_sub_menu(item, item.menu, 'level2', itemlist)
@@ -93,7 +93,7 @@ def show_menu(item):
             json = load_json(item)
         if 'disable_pagination' in json:
             item.disable_pagination = True
-        # support.dbg()
+
         for key in json:
             if key == 'menu':
                 get_menu(item, json, key, itemlist)
@@ -502,7 +502,7 @@ def submenu(item, json, key, itemlist = [], filter_list = []):
         else:
             if ':/' in item.description: url = item.description
             else: url = filetools.join(item.path, item.description)
-            description = load_json(url)
+            description = load_json(url, no_order=True)
     else:
         description = None
 
@@ -570,6 +570,7 @@ def filter_thread(filter, key, item, description):
             fanart = extra.fanart if extra.fanart else item.fanart
             plot = extra.plot if extra.plot else item.plot
 
+
     item = Item(channel=item.channel,
                 title=support.typo(filter, 'bold'),
                 url=item.url,
@@ -582,13 +583,17 @@ def filter_thread(filter, key, item, description):
                 filterkey=item.filterkey,
                 filter=filter,
                 key=key)
+
+    if item.filterkey in ['genre']:
+        support.thumb(item)
+
     return item
 
 
 ################################   Utils   ################################
 
 # for load json from item or url
-def load_json(item):
+def load_json(item, no_order=False):
     support.log()
 
     url = item.url if type(item) == Item else item
@@ -597,7 +602,7 @@ def load_json(item):
             json_file = httptools.downloadpage(url).data
         else:
             json_file = open(url, "r").read()
-        if item.filterkey:
+        if no_order or item.filterkey:
             json = jsontools.load(json_file)
         else:
             json = jsontools.load(json_file, object_pairs_hook=OrderedDict)
