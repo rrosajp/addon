@@ -1050,7 +1050,7 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
     if (function == 'findvideos' and contentType == 'movie') \
         or (function == 'episodios' and contentType != 'movie'):
         if config.get_videolibrary_support() and len(itemlist) > 0:
-            from  channelselector import get_thumb
+            from channelselector import get_thumb
             itemlist.append(
                 Item(channel=item.channel,
                      title=title,

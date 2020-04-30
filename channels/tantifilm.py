@@ -80,7 +80,10 @@ def episodios(item):
     else:
         data_check = item.data
     patron_check = r'<iframe src="([^"]+)" scrolling="no" frameborder="0" width="626" height="550" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">'
-    item.url = scrapertools.find_single_match(data_check, patron_check)
+    data = httptools.downloadpage(scrapertools.find_single_match(data_check, patron_check), headers=headers).data
+    data = data.replace("'", '"')
+    data = re.sub('\n|\t', ' ', data)
+    data = re.sub(r'>\s+<', '> <', data)
 
     patronBlock = r'Stagioni<\/a>.*?<ul class="nav navbar-nav">(?P<block>.*?)<\/ul>'
     patron = r'<a href="(?P<url>[^"]+)"\s*>\s*<i[^>]+><\/i>\s*(?P<episode>\d+)<\/a>'
