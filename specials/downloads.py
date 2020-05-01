@@ -152,7 +152,11 @@ def browser(item):
         if filetools.isdir(filetools.join(item.url, file)):
             itemlist.append(Item(channel=item.channel, title=file, action=item.action, url=filetools.join(item.url, file), context=[{ 'title': config.get_localized_string(30037), 'channel': 'downloads', 'action': "del_dir"}]))
         else:
-            itemlist.append(Item(channel=item.channel, title=file, action="play", url=filetools.join(item.url, file), context=[{ 'title': config.get_localized_string(30039), 'channel': 'downloads', 'action': "del_file"}]))
+            if not item.infoLabels:
+                infoLabels = {"mediatype":"video"}
+            else:
+                infoLabels = item.infoLabels
+            itemlist.append(Item(channel=item.channel, title=file, action="play", infoLabels=infoLabels, url=filetools.join(item.url, file), context=[{ 'title': config.get_localized_string(30039), 'channel': 'downloads', 'action': "del_file"}]))
 
     return itemlist
 

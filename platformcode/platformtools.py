@@ -1505,18 +1505,8 @@ def play_torrent(item, xlistitem, mediaurl):
                 mediaurl += "&library=&tmdb=%s&type=movie" % (item.infoLabels['tmdb_id'])
 
         if torr_client in ['quasar', 'elementum'] and item.downloadFilename:
-            # if torr_client == 'elementum':
-                # config.set_setting('elementumtype', torr_setting.getSetting('download_storage'))
-                # config.set_setting('elementumdl', torr_setting.getSetting('download_path'))
-                # torr_setting.setSetting('download_storage', '0')
-                # torr_setting.setSetting('download_path', config.get_setting('downloadpath'))
-                # xbmc.sleep(1000)
-            torrent.call_torrent_via_web(urllib.quote_plus(item.url), torr_client)
+            torrent.elementum_monitor(item, torr_client)
         else:
-            # if torr_client == 'elementum':
-                # if config.get_setting('elementumtype'): torr_setting.setSetting('download_storage', config.get_setting('elementumtype'))
-                # if config.get_setting('elementumdl'): torr_setting.setSetting('download_path', config.get_setting('elementumdl'))
-                # xbmc.sleep(1000)
             xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
 
         # Si es un archivo RAR, monitorizamos el cliente Torrent hasta que haya descargado el archivo,
@@ -1569,4 +1559,3 @@ def play_torrent(item, xlistitem, mediaurl):
 
 def log(texto):
     xbmc.log(texto, xbmc.LOGNOTICE)
-

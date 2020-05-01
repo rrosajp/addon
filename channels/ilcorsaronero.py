@@ -7,9 +7,11 @@ from core import support
 
 def findhost():
     data = support.httptools.downloadpage('https://lagazzettadelcorsaro.com/').data
-    return support.scrapertools.find_single_match(data, '<li><a href="([^"]+)')
+    url = support.scrapertools.find_single_match(data, '<li><a href="([^"]+)')
+    return url[:-1] if url.endswith('/') else url
 
 host = support.config.get_channel_url(findhost)
+support.log('HOST',host)
 # host = 'https://ilcorsaronero.xyz'
 headers = [['Referer', host]]
 
@@ -21,21 +23,21 @@ def mainlist(item):
 
     menu = [
         ('BDRiP {film}', ['/categoria.php?active=0&category=1&order=data&by=DESC&page=', 'peliculas', [0, 'movie', True]]),
-        ('Cerca BDRiP... submenu {film}', ['/categoria.php?active=0&category=1&order=data&by=DESC&argh.php?search=', 'search', ['search', 'movie', True]]),
+        ('Cerca BDRiP... submenu {film}', ['/torrent-ita/1/', 'search', ['search', 'movie', True]]),
         ('DVD {film}', ['/categoria.php?active=0&category=20&order=data&by=DESC&page=', 'peliculas', [0, 'movie', True]]),
-        ('Cerca DVD... submenu {film}', ['/categoria.php?active=0&category=20&order=data&by=DESC&argh.php?search=', 'search', ['search', 'movie', True]]),
+        ('Cerca DVD... submenu {film}', ['/torrent-ita/20/', 'search', ['search', 'movie', True]]),
         ('Screener {film}', ['/categoria.php?active=0&category=19&order=data&by=DESC&page=', 'peliculas', [0, 'movie', True]]),
-        ('Cerca Screener.. submenu {film}', ['/categoria.php?active=0&category=19&order=data&by=DESC&argh.php?search=', 'search', ['search', 'movie', True]]),
+        ('Cerca Screener.. submenu {film}', ['/torrent-ita/19/', 'search', ['search', 'movie', True]]),
         ('Serie TV', ['/categoria.php?active=0&category=15&order=data&by=DES&page=', 'peliculas', [0 , 'tvshow', True]]),
-        ('Cerca Serie TV.. submenu', ['/categoria.php?active=0&category=15&order=data&by=DESC&argh.php?search=', 'search', ['search', 'tvshow',True]]),
+        ('Cerca Serie TV.. submenu', ['/torrent-ita/15/', 'search', ['search', 'tvshow',True]]),
         ('Anime', ['/categoria.php?active=0&category=5&order=data&by=DESC&page=', 'peliculas', [0, 'anime', True]]),
-        ('Cerca Anime.. submenu', ['/categoria.php?active=0&category=5&order=data&by=DESC&argh.php?search=', 'search', ['search', 'anime', True]]),
+        ('Cerca Anime.. submenu', ['/torrent-ita/5/', 'search', ['search', 'anime', True]]),
         ('Musica', ['/categoria.php?active=0&category=2&order=data&by=DESC&page=', 'peliculas', [0, 'music', False]]),
-        ('Cerca Musica.. submenu', ['/categoria.php?active=0&category=2&order=data&by=DESC&argh.php?search=', 'search', ['search', 'music', False]]),
+        ('Cerca Musica.. submenu', ['/torrent-ita/2/', 'search', ['search', 'music', False]]),
         ('Audiolibri {musica}', ['/categoria.php?active=0&category=18&order=data&by=DESC&page=', 'peliculas', [0, 'music', False]]),
-        ('Cerca Audiolibri.. submenu', ['/categoria.php?active=0&category=18&order=data&by=DESC&argh.php?search=', 'search', ['search', 'music', False]]),
+        ('Cerca Audiolibri.. submenu', ['/torrent-ita/18/', 'search', ['search', 'music', False]]),
         ('Altro {film}', ['/categoria.php?active=0&category=4&order=data&by=DESC&page=', 'peliculas', [0, 'movie', False]]),
-        ('Cerca altro.. submenu', ['/categoria.php?active=0&category=4&order=data&by=DESC&argh.php?search=', 'search', ['search', 'movie', False]]),
+        ('Cerca altro.. submenu', ['/torrent-ita/4/', 'search', ['search', 'movie', False]]),
         ('Cerca Tutto... color kod bold', ['/argh.php?search=', 'search', ['search', 'all', False]])
     ]
 
@@ -61,13 +63,15 @@ def peliculas(item):
         support.log('OK')
         item.url += str(item.args[0])
         def itemlistHook(itemlist):
+            args = item.args
+            args[0] += 1
             itemlist.append(
                 support.Item(channel=item.channel,
                             action = item.action,
                             contentType=item.contentType,
                             title=support.typo(support.config.get_localized_string(30992), 'color kod bold'),
                             url=item.url,
-                            args=[item.args[0] + 1, item.args[1]],
+                            args=args,
                             thumbnail=support.thumb()))
             return itemlist
     return locals()
@@ -75,9 +79,11 @@ def peliculas(item):
 
 def search(item, text):
     support.log(item, text)
-
     itemlist = []
-    item.url += text
+    if 'all' in item.args:
+        item.url += text
+    else:
+        item.url += text + '.html'
     try:
         return peliculas(item)
     # Cattura la eccezione così non interrompe la ricerca globle se il canale si rompe!

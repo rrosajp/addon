@@ -1349,6 +1349,97 @@ def import_libtorrent(LIBTORRENT_PATH):
     return lt, e, e1, e2
 
 
+##########################  ELEMENTUM MONITOR TEST ##########################
+
+def elementum_monitor(item, torr_client):
+    host = 'http://127.0.0.1:65220/torrents/'
+    torr_setting = xbmcaddon.Addon(id="plugin.video.elementum")
+    # from core.support import dbg;dbg()
+    data = httptools.downloadpage(host, alfa_s=True).data
+    items = jsontools.load(data)['items']
+    if not items:
+        set_elementum()
+    call_torrent_via_web(urllib.quote_plus(item.url), torr_client)
+
+    result = 0
+    while result < 100:
+        data = httptools.downloadpage(host, alfa_s=True).data
+        items = jsontools.load(data)['items']
+
+        partials = []
+        files = []
+        titles = []
+
+        for it in items:
+            p = scrapertools.find_single_match(it['label'], r'(\d+\.\d+)%')
+            f = scrapertools.find_single_match(it['path'], r'resume=([^&]+)')
+            t = it['info']['title']
+            partials.append(p)
+            files.append(f)
+            titles.append(t)
+
+        partial = 0
+        for i, p in enumerate(partials):
+            partial += float(p)
+            update_download_info(files[i], p, titles[i])
+
+        result = partial / len(items)
+        xbmc.sleep(5000)
+
+    log('All Torrent downloaded.')
+    xbmc.sleep(1000)
+    unset_elementum()
+
+
+def update_download_info(file, partial, title):
+    extensions_list = ['aaf', '3gp', 'asf', 'avi', 'flv', 'mpeg', 'm1v', 'm2v', 'm4v', 'mkv', 'mov', 'mpg', 'mpe', 'mp4', 'ogg', 'wmv']
+    path = xbmc.translatePath(config.get_setting('downloadlistpath'))
+    dlpath = filetools.join(config.get_setting('downloadpath'), title)
+    log('DL PATH: ' + dlpath)
+    sep = '/' if dlpath.startswith('smb') else os.sep
+    if filetools.isdir(dlpath) and partial > 0:
+        dlfiles = filetools.listdir(dlpath)
+        for f in dlfiles:
+            log('FILE TYPE: ' + f.split('.')[-1])
+            if f.split('.')[-1] in extensions_list:
+                dlpath = filetools.join(dlpath.split(sep)[-1], f)
+    else:
+        dlpath = dlpath.split(sep)[-1]
+
+    files = filetools.listdir(path)
+    for f in files:
+        json = jsontools.load(filetools.read(filetools.join(path, f)))
+        if 'downloadServer' in json and file in json['downloadServer']['url'] or \
+            'url' in json and file in json['url']:
+            jsontools.update_node(dlpath, f, "downloadFilename", path)
+            jsontools.update_node(float(partial), f, "downloadProgress", path)
+            if float(partial) == 100:
+                jsontools.update_node(2, f, "downloadStatus", path)
+
+def set_elementum():
+    log('SET Elementum')
+    torr_setting = xbmcaddon.Addon(id="plugin.video.elementum")
+    config.set_setting('elementumtype', torr_setting.getSetting('download_storage'))
+    config.set_setting('elementumdl', torr_setting.getSetting('download_path'))
+    torr_setting.setSetting('download_storage', '0')
+    torr_setting.setSetting('download_path', config.get_setting('downloadpath'))
+    xbmc.sleep(3000)
+
+def unset_elementum():
+    log('UNSET Elementum')
+    torr_setting = xbmcaddon.Addon(id="plugin.video.elementum")
+    Sleep = False
+    if config.get_setting('elementumtype'):
+        torr_setting.setSetting('download_storage', str(config.get_setting('elementumtype')))
+        Sleep = True
+    if config.get_setting('elementumdl'):
+        torr_setting.setSetting('download_path', config.get_setting('elementumdl'))
+        Sleep = True
+    if Sleep:
+        xbmc.sleep(3000)
+
+##########################  ELEMENTUM MONITOR TEST ##########################
+
 def log(texto):
     try:
         xbmc.log(texto, xbmc.LOGNOTICE)
