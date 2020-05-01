@@ -67,14 +67,12 @@ def newest(categoria):
 
 @support.scrape
 def peliculas(item):
-    patron = r'data-placement="bottom" title="(?P<title>[^"]+)" alt=[^=]+="(?P<url>[^"]+)"> <img class="[^"]+" title="[^"]+" alt="[^"]+" src="(?P<thumb>[^"]+)"'
+    patron = r'data-placement="bottom" title="(?P<title>[^"]+)" alt=[^=]+="(?P<url>[^"]+)"> <img class="[^"]+" title="[^"]+(?P<type>film|serie)[^"]+" alt="[^"]+" src="(?P<thumb>[^"]+)"'
     patronNext = r'<a\s*class="nextpostslink" rel="next" href="([^"]+)">Avanti'
-    def itemHook(item):
-        item.thumbnail = item.thumbnail.replace('locandina-film-small','locandina-film-big')
-        if 'serie' in item.url:
-            item.contentType = 'tvshow'
-            item.action = 'episodios'
-        return item
+
+    typeActionDict = {'findvideos': ['film'], 'episodios': ['serie']}
+    typeContentDict = {'movie': ['film'], 'tvshow': ['serie']}
+    # debug = True
     return locals()
 
 
@@ -83,7 +81,7 @@ def episodios(item):
     if item.data: data = item.data
     # debug= True
     title = item.fulltitle
-    patron = r'link-episode">(?:\s*<strong>)?\s*(?P<episode>\d+.\d+(?:.\d+)?)(?:[^\(]+\((?P<lang>[?P<lang>A-Za-z-]+)[^>]+>)?(?:\s*(?P<title>.*?)  )[^>]+<\/span>\s*(?P<url>.*?)</div>'
+    patron = r'link-episode">(?:\s*<strong>)?\s*(?P<episode>\d+.\d+(?:.\d+)?)(?:\s*\((?P<lang>[?P<lang>A-Za-z-]+)[^>]+>)?(?:\s*(?P<title>.*?)  )[^>]+<\/span>\s*(?P<url>.*?)</div>'
     def itemHook(item):
         if 'Episodio' in item.title:
             item.title = support.re.sub(r'Episodio [0-9.-]+', title, item.title)
