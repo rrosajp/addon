@@ -5,13 +5,11 @@
 
 import re
 
-from core import scrapertools, httptools, tmdb, support
+from core import scrapertools, httptools, support
 from core.item import Item
 from core.support import log
 from platformcode import logger
-from specials import autorenumber
 from platformcode import config, unify
-from lib.unshortenit import unshorten_only
 
 
 def findhost():
@@ -79,7 +77,7 @@ def episodios(item):
         data_check = re.sub(r'>\s+<', '> <', data_check)
     else:
         data_check = item.data
-    patron_check = r'<iframe src="([^"]+)" scrolling="no" frameborder="0" width="626" height="550" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">'
+    patron_check = r'<iframe src="([^"]+)"'
     data = httptools.downloadpage(scrapertools.find_single_match(data_check, patron_check), headers=headers).data
     data = data.replace("'", '"')
     data = re.sub('\n|\t', ' ', data)
