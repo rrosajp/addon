@@ -137,32 +137,47 @@ def peliculas(item):
 
 @support.scrape
 def episodios(item):
-    patronBlock = r'(?P<block><div class="sp-head[a-z ]*?" title="Espandi">\s*(?:STAGION[EI]\s*(?:DA\s*[0-9]+\s*A)?\s*[0-9]+|MINISERIE) - (?P<lang>[^-<]+)(?:- (?P<quality>[^-<]+))?.*?[^<>]*?<\/div>.*?)<div class="spdiv">\[riduci\]<\/div>'
-    patron = r'(?:/>|<p>|<strong>)(?P<url>.*?(?P<episode>[0-9]+(?:&#215;|ÃÂ)[0-9]+)\s*(?P<title2>.*?)?(?:\s*&#8211;|\s*-|\s*<).*?)(?:<\/p>|<br)'
-    def itemlistHook(itemlist):
-        title_dict = {}
-        itlist = []
-        for item in itemlist:
-            item.title = re.sub(r'\.(\D)',' \\1', item.title)
-            match = support.match(item.title, patron=r'(\d+.\d+)').match.replace('x','')
-            item.order = match
-            if match not in title_dict:
-                title_dict[match] = item
-            elif match in title_dict and item.contentLanguage == title_dict[match].contentLanguage \
-                or item.contentLanguage == 'ITA' and not title_dict[match].contentLanguage \
-                or title_dict[match].contentLanguage == 'ITA' and not item.contentLanguage:
-                title_dict[match].url = item.url
-            else:
-                title_dict[match + '1'] = item
+    data = httptools.downloadpage(item.url, headers=headers).data
+    data = data.replace("'", '"')
+    data = re.sub('\n|\t', ' ', data)
+    data = re.sub(r'>\s+<', '> <', data)
+    if 'TUTTA LA ' in data:
+        folderUrl = scrapertools.find_single_match(data, 'TUTTA LA \w+\s+(?:&#8211;|-)\s+<a href="([^"]+)')
+        data = httptools.downloadpage(folderUrl).data
+        patron = r'<a href="(?P<url>[^"]+)[^>]+>(?P<title>[^<]+)'
+        sceneTitle = True
+        def itemHook(item):
+            item.serieFolder = True
+            return item
+    else:
+        patronBlock = r'(?P<block><div class="sp-head[a-z ]*?" title="Espandi">\s*(?:STAGION[EI]\s*(?:DA\s*[0-9]+\s*A)?\s*[0-9]+|MINISERIE) - (?P<lang>[^-<]+)(?:- (?P<quality>[^-<]+))?.*?[^<>]*?<\/div>.*?)<div class="spdiv">\[riduci\]<\/div>'
+        patron = r'(?:/>|<p>|<strong>)(?P<url>.*?(?P<episode>[0-9]+(?:&#215;|ÃÂ)[0-9]+)\s*(?P<title2>.*?)?(?:\s*&#8211;|\s*-|\s*<).*?)(?:<\/p>|<br)'
+        def itemlistHook(itemlist):
+            title_dict = {}
+            itlist = []
+            for item in itemlist:
+                item.title = re.sub(r'\.(\D)',' \\1', item.title)
+                match = support.match(item.title, patron=r'(\d+.\d+)').match.replace('x','')
+                item.order = match
+                if match not in title_dict:
+                    title_dict[match] = item
+                elif match in title_dict and item.contentLanguage == title_dict[match].contentLanguage \
+                    or item.contentLanguage == 'ITA' and not title_dict[match].contentLanguage \
+                    or title_dict[match].contentLanguage == 'ITA' and not item.contentLanguage:
+                    title_dict[match].url = item.url
+                else:
+                    title_dict[match + '1'] = item
 
-        for key, value in title_dict.items():
-            itlist.append(value)
+            for key, value in title_dict.items():
+                itlist.append(value)
 
-        return sorted(itlist, key=lambda it: (it.contentLanguage, int(it.order)))
+            return sorted(itlist, key=lambda it: (it.contentLanguage, int(it.order)))
     return locals()
 
 
 def findvideos(item):
+    if item.serieFolder:
+        return support.server(item, data=item.url)
     if item.contentType == "episode":
         return findvid_serie(item)
 
