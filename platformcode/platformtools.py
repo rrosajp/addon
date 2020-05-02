@@ -250,44 +250,32 @@ def getCurrentView(item=None, parent_item=None):
         info = xbmc.getInfoLabel('Container.ListItem(1).FileNameAndPath')
         item = Item().fromurl(info) if info else Item()
     parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'channel_search', 'newest', 'discover_list', 'new_search']
-    mode = None
 
     if parent_item.action == 'findvideos':
-        content = 'server'
-        mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
-        Type = '' if mode == 55 else 'addons'
+        return 'server', ''
 
     elif parent_item.action == 'mainlist':
-        content = 'channel'
-        mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
-        Type = '' if mode == 55 else 'addons'
+        return 'channel', ''
 
     elif (item.contentType in ['movie'] and parent_item.action in parent_actions) \
             or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']) \
             or (parent_item.channel in ['favorites'] and parent_item.action in ['mainlist']) \
             or parent_item.action in ['now_on_tv', 'now_on_misc', 'now_on_misc_film', 'mostrar_perfil']:
-        content ='movie'
-        Type = 'movies'
+        return 'movie', 'movies'
 
     elif (item.contentType in ['tvshow'] and parent_item.action in parent_actions) \
             or (item.channel in ['videolibrary'] and parent_item.action in ['list_tvshows']):
-        content = 'tvshow'
-        Type = 'tvshows'
+        return 'tvshow', 'tvshows'
 
     elif parent_item.action in ['get_seasons']:
-        content ='season'
-        Type = 'tvshows'
+        return 'season', 'tvshows'
 
     elif parent_item.action in ['episodios', 'get_episodes'] or item.contentType == 'episode':
-        content ='episode'
-        Type = 'tvshows'
+        return 'episode', 'tvshows'
 
     else:
-        content ='addon'
-        mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
-        Type = '' if mode == 55 else 'addons'
+        return 'addon', ''
 
-    return content, Type, mode if mode else int(config.get_setting('view_mode_%s' % content).split(',')[-1])
 
 def set_view_mode(item, parent_item):
     def reset_view_mode():
@@ -299,14 +287,15 @@ def set_view_mode(item, parent_item):
         reset_view_mode()
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='')
         xbmc.executebuiltin('Container.SetViewMode(%s)' % 55)
-    content, Type, mode= getCurrentView(item, parent_item)
 
+    content, Type = getCurrentView(item, parent_item)
+    mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
     if mode == 0:
         logger.info('default mode')
         mode = 55
     xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
     xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
-    logger.info('TYPE: ' + Type + ' - CONTENT: ' + content + ' - MODE:' + str(mode))
+    logger.info('TYPE: ' + Type + ' - ' + 'CONTENT: ' + content)
 
 
 def render_items_old(itemlist, parent_item):
