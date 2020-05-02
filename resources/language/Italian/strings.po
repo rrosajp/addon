@@ -28,8 +28,8 @@ msgid "Check for updates"
 msgstr "Verifica aggiornamenti"
 
 msgctxt "#30002"
-msgid ""
-msgstr ""
+msgid "Touch optmized view"
+msgstr "Vista ottimizzata per i dispositivi touch"
 
 msgctxt "#30003"
 msgid "Enable debug logging"

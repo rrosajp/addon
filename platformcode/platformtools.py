@@ -252,10 +252,10 @@ def getCurrentView(item=None, parent_item=None):
     parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'channel_search', 'newest', 'discover_list', 'new_search']
 
     if parent_item.action == 'findvideos':
-        return 'server', ''
+        return 'server', 'addons' if config.get_setting('touch_view') else ''
 
     elif parent_item.action == 'mainlist':
-        return 'channel', ''
+        return 'channel', 'addons' if config.get_setting('touch_view') else ''
 
     elif (item.contentType in ['movie'] and parent_item.action in parent_actions) \
             or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']) \
@@ -274,7 +274,7 @@ def getCurrentView(item=None, parent_item=None):
         return 'episode', 'tvshows'
 
     else:
-        return 'addon', ''
+        return 'addon', 'addons' if config.get_setting('touch_view') else ''
 
 
 def set_view_mode(item, parent_item):
