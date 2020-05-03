@@ -7,6 +7,8 @@ import os
 import re
 import sys
 
+from lib.guessit import guessit
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 if PY3:
@@ -271,14 +273,13 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         longtitle = title + (s if title and title2 else '') + title2 + '\n'
 
         if sceneTitle:
-            import lib.PTN.parse as parse
-            parsedTitle = parse(title)
+            parsedTitle = guessit(title)
             title = longtitle = parsedTitle.get('title', '')
             log('TITOLO',title)
-            if parsedTitle.get('quality'):
-                quality = str(parsedTitle.get('quality'))
-                if parsedTitle.get('resolution'):
-                    quality += ' ' + str(parsedTitle.get('resolution', ''))
+            if parsedTitle.get('source'):
+                quality = str(parsedTitle.get('source'))
+                if parsedTitle.get('screen_size'):
+                    quality += ' ' + str(parsedTitle.get('screen_size', ''))
             if not scraped['year']:
                 infolabels['year'] = parsedTitle.get('year', '')
             if parsedTitle.get('episode') and parsedTitle.get('season'):
@@ -297,8 +298,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 longtitle += s + config.get_localized_string(30140) + " " +str(parsedTitle.get('season')[0]) + '-' + str(parsedTitle.get('season')[-1])
             elif parsedTitle.get('season'):
                 longtitle += s + config.get_localized_string(60027) % str(parsedTitle.get('season'))
-            if parsedTitle.get('episodeName'):
-                longtitle += s + parsedTitle.get('episodeName')
+            if parsedTitle.get('episode_title'):
+                longtitle += s + parsedTitle.get('episode_title')
 
         longtitle = typo(longtitle, 'bold')
         lang1, longtitle = scrapeLang(scraped, lang, longtitle)
@@ -871,7 +872,7 @@ def match(item_url_string, **args):
     string = args.get('string', False)
 
     # remove scrape arguments
-    args = dict([(key, val) for key, val in args.items() if key not in ['patron', 'patronBlock', 'patronBlocks', 'debug', 'debugBlock', 'string']]) 
+    args = dict([(key, val) for key, val in args.items() if key not in ['patron', 'patronBlock', 'patronBlocks', 'debug', 'debugBlock', 'string']])
 
     # check type of item_url_string
     if string:
