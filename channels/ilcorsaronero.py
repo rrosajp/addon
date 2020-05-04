@@ -53,14 +53,10 @@ def peliculas(item):
         patron = r'>(?P<quality>[^"<]+)'
     patron += '</td> <TD[^>]+><A class="tab" HREF="(?P<url>[^"]+)"\s*>(?P<title>[^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<size>[^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<seed>[^<]+)'
     def itemHook(item):
-        # item.title = item.title.replace('.',' ')
         item.contentType = item.args[1]
-        thumb = (item.args[1] if type(item.args) == list else item.args) + '.png'
-        item.thumbnail = support.thumb(thumb=thumb)
 
         return item
     if 'search' not in item.args:
-        support.log('OK')
         item.url += str(item.args[0])
         def itemlistHook(itemlist):
             args = item.args
@@ -95,5 +91,6 @@ def search(item, text):
 
 
 def findvideos(item):
+    if item.contentType == 'tvshow': item.contentType = 'episode'
     video_library = True if 'movie' in item.args else False
-    return support.server(item, support.match(item.url, patron=r'"(magnet[^"]+)').match,down_load=False, video_library=video_library)
+    return support.server(item, support.match(item.url, patron=r'"(magnet[^"]+)').match, video_library=video_library)
