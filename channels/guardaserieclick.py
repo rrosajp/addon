@@ -118,7 +118,13 @@ def peliculas(item):
 ##            patron = r'<a href="(?P<url>[^"]+)".*?>\s<img\s.*?src="(?P<thumb>[^"]+)"\s/>[^>]+>[^>]+>\s[^>]+>\s(?P<year>\d{4})?\s.+?class="strongText">(?P<title>.+?)<'
 ##            pagination = 25
     #support.regexDbg(item, patronBlock, headers)
-    #debug = True
+    # debug = True
+
+    def itemHook(item):
+        item.url = 'https://web.archive.org' + item.url
+        item.thumbnail = 'https://web.archive.org' + item.thumbnail
+
+        return item
     return locals()
 
 
