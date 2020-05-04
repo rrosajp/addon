@@ -42,8 +42,8 @@ if HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT == 0: HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT =
 HTTPTOOLS_DEFAULT_RANDOM_HEADERS = False
 
 domainCF = list()
-channelsCF = ['guardaserieclick', 'casacinema', 'dreamsub', 'ilgeniodellostreaming', 'piratestreaming', 'altadefinizioneclick', 'altadefinizione01_link', 'cineblog01']
-otherCF = ['altadefinizione-nuovo.link', 'wstream.video', 'akvideo.stream', 'backin.net', 'vcrypt.net']
+channelsCF = ['guardaserieclick', 'casacinema', 'dreamsub', 'ilgeniodellostreaming', 'piratestreaming', 'altadefinizioneclick', 'altadefinizione01_link']
+otherCF = ['altadefinizione-nuovo.link', 'akvideo.stream', 'backin.net', 'vcrypt.net']
 for ch in channelsCF:
     domainCF.append(urlparse.urlparse(config.get_channel_url(name=ch)).hostname)
 domainCF.extend(otherCF)
@@ -260,12 +260,11 @@ def downloadpage(url, **opt):
     global domainCF
     CF = False
     if domain in domainCF or opt.get('cf', False):
-        from lib import cloudscraper
-        session = cloudscraper.create_scraper()
+        url = 'https://web.archive.org/save/' + url
         CF = True
-    else:
-        from lib import requests
-        session = requests.session()
+
+    from lib import requests
+    session = requests.session()
 
     if config.get_setting('resolver_dns') and not opt.get('use_requests', False):
         from specials import resolverdns
@@ -384,6 +383,9 @@ def downloadpage(url, **opt):
     response_code = req.status_code
 
     response['data'] = req.content if req.content else ''
+    if CF:
+        import re
+        response['data'] = re.sub('"/save/[^"]*(https?://[^"]+)', '"\\1', response['data'])
     response['url'] = req.url
 
     if type(response['data']) != str:

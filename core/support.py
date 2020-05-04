@@ -320,7 +320,6 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                     AC = name
                     break
                 else: AC = action
-
         if (scraped["title"] not in blacklist) and (search.lower() in longtitle.lower()):
             it = Item(
                 channel=item.channel,
