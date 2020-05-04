@@ -42,7 +42,7 @@ if HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT == 0: HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT =
 HTTPTOOLS_DEFAULT_RANDOM_HEADERS = False
 
 domainCF = list()
-channelsCF = ['casacinema', 'dreamsub', 'ilgeniodellostreaming', 'piratestreaming', 'altadefinizioneclick', 'altadefinizione01_link', 'cineblog01']
+channelsCF = ['guardaserieclick', 'casacinema', 'dreamsub', 'ilgeniodellostreaming', 'piratestreaming', 'altadefinizioneclick', 'altadefinizione01_link', 'cineblog01']
 otherCF = ['altadefinizione-nuovo.link', 'wstream.video', 'akvideo.stream', 'backin.net', 'vcrypt.net']
 for ch in channelsCF:
     domainCF.append(urlparse.urlparse(config.get_channel_url(name=ch)).hostname)
