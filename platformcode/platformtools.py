@@ -11,32 +11,22 @@
 from __future__ import division
 from __future__ import absolute_import
 from past.utils import old_div
-#from builtins import str
 import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
 if PY3:
-    #from future import standard_library
-    #standard_library.install_aliases()
-    import urllib.parse as urllib                               # Es muy lento en PY2.  En PY3 es nativo
+    import urllib.parse as urllib
 else:
-    import urllib                                               # Usamos el nativo de PY2 que es más rápido
+    import urllib
 
-import os
-
-import xbmc
-import xbmcgui
-import xbmcplugin
-import xbmcaddon
+import os, xbmc, xbmcgui, xbmcplugin, xbmcaddon
 
 from channelselector import get_thumb
 from core import channeltools
 from core import trakt_tools, scrapertools
 from core.item import Item
-from platformcode import logger
-from platformcode import config
-from platformcode import unify
+from platformcode import logger, config, unify
 
 addon = xbmcaddon.Addon('plugin.video.kod')
 addon_icon = os.path.join( addon.getAddonInfo( "path" ), "logo.png" )
@@ -812,7 +802,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
 
             elif item.contentSerieName:
                 # Descargar serie
-                if item.contentType == "tvshow":
+                if item.contentType == "tvshow" and item.action not in ['findvideos']:
                     if item.channel == 'videolibrary':
                         context_commands.append((config.get_localized_string(60003), "XBMC.RunPlugin(%s?%s&%s)" %
                                                  (sys.argv[0], item_url,
@@ -822,7 +812,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
                     context_commands.append((config.get_localized_string(60357), "XBMC.RunPlugin(%s?%s&%s)" %
                                              (sys.argv[0], item_url, 'channel=downloads&action=save_download&download=season&from_channel=' + item.channel + '&from_action=' + item.action)))
                 # Descargar episodio
-                elif item.contentType == "episode":
+                elif item.contentType == "episode" or item.action in ['findvideos']:
                     context_commands.append((config.get_localized_string(60356), "XBMC.RunPlugin(%s?%s&%s)" %
                                              (sys.argv[0], item_url, 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' + item.action)))
                 # Descargar temporada
@@ -1357,140 +1347,23 @@ def torrent_client_installed(show_tuple=False):
 def play_torrent(item, xlistitem, mediaurl):
     logger.info()
     import time
-    import traceback
-
-    from core import filetools
-    from core import httptools
-    from lib import generictools
     from servers import torrent
 
-
-    # Si Libtorrent ha dado error de inicialización, no se pueden usar los clientes internos
-    UNRAR = config.get_setting("unrar_path", server="torrent", default="")
-    LIBTORRENT = config.get_setting("libtorrent_path", server="torrent", default='')
-    size_rar = 2
-    rar_files = []
-    if item.password:
-        size_rar = 3
-
-
-    # Opciones disponibles para Reproducir torrents
     torrent_options = torrent_client_installed(show_tuple=True)
-    torrent_client = config.get_setting("torrent_client", server="torrent")
-
-    # Si es Libtorrent y no está soportado, se ofrecen alternativas, si las hay...
 
     if len(torrent_options) > 1:
         selection = dialog_select(config.get_localized_string(70193), [opcion[0] for opcion in torrent_options])
     else:
         selection = 0
 
-    # Si es Torrenter o Elementum con opción de Memoria, se ofrece la posibilidad ee usar Libtorrent temporalemente
-    if selection >= 0 and LIBTORRENT and UNRAR and 'RAR-' in item.torrent_info and (
-            "torrenter" in torrent_options[selection][0] \
-            or ("elementum" in torrent_options[selection][0] and xbmcaddon.Addon(id="plugin.video.%s"  % torrent_options[selection][0].replace('Plugin externo: ','')).getSetting('download_storage') == '1')):
-        if dialog_yesno(torrent_options[selection][0], config.get_localized_string(70777), config.get_localized_string(70778), config.get_localized_string(70779) % size_rar):
-            selection = 1
-        else:
-            return
-    # Si es Elementum pero con opción de Memoria, se muestras los Ajustes de Elementum y se pide al usuario que cambie a "Usar Archivos"
-    elif selection >= 0 and not LIBTORRENT and UNRAR and 'RAR-' in item.torrent_info and "elementum" in \
-            torrent_options[selection][0] \
-            and xbmcaddon.Addon(id="plugin.video.%s" % torrent_options[selection][0].capitalize()) \
-            .getSetting('download_storage') == '1':
-        if dialog_yesno(torrent_options[selection][0], config.get_localized_string(70780) % size_rar, config.get_localized_string(70781)):
-            __settings__ = xbmcaddon.Addon(
-                id="plugin.video.%s" % torrent_options[selection][0].capitalize())
-            __settings__.openSettings()  # Se visulizan los Ajustes de Elementum
-            elementum_dl = xbmcaddon.Addon(
-                id="plugin.video.%s" % torrent_options[selection][0].capitalize()) \
-                .getSetting('download_storage')
-            if elementum_dl != '1':
-                config.set_setting("elementum_dl", "1", server="torrent")  # Salvamos el cambio para restaurarlo luego
-        return  # Se sale, porque habrá refresco y cancelaría Kodi si no
-
-    # Descarga de torrents a local
     if selection >= 0:
 
-        #### Compatibilidad con Kodi 18: evita cuelgues/cancelaciones cuando el .torrent se lanza desde pantalla convencional
-        # if xbmc.getCondVisibility('Window.IsMedia'):
-        xbmcplugin.setResolvedUrl(int(sys.argv[1]), False, xlistitem)  # Preparamos el entorno para evitar error Kod1 18
-        time.sleep(0.5)  # Dejamos tiempo para que se ejecute
-
-        # Nuevo método de descarga previa del .torrent.  Si da error, miramos si hay alternatica local.
-        # Si ya es local, lo usamos
-        url = ''
-        url_stat = False
-        torrents_path = ''
-        referer = None
-        post = None
-        rar = False
-        size = ''
-        password = ''
-        if item.password:
-            password = item.password
-
-        videolibrary_path = config.get_videolibrary_path()  # Calculamos el path absoluto a partir de la Videoteca
-        if scrapertools.find_single_match(videolibrary_path, '(^\w+:\/\/)'):  # Si es una conexión REMOTA, usamos userdata local
-            videolibrary_path = config.get_data_path()  # Calculamos el path absoluto a partir de Userdata
-        if not filetools.exists(videolibrary_path):  # Si no existe el path, pasamos al modo clásico
-            videolibrary_path = False
-        else:
-            torrents_path = filetools.join(videolibrary_path, 'temp_torrents', 'client_torrent.torrent')  # path descarga temporal
-        if not videolibrary_path or not filetools.exists(filetools.join(videolibrary_path, 'temp_torrents')):  # Si no existe la carpeta temporal, la creamos
-            filetools.mkdir(filetools.join(videolibrary_path, 'temp_torrents'))
-
-        # Si hay headers, se pasar a la petición de descarga del .torrent
-        headers = {}
-        if item.headers:
-            headers = item.headers
-
-        # identificamos si es una url o un path de archivo
-        if not item.url.startswith("\\") and not item.url.startswith("/") and not url_stat:
-            timeout = 10
-            if item.torrent_alt:
-                timeout = 5
-            # Si es una llamada con POST, lo preparamos
-            if item.referer: referer = item.referer
-            if item.post: post = item.post
-            # Descargamos el .torrent
-            size, url, torrent_f, rar_files = generictools.get_torrent_size(item.url, referer, post, torrents_path=torrents_path, timeout=timeout, lookup=False, headers=headers, short_pad=True)
-            if url:
-                url_stat = True
-                item.url = url
-                if "torrentin" in torrent_options[selection][0]:
-                    item.url = 'file://' + item.url
-
-        if not url and item.torrent_alt:  # Si hay error, se busca un .torrent alternativo
-            if (item.torrent_alt.startswith("\\") or item.torrent_alt.startswith("/")) and videolibrary_path:
-                item.url = item.torrent_alt  # El .torrent alternativo puede estar en una url o en local
-            elif not item.url.startswith("\\") and not item.url.startswith("/"):
-                item.url = item.torrent_alt
-
-        # Si es un archivo .torrent local, actualizamos el path relativo a path absoluto
-        if (item.url.startswith("\\") or item.url.startswith("/")) and not url_stat and videolibrary_path:  # .torrent alternativo local
-            movies = config.get_setting("folder_movies")
-            series = config.get_setting("folder_tvshows")
-            if item.contentType == 'movie':
-                folder = movies  # películas
-            else:
-                folder = series  # o series
-            item.url = filetools.join(config.get_videolibrary_path(), folder, item.url)  # dirección del .torrent local en la Videoteca
-            if filetools.copy(item.url, torrents_path, silent=True):  # se copia a la carpeta generíca para evitar problemas de encode
-                item.url = torrents_path
-            if "torrentin" in torrent_options[selection][0]:  # Si es Torrentin, hay que añadir un prefijo
-                item.url = 'file://' + item.url
-            size, rar_files = generictools.get_torrent_size('', file_list=True, local_torr=torrents_path,short_pad=True)
-
-        mediaurl = item.url
-
-    if selection >= 0:
+        xbmcplugin.setResolvedUrl(int(sys.argv[1]), False, xlistitem)
+        time.sleep(1)
 
         mediaurl = urllib.quote_plus(item.url)
         torr_client = torrent_options[selection][0]
-        torr_setting = xbmcaddon.Addon(id="plugin.video.%s" %torr_client)
 
-        # Llamada con más parámetros para completar el título
         if torr_client in ['quasar', 'elementum'] and item.infoLabels['tmdb_id']:
             if item.contentType == 'episode' and "elementum" not in torr_client:
                 mediaurl += "&episode=%s&library=&season=%s&show=%s&tmdb=%s&type=episode" % (item.infoLabels['episode'], item.infoLabels['season'], item.infoLabels['tmdb_id'], item.infoLabels['tmdb_id'])
@@ -1498,56 +1371,11 @@ def play_torrent(item, xlistitem, mediaurl):
                 mediaurl += "&library=&tmdb=%s&type=movie" % (item.infoLabels['tmdb_id'])
 
         if torr_client in ['quasar', 'elementum'] and item.downloadFilename:
-            torrent.elementum_monitor(item, torr_client)
+            torrent.elementum_download(item)
         else:
             xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
 
-        # Si es un archivo RAR, monitorizamos el cliente Torrent hasta que haya descargado el archivo,
-        # y después lo extraemos, incluso con RAR's anidados y con contraseña
-        if 'RAR-' in size and torr_client in ['quasar', 'elementum'] and UNRAR:
-            rar_file, save_path_videos, folder_torr = torrent.wait_for_download(item, mediaurl, rar_files, torr_client)  # Esperamos mientras se descarga el RAR
-            if rar_file and save_path_videos:  # Si se ha descargado el RAR...
-                dp = dialog_progress_bg('KoD %s' % torr_client)
-                video_file, rar, video_path, erase_file_path = torrent.extract_files(rar_file, save_path_videos, password, dp, item, torr_client)  # ... extraemos el vídeo del RAR
-                dp.close()
-
-                # Reproducimos el vídeo extraido, si no hay nada en reproducción
-                while is_playing() and rar and not xbmc.abortRequested:
-                    time.sleep(3)  # Repetimos cada intervalo
-                if rar and not xbmc.abortRequested:
-                    time.sleep(1)
-                    video_play = filetools.join(video_path, video_file)
-                    log("##### video_play: %s" % video_play)
-                    playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-                    playlist.clear()
-                    playlist.add(video_play, xlistitem)
-                    xbmc_player.play(playlist)
-
-        # selectionamos que clientes torrent soportamos para el marcado de vídeos vistos: asumimos que todos funcionan
         torrent.mark_auto_as_watched(item)
-
-        # Si se ha extraido un RAR, se pregunta para borrar los archivos después de reproducir el vídeo (plugins externos)
-        while is_playing() and rar and not xbmc.abortRequested:
-            time.sleep(3)  # Repetimos cada intervalo
-        if rar and not xbmc.abortRequested:
-            if dialog_yesno('KoD %s' % torr_client, config.get_localized_string(30031)):
-                log("##### erase_file_path: %s" % erase_file_path)
-                try:
-                    torr_data, deamon_url, index = torrent.get_tclient_data(folder_torr, torr_client)
-                    if torr_data and deamon_url:
-                        data = httptools.downloadpage('%sdelete/%s' % (deamon_url, index), timeout=5, alfa_s=True).data
-                    time.sleep(1)
-                    if filetools.isdir(erase_file_path):
-                        filetools.rmdirtree(erase_file_path)
-                    elif filetools.exists(erase_file_path) and filetools.isfile(erase_file_path):
-                        filetools.remove(erase_file_path)
-                except:
-                    logger.error(traceback.format_exc(1))
-        elementum_dl = config.get_setting("elementum_dl", server="torrent", default='')  # Si salvamos el cambio de Elementum
-        if elementum_dl:
-            config.set_setting("elementum_dl", "", server="torrent")  # lo reseteamos en Alfa
-            xbmcaddon.Addon(id="plugin.video.%s" % torrent_options[selection][0].replace('Plugin externo: ', '')) \
-                .setSetting('download_storage', elementum_dl)  # y lo reseteamos en Elementum
 
 
 def log(texto):

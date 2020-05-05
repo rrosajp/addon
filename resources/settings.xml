@@ -106,9 +106,7 @@
         <setting id="download_adv" type="action" label="30030" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.kod/?ew0KCSJhY3Rpb24iOiJjaGFubmVsX2NvbmZpZyIsDQoJImNvbmZpZyI6ImRvd25sb2FkcyIsDQogICAgImNoYW5uZWwiOiJzZXR0aW5nIg0KfQ==)"/>
 
         <setting id="elementumtype" type="text" label="Elementum Download Type" visible="false"/>
-        <setting id="quasartype" type="text" label="Quasar Download Type" visible="false"/>
         <setting id="elementumdl" type="folder" label="Elementum Download Backup" visible="false"/>
-        <setting id="quasardl" type="folder" label="Quasar Download Backup" visible="false"/>
     </category>
 
     <!-- News -->
