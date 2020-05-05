@@ -397,6 +397,8 @@ if __name__ == "__main__":
     custom_code.init()
     from threading import Thread
     Thread(target=viewmodeMonitor).start()
+    from servers import torrent
+    Thread(target=torrent.elementum_monitor).start()
 
     if not config.get_setting("update", "videolibrary") == 2:
         check_for_update(overwrite=False)

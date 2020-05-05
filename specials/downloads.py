@@ -22,6 +22,7 @@ from core.downloader import Downloader
 from core.item import Item
 from platformcode import config, logger
 from platformcode import platformtools
+from core.support import log, dbg, typo
 
 kb = '0xFF65B3DA'
 kg = '0xFF65DAA8'
@@ -920,6 +921,7 @@ def get_episodes(item):
 def write_json(item):
     logger.info()
 
+    channel = item.channel
     item.action = "menu"
     item.channel = "downloads"
     item.downloadStatus = STATUS_CODES.stoped
@@ -933,7 +935,14 @@ def write_json(item):
         if name in item.__dict__:
             item.__dict__.pop(name)
 
-    path = filetools.join(DOWNLOAD_LIST_PATH, str(time.time()) + ".json")
+    naming =  item.fulltitle + typo(item.infoLabels['IMDBNumber'], '_ []') + typo(channel, '_ []')
+    naming += typo(item.contentLanguage, '_ []') if item.contentLanguage else ''
+    naming += typo(item.quality, '_ []') if item.quality else ''
+
+    path = filetools.join(DOWNLOAD_LIST_PATH, naming + ".json")
+    if filetools.isfile(path):
+        filetools.remove(path)
+
     item.path = path
     filetools.write(path, item.tojson())
     time.sleep(0.1)
@@ -1039,6 +1048,7 @@ def save_download_movie(item):
     progreso.update(0, config.get_localized_string(60062))
 
     item.downloadFilename = filetools.validate_path("%s [%s]" % (item.contentTitle.strip(), item.infoLabels['IMDBNumber']))
+    item.backupFilename = filetools.validate_path("%s [%s]" % (item.contentTitle.strip(), item.infoLabels['IMDBNumber']))
 
     write_json(item)
 
@@ -1059,8 +1069,7 @@ def save_download_movie(item):
 
 
 def save_download_tvshow(item):
-    logger.info("contentAction: %s | contentChannel: %s | contentType: %s | contentSerieName: %s" % (
-        item.contentAction, item.contentChannel, item.contentType, item.contentSerieName))
+    logger.info("contentAction: %s | contentChannel: %s | contentType: %s | contentSerieName: %s" % (item.contentAction, item.contentChannel, item.contentType, item.contentSerieName))
 
     progreso = platformtools.dialog_progress_bg(config.get_localized_string(30101), config.get_localized_string(70188))
     try:
@@ -1088,9 +1097,8 @@ def save_download_tvshow(item):
         progreso.close()
 
     if not platformtools.dialog_yesno(config.get_localized_string(30101), config.get_localized_string(70189)):
-        platformtools.dialog_ok(config.get_localized_string(30101),
-                                str(len(episodes)) + config.get_localized_string(30110) + item.contentSerieName,
-                                config.get_localized_string(30109))
+        platformtools.dialog_ok(config.get_localized_string(30101), str(len(episodes)) + config.get_localized_string(30110) + item.contentSerieName, config.get_localized_string(30109))
+
     else:
         if len(episodes) == 1:
             play_item = select_server(episodes[0])

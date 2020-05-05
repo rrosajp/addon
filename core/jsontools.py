@@ -44,6 +44,7 @@ def load(*args, **kwargs):
     except:
         logger.error("**NOT** able to load the JSON")
         logger.error(traceback.format_exc())
+        logger.error('ERROR STACK ' + str(stack()[1][3]))
         value = {}
 
     return value
@@ -184,7 +185,7 @@ def update_node(dict_node, name_file, node, path=None):
         # es un dict
         if dict_data:
             if node in dict_data:
-                logger.debug("   the key exists %s" % node)
+                # logger.debug("   the key exists %s" % node)
                 dict_data[node] = dict_node
             else:
                 logger.debug("   The key does NOT exist %s" % node)
