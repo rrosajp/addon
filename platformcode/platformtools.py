@@ -198,9 +198,9 @@ def render_items(itemlist, parent_item):
 
         # if cloudflare, cookies are needed to display images taken from site
         # before checking domain (time consuming), checking if tmdb failed (so, images scraped from website are used)
-        if item.action in ['findvideos'] and not item.infoLabels['tmdb_id'] and item.channel in httptools.channelsCF:
-            item.thumbnail = httptools.get_url_headers(item.thumbnail)
-            item.fanart = httptools.get_url_headers(item.fanart)
+        # if item.action in ['findvideos'] and not item.infoLabels['tmdb_id'] and item.channel in httptools.channelsCF:
+        #     item.thumbnail = httptools.get_url_headers(item.thumbnail)
+        #     item.fanart = httptools.get_url_headers(item.fanart)
 
         icon_image = "DefaultFolder.png" if item.folder else "DefaultVideo.png"
         listitem = xbmcgui.ListItem(item.title)
