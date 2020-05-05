@@ -196,11 +196,15 @@ def render_items(itemlist, parent_item):
         if item.action == 'play' and thumb_type == 1 and not item.forcethumb:
             item.thumbnail = "https://github.com/kodiondemand/media/raw/master/resources/servers/" + item.server.lower() + '.png'
 
-        # if cloudflare, cookies are needed to display images taken from site
+        # if cloudflare and cloudscraper is used, cookies are needed to display images taken from site
         # before checking domain (time consuming), checking if tmdb failed (so, images scraped from website are used)
-        # if item.action in ['findvideos'] and not item.infoLabels['tmdb_id'] and item.channel in httptools.channelsCF:
-        #     item.thumbnail = httptools.get_url_headers(item.thumbnail)
-        #     item.fanart = httptools.get_url_headers(item.fanart)
+        if item.action in ['findvideos'] and not item.infoLabels['tmdb_id']:
+            # faster but ugly way of checking
+            for d in httptools.FORCE_CLOUDSCRAPER_LIST:
+                if d + '/' in item.url:
+                    item.thumbnail = httptools.get_url_headers(item.thumbnail)
+                    item.fanart = httptools.get_url_headers(item.fanart)
+                    break
 
         icon_image = "DefaultFolder.png" if item.folder else "DefaultVideo.png"
         listitem = xbmcgui.ListItem(item.title)
