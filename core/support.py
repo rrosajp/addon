@@ -140,17 +140,6 @@ def regexDbg(item, patron, headers, data=''):
         webbrowser.open(url + "/r/" + permaLink)
 
 
-def scrape2(item, patron = '', listGroups = [], headers="", blacklist="", data="", patronBlock="",
-           patronNext="", action="findvideos", addVideolibrary = True, typeContentDict={}, typeActionDict={}):
-    m = re.search(r'(?<!\\|\[)\((?!\?)', patron)
-    n = 0
-    while m:
-        patron = patron[:m.end()] + '?P<' + listGroups[n] + '>' + patron[m.end():]
-        m = re.search(r'(?<!\\|\[)\((?!\?)', patron)
-        n += 1
-    regexDbg(item, patron, headers)
-
-
 def scrapeLang(scraped, lang, longtitle):
     ##    Aggiunto/modificato per gestire i siti che hanno i video
     ##    in ita e subita delle serie tv nella stessa pagina
@@ -485,7 +474,7 @@ def scrape(func):
                          page=pag + 1,
                          thumbnail=thumb()))
 
-        if action != 'play' and function != 'episodios' and 'patronMenu' not in args:
+        if action != 'play' and function != 'episodios' and 'patronMenu' not in args and item.contentType in ['movie', 'tvshow', 'episode']:
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
         from specials import autorenumber
@@ -958,11 +947,13 @@ def download(itemlist, item, typography='', function_level=1, function=''):
         elif item.contentType == 'episode':
             from_action = 'findvideos'
             title = typo(config.get_localized_string(60356), typography) + ' - ' + item.title
-        else:
+        elif item.contentType == 'tvshow':
             from_action = 'episodios'
             title = typo(config.get_localized_string(60355), typography)
+        else:  # content type does not support download
+            return itemlist
 
-        function = function if function else inspect.stack()[function_level][3]
+        # function = function if function else inspect.stack()[function_level][3]
 
         contentSerieName=item.contentSerieName if item.contentSerieName else ''
         contentTitle=item.contentTitle if item.contentTitle else ''

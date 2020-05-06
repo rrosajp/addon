@@ -410,7 +410,7 @@ def downloadpage(url, **opt):
     response['data'] = req.content if req.content else ''
     if CF:
         import re
-        response['data'] = re.sub('"/save/[^"]*(https?://[^"]+)', '"\\1', response['data'])
+        response['data'] = re.sub('["|\']/save/[^"]*(https?://[^"]+)', '"\\1', response['data'])
     response['url'] = req.url
 
     if type(response['data']) != str:
