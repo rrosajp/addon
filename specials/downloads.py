@@ -386,7 +386,7 @@ def move_to_libray(item):
         filetools.remove(library_path)
 
     if filetools.isfile(download_path):
-        if filetools.move(download_path, library_path):
+        if filetools.move(download_path, library_path, silent=True):
             final_path = library_path
 
         if len(filetools.listdir(filetools.dirname(download_path))) == 0:

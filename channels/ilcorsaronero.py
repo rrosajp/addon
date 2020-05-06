@@ -36,9 +36,10 @@ def mainlist(item):
         ('Cerca Musica.. submenu', ['/torrent-ita/2/', 'search', ['search', 'music', False]]),
         ('Audiolibri {musica}', ['/categoria.php?active=0&category=18&order=data&by=DESC&page=', 'peliculas', [0, 'music', False]]),
         ('Cerca Audiolibri.. submenu', ['/torrent-ita/18/', 'search', ['search', 'music', False]]),
-        ('Altro {film}', ['/categoria.php?active=0&category=4&order=data&by=DESC&page=', 'peliculas', [0, 'movie', False]]),
-        ('Cerca altro.. submenu', ['/torrent-ita/4/', 'search', ['search', 'movie', False]]),
-        ('Cerca Tutto... color kod bold', ['/argh.php?search=', 'search', ['search', 'all', False]])
+        # mostrerebbe anche risultati non "multimediali" e allungherebbero inutilmente la ricerca globale
+        # ('Altro {film}', ['/categoria.php?active=0&category=4&order=data&by=DESC&page=', 'peliculas', [0, 'other', False]]),
+        # ('Cerca altro.. submenu', ['/torrent-ita/4/', 'search', ['search', 'other', False]]),
+        # ('Cerca Tutto... color kod bold', ['/argh.php?search=', 'search', ['search', 'all', False]])
     ]
 
     return locals()
@@ -47,7 +48,7 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     sceneTitle = item.args[2]
-    if item.args[1] in ['tvshow', 'anime', 'music']:
+    if item.args[1] in ['tvshow', 'anime', 'music', 'other']:
         patron = r'>[^"<]+'
     else:
         patron = r'>(?P<quality>[^"<]+)'

@@ -25,6 +25,7 @@ def mainlist(item):
     patron = r'<a href="(?P<url>[^"]+)"(?: class="")?>(?P<title>[^<]+)<'
     def itemHook(item):
         item.thumbnail = support.thumb(thumb='music.png')
+        item.contentType = 'music'
         return item
     def itemlistHook(itemlist):
         itemlist.pop(0)
@@ -32,7 +33,8 @@ def mainlist(item):
             support.Item(
                 channel=item.channel,
                 title=support.typo('Cerca...', 'bold color kod'),
-                url = item.url,
+                contentType='music',
+                url=item.url,
                 action='search',
                 thumbnail=support.thumb(thumb='search.png')))
         return itemlist
@@ -43,6 +45,7 @@ def peliculas(item):
     action = 'findvideos'
     patron= r'<img src="[^"]+" alt="(?P<title>[^"]+)" data-echo="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+><a href="(?P<url>[^"]+)"'
     patronNext = r'<a href="([^"]+)">&raquo'
+    typeContentDict = {'': 'music'}
     return locals()
 
 
