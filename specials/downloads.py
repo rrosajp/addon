@@ -928,6 +928,7 @@ def write_json(item):
     item.downloadProgress = 0
     item.downloadSize = 0
     item.downloadCompleted = 0
+    title = re.sub(r'(?:\[[^\]]+\]|%s[^-]+-\s*)' %config.get_localized_string(60356), '', item.title).strip()
     if not item.contentThumbnail:
         item.contentThumbnail = item.thumbnail
 
@@ -935,7 +936,10 @@ def write_json(item):
         if name in item.__dict__:
             item.__dict__.pop(name)
 
-    naming =  item.fulltitle + typo(item.infoLabels['IMDBNumber'], '_ []') + typo(channel, '_ []')
+    if item.contentType == 'episode':
+        naming = title + typo(item.infoLabels['IMDBNumber'], '_ []') + typo(channel, '_ []')
+    else:
+        naming =  item.fulltitle + typo(item.infoLabels['IMDBNumber'], '_ []') + typo(channel, '_ []')
     naming += typo(item.contentLanguage, '_ []') if item.contentLanguage else ''
     naming += typo(item.quality, '_ []') if item.quality else ''
 

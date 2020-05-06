@@ -1342,6 +1342,7 @@ def torrent_client_installed(show_tuple=False):
 
 def play_torrent(item, xlistitem, mediaurl):
     logger.info()
+    # from core.support import dbg;dbg()
     import time
     from servers import torrent
 
@@ -1369,9 +1370,13 @@ def play_torrent(item, xlistitem, mediaurl):
         if torr_client in ['quasar', 'elementum'] and item.downloadFilename:
             torrent.elementum_download(item)
         else:
+            time.sleep(3)
             xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
 
-        torrent.mark_auto_as_watched(item)
+            torrent.mark_auto_as_watched(item)
+
+            while is_playing() and not xbmc.abortRequested:
+                time.sleep(3)
 
 
 def log(texto):

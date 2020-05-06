@@ -223,7 +223,7 @@ def show_infobox(info_dict):
 
 
 def downloadpage(url, **opt):
-    logger.info()
+    # logger.info()
     """
        Open a url and return the data obtained
 
