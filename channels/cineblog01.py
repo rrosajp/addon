@@ -220,7 +220,7 @@ def findvideos(item):
 
     itemlist = support.server(item, itemlist=itemlist)
     # Extract the quality format
-    patronvideos = '>([^<]+)</strong></div>'
+    patronvideos = '([\w.]+)</strong></div></td>'
     support.addQualityTag(item, itemlist, data, patronvideos)
 
     return itemlist
