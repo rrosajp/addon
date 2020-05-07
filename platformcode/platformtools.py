@@ -20,7 +20,7 @@ if PY3:
 else:
     import urllib
 
-import os, xbmc, xbmcgui, xbmcplugin, xbmcaddon
+import os, xbmc, xbmcgui, xbmcplugin
 
 from channelselector import get_thumb
 from core import channeltools
@@ -28,7 +28,7 @@ from core import trakt_tools, scrapertools
 from core.item import Item
 from platformcode import logger, config, unify
 
-addon = xbmcaddon.Addon('plugin.video.kod')
+addon = config.__settings__
 addon_icon = os.path.join( addon.getAddonInfo( "path" ), "logo.png" )
 
 class XBMCPlayer(xbmc.Player):
