@@ -2,14 +2,12 @@
 
 import glob
 import os
-import sys
 
 from core import channeltools
 from core.item import Item
 from platformcode.unify import thumb_dict
 from platformcode import config, logger, unify
-import xbmcaddon
-addon = xbmcaddon.Addon('plugin.video.kod')
+addon = config.__settings__
 downloadenabled = addon.getSetting('downloadenabled')
 
 def getmainlist(view="thumb_"):
