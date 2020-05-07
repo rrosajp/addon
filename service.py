@@ -393,8 +393,8 @@ if __name__ == "__main__":
             exit(0)
 
     # Copia Custom code a las carpetas de Alfa desde la zona de Userdata
-    from platformcode import custom_code
-    custom_code.init()
+    # from platformcode import custom_code
+    # custom_code.init()
     from threading import Thread
     Thread(target=viewmodeMonitor).start()
     from servers import torrent

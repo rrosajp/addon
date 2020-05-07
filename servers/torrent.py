@@ -23,14 +23,19 @@ from platformcode import config, platformtools
 from threading import Thread, currentThread
 from torrentool.api import Torrent
 from lib.guessit import guessit
-
-elementum_setting = xbmcaddon.Addon(id='plugin.video.elementum')
-elementum_host = 'http://127.0.0.1:' + elementum_setting.getSetting('remote_port') + '/torrents/'
+try:
+    elementum_setting = xbmcaddon.Addon(id='plugin.video.elementum')
+    elementum_host = 'http://127.0.0.1:' + elementum_setting.getSetting('remote_port') + '/torrents/'
+    TorrentPath = xbmc.translatePath(elementum_setting.getSetting('torrents_path'))
+except:
+    pass
 extensions_list = ['.aaf', '.3gp', '.asf', '.avi', '.flv', '.mpeg', '.m1v', '.m2v', '.m4v', '.mkv', '.mov', '.mpg', '.mpe', '.mp4', '.ogg', '.wmv']
+
 
 
 # Returns an array of possible video url's from the page_url
 def get_video_url(page_url, premium=False, user='', password='', video_password=''):
+ 
     torrent_options = platformtools.torrent_client_installed(show_tuple=True)
     if len(torrent_options) == 0:
         from specials import elementum_download
@@ -71,33 +76,38 @@ def mark_auto_as_watched(item):
 elementumHost = 'http://127.0.0.1:65220/torrents/'
 
 def elementum_download(item):
-    sleep = False
-    if elementum_setting.getSetting('logger_silent') == False:
-        elementum_setting.setSetting('logger_silent', 'true') 
-        sleep = True
-    if elementum_setting.getSetting('download_storage') != 0:
-        config.set_setting('elementumtype', elementum_setting.getSetting('download_storage'))    # Backup Setting
-        elementum_setting.setSetting('download_storage', '0')                                    # Set Setting
-        sleep = True
-    if elementum_setting.getSetting('download_path') != config.get_setting('downloadpath'):
-        elementum_setting.setSetting('download_path', config.get_setting('downloadpath'))        # Backup Setting
-        config.set_setting('elementumdl', elementum_setting.getSetting('download_path'))         # Set Setting
-        sleep = True
-    if sleep: time.sleep(3)
+    elementum = False
+    while not elementum:
+        try:
+            sleep = False
+            if elementum_setting.getSetting('logger_silent') == False:
+                elementum_setting.setSetting('logger_silent', 'true') 
+                sleep = True
+            if elementum_setting.getSetting('download_storage') != 0:
+                config.set_setting('elementumtype', elementum_setting.getSetting('download_storage'))    # Backup Setting
+                elementum_setting.setSetting('download_storage', '0')                                    # Set Setting
+                sleep = True
+            if elementum_setting.getSetting('download_path') != config.get_setting('downloadpath'):
+                elementum_setting.setSetting('download_path', config.get_setting('downloadpath'))        # Backup Setting
+                config.set_setting('elementumdl', elementum_setting.getSetting('download_path'))         # Set Setting
+                sleep = True
+            if sleep: time.sleep(3)
+            elementum = True
+            path = filetools.join(config.get_data_path(),'elementum_torrent.txt')
+            url = urllib.quote_plus(item.url)
+            filetools.write(path, url)
+        except:
+            pass
 
-    path = filetools.join(config.get_data_path(),'elementum_torrent.txt')
-    url = urllib.quote_plus(item.url)
-    filetools.write(path, url)
 
+# def stop_elementum_monitor():
+#     config.set_setting('stop_elementum_monitor', True)
+#     time.sleep(2)
 
-def stop_elementum_monitor():
-    config.set_setting('stop_elementum_monitor', True)
-    time.sleep(2)
-
-def start_elementum_monitor():
-    config.set_setting('stop_elementum_monitor', False)
-    time.sleep(3)
-    Thread(target=elementum_monitor).start()
+# def start_elementum_monitor():
+#     config.set_setting('stop_elementum_monitor', False)
+#     time.sleep(3)
+#     Thread(target=elementum_monitor).start()
 
 
 
@@ -106,37 +116,46 @@ def elementum_monitor():
     path = filetools.join(config.get_data_path(),'elementum_torrent.txt')
     partials = []
     while True:
-        if filetools.isfile(path):
-            log('Add Torrent')
-            url = filetools.read(path)
-            TorrentName = match(url, patron=r'btih(?::|%3A)([^&%]+)', string=True).match
-            uri = elementum_host  + 'add'
-            post = 'uri=%s&file=null&all=1' % url
-            match(uri, post=post, timeout=5, alfa_s=True, ignore_response_code=True)
-            filetools.remove(path)
-            while not filetools.isfile(filetools.join(elementum_setting.getSetting('torrents_path'), TorrentName + '.torrent')):
+        try:
+            if filetools.isfile(path):
+                log('Add Torrent')
+                url = filetools.read(path)
+                if url.startswith('/'):
+                    requests.get(elementum_host + url)
+                    wait = False
+                else:
+                    TorrentName = match(url, patron=r'btih(?::|%3A)([^&%]+)', string=True).match
+                    uri = elementum_host  + 'add'
+                    post = 'uri=%s&file=null&all=1' % url
+                    match(uri, post=post, timeout=5, alfa_s=True, ignore_response_code=True)
+                    wait = True
+                filetools.remove(path)
+                if wait:
+                    while not filetools.isfile(filetools.join(elementum_setting.getSetting('torrents_path'), TorrentName + '.torrent')):
+                        time.sleep(1)
+            else:
+                log('Watch')
+                try:
+                    data = requests.get(elementum_host).json()
+                except:
+                    data = ''
+                if data:
+                    json = data['items']
+
+                    for it in json:
+                        Partial = float(match(it['label'], patron=r'(\d+\.\d+)%').match)
+                        Title = it['info']['title']
+                        TorrentName = match(it['path'], patron=r'resume=([^&]+)').match
+                        File, Json = find_file(TorrentName)
+                        update_download_info(Partial, Title, TorrentName, File, Json)
+                        partials.append(Partial)
+
+                partials.sort()
+                if len(partials) > 0 and partials[0] == 100:
+                    unset_elementum()
+
                 time.sleep(1)
-        else:
-            log('Watch')
-            try:
-                data = requests.get(elementum_host).json()
-            except:
-                data = ''
-            if data:
-                json = data['items']
-
-                for it in json:
-                    Partial = float(match(it['label'], patron=r'(\d+\.\d+)%').match)
-                    Title = it['info']['title']
-                    TorrentName = match(it['path'], patron=r'resume=([^&]+)').match
-                    File, Json = find_file(TorrentName)
-                    update_download_info(Partial, Title, TorrentName, File, Json)
-                    partials.append(Partial)
-
-            partials.sort()
-            if len(partials) > 0 and partials[0] == 100:
-                unset_elementum()
-
+        except:
             time.sleep(1)
 
 
@@ -155,9 +174,11 @@ def find_file(File):
 def update_download_info(Partial, Title, TorrentName, File, Json):
     path = xbmc.translatePath(config.get_setting('downloadlistpath'))
     dlpath = filetools.join(config.get_setting('downloadpath'), Title)
-    tpath = filetools.join(xbmc.translatePath(elementum_setting.getSetting('torrents_path')), TorrentName)
+
+    if 'TorrentName' not in Json:
+        jsontools.update_node(TorrentName, File, 'TorrentName', path, silent=True)
     if Json['downloadSize'] == 0:
-        size = Torrent.from_file(tpath + '.torrent').total_size
+        size = Torrent.from_file(filetools.join(TorrentPath, TorrentName + '.torrent')).total_size
         jsontools.update_node(size, File, 'downloadSize', path, silent=True)
     if Json['downloadFilename'] != dlpath and 'backupFilename' not in Json:
         jsontools.update_node(Json['downloadFilename'], File, 'backupFilename', path, silent=True)
@@ -169,14 +190,17 @@ def update_download_info(Partial, Title, TorrentName, File, Json):
             jsontools.update_node(Json['downloadSize'], File, 'downloadCompleted', path, silent=True)
             jsontools.update_node(2, File, 'downloadStatus', path, silent=True)
             requests.get(elementum_host + 'pause/' + TorrentName)
-            filetools.remove(tpath + '.torrent')
+            del_torrent(TorrentName)
             time.sleep(1)
             rename(TorrentName, path)
             # requests.get(elementum_host + 'delete/' + TorrentName + '?files=false')
 
+def del_torrent(TorrentName):
+    filetools.remove(filetools.join(TorrentPath, TorrentName + '.torrent'))
 
 
 def rename(TorrentName, Path):
+    # dbg()
     File, Json = find_file(TorrentName)
     path = Json['downloadFilename']
     if Json['infoLabels']['mediatype'] == 'movie':
@@ -191,7 +215,7 @@ def rename(TorrentName, Path):
                 if ext in extensions_list: extension = ext
                 filetools.rename(filetools.join(path, f), f.replace(oldName, newName))
             filetools.rename(path, newName)
-            jsontools.update_node(filetools.join(newName,newName + extension), File, 'downloadFilename', Path)
+            jsontools.update_node(filetools.join(newName, newName + extension), File, 'downloadFilename', Path)
 
         else:
             oldName = filetools.split(path)[-1]
@@ -227,9 +251,9 @@ def rename(TorrentName, Path):
             if not filetools.isdir(NewFolder):
                 filetools.mkdir(NewFolder)
             from_folder = filetools.join(config.get_setting('downloadpath'), filename)
-            to_folder = filetools.join(FolderName, title)
+            to_folder = filetools.join(config.get_setting('downloadpath'), FolderName, title)
             filetools.move(from_folder, to_folder)
-            jsontools.update_node(filetools.join(config.get_setting('downloadpath'),to_folder), File, 'downloadFilename', Path)
+            jsontools.update_node(filetools.join(FolderName, title), File, 'downloadFilename', Path)
 
 def process_filename(filename, Title, ext=True):
     extension = os.path.splitext(filename)[-1]

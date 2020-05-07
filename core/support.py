@@ -262,33 +262,36 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         longtitle = title + (s if title and title2 else '') + title2 + '\n'
 
         if sceneTitle:
-            parsedTitle = guessit(title)
-            title = longtitle = parsedTitle.get('title', '')
-            log('TITOLO',title)
-            if parsedTitle.get('source'):
-                quality = str(parsedTitle.get('source'))
-                if parsedTitle.get('screen_size'):
-                    quality += ' ' + str(parsedTitle.get('screen_size', ''))
-            if not scraped['year']:
-                infolabels['year'] = parsedTitle.get('year', '')
-            if parsedTitle.get('episode') and parsedTitle.get('season'):
-                longtitle = title + s
+            try:
+                parsedTitle = guessit(title)
+                title = longtitle = parsedTitle.get('title', '')
+                log('TITOLO',title)
+                if parsedTitle.get('source'):
+                    quality = str(parsedTitle.get('source'))
+                    if parsedTitle.get('screen_size'):
+                        quality += ' ' + str(parsedTitle.get('screen_size', ''))
+                if not scraped['year']:
+                    infolabels['year'] = parsedTitle.get('year', '')
+                if parsedTitle.get('episode') and parsedTitle.get('season'):
+                    longtitle = title + s
 
-                if type(parsedTitle.get('season')) == list:
-                    longtitle += str(parsedTitle.get('season')[0]) + '-' + str(parsedTitle.get('season')[-1])
-                else:
-                    longtitle += str(parsedTitle.get('season'))
+                    if type(parsedTitle.get('season')) == list:
+                        longtitle += str(parsedTitle.get('season')[0]) + '-' + str(parsedTitle.get('season')[-1])
+                    else:
+                        longtitle += str(parsedTitle.get('season'))
 
-                if type(parsedTitle.get('episode')) == list:
-                     longtitle += 'x' + str(parsedTitle.get('episode')[0]).zfill(2) + '-' + str(parsedTitle.get('episode')[-1]).zfill(2)
-                else:
-                    longtitle += 'x' + str(parsedTitle.get('episode')).zfill(2)
-            elif parsedTitle.get('season') and type(parsedTitle.get('season')) == list:
-                longtitle += s + config.get_localized_string(30140) + " " +str(parsedTitle.get('season')[0]) + '-' + str(parsedTitle.get('season')[-1])
-            elif parsedTitle.get('season'):
-                longtitle += s + config.get_localized_string(60027) % str(parsedTitle.get('season'))
-            if parsedTitle.get('episode_title'):
-                longtitle += s + parsedTitle.get('episode_title')
+                    if type(parsedTitle.get('episode')) == list:
+                        longtitle += 'x' + str(parsedTitle.get('episode')[0]).zfill(2) + '-' + str(parsedTitle.get('episode')[-1]).zfill(2)
+                    else:
+                        longtitle += 'x' + str(parsedTitle.get('episode')).zfill(2)
+                elif parsedTitle.get('season') and type(parsedTitle.get('season')) == list:
+                    longtitle += s + config.get_localized_string(30140) + " " +str(parsedTitle.get('season')[0]) + '-' + str(parsedTitle.get('season')[-1])
+                elif parsedTitle.get('season'):
+                    longtitle += s + config.get_localized_string(60027) % str(parsedTitle.get('season'))
+                if parsedTitle.get('episode_title'):
+                    longtitle += s + parsedTitle.get('episode_title')
+            except:
+                log('Error')
 
         longtitle = typo(longtitle, 'bold')
         lang1, longtitle = scrapeLang(scraped, lang, longtitle)

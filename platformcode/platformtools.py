@@ -1351,8 +1351,11 @@ def play_torrent(item, xlistitem, mediaurl):
     from servers import torrent
 
     torrent_options = torrent_client_installed(show_tuple=True)
-
-    if len(torrent_options) > 1:
+    if len(torrent_options) == 0:
+        from specials import elementum_download
+        elementum_download.download()
+        return play_torrent(item, xlistitem, mediaurl)
+    elif len(torrent_options) > 1:
         selection = dialog_select(config.get_localized_string(70193), [opcion[0] for opcion in torrent_options])
     else:
         selection = 0
@@ -1365,13 +1368,13 @@ def play_torrent(item, xlistitem, mediaurl):
         mediaurl = urllib.quote_plus(item.url)
         torr_client = torrent_options[selection][0]
 
-        if torr_client in ['quasar', 'elementum'] and item.infoLabels['tmdb_id']:
+        if torr_client in ['elementum'] and item.infoLabels['tmdb_id']:
             if item.contentType == 'episode' and "elementum" not in torr_client:
                 mediaurl += "&episode=%s&library=&season=%s&show=%s&tmdb=%s&type=episode" % (item.infoLabels['episode'], item.infoLabels['season'], item.infoLabels['tmdb_id'], item.infoLabels['tmdb_id'])
             elif item.contentType == 'movie':
                 mediaurl += "&library=&tmdb=%s&type=movie" % (item.infoLabels['tmdb_id'])
 
-        if torr_client in ['quasar', 'elementum'] and item.downloadFilename:
+        if torr_client in ['elementum'] and item.downloadFilename:
             torrent.elementum_download(item)
         else:
             time.sleep(3)

@@ -144,7 +144,7 @@ msgid "Internal Client"
 msgstr ""
 
 msgctxt "#30034"
-msgid ": Select the video, or 'Cancel' for all"
+msgid "Select the video, or 'Cancel' for all"
 msgstr ""
 
 msgctxt "#30035"

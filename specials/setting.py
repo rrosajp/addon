@@ -468,16 +468,16 @@ def check_quickfixes(item):
         return False
 
 
-def update_quasar(item):
-    logger.info()
+# def update_quasar(item):
+#     logger.info()
 
-    from platformcode import custom_code, platformtools
-    stat = False
-    stat = custom_code.update_external_addon("quasar")
-    if stat:
-        platformtools.dialog_notification("Actualización Quasar", "Realizada con éxito")
-    else:
-        platformtools.dialog_notification("Actualización Quasar", "Ha fallado. Consulte el log")
+#     from platformcode import custom_code, platformtools
+#     stat = False
+#     stat = custom_code.update_external_addon("quasar")
+#     if stat:
+#         platformtools.dialog_notification("Actualización Quasar", "Realizada con éxito")
+#     else:
+#         platformtools.dialog_notification("Actualización Quasar", "Ha fallado. Consulte el log")
 
 
 def conf_tools(item):

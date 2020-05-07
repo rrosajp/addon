@@ -144,8 +144,8 @@ msgid "Internal Client"
 msgstr "Client Interno"
 
 msgctxt "#30034"
-msgid ": Select the video, or 'Cancel' for all"
-msgstr ": Seleziona il video o 'Annulla' per tutti"
+msgid "Select the video, or 'Cancel' for all"
+msgstr "Seleziona il video o 'Annulla' per tutti"
 
 msgctxt "#30035"
 msgid "ERROR in the Client"
