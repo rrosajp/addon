@@ -113,12 +113,12 @@ def start(itemlist, item):
     if item.channel == 'videolibrary':
         autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
         channel_id = item.contentChannel
-    try:
-        active = autoplay_node['status']
-    except:
-        active = is_active(item.channel)
+    # try:
+    #     active = autoplay_node['status']
+    # except:
+    #     active = is_active(item.channel)
 
-    if not channel_id in autoplay_node or not active:
+    if not channel_id in autoplay_node: # or not active:
         return itemlist
 
     # Agrega servidores y calidades que no estaban listados a autoplay_node
@@ -724,19 +724,40 @@ def reset(item, dict):
 
     return
 
-def set_status(status):
-    logger.info()
-    # Obtiene el nodo AUTOPLAY desde el json
-    autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
-    autoplay_node['status'] = status
+# def set_status(status):
+#     logger.info()
+#     # Obtiene el nodo AUTOPLAY desde el json
+#     autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
+#     autoplay_node['status'] = status
+#
+#     result, json_data = jsontools.update_node(autoplay_node, 'autoplay', 'AUTOPLAY')
 
-    result, json_data = jsontools.update_node(autoplay_node, 'autoplay', 'AUTOPLAY')
+# return if item channel has autoplay and hideserver enabled
+def get_channel_AP_HS(item):
+    autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
+    channel_node = autoplay_node.get(item.channel, {})
+    if not channel_node:  # non ha mai aperto il menu del canale quindi in autoplay_data.json non c'e la key
+        try:
+            channelFile = __import__('channels.' + item.channel, fromlist=["channels.%s" % item.channel])
+        except:
+            channelFile = __import__('specials.' + item.channel, fromlist=["specials.%s" % item.channel])
+        if hasattr(channelFile, 'list_servers') and hasattr(channelFile, 'list_quality'):
+            init(item.channel, channelFile.list_servers, channelFile.list_quality)
+
+    autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
+    channel_node = autoplay_node.get(item.channel, {})
+    settings_node = channel_node.get('settings', {})
+    AP = get_setting('autoplay') or (settings_node['active'] if 'active' in settings_node else False)
+    HS = config.get_setting('hide_servers') or (
+        settings_node['hide_servers'] if 'hide_server' in settings_node else False)
+
+    return AP, HS
 
 def play_multi_channel(item, itemlist):
     logger.info()
     global PLAYED
     video_dict = dict()
-    set_status(True)
+    # set_status(True)
 
     for video_item in itemlist:
         if is_active(video_item.contentChannel):
@@ -751,3 +772,6 @@ def play_multi_channel(item, itemlist):
             start(videos, item)
         else:
             break
+
+    AP, HS = get_channel_AP_HS(item)
+    return HS

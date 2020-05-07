@@ -1144,21 +1144,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True, vid
     from platformcode.config import get_setting
 
     CL = get_setting('checklinks') or get_setting('checklinks', item.channel)
-    autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
-    channel_node = autoplay_node.get(item.channel, {})
-    if not channel_node:  # non ha mai aperto il menu del canale quindi in autoplay_data.json non c'e la key
-        try:
-            channelFile = __import__('channels.' + item.channel, fromlist=["channels.%s" % item.channel])
-        except:
-            channelFile = __import__('specials.' + item.channel, fromlist=["specials.%s" % item.channel])
-        if hasattr(channelFile, 'list_servers') and hasattr(channelFile, 'list_quality'):
-            autoplay.init(item.channel, channelFile.list_servers, channelFile.list_quality)
-
-    autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
-    channel_node = autoplay_node.get(item.channel, {})
-    settings_node = channel_node.get('settings', {})
-    AP = get_setting('autoplay') or (settings_node['active'] if 'active' in settings_node else False)
-    HS = config.get_setting('hide_servers') or (settings_node['hide_servers'] if 'hide_server' in settings_node else False)
+    AP, HS = autoplay.get_channel_AP_HS(item)
 
     if CL and not AP:
         if get_setting('checklinks', item.channel):

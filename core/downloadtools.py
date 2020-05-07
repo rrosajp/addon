@@ -621,7 +621,7 @@ def downloadfileGzipped(url, pathfichero):
                         else:
                             tiempofalta = 0
                         logger.info(sec_to_hms(tiempofalta))
-                        progreso.update(percent, "%.2fMB/%.2fMB (%d%%) %.2f Kb/s %s falta " %
+                        progreso.update(percent, "%.2fMB/%.2fMB (%d%%) %.2f Kb/s %s mancanti " %
                                         (descargadosmb, totalmb, percent, old_div(velocidad, 1024), sec_to_hms(tiempofalta)))
                     break
                 except:

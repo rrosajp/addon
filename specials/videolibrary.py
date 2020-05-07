@@ -468,7 +468,7 @@ def findvideos(item):
     item_local = None
 
     # Desactiva autoplay
-    autoplay.set_status(False)
+    # autoplay.set_status(False)
 
     if not item.contentTitle or not item.strm_path:
         logger.debug("Unable to search for videos due to lack of parameters")
@@ -587,7 +587,7 @@ def findvideos(item):
                 list_servers = servertools.filter_servers(list_servers)
             elif item_json.action == 'play':
                 from platformcode import platformtools
-                autoplay.set_status(True)
+                # autoplay.set_status(True)
                 item_json.contentChannel = item_json.channel
                 item_json.channel = "videolibrary"
                 platformtools.play_video(item_json)
@@ -629,7 +629,8 @@ def findvideos(item):
             itemlist.append(server)
 
     # return sorted(itemlist, key=lambda it: it.title.lower())
-    autoplay.play_multi_channel(item, itemlist)
+    if autoplay.play_multi_channel(item, itemlist):  # hideserver
+        return []
     from inspect import stack
     from specials import nextep
     if nextep.check(item) and stack()[1][3] == 'run':
