@@ -28,7 +28,7 @@ msgid "Check for updates"
 msgstr ""
 
 msgctxt "#30002"
-msgid "Touch optmized view"
+msgid "Touch optimized view"
 msgstr ""
 
 msgctxt "#30003"
@@ -108,7 +108,7 @@ msgid "Contextual menu"
 msgstr ""
 
 msgctxt "#30025"
-msgid "Show KoD settings"
+msgid ""
 msgstr ""
 
 msgctxt "#30026"
@@ -477,15 +477,15 @@ msgid "Academy Awards"
 msgstr ""
 
 msgctxt "#30998"
-msgid "Shortcut"
+msgid "Quick menu shortcut"
 msgstr ""
 
 msgctxt "#30999"
-msgid "Assign key to open shortcut"
+msgid "Assign key"
 msgstr ""
 
 msgctxt "#31000"
-msgid "Remove key to open shortcut"
+msgid "Unassign key"
 msgstr ""
 
 msgctxt "#50000"
@@ -709,11 +709,11 @@ msgid "Mark TV show as watched"
 msgstr ""
 
 msgctxt "#60022"
-msgid "Automatically find new episodes: Disable"
+msgid "Remove from video library update"
 msgstr ""
 
 msgctxt "#60023"
-msgid "Automatically find new episodes: Enable"
+msgid "Add to video library update"
 msgstr ""
 
 msgctxt "#60024"
@@ -725,7 +725,7 @@ msgid "Delete TV show"
 msgstr ""
 
 msgctxt "#60026"
-msgid "Search for new episodes and update"
+msgid "KoD settings"
 msgstr ""
 
 msgctxt "#60027"
@@ -789,7 +789,7 @@ msgid "Delete TV show"
 msgstr ""
 
 msgctxt "#60042"
-msgid "Delete links of %s"
+msgid "Delete channel %s"
 msgstr ""
 
 msgctxt "#60043"
@@ -797,7 +797,7 @@ msgid "Delete %s links of channel %s"
 msgstr ""
 
 msgctxt "#60044"
-msgid "Do you want really to delete '%s' from video library?"
+msgid "Do you want really to delete "%s" from video library?"
 msgstr ""
 
 msgctxt "#60045"
@@ -877,7 +877,7 @@ msgid "Added episode to the video library..."
 msgstr ""
 
 msgctxt "#60066"
-msgid "An error has occurred. It has not been possible to add the movie "%s" to the video library"
+msgid "An error has occurred. The movie "%s" has not been added to the video library"
 msgstr ""
 
 msgctxt "#60067"
@@ -889,7 +889,7 @@ msgid "An error has occurred. The TV show "%s" has not been added to the video l
 msgstr ""
 
 msgctxt "#60069"
-msgid "An error has occurred. The TV show "%s" has not been added completely to the video library"
+msgid "An error has occurred. The TV show "%s" has not been completely added to the video library"
 msgstr ""
 
 msgctxt "#60070"
@@ -897,7 +897,7 @@ msgid "The TV show "%s" has been added to the video library"
 msgstr ""
 
 msgctxt "#60071"
-msgid "Autoplay configuration"
+msgid "AutoPlay configuration"
 msgstr ""
 
 msgctxt "#60072"
@@ -1557,7 +1557,7 @@ msgid "Information"
 msgstr ""
 
 msgctxt "#60349"
-msgid "Go to the main menu"
+msgid "Previous menu"
 msgstr ""
 
 msgctxt "#60350"
@@ -1565,7 +1565,7 @@ msgid "Search in other channels"
 msgstr "Search in other channels"
 
 msgctxt "#60351"
-msgid "Set as Homepage"
+msgid "Set as main menu"
 msgstr ""
 
 msgctxt "#60352"
@@ -1681,7 +1681,7 @@ msgid "Summary:"
 msgstr ""
 
 msgctxt "#60389"
-msgid "Updating %s [%s]..."
+msgid "Updating "%s" [%s]..."
 msgstr ""
 
 msgctxt "#60390"
@@ -2293,7 +2293,7 @@ msgid "Download settings"
 msgstr ""
 
 msgctxt "#60542"
-msgid "Video library settings"
+msgid "Configure video library"
 msgstr ""
 
 msgctxt "#60544"
@@ -2385,7 +2385,7 @@ msgid "Restore video library (strm, nfo and json)"
 msgstr ""
 
 msgctxt "#60568"
-msgid "Search for new episodes and update video library"
+msgid "Update video library"
 msgstr ""
 
 msgctxt "#60569"
@@ -2489,7 +2489,7 @@ msgid "    Server #%s"
 msgstr ""
 
 msgctxt "#60598"
-msgid "Configuration of video library"
+msgid "Video library configuration"
 msgstr ""
 
 msgctxt "#60600"
@@ -2509,15 +2509,15 @@ msgid "When Kodi starts"
 msgstr ""
 
 msgctxt "#60604"
-msgid "Once a day"
+msgid "Daily"
 msgstr ""
 
 msgctxt "#60605"
-msgid "At the start of Kodi and once a day"
+msgid "When Kodi starts and daily"
 msgstr ""
 
 msgctxt "#60606"
-msgid "      Wait before updating at startup of Kodi"
+msgid "      Update waiting time"
 msgstr ""
 
 msgctxt "#60607"
@@ -2541,11 +2541,11 @@ msgid "60 sec"
 msgstr ""
 
 msgctxt "#60613"
-msgid "      Begin scheduled update from"
+msgid "      Update time"
 msgstr ""
 
 msgctxt "#60614"
-msgid "      Search for new episodes in active TV shows"
+msgid "      Search for new episodes"
 msgstr ""
 
 msgctxt "#60615"
@@ -2557,15 +2557,15 @@ msgid "Always"
 msgstr ""
 
 msgctxt "#60617"
-msgid "According to new episodes"
+msgid "Based on airing"
 msgstr ""
 
 msgctxt "#60618"
-msgid "      Search for content in"
+msgid "      Kodi video library update"
 msgstr ""
 
 msgctxt "#60619"
-msgid "The folder of each TV show"
+msgid "Each TV show"
 msgstr ""
 
 msgctxt "#60620"
@@ -2573,7 +2573,7 @@ msgid "All video library"
 msgstr ""
 
 msgctxt "#60621"
-msgid "Show links in"
+msgid "Links view"
 msgstr ""
 
 msgctxt "#60622"
@@ -2629,7 +2629,7 @@ msgid "0 seg"
 msgstr ""
 
 msgctxt "#60637"
-msgid "Synchronizing with Trakt"
+msgid "  Synchronizing with Trakt"
 msgstr ""
 
 msgctxt "#60638"
@@ -2673,7 +2673,7 @@ msgid "Never"
 msgstr ""
 
 msgctxt "#60650"
-msgid "Video library information provider"
+msgid "  Video library information providers"
 msgstr ""
 
 msgctxt "#60651"
@@ -3117,15 +3117,15 @@ msgid "Most Viewed"
 msgstr ""
 
 msgctxt "#70078"
-msgid "Show only links of "
+msgid "Show links of "
 msgstr ""
 
 msgctxt "#70079"
-msgid "Delete ony the links of "
+msgid "Delete channel "
 msgstr ""
 
 msgctxt "#70081"
-msgid "The folder also contains local or downloaded video files. Do you want to delete them?"
+msgid "The folder "%s" contains other files. Delete it anyway?"
 msgstr ""
 
 msgctxt "#70082"
@@ -3145,7 +3145,7 @@ msgid "Delete TV show"
 msgstr ""
 
 msgctxt "#70086"
-msgid "Delete only the links of %s"
+msgid "Delete channel %s"
 msgstr ""
 
 msgctxt "#70087"
@@ -3153,7 +3153,7 @@ msgid "Deleted %s links from canal %s"
 msgstr ""
 
 msgctxt "#70088"
-msgid "Are you sure you want to delete '%s' from video library?"
+msgid "Are you sure you want to delete "%s" from video library?"
 msgstr ""
 
 msgctxt "#70089"
@@ -3305,8 +3305,8 @@ msgid "Customization"
 msgstr ""
 
 msgctxt "#70128"
-msgid "Infoplus Animation"
-msgstr "Animazione Infoplus"
+msgid "InfoPlus animation"
+msgstr "Animazione InfoPlus"
 
 msgctxt "#70129"
 msgid "Without animation"
@@ -3397,7 +3397,7 @@ msgid "Contextual menu"
 msgstr ""
 
 msgctxt "#70151"
-msgid "Show Infoplus"
+msgid "Show InfoPlus"
 msgstr ""
 
 msgctxt "#70152"
@@ -3405,7 +3405,7 @@ msgid "Show ExtendedInfo"
 msgstr ""
 
 msgctxt "#70153"
-msgid "Shortcut"
+msgid ""
 msgstr ""
 
 msgctxt "#70154"
@@ -3853,11 +3853,15 @@ msgid "The data entered is not correct!"
 msgstr ""
 
 msgctxt "#70266"
-msgid "The search for% s did not match."
+msgid "The search for %s did not match"
+msgstr ""
+
+msgctxt "#70268"
+msgid "The TV show "%s" is ended or has been canceled. Would you like to remove it from the video library update?"
 msgstr ""
 
 msgctxt "#70269"
-msgid "Search new episodes now"
+msgid "Search new episodes"
 msgstr ""
 
 msgctxt "#70270"
@@ -3929,7 +3933,7 @@ msgid "Configure search"
 msgstr ""
 
 msgctxt "#70287"
-msgid "Configure video library"
+msgid "Video library settings"
 msgstr ""
 
 msgctxt "#70288"
@@ -5905,7 +5909,7 @@ msgstr ""
 
 msgctxt "#70784"
 msgid "Attention!"
-msgstr "Attenzione!"
+msgstr ""
 
 msgctxt "#70785"
 msgid "Install Elementum"
@@ -6290,4 +6294,36 @@ msgstr ""
 
 msgctxt "#80041"
 msgid "Latest updates:\n"
+msgstr ""
+
+msgctxt "#80042"
+msgid "Include local episodes when adding a TV shows"
+msgstr ""
+
+msgctxt "#80043"
+msgid "Attention, in order to watch local episodes you have to configure the Kodi video library from the settings menu inside KoD"
+msgstr ""
+
+msgctxt "#80044"
+msgid "Do you want to include local episodes for the TV show "%s"?"
+msgstr ""
+
+msgctxt "#80045"
+msgid "The folder of the local episodes has to be different from the TV show one in the KoD video library"
+msgstr ""
+
+msgctxt "#80046"
+msgid "Select the folder containing the local episodes"
+msgstr ""
+
+msgctxt "#80047"
+msgid "The TV show "% s" includes local episodes. They will be only removed from the Kodi video library without being deleted"
+msgstr ""
+
+msgctxt "#80048"
+msgid "Add local episodes"
+msgstr ""
+
+msgctxt "#80049"
+msgid "Remove local episodes"
 msgstr ""

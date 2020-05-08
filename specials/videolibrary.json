@@ -5,6 +5,76 @@
   "language": ["*"],
   "settings": [
     {
+      "id": "update",
+      "type": "list",
+      "label": "@60601",
+      "default": 1,
+      "visible": true,
+      "lvalues": [
+        "@60602",
+        "@60603",
+        "@60604",
+        "@60605"
+      ]
+    },
+    {
+      "id": "update_wait",
+      "type": "list",
+      "label": "@60606",
+      "default": 0,
+      "enabled": "eq(-1,@60603)|eq(-1,@60605)",
+      "lvalues": [
+        "No",
+        "@60609",
+        "@60610",
+        "@60611",
+        "@60612"
+      ]
+    },
+    {
+      "id": "everyday_delay",
+      "type": "list",
+      "label": "@60613",
+      "default": 1,
+      "enabled": "eq(-2,@60604)|eq(-2,@60605)",
+      "lvalues": [
+        "00:00",
+        "04:00",
+        "08:00",
+        "12:00",
+        "16:00",
+        "20:00"
+      ]
+    },
+    {
+      "id": "updatetvshows_interval",
+      "type": "list",
+      "label": "@60614",
+      "default": 0,
+      "enabled": "!eq(-3,@60615)",
+      "lvalues": [
+        "@60616",
+        "@60617"
+      ]
+    },
+    {
+      "id": "search_new_content",
+      "type": "list",
+      "label": "@60618",
+      "default": 0,
+      "enabled": "!eq(-4,@60615)",
+      "lvalues": [
+        "@60619",
+        "@60620"
+      ]
+    },
+    {
+      "id": "local_episodes",
+      "type": "bool",
+      "label": "@80042",
+      "default": false
+    },
+    {
       "id": "lab_1",
       "type": "label",
       "label": "@60650",
@@ -53,73 +123,6 @@
         "fr",
         "it",
         "pt"
-      ]
-    },
-    {
-      "id": "update",
-      "type": "list",
-      "label": "@60601",
-      "default": 1,
-      "visible": true,
-      "lvalues": [
-        "@60602",
-        "@60603",
-        "@60604",
-        "@60605"
-      ]
-    },
-    {
-      "id": "update_wait",
-      "type": "list",
-      "label": "@60606",
-      "default": 0,
-      "visible": true,
-      "enabled": "eq(-1,@60603)|eq(-1,@60605)",
-      "lvalues": [
-        "No",
-        "@60609",
-        "@60610",
-        "@60611",
-        "@60612"
-      ]
-    },
-    {
-      "id": "everyday_delay",
-      "type": "list",
-      "label": "@60613",
-      "default": 1,
-      "visible": true,
-      "enabled": "eq(-2,@60604)|eq(-2,@60605)",
-      "lvalues": [
-        "00:00",
-        "04:00",
-        "08:00",
-        "12:00",
-        "16:00",
-        "20:00"
-      ]
-    },
-    {
-      "id": "updatetvshows_interval",
-      "type": "list",
-      "label": "@60614",
-      "default": 0,
-      "visible": true,
-      "enabled": "!eq(-3,@60615)",
-      "lvalues": [
-        "@60616",
-        "@60617"
-      ]
-    },
-    {
-      "id": "search_new_content",
-      "type": "list",
-      "label": "@60618",
-      "default": 0,
-      "enabled": "!eq(-4,@60615)",
-      "lvalues": [
-        "@60619",
-        "@60620"
       ]
     },
     {

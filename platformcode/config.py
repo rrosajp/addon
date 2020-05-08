@@ -211,9 +211,7 @@ def open_settings():
     if not settings_pre.get("videolibrary_kodi", None) and settings_post.get("videolibrary_kodi", None):
         xbmc_videolibrary.ask_set_content(silent=True)
     elif settings_pre.get("videolibrary_kodi", None) and not settings_post.get("videolibrary_kodi", None):
-        strm_list = []
-        strm_list.append(get_setting('videolibrarypath'))
-        xbmc_videolibrary.clean(strm_list)
+        xbmc_videolibrary.clean()
 
 
 def get_setting(name, channel="", server="", default=None):

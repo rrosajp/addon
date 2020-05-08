@@ -10,6 +10,7 @@ import xbmc
 from core import ziptools, videolibrarytools, filetools
 from platformcode import logger, config, platformtools, xbmc_videolibrary
 from distutils.dir_util import copy_tree
+from specials import videolibrary
 
 temp_path = xbmc.translatePath("special://userdata/addon_data/plugin.video.kod/temp/")
 movies_path = os.path.join(temp_path, "movies")
@@ -67,15 +68,14 @@ def import_videolibrary(item):
 
     unzipper = ziptools.ziptools()
     unzipper.extract(zip_file, temp_path)
-    p_dialog.update(25)
+    p_dialog.update(20)
 
+    if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
+        xbmc_videolibrary.clean()
+    p_dialog.update(30)
     filetools.rmdirtree(videolibrarytools.MOVIES_PATH)
     filetools.rmdirtree(videolibrarytools.TVSHOWS_PATH)
     p_dialog.update(50)
-    if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
-        strm_list = []
-        strm_list.append(config.get_setting('videolibrarypath'))
-        xbmc_videolibrary.clean(strm_list)
 
     config.verify_directories_created()
     if filetools.exists(movies_path):
@@ -91,9 +91,6 @@ def import_videolibrary(item):
     p_dialog.close()
     platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(80008), time=5000, sound=False)
 
-    if platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(80009)):
-        import service
-        service.check_for_update(overwrite=True)
-
+    videolibrary.update_videolibrary()
     if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
         xbmc_videolibrary.update()

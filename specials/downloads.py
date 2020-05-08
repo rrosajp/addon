@@ -433,9 +433,8 @@ def move_to_libray(item):
     if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
         from platformcode import xbmc_videolibrary
         if clean == True:
-            strm_list = []
-            strm_list.append(file_strm_path)
-            xbmc_videolibrary.clean(strm_list)
+            path_list = [file_strm_path]
+            xbmc_videolibrary.clean(path_list)
         xbmc_videolibrary.update(FOLDER, path_title)
 
 

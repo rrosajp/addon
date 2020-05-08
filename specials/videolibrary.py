@@ -306,6 +306,14 @@ def list_tvshows(item):
                                        {"title": config.get_localized_string(70269),
                                         "action": "update_tvshow",
                                         "channel": "videolibrary"}]
+                if item_tvshow.local_episodes_path == "":
+                    item_tvshow.context.append({"title": config.get_localized_string(80048),
+                                                "action": "add_local_episodes",
+                                                "channel": "videolibrary"})
+                else:
+                    item_tvshow.context.append({"title": config.get_localized_string(80049),
+                                                "action": "remove_local_episodes",
+                                                "channel": "videolibrary"})
                 # ,{"title": "Cambiar contenido (PENDIENTE)",
                 # "action": "",
                 # "channel": "videolibrary"}]
@@ -322,7 +330,7 @@ def list_tvshows(item):
         itemlist = sorted(itemlist, key=lambda it: it.title.lower())
 
         itemlist.append(Item(channel=item.channel, action="update_videolibrary", thumbnail=item.thumbnail,
-                             title=config.get_localized_string(60026), folder=False))
+                             title=typo(config.get_localized_string(70269), 'bold color kod'), folder=False))
 
     return itemlist
 
@@ -679,7 +687,7 @@ def play(item):
     return itemlist
 
 
-def update_videolibrary(item):
+def update_videolibrary(item=''):
     logger.info()
 
     # Actualizar las series activas sobreescribiendo
@@ -768,17 +776,15 @@ def delete_videolibrary(item):
     p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80038))
     p_dialog.update(0)
 
-    filetools.rmdirtree(videolibrarytools.MOVIES_PATH)
-    p_dialog.update(40)
-    filetools.rmdirtree(videolibrarytools.TVSHOWS_PATH)
-    p_dialog.update(80)
     if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
         from platformcode import xbmc_videolibrary
-        strm_list = []
-        strm_list.append(config.get_setting('videolibrarypath'))
-        xbmc_videolibrary.clean(strm_list)
-
+        xbmc_videolibrary.clean()
+    p_dialog.update(10)
+    filetools.rmdirtree(videolibrarytools.MOVIES_PATH)
+    p_dialog.update(50)
+    filetools.rmdirtree(videolibrarytools.TVSHOWS_PATH)
     p_dialog.update(90)
+
     config.verify_directories_created()
     p_dialog.update(100)
     xbmc.sleep(1000)
@@ -796,11 +802,58 @@ def update_tvshow(item):
     p_dialog.update(0, heading, item.contentSerieName)
 
     import service
-    if service.update(item.path, p_dialog, 1, 1, item, False) and config.is_xbmc() and config.get_setting("videolibrary_kodi"):
+    if service.update(item.path, p_dialog, 0, 100, item, False) and config.is_xbmc() and config.get_setting("videolibrary_kodi"):
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.update(folder=filetools.basename(item.path))
 
     p_dialog.close()
+
+    # check if the TV show is ended or has been canceled and ask the user to remove it from the video library update
+    nfo_path = filetools.join(item.path, "tvshow.nfo")
+    head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
+    if item.active and not item_nfo.active:
+        if not platformtools.dialog_yesno(config.get_localized_string(60037).replace('...',''), config.get_localized_string(70268) % item.contentSerieName):
+            item_nfo.active = 1
+            filetools.write(nfo_path, head_nfo + item_nfo.tojson())
+
+    platformtools.itemlist_refresh()
+
+
+def add_local_episodes(item):
+    logger.info()
+
+    done, local_episodes_path = videolibrarytools.config_local_episodes_path(item.path, item.contentSerieName)
+    if done < 0:
+        logger.info("An issue has occurred while configuring local episodes")
+    elif local_episodes_path:
+        nfo_path = filetools.join(item.path, "tvshow.nfo")
+        head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
+        item_nfo.local_episodes_path = local_episodes_path
+        if not item_nfo.active:
+            item_nfo.active = 1
+        filetools.write(nfo_path, head_nfo + item_nfo.tojson())
+
+        update_tvshow(item)
+
+        platformtools.itemlist_refresh()
+
+
+def remove_local_episodes(item):
+    logger.info()
+
+    nfo_path = filetools.join(item.path, "tvshow.nfo")
+    head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
+
+    for season_episode in item_nfo.local_episodes_list:
+        filetools.remove(filetools.join(item.path, season_episode + '.strm'))
+
+    item_nfo.local_episodes_list = []
+    item_nfo.local_episodes_path = ''
+    filetools.write(nfo_path, head_nfo + item_nfo.tojson())
+
+    update_tvshow(item)
+
+    platformtools.itemlist_refresh()
 
 
 def verify_playcount_series(item, path):
@@ -1025,22 +1078,24 @@ def delete(item):
         for file in filetools.listdir(_item.path):
             if file.endswith(".strm") or file.endswith(".nfo") or file.endswith(".json")or file.endswith(".torrent"):
                 filetools.remove(filetools.join(_item.path, file))
-        raiz, carpeta_serie, ficheros = next(filetools.walk(_item.path))
-        if ficheros == []:
-            filetools.rmdir(_item.path)
+
+        if _item.contentType == 'movie':
+            heading = config.get_localized_string(70084)
         else:
-            if _item.contentType == 'movie':
-                heading = config.get_localized_string(70084)
-            else:
-                heading = config.get_localized_string(70085)
-            if platformtools.dialog_yesno(heading, config.get_localized_string(70081)):
-                filetools.rmdirtree(_item.path)
+            heading = config.get_localized_string(70085)
 
         if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
             from platformcode import xbmc_videolibrary
-            strm_list = []
-            strm_list.append(_item.extra)
-            xbmc_videolibrary.clean(strm_list)
+            if _item.local_episodes_path:
+                platformtools.dialog_ok(heading, config.get_localized_string(80047) % _item.infoLabels['title'])
+            path_list = [_item.extra]
+            xbmc_videolibrary.clean(path_list)
+
+        raiz, carpeta_serie, ficheros = next(filetools.walk(_item.path))
+        if ficheros == []:
+            filetools.rmdir(_item.path)
+        elif platformtools.dialog_yesno(heading, config.get_localized_string(70081) % os.path.basename(_item.path)):
+            filetools.rmdirtree(_item.path)
 
         logger.info("All links removed")
         xbmc.sleep(1000)
@@ -1068,8 +1123,8 @@ def delete(item):
 
             if index == 0:
                 # Seleccionado Eliminar pelicula/serie
-                canal = None
                 delete_all(item)
+                return
 
             elif index > 0:
                 # Seleccionado Eliminar canal X
@@ -1080,41 +1135,43 @@ def delete(item):
         else:
             canal = item.dead
 
-        if canal:
-            num_enlaces = 0
-            strm_list = []
-            for fd in filetools.listdir(item.path):
-                if fd.endswith(canal + '].json') or scrapertools.find_single_match(fd, '%s]_\d+.torrent' % canal):
-                    if filetools.remove(filetools.join(item.path, fd)):
-                        num_enlaces += 1
-                        # Remove strm and nfo if no other channel
-                        episode = fd.replace(' [' + canal + '].json', '')
-                        found_ch = False
-                        for ch in channels:
-                            if filetools.exists(filetools.join(item.path, episode + ' [' + ch + '].json')):
-                                found_ch = True
-                                break
-                        if found_ch == False:
-                            filetools.remove(filetools.join(item.path, episode + '.nfo'))
-                            filetools.remove(filetools.join(item.path, episode + '.strm'))
-                            strm_list.append(filetools.join(item.extra, episode + '.strm'))
+        num_enlaces = 0
+        path_list = []
+        for fd in filetools.listdir(item.path):
+            if fd.endswith(canal + '].json') or scrapertools.find_single_match(fd, '%s]_\d+.torrent' % canal):
+                if filetools.remove(filetools.join(item.path, fd)):
+                    num_enlaces += 1
+                    # Remove strm and nfo if no other channel
+                    episode = fd.replace(' [' + canal + '].json', '')
+                    found_ch = False
+                    for ch in channels:
+                        if filetools.exists(filetools.join(item.path, episode + ' [' + ch + '].json')):
+                            found_ch = True
+                            break
+                    if found_ch == False:
+                        filetools.remove(filetools.join(item.path, episode + '.nfo'))
+                        strm_path = filetools.join(item.path, episode + '.strm')
+                        # if it is a local episode, do not delete the strm
+                        if 'plugin://plugin.video.kod/?' in filetools.read(strm_path):
+                            filetools.remove(strm_path)
+                            path_list.append(filetools.join(item.extra, episode + '.strm'))
 
-            if config.is_xbmc() and config.get_setting("videolibrary_kodi") and strm_list:
-                from platformcode import xbmc_videolibrary
-                xbmc_videolibrary.clean(strm_list)
+        if config.is_xbmc() and config.get_setting("videolibrary_kodi") and path_list:
+            from platformcode import xbmc_videolibrary
+            xbmc_videolibrary.clean(path_list)
 
-            if num_enlaces > 0:
-                # Actualizar .nfo
-                head_nfo, item_nfo = videolibrarytools.read_nfo(item.nfo)
-                del item_nfo.library_urls[canal]
-                if item_nfo.emergency_urls and item_nfo.emergency_urls.get(canal, False):
-                    del item_nfo.emergency_urls[canal]
-                filetools.write(item.nfo, head_nfo + item_nfo.tojson())
+        if num_enlaces > 0:
+            # Actualizar .nfo
+            head_nfo, item_nfo = videolibrarytools.read_nfo(item.nfo)
+            del item_nfo.library_urls[canal]
+            if item_nfo.emergency_urls and item_nfo.emergency_urls.get(canal, False):
+                del item_nfo.emergency_urls[canal]
+            filetools.write(item.nfo, head_nfo + item_nfo.tojson())
 
-            msg_txt = config.get_localized_string(70087) % (num_enlaces, canal)
-            logger.info(msg_txt)
-            platformtools.dialog_notification(heading, msg_txt)
-            platformtools.itemlist_refresh()
+        msg_txt = config.get_localized_string(70087) % (num_enlaces, canal)
+        logger.info(msg_txt)
+        platformtools.dialog_notification(heading, msg_txt)
+        platformtools.itemlist_refresh()
 
     else:
         if platformtools.dialog_yesno(heading, config.get_localized_string(70088) % item.infoLabels['title']):
