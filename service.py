@@ -355,8 +355,8 @@ class AddonMonitor(xbmc.Monitor):
     def scheduleUpdater(self):
         if not config.dev_mode():
             updaterCheck()
-            self.updaterPeriod = float(config.get_setting('addon_update_timer')) * 3600
-            schedule.every(self.updaterPeriod).hour.do(updaterCheck).tag('updater')
+            self.updaterPeriod = config.get_setting('addon_update_timer')
+            schedule.every(self.updaterPeriod).hours.do(updaterCheck).tag('updater')
             logger.info('scheduled updater every ' + str(self.updaterPeriod) + ' hours')
 
     def scheduleVideolibrary(self):
