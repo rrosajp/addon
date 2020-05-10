@@ -30,7 +30,7 @@ try:
 except:
     pass
 extensions_list = ['.aaf', '.3gp', '.asf', '.avi', '.flv', '.mpeg', '.m1v', '.m2v', '.m4v', '.mkv', '.mov', '.mpg', '.mpe', '.mp4', '.ogg', '.wmv']
-
+monitorPath = filetools.join(config.get_data_path(), 'elementum_torrent.txt')
 
 
 # Returns an array of possible video url's from the page_url
@@ -112,51 +112,46 @@ def elementum_download(item):
 
 
 def elementum_monitor():
-    log('Start Elementum Monitor')
-    path = filetools.join(config.get_data_path(),'elementum_torrent.txt')
     partials = []
-    while True:
-        try:
-            if filetools.isfile(path):
-                log('Add Torrent')
-                url = filetools.read(path)
-                if url.startswith('/'):
-                    requests.get(elementum_host + url)
-                    wait = False
-                else:
-                    TorrentName = match(url, patron=r'btih(?::|%3A)([^&%]+)', string=True).match
-                    uri = elementum_host  + 'add'
-                    post = 'uri=%s&file=null&all=1' % url
-                    match(uri, post=post, timeout=5, alfa_s=True, ignore_response_code=True)
-                    wait = True
-                filetools.remove(path)
-                if wait:
-                    while not filetools.isfile(filetools.join(elementum_setting.getSetting('torrents_path'), TorrentName + '.torrent')):
-                        time.sleep(1)
+    try:
+        if filetools.isfile(monitorPath):
+            log('Add Torrent')
+            url = filetools.read(monitorPath)
+            if url.startswith('/'):
+                requests.get(elementum_host + url)
+                wait = False
             else:
-                log('Watch')
-                try:
-                    data = requests.get(elementum_host).json()
-                except:
-                    data = ''
-                if data:
-                    json = data['items']
+                TorrentName = match(url, patron=r'btih(?::|%3A)([^&%]+)', string=True).match
+                uri = elementum_host  + 'add'
+                post = 'uri=%s&file=null&all=1' % url
+                match(uri, post=post, timeout=5, alfa_s=True, ignore_response_code=True)
+                wait = True
+            filetools.remove(monitorPath)
+            if wait:
+                while not filetools.isfile(filetools.join(elementum_setting.getSetting('torrents_path'), TorrentName + '.torrent')):
+                    time.sleep(1)
+        else:
+            log('Watch')
+            try:
+                data = requests.get(elementum_host).json()
+            except:
+                data = ''
+            if data:
+                json = data['items']
 
-                    for it in json:
-                        Partial = float(match(it['label'], patron=r'(\d+\.\d+)%').match)
-                        Title = it['info']['title']
-                        TorrentName = match(it['path'], patron=r'resume=([^&]+)').match
-                        File, Json = find_file(TorrentName)
-                        update_download_info(Partial, Title, TorrentName, File, Json)
-                        partials.append(Partial)
+                for it in json:
+                    Partial = float(match(it['label'], patron=r'(\d+\.\d+)%').match)
+                    Title = it['info']['title']
+                    TorrentName = match(it['path'], patron=r'resume=([^&]+)').match
+                    File, Json = find_file(TorrentName)
+                    update_download_info(Partial, Title, TorrentName, File, Json)
+                    partials.append(Partial)
 
-                partials.sort()
-                if len(partials) > 0 and partials[0] == 100:
-                    unset_elementum()
-
-                time.sleep(1)
-        except:
-            time.sleep(1)
+            partials.sort()
+            if len(partials) > 0 and partials[0] == 100:
+                unset_elementum()
+    except:
+        pass
 
 
 def find_file(File):

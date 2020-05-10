@@ -15,6 +15,7 @@ from core import videolibrarytools, filetools, channeltools
 from lib import schedule
 from platformcode import logger, platformtools, updater
 from specials import videolibrary
+from servers import torrent
 
 
 def update(path, p_dialog, i, t, serie, overwrite):
@@ -49,7 +50,7 @@ def update(path, p_dialog, i, t, serie, overwrite):
                                                                               serie.channel.capitalize()))
             try:
                 pathchannels = filetools.join(config.get_runtime_path(), "channels", serie.channel + '.py')
-                logger.info("Cargando canal: " + pathchannels + " " +
+                logger.info("loading channel: " + pathchannels + " " +
                             serie.channel)
 
                 if serie.library_filter_show:
@@ -76,19 +77,19 @@ def update(path, p_dialog, i, t, serie, overwrite):
                     insertados_total += insertados
 
                 except Exception as ex:
-                    logger.error("Error al guardar los capitulos de la serie")
+                    logger.error("Error when saving the chapters of the series")
                     template = "An exception of type %s occured. Arguments:\n%r"
                     message = template % (type(ex).__name__, ex.args)
                     logger.error(message)
 
             except Exception as ex:
-                logger.error("Error al obtener los episodios de: %s" % serie.show)
+                logger.error("Error in obtaining the episodes of: %s" % serie.show)
                 template = "An exception of type %s occured. Arguments:\n%r"
                 message = template % (type(ex).__name__, ex.args)
                 logger.error(message)
 
         else:
-            logger.debug("Canal %s no activo no se actualiza" % serie.channel)
+            logger.debug("Channel %s not active is not updated" % serie.channel)
 
     #Sincronizamos los episodios vistos desde la videoteca de Kodi con la de Alfa
     try:
@@ -240,10 +241,10 @@ def check_for_update(overwrite=True):
             p_dialog.close()
 
         else:
-            logger.info("No actualiza la videoteca, está desactivado en la configuración de alfa")
+            logger.info("Not update the video library, it is disabled")
 
     except Exception as ex:
-        logger.error("Se ha producido un error al actualizar las series")
+        logger.error("An error occurred while updating the series")
         template = "An exception of type %s occured. Arguments:\n%r"
         message = template % (type(ex).__name__, ex.args)
         logger.error(message)
@@ -348,7 +349,7 @@ class AddonMonitor(xbmc.Monitor):
 
     def onScreensaverDeactivated(self):
         logger.info('screensaver deactivated, re-scheduling screen-on jobs')
-        schedule.every().second.do(viewmodeMonitor).tag('screenOn')
+        self.scheduleScreenOnJobs()
 
     def scheduleUpdater(self):
         if not config.dev_mode():
@@ -365,6 +366,18 @@ class AddonMonitor(xbmc.Monitor):
             schedule.every().day.at(str(self.update_hour).zfill(2) + ':00').do(run_threaded, check_for_update, (False,)).tag('videolibrary')
             logger.info('scheduled videolibrary at ' + str(self.update_hour).zfill(2) + ':00')
 
+    def scheduleScreenOnJobs(self):
+        schedule.every().second.do(viewmodeMonitor).tag('screenOn')
+        schedule.every().second.do(torrent.elementum_monitor).tag('screenOn')
+
+    def onDPMSActivated(self):
+        logger.info('DPMS activated, un-scheduling screen-on jobs')
+        schedule.clear('screenOn')
+
+    def onDPMSDeactivated(self):
+        logger.info('DPMS deactivated, re-scheduling screen-on jobs')
+        self.scheduleScreenOnJobs()
+
 
 if __name__ == "__main__":
     logger.info('Starting KoD service')
@@ -373,9 +386,6 @@ if __name__ == "__main__":
     # mark as stopped all downloads (if we are here, probably kodi just started)
     from specials.downloads import stop_all
     stop_all()
-
-    # other things
-    schedule.every().second.do(viewmodeMonitor).tag('screenOn')
 
     while True:
         schedule.run_pending()
