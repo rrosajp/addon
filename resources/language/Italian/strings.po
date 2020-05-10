@@ -5928,8 +5928,8 @@ msgid "Logging"
 msgstr "Logging"
 
 msgctxt "#70789"
-msgid "* Change by opening the settings from KoD main menu"
-msgstr "* Cambia aprendo le impostazioni dal menu principale di KoD"
+msgid ""
+msgstr ""
 
 msgctxt "#70790"
 msgid "RAR download in progress"

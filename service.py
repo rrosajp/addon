@@ -1,26 +1,20 @@
 # -*- coding: utf-8 -*-
-# ------------------------------------------------------------
-# Service for updating new episodes on library series
-# ------------------------------------------------------------
-
-import datetime, imp, math, threading, traceback, sys, glob, time
-
+import datetime
+import math
+import os
+import sys
+import threading
+import traceback
+import xbmc
+import xbmcgui
 from platformcode import config
-try:
-    import xbmc, os
-    librerias = xbmc.translatePath(os.path.join(config.get_runtime_path(), 'lib'))
-    sys.path.append(librerias)
-except:
-    import os
-    librerias = os.path.join(config.get_runtime_path(), 'lib')
-    sys.path.append(librerias)
+librerias = xbmc.translatePath(os.path.join(config.get_runtime_path(), 'lib'))
+sys.path.insert(0, librerias)
 
-
-from core import channeltools, filetools, videolibrarytools
-from platformcode import logger
-from platformcode import platformtools
+from core import videolibrarytools, filetools, channeltools
+from lib import schedule
+from platformcode import logger, platformtools, updater
 from specials import videolibrary
-from platformcode import updater
 
 
 def update(path, p_dialog, i, t, serie, overwrite):
@@ -61,7 +55,8 @@ def update(path, p_dialog, i, t, serie, overwrite):
                 if serie.library_filter_show:
                     serie.show = serie.library_filter_show.get(serie.channel, serie.contentSerieName)
 
-                obj = imp.load_source(serie.channel, pathchannels)
+                obj = __import__('channels.%s' % serie.channel, fromlist=[pathchannels])
+
                 itemlist = obj.episodios(serie)
 
                 try:
@@ -261,166 +256,129 @@ def check_for_update(overwrite=True):
     videolibrary.list_movies(item_dummy, silent=True)
 
 
-def start(thread=True):
-    if thread:
-        t = threading.Thread(target=start, args=[False])
-        t.setDaemon(True)
-        t.start()
-    else:
-        import time
+def viewmodeMonitor():
+    try:
+        currentModeName = xbmc.getInfoLabel('Container.Viewmode')
+        win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+        currentMode = int(win.getFocusId())
+        if currentModeName and 'plugin.video.kod' in xbmc.getInfoLabel(
+                'Container.FolderPath') and currentMode < 1000 and currentMode > 50:  # inside addon and in itemlist view
+            content, Type = platformtools.getCurrentView()
+            defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
+            if currentMode != defaultMode:
+                logger.info('viewmode changed: ' + currentModeName + '-' + str(currentMode) + ' - content: ' + content)
+                config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
+    except:
+        logger.error(traceback.print_exc())
 
+
+def updaterCheck():
+    # updater check
+    updated, needsReload = updater.check(background=True)
+    if needsReload:
+        xbmc.executescript(__file__)
+        exit(0)
+
+
+def run_threaded(job_func, args):
+    job_thread = threading.Thread(target=job_func, args=args)
+    job_thread.start()
+
+
+class AddonMonitor(xbmc.Monitor):
+    def __init__(self):
+        self.settings_pre = config.get_all_settings_addon()
+
+        self.updaterPeriod = None
+        self.update_setting = None
+        self.update_hour = None
+        self.scheduleUpdater()
+
+        # videolibrary wait
         update_wait = [0, 10000, 20000, 30000, 60000]
         wait = update_wait[int(config.get_setting("update_wait", "videolibrary"))]
         if wait > 0:
-            time.sleep(wait)
-
+            xbmc.sleep(wait)
         if not config.get_setting("update", "videolibrary") == 2:
             check_for_update(overwrite=False)
+            run_threaded(check_for_update, (False,))
+        self.scheduleVideolibrary()
+        super(AddonMonitor, self).__init__()
 
-        # Se ejecuta ciclicamente
-        while True:
-            monitor_update()
-            time.sleep(3600)  # cada hora
+    def onSettingsChanged(self):
+        logger.info('settings changed')
+        settings_post = config.get_all_settings_addon()
+        from platformcode import xbmc_videolibrary
 
+        if self.settings_pre.get('downloadpath', None) != settings_post.get('downloadpath', None):
+            xbmc_videolibrary.update_sources(settings_post.get('downloadpath', None),
+                                             self.settings_pre.get('downloadpath', None))
 
-def monitor_update():
-    update_setting = config.get_setting("update", "videolibrary")
+        # si se ha cambiado la ruta de la videoteca llamamos a comprobar directorios para que lo cree y pregunte
+        # automaticamente si configurar la videoteca
+        if self.settings_pre.get("videolibrarypath", None) != settings_post.get("videolibrarypath", None) or \
+                self.settings_pre.get("folder_movies", None) != settings_post.get("folder_movies", None) or \
+                self.settings_pre.get("folder_tvshows", None) != settings_post.get("folder_tvshows", None):
+            videolibrary.move_videolibrary(self.settings_pre.get("videolibrarypath", None),
+                                           settings_post.get("videolibrarypath", None),
+                                           self.settings_pre.get("folder_movies", None),
+                                           settings_post.get("folder_movies", None),
+                                           self.settings_pre.get("folder_tvshows", None),
+                                           settings_post.get("folder_tvshows", None))
 
-    # "Actualizar "Una sola vez al dia" o "al inicar Kodi y al menos una vez al dia"
+        # si se ha puesto que se quiere autoconfigurar y se había creado el directorio de la videoteca
+        if not self.settings_pre.get("videolibrary_kodi", None) and settings_post.get("videolibrary_kodi", None):
+            xbmc_videolibrary.ask_set_content(silent=True)
+        elif self.settings_pre.get("videolibrary_kodi", None) and not settings_post.get("videolibrary_kodi", None):
+            xbmc_videolibrary.clean()
 
-    if update_setting == 2 or update_setting == 3:
-        hoy = datetime.date.today()
-        last_check = config.get_setting("updatelibrary_last_check", "videolibrary")
-        if last_check:
-            y, m, d = last_check.split('-')
-            last_check = datetime.date(int(y), int(m), int(d))
-        else:
-            last_check = hoy - datetime.timedelta(days=1)
+        if self.settings_pre.get('addon_update_timer') != settings_post.get('addon_update_timer'):
+            schedule.clear('updater')
+            self.scheduleUpdater()
 
-        update_start = config.get_setting("everyday_delay", "videolibrary") * 4
+        if self.update_setting != config.get_setting("update", "videolibrary") or self.update_hour != config.get_setting("everyday_delay", "videolibrary") * 4:
+            schedule.clear('videolibrary')
+            self.scheduleVideolibrary()
 
-        # logger.info("Ultima comprobacion: %s || Fecha de hoy:%s || Hora actual: %s" %
-        #             (last_check, hoy, datetime.datetime.now().hour))
-        # logger.info("Atraso del inicio del dia: %i:00" % update_start)
+        self.settings_pre = settings_post
 
-        if last_check <= hoy and datetime.datetime.now().hour == int(update_start):
-            logger.info("Inicio actualizacion programada para las %s h.: %s" % (update_start, datetime.datetime.now()))
-            check_for_update(overwrite=False)
+    def onScreensaverActivated(self):
+        logger.info('screensaver activated, un-scheduling screen-on jobs')
+        schedule.clear('screenOn')
 
-    if not config.dev_mode():
-        period = float(config.get_setting('addon_update_timer')) * 3600
-        curTime = time.time()
-        lastCheck = config.get_setting("updater_last_check", "videolibrary", '0')
-        if lastCheck:
-            lastCheck = float(lastCheck)
-        else:
-            lastCheck = 0
+    def onScreensaverDeactivated(self):
+        logger.info('screensaver deactivated, re-scheduling screen-on jobs')
+        schedule.every().second.do(viewmodeMonitor).tag('screenOn')
 
-        if curTime - lastCheck > period:
-            updated, needsReload = updater.check(background=True)
-            config.set_setting("updater_last_check", str(curTime), "videolibrary")
-            if needsReload:
-                xbmc.executescript(__file__)
-                exit(0)
+    def scheduleUpdater(self):
+        if not config.dev_mode():
+            updaterCheck()
+            self.updaterPeriod = float(config.get_setting('addon_update_timer')) * 3600
+            schedule.every(self.updaterPeriod).hour.do(updaterCheck).tag('updater')
+            logger.info('scheduled updater every ' + str(self.updaterPeriod) + ' hours')
 
-# always bypass al websites that use cloudflare at startup, so there's no need to wait 5 seconds when opened
-def callCloudflare():
-    from core import httptools, support
-    import json
-    channels_path = os.path.join(config.get_runtime_path(), "channels", '*.json')
-    channel_files = [os.path.splitext(os.path.basename(c))[0] for c in glob.glob(channels_path)]
-    for channel_name in channel_files:
-        channel_parameters = channeltools.get_channel_parameters(channel_name)
-        if 'cloudflare' in channel_parameters and channel_parameters["cloudflare"]:
-            channel = __import__('channels.%s' % channel_name, fromlist=["channels.%s" % channel_name])
-            try:
-                channel.findhost()
-            except:
-                pass
-            httptools.downloadpage(channel.host)
-
-    servers_path = os.path.join(config.get_runtime_path(), "servers", '*.json')
-    servers_files = glob.glob(servers_path)
-    for server in servers_files:
-        with open(server) as server:
-            server_parameters = json.load(server)
-        if 'cloudflare' in server_parameters and server_parameters["cloudflare"]:
-            patternUrl = server_parameters["find_videos"]["patterns"][0]["url"]
-            url = '/'.join(patternUrl.split('/')[:3])
-            httptools.downloadpage(url)
-
-
-def viewmodeMonitor(monitor):
-    import xbmcgui
-    while not monitor.abortRequested():
-        time.sleep(0.5)
-        try:
-            currentModeName = xbmc.getInfoLabel('Container.Viewmode')
-            win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
-            currentMode = int(win.getFocusId())
-            if currentModeName and 'plugin.video.kod' in xbmc.getInfoLabel('Container.FolderPath') and currentMode < 1000 and currentMode > 50:  # inside addon and in itemlist view
-                content, Type = platformtools.getCurrentView()
-                defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
-                if currentMode != defaultMode:
-                    logger.info('viewmode changed: ' + currentModeName + '-' + str(currentMode) + ' - content: ' + content)
-                    config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
-        except:
-            logger.error(traceback.print_exc())
+    def scheduleVideolibrary(self):
+        self.update_setting = config.get_setting("update", "videolibrary")
+        # 2= daily 3=daily and when kodi starts
+        if self.update_setting == 2 or self.update_setting == 3:
+            self.update_hour = config.get_setting("everyday_delay", "videolibrary") * 4
+            schedule.every().day.at(str(self.update_hour).zfill(2) + ':00').do(run_threaded, check_for_update, (False,)).tag('videolibrary')
+            logger.info('scheduled videolibrary at ' + str(self.update_hour).zfill(2) + ':00')
 
 
 if __name__ == "__main__":
-    # threading.Thread(target=callCloudflare())
-    # Se ejecuta en cada inicio
-    import xbmc
-    import time
+    logger.info('Starting KoD service')
+    monitor = AddonMonitor()
 
     # mark as stopped all downloads (if we are here, probably kodi just started)
     from specials.downloads import stop_all
     stop_all()
 
-    update_wait = [0, 10000, 20000, 30000, 60000]
-    wait = update_wait[int(config.get_setting("update_wait", "videolibrary"))]
-    if wait > 0:
-        xbmc.sleep(wait)
+    # other things
+    schedule.every().second.do(viewmodeMonitor).tag('screenOn')
 
+    while True:
+        schedule.run_pending()
 
-    # Verificar quick-fixes al abrirse Kodi, y dejarlo corriendo como Thread
-    if not config.dev_mode():
-        updated, needsReload = updater.check(background=True)
-        config.set_setting("updater_last_check", str(time.time()), "videolibrary")
-        if needsReload:
-            xbmc.executescript(__file__)
-            exit(0)
-
-    # Copia Custom code a las carpetas de Alfa desde la zona de Userdata
-    # from platformcode import custom_code
-    # custom_code.init()
-    from threading import Thread
-    Thread(target=viewmodeMonitor).start()
-    from servers import torrent
-    Thread(target=torrent.elementum_monitor).start()
-
-    if not config.get_setting("update", "videolibrary") == 2:
-        check_for_update(overwrite=False)
-
-
-    # Se ejecuta ciclicamente
-    if config.get_platform(True)['num_version'] >= 14:
-        monitor = xbmc.Monitor()  # For Kodi >= 14
-    else:
-        monitor = None  # For Kodi < 14
-
-    from threading import Thread
-
-    Thread(target=viewmodeMonitor, args=(monitor,)).start()
-
-    if monitor:
-        while not monitor.abortRequested():
-            monitor_update()
-            if monitor.waitForAbort(3600):  # cada hora
-                break
-    else:
-        while not xbmc.abortRequested:
-            monitor_update()
-            xbmc.sleep(3600)
-
+        if monitor.waitForAbort(1):  # every second
+            break

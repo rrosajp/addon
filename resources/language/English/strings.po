@@ -5928,7 +5928,7 @@ msgid "Logging"
 msgstr ""
 
 msgctxt "#70789"
-msgid "* Change by opening the settings from KoD main menu"
+msgid ""
 msgstr ""
 
 msgctxt "#70790"
