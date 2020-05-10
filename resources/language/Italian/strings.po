@@ -76,8 +76,8 @@ msgid "Password"
 msgstr "Password"
 
 msgctxt "#30017"
-msgid "Download path*"
-msgstr "Percorso download*"
+msgid "Download path"
+msgstr "Percorso download"
 
 msgctxt "#30018"
 msgid "Download list path"
@@ -204,8 +204,8 @@ msgid "Unsopported Server"
 msgstr "Server non supportato"
 
 msgctxt "#30067"
-msgid "Path*"
-msgstr "Percorso*"
+msgid "Path"
+msgstr "Percorso"
 
 msgctxt "#30068"
 msgid "Filter by servers"
@@ -3268,16 +3268,16 @@ msgid "Confirm new password"
 msgstr "Conferma nuova password"
 
 msgctxt "#70118"
-msgid "TV shows folder*"
-msgstr "Cartella serie TV*"
+msgid "TV shows folder"
+msgstr "Cartella serie TV"
 
 msgctxt "#70119"
-msgid "Movies folder*"
-msgstr "Cartella film*"
+msgid "Movies folder"
+msgstr "Cartella film"
 
 msgctxt "#70120"
-msgid "Add KoD contents to Kodi video library*"
-msgstr "Aggiungi la videoteca di KoD alla libreria di Kodi*"
+msgid "Add KoD contents to Kodi video library"
+msgstr "Aggiungi la videoteca di KoD alla libreria di Kodi"
 
 msgctxt "#70121"
 msgid "Activate"
@@ -6217,16 +6217,16 @@ msgid "Folder name for TV shows"
 msgstr "Nome della cartella per le serie TV"
 
 msgctxt "#80022"
-msgid "You can configure the Kodi video library later from the settings menu inside KoD"
-msgstr "Potrai configurare la libreria di Kodi in seguito dal menu impostazioni all'interno di KoD"
+msgid "You can configure the Kodi video library later from the KoD settings"
+msgstr "Potrai configurare la libreria di Kodi in seguito dalle impostazioni di KoD"
 
 msgctxt "#80023"
 msgid "You will be asked to choose and configure the information providers for movies and TV shows"
 msgstr "Ti verrà chiesto di scegliere e configurare i provider delle informazioni per film e serie TV"
 
 msgctxt "#80024"
-msgid "An error has occurred during the configuration of the Kodi video library. Please check the log and try again from the settings menu inside KoD"
-msgstr "Si è verificato un errore durante la configurazione della libreria di Kodi. Si prega di controllare il log e riprovare dal menu impostazioni all'interno di KoD"
+msgid "An error has occurred during the configuration of the Kodi video library. Please check the log and try again from the KoD settings"
+msgstr "Si è verificato un errore durante la configurazione della libreria di Kodi. Si prega di controllare il log e riprovare dalle impostazioni di KoD"
 
 msgctxt "#80025"
 msgid "Cleaning database..."
@@ -6245,8 +6245,8 @@ msgid "The selected folders are already used by the Kodi library. Please change 
 msgstr "Le cartelle selezionate sono già utilizzate dalla libreria di Kodi. Si prega di cambiarle opportunamente"
 
 msgctxt "#80029"
-msgid "The selected folders are already used by the Kodi library. Please change them properly from the settings menu inside KoD"
-msgstr "Le cartelle selezionate sono già utilizzate dalla libreria di Kodi. Si prega di cambiarle opportunamente dal menu impostazioni all'interno di KoD"
+msgid "The selected folders are already used by the Kodi library. Please change them properly from the KoD settings"
+msgstr "Le cartelle selezionate sono già utilizzate dalla libreria di Kodi. Si prega di cambiarle opportunamente dalle impostazioni di KoD"
 
 msgctxt "#80030"
 msgid "The default path and folders will be used. You will be asked to choose and configure the information providers for movies and TV shows"
@@ -6301,8 +6301,8 @@ msgid "Include local episodes when adding a TV shows"
 msgstr "Includere episodi in locale all'aggiunta di una serie TV"
 
 msgctxt "#80043"
-msgid "Attention, in order to watch local episodes you have to configure the Kodi video library from the settings menu inside KoD"
-msgstr "Attenzione, per guardare gli episodi in locale devi configurare la libreria di Kodi dal menu impostazioni all'interno di KoD"
+msgid "Attention, in order to watch local episodes you have to configure the Kodi video library from the KoD settings"
+msgstr "Attenzione, per guardare gli episodi in locale devi configurare la libreria di Kodi dalle impostazioni di KoD"
 
 msgctxt "#80044"
 msgid "Do you want to include local episodes for the TV show "%s"?"
