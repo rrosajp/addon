@@ -293,6 +293,7 @@ class AddonMonitor(xbmc.Monitor):
         self.updaterPeriod = None
         self.update_setting = None
         self.update_hour = None
+        self.scheduleScreenOnJobs()
         self.scheduleUpdater()
 
         # videolibrary wait
