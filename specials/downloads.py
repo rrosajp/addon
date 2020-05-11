@@ -190,8 +190,6 @@ def clean_all(item):
     for File in sorted(filetools.listdir(DOWNLOAD_LIST_PATH)):
         if File.endswith(".json"):
             download_item = Item().fromjson(filetools.read(filetools.join(DOWNLOAD_LIST_PATH, File)))
-            if download_item.TorrentName:
-                torrent.elementum_actions('delete', item.TorrentName)
             if not item.contentType == "tvshow" or ( item.contentSerieName == download_item.contentSerieName and item.contentChannel == download_item.contentChannel):
                 filetools.remove(filetools.join(DOWNLOAD_LIST_PATH, File))
                 if removeFiles:
@@ -215,7 +213,10 @@ def stop_all(item=None):
         if fichero.endswith(".json"):
             download_item = Item().fromjson(filetools.read(filetools.join(DOWNLOAD_LIST_PATH, fichero)))
             if download_item.TorrentName:
-                torrent.elementum_actions('pause', download_item.TorrentName)
+                from inspect import stack
+                if stack()[1][3] == 'clean_all': action = 'delete'
+                else: action = 'pause'
+                torrent.elementum_actions(action, download_item.TorrentName)
             if download_item.downloadStatus == 4:
                 update_json(filetools.join(DOWNLOAD_LIST_PATH, fichero), {"downloadStatus": STATUS_CODES.stoped})
     xbmc.sleep(300)
