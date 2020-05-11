@@ -6257,8 +6257,8 @@ msgid "Unable to connect to github. This is probably due to a lack of connection
 msgstr "Impossibile connettersi a github. Questo è probabilmente dovuto ad una mancanza di connessione oppure github è attualmente offline. Per favore verifica e riprova"
 
 msgctxt "#80032"
-msgid "Installation in progress..."
-msgstr "Installazione in corso..."
+msgid "Installing..."
+msgstr "Installazione..."
 
 msgctxt "#80033"
 msgid "Choose the version of KoD to install"
@@ -6327,3 +6327,7 @@ msgstr "Aggiungi episodi in locale"
 msgctxt "#80049"
 msgid "Remove local episodes"
 msgstr "Rimuovi episodi in locale"
+
+msgctxt "#80050"
+msgid "Downloading..."
+msgstr "Download in corso..."

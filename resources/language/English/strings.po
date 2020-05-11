@@ -6257,7 +6257,7 @@ msgid "Unable to connect to github. This is probably due to a lack of connection
 msgstr ""
 
 msgctxt "#80032"
-msgid "Installation in progress..."
+msgid "Installing..."
 msgstr ""
 
 msgctxt "#80033"
@@ -6326,4 +6326,8 @@ msgstr ""
 
 msgctxt "#80049"
 msgid "Remove local episodes"
+msgstr ""
+
+msgctxt "#80050"
+msgid "Downloading..."
 msgstr ""

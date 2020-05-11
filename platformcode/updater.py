@@ -283,8 +283,8 @@ def getShaStr(str):
 
 
 
-def updateFromZip(message='Installazione in corso...'):
-    dp = platformtools.dialog_progress_bg('Kodi on Demand', message)
+def updateFromZip(message=config.get_localized_string(80050)):
+    dp = platformtools.dialog_progress_bg(config.get_localized_string(20000), message)
     dp.update(0)
 
     remotefilename = 'https://github.com/' + user + "/" + repo + "/archive/" + branch + ".zip"
@@ -304,8 +304,7 @@ def updateFromZip(message='Installazione in corso...'):
         urllib.urlretrieve(remotefilename, localfilename,
                            lambda nb, bs, fs, url=remotefilename: _pbhook(nb, bs, fs, url, dp))
     except Exception as e:
-        platformtools.dialog_ok('Kodi on Demand', 'Non riesco a scaricare il file d\'installazione da github, questo è probabilmente dovuto ad una mancanza di connessione (o qualcosa impedisce di raggiungere github).\n'
-                                                  'Controlla bene e quando hai risolto riapri KoD.')
+        platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(80031))
         logger.info('Non sono riuscito a scaricare il file zip')
         logger.info(e)
         dp.close()
@@ -318,6 +317,8 @@ def updateFromZip(message='Installazione in corso...'):
     if os.path.isfile(localfilename):
         logger.info('il file esiste')
 
+    dp.update(80, config.get_localized_string(20000), config.get_localized_string(80032))
+
     import zipfile
     try:
         hash = fixZipGetHash(localfilename)
@@ -329,7 +330,7 @@ def updateFromZip(message='Installazione in corso...'):
             for member in zip.infolist():
                 zip.extract(member, destpathname)
                 cur_size += member.file_size
-                dp.update(int(80 + cur_size * 19 / size))
+                dp.update(int(80 + cur_size * 15 / size))
 
     except Exception as e:
         logger.info('Non sono riuscito ad estrarre il file zip')
@@ -341,7 +342,7 @@ def updateFromZip(message='Installazione in corso...'):
 
         return False
 
-    dp.update(99)
+    dp.update(95)
 
     # puliamo tutto
     global addonDir
@@ -356,8 +357,9 @@ def updateFromZip(message='Installazione in corso...'):
     remove(localfilename)
 
     dp.update(100)
+    xbmc.sleep(1000)
     dp.close()
-    if message != 'Installazione in corso...':
+    if message != config.get_localized_string(80050):
         xbmc.executebuiltin("UpdateLocalAddons")
         refreshLang()
 
@@ -448,9 +450,9 @@ def fOpen(file, mode = 'r'):
 
 def _pbhook(numblocks, blocksize, filesize, url, dp):
     try:
-        percent = min((numblocks*blocksize*90)/filesize, 100)
+        percent = min((numblocks*blocksize*80)/filesize, 80)
         dp.update(int(percent))
     except Exception as e:
         logger.error(e)
-        percent = 90
+        percent = 80
         dp.update(percent)
