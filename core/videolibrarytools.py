@@ -854,11 +854,13 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     return insertados, sobreescritos, fallidos
 
 
-def config_local_episodes_path(path, title):
+def config_local_episodes_path(path, title, silent=False):
     logger.info()
 
     local_episodes_path = ''
-    if platformtools.dialog_yesno(config.get_localized_string(30131), config.get_localized_string(80044) % title):
+    if not silent:
+        silent = platformtools.dialog_yesno(config.get_localized_string(30131), config.get_localized_string(80044) % title)
+    if silent:
         if config.is_xbmc() and not config.get_setting("videolibrary_kodi"):
             platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(80043))
         local_episodes_path = platformtools.dialog_browse(0, config.get_localized_string(80046))
@@ -872,9 +874,10 @@ def config_local_episodes_path(path, title):
 
     if local_episodes_path:
         # import artwork
+        artwork_extensions = ['.jpg', '.jpeg', '.png']
         files = filetools.listdir(local_episodes_path)
         for file in files:
-            if file.endswith('.jpg') or file.endswith('.jpeg') or file.endswith('.png'):
+            if os.path.splitext(file)[1] in artwork_extensions:
                 filetools.copy(filetools.join(local_episodes_path, file), filetools.join(path, file))
 
     return 0, local_episodes_path
@@ -883,22 +886,29 @@ def config_local_episodes_path(path, title):
 def process_local_episodes(local_episodes_path, path):
     logger.info()
 
+    sub_extensions = ['.srt', '.sub', '.sbv', '.ass', '.idx', '.ssa', '.smi']
+    artwork_extensions = ['.jpg', '.jpeg', '.png']
+    extensions = sub_extensions + artwork_extensions
+
     local_episodes_list = []
+    files_list = []
     for root, folders, files in filetools.walk(local_episodes_path):
         for file in files:
+            if os.path.splitext(file)[1] in extensions:
+                continue
             season_episode = scrapertools.get_season_and_episode(file)
             if season_episode == "":
                 continue
             local_episodes_list.append(season_episode)
+            files_list.append(file)
 
-    local_episodes_list = sorted(set(local_episodes_list))
-	
     nfo_path = filetools.join(path, "tvshow.nfo")
     head_nfo, item_nfo = read_nfo(nfo_path)
 
     # if a local episode has been added, overwrites the strm
-    for season_episode in set(local_episodes_list).difference(item_nfo.local_episodes_list):
-        filetools.write(filetools.join(path, season_episode + '.strm'), filetools.join(root, file))
+    for season_episode, file in zip(local_episodes_list, files_list):
+        if not season_episode in item_nfo.local_episodes_list:
+            filetools.write(filetools.join(path, season_episode + '.strm'), filetools.join(root, file))
 
     # if a local episode has been removed, deletes the strm
     for season_episode in set(item_nfo.local_episodes_list).difference(local_episodes_list):
@@ -907,8 +917,8 @@ def process_local_episodes(local_episodes_path, path):
     # updates the local episodes path and list in the nfo
     if not local_episodes_list:
         item_nfo.local_episodes_path = ''
-    item_nfo.local_episodes_list = local_episodes_list
-        
+    item_nfo.local_episodes_list = sorted(set(local_episodes_list))
+
     filetools.write(nfo_path, head_nfo + item_nfo.tojson())
 
 

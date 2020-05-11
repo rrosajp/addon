@@ -822,7 +822,7 @@ def update_tvshow(item):
 def add_local_episodes(item):
     logger.info()
 
-    done, local_episodes_path = videolibrarytools.config_local_episodes_path(item.path, item.contentSerieName)
+    done, local_episodes_path = videolibrarytools.config_local_episodes_path(item.path, item.contentSerieName, silent=True)
     if done < 0:
         logger.info("An issue has occurred while configuring local episodes")
     elif local_episodes_path:

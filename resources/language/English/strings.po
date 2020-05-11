@@ -76,7 +76,7 @@ msgid "Password"
 msgstr ""
 
 msgctxt "#30017"
-msgid "Download path*"
+msgid "Download path"
 msgstr ""
 
 msgctxt "#30018"
@@ -204,7 +204,7 @@ msgid "Unsopported Server"
 msgstr ""
 
 msgctxt "#30067"
-msgid "Path*"
+msgid "Path"
 msgstr ""
 
 msgctxt "#30068"
@@ -3269,15 +3269,15 @@ msgid "Confirm new password"
 msgstr ""
 
 msgctxt "#70118"
-msgid "TV shows folder*"
+msgid "TV shows folder"
 msgstr ""
 
 msgctxt "#70119"
-msgid "Movies folder*"
+msgid "Movies folder"
 msgstr ""
 
 msgctxt "#70120"
-msgid "Add KoD contents to Kodi video library*"
+msgid "Add KoD contents to Kodi video library"
 msgstr ""
 
 msgctxt "#70121"
@@ -6217,7 +6217,7 @@ msgid "Folder name for TV shows"
 msgstr ""
 
 msgctxt "#80022"
-msgid "You can configure the Kodi video library later from the settings menu inside KoD"
+msgid "You can configure the Kodi video library later from the KoD settings"
 msgstr ""
 
 msgctxt "#80023"
@@ -6225,7 +6225,7 @@ msgid "You will be asked to choose and configure the information providers for m
 msgstr ""
 
 msgctxt "#80024"
-msgid "An error has occurred during the configuration of the Kodi video library. Please check the log and try again from the settings menu inside KoD"
+msgid "An error has occurred during the configuration of the Kodi video library. Please check the log and try again from the KoD settings"
 msgstr ""
 
 msgctxt "#80025"
@@ -6245,7 +6245,7 @@ msgid "The selected folders are already used by the Kodi library. Please change 
 msgstr ""
 
 msgctxt "#80029"
-msgid "The selected folders are already used by the Kodi library. Please change them properly from the settings menu inside KoD"
+msgid "The selected folders are already used by the Kodi library. Please change them properly from the KoD settings"
 msgstr ""
 
 msgctxt "#80030"
@@ -6301,7 +6301,7 @@ msgid "Include local episodes when adding a TV shows"
 msgstr ""
 
 msgctxt "#80043"
-msgid "Attention, in order to watch local episodes you have to configure the Kodi video library from the settings menu inside KoD"
+msgid "Attention, in order to watch local episodes you have to configure the Kodi video library from the KoD settings"
 msgstr ""
 
 msgctxt "#80044"
