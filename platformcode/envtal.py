@@ -4,7 +4,6 @@
 # ------------------------------------------------------------
 
 from __future__ import division
-# from builtins import str
 from past.utils import old_div
 import sys
 
@@ -31,8 +30,8 @@ from platformcode import logger, config, platformtools
 
 def get_environment():
     """
-    Devuelve las variables de entorno del OS, de Kodi y de Alfa más habituales,
-    necesarias para el diagnóstico de fallos
+    Returns the most common OS, Kodi and Alpha environment variables,
+    necessary for fault diagnosis
     """
 
     try:
@@ -56,9 +55,9 @@ def get_environment():
             try:
                 for label_a in subprocess.check_output('getprop').split('\n'):
                     if 'build.version.release' in label_a:
-                        environment['os_release'] = str(scrapertools.find_single_match(label_a, ':\s*\[(.*?)\]$'))
+                        environment['os_release'] = str(scrapertools.find_single_match(label_a, r':\s*\[(.*?)\]$'))
                     if 'product.model' in label_a:
-                        environment['prod_model'] = str(scrapertools.find_single_match(label_a, ':\s*\[(.*?)\]$'))
+                        environment['prod_model'] = str(scrapertools.find_single_match(label_a, r':\s*\[(.*?)\]$'))
             except:
                 try:
                     for label_a in filetools.read(os.environ['ANDROID_ROOT'] + '/build.prop').split():
@@ -196,87 +195,87 @@ def get_environment():
         except:
             environment['videolab_free'] = '?'
 
-        environment['torrent_list'] = []
-        environment['torrentcli_option'] = ''
-        environment['torrent_error'] = ''
-        environment['torrentcli_rar'] = config.get_setting("mct_rar_unpack", server="torrent", default=True)
-        environment['torrentcli_backgr'] = config.get_setting("mct_background_download", server="torrent", default=True)
-        environment['torrentcli_lib_path'] = config.get_setting("libtorrent_path", server="torrent", default="")
-        if environment['torrentcli_lib_path']:
-            lib_path = 'Activo'
-        else:
-            lib_path = 'Inactivo'
-        environment['torrentcli_unrar'] = config.get_setting("unrar_path", server="torrent", default="")
-        if environment['torrentcli_unrar']:
-            if xbmc.getCondVisibility("system.platform.Android"):
-                unrar = 'Android'
-            else:
-                unrar, bin = filetools.split(environment['torrentcli_unrar'])
-                unrar = unrar.replace('\\', '/')
-                if not unrar.endswith('/'):
-                    unrar = unrar + '/'
-                unrar = scrapertools.find_single_match(unrar, '\/([^\/]+)\/$').capitalize()
-        else:
-            unrar = 'Inactivo'
-        torrent_id = config.get_setting("torrent_client", server="torrent", default=0)
-        environment['torrentcli_option'] = str(torrent_id)
-        torrent_options = platformtools.torrent_client_installed()
-        if lib_path == 'Activo':
-            torrent_options = ['MCT'] + torrent_options
-            torrent_options = ['BT'] + torrent_options
-        environment['torrent_list'].append({'Torrent_opt': str(torrent_id), 'Libtorrent': lib_path, \
-                                            'RAR_Auto': str(environment['torrentcli_rar']), \
-                                            'RAR_backgr': str(environment['torrentcli_backgr']), \
-                                            'UnRAR': unrar})
-        environment['torrent_error'] = config.get_setting("libtorrent_error", server="torrent", default="")
-        if environment['torrent_error']:
-            environment['torrent_list'].append({'Libtorrent_error': environment['torrent_error']})
+        # environment['torrent_list'] = []
+        # environment['torrentcli_option'] = ''
+        # environment['torrent_error'] = ''
+        # environment['torrentcli_rar'] = config.get_setting("mct_rar_unpack", server="torrent", default=True)
+        # environment['torrentcli_backgr'] = config.get_setting("mct_background_download", server="torrent", default=True)
+        # environment['torrentcli_lib_path'] = config.get_setting("libtorrent_path", server="torrent", default="")
+        # if environment['torrentcli_lib_path']:
+        #     lib_path = 'Activo'
+        # else:
+        #     lib_path = 'Inactivo'
+        # environment['torrentcli_unrar'] = config.get_setting("unrar_path", server="torrent", default="")
+        # if environment['torrentcli_unrar']:
+        #     if xbmc.getCondVisibility("system.platform.Android"):
+        #         unrar = 'Android'
+        #     else:
+        #         unrar, bin = filetools.split(environment['torrentcli_unrar'])
+        #         unrar = unrar.replace('\\', '/')
+        #         if not unrar.endswith('/'):
+        #             unrar = unrar + '/'
+        #         unrar = scrapertools.find_single_match(unrar, '\/([^\/]+)\/$').capitalize()
+        # else:
+        #     unrar = 'Inactivo'
+        # torrent_id = config.get_setting("torrent_client", server="torrent", default=0)
+        # environment['torrentcli_option'] = str(torrent_id)
+        # torrent_options = platformtools.torrent_client_installed()
+        # if lib_path == 'Activo':
+        #     torrent_options = ['MCT'] + torrent_options
+        #     torrent_options = ['BT'] + torrent_options
+        # environment['torrent_list'].append({'Torrent_opt': str(torrent_id), 'Libtorrent': lib_path, \
+        #                                     'RAR_Auto': str(environment['torrentcli_rar']), \
+        #                                     'RAR_backgr': str(environment['torrentcli_backgr']), \
+        #                                     'UnRAR': unrar})
+        # environment['torrent_error'] = config.get_setting("libtorrent_error", server="torrent", default="")
+        # if environment['torrent_error']:
+        #     environment['torrent_list'].append({'Libtorrent_error': environment['torrent_error']})
 
-        for torrent_option in torrent_options:
-            cliente = dict()
-            cliente['D_load_Path'] = ''
-            cliente['Libre'] = '?'
-            cliente['Plug_in'] = torrent_option.replace('Plugin externo: ', '')
-            if cliente['Plug_in'] == 'BT':
-                cliente['D_load_Path'] = str(config.get_setting("bt_download_path", server="torrent", default=''))
-                if not cliente['D_load_Path']: continue
-                cliente['Buffer'] = str(config.get_setting("bt_buffer", server="torrent", default=50))
-            elif cliente['Plug_in'] == 'MCT':
-                cliente['D_load_Path'] = str(config.get_setting("mct_download_path", server="torrent", default=''))
-                if not cliente['D_load_Path']: continue
-                cliente['Buffer'] = str(config.get_setting("mct_buffer", server="torrent", default=50))
-            elif xbmc.getCondVisibility('System.HasAddon("plugin.video.%s")' % cliente['Plug_in']):
-                __settings__ = xbmcaddon.Addon(id="plugin.video.%s" % cliente['Plug_in'])
-                cliente['Plug_in'] = cliente['Plug_in'].capitalize()
-                if cliente['Plug_in'] == 'Torrenter':
-                    cliente['D_load_Path'] = str(xbmc.translatePath(__settings__.getSetting('storage')))
-                    if not cliente['D_load_Path']:
-                        cliente['D_load_Path'] = str(filetools.join(xbmc.translatePath("special://home/"), \
-                                                                    "cache", "xbmcup", "plugin.video.torrenter",
-                                                                    "Torrenter"))
-                    cliente['Buffer'] = str(__settings__.getSetting('pre_buffer_bytes'))
-                else:
-                    cliente['D_load_Path'] = str(xbmc.translatePath(__settings__.getSetting('download_path')))
-                    cliente['Buffer'] = str(__settings__.getSetting('buffer_size'))
-                    if __settings__.getSetting('download_storage') == '1' and __settings__.getSetting('memory_size'):
-                        cliente['Memoria'] = str(__settings__.getSetting('memory_size'))
+        # for torrent_option in torrent_options:
+        #     cliente = dict()
+        #     cliente['D_load_Path'] = ''
+        #     cliente['Libre'] = '?'
+        #     cliente['Plug_in'] = torrent_option.replace('Plugin externo: ', '')
+        #     if cliente['Plug_in'] == 'BT':
+        #         cliente['D_load_Path'] = str(config.get_setting("bt_download_path", server="torrent", default=''))
+        #         if not cliente['D_load_Path']: continue
+        #         cliente['Buffer'] = str(config.get_setting("bt_buffer", server="torrent", default=50))
+        #     elif cliente['Plug_in'] == 'MCT':
+        #         cliente['D_load_Path'] = str(config.get_setting("mct_download_path", server="torrent", default=''))
+        #         if not cliente['D_load_Path']: continue
+        #         cliente['Buffer'] = str(config.get_setting("mct_buffer", server="torrent", default=50))
+        #     elif xbmc.getCondVisibility('System.HasAddon("plugin.video.%s")' % cliente['Plug_in']):
+        #         __settings__ = xbmcaddon.Addon(id="plugin.video.%s" % cliente['Plug_in'])
+        #         cliente['Plug_in'] = cliente['Plug_in'].capitalize()
+        #         if cliente['Plug_in'] == 'Torrenter':
+        #             cliente['D_load_Path'] = str(xbmc.translatePath(__settings__.getSetting('storage')))
+        #             if not cliente['D_load_Path']:
+        #                 cliente['D_load_Path'] = str(filetools.join(xbmc.translatePath("special://home/"), \
+        #                                                             "cache", "xbmcup", "plugin.video.torrenter",
+        #                                                             "Torrenter"))
+        #             cliente['Buffer'] = str(__settings__.getSetting('pre_buffer_bytes'))
+        #         else:
+        #             cliente['D_load_Path'] = str(xbmc.translatePath(__settings__.getSetting('download_path')))
+        #             cliente['Buffer'] = str(__settings__.getSetting('buffer_size'))
+        #             if __settings__.getSetting('download_storage') == '1' and __settings__.getSetting('memory_size'):
+        #                 cliente['Memoria'] = str(__settings__.getSetting('memory_size'))
 
-            if cliente['D_load_Path']:
-                try:
-                    if environment['os_name'].lower() == 'windows':
-                        free_bytes = ctypes.c_ulonglong(0)
-                        ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(cliente['D_load_Path']),
-                                                                   None, None, ctypes.pointer(free_bytes))
-                        cliente['Libre'] = str(round(float(free_bytes.value) / \
-                                                     (1024 ** 3), 3)).replace('.', ',')
-                    else:
-                        disk_space = os.statvfs(cliente['D_load_Path'])
-                        if not disk_space.f_frsize: disk_space.f_frsize = disk_space.f_frsize.f_bsize
-                        cliente['Libre'] = str(round((float(disk_space.f_bavail) / \
-                                                      (1024 ** 3)) * float(disk_space.f_frsize), 3)).replace('.', ',')
-                except:
-                    pass
-            environment['torrent_list'].append(cliente)
+        #     if cliente['D_load_Path']:
+        #         try:
+        #             if environment['os_name'].lower() == 'windows':
+        #                 free_bytes = ctypes.c_ulonglong(0)
+        #                 ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(cliente['D_load_Path']),
+        #                                                            None, None, ctypes.pointer(free_bytes))
+        #                 cliente['Libre'] = str(round(float(free_bytes.value) / \
+        #                                              (1024 ** 3), 3)).replace('.', ',')
+        #             else:
+        #                 disk_space = os.statvfs(cliente['D_load_Path'])
+        #                 if not disk_space.f_frsize: disk_space.f_frsize = disk_space.f_frsize.f_bsize
+        #                 cliente['Libre'] = str(round((float(disk_space.f_bavail) / \
+        #                                               (1024 ** 3)) * float(disk_space.f_frsize), 3)).replace('.', ',')
+        #         except:
+        #             pass
+        #     environment['torrent_list'].append(cliente)
 
         environment['proxy_active'] = ''
         try:

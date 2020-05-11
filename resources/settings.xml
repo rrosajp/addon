@@ -68,7 +68,7 @@
         <setting id="servers_config" type="action" label="60538" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAic2VydmVyc19tZW51IiwNCiAgICAiY2hhbm5lbCI6ICJzaG9ydGN1dHMiDQp9==)"/>
         <setting id="debriders_config" type="action" label="60552" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAic2VydmVyc19tZW51IiwNCiAgICAiY2hhbm5lbCI6ICJzaG9ydGN1dHMiLA0KCSJ0eXBlIjogImRlYnJpZGVycyINCn0==)"/>
         <setting label="70578" type="lsep"/>
-        <setting id="torrent_config" type="action" label="70253" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJzZXR0aW5nX3RvcnJlbnQiLA0KICAgICJjaGFubmVsIjoic2V0dGluZyINCn0=)"/>
+        <!-- <setting id="torrent_config" type="action" label="70253" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJzZXR0aW5nX3RvcnJlbnQiLA0KICAgICJjaGFubmVsIjoic2V0dGluZyINCn0=)"/> -->
         <setting id="quasar_install" type="action" label="70785" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJkb3dubG9hZCIsDQogICAgImNoYW5uZWwiOiJxdWFzYXJfZG93bmxvYWQiDQp9)"/>
     </category>
 
@@ -102,9 +102,6 @@
         <setting id="server_speed" type="bool" label="70242" visible="eq(-5,true)" default="true"/>
         <setting id="quality" type="select" label="70240" lvalues="70241|70763|70764|70765" visible="eq(-6,true)" default="0"/>
         <setting id="download_adv" type="action" label="30030" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.kod/?ew0KCSJhY3Rpb24iOiJjaGFubmVsX2NvbmZpZyIsDQoJImNvbmZpZyI6ImRvd25sb2FkcyIsDQogICAgImNoYW5uZWwiOiJzZXR0aW5nIg0KfQ==)"/>
-
-        <setting id="elementumtype" type="text" label="Elementum Download Type" visible="false"/>
-        <setting id="elementumdl" type="folder" label="Elementum Download Backup" visible="false"/>
     </category>
 
     <!-- News -->
