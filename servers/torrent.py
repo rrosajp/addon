@@ -1,41 +1,25 @@
 # -*- coding: utf-8 -*-
 
-import re, os, sys
+import re, os, sys, time, requests, xbmc, xbmcaddon
 
-# from builtins import str
-from builtins import range
+from core import filetools, jsontools
+from core.support import dbg, log, match
+from platformcode import config, platformtools
+from torrentool.api import Torrent
+from lib.guessit import guessit
 
-PY3 = False
-VFS = True
-if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int; VFS = False
-
-if PY3:
+if sys.version_info[0] >= 3:
     import urllib.parse as urllib
 else:
     import urllib
 
-import time, requests, xbmc, xbmcgui, xbmcaddon, shutil
-from core import filetools, jsontools
-from core.support import dbg, log, match
-# from core import httptools
-# from core import scrapertools
-from platformcode import config, platformtools
-from threading import Thread, currentThread
-from torrentool.api import Torrent
-from lib.guessit import guessit
-try:
-    elementum_setting = xbmcaddon.Addon(id='plugin.video.elementum')
-    elementum_host = 'http://127.0.0.1:' + elementum_setting.getSetting('remote_port') + '/torrents/'
-    TorrentPath = xbmc.translatePath(elementum_setting.getSetting('torrents_path'))
-except:
-    pass
+monitor = filetools.join(config.get_data_path(), 'elementum_monitor.json')
 extensions_list = ['.aaf', '.3gp', '.asf', '.avi', '.flv', '.mpeg', '.m1v', '.m2v', '.m4v', '.mkv', '.mov', '.mpg', '.mpe', '.mp4', '.ogg', '.wmv']
-monitorPath = filetools.join(config.get_data_path(), 'elementum_torrent.txt')
+
 
 
 # Returns an array of possible video url's from the page_url
 def get_video_url(page_url, premium=False, user='', password='', video_password=''):
- 
     torrent_options = platformtools.torrent_client_installed(show_tuple=True)
     if len(torrent_options) == 0:
         from specials import elementum_download
@@ -71,184 +55,154 @@ def mark_auto_as_watched(item):
         xbmc_videolibrary.mark_auto_as_watched(item)
 
 
-##########################  ELEMENTUM MONITOR TEST ##########################
+def setting():
+    try:
+        elementum_setting = xbmcaddon.Addon(id='plugin.video.elementum')
+        elementum_host = 'http://127.0.0.1:' + elementum_setting.getSetting('remote_port') + '/torrents/'
+        TorrentPath = xbmc.translatePath(elementum_setting.getSetting('torrents_path'))
+    except:
+        elementum_setting = ''
+        elementum_host = ''
+        TorrentPath = ''
+    return elementum_setting, elementum_host, TorrentPath
 
-elementumHost = 'http://127.0.0.1:65220/torrents/'
 
 def elementum_download(item):
-    elementum = False
-    while not elementum:
-        try:
-            sleep = False
-            if elementum_setting.getSetting('logger_silent') == False:
-                elementum_setting.setSetting('logger_silent', 'true') 
-                sleep = True
-            if elementum_setting.getSetting('download_storage') != 0:
-                config.set_setting('elementumtype', elementum_setting.getSetting('download_storage'))    # Backup Setting
-                elementum_setting.setSetting('download_storage', '0')                                    # Set Setting
-                sleep = True
-            if elementum_setting.getSetting('download_path') != config.get_setting('downloadpath'):
-                elementum_setting.setSetting('download_path', config.get_setting('downloadpath'))        # Backup Setting
-                config.set_setting('elementumdl', elementum_setting.getSetting('download_path'))         # Set Setting
-                sleep = True
-            if sleep: time.sleep(3)
-            elementum = True
-            path = filetools.join(config.get_data_path(),'elementum_torrent.txt')
-            url = urllib.quote_plus(item.url)
-            filetools.write(path, url)
-        except:
-            pass
+    elementum_setting, elementum_host, TorrentPath = setting()
 
+    if elementum_setting:
+        set_elementum(True)
+        time.sleep(3)
+        TorrentName = match(item.url, patron=r'btih(?::|%3A)([^&%]+)', string=True).match
+        post = 'uri=%s&file=null&all=1' % urllib.quote_plus(item.url)
+        match(elementum_host  + 'add', post=post, timeout=5, alfa_s=True, ignore_response_code=True)
+        while not filetools.isfile(filetools.join(elementum_setting.getSetting('torrents_path'), TorrentName + '.torrent')):
+            time.sleep(1)
 
-# def stop_elementum_monitor():
-#     config.set_setting('stop_elementum_monitor', True)
-#     time.sleep(2)
-
-# def start_elementum_monitor():
-#     config.set_setting('stop_elementum_monitor', False)
-#     time.sleep(3)
-#     Thread(target=elementum_monitor).start()
-
+        monitor_update(TorrentPath, TorrentName)
 
 
 def elementum_monitor():
-    partials = []
-    try:
-        if filetools.isfile(monitorPath):
-            log('Add Torrent')
-            url = filetools.read(monitorPath)
-            if url.startswith('/'):
-                requests.get(elementum_host + url)
-                wait = False
-            else:
-                TorrentName = match(url, patron=r'btih(?::|%3A)([^&%]+)', string=True).match
-                uri = elementum_host  + 'add'
-                post = 'uri=%s&file=null&all=1' % url
-                match(uri, post=post, timeout=5, alfa_s=True, ignore_response_code=True)
-                wait = True
-            filetools.remove(monitorPath)
-            if wait:
-                while not filetools.isfile(filetools.join(elementum_setting.getSetting('torrents_path'), TorrentName + '.torrent')):
-                    time.sleep(1)
+    path = xbmc.translatePath(config.get_setting('downloadlistpath'))
+    elementum_setting, elementum_host, TorrentPath = setting()
+    active_torrent = filetools.listdir(TorrentPath)
+
+    if elementum_setting:
+        # check if command file exist
+        if filetools.isfile(monitor):
+            json = jsontools.load(open(monitor, "r").read())
+            Monitor = json['monitor']
+        # else create it
         else:
-            log('Watch')
+            json = jsontools.load('{"monitor":{},"settings":{}}')
+            json = jsontools.dump(json)
+            filetools.write(monitor, json, silent=True)
+
+        if len(Monitor) > 0:
             try:
-                data = requests.get(elementum_host).json()
+                data = requests.get(elementum_host + '/list').json()
             except:
                 data = ''
             if data:
-                json = data['items']
+                for it in data:
+                    progress = round(it['progress'], 2)
+                    status = it['status']
+                    name = it['id']
+                    if name in Monitor:
+                        jsontools.update_node(progress, Monitor[name]['file'], 'downloadProgress', path, silent=True)
+                        jsontools.update_node(4, Monitor[name]['file'], 'downloadStatus', path, silent=True)
+                        if status in ['Paused']:
+                            jsontools.update_node(0, Monitor[name]['file'], 'downloadStatus', path, silent=True)
+                        if status in ['Seeding', 'Finished']:
+                            monitor_update(TorrentPath, name, remove=True)
+                            dlJson = jsontools.load(open(filetools.join(path, Monitor[name]['file']), "r").read())
+                            jsontools.update_node(dlJson['downloadSize'], Monitor[name]['file'], 'downloadCompleted', path, silent=True)
+                            jsontools.update_node(2, Monitor[name]['file'], 'downloadStatus', path, silent=True)
+                            requests.get(elementum_host + 'pause/' + name)
+                            filetools.remove(filetools.join(TorrentPath, name + '.torrent'))
+                            filetools.remove(filetools.join(TorrentPath, name + '.fastresume'))
+                            time.sleep(1)
+                            rename(Monitor[name]['file'])
 
-                for it in json:
-                    Partial = float(match(it['label'], patron=r'(\d+\.\d+)%').match)
-                    Title = it['info']['title']
-                    TorrentName = match(it['path'], patron=r'resume=([^&]+)').match
-                    File, Json = find_file(TorrentName)
-                    update_download_info(Partial, Title, TorrentName, File, Json)
-                    partials.append(Partial)
 
-            partials.sort()
-            if len(partials) > 0 and partials[0] == 100:
-                unset_elementum()
-    except:
-        pass
+def monitor_update(TorrentPath, value, remove=False):
+    elementum_setting, elementum_host, TorrentPath = setting()
+    json = jsontools.load(open(monitor, "r").read())
+    Monitor = json['monitor']
+    info = Torrent.from_file(filetools.join(TorrentPath, value + '.torrent'))
+    path = xbmc.translatePath(config.get_setting('downloadlistpath'))
+
+    if not value in Monitor:
+        Monitor[value]={}
+        Monitor[value]['name'] = info.name
+        Monitor[value]['size'] = info.total_size
+        File = find_file(value)
+        Monitor[value]['file'] = File
+        json = jsontools.dump(json)
+        filetools.write(monitor, json, silent=True)
+
+        backupFilename = jsontools.load(open(filetools.join(path, File), "r").read())['downloadFilename']
+        jsontools.update_node(value, File, 'TorrentName', path, silent=True)
+        jsontools.update_node(info.total_size, File, 'downloadSize', path, silent=True)
+        jsontools.update_node(backupFilename, File, 'backupFilename', path, silent=True)
+        jsontools.update_node(info.name, File, 'downloadFilename', path, silent=True)
+
+    elif remove:
+        Monitor.pop(value)
+        jsontools.dump(json)
+        filetools.write(monitor, jsontools.dump(json), silent=True)
+
+    if len(Monitor) == 0: set_elementum()
 
 
-def find_file(File):
+def set_elementum(SET=False):
+    elementum_setting, elementum_host, TorrentPath = setting()
+    json = jsontools.load(open(monitor, "r").read())
+    backup_setting = json['settings']
+    write = False
+    if SET:
+        if elementum_setting.getSetting('logger_silent') == False or not 'logger_silent' in backup_setting:
+            elementum_setting.setSetting('logger_silent', 'true')
+            backup_setting['logger_silent'] = 'false'
+
+        if elementum_setting.getSetting('download_storage') != 0 or not 'download_storage' in backup_setting:
+            backup_setting['download_storage'] = elementum_setting.getSetting('download_storage')           # Backup Setting
+            elementum_setting.setSetting('download_storage', '0')                                    # Set Setting
+
+        if elementum_setting.getSetting('download_path') != config.get_setting('downloadpath') or not 'download_path' in backup_setting:
+            backup_setting['download_path'] = elementum_setting.getSetting('download_path')              # Backup Setting
+            elementum_setting.setSetting('download_path', config.get_setting('downloadpath'))        # Set Setting
+        write = True
+
+    elif backup_setting:
+        elementum_setting.setSetting('logger_silent', backup_setting['logger_silent'])
+        elementum_setting.setSetting('download_storage', backup_setting['download_storage'])
+        elementum_setting.setSetting('download_path', backup_setting['download_path'])
+        json['settings'] = {}
+        write = True
+    if write:
+        json = jsontools.dump(json)
+        filetools.write(monitor, json, silent=True)
+        time.sleep(1)
+
+
+def find_file(hash):
     path = xbmc.translatePath(config.get_setting('downloadlistpath'))
     files = filetools.listdir(path)
-    # dbg()
     for f in files:
         filepath = filetools.join(path, f)
         json = jsontools.load(filetools.read(filepath))
-        if ('downloadServer' in json and 'url' in json['downloadServer'] and File in json['downloadServer']['url']) or ('url' in json and File in json['url']):
+        if ('downloadServer' in json and 'url' in json['downloadServer'] and hash in json['downloadServer']['url']) or ('url' in json and hash in json['url']):
             break
-    return filetools.split(filepath)[-1], json
+    return filetools.split(filepath)[-1]
 
 
-def update_download_info(Partial, Title, TorrentName, File, Json):
-    path = xbmc.translatePath(config.get_setting('downloadlistpath'))
-    dlpath = filetools.join(config.get_setting('downloadpath'), Title)
+def elementum_actions(parameter, TorrentHash):
+    elementum_setting, elementum_host, TorrentPath = setting()
+    if elementum_setting:
+        if parameter == 'delete' : monitor_update(TorrentPath, TorrentHash, remove=True)
+        requests.get('%s/%s/%s' %(elementum_host, parameter, TorrentHash))
 
-    if 'TorrentName' not in Json:
-        jsontools.update_node(TorrentName, File, 'TorrentName', path, silent=True)
-    if Json['downloadSize'] == 0:
-        size = Torrent.from_file(filetools.join(TorrentPath, TorrentName + '.torrent')).total_size
-        jsontools.update_node(size, File, 'downloadSize', path, silent=True)
-    if Json['downloadFilename'] != dlpath and 'backupFilename' not in Json:
-        jsontools.update_node(Json['downloadFilename'], File, 'backupFilename', path, silent=True)
-        jsontools.update_node(dlpath, File, 'downloadFilename', path, silent=True)
-    if Json['downloadProgress'] != Partial and Partial != 0:
-        jsontools.update_node(Partial, File, 'downloadProgress', path, silent=True)
-        jsontools.update_node(4, File, 'downloadStatus', path, silent=True)
-        if Partial == 100:
-            jsontools.update_node(Json['downloadSize'], File, 'downloadCompleted', path, silent=True)
-            jsontools.update_node(2, File, 'downloadStatus', path, silent=True)
-            requests.get(elementum_host + 'pause/' + TorrentName)
-            del_torrent(TorrentName)
-            time.sleep(1)
-            rename(TorrentName, path)
-            # requests.get(elementum_host + 'delete/' + TorrentName + '?files=false')
-
-def del_torrent(TorrentName):
-    filetools.remove(filetools.join(TorrentPath, TorrentName + '.torrent'))
-
-
-def rename(TorrentName, Path):
-    # dbg()
-    File, Json = find_file(TorrentName)
-    path = Json['downloadFilename']
-    if Json['infoLabels']['mediatype'] == 'movie':
-        if filetools.isdir(path):
-            extension = ''
-            files = filetools.listdir(path)
-            sep = '/' if path.lower().startswith("smb://") else os.sep
-            oldName = path.split(sep)[-1]
-            newName = Json['backupFilename']
-            for f in files:
-                ext = os.path.splitext(f)[-1]
-                if ext in extensions_list: extension = ext
-                filetools.rename(filetools.join(path, f), f.replace(oldName, newName))
-            filetools.rename(path, newName)
-            jsontools.update_node(filetools.join(newName, newName + extension), File, 'downloadFilename', Path)
-
-        else:
-            oldName = filetools.split(path)[-1]
-            newName = Json['backupFilename'] + os.path.splitext(oldName)[-1]
-            filetools.rename(path, newName)
-            jsontools.update_node(newName, File, 'downloadFilename', Path)
-    else:
-        sep = '/' if path.lower().startswith("smb://") else os.sep
-        FolderName = Json['backupFilename'].split(sep)[0]
-        Title = re.sub(r'(\s*\[[^\]]+\])', '', FolderName)
-        if filetools.isdir(path):
-            files = filetools.listdir(path)
-            file_dict = {}
-            for f in files:
-                title = process_filename(f, Title, ext=False)
-                ext = os.path.splitext(f)[-1]
-                name = os.path.splitext(f)[0]
-                if title not in file_dict and ext in extensions_list:
-                    file_dict[title] = name
-
-            for title, name in file_dict.items():
-                for f in files:
-                    if name in f:
-                        # log('Name:',name,'Title:',title)
-                        filetools.rename(filetools.join(path, f), f.replace(name, title))
-
-            filetools.rename(path, FolderName)
-            jsontools.update_node(FolderName, File, 'downloadFilename', Path)
-        else:
-            filename = filetools.split(path)[-1]
-            title = process_filename(filename, Title)
-            NewFolder = filetools.join(config.get_setting('downloadpath'), FolderName)
-            if not filetools.isdir(NewFolder):
-                filetools.mkdir(NewFolder)
-            from_folder = filetools.join(config.get_setting('downloadpath'), filename)
-            to_folder = filetools.join(config.get_setting('downloadpath'), FolderName, title)
-            filetools.move(from_folder, to_folder)
-            jsontools.update_node(filetools.join(FolderName, title), File, 'downloadFilename', Path)
 
 def process_filename(filename, Title, ext=True):
     extension = os.path.splitext(filename)[-1]
@@ -275,16 +229,58 @@ def process_filename(filename, Title, ext=True):
     title = (t if t else Title) + s + episode + (extension if ext else '')
     return title
 
-def unset_elementum():
-    log('UNSET Elementum')
-    Sleep = False
-    if config.get_setting('elementumtype') and config.get_setting('elementumtype') != elementum_setting.gerSetting('download_storage'):
-        elementum_setting.setSetting('download_storage', str(config.get_setting('elementumtype')))
-        Sleep = True
-    if config.get_setting('elementumdl') and config.get_setting('elementumdl') != elementum_setting.gerSetting('download_path'):
-        elementum_setting.setSetting('download_path', config.get_setting('elementumdl'))
-        Sleep = True
-    if Sleep:
-        time.sleep(1)
 
-##########################  ELEMENTUM MONITOR TEST ##########################
+def rename(File):
+    jsonPath = xbmc.translatePath(config.get_setting('downloadlistpath'))
+    json = jsontools.load(open(filetools.join(jsonPath, File), "r").read())
+    filePath = filetools.join(xbmc.translatePath(config.get_setting('downloadpath')), json['downloadFilename'])
+
+    if json['infoLabels']['mediatype'] == 'movie':
+        if filetools.isdir(filePath):
+            extension = ''
+            files = filetools.listdir(filePath)
+            oldName = json['downloadFilename']
+            newName = json['backupFilename']
+            for f in files:
+                ext = os.path.splitext(f)[-1]
+                if ext in extensions_list: extension = ext
+                filetools.rename(filetools.join(filePath, f), f.replace(oldName, newName))
+            filetools.rename(filePath, newName)
+            jsontools.update_node(filetools.join(newName, newName + extension), File, 'downloadFilename', jsonPath)
+
+        else:
+            oldName = json['downloadFilename']
+            newName = json['backupFilename'] + os.path.splitext(oldName)[-1]
+            filetools.rename(filePath, newName)
+            jsontools.update_node(newName, File, 'downloadFilename', jsonPath)
+    else:
+        sep = '/' if filePath.lower().startswith("smb://") else os.sep
+        FolderName = json['backupFilename'].split(sep)[0]
+        Title = re.sub(r'(\s*\[[^\]]+\])', '', FolderName)
+        if filetools.isdir(filePath):
+            files = filetools.listdir(filePath)
+            file_dict = {}
+            for f in files:
+                title = process_filename(f, Title, ext=False)
+                ext = os.path.splitext(f)[-1]
+                name = os.path.splitext(f)[0]
+                if title not in file_dict and ext in extensions_list:
+                    file_dict[title] = name
+
+            for title, name in file_dict.items():
+                for f in files:
+                    if name in f:
+                        filetools.rename(filetools.join(filePath, f), f.replace(name, title))
+
+            filetools.rename(filePath, FolderName)
+            jsontools.update_node(FolderName, File, 'downloadFilename', jsonPath)
+        else:
+            filename = filetools.split(filePath)[-1]
+            title = process_filename(filename, Title)
+            NewFolder = filetools.join(config.get_setting('downloadpath'), FolderName)
+            if not filetools.isdir(NewFolder):
+                filetools.mkdir(NewFolder)
+            from_folder = filetools.join(config.get_setting('downloadpath'), filename)
+            to_folder = filetools.join(config.get_setting('downloadpath'), FolderName, title)
+            filetools.move(from_folder, to_folder)
+            jsontools.update_node(filetools.join(FolderName, title), File, 'downloadFilename', jsonPath)
