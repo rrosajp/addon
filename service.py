@@ -302,7 +302,6 @@ class AddonMonitor(xbmc.Monitor):
         if wait > 0:
             xbmc.sleep(wait)
         if not config.get_setting("update", "videolibrary") == 2:
-            check_for_update(overwrite=False)
             run_threaded(check_for_update, (False,))
         self.scheduleVideolibrary()
         super(AddonMonitor, self).__init__()
