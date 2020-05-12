@@ -56,11 +56,11 @@ def mark_auto_as_watched(item):
 
 
 def setting():
-    try:
+    if xbmc.getCondVisibility('System.HasAddon("plugin.video.elementum")') == 1:
         elementum_setting = xbmcaddon.Addon(id='plugin.video.elementum')
         elementum_host = 'http://127.0.0.1:' + elementum_setting.getSetting('remote_port') + '/torrents/'
         TorrentPath = xbmc.translatePath(elementum_setting.getSetting('torrents_path'))
-    except:
+    else:
         elementum_setting = ''
         elementum_host = ''
         TorrentPath = ''
