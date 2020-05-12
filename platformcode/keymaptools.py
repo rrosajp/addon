@@ -102,10 +102,11 @@ MAIN_MENU = {
     "news": {"label": config.get_localized_string(30130), "icon": get_thumb("news.png"), "order": 0},
     "channels": {"label": config.get_localized_string(30118), "icon": get_thumb("channels.png"), "order": 1},
     "search": {"label": config.get_localized_string(70082), "icon": get_thumb("search.png"), "order": 2},
-    "favorites": {"label": config.get_localized_string(30102), "icon": get_thumb("favorites.png"), "order": 3},
-    "videolibrary": {"label": config.get_localized_string(30131), "icon": get_thumb("videolibrary.png"), "order": 4},
-    "downloads": {"label": config.get_localized_string(60332), "icon": get_thumb("downloads.png"), "order": 5},
-    "settings": {"label": config.get_localized_string(60333), "icon": get_thumb("setting_0.png"), "order": 6}
+    "videolibrary": {"label": config.get_localized_string(30131), "icon": get_thumb("videolibrary.png"), "order": 3},
+    "kodfavorites": {"label": config.get_localized_string(70527), "icon": get_thumb("mylink.png"), "order": 4},
+    "favorites": {"label": config.get_localized_string(30102), "icon": get_thumb("favorites.png"), "order": 5},
+    "downloads": {"label": config.get_localized_string(60332), "icon": get_thumb("downloads.png"), "order": 6},
+    "settings": {"label": config.get_localized_string(60333), "icon": get_thumb("setting_0.png"), "order": 7}
 }
 
 
@@ -134,32 +135,28 @@ class Main(xbmcgui.WindowXMLDialog):
             identifier = self.getControl(32500).getSelectedItem().getProperty("identifier")
             if identifier == "news":
                 xbmc.executebuiltin('Dialog.Close(all,true)')
-                xbmc.executebuiltin(
-                    'ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJuZXdzIg0KfQ==")')
+                xbmc.executebuiltin('ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJuZXdzIg0KfQ==")')
             elif identifier == "channels":
                 xbmc.executebuiltin('Dialog.Close(all,true)')
-                xbmc.executebuiltin(
-                    'ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAiZ2V0Y2hhbm5lbHR5cGVzIiwgDQogICAgImNoYW5uZWwiOiAiY2hhbm5lbHNlbGVjdG9yIg0KfQ==")')
+                xbmc.executebuiltin('ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAiZ2V0Y2hhbm5lbHR5cGVzIiwgDQogICAgImNoYW5uZWwiOiAiY2hhbm5lbHNlbGVjdG9yIg0KfQ==")')
             elif identifier == "search":
                 xbmc.executebuiltin('Dialog.Close(all,true)')
-                xbmc.executebuiltin(
-                    'ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJzZWFyY2giDQp9")')
-            elif identifier == "favorites":
-                xbmc.executebuiltin('Dialog.Close(all,true)')
-                xbmc.executebuiltin(
-                    'ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJmYXZvcml0ZXMiDQp9")')
+                xbmc.executebuiltin('ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJzZWFyY2giDQp9")')
             elif identifier == "videolibrary":
                 xbmc.executebuiltin('Dialog.Close(all,true)')
-                xbmc.executebuiltin(
-                    'ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJ2aWRlb2xpYnJhcnkiDQp9")')
+                xbmc.executebuiltin('ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJ2aWRlb2xpYnJhcnkiDQp9")')
+            elif identifier == "favorites":
+                xbmc.executebuiltin('Dialog.Close(all,true)')
+                xbmc.executebuiltin('ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJmYXZvcml0ZXMiDQp9")')
+            elif identifier == "kodfavorites":
+                xbmc.executebuiltin('Dialog.Close(all,true)')
+                xbmc.executebuiltin('ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJrb2RmYXZvcml0ZXMiDQp9")')
             elif identifier == "downloads":
                 xbmc.executebuiltin('Dialog.Close(all,true)')
-                xbmc.executebuiltin(
-                    'ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJkb3dubG9hZHMiDQp9")')
+                xbmc.executebuiltin('ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJkb3dubG9hZHMiDQp9")')
             elif identifier == "settings":
                 xbmc.executebuiltin('Dialog.Close(all,true)')
-                xbmc.executebuiltin(
-                    'ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJzZXR0aW5nIg0KfQ==")')
+                xbmc.executebuiltin('ActivateWindow(10025, "plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAibWFpbmxpc3QiLCANCiAgICAiY2hhbm5lbCI6ICJzZXR0aW5nIg0KfQ==")')
 
 
     def onAction(self, action):
