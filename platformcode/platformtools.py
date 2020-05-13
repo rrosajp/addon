@@ -240,9 +240,9 @@ def getCurrentView(item=None, parent_item=None):
     if not item:
         info = xbmc.getInfoLabel('Container.ListItem(1).FileNameAndPath')
         item = Item().fromurl(info) if info else Item()
-    parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'channel_search', 'newest', 'discover_list', 'new_search']
+    parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'newest', 'discover_list']
 
-    if parent_item.action == 'findvideos':
+    if parent_item.action == 'findvideos' or parent_item.action in ['channel_search', 'new_search']:
         return 'server', 'addons' if config.get_setting('touch_view') else ''
 
     elif parent_item.action == 'mainlist':
@@ -725,7 +725,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
 
         # Add to kodfavoritos (My links)
         if item.channel not in ["favorites", "videolibrary", "help", ""] and parent_item.channel != "favorites":
-            context_commands.append( (config.get_localized_string(70557), "XBMC.RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, urllib.urlencode({'channel': "kodfavourites", 'action': "addFavourite", 'from_channel': item.channel, 'from_action': item.action}))))
+            context_commands.append( (config.get_localized_string(70557), "XBMC.RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, urllib.urlencode({'channel': "kodfavorites", 'action': "addFavourite", 'from_channel': item.channel, 'from_action': item.action}))))
         # Search in other channels
         if item.contentType in ['movie', 'tvshow'] and item.channel != 'search' and item.action not in ['play'] and parent_item.action != 'mainlist':
 
