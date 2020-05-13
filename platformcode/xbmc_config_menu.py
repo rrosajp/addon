@@ -878,7 +878,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                     self.check_ok()
 
             # if Focus is on button
-            else:ù
+            else:
                 self.dispose_controls(0)
                 self.setFocusId(3001)
 
