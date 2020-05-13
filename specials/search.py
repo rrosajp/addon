@@ -298,34 +298,30 @@ def channel_search(item):
 def get_channel_results(ch, item):
     max_results = 10
     results = list()
+    try:
+        ch_params = channeltools.get_channel_parameters(ch)
 
-    ch_params = channeltools.get_channel_parameters(ch)
+        module = __import__('channels.%s' % ch_params["channel"], fromlist=["channels.%s" % ch_params["channel"]])
+        mainlist = getattr(module, 'mainlist')(Item(channel=ch_params["channel"]))
+        search_action = [elem for elem in mainlist if elem.action == "search" and (item.mode == 'all' or elem.contentType == item.mode)]
 
-    module = __import__('channels.%s' % ch_params["channel"], fromlist=["channels.%s" % ch_params["channel"]])
-    mainlist = getattr(module, 'mainlist')(Item(channel=ch_params["channel"]))
-    search_action = [elem for elem in mainlist if elem.action == "search" and (item.mode == 'all' or elem.contentType == item.mode)]
-
-    if search_action:
-        for search_ in search_action:
-            try:
+        if search_action:
+            for search_ in search_action:
                 results.extend(module.search(search_, item.text))
-            except:
-                pass
-    else:
-        try:
+        else:
             results.extend(module.search(item, item.text))
-        except:
-            pass
 
-    if len(results) < 0 and len(results) < max_results and item.mode != 'all':
+        if len(results) < 0 and len(results) < max_results and item.mode != 'all':
 
-        if len(results) == 1:
-            if not results[0].action or config.get_localized_string(30992).lower() in results[0].title.lower():
-                return [ch, []]
+            if len(results) == 1:
+                if not results[0].action or config.get_localized_string(30992).lower() in results[0].title.lower():
+                    return [ch, []]
 
-        results = get_info(results)
+            results = get_info(results)
 
-    return [ch, results]
+        return [ch, results]
+    except:
+        return [ch, results]
 
 
 def get_info(itemlist):
