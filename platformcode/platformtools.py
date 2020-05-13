@@ -236,13 +236,17 @@ def render_items(itemlist, parent_item):
 def getCurrentView(item=None, parent_item=None):
     if not parent_item:
         info = xbmc.getInfoLabel('Container.FolderPath')
-        parent_item = Item().fromurl(info) if info else Item()
+        if not info:
+            return None, None
+        parent_item = Item().fromurl(info)
     if not item:
         info = xbmc.getInfoLabel('Container.ListItem(1).FileNameAndPath')
+        if not info:
+            return None, None
         item = Item().fromurl(info) if info else Item()
-    parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'newest', 'discover_list']
+    parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'newest', 'discover_list', 'new_search', 'channel_search']
 
-    if parent_item.action == 'findvideos' or parent_item.action in ['channel_search', 'new_search']:
+    if parent_item.action == 'findvideos' or (parent_item.action in ['channel_search', 'new_search'] and parent_item.infoLabels['tmdb_id']):
         return 'server', 'addons' if config.get_setting('touch_view') else ''
 
     elif parent_item.action == 'mainlist':
@@ -280,13 +284,14 @@ def set_view_mode(item, parent_item):
         xbmc.executebuiltin('Container.SetViewMode(%s)' % 55)
 
     content, Type = getCurrentView(item, parent_item)
-    mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
-    if mode == 0:
-        logger.info('default mode')
-        mode = 55
-    xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
-    xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
-    logger.info('TYPE: ' + Type + ' - ' + 'CONTENT: ' + content)
+    if content:
+        mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
+        if mode == 0:
+            logger.info('default mode')
+            mode = 55
+        xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
+        xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
+        logger.info('TYPE: ' + Type + ' - ' + 'CONTENT: ' + content)
 
 
 # def render_items_old(itemlist, parent_item):
@@ -756,7 +761,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
             elif item.action in ["detail", "findvideos"] and item.contentType == 'movie' and item.contentTitle:
                 context_commands.append((config.get_localized_string(60353), "XBMC.RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'action=add_pelicula_to_library&from_action=' + item.action)))
 
-        if not item.local and item.channel not in ["downloads"] and item.server != 'torrent' and parent_item.action != 'mainlist' and config.get_setting('downloadenabled'):
+        if not item.local and item.channel not in ["downloads", "filmontv"] and item.server != 'torrent' and parent_item.action != 'mainlist' and config.get_setting('downloadenabled'):
             # Download movie
             if item.contentType == "movie":
                 context_commands.append((config.get_localized_string(60354), "XBMC.RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' + item.action)))
@@ -781,8 +786,8 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
         #                              (sys.argv[0], Item(channel="setting", action="mainlist").tourl())))
 
         # Open settings...
-        if item.action in ["findvideos", 'episodios', 'check'] or "buscar_trailer" in context:
-            context_commands.append((config.get_localized_string(60359), "XBMC.RunPlugin(%s?%s)" % (sys.argv[0], urllib.urlencode({ 'channel': "trailertools", 'action': "buscartrailer", 'search_title': item.fulltitle if item.fulltitle else item.contentTitle, 'contextual': True}))))
+        if item.action in ["findvideos", 'episodios', 'check', 'new_search'] or "buscar_trailer" in context:
+            context_commands.append((config.get_localized_string(60359), "XBMC.RunPlugin(%s?%s)" % (sys.argv[0], urllib.urlencode({ 'channel': "trailertools", 'action': "buscartrailer", 'search_title': item.contentTitle if item.contentTitle else item.fulltitle, 'contextual': True}))))
 
         if kwargs.get('superfavourites'):
             context_commands.append((config.get_localized_string(60361), "XBMC.RunScript(special://home/addons/plugin.program.super.favourites/LaunchSFMenu.py)"))
