@@ -848,6 +848,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
 
             # if Focus is on close button
             elif focus == 10003:
+                self.dispose_controls(0)
                 self.setFocusId(3001)
 
         # On Right
@@ -877,7 +878,8 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                     self.check_ok()
 
             # if Focus is on button
-            else:
+            else:ù
+                self.dispose_controls(0)
                 self.setFocusId(3001)
 
         # On Down
@@ -895,8 +897,10 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                     focus_control += 1
 
                 if focus_control >= len(self.visible_controls):
-                    focus_control = 0
-                    self.setFocusId(3001)
+                    if self.ok_enabled:
+                        self.setFocusId(10004)
+                    else:
+                        self.setFocusId(10005)
                     return
 
                 self.dispose_controls(focus_control, True)
