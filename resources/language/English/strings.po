@@ -23,12 +23,16 @@ msgctxt "#20001"
 msgid "eng"
 msgstr ""
 
+msgctxt "#30000"
+msgid "View"
+msgstr ""
+
 msgctxt "#30001"
 msgid "Check for updates"
 msgstr ""
 
 msgctxt "#30002"
-msgid "Touch optimized view"
+msgid "Enable touch view"
 msgstr ""
 
 msgctxt "#30003"
@@ -53,6 +57,10 @@ msgstr ""
 
 msgctxt "#30008"
 msgid "High"
+msgstr ""
+
+msgctxt "#30009"
+msgid "Show only channels"
 msgstr ""
 
 msgctxt "#30010"

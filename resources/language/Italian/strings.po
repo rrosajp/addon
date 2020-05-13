@@ -23,13 +23,17 @@ msgctxt "#20001"
 msgid "eng"
 msgstr "ita"
 
+msgctxt "#30000"
+msgid "View"
+msgstr "Vista"
+
 msgctxt "#30001"
 msgid "Check for updates"
 msgstr "Verifica aggiornamenti"
 
 msgctxt "#30002"
-msgid "Touch optimized view"
-msgstr "Vista ottimizzata touch"
+msgid "Enable touch view"
+msgstr "Abilita vista touch"
 
 msgctxt "#30003"
 msgid "Enable debug logging"
@@ -54,6 +58,10 @@ msgstr "Bassa"
 msgctxt "#30008"
 msgid "High"
 msgstr "Alta"
+
+msgctxt "#30009"
+msgid "Show only channels"
+msgstr "Mostra solo canali"
 
 msgctxt "#30010"
 msgid "Channel icons view"
