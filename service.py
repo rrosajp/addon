@@ -385,7 +385,10 @@ if __name__ == "__main__":
 
     # mark as stopped all downloads (if we are here, probably kodi just started)
     from specials.downloads import stop_all
-    stop_all()
+    try:
+        stop_all()
+    except:
+        logger.error(traceback.format_exc())
 
     while True:
         schedule.run_pending()

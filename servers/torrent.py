@@ -94,8 +94,8 @@ def elementum_monitor():
             Monitor = json['monitor']
         # else create it
         else:
-            json = jsontools.load('{"monitor":{},"settings":{}}')
-            json = jsontools.dump(json)
+            Monitor = jsontools.load('{"monitor":{},"settings":{}}')
+            json = jsontools.dump(Monitor)
             filetools.write(monitor, json, silent=True)
 
         if len(Monitor) > 0:
