@@ -4,21 +4,15 @@
 # ------------------------------------------------------------
 
 from __future__ import division
-#from builtins import str
-import sys
+import sys, os, inspect, xbmcgui, xbmc
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 from builtins import range
 from past.utils import old_div
 
-import inspect
-import os
-
-import xbmcgui
-
-from core import channeltools
-from core import servertools, scrapertools
-from platformcode import config, logger
+from core import channeltools, servertools, scrapertools
+from platformcode import config, logger, platformtools
+from core.support import log, dbg, match
 
 
 class SettingsWindow(xbmcgui.WindowXMLDialog):
@@ -155,14 +149,13 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
             parámetros, el item y el dict_values
     """
 
-    def start(self, list_controls=None, dict_values=None, caption="", callback=None, item=None,
-              custom_button=None, channelpath=None):
-        logger.info()
+    def start(self, list_controls=None, dict_values=None, caption="", callback=None, item=None, custom_button=None, channelpath=None):
+        log()
 
-        # Ruta para las imagenes de la ventana
+        # Media Path
         self.mediapath = os.path.join(config.get_runtime_path(), 'resources', 'skins', 'Default', 'media')
 
-        # Capturamos los parametros
+        # Params
         self.list_controls = list_controls
         self.values = dict_values
         self.caption = caption
@@ -178,45 +171,48 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         else:
             self.custom_button = None
 
-        # Obtenemos el canal desde donde se ha echo la llamada y cargamos los settings disponibles para ese canal
+        # Load Channel Settings
         if not channelpath:
             channelpath = inspect.currentframe().f_back.f_back.f_code.co_filename
         self.channel = os.path.basename(channelpath).replace(".py", "")
         self.ch_type = os.path.basename(os.path.dirname(channelpath))
-        logger.info('PATH= ' + channelpath)
-        # Si no tenemos list_controls, hay que sacarlos del json del canal
+        # If list_controls does not exist, it is removed from the channel json
         if not self.list_controls:
 
-            # Si la ruta del canal esta en la carpeta "channels", obtenemos los controles y valores mediante chaneltools
-            if os.path.join(config.get_runtime_path(), "channels") or os.path.join(config.get_runtime_path(), "specials")  in channelpath:
+            # If the channel path is in the "channels" folder, we get the controls and values using chaneltools
+            if os.path.join(config.get_runtime_path(), "channels") or os.path.join(config.get_runtime_path(), "specials") in channelpath:
 
-                # La llamada se hace desde un canal
+                # The call is made from a channel
                 self.list_controls, default_values = channeltools.get_channel_controls_settings(self.channel)
                 self.kwargs = {"channel": self.channel}
+                self.channelName = channeltools.get_channel_json(self.channel)['name']
 
-            # Si la ruta del canal esta en la carpeta "servers", obtenemos los controles y valores mediante servertools
+            # If the channel path is in the "servers" folder, we get the controls and values through servertools
             elif os.path.join(config.get_runtime_path(), "servers") in channelpath:
 
-                # La llamada se hace desde un canal
+                # The call is made from a channel
                 self.list_controls, default_values = servertools.get_server_controls_settings(self.channel)
                 self.kwargs = {"server": self.channel}
+                self.channelName = servertools.get_server_json(self.channel)['name']
 
-            # En caso contrario salimos
+            # Else Exit
             else:
                 return None
 
-        # Si no se pasan dict_values, creamos un dict en blanco
+        # If dict_values are not passed, create a blank dict
         if self.values is None:
             self.values = {}
 
-        # Ponemos el titulo
+        # Make title
         if self.caption == "":
-            self.caption = str(config.get_localized_string(30100)) + " -- " + self.channel.capitalize()
+            self.caption = str(config.get_localized_string(30100)) + ' - ' + self.channelName
 
-        elif self.caption.startswith('@') and unicode(self.caption[1:]).isnumeric():
-            self.caption = config.get_localized_string(int(self.caption[1:]))
+        matches = match(self.caption, patron=r'@(\d+)').matches
+        if matches:
+            for m in matches:
+                self.caption = self.caption.replace('@' + match, config.get_localized_string(int(m)))
 
-        # Muestra la ventana
+        # Show Window
         self.return_value = None
         self.doModal()
         return self.return_value
@@ -225,8 +221,6 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
     def set_enabled(c, val):
         if c["type"] == "list":
             c["control"].setEnabled(val)
-            c["downBtn"].setEnabled(val)
-            c["upBtn"].setEnabled(val)
             c["label"].setEnabled(val)
         else:
             c["control"].setEnabled(val)
@@ -235,8 +229,6 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
     def set_visible(c, val):
         if c["type"] == "list":
             c["control"].setVisible(val)
-            c["downBtn"].setVisible(val)
-            c["upBtn"].setVisible(val)
             c["label"].setVisible(val)
         else:
             c["control"].setVisible(val)
@@ -255,41 +247,37 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
 
         ok = False
 
-        # Si la condicion es True o False, no hay mas que evaluar, ese es el valor
+        # If the condition is True or False, there is nothing else to evaluate, that is the value
         if isinstance(cond, bool):
             return cond
 
-        # Obtenemos las condiciones
-        # conditions = re.compile("(!?eq|!?gt|!?lt)?\(([^,]+),[\"|']?([^)|'|\"]*)['|\"]?\)[ ]*([+||])?").findall(cond)
+        # Get the conditions
         conditions = re.compile(r'''(!?eq|!?gt|!?lt)?\s*\(\s*([^, ]+)\s*,\s*["']?([^"'\)]+)["']?\)([+|])?''').findall(cond)
-        # conditions = scrapertools.find_multiple_matches(cond, r"(!?eq|!?gt|!?lt)?\(([^,]+),[\"|']?([^)|'|\"]*)['|\"]?\)[ ]*([+||])?")
         for operator, id, value, next in conditions:
-            # El id tiene que ser un numero, sino, no es valido y devuelve False
+            # The id must be a number, otherwise it is not valid and returns False
             try:
                 id = int(id)
             except:
                 return False
 
-            # El control sobre el que evaluar, tiene que estar dentro del rango, sino devuelve False
+            # The control to evaluate on has to be within range, otherwise it returns False
             if index + id < 0 or index + id >= len(self.list_controls):
                 return False
 
             else:
-                # Obtenemos el valor del control sobre el que se compara
+                # Obtain the value of the control on which it is compared
                 c = self.list_controls[index + id]
-                if c["type"] == "bool":
-                    control_value = bool(c["control"].isSelected())
-                if c["type"] == "text":
-                    control_value = c["control"].getText()
-                if c["type"] == "list":
-                    control_value = c["label"].getLabel()
-                if c["type"] == "label":
-                    control_value = c["control"].getLabel()
+                if c["type"] == "bool": control_value = bool(c["control"].isSelected())
+                if c["type"] == "text": control_value = c["control"].getText()
+                if c["type"] == "list": control_value = c["label"].getLabel()
+                if c["type"] == "label": control_value = c["control"].getLabel()
 
-                if value.startswith('@') and unicode(value[1:]).isnumeric():
-                    value = config.get_localized_string(int(value[1:]))
+                matches = match(self.caption, patron=r'@(\d+)').matches
+                if matches:
+                    for m in matches:
+                        self.caption = self.caption.replace('@' + match, config.get_localized_string(int(m)))
 
-            # Operaciones lt "menor que" y gt "mayor que", requieren que las comparaciones sean numeros, sino devuelve
+            # Operations lt "less than" and gt "greater than" require comparisons to be numbers, otherwise it returns
             # False
             if operator in ["lt", "!lt", "gt", "!gt"]:
                 try:
@@ -297,73 +285,71 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                 except ValueError:
                     return False
 
-            # Operacion eq "igual a"
+            # Operation eq "equal to"
             if operator in ["eq", "!eq"]:
-                # valor int
+                # int
                 try:
                     value = int(value)
                 except ValueError:
                     pass
 
-                # valor bool
+                # bool
                 if not isinstance(value, int) and value.lower() == "true":
                     value = True
                 elif not isinstance(value, int) and value.lower() == "false":
                     value = False
 
-            # operacion "eq" "igual a"
+            # Operation eq "equal to"
             if operator == "eq":
                 if control_value == value:
                     ok = True
                 else:
                     ok = False
 
-            # operacion "!eq" "no igual a"
+            # Operation !eq "not equal to"
             if operator == "!eq":
                 if not control_value == value:
                     ok = True
                 else:
                     ok = False
 
-            # operacion "gt" "mayor que"
+            # operation "gt" "greater than"
             if operator == "gt":
                 if control_value > value:
                     ok = True
                 else:
                     ok = False
 
-            # operacion "!gt" "no mayor que"
+            # operation "!gt" "not greater than"
             if operator == "!gt":
                 if not control_value > value:
                     ok = True
                 else:
                     ok = False
 
-            # operacion "lt" "menor que"
+            # operation "lt" "less than"
             if operator == "lt":
                 if control_value < value:
                     ok = True
                 else:
                     ok = False
 
-            # operacion "!lt" "no menor que"
+            # operation "!lt" "not less than"
             if operator == "!lt":
                 if not control_value < value:
                     ok = True
                 else:
                     ok = False
 
-            # Siguiente operación, si es "|" (or) y el resultado es True, no tiene sentido seguir, es True
+            # Next operation, if it is "|" (or) and the result is True, there is no sense to follow, it is True
             if next == "|" and ok is True:
                 break
-            # Siguiente operación, si es "+" (and) y el resultado es False, no tiene sentido seguir, es False
+            # Next operation, if it is "+" (and) and the result is False, there is no sense to follow, it is False
             if next == "+" and ok is False:
                 break
 
-                # Siguiente operación, si es "+" (and) y el resultado es True, Seguira, para comprobar el siguiente valor
-                # Siguiente operación, si es "|" (or) y el resultado es False, Seguira, para comprobar el siguiente valor
-
         return ok
+
 
     def add_control_label(self, c):
         control = xbmcgui.ControlLabel(0, -100, self.controls_width + 20, 40, "", alignment=4, font=self.font, textColor=c["color"])
@@ -372,51 +358,33 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
 
         control.setVisible(False)
         control.setLabel(c["label"])
-
-        # Lo añadimos al listado
         c["control"] = control
 
+
     def add_control_list(self, c):
-        control = xbmcgui.ControlButton(0, -100, self.controls_width + 10, self.height_control,
-                                        c["label"], os.path.join(self.mediapath, 'Controls', 'MenuItemFO.png'),
+        control = xbmcgui.ControlButton(0, -100, self.controls_width + 10, self.height_control, c["label"],
+                                        os.path.join(self.mediapath, 'Controls', 'MenuItemFO.png'),
                                         os.path.join(self.mediapath, 'Controls', 'MenuItemNF.png'),
-                                        10, textColor=c["color"],
-                                        font=self.font)
-
-        label = xbmcgui.ControlLabel(0, -100, self.controls_width - 100, self.height_control,
-                                     "", font=self.font, textColor=c["color"], alignment= 1 | 4)
-
-        upBtn = xbmcgui.ControlButton(100, -100, 30, 15, "",
-                                      focusTexture=os.path.join(self.mediapath, 'Controls', 'spinUp-Focus.png'),
-                                      noFocusTexture=os.path.join(self.mediapath, 'Controls', 'spinUp-noFocus.png'))
-
-        downBtn = xbmcgui.ControlButton(0, -100, 30, 15, "",
-                                        focusTexture=os.path.join(self.mediapath, 'Controls', 'spinDown-Focus.png'),
-                                        noFocusTexture=os.path.join(self.mediapath, 'Controls', 'spinDown-noFocus.png'))
+                                        10, textColor=c["color"], font=self.font)
+        label = xbmcgui.ControlLabel(0, -100, self.controls_width, self.height_control,  "", font=self.font, textColor=c["color"], alignment= 1 | 4)
 
         self.addControl(control)
         self.addControl(label)
-        self.addControl(upBtn)
-        self.addControl(downBtn)
 
         control.setVisible(False)
         label.setVisible(False)
-        upBtn.setVisible(False)
-        downBtn.setVisible(False)
         label.setLabel(c["lvalues"][self.values[c["id"]]])
 
         c["control"] = control
         c["label"] = label
-        c["downBtn"] = downBtn
-        c["upBtn"] = upBtn
+
 
     def add_control_text(self, c):
         if xbmcgui.ControlEdit == ControlEdit:
-            control = xbmcgui.ControlEdit(0, -100, self.controls_width, self.height_control,
-                                          c["label"], os.path.join(self.mediapath, 'Controls', 'MenuItemFO.png'),
-                                          os.path.join(self.mediapath, 'Controls', 'MenuItemNF.png'),
-                                          0, textColor=c["color"],
-                                          font=self.font, isPassword=c["hidden"], window=self)
+            control = xbmcgui.ControlEdit(0, -100, self.controls_width, self.height_control, c["label"],
+                                         os.path.join(self.mediapath, 'Controls', 'MenuItemFO.png'),
+                                         os.path.join(self.mediapath, 'Controls', 'MenuItemNF.png'), 0,
+                                         textColor=c["color"], font=self.font, isPassword=c["hidden"], window=self)
 
         else:
             control = xbmcgui.ControlEdit(0, -100, self.controls_width - 5, self.height_control,
@@ -440,7 +408,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         c["control"] = control
 
     def add_control_bool(self, c):
-        # Versiones antiguas no admite algunas texturas
+        # Old versions do not support some textures
         if xbmcgui.__version__ in ["1.2", "2.0"]:
             control = xbmcgui.ControlRadioButton(0, -100, self.controls_width + 20, self.height_control,
                                                  label=c["label"], font=self.font, textColor=c["color"],
@@ -460,8 +428,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         self.addControl(control)
 
         control.setVisible(False)
-        control.setRadioDimension(x=self.controls_width - (self.height_control - 5), y=0,
-                                  width=self.height_control - 5, height=self.height_control - 5)
+        control.setRadioDimension(x=self.controls_width - (self.height_control - 5), y=0, width=self.height_control - 5, height=self.height_control - 5)
         control.setSelected(self.values[c["id"]])
 
         c["control"] = control
@@ -473,14 +440,14 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         self.ok_enabled = False
         self.default_enabled = False
 
-        #### Compatibilidad con Kodi 18 ####
+        # Kodi 18 compatibility
         if config.get_platform(True)['num_version'] < 18:
             if xbmcgui.__version__ == "1.2":
                 self.setCoordinateResolution(1)
             else:
                 self.setCoordinateResolution(5)
 
-        # Ponemos el título
+        # Title
         self.getControl(10002).setLabel(self.caption)
 
         if self.custom_button is not None:
@@ -491,7 +458,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                 self.getControl(10004).setPosition(self.getControl(10004).getPosition()[0] + 80, self.getControl(10004).getPosition()[1])
                 self.getControl(10005).setPosition(self.getControl(10005).getPosition()[0] + 80, self.getControl(10005).getPosition()[1])
 
-        # Obtenemos las dimensiones del area de controles
+        # Control Area Dimensions
         self.controls_width = self.getControl(10007).getWidth() - 30
         self.controls_height = self.getControl(10007).getHeight() -100
         self.controls_pos_x = self.getControl(10007).getPosition()[0] + self.getControl(10001).getPosition()[0] + 10
@@ -499,82 +466,55 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         self.height_control = 60
         self.font = "font16"
 
-        # En versiones antiguas: creamos 5 controles, de lo conrtario al hacer click al segundo control,
-        # automaticamente cambia el label del tercero a "Short By: Name" no se porque...
+        # In old versions: we create 5 controls, from the contrary when clicking the second control,
+        # automatically change third party label to "Short By: Name" I don't know why ...
         if xbmcgui.ControlEdit == ControlEdit:
             for x in range(5):
                 control = xbmcgui.ControlRadioButton(-500, 0, 0, 0, "")
                 self.addControl(control)
 
         for c in self.list_controls:
-            # Saltamos controles que no tengan los valores adecuados
-            if "type" not in c:
-                continue
-            if "label" not in c:
-                continue
-            if c["type"] != "label" and "id" not in c:
-                continue
-            if c["type"] == "list" and "lvalues" not in c:
-                continue
-            if c["type"] == "list" and not isinstance(c["lvalues"], list):
-                continue
-            if c["type"] == "list" and not len(c["lvalues"]) > 0:
-                continue
-            if c["type"] != "label" and len(
-                    [control.get("id") for control in self.list_controls if c["id"] == control.get("id")]) > 1:
-                continue
+            # Skip controls that do not have the appropriate values
+            if "type" not in c: continue
+            if "label" not in c: continue
+            if c["type"] != "label" and "id" not in c: continue
+            if c["type"] == "list" and "lvalues" not in c: continue
+            if c["type"] == "list" and not isinstance(c["lvalues"], list): continue
+            if c["type"] == "list" and not len(c["lvalues"]) > 0: continue
+            if c["type"] != "label" and len([control.get("id") for control in self.list_controls if c["id"] == control.get("id")]) > 1: continue
 
-            # Translation label y lvalues
-            if c['label'].startswith('@') and unicode(c['label'][1:]).isnumeric():
-                c['label'] = config.get_localized_string(int(c['label'][1:]))
+            # Translation label and lvalues
+            if c['label'].startswith('@') and unicode(c['label'][1:]).isnumeric(): c['label'] = config.get_localized_string(int(c['label'][1:]))
             if c['type'] == 'list':
                 lvalues = []
                 for li in c['lvalues']:
-                    if li.startswith('@') and unicode(li[1:]).isnumeric():
-                        lvalues.append(config.get_localized_string(int(li[1:])))
-                    else:
-                        lvalues.append(li)
+                    if li.startswith('@') and unicode(li[1:]).isnumeric(): lvalues.append(config.get_localized_string(int(li[1:])))
+                    else: lvalues.append(li)
                 c['lvalues'] = lvalues
 
-            # Valores por defecto en caso de que el control no disponga de ellos
-            if c["type"] == "bool":
-                default = False
-            elif c["type"] == "list":
-                default = 0
-            else:
-                # label or text
-                default = ""
+            # Default values in case the control does not have them
+            if c["type"] == "bool": default = False
+            elif c["type"] == "list": default = 0
+            else: default = "" # label or text
 
             c["default"] = c.get("default", default)
             c["color"] = c.get("color", "0xFFFFFFFF")
             c["visible"] = c.get("visible", True)
             c["enabled"] = c.get("enabled", True)
 
-            if c["type"] == "label" and "id" not in c:
-                c["id"] = None
+            if c["type"] == "label" and "id" not in c: c["id"] = None
+            if c["type"] == "text": c["hidden"] = c.get("hidden", False)
 
-            if c["type"] == "text":
-                c["hidden"] = c.get("hidden", False)
-
-            # Decidimos si usar el valor por defecto o el valor guardado
+            # Decide whether to use the default value or the saved value
             if c["type"] in ["bool", "text", "list"]:
                 if c["id"] not in self.values:
-                    if not self.callback:
-                        self.values[c["id"]] = config.get_setting(c["id"], **self.kwargs)
-                    else:
-                        self.values[c["id"]] = c["default"]
+                    if not self.callback: self.values[c["id"]] = config.get_setting(c["id"], **self.kwargs)
+                    else: self.values[c["id"]] = c["default"]
 
-            if c["type"] == "bool":
-                self.add_control_bool(c)
-
-            elif c["type"] == 'text':
-                self.add_control_text(c)
-
-            elif c["type"] == 'list':
-                self.add_control_list(c)
-
-            elif c["type"] == 'label':
-                self.add_control_label(c)
+            if c["type"] == "bool": self.add_control_bool(c)
+            elif c["type"] == 'text': self.add_control_text(c)
+            elif c["type"] == 'list': self.add_control_list(c)
+            elif c["type"] == 'label': self.add_control_label(c)
 
         self.list_controls = [c for c in self.list_controls if "control" in c]
 
@@ -597,18 +537,12 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
 
         if focus:
             if not index >= self.index or not index <= self.index + show_controls:
-                if index < self.index:
-                    new_index = index
-                else:
-                    new_index = index - show_controls
-            else:
-                new_index = self.index
+                if index < self.index: new_index = index
+                else: new_index = index - show_controls
+            else:new_index = self.index
         else:
-
-            if index + show_controls >= len(self.visible_controls): 
-                index = len(self.visible_controls) - show_controls - 1
-            if index < 0:
-                index = 0
+            if index + show_controls >= len(self.visible_controls): index = len(self.visible_controls) - show_controls - 1
+            if index < 0: index = 0
             new_index = index
 
         if self.index != new_index or force:
@@ -620,23 +554,17 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                     visible_count += 1
 
                     if c["type"] != "list":
-                        if c["type"] == "bool":
-                            c["control"].setPosition(self.controls_pos_x, c["y"])
-                        else:
-                            c["control"].setPosition(self.controls_pos_x, c["y"])
+                        if c["type"] == "bool": c["control"].setPosition(self.controls_pos_x, c["y"])
+                        else: c["control"].setPosition(self.controls_pos_x, c["y"])
 
                     else:
                         c["control"].setPosition(self.controls_pos_x, c["y"])
-                        if xbmcgui.__version__ == "1.2":
-                            c["label"].setPosition(self.controls_pos_x + self.controls_width - 30, c["y"])
-                        else:
-                            c["label"].setPosition(self.controls_pos_x, c["y"])
-                        c["upBtn"].setPosition(self.controls_pos_x + c["control"].getWidth() - 90, c["y"] + 23)
-                        c["downBtn"].setPosition(self.controls_pos_x + c["control"].getWidth() - 50, c["y"] + 23)
+                        if xbmcgui.__version__ == "1.2": c["label"].setPosition(self.controls_pos_x + self.controls_width - 30, c["y"])
+                        else: c["label"].setPosition(self.controls_pos_x, c["y"])
 
                     self.set_visible(c, True)
 
-            # Calculamos la posicion y tamaño del ScrollBar
+            # Calculate the position and size of the ScrollBar
             hidden_controls = len(self.visible_controls) - show_controls - 1
             if hidden_controls < 0: hidden_controls = 0
 
@@ -677,34 +605,26 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                 self.default_enabled = True
 
     def onClick(self, id):
-        # Valores por defecto
+        # Default values
         if id == 10006:
             if self.custom_button is not None:
                 if self.custom_button["close"]:
                     self.close()
 
-                if '.' in self.callback:
-                    package, self.callback = self.callback.rsplit('.', 1)
-                else:
-                    package = '%s.%s' % (self.ch_type, self.channel)
+                if '.' in self.callback: package, self.callback = self.callback.rsplit('.', 1)
+                else: package = '%s.%s' % (self.ch_type, self.channel)
 
-                try:
-                    cb_channel = __import__(package, None, None, [package])
-                except ImportError:
-                    logger.error('Imposible importar %s' % package)
+                try: cb_channel = __import__(package, None, None, [package])
+                except ImportError: logger.error('Imposible importar %s' % package)
                 else:
                     self.return_value = getattr(cb_channel, self.custom_button['function'])(self.item, self.values)
                     if not self.custom_button["close"]:
-                        if isinstance(self.return_value, dict) and "label" in self.return_value:
-                            self.getControl(10006).setLabel(self.return_value['label'])
+                        if isinstance(self.return_value, dict) and "label" in self.return_value: self.getControl(10006).setLabel(self.return_value['label'])
 
                         for c in self.list_controls:
-                            if c["type"] == "text":
-                                c["control"].setText(self.values[c["id"]])
-                            if c["type"] == "bool":
-                                c["control"].setSelected(self.values[c["id"]])
-                            if c["type"] == "list":
-                                c["label"].setLabel(c["lvalues"][self.values[c["id"]]])
+                            if c["type"] == "text": c["control"].setText(self.values[c["id"]])
+                            if c["type"] == "bool": c["control"].setSelected(self.values[c["id"]])
+                            if c["type"] == "list": c["label"].setLabel(c["lvalues"][self.values[c["id"]]])
 
                         self.evaluate_conditions()
                         self.dispose_controls(self.index, force=True)
@@ -726,78 +646,57 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                 self.check_default()
                 self.check_ok()
 
-        # Boton Cancelar y [X]
+        # Cancel button [X]
         if id == 10003 or id == 10005:
             self.close()
 
-        # Boton Aceptar
+        # OK button
         if id == 10004:
             self.close()
-            if self.callback and '.' in self.callback:
-                package, self.callback = self.callback.rsplit('.', 1)
-            else:
-                package = '%s.%s' % (self.ch_type, self.channel)
+            if self.callback and '.' in self.callback: package, self.callback = self.callback.rsplit('.', 1)
+            else: package = '%s.%s' % (self.ch_type, self.channel)
 
             cb_channel = None
-            try:
-                cb_channel = __import__(package, None, None, [package])
-            except ImportError:
-                logger.error('Imposible importar %s' % package)
+
+            try: cb_channel = __import__(package, None, None, [package])
+            except ImportError:logger.error('Impossible to import %s' % package)
 
             if self.callback:
-                # Si existe una funcion callback la invocamos ...
+                # If there is a callback function we invoke it...
                 self.return_value = getattr(cb_channel, self.callback)(self.item, self.values)
             else:
-                # si no, probamos si en el canal existe una funcion 'cb_validate_config' ...
+                # if not, we test if there is a 'cb_validate_config' function in the channel...
                 try:
                     self.return_value = getattr(cb_channel, 'cb_validate_config')(self.item, self.values)
                 except AttributeError:
-                    # ... si tampoco existe 'cb_validate_config'...
+                    # if 'cb_validate_config' doesn't exist either ...
                     for v in self.values:
                         config.set_setting(v, self.values[v], **self.kwargs)
 
-        # Controles de ajustes, si se cambia el valor de un ajuste, cambiamos el valor guardado en el diccionario de
-        # valores
-        # Obtenemos el control sobre el que se ha echo click
+        # Adjustment controls, if the value of an adjustment is changed, we change the value saved in the value dictionary
+        # Get the control that has been clicked
         # control = self.getControl(id)
 
-        # Lo buscamos en el listado de controles
+        # We look it up in the list of controls
         for cont in self.list_controls:
 
-            # Si el control es un "downBtn" o "upBtn" son los botones del "list"
-            # en este caso cambiamos el valor del list
-            if cont["type"] == "list" and (cont["downBtn"].getId() == id or cont["upBtn"].getId() == id):
+            if cont['type'] == "list" and cont["control"].getId() == id:
+                select = platformtools.dialog_select(config.get_localized_string(30041), cont["lvalues"], self.values[cont["id"]])
+                if select >= 0:
+                    cont["label"].setLabel(cont["lvalues"][select])
+                    self.values[cont["id"]] = cont["lvalues"].index(cont["label"].getLabel())
 
-                # Para bajar una posicion
-                if cont["downBtn"].getId() == id:
-                    index = cont["lvalues"].index(cont["label"].getLabel())
-                    if index > 0:
-                        cont["label"].setLabel(cont["lvalues"][index - 1])
+            # If the control is a "bool", we save the new value True / False
+            if cont["type"] == "bool" and cont["control"].getId() == id: self.values[cont["id"]] = bool(cont["control"].isSelected())
 
-                # Para subir una posicion
-                elif cont["upBtn"].getId() == id:
-                    index = cont["lvalues"].index(cont["label"].getLabel())
-                    if index < len(cont["lvalues"]) - 1:
-                        cont["label"].setLabel(cont["lvalues"][index + 1])
-
-                # Guardamos el nuevo valor en el diccionario de valores
-                self.values[cont["id"]] = cont["lvalues"].index(cont["label"].getLabel())
-
-            # Si esl control es un "bool", guardamos el nuevo valor True/False
-            if cont["type"] == "bool" and cont["control"].getId() == id:
-                self.values[cont["id"]] = bool(cont["control"].isSelected())
-
-            # Si esl control es un "text", guardamos el nuevo valor
+            # If the control is a "text", we save the new value
             if cont["type"] == "text" and cont["control"].getId() == id:
-                # Versiones antiguas requieren abrir el teclado manualmente
+                # Older versions require opening the keyboard manually
                 if xbmcgui.ControlEdit == ControlEdit:
-                    import xbmc
-                    keyboard = xbmc.Keyboard(cont["control"].getText(), cont["control"].getLabel(),
-                                             cont["control"].isPassword)
+                    keyboard = xbmc.Keyboard(cont["control"].getText(), cont["control"].getLabel(), cont["control"].isPassword)
                     keyboard.setHiddenInput(cont["control"].isPassword)
                     keyboard.doModal()
-                    if keyboard.isConfirmed():
-                        cont["control"].setText(keyboard.getText())
+                    if keyboard.isConfirmed(): cont["control"].setText(keyboard.getText())
 
                 self.values[cont["id"]] = cont["control"].getText()
 
@@ -806,7 +705,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         self.check_default()
         self.check_ok()
 
-    # Versiones antiguas requieren esta funcion
+    # Older versions require this feature
     def onFocus(self, a):
         pass
 
@@ -817,70 +716,28 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
         action = raw_action.getId()
         # On Left
         if action == 1:
-            # if focus is on List
-            if focus not in [10003, 10004, 10005, 10006]:
-                isList = False
-                control = self.getFocus().getId()
-
-                # if Focus is on control list
-                for cont in self.list_controls:
-                    if cont["type"] == "list" and cont["control"].getId() == control:
-                        index = cont["lvalues"].index(cont["label"].getLabel())
-                        if index > 0:
-                            cont["label"].setLabel(cont["lvalues"][index - 1])
-
-                        # the new value is saved in the list of controls
-                        self.values[cont["id"]] = cont["lvalues"].index(cont["label"].getLabel())
-                        isList = True
-
-                # else focus on first active Button
-                if not isList:
-                    if self.ok_enabled:
-                        self.setFocusId(10004)
-                    else:
-                        self.setFocusId(10005)
-
-                else:
-                    self.evaluate_conditions()
-                    self.dispose_controls(self.index, force=True)
-                    self.check_default()
-                    self.check_ok()
-
             # if Focus is on close button
-            elif focus == 10003:
-                self.dispose_controls(0)
+            if focus == 10003:
+                self.dispose_controls(0, True)
                 self.setFocusId(3001)
+
+            # if focus is on List
+            else:
+                if self.ok_enabled:
+                    self.setFocusId(10004)
+                else:
+                    self.setFocusId(10005)
 
         # On Right
         elif action == 2:
-            # if focus is on List
-            if focus not in [10003, 10004, 10005, 10006]:
-                isList = False
-                control = self.getFocus().getId()
-                for cont in self.list_controls:
-                    if cont["type"] == "list" and cont["control"].getId() == control:
-                        index = cont["lvalues"].index(cont["label"].getLabel())
-                        if index < len(cont["lvalues"]) - 1:
-                            cont["label"].setLabel(cont["lvalues"][index + 1])
-
-                        # the new value is saved in the list of controls
-                        self.values[cont["id"]] = cont["lvalues"].index(cont["label"].getLabel())
-                        isList = True
-
-                # else focus on close Button
-                if not isList:
-                    self.setFocusId(10003)
-
-                else:
-                    self.evaluate_conditions()
-                    self.dispose_controls(self.index, force=True)
-                    self.check_default()
-                    self.check_ok()
-
             # if Focus is on button
-            else:
-                self.dispose_controls(0)
+            if focus in [10004, 10005, 10006]:
+                self.dispose_controls(0, True)
                 self.setFocusId(3001)
+
+            # if focus is on List
+            else:
+                self.setFocusId(10003)
 
         # On Down
         elif action == 4:
@@ -897,11 +754,8 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                     focus_control += 1
 
                 if focus_control >= len(self.visible_controls):
-                    if self.ok_enabled:
-                        self.setFocusId(10004)
-                    else:
-                        self.setFocusId(10005)
-                    return
+                    focus_control = 0
+                    self.setFocusId(3001)
 
                 self.dispose_controls(focus_control, True)
 

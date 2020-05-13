@@ -147,5 +147,5 @@ def select(item):
 	else:
 		values = item.values.split('|')
 
-	select = platformtools.dialog_select(label, values)
+	select = platformtools.dialog_select(label, values, config.get_setting(item.id))
 	config.set_setting(item.id, values[select])

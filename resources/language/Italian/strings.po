@@ -171,6 +171,10 @@ msgctxt "#30040"
 msgid "Do you really want to delete the %s file?"
 msgstr "Vuoi veramente eliminare il file %s?"
 
+msgctxt "#30041"
+msgid "Select a value"
+msgstr "Seleziona un valore"
+
 msgctxt "#30043"
 msgid "Force view mode"
 msgstr "Forza modalità di visualizzazione"
