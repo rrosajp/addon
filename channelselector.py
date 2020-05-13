@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import glob
-import os
+import glob, os
 
 from core import channeltools
 from core.item import Item
@@ -18,12 +17,8 @@ def getmainlist(view="thumb_"):
         itemlist.append(Item(title="Redirect", channel="checkhost", action="check_channels",
                             thumbnail='',
                             category=config.get_localized_string(30119), viewmode="thumbnails"))
-    # Añade los canales que forman el menú principal
+    # Main Menu Channels
     if addon.getSetting('enable_news_menu') == "true":
-        # itemlist.append(Item(title=config.get_localized_string(30130), channel="news", action="mainlist",
-        #                     thumbnail=get_thumb("news.png", view),
-        #                     category=config.get_localized_string(30119), viewmode="thumbnails",
-        #                     context=CONTEXT + [{"title": config.get_localized_string(70285), "channel": "news", "action": "menu_opciones","goto": True}]))
         itemlist.append(Item(title=config.get_localized_string(30130), channel="news", action="mainlist",
                             thumbnail=get_thumb("news.png", view),
                             category=config.get_localized_string(30119), viewmode="thumbnails",
@@ -35,11 +30,6 @@ def getmainlist(view="thumb_"):
                             category=config.get_localized_string(30119), viewmode="thumbnails"))
 
     if addon.getSetting('enable_search_menu') == "true":
-        # itemlist.append(Item(title=config.get_localized_string(30103), channel="search", path='special', action="mainlist",
-        #                     thumbnail=get_thumb("search.png", view),
-        #                     category=config.get_localized_string(30119), viewmode="list",
-        #                     context = CONTEXT + [{"title": config.get_localized_string(60412), "action": "setting_channel_new", "channel": "search"},
-        #                                          {"title": config.get_localized_string(70286), "action": "settings", "channel": "search"}]))
         itemlist.append(Item(title=config.get_localized_string(30103), channel="search", path='special', action="mainlist",
                             thumbnail=get_thumb("search.png", view),
                             category=config.get_localized_string(30119), viewmode="list",
@@ -61,30 +51,18 @@ def getmainlist(view="thumb_"):
                             category=config.get_localized_string(30102), viewmode="thumbnails"))
 
     if config.get_videolibrary_support() and addon.getSetting('enable_library_menu') == "true":
-        # itemlist.append(Item(title=config.get_localized_string(30131), channel="videolibrary", action="mainlist",
-        #                      thumbnail=get_thumb("videolibrary.png", view),
-        #                      category=config.get_localized_string(30119), viewmode="thumbnails",
-        #                      context=CONTEXT + [{"title": config.get_localized_string(70287), "channel": "videolibrary",
-        #                                "action": "channel_config"}]))
         itemlist.append(Item(title=config.get_localized_string(30131), channel="videolibrary", action="mainlist",
                              thumbnail=get_thumb("videolibrary.png", view),
                              category=config.get_localized_string(30119), viewmode="thumbnails",
                              context=[{"title": config.get_localized_string(70287), "channel": "shortcuts", "action": "SettingOnPosition", "category":2, "setting":1},
                                                 {"title": config.get_localized_string(60568), "channel": "videolibrary", "action": "update_videolibrary"}]))
     if downloadenabled != "false":
-        # itemlist.append(Item(title=config.get_localized_string(30101), channel="downloads", action="mainlist",
-        #                     thumbnail=get_thumb("downloads.png", view), viewmode="list",
-        #                     context=CONTEXT + [{"title": config.get_localized_string(70288), "channel": "setting", "config": "downloads",
-        #                             "action": "channel_config"}]))
         itemlist.append(Item(title=config.get_localized_string(30101), channel="downloads", action="mainlist",
                             thumbnail=get_thumb("downloads.png", view), viewmode="list",
                             context=[{"title": config.get_localized_string(70288), "channel": "shortcuts", "action": "SettingOnPosition", "category":6}]))
 
     thumb_setting = "setting_%s.png" % 0  # config.get_setting("plugin_updates_available")
 
-    # itemlist.append(Item(title=config.get_localized_string(30100), channel="setting", action="mainlist",
-    #                      thumbnail=get_thumb(thumb_setting, view),
-    #                      category=config.get_localized_string(30100), viewmode="list"))
     itemlist.append(Item(title=config.get_localized_string(30100), channel="setting", action="settings",
                          thumbnail=get_thumb(thumb_setting, view),
                          category=config.get_localized_string(30100), viewmode="list"))
@@ -97,14 +75,14 @@ def getmainlist(view="thumb_"):
 def getchanneltypes(view="thumb_"):
     logger.info()
 
-    # Lista de categorias
+    # Category List
     channel_types = ["movie", "tvshow", "anime", "documentary", "vos", "direct", "live", "torrent",  "music"]
 
-    # channel_language = config.get_setting("channel_language", default="all")
+    # Channel Language
     channel_language = auto_filter()
     logger.info("channel_language=%s" % channel_language)
 
-    # Ahora construye el itemlist ordenadamente
+    # Build Itemlist
     itemlist = list()
     title = config.get_localized_string(30121)
     itemlist.append(Item(title=title, channel="channelselector", action="filterchannels", view=view,
@@ -117,12 +95,6 @@ def getchanneltypes(view="thumb_"):
                              channel_type=channel_type, viewmode="thumbnails",
                              thumbnail=get_thumb("%s.png" % channel_type, view)))
 
-    # itemlist.append(Item(title='Oggi in TV', channel="filmontv", action="mainlist", view=view,
-    #                      category=title, channel_type="all", thumbnail=get_thumb("on_the_air.png", view),
-    #                      viewmode="thumbnails"))
-
-
-
     itemlist.append(Item(title=config.get_localized_string(70685), channel="community", action="mainlist", view=view,
                          category=config.get_localized_string(70685), channel_type="all", thumbnail=get_thumb("community.png", view),
                          viewmode="thumbnails"))
@@ -130,11 +102,11 @@ def getchanneltypes(view="thumb_"):
 
 
 def filterchannels(category, view="thumb_"):
-    logger.info('Filterchannl'+category)
+    logger.info('Filter Channels ' + category)
 
     channelslist = []
 
-    # Si category = "allchannelstatus" es que estamos activando/desactivando canales
+    # If category = "allchannelstatus" is that we are activating / deactivating channels
     appenddisabledchannels = False
     if category == "allchannelstatus":
         category = "all"
@@ -144,9 +116,9 @@ def filterchannels(category, view="thumb_"):
     logger.info("channel_path = %s" % channel_path)
 
     channel_files = glob.glob(channel_path)
-    logger.info("channel_files encontrados %s" % (len(channel_files)))
+    logger.info("channel_files found %s" % (len(channel_files)))
 
-    # channel_language = config.get_setting("channel_language", default="all")
+    # Channel Language
     channel_language = auto_filter()
     logger.info("channel_language=%s" % channel_language)
 
@@ -161,72 +133,56 @@ def filterchannels(category, view="thumb_"):
             if channel_parameters["channel"] == 'community':
                 continue
 
-            # # si el canal no es compatible, no se muestra
-            # if not channel_parameters["compatible"]:
-            #     continue
-
-            # Si no es un canal lo saltamos
+            # If it's not a channel we skip it
             if not channel_parameters["channel"]:
                 continue
             logger.info("channel_parameters=%s" % repr(channel_parameters))
 
-            # Si prefiere el banner y el canal lo tiene, cambia ahora de idea
+            # If you prefer the banner and the channel has it, now change your mind
             if view == "banner_" and "banner" in channel_parameters:
                 channel_parameters["thumbnail"] = channel_parameters["banner"]
 
-            # si el canal está desactivado no se muestra el canal en la lista
+            # if the channel is deactivated the channel is not shown in the list
             if not channel_parameters["active"]:
                 continue
 
-            # Se salta el canal si no está activo y no estamos activando/desactivando los canales
+            # The channel is skipped if it is not active and we are not activating / deactivating the channels
             channel_status = config.get_setting("enabled", channel_parameters["channel"])
 
             if channel_status is None:
-                # si channel_status no existe es que NO HAY valor en _data.json.
-                # como hemos llegado hasta aquí (el canal está activo en channel.json), se devuelve True
+                # if channel_status does not exist, there is NO value in _data.json.
+                # as we got here (the channel is active in channel.json), True is returned
                 channel_status = True
 
             if not channel_status:
-                # si obtenemos el listado de canales desde "activar/desactivar canales", y el canal está desactivado
-                # lo mostramos, si estamos listando todos los canales desde el listado general y está desactivado,
-                # no se muestra
+                # if we get the list of channels from "activate / deactivate channels", and the channel is deactivated
+                # we show it, if we are listing all the channels from the general list and it is deactivated, it is not shown
                 if not appenddisabledchannels:
                     continue
 
-            # Se salta el canal si está en un idioma filtrado
-            # Se muestran todos los canales si se elige "all" en el filtrado de idioma
-            # Se muestran sólo los idiomas filtrados, cast o lat
-            # Los canales de adultos se mostrarán siempre que estén activos
-
-            # for channel_language_list in channel_language_list:
-            #     if c in channel_parameters["language"]:
-            #         L = True
-            #     else:
-            #         L = False
-            # logger.info('CCLANG= ' + channel_language + ' ' + str(channel_language_list))
             if channel_language != "all" and "*" not in channel_parameters["language"] \
                  and channel_language not in str(channel_parameters["language"]):
                 continue
 
-            # Se salta el canal si está en una categoria filtrado
+            # The channel is skipped if it is in a filtered category
             if category != "all" and category not in channel_parameters["categories"]:
                 continue
 
-            # Si tiene configuración añadimos un item en el contexto
+            # If you have configuration we add an item in the context
             context = []
             if channel_parameters["has_settings"]:
                 context.append({"title": config.get_localized_string(70525), "channel": "setting", "action": "channel_config",
                                 "config": channel_parameters["channel"]})
 
             channel_info = set_channel_info(channel_parameters)
-            # Si ha llegado hasta aquí, lo añade
+            # If it has come this far, add it
             channelslist.append(Item(title=channel_parameters["title"], channel=channel_parameters["channel"],
                                      action="mainlist", thumbnail=channel_parameters["thumbnail"],
                                      fanart=channel_parameters["fanart"], plot=channel_info, category=channel_parameters["title"],
                                      language=channel_parameters["language"], viewmode="list", context=context))
 
         except:
-            logger.error("Se ha producido un error al leer los datos del canal '%s'" % channel)
+            logger.error("An error occurred while reading the channel data '%s'" % channel)
             import traceback
             logger.error(traceback.format_exc())
 
@@ -234,13 +190,13 @@ def filterchannels(category, view="thumb_"):
 
     if category == "all":
         channel_parameters = channeltools.get_channel_parameters('url')
-        # Si prefiere el banner y el canal lo tiene, cambia ahora de idea
+        # If you prefer the banner and the channel has it, now change your mind
         if view == "banner_" and "banner" in channel_parameters:
             channel_parameters["thumbnail"] = channel_parameters["banner"]
 
         channelslist.insert(0, Item(title=config.get_localized_string(60088), action="mainlist", channel="url",
                                     thumbnail=channel_parameters["thumbnail"], type="generic", viewmode="list"))
-
+    # Special Category
     if category in ['movie', 'tvshow']:
         titles = [config.get_localized_string(70028), config.get_localized_string(30985), config.get_localized_string(70559), config.get_localized_string(60264), config.get_localized_string(70560)]
         ids = ['popular', 'top_rated', 'now_playing', 'on_the_air']
@@ -300,10 +256,6 @@ def set_channel_info(parameters):
                  '*':'Italiano, Sottotitolato in Italiano'}
 
     for lang in langs:
-        # if 'vos' in parameters['categories']:
-        #     lang = '*'
-        # if 'sub-ita' in parameters['categories']:
-        #     lang = 'ita'
 
         if lang in lang_dict:
             if language != '' and language != '*':
@@ -337,26 +289,6 @@ def auto_filter(auto_lang=False):
         lang = 'all'
 
     return lang
-
-    # import xbmc, xbmcaddon
-
-    # addon = xbmcaddon.Addon('metadata.themoviedb.org')
-    # def_lang = addon.getSetting('language')
-    # lang = 'all'
-    # lang_list = ['all']
-
-    # lang_dict = {'it':'ita'}
-    # lang_list_dict = {'it':['ita','vosi']}
-
-    # if config.get_setting("channel_language") == 'auto' or auto_lang == True:
-    #     lang = lang_dict[def_lang]
-    #     lang_list = lang_list_dict[def_lang]
-
-    # else:
-    #     lang = config.get_setting("channel_language", default="all")
-    #     lang_list = lang_list_dict[def_lang]
-
-    # return lang, lang_list
 
 
 def thumb(item_or_itemlist=None, genre=False, thumb=''):
