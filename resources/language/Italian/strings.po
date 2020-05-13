@@ -909,7 +909,7 @@ msgstr "La serie TV "%s" è stata aggiunta alla videoteca"
 
 msgctxt "#60071"
 msgid "AutoPlay configuration"
-msgstr "Configurazione Autoplay"
+msgstr "Configurazione AutoPlay"
 
 msgctxt "#60072"
 msgid "It seems that links of %s are not working."

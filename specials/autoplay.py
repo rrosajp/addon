@@ -56,6 +56,7 @@ def show_option(channel, itemlist, text_color=colorKOD, thumbnail=None, fanart=N
     :return:
     '''
     from channelselector import get_thumb
+    from core.support import typo
     logger.info()
 
     if not config.is_xbmc():
@@ -69,7 +70,7 @@ def show_option(channel, itemlist, text_color=colorKOD, thumbnail=None, fanart=N
     plot_autoplay = config.get_localized_string(60399)
     itemlist.append(
         Item(channel=__channel__,
-             title=config.get_localized_string(60071),
+             title=typo(config.get_localized_string(60071), 'bold color kod'),
              action="autoplay_config",
              text_color=text_color,
              text_bold=True,
