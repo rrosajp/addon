@@ -2,14 +2,15 @@
 <window>
     <allowoverlays>false</allowoverlays>
     <animation type="WindowOpen" reversible="false">
-      <effect type="slide" start="0,-100" end="0,0" center="640,225" delay="160" tween="back" time="240" />
+      <effect type="slide" start="0,200" end="0,0" center="640,225" delay="160" tween="cubic" time="200" />
       <effect type="fade" delay="160" end="100" time="240" />
     </animation>
     <animation type="WindowClose" reversible="false">
-      <effect type="slide" start="0,0" end="0,-100" center="640,225" easing="in" tween="back" time="240" />
+      <effect type="slide" start="0,0" end="0,200" center="640,225" easing="in" tween="cubic" time="200" />
       <effect type="fade" start="100" end="0" time="240" />
     </animation>
     <controls>
+      <!-- Background -->
       <control type="group" id="10001">
         <left>0</left>
         <top>0</top>
@@ -18,11 +19,20 @@
         <control type="image">
           <width>100%</width>
           <height>100%</height>
-          <texture border="2" colordiffuse="EE232323">Shortcut/white.png</texture>
+          <texture colordiffuse="EE232323">Shortcut/white.png</texture>
         </control>
+        <!-- Divider -->
+        <control type="image">
+          <top>80</top>
+          <right>0</right>
+          <width>100%</width>
+          <height>1</height>
+          <texture colordiffuse="33FFFFFF">Shortcut/white.png</texture>
+        </control>
+        <!-- Header -->
         <control type="label" id="10002">
           <top>20</top>
-          <left>10%</left>
+          <left>70</left>
           <height>40</height>
           <width>80%</width>
           <font>font30_title</font>
@@ -34,56 +44,57 @@
         <!-- CLOSE BUTTON -->
         <control type="button" id="10003">
           <right>30</right>
-          <top>30</top>
+          <top>25</top>
           <width>30</width>
           <height>30</height>
-          <texturefocus>Controls/DialogCloseButton-focus.png</texturefocus>
-          <texturenofocus>Controls/DialogCloseButton.png</texturenofocus>    
+          <texturefocus colordiffuse="FFFFFFFF">Controls/DialogCloseButton-focus.png</texturefocus>
+          <texturenofocus colordiffuse="55FFFFFF">Controls/DialogCloseButton-focus.png</texturenofocus>
         </control>
         <!-- OK -->
         <control type="button" id="10004">
           <left>60</left>
-          <top>100</top>
+          <top>120</top>
           <width>200</width>
           <height>60</height>
           <textwidth>110</textwidth>
           <textcolor>FFFFFFFF</textcolor>
-          <texturefocus>Controls/KeyboardKey.png</texturefocus>
-          <texturenofocus>Controls/KeyboardKeyNF.png</texturenofocus>  
+          <texturefocus colordiffuse="FF0081C2">Shortcut/white.png</texturefocus>
+          <texturenofocus colordiffuse="FF191919">Shortcut/white.png</texturenofocus>
           <align>center</align>
-          <aligny>center</aligny>  
+          <aligny>center</aligny>
           <label>$ADDON[plugin.video.kod 70001]</label>
         </control>
         <!-- CANCEL -->
         <control type="button" id="10005">
           <left>60</left>
-          <top>170</top>
+          <top>190</top>
           <width>200</width>
           <height>60</height>
           <textwidth>110</textwidth>
           <textcolor>FFFFFFFF</textcolor>
-          <texturefocus>Controls/KeyboardKey.png</texturefocus>
-          <texturenofocus>Controls/KeyboardKeyNF.png</texturenofocus>   
+          <texturefocus colordiffuse="FF0081C2">Shortcut/white.png</texturefocus>
+          <texturenofocus colordiffuse="FF191919">Shortcut/white.png</texturenofocus>
           <align>center</align>
-          <aligny>center</aligny> 
+          <aligny>center</aligny>
           <label>$ADDON[plugin.video.kod 70002]</label>
         </control>
         <!-- DEFAULT -->
         <control type="button" id="10006">
           <left>60</left>
-          <top>240</top>
+          <top>260</top>
           <width>200</width>
           <height>60</height>
           <textwidth>110</textwidth>
           <textcolor>FFFFFFFF</textcolor>
-          <texturefocus>Controls/KeyboardKey.png</texturefocus>
-          <texturenofocus>Controls/KeyboardKeyNF.png</texturenofocus>    
+          <texturefocus colordiffuse="FF0081C2">Shortcut/white.png</texturefocus>
+          <texturenofocus colordiffuse="FF191919">Shortcut/white.png</texturenofocus>
           <align>center</align>
           <aligny>center</aligny>
           <label>$ADDON[plugin.video.kod 70003]</label>
         </control>
-          <control type="group" id="10007">
-          <top>100</top>
+        <!-- Parameters -->
+        <control type="group" id="10007">
+          <top>120</top>
           <left>300</left>
           <width>900</width>
           <height>680</height>
@@ -99,18 +110,19 @@
             <label>$ADDON[plugin.video.kod 70004]</label>
           </control>
         </control>
+        <!-- Scrollbar -->
         <control type="image" id="10008">
-          <top>100</top>
+          <top>120</top>
           <right>0</right>
           <width>10</width>
-          <height>560</height>
+          <height>540</height>
           <texture border="2" colordiffuse="FF232323">Shortcut/white.png</texture>
         </control>
         <control type="image" id="10009">
-          <top>100</top>
+          <top>120</top>
           <right>0</right>
           <width>10</width>
-          <height>560</height>
+          <height>540</height>
           <texture border="2" colordiffuse="33FFFFFF">Shortcut/white.png</texture>
         </control>
       </control>
