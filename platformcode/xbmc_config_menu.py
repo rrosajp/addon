@@ -16,21 +16,22 @@ from core.support import log, dbg, match
 
 
 class SettingsWindow(xbmcgui.WindowXMLDialog):
-    """ Clase derivada que permite utilizar cuadros de configuracion personalizados.
+    """
+    Derived class that allows you to use custom configuration boxes.
 
-    Esta clase deriva de xbmcgui.WindowXMLDialog y permite crear un cuadro de dialogo con controles del tipo:
-    Radio Button (bool), Cuadro de texto (text), Lista (list) y Etiquetas informativas (label).
-    Tambien podemos personalizar el cuadro añadiendole un titulo (title).
+    This class is derived from xbmcgui.WindowXMLDialog and allows you to create a dialog box with controls of the type:
+    Radio Button (bool), Text Box (text), List (list) and Information Labels (label).
+    We can also customize the box by adding a title (title).
 
-    Metodo constructor:
-        SettingWindow(listado_controles, dict_values, title, callback, item)
+    Construction method:
+        SettingWindow(list_controls, dict_values, title, callback, item)
             Parametros:
-                listado_controles: (list) Lista de controles a incluir en la ventana, segun el siguiente esquema:
+                list_controls: (list) Lista de controles a incluir en la ventana, segun el siguiente esquema:
                     (opcional)list_controls= [
                                 {'id': "nameControl1",
                                   'type': "bool",                       # bool, text, list, label
                                   'label': "Control 1: tipo RadioButton",
-                                  'color': '0xFFee66CC',                # color del texto en formato ARGB hexadecimal
+                                  'color': '0xFFee66CC',                # text color in hexadecimal ARGB format
                                   'default': True,
                                   'enabled': True,
                                   'visible': True
@@ -40,8 +41,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                                   'label': "Control 2: tipo Cuadro de texto",
                                   'color': '0xFFee66CC',
                                   'default': "Valor por defecto",
-                                  'hidden': False,                      # only for type = text Indica si hay que ocultar
-                                                                            el texto (para passwords)
+                                  'hidden': False,                      # only for type = text Indicates whether to hide the text (for passwords)
                                   'enabled': True,
                                   'visible': True
                                 },
@@ -49,7 +49,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                                   'type': "list",                       # bool, text, list, label
                                   'label': "Control 3: tipo Lista",
                                   'color': '0xFFee66CC',
-                                  'default': 0,                         # Indice del valor por defecto en lvalues
+                                  'default': 0,                         # Default value index in lvalues
                                   'enabled': True,
                                   'visible': True,
                                   'lvalues':["item1", "item2", "item3", "item4"],  # only for type = list
@@ -61,10 +61,9 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                                   'enabled': True,
                                   'visible': True
                                 }]
-                    Si no se incluye el listado_controles, se intenta obtener del json del canal desde donde se hace la
-                    llamada.
+                    If the controls list is not included, an attempt is made to obtain the json of the channel from which the call is made.
 
-                    El formato de los controles en el json es:
+                    The format of the controls in the json is:
                         {
                             ...
                             ...
@@ -114,39 +113,31 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                             ]
                         }
 
-                    Los campos 'label', 'default', 'enabled' y 'lvalues' pueden ser un numero precedido de '@'. En cuyo caso se
-                    buscara el literal en el archivo string.xml del idioma seleccionado.
-                    Los campos 'enabled' y 'visible' admiten los comparadores eq(), gt() e it() y su funcionamiento se
-                    describe en: http://kodi.wiki/view/Add-on_settings#Different_types
+                The fields 'label', 'default', 'enabled' and 'lvalues' can be a number preceded by '@'. In which case
+                it will look for the literal in the string.xml file of the selected language.
+                The 'enabled' and 'visible' fields support the comparators eq (), gt () and it () and their operation is
+                described at: http://kodi.wiki/view/Add-on_settings#Different_types
 
-                (opcional)dict_values: (dict) Diccionario que representa el par (id: valor) de los controles de la
-                lista.
-                    Si algun control de la lista no esta incluido en este diccionario se le asignara el valor por
-                    defecto.
+                (opcional) dict_values: (dict) Dictionary representing the pair (id: value) of the controls in the list.
+                If any control in the list is not included in this dictionary, it will be assigned the default value.
                         dict_values={"nameControl1": False,
                                      "nameControl2": "Esto es un ejemplo"}
 
-                (opcional) caption: (str) Titulo de la ventana de configuracion. Se puede localizar mediante un numero
-                precedido de '@'
-                (opcional) callback (str) Nombre de la funcion, del canal desde el que se realiza la llamada, que sera
-                invocada al pulsar el boton aceptar de la ventana. A esta funcion se le pasara como parametros el
-                objeto 'item' y el dicionario 'dict_values'. Si este parametro no existe, se busca en el canal una
-                funcion llamada 'cb_validate_config' y si existe se utiliza como callback.
+                (opcional) caption: (str) Configuration window title. It can be located by a number preceded by '@'
+                (opcional) callback (str) Name of the function, of the channel from which the call is made, which will be
+                invoked when pressing the accept button in the window. This function will be passed as parameters the
+                object 'item' and the 'dict_values' dictionary. If this parameter does not exist, the channel is searched for
+                 function called 'cb_validate_config' and if it exists it is used as a callback.
 
-            Retorno: Si se especifica 'callback' o el canal incluye 'cb_validate_config' se devolvera lo que devuelva
-                esa funcion. Si no devolvera None
+            Retorno: If 'callback' is specified or the channel includes 'cb_validate_config' what that function returns will be returned. If not return none
 
-    Ejemplos de uso:
-        platformtools.show_channel_settings(): Así tal cual, sin pasar ningún argumento, la ventana detecta de que canal
-        se ha hecho la llamada,
-            y lee los ajustes del json y carga los controles, cuando le das a Aceptar los vuelve a guardar.
+    Usage examples:
+        platformtools.show_channel_settings(): As such, without passing any argument, the window detects which channel the call has been made,
+                                               and read the json settings and load the controls, when you click OK, save them again.
 
-        return platformtools.show_channel_settings(list_controls=list_controls, dict_values=dict_values, callback='cb',
-        item=item):
-            Así abre la ventana con los controles pasados y los valores de dict_values, si no se pasa dict_values, carga
-            los valores por defecto de los controles,
-            cuando le das a aceptar, llama a la función 'callback' del canal desde donde se ha llamado, pasando como
-            parámetros, el item y el dict_values
+        return platformtools.show_channel_settings(list_controls=list_controls, dict_values=dict_values, callback='cb', item=item):
+            This opens the window with the passed controls and the dict_values values, if dict_values is not passed, it loads the default values of the controls,
+            when you accept, it calls the 'callback' function of the channel from where it was called, passing as parameters, item and dict_values
     """
 
     def start(self, list_controls=None, dict_values=None, caption="", callback=None, item=None, custom_button=None, channelpath=None):
