@@ -1089,7 +1089,7 @@ def get_dialogo_opciones(item, default_action, strm, autoplay):
                 # "Add to Favorites"
                 opciones.append(config.get_localized_string(30155))
 
-            if not strm and item.contentType == 'movie':
+            if not strm and item.contentType == 'movie' and item.channel != 'videolibrary':
                 # "Add to video library"
                 opciones.append(config.get_localized_string(30161))
 
