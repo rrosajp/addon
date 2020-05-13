@@ -64,7 +64,7 @@ def buscartrailer(item, trailers=[]):
 
         itemlist = []
         if item.search_title:
-            item.contentTitle = item.search_title
+            item.contentTitle = urllib.unquote_plus(item.search_title)
         elif item.contentTitle != "":
             item.contentTitle = item.contentTitle.strip()
         elif keyboard:

@@ -265,10 +265,11 @@ def viewmodeMonitor():
         if currentModeName and 'plugin.video.kod' in xbmc.getInfoLabel(
                 'Container.FolderPath') and currentMode < 1000 and currentMode > 50:  # inside addon and in itemlist view
             content, Type = platformtools.getCurrentView()
-            defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
-            if currentMode != defaultMode:
-                logger.info('viewmode changed: ' + currentModeName + '-' + str(currentMode) + ' - content: ' + content)
-                config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
+            if content:
+                defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
+                if currentMode != defaultMode:
+                    logger.info('viewmode changed: ' + currentModeName + '-' + str(currentMode) + ' - content: ' + content)
+                    config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
     except:
         logger.error(traceback.print_exc())
 
