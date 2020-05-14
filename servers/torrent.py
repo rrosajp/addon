@@ -121,8 +121,8 @@ def elementum_monitor():
                             requests.get(elementum_host + 'pause/' + name)
                             filetools.remove(filetools.join(TorrentPath, name + '.torrent'))
                             filetools.remove(filetools.join(TorrentPath, name + '.fastresume'))
-                            time.sleep(1)
-                            rename(Monitor[name]['file'])
+                            # time.sleep(1)
+                            # rename(Monitor[name]['file'])
 
 
 def monitor_update(TorrentPath, value, remove=False):
