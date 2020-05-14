@@ -2,7 +2,6 @@
   "id": "tvmoviedb",
   "name": "TvMovieDB",
   "active": false,
-  "adult": false,
   "language": ["*"],
   "thumbnail": "http://i.imgur.com/HA7fvgD.png",
   "categories": [

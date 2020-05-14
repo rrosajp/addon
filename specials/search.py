@@ -46,7 +46,7 @@ def mainlist(item):
 
                 Item(channel=item.channel, title=typo(config.get_localized_string(59994), 'color kod bold'), action='opciones', thumbnail=get_thumb('setting_0.png')),
 
-                Item(channel='shortcuts', title=typo(config.get_localized_string(70286), 'color kod bold'), action='SettingOnPosition', category=3, thumbnail=get_thumb('setting_0.png'))]
+                Item(channel='shortcuts', title=typo(config.get_localized_string(70286), 'color kod bold'), action='SettingOnPosition', category=5, setting=1, thumbnail=get_thumb('setting_0.png'))]
 
     itemlist = set_context(itemlist)
 
@@ -298,34 +298,30 @@ def channel_search(item):
 def get_channel_results(ch, item):
     max_results = 10
     results = list()
+    try:
+        ch_params = channeltools.get_channel_parameters(ch)
 
-    ch_params = channeltools.get_channel_parameters(ch)
+        module = __import__('channels.%s' % ch_params["channel"], fromlist=["channels.%s" % ch_params["channel"]])
+        mainlist = getattr(module, 'mainlist')(Item(channel=ch_params["channel"]))
+        search_action = [elem for elem in mainlist if elem.action == "search" and (item.mode == 'all' or elem.contentType == item.mode)]
 
-    module = __import__('channels.%s' % ch_params["channel"], fromlist=["channels.%s" % ch_params["channel"]])
-    mainlist = getattr(module, 'mainlist')(Item(channel=ch_params["channel"]))
-    search_action = [elem for elem in mainlist if elem.action == "search" and (item.mode == 'all' or elem.contentType == item.mode)]
-
-    if search_action:
-        for search_ in search_action:
-            try:
+        if search_action:
+            for search_ in search_action:
                 results.extend(module.search(search_, item.text))
-            except:
-                pass
-    else:
-        try:
+        else:
             results.extend(module.search(item, item.text))
-        except:
-            pass
 
-    if len(results) < 0 and len(results) < max_results and item.mode != 'all':
+        if len(results) < 0 and len(results) < max_results and item.mode != 'all':
 
-        if len(results) == 1:
-            if not results[0].action or config.get_localized_string(30992).lower() in results[0].title.lower():
-                return [ch, []]
+            if len(results) == 1:
+                if not results[0].action or config.get_localized_string(30992).lower() in results[0].title.lower():
+                    return [ch, []]
 
-        results = get_info(results)
+            results = get_info(results)
 
-    return [ch, results]
+        return [ch, results]
+    except:
+        return [ch, results]
 
 
 def get_info(itemlist):
@@ -418,8 +414,6 @@ def setting_channel_new(item):
     presel_values = ['skip', 'actual', 'all', 'none']
 
     categs = ['movie', 'tvshow', 'documentary', 'anime', 'vos', 'direct', 'torrent']
-    if config.get_setting('adult_mode') > 0:
-        categs.append('adult')
     for c in categs:
         preselecciones.append(config.get_localized_string(70577) + config.get_localized_category(c))
         presel_values.append(c)

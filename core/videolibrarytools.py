@@ -111,7 +111,7 @@ def save_movie(item, silent=False):
     # Si llegados a este punto no tenemos titulo, salimos
     if not item.contentTitle or not item.channel:
         logger.debug("contentTitle NOT FOUND")
-        return 0, 0, -1  # Salimos sin guardar
+        return 0, 0, -1, path  # Salimos sin guardar
 
     scraper_return = scraper.find_and_set_infoLabels(item)
 
@@ -123,7 +123,7 @@ def save_movie(item, silent=False):
         # TODO de momento si no hay resultado no añadimos nada,
         # aunq podriamos abrir un cuadro para introducir el identificador/nombre a mano
         logger.debug("NOT FOUND IN SCRAPER OR DO NOT HAVE code")
-        return 0, 0, -1
+        return 0, 0, -1, path
 
     _id = item.infoLabels['code'][0]
 
@@ -158,7 +158,7 @@ def save_movie(item, silent=False):
         logger.info("Creating movie directory:" + path)
         if not filetools.mkdir(path):
             logger.debug("Could not create directory")
-            return 0, 0, -1
+            return 0, 0, -1, path
 
     nfo_path = filetools.join(path, "%s [%s].nfo" % (base_name, _id))
     strm_path = filetools.join(path, "%s.strm" % base_name)
@@ -227,14 +227,14 @@ def save_movie(item, silent=False):
                     xbmc_videolibrary.update()
 
                 if not silent: p_dialog.close()
-                return insertados, sobreescritos, fallidos
+                return insertados, sobreescritos, fallidos, path
 
     # Si llegamos a este punto es por q algo ha fallado
     logger.error("Could not save %s in the video library" % item.contentTitle)
     if not silent:
         p_dialog.update(100, config.get_localized_string(60063), item.contentTitle)
         p_dialog.close()
-    return 0, 0, -1
+    return 0, 0, -1, path
 
 def update_renumber_options(item, head_nfo, path):
     from core import jsontools
@@ -586,6 +586,22 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
         logger.info("There is no episode list, we go out without creating strm")
         return 0, 0, 0
 
+    # process local episodes
+    local_episodes_path = ''
+    nfo_path = filetools.join(path, "tvshow.nfo")
+    head_nfo, item_nfo = read_nfo(nfo_path)
+    if item_nfo.update_last:
+        local_episodes_path = item_nfo.local_episodes_path
+    elif config.get_setting("local_episodes", "videolibrary"):
+        done, local_episodes_path = config_local_episodes_path(path, serie.show)
+        if done < 0:
+            logger.info("An issue has occurred while configuring local episodes, going out without creating strm")
+            return 0, 0, done
+        item_nfo.local_episodes_path = local_episodes_path
+        filetools.write(nfo_path, head_nfo + item_nfo.tojson())
+    if local_episodes_path:
+        process_local_episodes(local_episodes_path, path)
+
     insertados = 0
     sobreescritos = 0
     fallidos = 0
@@ -671,9 +687,6 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     except:
         t = 0
 
-    local_episodelist = get_local_content(path)
-
-    last_season_episode = ''
     for i, e in enumerate(scraper.sort_episode_list(new_episodelist)):
         if not silent:
             p_dialog.update(int(math.ceil((i + 1) * t)), config.get_localized_string(60064), e.title)
@@ -695,9 +708,11 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
         nfo_path = filetools.join(path, "%s.nfo" % season_episode)
         json_path = filetools.join(path, ("%s [%s].json" % (season_episode, e.channel)).lower())
 
-        if season_episode in local_episodelist:
-            logger.info('Skipped: Serie ' + serie.contentSerieName + ' ' + season_episode + ' available as local content')
+        # check if the episode has been downloaded
+        if filetools.join(path, "%s [downloads].json" % season_episode) in ficheros:
+            logger.info('INFO: "%s" episode %s has been downloaded, skipping it' % (serie.contentSerieName, season_episode))
             continue
+
         strm_exists = strm_path in ficheros
         nfo_exists = nfo_path in ficheros
         json_exists = json_path in ficheros
@@ -808,7 +823,8 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
                 tvshow_item.infoLabels["title"] = tvshow_item.infoLabels["tvshowtitle"] 
 
             if max_sea == high_sea and max_epi == high_epi and (tvshow_item.infoLabels["status"] == "Ended" 
-                            or tvshow_item.infoLabels["status"] == "Canceled") and insertados == 0 and fallidos == 0:
+                            or tvshow_item.infoLabels["status"] == "Canceled") and insertados == 0 and fallidos == 0 \
+                            and not tvshow_item.local_episodes_path:
                 tvshow_item.active = 0                                          # ... no la actualizaremos más
                 logger.debug("%s [%s]: serie 'Terminada' o 'Cancelada'.  Se desactiva la actualización periódica" % \
                             (serie.contentSerieName, serie.channel))
@@ -838,19 +854,72 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     return insertados, sobreescritos, fallidos
 
 
-def get_local_content(path):
+def config_local_episodes_path(path, title, silent=False):
     logger.info()
 
-    local_episodelist = []
-    for root, folders, files in filetools.walk(path):
-        for file in files:
-            season_episode = scrapertools.get_season_and_episode(file)
-            if season_episode == "" or filetools.exists(filetools.join(path, "%s.strm" % season_episode)):
-                continue
-            local_episodelist.append(season_episode)
-    local_episodelist = sorted(set(local_episodelist))
+    local_episodes_path = ''
+    if not silent:
+        silent = platformtools.dialog_yesno(config.get_localized_string(30131), config.get_localized_string(80044) % title)
+    if silent:
+        if config.is_xbmc() and not config.get_setting("videolibrary_kodi"):
+            platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(80043))
+        local_episodes_path = platformtools.dialog_browse(0, config.get_localized_string(80046))
+        if local_episodes_path == '':
+            logger.info("User has canceled the dialog")
+            return -2, local_episodes_path
+        elif path in local_episodes_path:
+            platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(80045))
+            logger.info("Selected folder is the same of the TV show one")
+            return -2, local_episodes_path
 
-    return local_episodelist
+    if local_episodes_path:
+        # import artwork
+        artwork_extensions = ['.jpg', '.jpeg', '.png']
+        files = filetools.listdir(local_episodes_path)
+        for file in files:
+            if os.path.splitext(file)[1] in artwork_extensions:
+                filetools.copy(filetools.join(local_episodes_path, file), filetools.join(path, file))
+
+    return 0, local_episodes_path
+
+
+def process_local_episodes(local_episodes_path, path):
+    logger.info()
+
+    sub_extensions = ['.srt', '.sub', '.sbv', '.ass', '.idx', '.ssa', '.smi']
+    artwork_extensions = ['.jpg', '.jpeg', '.png']
+    extensions = sub_extensions + artwork_extensions
+
+    local_episodes_list = []
+    files_list = []
+    for root, folders, files in filetools.walk(local_episodes_path):
+        for file in files:
+            if os.path.splitext(file)[1] in extensions:
+                continue
+            season_episode = scrapertools.get_season_and_episode(file)
+            if season_episode == "":
+                continue
+            local_episodes_list.append(season_episode)
+            files_list.append(file)
+
+    nfo_path = filetools.join(path, "tvshow.nfo")
+    head_nfo, item_nfo = read_nfo(nfo_path)
+
+    # if a local episode has been added, overwrites the strm
+    for season_episode, file in zip(local_episodes_list, files_list):
+        if not season_episode in item_nfo.local_episodes_list:
+            filetools.write(filetools.join(path, season_episode + '.strm'), filetools.join(root, file))
+
+    # if a local episode has been removed, deletes the strm
+    for season_episode in set(item_nfo.local_episodes_list).difference(local_episodes_list):
+        filetools.remove(filetools.join(path, season_episode + '.strm'))
+
+    # updates the local episodes path and list in the nfo
+    if not local_episodes_list:
+        item_nfo.local_episodes_path = ''
+    item_nfo.local_episodes_list = sorted(set(local_episodes_list))
+
+    filetools.write(nfo_path, head_nfo + item_nfo.tojson())
 
 
 def add_movie(item):
@@ -883,12 +952,13 @@ def add_movie(item):
     #    del item.tmdb_stat          #Limpiamos el status para que no se grabe en la Videoteca
 
     new_item = item.clone(action="findvideos")
-    insertados, sobreescritos, fallidos = save_movie(new_item)
+    insertados, sobreescritos, fallidos, path = save_movie(new_item)
 
     if fallidos == 0:
         platformtools.dialog_ok(config.get_localized_string(30131),
                                 config.get_localized_string(30135) % new_item.contentTitle)  # 'se ha añadido a la videoteca'
     else:
+        filetools.rmdirtree(path)
         platformtools.dialog_ok(config.get_localized_string(30131),
                                 config.get_localized_string(60066) % new_item.contentTitle)  #"ERROR, la pelicula NO se ha añadido a la videoteca")
 
@@ -968,12 +1038,17 @@ def add_tvshow(item, channel=None):
     insertados, sobreescritos, fallidos, path = save_tvshow(item, itemlist)
 
     if not insertados and not sobreescritos and not fallidos:
+        filetools.rmdirtree(path)
         platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60067) % item.show)
         logger.error("La serie %s no se ha podido añadir a la videoteca. No se ha podido obtener ningun episodio" % item.show)
 
     elif fallidos == -1:
+        filetools.rmdirtree(path)
         platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60068) % item.show)
         logger.error("La serie %s no se ha podido añadir a la videoteca" % item.show)
+
+    elif fallidos == -2:
+        filetools.rmdirtree(path)
 
     elif fallidos > 0:
         platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(60069) % item.show)

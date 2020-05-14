@@ -826,7 +826,7 @@ class Tmdb(object):
         self.busqueda_texto = re.sub('\[\\\?(B|I|COLOR)\s?[^\]]*\]', '', self.texto_buscado).strip()
         self.busqueda_tipo = kwargs.get('tipo', '')
         self.busqueda_idioma = kwargs.get('idioma_busqueda', def_lang)
-        self.busqueda_include_adult = kwargs.get('include_adult', False)
+        # self.busqueda_include_adult = kwargs.get('include_adult', False)
         self.busqueda_year = kwargs.get('year', '')
         self.busqueda_filtro = kwargs.get('filtro', {})
         self.discover = kwargs.get('discover', {})
@@ -978,7 +978,7 @@ class Tmdb(object):
             # &include_adult=false&page=1
             url = ('http://api.themoviedb.org/3/search/%s?api_key=a1ab8b8669da03637a4b98fa39c39228&query=%s&language=%s'
                    '&include_adult=%s&page=%s' % (self.busqueda_tipo, text_quote,
-                                                  self.busqueda_idioma, self.busqueda_include_adult, page))
+                                                  self.busqueda_idioma, True, page))
 
             if self.busqueda_year:
                 url += '&year=%s' % self.busqueda_year

@@ -3,7 +3,6 @@
 	"name": "StreamTime",
 	"language": ["ita"],
 	"active": false,
-	"adult": false,
 	"thumbnail": "streamtime.png",
 	"banner": "streamtime.png",
 	"categories": ["tvshow", "movie"],

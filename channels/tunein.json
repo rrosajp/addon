@@ -2,7 +2,6 @@
   "id": "tunein",
   "name": "TuneIn",
   "active": true,
-  "adult": false,
   "language": ["*"],
   "thumbnail": "tunein.png",
   "banner": "tunein.png",

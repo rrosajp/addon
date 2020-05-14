@@ -6,6 +6,7 @@
 import traceback
 
 from platformcode import logger
+from inspect import stack
 
 try:
     import json
@@ -43,6 +44,7 @@ def load(*args, **kwargs):
     except:
         logger.error("**NOT** able to load the JSON")
         logger.error(traceback.format_exc())
+        logger.error('ERROR STACK ' + str(stack()[1][3]))
         value = {}
 
     return value
@@ -146,7 +148,7 @@ def check_to_backup(data, fname, dict_data):
             logger.debug("The file is empty: %s" % fname)
 
 
-def update_node(dict_node, name_file, node, path=None):
+def update_node(dict_node, name_file, node, path=None, silent=False):
     """
     actualiza el json_data de un fichero con el diccionario pasado
 
@@ -162,7 +164,7 @@ def update_node(dict_node, name_file, node, path=None):
     @return json_data
     @rtype: dict
     """
-    logger.info()
+    if not silent: logger.info()
 
     from platformcode import config
     from core import filetools
@@ -183,14 +185,14 @@ def update_node(dict_node, name_file, node, path=None):
         # es un dict
         if dict_data:
             if node in dict_data:
-                logger.debug("   the key exists %s" % node)
+                if not silent: logger.debug("   the key exists %s" % node)
                 dict_data[node] = dict_node
             else:
-                logger.debug("   The key does NOT exist %s" % node)
+                if not silent: logger.debug("   The key does NOT exist %s" % node)
                 new_dict = {node: dict_node}
                 dict_data.update(new_dict)
         else:
-            logger.debug("   It is NOT a dict")
+            if not silent: logger.debug("   It is NOT a dict")
             dict_data = {node: dict_node}
         json_data = dump(dict_data)
         result = filetools.write(fname, json_data)

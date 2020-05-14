@@ -41,12 +41,23 @@ if HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT == 0: HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT =
 # Random use of User-Agents, if nad is not specified
 HTTPTOOLS_DEFAULT_RANDOM_HEADERS = False
 
-domainCF = list()
-channelsCF = ['guardaserieclick', 'casacinema', 'dreamsub', 'ilgeniodellostreaming', 'piratestreaming', 'altadefinizioneclick', 'altadefinizione01_link', 'cineblog01']
-otherCF = ['altadefinizione-nuovo.link', 'wstream.video', 'akvideo.stream', 'backin.net', 'vcrypt.net']
-for ch in channelsCF:
-    domainCF.append(urlparse.urlparse(config.get_channel_url(name=ch)).hostname)
-domainCF.extend(otherCF)
+# old
+# domainCF = list()
+# channelsCF = ['guardaserieclick', 'ilgeniodellostreaming']
+# otherCF = ['akvideo.stream', 'backin.net', 'vcrypt.net']
+# for ch in channelsCF:
+#     domainCF.append(urlparse.urlparse(config.get_channel_url(name=ch)).hostname)
+# domainCF.extend(otherCF)
+
+global CF_LIST
+CF_LIST = list()
+CF_LIST_PATH = os.path.join(config.get_data_path(), "CF_Domains.txt")
+
+if os.path.exists(CF_LIST_PATH):
+    with open(CF_LIST_PATH, "rb") as CF_File:
+        CF_LIST = CF_File.read().splitlines()
+
+FORCE_CLOUDSCRAPER_LIST = ['akvideo.stream']
 
 def get_user_agent():
     # Returns the global user agent to be used when necessary for the url.
@@ -212,7 +223,7 @@ def show_infobox(info_dict):
 
 
 def downloadpage(url, **opt):
-    logger.info()
+    # logger.info()
     """
        Open a url and return the data obtained
 
@@ -257,15 +268,20 @@ def downloadpage(url, **opt):
         """
     url = scrapertools.unescape(url)
     domain = urlparse.urlparse(url).netloc
-    global domainCF
+    global CF_LIST
     CF = False
-    if domain in domainCF or opt.get('cf', False):
+
+    if domain in FORCE_CLOUDSCRAPER_LIST:
         from lib import cloudscraper
         session = cloudscraper.create_scraper()
         CF = True
     else:
         from lib import requests
         session = requests.session()
+
+        if domain in CF_LIST or opt.get('CF', False):
+            url = 'https://web.archive.org/save/' + url
+            CF = True
 
     if config.get_setting('resolver_dns') and not opt.get('use_requests', False):
         from specials import resolverdns
@@ -383,7 +399,18 @@ def downloadpage(url, **opt):
 
     response_code = req.status_code
 
+    if req.headers.get('Server', '').startswith('cloudflare') and response_code in [429, 503, 403] and not opt.get('CF', False):
+        if domain not in CF_LIST:
+            opt["CF"] = True
+            with open(CF_LIST_PATH, "a") as CF_File:
+                CF_File.write("%s\n" % domain)
+            logger.debug("CF retry... for domain: %s" % domain)
+            return downloadpage(url, **opt)
+
     response['data'] = req.content if req.content else ''
+    if CF:
+        import re
+        response['data'] = re.sub('["|\']/save/[^"]*(https?://[^"]+)', '"\\1', response['data'])
     response['url'] = req.url
 
     if type(response['data']) != str:

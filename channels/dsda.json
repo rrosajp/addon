@@ -3,7 +3,6 @@
 	"name": "D.S.D.A",
 	"language": ["ita"],
 	"active": true,
-	"adult": false,
 	"thumbnail": "dsda.png",
 	"banner": "dsda.png",
 	"categories": ["documentary"],

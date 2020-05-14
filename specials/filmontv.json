@@ -3,7 +3,6 @@
     "name": "Film in tv",
     "language": ["ita"],
     "active": false,
-    "adult": false,
     "thumbnail": null,
     "banner": null,
     "categories": [],

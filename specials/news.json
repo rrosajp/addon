@@ -2,7 +2,6 @@
   "id": "news",
   "name": "Novedades",
   "active": false,
-  "adult": false,
   "language": ["*"],
   "categories": [
     "movie"

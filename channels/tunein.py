@@ -21,6 +21,7 @@ def mainlist(item):
     patron = r'text="(?P<title>[^"]+)" URL="(?P<url>[^"]+)"'
     def itemHook(item):
         item.thumbnail = support.thumb(thumb='music.png')
+        item.contentType = 'music'
         return item
     def itemlistHook(itemlist):
         itemlist.append(

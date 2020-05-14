@@ -4,8 +4,8 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "upstream.to/([a-z0-9]+)",
-        "url": "https://upstream.to/\\1"
+        "pattern": "upstream.to/((?:embed-)?[a-z0-9]+)",
+        "url": "https://upstream.to/\\1.html"
       }
     ]
   },

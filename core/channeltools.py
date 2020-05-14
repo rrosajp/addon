@@ -14,13 +14,6 @@ default_file = dict()
 
 remote_path = 'https://raw.githubusercontent.com/kodiondemand/media/master/'
 
-
-def is_adult(channel_name):
-    logger.info("channel_name=" + channel_name)
-    channel_parameters = get_channel_parameters(channel_name)
-    return channel_parameters["adult"]
-
-
 def is_enabled(channel_name):
     logger.info("channel_name=" + channel_name)
     return get_channel_parameters(channel_name)["active"] and get_channel_setting("enabled", channel=channel_name,
@@ -41,14 +34,8 @@ def get_channel_parameters(channel_name):
                 channel_parameters["channel"] = channel_parameters.pop("id")
 
                 # si no existe el key se declaran valor por defecto para que no de fallos en las funciones que lo llaman
-                channel_parameters["adult"] = channel_parameters.get("adult", False)
-                logger.info(channel_parameters["adult"])
-                if channel_parameters["adult"]:
-                    channel_parameters["update_url"] = channel_parameters.get("update_url", DEFAULT_UPDATE_URL + 'porn/')
-                else:
-                    channel_parameters["update_url"] = channel_parameters.get("update_url", DEFAULT_UPDATE_URL)
+                channel_parameters["update_url"] = channel_parameters.get("update_url", DEFAULT_UPDATE_URL)
                 channel_parameters["language"] = channel_parameters.get("language", ["all"])
-                ##                channel_parameters["adult"] = channel_parameters.get("adult", False)
                 channel_parameters["active"] = channel_parameters.get("active", False)
                 channel_parameters["include_in_global_search"] = channel_parameters.get("include_in_global_search",
                                                                                         False)
@@ -92,7 +79,6 @@ def get_channel_parameters(channel_name):
             logger.error(channel_name + ".json error \n%s" % ex)
             channel_parameters = dict()
             channel_parameters["channel"] = ""
-            channel_parameters["adult"] = False
             channel_parameters['active'] = False
             channel_parameters["language"] = ""
             channel_parameters["update_url"] = DEFAULT_UPDATE_URL
@@ -108,14 +94,12 @@ def get_channel_json(channel_name):
     try:
         channel_path = filetools.join(config.get_runtime_path(), "channels", channel_name + ".json")
         if not filetools.isfile(channel_path):
-            channel_path = filetools.join(config.get_runtime_path(), 'channels', "porn", channel_name + ".json")
+            channel_path = filetools.join(config.get_runtime_path(), "specials", channel_name + ".json")
             if not filetools.isfile(channel_path):
-                channel_path = filetools.join(config.get_runtime_path(), "specials", channel_name + ".json")
+                channel_path = filetools.join(config.get_runtime_path(), "servers", channel_name + ".json")
                 if not filetools.isfile(channel_path):
-                    channel_path = filetools.join(config.get_runtime_path(), "servers", channel_name + ".json")
-                    if not filetools.isfile(channel_path):
-                        channel_path = filetools.join(config.get_runtime_path(), "servers", "debriders",
-                                                      channel_name + ".json")
+                    channel_path = filetools.join(config.get_runtime_path(), "servers", "debriders",
+                                                  channel_name + ".json")
 
         if filetools.isfile(channel_path):
             # logger.info("channel_data=" + channel_path)
@@ -182,10 +166,9 @@ def get_default_settings(channel_name):
         default_file = jsontools.load(filetools.read(default_path))
 
     channel_path = filetools.join(config.get_runtime_path(), 'channels', channel_name + '.json')
-    adult_path = filetools.join(config.get_runtime_path(), 'channels', 'porn', channel_name + '.json')
 
     # from core.support import dbg; dbg()
-    if filetools.exists(channel_path) or filetools.exists(adult_path):
+    if filetools.exists(channel_path):
         default_controls = default_file['settings']
         default_controls_renumber = default_file['renumber']
         channel_json = get_channel_json(channel_name)

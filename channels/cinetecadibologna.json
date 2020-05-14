@@ -3,7 +3,6 @@
 	"name": "Cineteca di Bologna",
 	"language": ["ita"],
 	"active": true,
-	"adult": false,
 	"thumbnail": "cinetecadibologna.png",
 	"banner": "cinetecadibologna.png",
 	"categories": ["documentary"],

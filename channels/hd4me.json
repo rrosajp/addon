@@ -3,7 +3,6 @@
     "name": "HD4ME",
     "language": ["ita", "sub-ita"],
     "active": true,
-    "adult": false,
     "thumbnail": "hd4me.png",
     "banner": "hd4me.png",
     "categories": ["movie", "vos"],

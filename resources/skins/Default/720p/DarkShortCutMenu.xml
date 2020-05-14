@@ -7,12 +7,10 @@
 	</coordinates>
 	<defaultcontrol always="true">32500</defaultcontrol>
 	<animation type="WindowOpen" reversible="false">
-		<effect type="zoom" start="80" end="100" center="440,110" delay="160" tween="back" time="240" />
-		<effect type="fade" delay="160" end="100" time="240" />
+		<effect type="fade" delay="160" end="100" time="220" />
 	</animation>
 	<animation type="WindowClose" reversible="false">
-		<effect type="zoom" start="100" end="80" center="440,110" easing="in" tween="back" time="240" />
-		<effect type="fade" start="100" end="0" time="240" />
+		<effect type="fade" delay="160" start="100" end="0" time="200" />
 	</animation>
 	<controls>
 	<control type="button">
@@ -24,14 +22,22 @@
 			<texturenofocus colordiffuse="88FFFFFF">Shortcut/white.png</texturenofocus>
 			<onclick>Action(close)</onclick>
 		</control>
-		<control type="image">
-			<left>0</left>
-			<top>0</top>
-			<width>880</width>
-			<height>220</height>
-			<texture border="2" colordiffuse="FFEEEEEE">Shortcut/white.png</texture>
-		</control>
 		<control type="group">
+			<animation type="WindowOpen" reversible="false">
+				<effect type="slide" start="0,100" end="0,0" center="640,225" delay="160" tween="cubic" time="200" />
+				<effect type="fade" delay="160" end="100" time="220" />
+			</animation>
+			<animation type="WindowClose" reversible="false">
+				<effect type="slide" start="0,0" end="0,-100" center="640,225" delay="160" tween="cubic" time="200" />
+				<effect type="fade" delay="160" start="100" end="0" time="200" />
+			</animation>
+			<control type="image">
+				<left>0</left>
+				<top>0</top>
+				<width>880</width>
+				<height>220</height>
+				<texture border="2" colordiffuse="FFEEEEEE">Shortcut/white.png</texture>
+			</control>
 			<control type="group">
 				<control type="image">
 					<left>-21</left>
@@ -53,7 +59,6 @@
 					<animation effect="slide" start="0,0" end="10,0" time="0" condition="true">Conditional</animation>
 					<animation effect="slide" end="120,0" time="0" condition="!Control.IsVisible(5)">Conditional</animation>
 					<itemlayout height="220" width="220">
-						<!-- <top>2</top> -->
 						<control type="image">
 							<top>0</top>
 							<left>0</left>
@@ -69,11 +74,9 @@
 							<texture colordiffuse="60FFFFFF">Shortcut/black.png</texture>
 						</control>
 						<control type="image">
-							<left>35</left>
-							<top>35</top>
-							<width>150</width>
-							<height>150</height>
-							<texture>$INFO[ListItem.Property(thumb)]</texture>
+							<width>220</width>
+							<height>220</height>
+							<texture>$INFO[ListItem.Property(thumbnail)]</texture>
 							<aspectratio>keep</aspectratio>
 							<align>center</align>
 						</control>
@@ -97,8 +100,9 @@
 								<animation effect="fade" start="100" end="0" time="0">Focus</animation>
 							</control>
 							<control type="image">
+								<top>1</top>
 								<width>220</width>
-								<height>220</height>
+								<height>218</height>
 								<texture colordiffuse="FF0082C2">Shortcut/button-fo.png</texture>
 								<animation effect="fade" start="100" end="0" time="0">Unfocus</animation>
 							</control>
@@ -118,23 +122,31 @@
 								<texture colordiffuse="60FFFFFF">Shortcut/black.png</texture>
 							</control>
 							<control type="image">
-								<left>35</left>
-								<top>35</top>
-								<width>150</width>
-								<height>150</height>
-								<texture>$INFO[ListItem.Property(thumb)]</texture>
+								<width>220</width>
+								<height>220</height>
+								<texture>$INFO[ListItem.Property(thumbnail)]</texture>
 								<aspectratio>keep</aspectratio>
 								<align>center</align>
 							</control>
 							<control type="textbox">
 								<left>0</left>
-								<top>146</top>
+								<top>160</top>
 								<width>220</width>
 								<height>74</height>
 								<font>font12</font>
+								<textcolor>FF232323</textcolor>
 								<label>$INFO[ListItem.Label]</label>
 								<align>center</align>
 								<aligny>center</aligny>
+							</control>
+							<control type="image">
+								<left>100</left>
+								<top>5</top>
+								<width>20</width>
+								<height>20</height>
+								<texture colordiffuse="FF232323">$INFO[ListItem.Property(sub)]</texture>
+								<aspectratio>keep</aspectratio>
+								<align>center</align>
 							</control>
 						</control>
 					</focusedlayout>
@@ -151,10 +163,8 @@
 					<textureslidernibfocus>-</textureslidernibfocus>
 					<showonepage>false</showonepage>
 					<orientation>horizontal</orientation>
-					<onleft>32500</onleft>
-					<onright>32500</onright>
 					<ondown>32500</ondown>
-					<onup>32500</onup>
+					<!-- <onup>32500</onup> -->
 					<animation effect="slide" end="120,0" time="0" condition="!Control.IsVisible(5)">Conditional</animation>
 				</control>
 			</control>

@@ -226,14 +226,12 @@ class InfoWindow(xbmcgui.WindowXMLDialog):
                 self.getControl(100014).setLabel(config.get_localized_string(60384))
                 self.getControl(100015).setLabel(self.result.get("temporada_nombre", "N/A"))
                 self.getControl(100016).setLabel(config.get_localized_string(60385))
-                self.getControl(100017).setLabel(self.result.get("season", "N/A") + " de " +
-                                                 self.result.get("seasons", "N/A"))
+                self.getControl(100017).setLabel(self.result.get("season", "N/A") + " de " + self.result.get("seasons", "N/A"))
             if self.result.get("episode"):
                 self.getControl(100014).setLabel(config.get_localized_string(60377))
                 self.getControl(100015).setLabel(self.result.get("episode_title", "N/A"))
                 self.getControl(100018).setLabel(config.get_localized_string(60386))
-                self.getControl(100019).setLabel(self.result.get("episode", "N/A") + " de " +
-                                                 self.result.get("episodes", "N/A"))
+                self.getControl(100019).setLabel(self.result.get("episode", "N/A") + " de " + self.result.get("episodes", "N/A"))
                 self.getControl(100020).setLabel(config.get_localized_string(60387))
                 self.getControl(100021).setLabel(self.result.get("date", "N/A"))
 
@@ -287,10 +285,10 @@ class InfoWindow(xbmcgui.WindowXMLDialog):
         logger.info("action=" + repr(action.getId()))
         action = action.getId()
 
-        # Obtenemos el foco
+        # Find Focus
         focus = self.getFocusId()
 
-        # Accion 1: Flecha izquierda
+        # Left
         if action == 1:
 
             if focus == ID_BUTTON_OK:
@@ -298,26 +296,26 @@ class InfoWindow(xbmcgui.WindowXMLDialog):
 
             elif focus == ID_BUTTON_CANCEL:
                 if self.indexList + 1 != len(self.listData):
-                    # vamos al botón Siguiente
+                    # Next
                     self.setFocus(self.getControl(ID_BUTTON_NEXT))
                 elif self.indexList > 0:
-                    # vamos al botón Anterior ya que Siguiente no está activo (estamos al final de la lista)
+                    # Previous
                     self.setFocus(self.getControl(ID_BUTTON_PREVIOUS))
 
             elif focus == ID_BUTTON_NEXT:
                 if self.indexList > 0:
-                    # vamos al botón Anterior
+                    # Next
                     self.setFocus(self.getControl(ID_BUTTON_PREVIOUS))
 
-        # Accion 2: Flecha derecha
+        # Right
         elif action == 2:
 
             if focus == ID_BUTTON_PREVIOUS:
                 if self.indexList + 1 != len(self.listData):
-                    # vamos al botón Siguiente
+                    # Next
                     self.setFocus(self.getControl(ID_BUTTON_NEXT))
                 else:
-                    # vamos al botón Cancelar ya que Siguiente no está activo (estamos al final de la lista)
+                    # Cancel
                     self.setFocus(self.getControl(ID_BUTTON_CANCEL))
 
             elif focus == ID_BUTTON_NEXT:
@@ -326,6 +324,13 @@ class InfoWindow(xbmcgui.WindowXMLDialog):
             elif focus == ID_BUTTON_CANCEL:
                 self.setFocus(self.getControl(ID_BUTTON_OK))
 
+        # Up
+        elif action == 3:
+            self.setFocus(self.getControl(ID_BUTTON_CLOSE))
+
+        # Down
+        elif action == 4:
+            self.setFocus(self.getControl(ID_BUTTON_OK))
         # Pulsa ESC o Atrás, simula click en boton cancelar
         if action in [10, 92]:
             self.onClick(ID_BUTTON_CANCEL)

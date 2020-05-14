@@ -3,7 +3,6 @@
     "name": "Fastsubita",
     "language": ["sub-ita"],
     "active": true,
-    "adult": false,
     "thumbnail": "fastsubita.png",
     "banner": "fastsubita.png",
     "categories": ["tvshow", "vos"],

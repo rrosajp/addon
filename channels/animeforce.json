@@ -3,7 +3,6 @@
 	"name": "AnimeForce",
 	"language": ["ita"],
 	"active": true,
-	"adult": false,
 	"thumbnail": "animeforce.png",
 	"banner": "animeforce.png",
 	"categories": ["anime"],

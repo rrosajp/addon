@@ -10,13 +10,12 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
-if PY3:
-    import urllib.error as urllib2                              # Es muy lento en PY2.  En PY3 es nativo
-else:
-    import urllib2                                              # Usamos el nativo de PY2 que es más rápido
+# if PY3:
+#     import urllib.error as urllib2                              # Es muy lento en PY2.  En PY3 es nativo
+# else:
+#     import urllib2                                              # Usamos el nativo de PY2 que es más rápido
 
 import os
-import sys
 
 from core.item import Item
 from platformcode import config, logger
@@ -163,17 +162,6 @@ def run(item=None):
                                             config.get_localized_string(70740) % short)
         # Action in certain channel specified in "action" and "channel" parameters
         else:
-            # Entry point for a channel is the "mainlist" action, so here we check parental control
-            if item.action == "mainlist":
-                from core import channeltools
-                #updater.checkforupdates() beta version checking for update, still disabled
-
-                # Parental control
-                # If it is an adult channel, and user has configured pin, asks for it
-                if channeltools.is_adult(item.channel) and config.get_setting("adult_request_password"):
-                    tecleado = platformtools.dialog_input("", config.get_localized_string(60334), True)
-                    if tecleado is None or tecleado != config.get_setting("adult_password"):
-                        return
             # # Actualiza el canal individual
             # if (item.action == "mainlist" and item.channel != "channelselector" and
             #             config.get_setting("check_for_channel_updates") == True):
@@ -183,16 +171,10 @@ def run(item=None):
             # Checks if channel exists
             if os.path.isfile(os.path.join(config.get_runtime_path(), 'channels', item.channel + ".py")):
                 CHANNELS = 'channels'
-            elif os.path.isfile(os.path.join(config.get_runtime_path(), 'channels', 'porn', item.channel + ".py")):
-                CHANNELS = 'channels.porn'
             else:
                 CHANNELS = 'specials'
 
-            if CHANNELS != 'channels.porn':
-                channel_file = os.path.join(config.get_runtime_path(), CHANNELS, item.channel + ".py")
-            else:
-                channel_file = os.path.join(config.get_runtime_path(), 'channels', 'porn',
-                                                         item.channel + ".py")
+            channel_file = os.path.join(config.get_runtime_path(), CHANNELS, item.channel + ".py")
 
             logger.info("channel_file= " + channel_file + ' - ' + CHANNELS + ' - ' + item.channel)
 
@@ -329,21 +311,21 @@ def run(item=None):
 
                 platformtools.render_items(itemlist, item)
 
-    except urllib2.URLError as e:
-        import traceback
-        logger.error(traceback.format_exc())
-
-        # Grab inner and third party errors
-        if hasattr(e, 'reason'):
-            logger.error("Reason for the error, code: %s | Reason: %s" % (str(e.reason[0]), str(e.reason[1])))
-            texto = config.get_localized_string(30050)  # "No se puede conectar con el sitio web"
-            platformtools.dialog_ok(config.get_localized_string(20000), texto)
-
-        # Grab server response errors
-        elif hasattr(e, 'code'):
-            logger.error("HTTP error code: %d" % e.code)
-            # "El sitio web no funciona correctamente (error http %d)"
-            platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(30051) % e.code)
+    # except urllib2.URLError as e:
+    #     import traceback
+    #     logger.error(traceback.format_exc())
+    #
+    #     # Grab inner and third party errors
+    #     if hasattr(e, 'reason'):
+    #         logger.error("Reason for the error, code: %s | Reason: %s" % (str(e.reason[0]), str(e.reason[1])))
+    #         texto = config.get_localized_string(30050)  # "No se puede conectar con el sitio web"
+    #         platformtools.dialog_ok(config.get_localized_string(20000), texto)
+    #
+    #     # Grab server response errors
+    #     elif hasattr(e, 'code'):
+    #         logger.error("HTTP error code: %d" % e.code)
+    #         # "El sitio web no funciona correctamente (error http %d)"
+    #         platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(30051) % e.code)
     except WebErrorException as e:
         import traceback
         from core import scrapertools

@@ -10,6 +10,7 @@ from lib.requests_toolbelt.adapters import host_header_ssl
 from lib import doh
 from platformcode import logger, config
 import requests
+from core import scrapertools
 
 try:
     import _sqlite3 as sql
@@ -107,7 +108,10 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
             domain = parse.netloc
         else:
             raise requests.exceptions.URLRequired
-        ip = self.getIp(domain)
+        if not scrapertools.find_single_match(domain, '\d+\.\d+\.\d+\.\d+'):
+            ip = self.getIp(domain)
+        else:
+            ip = None
         if ip:
             self.ssl_context = CustomContext(protocol, domain)
             if self.CF:

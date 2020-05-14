@@ -2,7 +2,6 @@
     "id": "animetubeita",
     "name": "AnimeTubeITA",
     "active": true,
-    "adult": false,
     "language": ["sub-ita"],
     "thumbnail": "animetubeita.png",
     "bannermenu": "animetubeita.png",

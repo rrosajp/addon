@@ -3,7 +3,6 @@
 	"name": "Tantifilm",
 	"language": ["ita"],
 	"active": true,
-	"adult": false,
 	"thumbnail": "tantifilm.png",
 	"banner": "tantifilm.png",
     "categories": ["tvshow", "movie", "anime"],

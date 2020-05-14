@@ -2,7 +2,6 @@
     "id": "animesubita",
     "name": "AnimeSubIta",
     "active": true,
-    "adult": false,
     "language": ["sub-ita"],
     "thumbnail": "animesubita.png",
     "bannermenu": "animesubita.png",

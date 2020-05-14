@@ -6,6 +6,9 @@ import inspect
 import os
 import re
 import sys
+
+from lib.guessit import guessit
+
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 if PY3:
@@ -137,17 +140,6 @@ def regexDbg(item, patron, headers, data=''):
         webbrowser.open(url + "/r/" + permaLink)
 
 
-def scrape2(item, patron = '', listGroups = [], headers="", blacklist="", data="", patronBlock="",
-           patronNext="", action="findvideos", addVideolibrary = True, typeContentDict={}, typeActionDict={}):
-    m = re.search(r'(?<!\\|\[)\((?!\?)', patron)
-    n = 0
-    while m:
-        patron = patron[:m.end()] + '?P<' + listGroups[n] + '>' + patron[m.end():]
-        m = re.search(r'(?<!\\|\[)\((?!\?)', patron)
-        n += 1
-    regexDbg(item, patron, headers)
-
-
 def scrapeLang(scraped, lang, longtitle):
     ##    Aggiunto/modificato per gestire i siti che hanno i video
     ##    in ita e subita delle serie tv nella stessa pagina
@@ -171,7 +163,7 @@ def cleantitle(title):
     cleantitle = title.replace('"', "'").replace('×', 'x').replace('–', '-').strip()
     return cleantitle
 
-def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang):
+def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang, sceneTitle):
     itemlist = []
     log("scrapeBlock qui")
     if debug:
@@ -240,17 +232,6 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         Type = scraped['type'] if scraped['type'] else ''
         plot = cleantitle(scraped["plot"]) if scraped["plot"] else ''
 
-        # make formatted Title [longtitle]
-        s = ' - '
-        title = episode + (s if episode and title else '') + title
-        longtitle = title + (s if title and title2 else '') + title2
-        longtitle = typo(longtitle, 'bold')
-        longtitle += typo(quality, '_ [] color kod') if quality else ''
-        longtitle += typo(scraped['size'], '_ [] color kod') if scraped['size'] else ''
-        longtitle += typo(scraped['seed']+ ' SEEDS', '_ [] color kod') if scraped['seed'] else ''
-
-        lang1, longtitle = scrapeLang(scraped, lang, longtitle)
-
         # if title is set, probably this is a list of episodes or video sources
         # necessaria l'aggiunta di == scraped["title"] altrimenti non prende i gruppi dopo le categorie
         if item.infoLabels["title"] == scraped["title"]:
@@ -275,6 +256,49 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             if scraped["rating"]:
                 infolabels['rating'] = scrapertools.decodeHtmlentities(scraped["rating"])
 
+        # make formatted Title [longtitle]
+        s = ' - '
+        title = episode + (s if episode and title else '') + title
+        longtitle = title + (s if title and title2 else '') + title2 + '\n'
+
+        if sceneTitle:
+            try:
+                parsedTitle = guessit(title)
+                title = longtitle = parsedTitle.get('title', '')
+                log('TITOLO',title)
+                if parsedTitle.get('source'):
+                    quality = str(parsedTitle.get('source'))
+                    if parsedTitle.get('screen_size'):
+                        quality += ' ' + str(parsedTitle.get('screen_size', ''))
+                if not scraped['year']:
+                    infolabels['year'] = parsedTitle.get('year', '')
+                if parsedTitle.get('episode') and parsedTitle.get('season'):
+                    longtitle = title + s
+
+                    if type(parsedTitle.get('season')) == list:
+                        longtitle += str(parsedTitle.get('season')[0]) + '-' + str(parsedTitle.get('season')[-1])
+                    else:
+                        longtitle += str(parsedTitle.get('season'))
+
+                    if type(parsedTitle.get('episode')) == list:
+                        longtitle += 'x' + str(parsedTitle.get('episode')[0]).zfill(2) + '-' + str(parsedTitle.get('episode')[-1]).zfill(2)
+                    else:
+                        longtitle += 'x' + str(parsedTitle.get('episode')).zfill(2)
+                elif parsedTitle.get('season') and type(parsedTitle.get('season')) == list:
+                    longtitle += s + config.get_localized_string(30140) + " " +str(parsedTitle.get('season')[0]) + '-' + str(parsedTitle.get('season')[-1])
+                elif parsedTitle.get('season'):
+                    longtitle += s + config.get_localized_string(60027) % str(parsedTitle.get('season'))
+                if parsedTitle.get('episode_title'):
+                    longtitle += s + parsedTitle.get('episode_title')
+            except:
+                log('Error')
+
+        longtitle = typo(longtitle, 'bold')
+        lang1, longtitle = scrapeLang(scraped, lang, longtitle)
+        longtitle += typo(quality, '_ [] color kod') if quality else ''
+        longtitle += typo(scraped['size'], '_ [] color kod') if scraped['size'] else ''
+        longtitle += typo(scraped['seed'] + ' SEEDS', '_ [] color kod') if scraped['seed'] else ''
+
         AC = CT = ''
         if typeContentDict:
             for name, variants in typeContentDict.items():
@@ -288,7 +312,6 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                     AC = name
                     break
                 else: AC = action
-
         if (scraped["title"] not in blacklist) and (search.lower() in longtitle.lower()):
             it = Item(
                 channel=item.channel,
@@ -380,6 +403,7 @@ def scrape(func):
         if 'pagination' in args and inspect.stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']: pagination = args['pagination'] if args['pagination'] else 20
         else: pagination = ''
         lang = args['deflang'] if 'deflang' in args else ''
+        sceneTitle = args.get('sceneTitle')
         pag = item.page if item.page else 1  # pagination
         matches = []
 
@@ -402,7 +426,7 @@ def scrape(func):
                     if 'season' in bl and bl['season']:
                         item.season = bl['season']
                     blockItemlist, blockMatches = scrapeBlock(item, args, bl['block'], patron, headers, action, pagination, debug,
-                                                typeContentDict, typeActionDict, blacklist, search, pag, function, lang)
+                                                typeContentDict, typeActionDict, blacklist, search, pag, function, lang, sceneTitle)
                     for it in blockItemlist:
                         if 'lang' in bl:
                             it.contentLanguage, it.title = scrapeLang(bl, it.contentLanguage, it.title)
@@ -413,7 +437,7 @@ def scrape(func):
                     matches.extend(blockMatches)
             elif patron:
                 itemlist, matches = scrapeBlock(item, args, data, patron, headers, action, pagination, debug, typeContentDict,
-                                       typeActionDict, blacklist, search, pag, function, lang)
+                                       typeActionDict, blacklist, search, pag, function, lang, sceneTitle)
 
             if 'itemlistHook' in args:
                 itemlist = args['itemlistHook'](itemlist)
@@ -453,7 +477,7 @@ def scrape(func):
                          page=pag + 1,
                          thumbnail=thumb()))
 
-        if action != 'play' and function != 'episodios' and 'patronMenu' not in args:
+        if action != 'play' and function != 'episodios' and 'patronMenu' not in args and item.contentType in ['movie', 'tvshow', 'episode']:
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
         from specials import autorenumber
@@ -826,7 +850,6 @@ def match(item_url_string, **args):
         match: first match
         matches: all the matches
     '''
-    log()
 
     matches = blocks = []
     url = None
@@ -839,7 +862,7 @@ def match(item_url_string, **args):
     string = args.get('string', False)
 
     # remove scrape arguments
-    args = dict([(key, val) for key, val in args.items() if key not in ['patron', 'patronBlock', 'patronBlocks', 'debug', 'debugBlock', 'string']]) 
+    args = dict([(key, val) for key, val in args.items() if key not in ['patron', 'patronBlock', 'patronBlocks', 'debug', 'debugBlock', 'string']])
 
     # check type of item_url_string
     if string:
@@ -927,11 +950,13 @@ def download(itemlist, item, typography='', function_level=1, function=''):
         elif item.contentType == 'episode':
             from_action = 'findvideos'
             title = typo(config.get_localized_string(60356), typography) + ' - ' + item.title
-        else:
+        elif item.contentType == 'tvshow':
             from_action = 'episodios'
             title = typo(config.get_localized_string(60355), typography)
+        else:  # content type does not support download
+            return itemlist
 
-        function = function if function else inspect.stack()[function_level][3]
+        # function = function if function else inspect.stack()[function_level][3]
 
         contentSerieName=item.contentSerieName if item.contentSerieName else ''
         contentTitle=item.contentTitle if item.contentTitle else ''
@@ -1119,21 +1144,7 @@ def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True, vid
     from platformcode.config import get_setting
 
     CL = get_setting('checklinks') or get_setting('checklinks', item.channel)
-    autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
-    channel_node = autoplay_node.get(item.channel, {})
-    if not channel_node:  # non ha mai aperto il menu del canale quindi in autoplay_data.json non c'e la key
-        try:
-            channelFile = __import__('channels.' + item.channel, fromlist=["channels.%s" % item.channel])
-        except:
-            channelFile = __import__('specials.' + item.channel, fromlist=["specials.%s" % item.channel])
-        if hasattr(channelFile, 'list_servers') and hasattr(channelFile, 'list_quality'):
-            autoplay.init(item.channel, channelFile.list_servers, channelFile.list_quality)
-
-    autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
-    channel_node = autoplay_node.get(item.channel, {})
-    settings_node = channel_node.get('settings', {})
-    AP = get_setting('autoplay') or (settings_node['active'] if 'active' in settings_node else False)
-    HS = config.get_setting('hide_servers') or (settings_node['hide_servers'] if 'hide_server' in settings_node else False)
+    AP, HS = autoplay.get_channel_AP_HS(item)
 
     if CL and not AP:
         if get_setting('checklinks', item.channel):

@@ -2,7 +2,6 @@
     "id": "italiaserie",
     "name": "Italia Serie",
     "active": true,
-    "adult": false,
     "language": ["ita","sub-ita"],
     "thumbnail": "italiaserie.png",
     "bannermenu": "italiaserie.png",

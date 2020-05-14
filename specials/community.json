@@ -2,7 +2,6 @@
   "id": "community",
   "name": "Community",
   "active": true,
-  "adult": false,
   "language": ["*"],
   "thumbnail": "",
   "banner": "",

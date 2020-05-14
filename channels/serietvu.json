@@ -2,7 +2,6 @@
     "id": "serietvu",
     "name": "SerieTVU",
     "active": true,
-    "adult": false,
     "language": ["ita", "sub-ita"],
     "thumbnail": "serietvu.png",
     "banner": "serietvu.png",

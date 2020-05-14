@@ -2,7 +2,6 @@
     "id": "serietvonline",
     "name": "SerieTvOnline",
     "active": true,
-    "adult": false,
     "language": ["ita"],
     "thumbnail": "serietvonline.png",
     "bannermenu": "serietvonline.png",

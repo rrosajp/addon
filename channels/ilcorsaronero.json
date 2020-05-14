@@ -1,8 +1,7 @@
 {
     "id": "ilcorsaronero",
     "name": "ilCorSaRoNeRo",
-    "active": false,
-    "adult": false,
+    "active": true,
     "language": ["ita"],
     "thumbnail": "ilcorsaronero.png",
     "banner": "ilcorsaronero.png",
