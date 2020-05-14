@@ -123,8 +123,12 @@ class Main(xbmcgui.WindowXMLDialog):
         if action.getId() == xbmcgui.ACTION_CONTEXT_MENU:
             config.open_settings()
 
+        focus = self.getFocusId()
+
         if action == 3:
-            if submenu:
+            if focus == 61:
+                self.setFocusId(32500)
+            elif submenu:
                 self.close()
                 open_shortcut_menu()
             elif self.getControl(32500).getSelectedItem().getProperty('channel') in ['news', 'channelselector', 'search', 'videolibrary']:

@@ -164,7 +164,7 @@
 					<showonepage>false</showonepage>
 					<orientation>horizontal</orientation>
 					<ondown>32500</ondown>
-					<onup>32500</onup>
+					<!-- <onup>32500</onup> -->
 					<animation effect="slide" end="120,0" time="0" condition="!Control.IsVisible(5)">Conditional</animation>
 				</control>
 			</control>
