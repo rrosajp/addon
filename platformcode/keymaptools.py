@@ -95,6 +95,7 @@ class Main(xbmcgui.WindowXMLDialog):
             self.setCoordinateResolution(2)
 
         for menuentry in menu:
+            if not menuentry.channel: menuentry.channel = prevchannel
             item = xbmcgui.ListItem(menuentry.title)
             if not submenu and menuentry.channel in ['news', 'channelselector', 'search', 'videolibrary']:
                 item.setProperty('sub', 'Controls/spinUp-Focus.png')
@@ -110,7 +111,7 @@ class Main(xbmcgui.WindowXMLDialog):
     def onClick(self, control_id):
         if control_id == 32500:
             action = self.getControl(32500).getSelectedItem().getProperty('run')
-            xbmc.executebuiltin('Dialog.Close(all,true)')
+            self.close()
             xbmc.executebuiltin('ActivateWindow(10025, "plugin://plugin.video.kod/?' + base64.b64encode(action) + '")')
 
 
@@ -118,7 +119,7 @@ class Main(xbmcgui.WindowXMLDialog):
     def onAction(self, action):
         # exit
         if action.getId() in [xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]:
-            xbmc.executebuiltin('Dialog.Close(all,true)')
+            self.close()
             if submenu: open_shortcut_menu()
 
         if action.getId() == xbmcgui.ACTION_CONTEXT_MENU:
@@ -126,25 +127,27 @@ class Main(xbmcgui.WindowXMLDialog):
 
         if action == 3:
             if submenu:
-                xbmc.executebuiltin('Dialog.Close(all,true)')
+                self.close()
                 open_shortcut_menu()
             elif self.getControl(32500).getSelectedItem().getProperty('channel') in ['news', 'channelselector', 'search', 'videolibrary']:
                 channel_name = self.getControl(32500).getSelectedItem().getProperty('channel')
                 if channel_name == 'channelselector':
                     import channelselector
-                    xbmc.executebuiltin('Dialog.Close(all,true)')
-                    open_shortcut_menu(channelselector.getchanneltypes())
+                    self.close()
+                    open_shortcut_menu(channelselector.getchanneltypes(), channel_name)
                 else:
                     from core.item import Item
                     channel = __import__('specials.%s' % channel_name, fromlist=["specials.%s" % channel_name])
-                    xbmc.executebuiltin('Dialog.Close(all,true)')
-                    open_shortcut_menu(channel.mainlist(Item().fromjson(action)))
+                    self.close()
+                    open_shortcut_menu(channel.mainlist(Item().fromjson(action)), channel_name)
 
 
 
-def open_shortcut_menu(newmenu=''):
+def open_shortcut_menu(newmenu='', channel=''):
     global menu
     global submenu
+    global prevchannel
+    prevchannel = channel
     if newmenu:
         menu = newmenu
         submenu = True
@@ -154,7 +157,6 @@ def open_shortcut_menu(newmenu=''):
     XML =  'ShortCutMenu.xml'
     if config.get_setting('icon_set') == 'dark':
         XML = 'Dark' + XML
-    xbmc.executebuiltin('Dialog.Close(all,true)')
     main = Main(XML, config.get_runtime_path())
     main.doModal()
     del main
