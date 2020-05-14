@@ -1384,8 +1384,8 @@ msgid "Find %s possible matches"
 msgstr "Trovate %s possibili corrispondenze"
 
 msgctxt "#60298"
-msgid "[%s]: Select the correct TV show"
-msgstr "[%s]: Seleziona la serie TV corretta"
+msgid "%s - Select the correct TV show"
+msgstr "%s - Seleziona la serie TV corretta"
 
 msgctxt "#60299"
 msgid "Not found in the language '%s'"

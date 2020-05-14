@@ -19,7 +19,7 @@
         <control type="image">
           <width>100%</width>
           <height>100%</height>
-          <texture colordiffuse="EE232323">Shortcut/white.png</texture>
+          <texture colordiffuse="FF232323">Shortcut/white.png</texture>
         </control>
         <!-- Divider -->
         <control type="image">

@@ -1385,7 +1385,7 @@ msgid "Find %s possible matches"
 msgstr ""
 
 msgctxt "#60298"
-msgid "[%s]: Select the correct TV show"
+msgid "%s - Select the correct TV show"
 msgstr ""
 
 msgctxt "#60299"
