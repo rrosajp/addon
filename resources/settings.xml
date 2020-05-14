@@ -70,7 +70,7 @@
         <setting label="70578" type="lsep"/>
         <!-- <setting id="torrent_config" type="action" label="70253" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJzZXR0aW5nX3RvcnJlbnQiLA0KICAgICJjaGFubmVsIjoic2V0dGluZyINCn0=)"/> -->
         <setting id="elementum_on_seed" type="bool" label="70805" default="false"/>
-        <setting id="elementum_install" type="action" label="70785" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJkb3dubG9hZCIsDQogICAgImNoYW5uZWwiOiJxdWFzYXJfZG93bmxvYWQiDQp9)"/>
+        <setting id="elementum_install" type="action" label="70785" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiJkb3dubG9hZCIsDQogICAgImNoYW5uZWwiOiJlbGVtZW50dW1fZG93bmxvYWQiDQp9)"/>
     </category>
 
     <!-- Search -->
