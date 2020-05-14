@@ -6004,12 +6004,12 @@ msgid "Next extraction..."
 msgstr "Estrazione successiva..."
 
 msgctxt "#70805"
-msgid "Stay on seed"
+msgid "Stay in seed"
 msgstr "Resta in seed"
 
 msgctxt "#70806"
-msgid "Changing this parameter permanently overwrites the Elementum settings.\nAre you sure you want to continue?"
-msgstr "Modificando questo parametro vengono sovrascritte permanentemente le impostazioni di Elementum.\nSicuro di Voler continuare?"
+msgid "Changing this parameter permanently overwrites the Elementum settings.\nDo you want to continue?"
+msgstr "Modificando questo parametro vengono sovrascritte permanentemente le impostazioni di Elementum.\nVuoi continuare?"
 
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
@@ -6237,7 +6237,7 @@ msgid "Folder name for TV shows"
 msgstr "Nome della cartella per le serie TV"
 
 msgctxt "#80022"
-msgid "You can configure the Kodi video library later from the KoD settings"
+msgid "You can configure the Kodi video library later from KoD settings"
 msgstr "Potrai configurare la libreria di Kodi in seguito dalle impostazioni di KoD"
 
 msgctxt "#80023"
@@ -6245,7 +6245,7 @@ msgid "You will be asked to choose and configure the information providers for m
 msgstr "Ti verrà chiesto di scegliere e configurare i provider delle informazioni per film e serie TV"
 
 msgctxt "#80024"
-msgid "An error has occurred during the configuration of the Kodi video library. Please check the log and try again from the KoD settings"
+msgid "An error has occurred during the configuration of the Kodi video library. Please check the log and try again from KoD settings"
 msgstr "Si è verificato un errore durante la configurazione della libreria di Kodi. Si prega di controllare il log e riprovare dalle impostazioni di KoD"
 
 msgctxt "#80025"
@@ -6265,7 +6265,7 @@ msgid "The selected folders are already used by the Kodi library. Please change 
 msgstr "Le cartelle selezionate sono già utilizzate dalla libreria di Kodi. Si prega di cambiarle opportunamente"
 
 msgctxt "#80029"
-msgid "The selected folders are already used by the Kodi library. Please change them properly from the KoD settings"
+msgid "The selected folders are already used by the Kodi library. Please change them properly from KoD settings"
 msgstr "Le cartelle selezionate sono già utilizzate dalla libreria di Kodi. Si prega di cambiarle opportunamente dalle impostazioni di KoD"
 
 msgctxt "#80030"
@@ -6321,7 +6321,7 @@ msgid "Include local episodes when adding a TV shows"
 msgstr "Includere episodi in locale all'aggiunta di una serie TV"
 
 msgctxt "#80043"
-msgid "Attention, in order to watch local episodes you have to configure the Kodi video library from the KoD settings"
+msgid "Attention, in order to watch local episodes you have to configure the Kodi video library from KoD settings"
 msgstr "Attenzione, per guardare gli episodi in locale devi configurare la libreria di Kodi dalle impostazioni di KoD"
 
 msgctxt "#80044"

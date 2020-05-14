@@ -6004,11 +6004,11 @@ msgid "Next extraction..."
 msgstr ""
 
 msgctxt "#70805"
-msgid "Stay on seed"
+msgid "Stay in seed"
 msgstr ""
 
 msgctxt "#70806"
-msgid "Changing this parameter permanently overwrites the Elementum settings.\nAre you sure you want to continue?"
+msgid "Changing this parameter permanently overwrites the Elementum settings.\nDo you want to continue?"
 msgstr ""
 
 # DNS start [ settings and declaration ]
@@ -6237,7 +6237,7 @@ msgid "Folder name for TV shows"
 msgstr ""
 
 msgctxt "#80022"
-msgid "You can configure the Kodi video library later from the KoD settings"
+msgid "You can configure the Kodi video library later from KoD settings"
 msgstr ""
 
 msgctxt "#80023"
@@ -6245,7 +6245,7 @@ msgid "You will be asked to choose and configure the information providers for m
 msgstr ""
 
 msgctxt "#80024"
-msgid "An error has occurred during the configuration of the Kodi video library. Please check the log and try again from the KoD settings"
+msgid "An error has occurred during the configuration of the Kodi video library. Please check the log and try again from KoD settings"
 msgstr ""
 
 msgctxt "#80025"
@@ -6265,7 +6265,7 @@ msgid "The selected folders are already used by the Kodi library. Please change 
 msgstr ""
 
 msgctxt "#80029"
-msgid "The selected folders are already used by the Kodi library. Please change them properly from the KoD settings"
+msgid "The selected folders are already used by the Kodi library. Please change them properly from KoD settings"
 msgstr ""
 
 msgctxt "#80030"
@@ -6321,7 +6321,7 @@ msgid "Include local episodes when adding a TV shows"
 msgstr ""
 
 msgctxt "#80043"
-msgid "Attention, in order to watch local episodes you have to configure the Kodi video library from the KoD settings"
+msgid "Attention, in order to watch local episodes you have to configure the Kodi video library from KoD settings"
 msgstr ""
 
 msgctxt "#80044"
