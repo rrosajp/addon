@@ -86,8 +86,6 @@ def delete_key():
 class Main(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
         self.items = []
-        logger.info(str(args))
-        logger.info(str(kwargs))
 
     def onInit(self):
         #### Compatibilidad con Kodi 18 ####
@@ -139,7 +137,7 @@ class Main(xbmcgui.WindowXMLDialog):
                     from core.item import Item
                     channel = __import__('specials.%s' % channel_name, fromlist=["specials.%s" % channel_name])
                     self.close()
-                    open_shortcut_menu(channel.mainlist(Item().fromjson(action)), channel_name)
+                    open_shortcut_menu(channel.mainlist(Item()), channel_name)
 
 
 
