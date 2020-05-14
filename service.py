@@ -342,6 +342,10 @@ class AddonMonitor(xbmc.Monitor):
             schedule.clear('videolibrary')
             self.scheduleVideolibrary()
 
+        if self.settings_pre.get('elementum_on_seed') != settings_post.get('elementum_on_seed') and settings_post.get('elementum_on_seed'):
+            if not platformtools.dialog_yesno(config.get_localized_string(70805), config.get_localized_string(70806)):
+                config.set_setting('elementum_on_seed', False)
+
         self.settings_pre = settings_post
 
     def onScreensaverActivated(self):

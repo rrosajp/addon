@@ -6003,6 +6003,14 @@ msgctxt "#70804"
 msgid "Next extraction..."
 msgstr "Estrazione successiva..."
 
+msgctxt "#70805"
+msgid "Stay on seed"
+msgstr "Resta in seed"
+
+msgctxt "#70806"
+msgid "Changing this parameter permanently overwrites the Elementum settings.\nAre you sure you want to continue?"
+msgstr "Modificando questo parametro vengono sovrascritte permanentemente le impostazioni di Elementum.\nSicuro di Voler continuare?"
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS check alert"

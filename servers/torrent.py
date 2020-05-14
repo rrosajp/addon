@@ -113,7 +113,7 @@ def elementum_monitor():
                         jsontools.update_node(4, Monitor[name]['file'], 'downloadStatus', path, silent=True)
                         if status in ['Paused']:
                             jsontools.update_node(0, Monitor[name]['file'], 'downloadStatus', path, silent=True)
-                        if status in ['Seeding', 'Finished']:
+                        if status in ['Seeding', 'Finished'] and not config.get_setting('elementum_on_seed'):
                             monitor_update(TorrentPath, name, remove=True)
                             dlJson = jsontools.load(open(filetools.join(path, Monitor[name]['file']), "r").read())
                             jsontools.update_node(dlJson['downloadSize'], Monitor[name]['file'], 'downloadCompleted', path, silent=True)
@@ -200,7 +200,7 @@ def find_file(hash):
 def elementum_actions(parameter, TorrentHash):
     elementum_setting, elementum_host, TorrentPath = setting()
     if elementum_setting:
-        if parameter == 'delete' : monitor_update(TorrentPath, TorrentHash, remove=True)
+        if parameter == 'delete': monitor_update(TorrentPath, TorrentHash, remove=True)
         requests.get('%s/%s/%s' %(elementum_host, parameter, TorrentHash))
 
 
