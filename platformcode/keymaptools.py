@@ -144,6 +144,7 @@ class Main(xbmcgui.WindowXMLDialog):
 
 
 def open_shortcut_menu(newmenu='', channel=''):
+    xbmc.executebuiltin('Dialog.Close(all,true)')
     global menu
     global submenu
     global prevchannel
