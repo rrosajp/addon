@@ -22,8 +22,10 @@ class KeyListener(xbmcgui.WindowXMLDialog):
             filenname = "DialogKaiToast.xml"
         return super(KeyListener, cls).__new__(cls, filenname, "")
 
+
     def __init__(self):
         self.key = None
+
 
     def onInit(self):
         try:
@@ -33,6 +35,7 @@ class KeyListener(xbmcgui.WindowXMLDialog):
             self.getControl(401).setLabel(config.get_localized_string(70698))
             self.getControl(402).setLabel(config.get_localized_string(70699) % self.TIMEOUT)
 
+
     def onAction(self, action):
         code = action.getButtonCode()
         if code == 0:
@@ -40,6 +43,7 @@ class KeyListener(xbmcgui.WindowXMLDialog):
         else:
             self.key = str(code)
         self.close()
+
 
     @staticmethod
     def record_key():
@@ -70,6 +74,7 @@ def set_key():
 
     return
 
+
 def delete_key():
     from core import filetools
     from platformcode import platformtools
@@ -82,13 +87,13 @@ def delete_key():
     config.set_setting("shortcut_key", '')
 
 
-
 class Main(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
         self.items = []
 
+
     def onInit(self):
-        #### Compatibilidad con Kodi 18 ####
+        #### Compatibility with Kodi 18 ####
         if config.get_platform(True)['num_version'] < 18:
             self.setCoordinateResolution(2)
 
@@ -98,13 +103,14 @@ class Main(xbmcgui.WindowXMLDialog):
             if not submenu and menuentry.channel in ['news', 'channelselector', 'search', 'videolibrary']:
                 item.setProperty('sub', 'Controls/spinUp-Focus.png')
             if menuentry.title != 'Redirect':
-                for key, value in json.loads(menuentry.tojson()).items():
+                for key , value in json.loads(menuentry.tojson()).items():
                     item.setProperty(key, str(value))
                 item.setProperty('run', menuentry.tojson())
                 self.items.append(item)
 
         self.getControl(32500).addItems(self.items)
         self.setFocusId(32500)
+
 
     def onClick(self, control_id):
         if control_id == 32500:
@@ -118,7 +124,7 @@ class Main(xbmcgui.WindowXMLDialog):
         # exit
         if action.getId() in [xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]:
             self.close()
-            if submenu: open_shortcut_menu()
+            if submenu: open_shortcut_menu(self=True)
 
         if action.getId() == xbmcgui.ACTION_CONTEXT_MENU:
             config.open_settings()
@@ -130,23 +136,22 @@ class Main(xbmcgui.WindowXMLDialog):
                 self.setFocusId(32500)
             elif submenu:
                 self.close()
-                open_shortcut_menu()
+                open_shortcut_menu(self=True)
             elif self.getControl(32500).getSelectedItem().getProperty('channel') in ['news', 'channelselector', 'search', 'videolibrary']:
                 channel_name = self.getControl(32500).getSelectedItem().getProperty('channel')
                 if channel_name == 'channelselector':
                     import channelselector
                     self.close()
-                    open_shortcut_menu(channelselector.getchanneltypes(), channel_name)
+                    open_shortcut_menu(channelselector.getchanneltypes(), channel_name, self=True)
                 else:
                     from core.item import Item
                     channel = __import__('specials.%s' % channel_name, fromlist=["specials.%s" % channel_name])
                     self.close()
-                    open_shortcut_menu(channel.mainlist(Item()), channel_name)
+                    open_shortcut_menu(channel.mainlist(Item()), channel_name, self=True)
 
 
-
-def open_shortcut_menu(newmenu='', channel=''):
-    xbmc.executebuiltin('Dialog.Close(all,true)')
+def open_shortcut_menu(newmenu='', channel='', self=False):
+    if not self: xbmc.executebuiltin('Dialog.Close(all,true)')
     global menu
     global submenu
     global prevchannel
