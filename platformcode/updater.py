@@ -101,6 +101,7 @@ def check(background=False):
                     localCommitFile = open(os.path.join(xbmc.translatePath("special://home/addons/"), 'plugin.video.kod', trackingFile), 'w')  # il file di tracking viene eliminato, lo ricreo
                     changelog += commitJson['commit']['message'] + "\n"
                     poFilesChanged = True
+                    serviceChanged = True
                     break
 
                 for file in commitJson['files']:
