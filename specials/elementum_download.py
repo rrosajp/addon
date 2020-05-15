@@ -37,9 +37,20 @@ def download(item=None):
 
 def extract():
     import zipfile
+    from platformcode.updater import fixZipGetHash, fOpen
     support.log('Estraggo Elementum in:', elementum_path)
-    with zipfile.ZipFile(filename, 'r') as zip_ref:
-        zip_ref.extractall(xbmc.translatePath(addon_path))
+    try:
+        hash = fixZipGetHash(filename)
+        support.log(hash)
+
+        with zipfile.ZipFile(fOpen(filename, 'rb')) as zip_ref:
+            zip_ref.extractall(xbmc.translatePath(addon_path))
+
+    except Exception as e:
+        support.log('Non sono riuscito ad estrarre il file zip')
+        support.logger.error(e)
+        import traceback
+        support.logger.error(traceback.print_exc())
 
 
 def setting():
