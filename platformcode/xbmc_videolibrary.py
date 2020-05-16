@@ -28,6 +28,7 @@ def mark_auto_as_watched(item):
     def mark_as_watched_subThread(item):
         logger.info()
         # logger.debug("item:\n" + item.tostring('\n'))
+        # if nfo and strm_path not exist
         if not item.info:
             if item.contentType == 'movie':
                 vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_movies")))
@@ -38,8 +39,12 @@ def mark_auto_as_watched(item):
                 vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows")))
                 path = '%s [%s]' % (item.contentSerieName, item.infoLabels['IMDBNumber'])
                 item.nfo = filetools.join(vl, path, 'tvshow.nfo')
-                item.strm_path = filetools.join(path, item.title + '.strm')
-        logger.debug("item:\n" + item.tostring('\n'))
+                if item.contentSeason and item.contentEpisodeNumber:
+                    title = str(item.contentSeason) + 'x' + str(item.contentEpisodeNumber).zfill(2)
+                else:
+                    season, episode = scrapertools.find_single_match(item.title, r'(\d+)x(\d+)')
+                    title = season + 'x' + episode.zfill(2)
+                item.strm_path = filetools.join(path, title + '.strm')
         condicion = config.get_setting("watched_setting", "videolibrary")
 
         time_limit = time.time() + 30
@@ -68,7 +73,7 @@ def mark_auto_as_watched(item):
             # logger.debug(str(mark_time))
 
             if tiempo_actual > mark_time:
-                logger.debug("marcado")
+                logger.debug("Marked as Watched")
                 item.playcount = 1
                 sync_with_trakt = True
                 from specials import videolibrary
@@ -218,17 +223,14 @@ def sync_trakt_kodi(silent=True):
     # Para que la sincronizacion no sea silenciosa vale con silent=False
     if xbmc.getCondVisibility('System.HasAddon("script.trakt")'):
         notificacion = True
-        if (not config.get_setting("sync_trakt_notification", "videolibrary") and
-                platformtools.is_playing()):
+        if (not config.get_setting("sync_trakt_notification", "videolibrary") and platformtools.is_playing()):
             notificacion = False
 
         xbmc.executebuiltin('RunScript(script.trakt,action=sync,silent=%s)' % silent)
-        logger.info("Sincronizacion con Trakt iniciada")
+        logger.info("Synchronization with Trakt started")
 
         if notificacion:
-            platformtools.dialog_notification(config.get_localized_string(20000),
-                                              config.get_localized_string(60045),
-                                              time=2000)
+            platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60045), time=2000)
 
 
 def mark_content_as_watched_on_kodi(item, value=1):
