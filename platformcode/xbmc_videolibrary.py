@@ -67,9 +67,9 @@ def mark_auto_as_watched(item):
             time.sleep(30)
 
         # Sincronizacion silenciosa con Trakt
-        if sync_with_trakt:
-            if config.get_setting("sync_trakt_watched", "videolibrary"):
-                sync_trakt_kodi()
+        # if sync_with_trakt:
+        #     if config.get_setting("sync_trakt_watched", "videolibrary"):
+        #         sync_trakt_kodi()
 
                 # logger.debug("Fin del hilo")
 
@@ -331,7 +331,7 @@ def mark_season_as_watched_on_kodi(item, value=1):
     execute_sql_kodi(sql)
 
 
-def mark_content_as_watched_on_alfa(path):
+def mark_content_as_watched_on_kod(path):
     from specials import videolibrary
     from core import videolibrarytools
 
@@ -357,9 +357,9 @@ def mark_content_as_watched_on_alfa(path):
     path2 = ''
     if "special://" in VIDEOLIBRARY_PATH:
         if FOLDER_TVSHOWS in path:
-            path2 = re. sub(r'.*?%s' % FOLDER_TVSHOWS, VIDEOLIBRARY_PATH + "/" + FOLDER_TVSHOWS, path).replace("\\", "/")
+            path2 = re. sub(r'.*?%s' % FOLDER_TVSHOWS, filetools.join(VIDEOLIBRARY_PATH, FOLDER_TVSHOWS), path).replace("\\", "/")
         if FOLDER_MOVIES in path:
-            path2 = re. sub(r'.*?%s' % FOLDER_MOVIES, VIDEOLIBRARY_PATH + "/" + FOLDER_MOVIES, path).replace("\\", "/")
+            path2 = re. sub(r'.*?%s' % FOLDER_MOVIES, filetools.join(VIDEOLIBRARY_PATH, FOLDER_MOVIES), path).replace("\\", "/")
 
     if "\\" in path:
         path = path.replace("/", "\\")
