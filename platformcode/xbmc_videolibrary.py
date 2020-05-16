@@ -28,7 +28,18 @@ def mark_auto_as_watched(item):
     def mark_as_watched_subThread(item):
         logger.info()
         # logger.debug("item:\n" + item.tostring('\n'))
-
+        if not item.info:
+            if item.contentType == 'movie':
+                vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_movies")))
+                path = '%s [%s]' % (item.contentTitle, item.infoLabels['IMDBNumber'])
+                item.nfo = filetools.join(vl, path, path + '.nfo')
+                item.strm_path = filetools.join(path, item.contentTitle + '.strm')
+            else:
+                vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows")))
+                path = '%s [%s]' % (item.contentSerieName, item.infoLabels['IMDBNumber'])
+                item.nfo = filetools.join(vl, path, 'tvshow.nfo')
+                item.strm_path = filetools.join(path, item.title + '.strm')
+        logger.debug("item:\n" + item.tostring('\n'))
         condicion = config.get_setting("watched_setting", "videolibrary")
 
         time_limit = time.time() + 30
@@ -67,9 +78,9 @@ def mark_auto_as_watched(item):
             time.sleep(30)
 
         # Sincronizacion silenciosa con Trakt
-        # if sync_with_trakt:
-        #     if config.get_setting("sync_trakt_watched", "videolibrary"):
-        #         sync_trakt_kodi()
+        if sync_with_trakt:
+            if config.get_setting("sync_trakt_watched", "videolibrary"):
+                sync_trakt_kodi()
 
                 # logger.debug("Fin del hilo")
 
