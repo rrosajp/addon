@@ -65,7 +65,7 @@ def list_movies(item, silent=False):
                 try:
                     if config.is_xbmc():                #Si es Kodi, lo hacemos
                         from platformcode import xbmc_videolibrary
-                        xbmc_videolibrary.mark_content_as_watched_on_alfa(nfo_path)
+                        xbmc_videolibrary.mark_content_as_watched_on_kod(nfo_path)
                 except:
                     logger.error(traceback.format_exc())
 
@@ -192,7 +192,7 @@ def list_tvshows(item):
                 try:
                     if config.is_xbmc():                #Si es Kodi, lo hacemos
                         from platformcode import xbmc_videolibrary
-                        xbmc_videolibrary.mark_content_as_watched_on_alfa(tvshow_path)
+                        xbmc_videolibrary.mark_content_as_watched_on_kod(tvshow_path)
                 except:
                     logger.error(traceback.format_exc())
 
@@ -924,7 +924,7 @@ def mark_content_as_watched2(item):
     logger.info()
     # logger.debug("item:\n" + item.tostring('\n'))
 
-    if filetools.exists(item.nfo):
+    if filetools.isfile(item.nfo):
         head_nfo, it = videolibrarytools.read_nfo(item.nfo)
         #logger.debug(it)
         name_file = ""

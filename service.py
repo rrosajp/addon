@@ -95,7 +95,7 @@ def update(path, p_dialog, i, t, serie, overwrite):
     try:
         if config.is_xbmc():                #Si es Kodi, lo hacemos
             from platformcode import xbmc_videolibrary
-            xbmc_videolibrary.mark_content_as_watched_on_alfa(path + '/tvshow.nfo')
+            xbmc_videolibrary.mark_content_as_watched_on_kod(filetools.join(path,'tvshow.nfo'))
     except:
         logger.error(traceback.format_exc())
 
@@ -154,7 +154,7 @@ def check_for_update(overwrite=True):
                         try:
                             if config.is_xbmc():                #Si es Kodi, lo hacemos
                                 from platformcode import xbmc_videolibrary
-                                xbmc_videolibrary.mark_content_as_watched_on_alfa(path + '/tvshow.nfo')
+                                xbmc_videolibrary.mark_content_as_watched_on_kod(filetools.join(path,'tvshow.nfo'))
                         except:
                             logger.error(traceback.format_exc())
 
