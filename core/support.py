@@ -40,6 +40,7 @@ def hdpass_get_servers(item):
 
         for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
             mir_url = scrapertools.decodeHtmlentities(mir_url)
+            log(mir_url)
             ret.append(Item(channel=item.channel,
                             action="play",
                             fulltitle=item.fulltitle,
@@ -58,7 +59,7 @@ def hdpass_get_servers(item):
     else:
         data = httptools.downloadpage(item.url).data.replace('\n', '')
         patron = r'<iframe(?: id="[^"]+")? width="[^"]+" height="[^"]+" src="([^"]+)"[^>]+><\/iframe>'
-        url = scrapertools.find_single_match(data, patron).replace("?alta", "")
+        url = scrapertools.find_single_match(data, patron)
         url = url.replace("&download=1", "")
         if 'hdpass' not in url and 'hdplayer' not in url:
             return itemlist
