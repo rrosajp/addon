@@ -29,7 +29,7 @@ def mark_auto_as_watched(item):
         logger.info()
         # logger.debug("item:\n" + item.tostring('\n'))
         # if nfo and strm_path not exist
-        if not item.info:
+        if not item.nfo:
             if item.contentType == 'movie':
                 vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_movies")))
                 path = '%s [%s]' % (item.contentTitle, item.infoLabels['IMDBNumber'])
