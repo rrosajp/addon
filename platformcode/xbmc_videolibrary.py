@@ -793,6 +793,10 @@ def set_content(content_type, silent=False, custom=False):
 
 def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvshows_folder, new_tvshows_folder, progress):
     def path_replace(path, old, new):
+
+        logger.info()
+        logger.info('path: ' + path + ', old: ' + old + ', new: ' + new)
+
         if new.startswith("special://") or '://' in new: sep = '/'
         else: sep = os.sep
 
@@ -814,8 +818,10 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
     if not sql_old_path.endswith(sep):
         sql_old_path += sep
 
+    logger.info('sql_old_path: ' + sql_old_path)
     # search MAIN path in the DB
     sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % sql_old_path
+    logger.info('sql: ' + sql)
     nun_records, records = execute_sql_kodi(sql)
 
     # change main path
@@ -823,6 +829,7 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
         idPath = records[0][0]
         strPath = path_replace(records[0][1], old_path, new_path)
         sql = 'UPDATE path SET strPath="%s" WHERE idPath=%s' % (strPath, idPath)
+        logger.info('sql: ' + sql)
         nun_records, records = execute_sql_kodi(sql)
 
     p = 80
@@ -834,6 +841,7 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
 
         # Search Main Sub Folder
         sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % sql_old_folder
+        logger.info('sql: ' + sql)
         nun_records, records = execute_sql_kodi(sql)
 
         # Change Main Sub Folder
@@ -842,11 +850,13 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
                 idPath = record[0]
                 strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
                 sql = 'UPDATE path SET strPath="%s" WHERE idPath=%s' % (strPath, idPath)
+                logger.info('sql: ' + sql)
                 nun_records, records = execute_sql_kodi(sql)
 
         # Search if Sub Folder exixt in all paths
         sql_old_folder += '%'
         sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % sql_old_folder
+        logger.info('sql: ' + sql)
         nun_records, records = execute_sql_kodi(sql)
 
         #Change Sub Folder in all paths
@@ -855,6 +865,7 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
                 idPath = record[0]
                 strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
                 sql = 'UPDATE path SET strPath="%s" WHERE idPath=%s' % (strPath, idPath)
+                logger.info('sql: ' + sql)
                 nun_records, records = execute_sql_kodi(sql)
 
 
@@ -862,23 +873,27 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
             # if is Movie Folder
             # search and modify in "movie"
             sql = 'SELECT idMovie, c22 FROM movie where c22 LIKE "%s"' % sql_old_folder
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             if records:
                 for record in records:
                     idMovie = record[0]
                     strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
                     sql = 'UPDATE movie SET c22="%s" WHERE idMovie=%s' % (strPath, idMovie)
+                    logger.info('sql: ' + sql)
                     nun_records, records = execute_sql_kodi(sql)
         else:
             # if is TV Show Folder
             # search and modify in "episode"
             sql = 'SELECT idEpisode, c18 FROM episode where c18 LIKE "%s"' % sql_old_folder
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             if records:
                 for record in records:
                     idEpisode = record[0]
                     strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
                     sql = 'UPDATE episode SET c18="%s" WHERE idEpisode=%s' % (strPath, idEpisode)
+                    logger.info('sql: ' + sql)
                     nun_records, records = execute_sql_kodi(sql)
         p += 5
         progress.update(p, config.get_localized_string(20000), config.get_localized_string(80013))
@@ -910,15 +925,19 @@ def clean(path_list=[]):
 
     # if the path list is empty, clean the entire video library
     if not path_list:
+        logger.info('the path list is empty, clean the entire video library')
         if not config.get_setting("videolibrary_kodi"):
             sql_path, sep = sql_format(config.get_setting("videolibrarypath"))
             if not sql_path.endswith(sep): sql_path += sep
             sql = 'SELECT idPath FROM path where strPath LIKE "%s"' % sql_path
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             idPath = records[0][0]
             sql = 'DELETE from path WHERE idPath=%s' % idPath
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             sql = 'DELETE from path WHERE idParentPath=%s' % idPath
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
 
         from core import videolibrarytools
@@ -932,6 +951,7 @@ def clean(path_list=[]):
                 if filetools.exists(tvshow_nfo):
                     path_list.append(filetools.join(config.get_setting("videolibrarypath"), videolibrarytools.FOLDER_TVSHOWS, folder))
 
+    logger.info('path_list: ' + str(path_list))
     if path_list: t = float(100) / len(path_list)
     for i, path in enumerate(path_list):
         progress.update(int(math.ceil((i + 1) * t)))
@@ -941,10 +961,13 @@ def clean(path_list=[]):
 
         sql_path, sep = sql_format(path)
         if filetools.isdir(path) and not sql_path.endswith(sep): sql_path += sep
+        logger.info('path: ' + path)
+        logger.info('sql_path: ' + sql_path)
 
         if filetools.isdir(path):
             # search movie in the DB
             sql = 'SELECT idMovie FROM movie where c22 LIKE "%s"' % (sql_path + '%')
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             # delete movie
             if records:
@@ -953,6 +976,7 @@ def clean(path_list=[]):
                 continue
             # search TV show in the DB
             sql = 'SELECT idShow FROM tvshow_view where strPath LIKE "%s"' % sql_path
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             # delete TV show
             if records:
@@ -961,6 +985,7 @@ def clean(path_list=[]):
         elif config.get_setting("folder_movies") in sql_path:
             # search movie in the DB
             sql = 'SELECT idMovie FROM movie where c22 LIKE "%s"' % sql_path
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             # delete movie
             if records:
@@ -969,6 +994,7 @@ def clean(path_list=[]):
         else:
             # search episode in the DB
             sql = 'SELECT idEpisode FROM episode where c18 LIKE "%s"' % sql_path
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             # delete episode
             if records:
