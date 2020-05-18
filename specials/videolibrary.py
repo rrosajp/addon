@@ -923,7 +923,6 @@ def verify_playcount_series(item, path):
 def mark_content_as_watched2(item):
     logger.info()
     # logger.debug("item:\n" + item.tostring('\n'))
-
     if filetools.isfile(item.nfo):
         head_nfo, it = videolibrarytools.read_nfo(item.nfo)
         #logger.debug(it)
@@ -935,7 +934,7 @@ def mark_content_as_watched2(item):
                 it.library_playcounts.update({name_file: item.playcount})
 
         if item.contentType == 'episode' or item.contentType == 'tvshow' or item.contentType == 'list' or name_file == 'tvshow':
-       # elif item.contentType == 'episode':
+        # elif item.contentType == 'episode':
             name_file = os.path.splitext(filetools.basename(item.strm_path))[0]
             num_season = name_file [0]
             item.__setattr__('contentType', 'episode')
@@ -958,7 +957,7 @@ def mark_content_as_watched2(item):
         # Guardamos los cambios en item.nfo
         if filetools.write(item.nfo, head_nfo + it.tojson()):
             item.infoLabels['playcount'] = item.playcount
-            #logger.debug(item.playcount)
+            # logger.debug(item.playcount)
 
            # if  item.contentType == 'episodesss':
                 # Actualizar toda la serie
@@ -968,9 +967,9 @@ def mark_content_as_watched2(item):
             if config.is_xbmc():
                 from platformcode import xbmc_videolibrary
                 xbmc_videolibrary.mark_content_as_watched_on_kodi(item , item.playcount)
-               # logger.debug(item)
+                # logger.debug(item)
 
-            platformtools.itemlist_refresh()
+            # platformtools.itemlist_refresh()
 
 
 def mark_content_as_watched(item):

@@ -1139,6 +1139,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         videoitem.thumbnail = item.thumbnail
         videoitem.channel = item.channel
         videoitem.contentType = item.contentType
+        videoitem.infoLabels = item.infoLabels
         verifiedItemlist.append(videoitem)
 
     if patronTag:
