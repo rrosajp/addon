@@ -145,48 +145,44 @@ def findvideos(item):
     import time
     support.log(item)
     itemlist = []
-    matches = support.match(item, patron=r'class="tab.*?data-name="([0-9]+)">', headers=headers)
+    matches = support.match(item, patron=r'data-name="([0-9]+)">', headers=headers)
     data = matches.data
     matches = matches.matches
-    videoData = ''
+    videoData = []
 
     for serverid in matches:
-        if not item.number: item.number = support.scrapertools.find_single_match(item.title, r'(\d+) -')
-        block = support.scrapertools.find_multiple_matches(data, 'data-id="' + serverid + '">(.*?)<div class="server')
-        ID = support.scrapertools.find_single_match(str(block), r'<a data-id="([^"]+)" data-base="' + (item.number if item.number else '1') + '"')
-        support.log('ID= ',serverid)
-        if id:
-            if serverid == '26':
-                matches = support.match('%s/ajax/episode/serverPlayer?id=%s' % (host, item.url.split('/')[-1]), patron=r'<a href="([^"]+)"', ).matches
-                for url in matches:
-                        videoData += '\n' + url
-            else:
-                try:
-                    dataJson = support.httptools.downloadpage('%s/ajax/episode/info?id=%s&server=%s&ts=%s' % (host, ID, serverid, int(time.time())), headers=[['x-requested-with', 'XMLHttpRequest']]).data
-                    json = jsontools.load(dataJson)
-                    support.log(json)
-                    if 'keepsetsu' in json['grabber']:
-                        matches = support.match(json['grabber'], patron=r'<iframe\s*src="([^"]+)"'),matches
-                        for url in matches:
-                            videoData += '\n' + url
-                    else:
-                        videoData += '\n' + json['grabber']
+        if not item.number: item.number = support.match(item.title, patron=r'(\d+) -').match
+        block = support.match(data, patron=r'data-id="' + serverid + r'">(.*?)<div class="server').match
+        ID = support.match(block, patron=r'<a data-id="([^"]+)" data-base="' + (item.number if item.number else '1') + '"').match
 
-                    if serverid == '28':
-                        itemlist.append(
-                            support.Item(
-                                channel=item.channel,
-                                action="play",
-                                title='diretto',
-                                quality='',
-                                url=json['grabber'],
-                                server='directo',
-                                fulltitle=item.fulltitle,
-                                show=item.show,
-                                contentType=item.contentType,
-                                folder=False))
-                except:
-                    pass
+        if serverid == '18':
+            url = support.match('%s/ajax/episode/serverPlayer?id=%s' % (host, ID), patron=r'source src="([^"]+)"', debug=False).match
+            itemlist.append(
+                support.Item(
+                    channel=item.channel,
+                    action="play",
+                    title='diretto',
+                    quality='',
+                    url=url,
+                    server='directo',
+                    fulltitle=item.fulltitle,
+                    show=item.show,
+                    contentType=item.contentType,
+                    folder=False))
+
+        elif serverid == '26':
+            matches = support.match('%s/ajax/episode/serverPlayer?id=%s' % (host, item.url.split('/')[-1]), patron=r'<a href="([^"]+)"', ).matches
+            for url in matches:
+                videoData.append(url)
+        else:
+            try:
+                dataJson = support.match('%s/ajax/episode/info?id=%s&server=%s&ts=%s' % (host, ID, serverid, int(time.time())), headers=[['x-requested-with', 'XMLHttpRequest']]).data
+                json = jsontools.load(dataJson)
+                support.log(json)
+                videoData.append(json['grabber'])
+            except:
+                pass
+
 
     return support.server(item, videoData, itemlist)
 

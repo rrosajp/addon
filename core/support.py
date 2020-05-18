@@ -1132,7 +1132,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
 
         item.title = typo(item.contentTitle.strip(),'bold') if item.contentType == 'movie' or (config.get_localized_string(30161) in item.title) else item.title
 
-        videoitem.plot= typo(videoitem.title, 'bold') + typo(videoitem.quality, '_ [] bold')
+        videoitem.plot= typo(videoitem.title, 'bold') + (typo(videoitem.quality, '_ [] bold') if item.quality else '')
         videoitem.title = (item.title  if item.channel not in ['url'] else '') + (typo(videoitem.title, '_ color kod [] bold') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
@@ -1303,11 +1303,11 @@ def get_jwplayer_mediaurl(data, srvName):
     block = scrapertools.find_single_match(data, r'sources: \[([^\]]+)\]')
     sources = scrapertools.find_multiple_matches(block, r'file:\s*"([^"]+)"(?:,label:\s*"([^"]+)")?')
     if not sources:
-        sources = scrapertools.find_multiple_matches(data,
-                                                     r'src:\s*"([^"]+)",\s*type:\s*"[^"]+",[^,]+,\s*label:\s*"([^"]+)"')
+        sources = scrapertools.find_multiple_matches(data, r'src:\s*"([^"]+)",\s*type:\s*"[^"]+",[^,]+,\s*label:\s*"([^"]+)"')
     for url, quality in sources:
         quality = 'auto' if not quality else quality
-        video_urls.append(['.' + url.split('.')[-1] + ' [' + quality + '] [' + srvName + ']', url])
+        if url.split('.')[-1] != 'mpd':
+            video_urls.append(['.' + url.split('.')[-1] + ' [' + quality + '] [' + srvName + ']', url])
 
     video_urls.sort(key=lambda x: x[0].split()[1])
     return video_urls
