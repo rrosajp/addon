@@ -713,6 +713,13 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
     backup_current_path = current_path
     backup_new_path = new_path
 
+    logger.info('current_path: ' + current_path)
+    logger.info('new_path: ' + new_path)
+    logger.info('current_movies_folder: ' + current_movies_folder)
+    logger.info('new_movies_folder: ' + new_movies_folder)
+    logger.info('current_tvshows_folder: ' + current_tvshows_folder)
+    logger.info('new_tvshows_folder: ' + new_tvshows_folder)
+
     notify = False
     progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80011))
     current_path = xbmc.translatePath(current_path)
@@ -722,8 +729,14 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
     current_tvshows_path = os.path.join(current_path, current_tvshows_folder)
     new_tvshows_path = os.path.join(new_path, new_tvshows_folder)
 
+    logger.info('current_movies_path: ' + current_movies_path)
+    logger.info('new_movies_path: ' + new_movies_path)
+    logger.info('current_tvshows_path: ' + current_tvshows_path)
+    logger.info('new_tvshows_path: ' + new_tvshows_path)
+
     from platformcode import xbmc_videolibrary
     movies_path, tvshows_path = xbmc_videolibrary.check_sources(new_movies_path, new_tvshows_path)
+    logger.info('check_sources: ' + movies_path + ', ' + tvshows_path)
     if movies_path or tvshows_path:
         if not movies_path:
             filetools.rmdir(new_movies_path)
