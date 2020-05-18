@@ -41,11 +41,14 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     def int_bckup_method():
         global data,headers
         page_url = scrapertools.find_single_match(data, r"""<center><a href='(https?:\/\/wstream[^']+)'\s*title='bkg'""")
+        if not page_url:
+            page_url = scrapertools.find_single_match(data, r"""<form action=['"]([^'"]+)['"]""")
+        if page_url.startswith('/'):
+            page_url = 'https://wstream.video' + page_url
         if page_url:
             data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True, post={'g-recaptcha-response': captcha}, verify=False).data
 
     def getSources(data):
-        # from core.support import dbg;dbg()
         possibileSources = scrapertools.find_multiple_matches(data, r'sources:\s*(\[[^\]]+\])')
         for data in possibileSources:
             try:
@@ -74,20 +77,19 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     video_urls = []
     global data, real_url
     # logger.info(data)
-    # from core.support import dbg;dbg()
     sitekey = scrapertools.find_multiple_matches(data, """data-sitekey=['"] *([^"']+)""")
     if sitekey: sitekey = sitekey[-1]
     captcha = platformtools.show_recaptcha(sitekey, page_url.replace('116.202.226.34', 'wstream.video')) if sitekey else ''
 
     possibleParam = scrapertools.find_multiple_matches(data,r"""<input.*?(?:name=["']([^'"]+).*?value=["']([^'"]*)['"]>|>)""")
-    if possibleParam and possibleParam[0]:
+    if possibleParam[0][0]:
         post = {param[0]: param[1] for param in possibleParam if param[0]}
         if captcha: post['g-recaptcha-response'] = captcha
         if post:
             data = httptools.downloadpage(real_url, headers=headers, post=post, follow_redirects=True, verify=False).data
         elif captcha:
             int_bckup_method()
-    elif captcha:
+    elif captcha or not sitekey:
         int_bckup_method()
     else:
         platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(707434))
