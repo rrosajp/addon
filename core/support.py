@@ -507,6 +507,10 @@ def scrape(func):
 
         # itemlist = filterLang(item, itemlist)   # causa problemi a newest
 
+        if config.get_setting('trakt_sync'):
+            from core import trakt_tools
+            trakt_tools.trakt_check(itemlist)
+
         return itemlist
 
     return wrapper

@@ -199,7 +199,7 @@ def trakt_check(itemlist):
     from core.support import typo
     id_result = ''
     # check = u'\u221a'
-    check = typo(u'\u221a','[] color kod bold')+' '
+    check = typo(u'\u221a','color kod bold')+' '
     synced = False
     try:
         for item in itemlist:
@@ -247,7 +247,7 @@ def trakt_check(itemlist):
 
 def get_sync_from_file():
     logger.info()
-    sync_path = os.path.join(config.get_data_path(), 'settings_channels', 'trakt')
+    sync_path = os.path.join(config.get_data_path(), 'settings_channels', 'trakt_data.json')
     trakt_node = {}
     if os.path.exists(sync_path):
         trakt_node = jsontools.get_node_from_file('trakt', "TRAKT")
@@ -260,7 +260,7 @@ def get_sync_from_file():
 def update_trakt_data(mediatype, trakt_data):
     logger.info()
 
-    sync_path = os.path.join(config.get_data_path(), 'settings_channels', 'trakt')
+    sync_path = os.path.join(config.get_data_path(), 'settings_channels', 'trakt_data.json')
     if os.path.exists(sync_path):
         trakt_node = jsontools.get_node_from_file('trakt', "TRAKT")
         trakt_node[mediatype] = trakt_data
@@ -289,6 +289,7 @@ def wait_for_update_trakt():
     t.isAlive()
 
 def update_all():
+    # from core.support import dbg;dbg()
     from time import sleep
     logger.info()
     sleep(20)
