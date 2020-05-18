@@ -34,38 +34,44 @@ from specials import autoplay
 def hdpass_get_servers(item):
     def get_hosts(url, quality):
         ret = []
-        page = httptools.downloadpage(url).data
-
+        page = httptools.downloadpage(url, CF=False).data
         mir = scrapertools.find_single_match(page, patron_mir)
 
-        for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
-            mir_url = scrapertools.decodeHtmlentities(mir_url)
-            ret.append(Item(channel=item.channel,
-                            action="play",
-                            fulltitle=item.fulltitle,
-                            quality=quality,
-                            show=item.show,
-                            thumbnail=item.thumbnail,
-                            contentType=item.contentType,
-                            title=srv,
-                            server=srv,
-                            url= mir_url))
+        with futures.ThreadPoolExecutor() as executor:
+            thL = []
+            for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
+                mir_url = scrapertools.decodeHtmlentities(mir_url)
+                log(mir_url)
+                it = Item(channel=item.channel,
+                                action="play",
+                                fulltitle=item.fulltitle,
+                                quality=quality,
+                                show=item.show,
+                                thumbnail=item.thumbnail,
+                                contentType=item.contentType,
+                                title=srv,
+                                # server=srv,
+                                url= mir_url)
+                thL.append(executor.submit(hdpass_get_url, it))
+            for res in futures.as_completed(thL):
+                if res.result():
+                    ret.append(res.result()[0])
         return ret
     # Carica la pagina
     itemlist = []
     if 'hdpass' in item.url or 'hdplayer' in item.url:
         url = item.url
     else:
-        data = httptools.downloadpage(item.url).data.replace('\n', '')
+        data = httptools.downloadpage(item.url, CF=False).data.replace('\n', '')
         patron = r'<iframe(?: id="[^"]+")? width="[^"]+" height="[^"]+" src="([^"]+)"[^>]+><\/iframe>'
-        url = scrapertools.find_single_match(data, patron).replace("?alta", "")
+        url = scrapertools.find_single_match(data, patron)
         url = url.replace("&download=1", "")
         if 'hdpass' not in url and 'hdplayer' not in url:
             return itemlist
     if not url.startswith('http'):
         url = 'https:' + url
 
-    data = httptools.downloadpage(url).data
+    data = httptools.downloadpage(url, CF=False).data
     patron_res = '<div class="buttons-bar resolutions-bar">(.*?)<div class="buttons-bar'
     patron_mir = '<div class="buttons-bar hosts-bar">(.*?)<div id="fake'
     patron_option = r'<a href="([^"]+?)".*?>([^<]+?)</a>'
@@ -84,7 +90,7 @@ def hdpass_get_servers(item):
 
 def hdpass_get_url(item):
     patron_media = r'<iframe allowfullscreen custom-src="([^"]+)'
-    data = httptools.downloadpage(item.url).data
+    data = httptools.downloadpage(item.url, CF=False).data
     item.url = base64.b64decode(scrapertools.find_single_match(data, patron_media))
     return [item]
 
@@ -1126,7 +1132,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
 
         item.title = typo(item.contentTitle.strip(),'bold') if item.contentType == 'movie' or (config.get_localized_string(30161) in item.title) else item.title
 
-        videoitem.plot= typo(videoitem.title, 'bold') + typo(videoitem.quality, '_ [] bold')
+        videoitem.plot= typo(videoitem.title, 'bold') + (typo(videoitem.quality, '_ [] bold') if item.quality else '')
         videoitem.title = (item.title  if item.channel not in ['url'] else '') + (typo(videoitem.title, '_ color kod [] bold') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
@@ -1291,3 +1297,17 @@ def addQualityTag(item, itemlist, data, patron):
                                  folder=False))
         else:
             log('nessun tag qualità trovato')
+
+def get_jwplayer_mediaurl(data, srvName):
+    video_urls = []
+    block = scrapertools.find_single_match(data, r'sources: \[([^\]]+)\]')
+    sources = scrapertools.find_multiple_matches(block, r'file:\s*"([^"]+)"(?:,label:\s*"([^"]+)")?')
+    if not sources:
+        sources = scrapertools.find_multiple_matches(data, r'src:\s*"([^"]+)",\s*type:\s*"[^"]+",[^,]+,\s*label:\s*"([^"]+)"')
+    for url, quality in sources:
+        quality = 'auto' if not quality else quality
+        if url.split('.')[-1] != 'mpd':
+            video_urls.append(['.' + url.split('.')[-1] + ' [' + quality + '] [' + srvName + ']', url])
+
+    video_urls.sort(key=lambda x: x[0].split()[1])
+    return video_urls

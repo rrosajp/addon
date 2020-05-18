@@ -10,7 +10,7 @@ def test_video_exists(page_url):
 
     data = httptools.downloadpage(page_url, cookies=False).data
     if 'File you are looking for is not found.' in data:
-        return False, config.get_localized_string(70449) % "Onlystream"
+        return False, config.get_localized_string(70449) % "AvaVids"
 
     return True, ""
 
@@ -18,6 +18,5 @@ def test_video_exists(page_url):
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     logger.info("url=" + page_url)
     data = httptools.downloadpage(page_url).data
-    # logger.info(data)
-    video_urls = support.get_jwplayer_mediaurl(data, 'Onlystream')
+    video_urls = support.get_jwplayer_mediaurl(data, 'AvaVids')
     return video_urls

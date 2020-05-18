@@ -3,7 +3,7 @@
 import time
 import urllib
 
-from core import httptools
+from core import httptools, support
 from core import scrapertools
 from platformcode import logger, config
 
@@ -29,9 +29,5 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     time.sleep(6)
     data = httptools.downloadpage(page_url_post, post=post).data
     logger.info("(data page_url='%s')" % data)
-    sources = scrapertools.find_single_match(data, r'sources: \[([^\]]+)\]')
-
-    for media_url in scrapertools.find_multiple_matches(sources, '"([^"]+)"'):
-        ext = scrapertools.get_filename_from_url(media_url)[-4:]
-        video_urls.append(["%s [%s]" % (ext, server), media_url])
+    video_urls = support.get_jwplayer_mediaurl(data, 'Turbovid')
     return video_urls
