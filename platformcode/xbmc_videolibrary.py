@@ -83,11 +83,10 @@ def mark_auto_as_watched(item):
             time.sleep(30)
 
         # Sincronizacion silenciosa con Trakt
-        if sync_with_trakt:
-            if config.get_setting("sync_trakt_watched", "videolibrary"):
-                sync_trakt_kodi()
+        if sync_with_trakt and config.get_setting("trakt_sync"):
+            sync_trakt_kodi()
 
-                # logger.debug("Fin del hilo")
+            # logger.debug("Fin del hilo")
 
     # Si esta configurado para marcar como visto
     if config.get_setting("mark_as_watched", "videolibrary"):
@@ -455,8 +454,7 @@ def get_data(payload):
             except:
                 xbmc_port = 0
 
-            xbmc_json_rpc_url = "http://" + config.get_setting("xbmc_host", "videolibrary") + ":" + str(
-                xbmc_port) + "/jsonrpc"
+            xbmc_json_rpc_url = "http://" + config.get_setting("xbmc_host", "videolibrary") + ":" + str(xbmc_port) + "/jsonrpc"
             req = urllib.request.Request(xbmc_json_rpc_url, data=jsontools.dump(payload), headers=headers)
             f = urllib.request.urlopen(req)
             response = f.read()
