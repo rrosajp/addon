@@ -25,7 +25,7 @@ except ImportError:
     from urllib import urlencode
 
 from channelselector import thumb
-from core import httptools, scrapertools, servertools, tmdb, channeltools, filetools
+from core import httptools, scrapertools, servertools, tmdb, channeltools
 from core.item import Item
 from lib import unshortenit
 from platformcode import logger, config
@@ -43,21 +43,16 @@ def hdpass_get_servers(item):
                 mir_url = scrapertools.decodeHtmlentities(mir_url)
                 log(mir_url)
                 it = Item(channel=item.channel,
-                          action="play",
-                          fulltitle=item.fulltitle,
-                          quality=quality,
-                          show=item.show,
-                          thumbnail=item.thumbnail,
-                          contentType=item.contentType,
-                          title=srv,
-                          # server=srv,
-                          url= mir_url)
-
-                if filetools.isfile(filetools.join(config.get_runtime_path(), 'servers', srv.lower() + '.json')):
-                    it.server = srv.lower()
-                    ret.append(it)
-                else:
-                    thL.append(executor.submit(hdpass_get_url, it))
+                                action="play",
+                                fulltitle=item.fulltitle,
+                                quality=quality,
+                                show=item.show,
+                                thumbnail=item.thumbnail,
+                                contentType=item.contentType,
+                                title=srv,
+                                # server=srv,
+                                url= mir_url)
+                thL.append(executor.submit(hdpass_get_url, it))
             for res in futures.as_completed(thL):
                 if res.result():
                     ret.append(res.result()[0])
