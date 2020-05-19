@@ -19,9 +19,7 @@ else:
 from future.builtins import range
 from past.utils import old_div
 
-import datetime
 import re
-import time
 
 from core import filetools
 from core import httptools
@@ -32,6 +30,7 @@ from platformcode import platformtools
 from lib import unshortenit
 
 dict_servers_parameters = {}
+server_list = {}
 
 
 def find_video_items(item=None, data=None):
@@ -654,11 +653,12 @@ def get_servers_list():
     y como valor un diccionario con los parametros del servidor.
     @rtype: dict
     """
-    server_list = {}
-    for server in filetools.listdir(filetools.join(config.get_runtime_path(), "servers")):
-        if server.endswith(".json") and not server == "version.json":
-            server_parameters = get_server_parameters(server)
-            server_list[server.split(".")[0]] = server_parameters
+    global server_list
+    if not server_list:
+        for server in filetools.listdir(filetools.join(config.get_runtime_path(), "servers")):
+            if server.endswith(".json") and not server == "version.json":
+                server_parameters = get_server_parameters(server)
+                server_list[server.split(".")[0]] = server_parameters
 
     return server_list
 

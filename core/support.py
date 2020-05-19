@@ -1108,14 +1108,14 @@ def pagination(itemlist, item, page, perpage, function_level=1):
     return itemlist
 
 def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, down_load=True, patronTag=None, video_library=True):
-
+    log()
     if not data and not itemlist:
         data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
     if data:
         itemList = servertools.find_video_items(data=str(data))
         itemlist = itemlist + itemList
     verifiedItemlist = []
-    for videoitem in itemlist:
+    def getItem(videoitem):
         if not videoitem.server:
             findS = servertools.findvideos(videoitem.url)
             if findS:
@@ -1123,28 +1123,34 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
             elif item.channel == 'community':
                 findS= ('Diretto', videoitem.url, 'directo')
             else:
-                videoitem.url = unshortenit.unshorten(videoitem.url)[0]
+                videoitem.url = unshortenit.unshorten_only(videoitem.url)[0]
                 findS = servertools.findvideos(videoitem.url)
                 if findS:
                     findS = findS[0]
                 else:
                     log(videoitem, 'Non supportato')
-                    continue
+                    return
             videoitem.server = findS[2]
             videoitem.title = findS[0]
             videoitem.url = findS[1]
 
-        item.title = typo(item.contentTitle.strip(),'bold') if item.contentType == 'movie' or (config.get_localized_string(30161) in item.title) else item.title
+        item.title = typo(item.contentTitle.strip(), 'bold') if item.contentType == 'movie' or (config.get_localized_string(30161) in item.title) else item.title
 
         videoitem.plot= typo(videoitem.title, 'bold') + (typo(videoitem.quality, '_ [] bold') if item.quality else '')
-        videoitem.title = (item.title  if item.channel not in ['url'] else '') + (typo(videoitem.title, '_ color kod [] bold') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
+        videoitem.title = (item.title if item.channel not in ['url'] else '') + (typo(videoitem.title, '_ color kod [] bold') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail
         videoitem.channel = item.channel
         videoitem.contentType = item.contentType
         videoitem.infoLabels = item.infoLabels
-        verifiedItemlist.append(videoitem)
+        return videoitem
+
+    with futures.ThreadPoolExecutor() as executor:
+        thL = [executor.submit(getItem, videoitem) for videoitem in itemlist]
+        for it in futures.as_completed(thL):
+            if it.result():
+                verifiedItemlist.append(it.result())
 
     if patronTag:
         addQualityTag(item, verifiedItemlist, data, patronTag)
