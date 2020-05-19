@@ -1312,9 +1312,12 @@ def addQualityTag(item, itemlist, data, patron):
 def get_jwplayer_mediaurl(data, srvName):
     video_urls = []
     block = scrapertools.find_single_match(data, r'sources: \[([^\]]+)\]')
-    sources = scrapertools.find_multiple_matches(block, r'file:\s*"([^"]+)"(?:,label:\s*"([^"]+)")?')
-    if not sources:
+    if 'file:' in block:
+        sources = scrapertools.find_multiple_matches(block, r'file:\s*"([^"]+)"(?:,label:\s*"([^"]+)")?')
+    elif 'src:' in block:
         sources = scrapertools.find_multiple_matches(data, r'src:\s*"([^"]+)",\s*type:\s*"[^"]+",[^,]+,\s*label:\s*"([^"]+)"')
+    else:
+        sources =[(block.replace('"',''), '')]
     for url, quality in sources:
         quality = 'auto' if not quality else quality
         if url.split('.')[-1] != 'mpd':
