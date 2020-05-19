@@ -1115,16 +1115,17 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         itemList = servertools.find_video_items(data=str(data))
         itemlist = itemlist + itemList
     verifiedItemlist = []
+
     def getItem(videoitem):
         if not videoitem.server:
-            findS = servertools.findvideos(videoitem.url)
+            findS = servertools.get_server_from_url(videoitem.url)
             if findS:
                 findS = findS[0]
             elif item.channel == 'community':
                 findS= ('Diretto', videoitem.url, 'directo')
             else:
                 videoitem.url = unshortenit.unshorten_only(videoitem.url)[0]
-                findS = servertools.findvideos(videoitem.url)
+                findS = servertools.get_server_from_url(videoitem.url)
                 if findS:
                     findS = findS[0]
                 else:

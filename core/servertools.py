@@ -153,8 +153,6 @@ def findvideos(data, skip=False):
     servers_list = list(get_servers_list().keys())
 
 
-    # Ordenar segun favoriteslist si es necesario
-    servers_list = sort_servers(servers_list)
     is_filter_servers = False
 
     # Ejecuta el findvideos en cada servidor activo
@@ -210,13 +208,40 @@ def guess_server_thumbnail(serverid):
 
 
 def get_server_from_url(url):
-    encontrado = findvideos(url, True)
-    if len(encontrado) > 0:
-        devuelve = encontrado[0][2]
-    else:
-        devuelve = "directo"
+    logger.info()
+    servers_list = list(get_servers_list().keys())
 
-    return devuelve
+    # Ejecuta el findvideos en cada servidor activo
+    for serverid in servers_list:
+        '''if not is_server_enabled(serverid):
+            continue'''
+        if config.get_setting("filter_servers") == True and config.get_setting("black_list", server=serverid):
+            continue
+        serverid = get_server_name(serverid)
+        if not serverid:
+            return []
+
+        server_parameters = get_server_parameters(serverid)
+        if not server_parameters["active"]:
+            return []
+        if "find_videos" in server_parameters:
+            # Recorre los patrones
+            for pattern in server_parameters["find_videos"].get("patterns", []):
+                msg = "%s\npattern: %s" % (serverid, pattern["pattern"])
+                # Recorre los resultados
+                match = re.match(pattern["pattern"], url)
+                if match:
+                    url = pattern["url"]
+                    # Crea la url con los datos
+                    for x in range(len(match.groups())):
+                        url = url.replace("\\%s" % (x + 1), match.groups()[x])
+                    msg += "\nurl encontrada: %s" % url
+                    value = server_parameters["name"], url, serverid, server_parameters.get("thumbnail", "")
+                    if url not in server_parameters["find_videos"].get("ignore_urls", []):
+                        logger.info(msg)
+                        return value
+
+    return None
 
 
 def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialogo=False, background_dialog=False):
@@ -659,7 +684,7 @@ def get_servers_list():
             if server.endswith(".json") and not server == "version.json":
                 server_parameters = get_server_parameters(server)
                 server_list[server.split(".")[0]] = server_parameters
-
+        server_list = sort_servers(server_list)
     return server_list
 
 
@@ -724,9 +749,6 @@ def filter_servers(servers_list):
                                                                  config.get_localized_string(60010),
                                                                  config.get_localized_string(70281)):
             servers_list = servers_list_filter
-    
-    if config.get_setting("favorites_servers") == True:
-        servers_list = sort_servers(servers_list)
     
     return servers_list
 
