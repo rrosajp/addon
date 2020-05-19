@@ -220,16 +220,19 @@ def get_server_from_url(url):
         serverid = get_server_name(serverid)
         if not serverid:
             continue
-
         server_parameters = get_server_parameters(serverid)
         if not server_parameters["active"]:
             continue
         if "find_videos" in server_parameters:
             # Recorre los patrones
-            for pattern in server_parameters["find_videos"].get("patterns", []):
+            for n, pattern in enumerate(server_parameters["find_videos"].get("patterns", [])):
                 msg = "%s\npattern: %s" % (serverid, pattern["pattern"])
+                if not "pattern_compiled" in pattern:
+                    # logger.info('compiled ' + serverid)
+                    pattern["pattern_compiled"] = re.compile(pattern["pattern"])
+                    dict_servers_parameters[serverid]["find_videos"]["patterns"][n]["pattern_compiled"] = pattern["pattern_compiled"]
                 # Recorre los resultados
-                match = re.search(pattern["pattern"], url)
+                match = re.search(pattern["pattern_compiled"], url)
                 if match:
                     url = pattern["url"]
                     # Crea la url con los datos
