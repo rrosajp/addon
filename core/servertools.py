@@ -219,17 +219,17 @@ def get_server_from_url(url):
             continue
         serverid = get_server_name(serverid)
         if not serverid:
-            return []
+            continue
 
         server_parameters = get_server_parameters(serverid)
         if not server_parameters["active"]:
-            return []
+            continue
         if "find_videos" in server_parameters:
             # Recorre los patrones
             for pattern in server_parameters["find_videos"].get("patterns", []):
                 msg = "%s\npattern: %s" % (serverid, pattern["pattern"])
                 # Recorre los resultados
-                match = re.match(pattern["pattern"], url)
+                match = re.search(pattern["pattern"], url)
                 if match:
                     url = pattern["url"]
                     # Crea la url con los datos
