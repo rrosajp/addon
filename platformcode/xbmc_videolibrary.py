@@ -80,7 +80,7 @@ def mark_auto_as_watched(item):
                 videolibrary.mark_content_as_watched2(item)
                 break
 
-            time.sleep(30)
+            time.sleep(5)
 
         # Sincronizacion silenciosa con Trakt
         if sync_with_trakt and config.get_setting("trakt_sync"):
@@ -420,7 +420,7 @@ def mark_content_as_watched_on_kod(path):
 
         elif not PY3 and isinstance(title_plain, (str, unicode)):
             title_plain = title_plain.decode("utf-8").encode("utf-8")   #Hacemos esto porque si no genera esto: u'title_plain'
-        elif PY3 and isinstance(var, bytes):
+        elif PY3 and isinstance(title_plain, bytes):
             title_plain = title_plain.decode('utf-8')
         item.library_playcounts.update({title_plain: playCount_final})  #actualizamos el playCount del .nfo
 
