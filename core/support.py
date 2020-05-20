@@ -50,7 +50,7 @@ def hdpass_get_servers(item):
                                 thumbnail=item.thumbnail,
                                 contentType=item.contentType,
                                 title=srv,
-                                # server=srv,
+                                server=srv,
                                 url= mir_url)
                 thL.append(executor.submit(hdpass_get_url, it))
             for res in futures.as_completed(thL):
@@ -1117,7 +1117,9 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
     verifiedItemlist = []
 
     def getItem(videoitem):
-        if not videoitem.server:
+        path = os.path.join(config.get_runtime_path(),'servers',videoitem.server.lower() + '.json')
+        exist = os.path.isfile(path)
+        if not videoitem.server or not exist:
             findS = servertools.get_server_from_url(videoitem.url)
             log(findS)
             if not findS:
@@ -1144,7 +1146,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         videoitem.thumbnail = item.thumbnail
         videoitem.contentType = item.contentType
         videoitem.infoLabels = item.infoLabels
-
+        videoitem.quality = quality
         return videoitem
 
     with futures.ThreadPoolExecutor() as executor:
@@ -1152,7 +1154,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         for it in futures.as_completed(thL):
             if it.result():
                 verifiedItemlist.append(it.result())
-
+    verifiedItemlist.sort(key=lambda it: int(re.sub(r'\D','',it.quality)))
     if patronTag:
         addQualityTag(item, verifiedItemlist, data, patronTag)
 
@@ -1176,6 +1178,8 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         download(verifiedItemlist, item, function_level=3)
 
     if not AP or not HS:
+        # for it in verifiedItemlist:
+        #     log(it)
         return verifiedItemlist
 
 
