@@ -1107,7 +1107,7 @@ def pagination(itemlist, item, page, perpage, function_level=1):
                  thumbnail=thumb()))
     return itemlist
 
-def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, down_load=True, patronTag=None, video_library=True):
+def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, Download=True, patronTag=None, Videolibrary=True):
     log()
     if not data and not itemlist:
         data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
@@ -1135,14 +1135,16 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
 
         item.title = typo(item.contentTitle.strip(), 'bold') if item.contentType == 'movie' or (config.get_localized_string(30161) in item.title) else item.title
 
-        videoitem.plot= typo(videoitem.title, 'bold') + (typo(videoitem.quality, '_ [] bold') if item.quality else '')
+        quality = videoitem.quality if videoitem.quality else item.quality if item.quality else ''
         videoitem.title = (item.title if item.channel not in ['url'] else '') + (typo(videoitem.title, '_ color kod [] bold') if videoitem.title else "") + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")
+        videoitem.plot= typo(videoitem.title, 'bold') + (typo(quality, '_ [] bold') if quality else '')
+        videoitem.channel = item.channel
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail
-        videoitem.channel = item.channel
         videoitem.contentType = item.contentType
         videoitem.infoLabels = item.infoLabels
+
         return videoitem
 
     with futures.ThreadPoolExecutor() as executor:
@@ -1153,42 +1155,29 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
 
     if patronTag:
         addQualityTag(item, verifiedItemlist, data, patronTag)
-    return controls(verifiedItemlist, item, AutoPlay, CheckLinks, down_load, video_library)
 
-def controls(itemlist, item, AutoPlay=True, CheckLinks=True, down_load=True, video_library=True):
-    from core import jsontools
-    from platformcode.config import get_setting
-
-    CL = get_setting('checklinks') or get_setting('checklinks', item.channel)
+    # Auto Play & Hide Links
     AP, HS = autoplay.get_channel_AP_HS(item)
 
-    if CL and not AP:
-        if get_setting('checklinks', item.channel):
-            checklinks = get_setting('checklinks', item.channel)
-            checklinks_number = get_setting('checklinks_number', item.channel)
-        else:
-            checklinks = get_setting('checklinks')
-            checklinks_number = get_setting('checklinks_number')
-        itemlist = servertools.check_list_links(itemlist, checklinks_number)
+    # Check Links
+    if not AP and (config.get_setting('checklinks') or config.get_setting('checklinks', item.channel)):
+        if config.get_setting('checklinks', item.channel):
+            checklinks_number = config.get_setting('checklinks_number', item.channel)
+        elif config.get_setting('checklinks'):
+            checklinks_number = config.get_setting('checklinks_number')
+        verifiedItemlist = servertools.check_list_links(verifiedItemlist, checklinks_number)
 
-    if AutoPlay == True and not 'downloads' in inspect.stack()[3][1] + inspect.stack()[4][1]:
-        autoplay.start(itemlist, item)
+    if AutoPlay and not 'downloads' in inspect.stack()[3][1] or not 'downloads' in inspect.stack()[3][1] or not inspect.stack()[4][1]:
+        autoplay.start(verifiedItemlist, item)
 
-    if item.contentChannel != 'videolibrary' and video_library: videolibrary(itemlist, item, function_level=3)
-    if down_load == True: download(itemlist, item, function_level=3)
+    if Videolibrary and item.contentChannel != 'videolibrary':
+        videolibrary(verifiedItemlist, item, function_level=3)
+    if Download:
+        download(verifiedItemlist, item, function_level=3)
 
-    VL = False
-    try:
-        if  'downloads' in inspect.stack()[3][1] + inspect.stack()[4][1] or \
-            inspect.stack()[4][3] == 'play_from_library' or \
-            inspect.stack()[5][3] == 'play_from_library' or \
-            'videolibrary' in inspect.stack()[3][1] or \
-            'videolibrary' in inspect.stack()[4][1]:
-            VL = True
-    except:
-        pass
-    if not AP or VL or not HS:
-        return itemlist
+    if not AP or not HS:
+        return verifiedItemlist
+
 
 def filterLang(item, itemlist):
     # import channeltools
@@ -1206,14 +1195,16 @@ def aplay(item, itemlist, list_servers='', list_quality=''):
         autoplay.start(itemlist, item)
 
 
-def log(stringa1="", stringa2="", stringa3="", stringa4="", stringa5=""):
+def log(*args):
     # Function to simplify the log
     # Automatically returns File Name and Function Name
-
+    string = ''
+    for arg in args:
+        string += ' '+str(arg)
     frame = inspect.stack()[1]
     filename = frame[0].f_code.co_filename
     filename = os.path.basename(filename)
-    logger.info("[" + filename + "] - [" + inspect.stack()[1][3] + "] " + str(stringa1) + ( ' ' + str(stringa2) if stringa2 else '') + ( ' ' + str(stringa3) if stringa3 else '') + ( ' ' + str(stringa4) if stringa4 else '') + ( ' ' + str(stringa5) if stringa5 else '') )
+    logger.info("[" + filename + "] - [" + inspect.stack()[1][3] + "] " + string)
 
 
 def channel_config(item, itemlist):
