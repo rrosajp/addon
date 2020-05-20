@@ -254,7 +254,7 @@ def set_infoLabels_item(item):
 
         else:
             # We have a valid season number but no episode number ...
-            # ... search season data
+            # ... search season data
             item.infoLabels['mediatype'] = 'season'
             data_season = otvdb_global.get_images(otvdb_global.get_id(), "season", int_season)
 

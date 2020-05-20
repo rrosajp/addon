@@ -1154,7 +1154,10 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         for it in futures.as_completed(thL):
             if it.result():
                 verifiedItemlist.append(it.result())
-    verifiedItemlist.sort(key=lambda it: int(re.sub(r'\D','',it.quality)))
+    try:
+        verifiedItemlist.sort(key=lambda it: int(re.sub(r'\D','',it.quality)))
+    except:
+        verifiedItemlist.sort(key=lambda it: it.quality, reverse=True)
     if patronTag:
         addQualityTag(item, verifiedItemlist, data, patronTag)
 
