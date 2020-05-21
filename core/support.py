@@ -1117,9 +1117,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
     verifiedItemlist = []
 
     def getItem(videoitem):
-        path = os.path.join(config.get_runtime_path(),'servers',videoitem.server.lower() + '.json')
-        exist = os.path.isfile(path)
-        if not videoitem.server or not exist:
+        if not servertools.get_server_parameters(videoitem.server.lower()):  # do not exists or it's empty
             findS = servertools.get_server_from_url(videoitem.url)
             log(findS)
             if not findS:
