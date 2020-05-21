@@ -217,8 +217,12 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
         if scraped['season']:
             stagione = scraped['season']
+            item.infoLabels['season'] = int(scraped['season'])
+            item.infoLabels['episode'] = int(scraped['episode'])
             episode = str(int(scraped['season'])) +'x'+ str(int(scraped['episode'])).zfill(2)
         elif item.season:
+            item.infoLabels['season'] = int(item.season)
+            item.infoLabels['episode'] = int(scrapertools.find_single_match(scraped['episode'], r'(\d+)'))
             episode = item.season +'x'+ scraped['episode']
         elif item.contentType == 'tvshow' and (scraped['episode'] == '' and scraped['season'] == '' and stagione == ''):
             item.news = 'season_completed'
@@ -228,6 +232,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             if 'x' in episode:
                 ep = episode.split('x')
                 episode = str(int(ep[0])).zfill(1) + 'x' + str(int(ep[1])).zfill(2)
+                item.infoLabels['season'] = int(ep[0])
+                item.infoLabels['episode'] = int(ep[1])
             second_episode = scrapertools.find_single_match(episode, r'x\d+x(\d+)')
             if second_episode: episode = re.sub(r'(\d+x\d+)x\d+',r'\1-', episode) + second_episode.zfill(2)
 
@@ -243,14 +249,16 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         if item.infoLabels["title"] == scraped["title"]:
             infolabels = item.infoLabels
         else:
-            infolabels = {}
+            if function == 'episodios':
+                infolabels = item.infoLabels
+            else:
+                infolabels = {}
             if scraped['year']:
                 infolabels['year'] = scraped['year']
             if scraped["plot"]:
                 infolabels['plot'] = plot
             if scraped['duration']:
-                matches = scrapertools.find_multiple_matches(scraped['duration'],
-                                                             r'([0-9])\s*?(?:[hH]|:|\.|,|\\|\/|\||\s)\s*?([0-9]+)')
+                matches = scrapertools.find_multiple_matches(scraped['duration'],r'([0-9])\s*?(?:[hH]|:|\.|,|\\|\/|\||\s)\s*?([0-9]+)')
                 for h, m in matches:
                     scraped['duration'] = int(h) * 60 + int(m)
                 if not matches:
