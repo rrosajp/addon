@@ -37,25 +37,22 @@ def hdpass_get_servers(item):
         page = httptools.downloadpage(url, CF=False).data
         mir = scrapertools.find_single_match(page, patron_mir)
 
-        with futures.ThreadPoolExecutor() as executor:
-            thL = []
-            for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
-                mir_url = scrapertools.decodeHtmlentities(mir_url)
-                log(mir_url)
-                it = Item(channel=item.channel,
-                                action="play",
-                                fulltitle=item.fulltitle,
-                                quality=quality,
-                                show=item.show,
-                                thumbnail=item.thumbnail,
-                                contentType=item.contentType,
-                                title=srv,
-                                server=srv,
-                                url= mir_url)
-                thL.append(executor.submit(hdpass_get_url, it))
-            for res in futures.as_completed(thL):
-                if res.result():
-                    ret.append(res.result()[0])
+        for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
+            mir_url = scrapertools.decodeHtmlentities(mir_url)
+            log(mir_url)
+            it = Item(channel=item.channel,
+                            action="play",
+                            fulltitle=item.fulltitle,
+                            quality=quality,
+                            show=item.show,
+                            thumbnail=item.thumbnail,
+                            contentType=item.contentType,
+                            title=srv,
+                            server=srv,
+                            url= mir_url)
+            if not servertools.get_server_parameters(srv.lower()):  # do not exists or it's empty
+                it = hdpass_get_url(it)[0]
+            ret.append(it)
         return ret
     # Carica la pagina
     itemlist = []
