@@ -6011,6 +6011,10 @@ msgctxt "#70806"
 msgid "Changing this parameter permanently overwrites the Elementum settings.\nDo you want to continue?"
 msgstr "Modificando questo parametro vengono sovrascritte permanentemente le impostazioni di Elementum.\nVuoi continuare?"
 
+msgctxt "#70807"
+msgid "Elementum does not support network folder downloads, do you want to change the download location?"
+msgstr "Elementum non supporta i download su cartella di rete, vuoi cambiare il percorso di download?"
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS check alert"

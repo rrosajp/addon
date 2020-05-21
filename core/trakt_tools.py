@@ -196,10 +196,7 @@ def get_trakt_watched(id_type, mediatype, update=False):
 
 
 def trakt_check(itemlist):
-    from core.support import typo
     id_result = ''
-    # check = u'\u221a'
-    check = typo(u'\u221a','color kod bold')+' '
     synced = False
     try:
         for item in itemlist:
@@ -221,7 +218,7 @@ def trakt_check(itemlist):
                     id_result = get_trakt_watched(id_type, mediatype)
                 if info['mediatype'] == 'movie':
                     if info[id_type + '_id'] in id_result:
-                        item.title = check + item.title
+                        item.infoLabels['playcount'] = 1
 
                 elif info['mediatype'] == 'episode':
                     if info[id_type + '_id'] in id_result:
@@ -236,7 +233,7 @@ def trakt_check(itemlist):
                                     season_watched = id_result[id][season]
 
                                     if episode in season_watched:
-                                        item.title = check + item.title
+                                        item.infoLabels['playcount'] = 1
             else:
                 break
     except:
