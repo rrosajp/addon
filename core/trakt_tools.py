@@ -218,8 +218,8 @@ def trakt_check(itemlist):
         and itemlist[0].infoLabels['mediatype'] in ['movie', 'episode']:
 
         id_result = {}
-        id_result['movie'] = get_trakt_watched('tmdb', 'movies')
-        id_result['episode'] = get_trakt_watched('tmdb', 'shows')
+        id_result['movie'] = get_trakt_watched('tmdb', 'movies', True)
+        id_result['episode'] = get_trakt_watched('tmdb', 'shows', True)
 
         with futures.ThreadPoolExecutor() as executor:
             [executor.submit(sync, it, id_result) for it in itemlist]
@@ -234,8 +234,8 @@ def get_sync_from_file():
     if os.path.exists(sync_path):
         trakt_node = jsontools.get_node_from_file('trakt', "TRAKT")
 
-    trakt_node['movies'] = get_trakt_watched('tmdb', 'movies', True)
-    trakt_node['shows'] = get_trakt_watched('tmdb', 'shows', True)
+    trakt_node['movies'] = get_trakt_watched('tmdb', 'movies')
+    trakt_node['shows'] = get_trakt_watched('tmdb', 'shows')
     jsontools.update_node(trakt_node, 'trakt', 'TRAKT')
 
 
