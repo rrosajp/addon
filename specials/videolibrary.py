@@ -277,11 +277,11 @@ def list_tvshows(item):
                 if item_tvshow.active and int(item_tvshow.active) > 0:
                     texto_update = config.get_localized_string(60022)
                     value = 0
-                    item_tvshow.title += " [B]" + u"\u2022".encode('utf-8') + "[/B]"
                     # item_tvshow.text_color = "green"
                 else:
                     texto_update = config.get_localized_string(60023)
                     value = 1
+                    item_tvshow.title += " [B]" + u"\u2022".encode('utf-8') + "[/B]"
                     # item_tvshow.text_color = "0xFFDF7401"
 
                 # Menu contextual: Eliminar serie/canal
@@ -355,7 +355,7 @@ def configure_update_videolibrary(item):
 
     # Dialog to select
     ret = xbmcgui.Dialog().multiselect(config.get_localized_string(60601), lista, preselect=preselect, useDetails=True)
-    if not ret:
+    if ret < 0:
         return False  # order cancel
     seleccionados = [ids[i] for i in ret]
 
