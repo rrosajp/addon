@@ -2504,6 +2504,10 @@ msgctxt "#60598"
 msgid "Video library configuration"
 msgstr ""
 
+msgctxt "#60599"
+msgid "Video library update configuration"
+msgstr ""
+
 msgctxt "#60600"
 msgid "TV shows"
 msgstr ""
@@ -5181,7 +5185,7 @@ msgid "Remove"
 msgstr ""
 
 msgctxt "#70600"
-msgid "Add Season"
+msgid "Add season"
 msgstr ""
 
 msgctxt "#70601"

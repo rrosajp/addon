@@ -829,6 +829,11 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
         sql = 'UPDATE path SET strPath="%s" WHERE idPath=%s' % (strPath, idPath)
         logger.info('sql: ' + sql)
         nun_records, records = execute_sql_kodi(sql)
+    else:
+        progress.update(100)
+        xbmc.sleep(1000)
+        progress.close()
+        return
 
     p = 80
     progress.update(p, config.get_localized_string(20000), config.get_localized_string(80013))

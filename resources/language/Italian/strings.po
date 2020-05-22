@@ -2503,6 +2503,10 @@ msgctxt "#60598"
 msgid "Video library configuration"
 msgstr "Configurazione videoteca"
 
+msgctxt "#60599"
+msgid "Video library update configuration"
+msgstr "Configurazione aggiornamento videoteca"
+
 msgctxt "#60600"
 msgid "TV shows"
 msgstr "Serie TV"
@@ -3389,7 +3393,7 @@ msgstr "Server"
 
 msgctxt "#70146"
 msgid "Add to video library"
-msgstr "Aggiungi alla Videoteca"
+msgstr "Aggiungi alla videoteca"
 
 msgctxt "#70147"
 msgid "Video library (update TV show)"
@@ -5180,8 +5184,8 @@ msgid "Remove"
 msgstr "Rimuovi"
 
 msgctxt "#70600"
-msgid "Add Season"
-msgstr "Aggiungi Stagione"
+msgid "Add season"
+msgstr "Aggiungi stagione"
 
 msgctxt "#70601"
 msgid "Update from the Internet:"

@@ -277,7 +277,7 @@ def list_tvshows(item):
                 if item_tvshow.active and int(item_tvshow.active) > 0:
                     texto_update = config.get_localized_string(60022)
                     value = 0
-                    item_tvshow.title = typo(item_tvshow.title,'color kod')
+                    item_tvshow.title += " [B]" + u"\u2022".encode('utf-8') + "[/B]"
                     # item_tvshow.text_color = "green"
                 else:
                     texto_update = config.get_localized_string(60023)
@@ -333,12 +333,12 @@ def list_tvshows(item):
         itemlist.append(Item(channel=item.channel, action="update_videolibrary", thumbnail=item.thumbnail,
                              title=typo(config.get_localized_string(70269), 'bold color kod'), folder=False))
 
-        itemlist.append(Item(channel=item.channel, action="setting_update_videolibrary", thumbnail=item.thumbnail,
-                             title=typo(config.get_localized_string(60601), 'bold color kod'), lista=lista, folder=False))
+        itemlist.append(Item(channel=item.channel, action="configure_update_videolibrary", thumbnail=item.thumbnail,
+                             title=typo(config.get_localized_string(60599), 'bold color kod'), lista=lista, folder=False))
 
     return itemlist
 
-def setting_update_videolibrary(item):
+def configure_update_videolibrary(item):
     import xbmcgui
     # Load list of options (active user channels that allow global search)
     lista = []
@@ -364,7 +364,10 @@ def setting_update_videolibrary(item):
             tvshow.active = 0
         elif tvshow in seleccionados:
             tvshow.active = 1
-        mark_tvshow_as_updatable(tvshow)
+        mark_tvshow_as_updatable(tvshow, silent=True)
+
+    platformtools.itemlist_refresh()
+
     return True
 
 
@@ -770,7 +773,7 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
 
     from platformcode import xbmc_videolibrary
     movies_path, tvshows_path = xbmc_videolibrary.check_sources(new_movies_path, new_tvshows_path)
-    logger.info('check_sources: ' + movies_path + ', ' + tvshows_path)
+    logger.info('check_sources: ' + str(movies_path) + ', ' + str(tvshows_path))
     if movies_path or tvshows_path:
         if not movies_path:
             filetools.rmdir(new_movies_path)
@@ -1110,13 +1113,14 @@ def mark_season_as_watched(item):
     platformtools.itemlist_refresh()
 
 
-def mark_tvshow_as_updatable(item):
+def mark_tvshow_as_updatable(item, silent=False):
     logger.info()
     head_nfo, it = videolibrarytools.read_nfo(item.nfo)
     it.active = item.active
     filetools.write(item.nfo, head_nfo + it.tojson())
 
-    platformtools.itemlist_refresh()
+    if not silent:
+        platformtools.itemlist_refresh()
 
 
 def delete(item):
