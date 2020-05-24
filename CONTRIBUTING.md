@@ -12,12 +12,12 @@ I siti web cambiano, spesso, ciò che oggi funziona domani potrebbe non più fun
 
 Prima di segnalare un problema assicurati che sia realmemte legato a KoD, sotto alcuni requisiti necessari:
 - avere l'ultima versione di KoD, per controllare vai qui e confronta il numero con quello presente nella sezione aiuto: https://github.com/kodiondemand/addon/commits/stable
-- avere l'ultima versione ufficiale Stabile di Kodi: https://kodi.wiki/view/Releases
+- avere una versione di kodi supportata, attualmente si tratta di 17.x e 18.x
 - verificare che il problema non dipenda dal sito stesso: se esce il messaggio 'Apri nel Browser': apri il tuo Browser e prova se li il film o serie tv funziona, senno apri il menù contestuale (tasto c) e clicca su "apri nel browser"
 
 Sei pregato di attenerti il più possibile a quanto descritto qua perchè un semplice "non funziona" fa solo perdere tempo.
 Puoi fare tutte le segnalazioni nella sezione [issues](https://github.com/kodiondemand/addon/issues), cliccando su "new issue" appariranno dei template che ti guideranno nel processo.
-Assicurati che qualcun'altro non abbia già effettuato la stessa segnalazione.
+Assicurati che qualcun'altro non abbia già effettuato la stessa segnalazione, nel caso avessi altro da aggiungere rispondi ad un issue già aperto piuttosto che farne uno nuovo.
 
 # Scrivere guide o registrare video-esempi
 Cerca di essere sintetico ma senza tralasciare le informazioni essenziali, una volta fatto mandalo pure sul [gruppo telegram](https://t.me/kodiondemand) taggando gli admin (@admin).<br>
