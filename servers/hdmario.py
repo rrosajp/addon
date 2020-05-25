@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import xbmc
 
 from core import httptools, scrapertools, filetools
 from platformcode import logger, config
@@ -6,6 +7,7 @@ from platformcode import logger, config
 baseUrl = 'https://hdmario.live'
 
 def test_video_exists(page_url):
+    page_url.replace('?', '')
     logger.info("(page_url='%s')" % page_url)
     global data
 
@@ -40,7 +42,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     logger.info('X-Secure-Proof=' + secureProof)
 
     data = httptools.downloadpage(baseUrl + '/pl/' + page_url.split('/')[-1].replace('?', '') + '.m3u8', headers=[['X-Secure-Proof', secureProof]]).data
-    filetools.write('special://temp/hdmario.m3u8', data, 'w')
+    filetools.write(xbmc.translatePath('special://temp/hdmario.m3u8'), data, 'w')
 
     video_urls = [['.m3u8 [HDmario]', 'special://temp/hdmario.m3u8']]
 
