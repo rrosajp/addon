@@ -3,6 +3,7 @@ import string
 import time
 
 from core import httptools
+from platformcode import platformtools, config
 
 baseUrl = 'https://www.1secmail.com/api/v1/'
 defDomain = '1secmail.com'
@@ -35,15 +36,20 @@ def readLastMessage(mail):
     return httptools.downloadpage(apiUrl).json
 
 
-def waitForMail(mail, timeout=10):
+def waitForMail(mail, timeout=50):
+    dialog = platformtools.dialog_progress(config.get_localized_string(20000),
+                                           'verifica tramite mail richiesta dal sito, sono in attesa di nuove mail sulla casella ' + mail)
     secs = 0
-    while secs < 10:
+    while secs < timeout:
         msg = readLastMessage(mail)
         if msg:
+            dialog.close()
             return msg
         else:
             time.sleep(1)
             secs += 1
+        if dialog.iscanceled():
+            break
     return None
 
 def getRandom(len=10):
