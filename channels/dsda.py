@@ -64,10 +64,16 @@ def search(item, texto):
 
 @support.scrape
 def peliculas(item):
+    blacklist = ['GUIDA PRINCIPIANTI Vedere film e documentari streaming gratis', 'Guida Dsda']
+    data = support.match(item).data
+    # debug =True
     if item.args == 'collection':
-        patron = r'<div class="cover-racolta">\s*<a href="(?P<url>[^"]+)"[^>]+>\s*<img width="[^"]+" height="[^"]+" src="(?P<thumb>[^"]+)"[^>]+>[^>]+>(?P<title>[^<]+)<'
-    elif item.args == 'raccolta':
-        patron = r'<a (?:style="[^"]+" )?href="(?P<url>[^"]+)"[^>]+>(?:[^>]+><strong>)?(?P<title>[^<]+)(?:</a>)?</strong'
+        if 'class="panel"' in data:
+            item.args = 'raccolta'
+            patron = r'class="title-episodio">(?P<title>[^<]+)<(?P<url>.*?)<p'
+            # patron = r'<a (?:style="[^"]+" )?href="(?P<url>[^"]+)"[^>]+>(?:[^>]+><strong>)?(?P<title>[^<]+)(?:</a>)?</strong'
+        else:
+            patron = r'<div class="cover-racolta">\s*<a href="(?P<url>[^"]+)"[^>]+>\s*<img width="[^"]+" height="[^"]+" src="(?P<thumb>[^"]+)".*?<p class="title[^>]+>(?P<title>[^<]+)<'
     else:
         patron = r'<article[^>]+>[^>]+>[^>]+>(?:<img width="[^"]+" height="[^"]+" src="(?P<thumb>[^"]+)"[^>]+>)?.*?<a href="(?P<url>[^"]+)">\s*(?P<title>[^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>\s*<p>(?P<plot>[^<]+)<'
         patronNext = r'<a class="page-numbers next" href="([^"]+)">'
@@ -80,16 +86,23 @@ def peliculas(item):
             item.action = 'episodios'
             item.contentSerieName = title
             item.contentTitle = ''
-        elif 'collezione' in item.fulltitle.lower():
+        elif 'collezion' in item.fulltitle.lower() or \
+             'raccolt' in item.fulltitle.lower() or \
+             'filmografia' in item.fulltitle.lower():
             item.args = 'collection'
             item.action = 'peliculas'
             item.contentTitle = title
             item.contentSerieName = ''
-        elif 'raccolta' in item.fulltitle.lower():
-            item.args = 'raccolta'
-            item.action = 'peliculas'
-            item.contentTitle = title
-            item.contentSerieName = ''
+        # elif 'collezion' in item.fulltitle.lower():
+        #     item.args = 'collection'
+        #     item.action = 'peliculas'
+        #     item.contentTitle = title
+        #     item.contentSerieName = ''
+        # elif 'raccolta' in item.fulltitle.lower():
+        #     item.args = 'collection'
+        #     item.action = 'peliculas'
+        #     item.contentTitle = title
+        #     item.contentSerieName = ''
         else:
             item.contentTitle = title
             item.contentSerieName = ''
