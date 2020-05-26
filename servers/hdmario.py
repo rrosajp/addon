@@ -2,7 +2,7 @@
 import xbmc
 
 from core import httptools, scrapertools, filetools
-from platformcode import logger, config, platformtools
+from platformcode import logger, config
 
 baseUrl = 'https://hdmario.live'
 
@@ -39,8 +39,10 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             page = httptools.downloadpage(page_url + '?code=' + code)
             data = page.data
     logger.info(data)
+    from lib import jsunpack_js2py
+    unpacked = jsunpack_js2py.unpack(scrapertools.find_single_match(data, '<script type="text/javascript">\n*\s*\n*(eval.*)'))
     # p,a,c,k,e,d data -> xhr.setRequestHeader
-    secureProof = scrapertools.find_single_match(data, '\|(\w{22})\|')
+    secureProof = scrapertools.find_single_match(unpacked, """X-Secure-Proof['"]\s*,\s*['"]([^"']+)""")
     logger.info('X-Secure-Proof=' + secureProof)
 
     data = httptools.downloadpage(baseUrl + '/pl/' + page_url.split('/')[-1].replace('?', '') + '.m3u8', headers=[['X-Secure-Proof', secureProof]]).data
