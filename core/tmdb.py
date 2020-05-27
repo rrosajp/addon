@@ -1247,13 +1247,13 @@ class Tmdb(object):
 
     def get_temporada(self, numtemporada=1):
         # --------------------------------------------------------------------------------------------------------------------------------------------
-       # Parameters:
-        # season number: (int) Season number. Default 1.
-        # Return: (Dec)
-        # Returns a dictionary with data about the season.
-        # You can get more information about the returned data at:
-        # http://docs.themoviedb.apiary.io/#reference/tv-seasons/tvidseasonseasonnumber/get
-        # http://docs.themoviedb.apiary.io/#reference/tv-seasons/tvidseasonseasonnumbercredits/get
+        # Parameters:
+        # season number: (int) Season number. Default 1.
+        # Return: (Dec)
+        # Returns a dictionary with data about the season.
+        # You can get more information about the returned data at:
+        # http://docs.themoviedb.apiary.io/#reference/tv-seasons/tvidseasonseasonnumber/get
+        # http://docs.themoviedb.apiary.io/#reference/tv-seasons/tvidseasonseasonnumbercredits/get
         # --------------------------------------------------------------------------------------------------------------------------------------------
         if not self.result["id"] or self.busqueda_tipo != "tv":
             return {}
@@ -1294,16 +1294,16 @@ class Tmdb(object):
 
     def get_episodio(self, numtemporada=1, capitulo=1):
         # --------------------------------------------------------------------------------------------------------------------------------------------
-       # Parameters:
-        # season number (optional): (int) Season number. Default 1.
-        # chapter: (int) Chapter number. Default 1.
-        # Return: (Dec)
-        # Returns a dictionary with the following elements:
-        # "season_name", "season_synopsis", "season_poster", "season_num_ episodes" (int),
-        # "season_air_date", "episode_vote_count", "episode_vote_average",
-        # "episode_title", "episode_synopsis", "episode_image", "episode_air_date",
-        # "episode_crew" and "episode_guest_stars",
-        # With chapter == -1 the dictionary will only have the elements referring to the season
+        # Parameters:
+        # season number (optional): (int) Season number. Default 1.
+        # chapter: (int) Chapter number. Default 1.
+        # Return: (Dec)
+        # Returns a dictionary with the following elements:
+        # "season_name", "season_synopsis", "season_poster", "season_num_ episodes" (int),
+        # "season_air_date", "episode_vote_count", "episode_vote_average",
+        # "episode_title", "episode_synopsis", "episode_image", "episode_air_date",
+        # "episode_crew" and "episode_guest_stars",
+        # With chapter == -1 the dictionary will only have the elements referring to the season
         # --------------------------------------------------------------------------------------------------------------------------------------------
         if not self.result["id"] or self.busqueda_tipo != "tv":
             return {}
