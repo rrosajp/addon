@@ -6,7 +6,7 @@ import requests
 
 from core import httptools
 from lib import vvvvid_decoder
-from platformcode import logger
+from platformcode import logger, config
 
 # Creating persistent session
 current_session = requests.Session()
