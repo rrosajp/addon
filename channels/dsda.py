@@ -93,16 +93,6 @@ def peliculas(item):
             item.action = 'peliculas'
             item.contentTitle = title
             item.contentSerieName = ''
-        # elif 'collezion' in item.fulltitle.lower():
-        #     item.args = 'collection'
-        #     item.action = 'peliculas'
-        #     item.contentTitle = title
-        #     item.contentSerieName = ''
-        # elif 'raccolta' in item.fulltitle.lower():
-        #     item.args = 'collection'
-        #     item.action = 'peliculas'
-        #     item.contentTitle = title
-        #     item.contentSerieName = ''
         else:
             item.contentTitle = title
             item.contentSerieName = ''
@@ -124,7 +114,21 @@ def peliculas(item):
 
 @support.scrape
 def episodios(item):
-    patron = r'class="title-episodio">(?P<episode>[^<]+)<(?P<url>.*?)<p'
+    html = support.match(item, patron=r'class="title-episodio">(\d+x\d+)')
+    data = html.data
+    if html.match:
+        patron = r'class="title-episodio">(?P<episode>[^<]+)<(?P<url>.*?)<p'
+    else:
+        patron = r'class="title-episodio">(?P<title>[^<]+)<(?P<url>.*?)<p'
+
+        def itemlistHook(itemlist):
+            counter = 0
+            for item in itemlist:
+                episode = support.match(item.title, patron=r'\d+').match
+                if episode == '1':
+                    counter += 1
+                item.title = support.typo(str(counter) + 'x' + episode.zfill(2) + support.re.sub(r'\[[^\]]+\](?:\d+)?','',item.title),'bold')
+            return itemlist
     return locals()
 
 
