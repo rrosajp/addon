@@ -668,11 +668,12 @@ def stayonline(id):
     return data
 
 
-def menuItem(itemlist, filename, title='', action='', url='', contentType='movie', args=[]):
+def menuItem(itemlist, filename, title='', action='', url='', contentType='movie', args=[], style=True):
     # Function to simplify menu creation
 
     # Call typo function
-    title = typo(title)
+    if style:
+        title = typo(title)
 
     if contentType == 'movie': extra = 'movie'
     else: extra = 'tvshow'
@@ -688,8 +689,9 @@ def menuItem(itemlist, filename, title='', action='', url='', contentType='movie
     ))
 
     # Apply auto Thumbnails at the menus
-    from channelselector import thumb
-    thumb(itemlist)
+    if style:
+        from channelselector import thumb
+        thumb(itemlist)
     return itemlist
 
 
@@ -704,12 +706,13 @@ def menu(func):
         list_quality = func.__globals__['list_quality'] if 'list_quality' in func.__globals__ else ['default']
         log('LIST QUALITY', list_quality)
         filename = func.__module__.split('.')[1]
-        global_search = False
+        single_search = False
         # listUrls = ['film', 'filmSub', 'tvshow', 'tvshowSub', 'anime', 'animeSub', 'search', 'top', 'topSub']
         listUrls = ['top', 'film', 'tvshow', 'anime', 'search']
         listUrls_extra = []
         dictUrl = {}
 
+        global_search = 'get_channel_results' in inspect.stack()[1][3]
 
         # Main options
         itemlist = []
@@ -722,60 +725,66 @@ def menu(func):
             if name == 'anime': title = 'Anime'
 
             if name == 'search' and dictUrl[name] is not None:
-                global_search = True
+                single_search = True
 
             # Make TOP MENU
             elif name == 'top' and dictUrl[name] is not None:
-                for sub, var in dictUrl['top']:
-                    menuItem(itemlist, filename,
-                             title = sub + ' italic bold',
-                             url = host + var[0] if len(var) > 0 else '',
-                             action = var[1] if len(var) > 1 else 'peliculas',
-                             args=var[2] if len(var) > 2 else '',
-                             contentType= var[3] if len(var) > 3 else 'movie')
+                if not global_search:
+                    for sub, var in dictUrl['top']:
+                        menuItem(itemlist, filename,
+                                 title = sub + ' italic bold',
+                                 url = host + var[0] if len(var) > 0 else '',
+                                 action = var[1] if len(var) > 1 else 'peliculas',
+                                 args=var[2] if len(var) > 2 else '',
+                                 contentType= var[3] if len(var) > 3 else 'movie')
 
             # Make MAIN MENU
             elif dictUrl[name] is not None:
-                if len(dictUrl[name]) == 0: url = ''
-                else: url = dictUrl[name][0] if type(dictUrl[name][0]) is not tuple and len(dictUrl[name][0]) > 0 else ''
-                menuItem(itemlist, filename,
-                         title + ' bullet bold', 'peliculas',
-                         host + url,
-                         contentType='movie' if name == 'film' else 'tvshow')
-                if len(dictUrl[name]) > 0:
-                    if type(dictUrl[name][0]) is not tuple and type(dictUrl[name]) is not str: dictUrl[name].pop(0)
-                if dictUrl[name] is not None and type(dictUrl[name]) is not str:
-                    for sub, var in dictUrl[name]:
-                        menuItem(itemlist, filename,
-                             title = sub + ' submenu  {' + title + '}',
-                             url = host + var[0] if len(var) > 0 else '',
-                             action = var[1] if len(var) > 1 else 'peliculas',
-                             args=var[2] if len(var) > 2 else '',
-                             contentType= var[3] if len(var) > 3 else 'movie' if name == 'film' else 'tvshow')
+                if len(dictUrl[name]) == 0:
+                    url = ''
+                else:
+                    url = dictUrl[name][0] if type(dictUrl[name][0]) is not tuple and len(dictUrl[name][0]) > 0 else ''
+
+                if not global_search:
+                    menuItem(itemlist, filename,
+                             title + ' bullet bold', 'peliculas',
+                             host + url,
+                             contentType='movie' if name == 'film' else 'tvshow')
+                    if len(dictUrl[name]) > 0:
+                        if type(dictUrl[name][0]) is not tuple and type(dictUrl[name]) is not str: dictUrl[name].pop(0)
+                    if dictUrl[name] is not None and type(dictUrl[name]) is not str:
+                        for sub, var in dictUrl[name]:
+                            menuItem(itemlist, filename,
+                                 title = sub + ' submenu  {' + title + '}',
+                                 url = host + var[0] if len(var) > 0 else '',
+                                 action = var[1] if len(var) > 1 else 'peliculas',
+                                 args=var[2] if len(var) > 2 else '',
+                                 contentType= var[3] if len(var) > 3 else 'movie' if name == 'film' else 'tvshow')
                 # add search menu for category
-                if 'search' not in args: menuItem(itemlist, filename, config.get_localized_string(70741) % title + ' … submenu bold', 'search', host + url, contentType='movie' if name == 'film' else 'tvshow')
+                if 'search' not in args: menuItem(itemlist, filename, config.get_localized_string(70741) % title + ' … submenu bold', 'search', host + url, contentType='movie' if name == 'film' else 'tvshow', style=not global_search)
 
         # Make EXTRA MENU (on bottom)
-        for name, var in args.items():
-            if name not in listUrls and name != 'item':
-               listUrls_extra.append(name)
-        for name in listUrls_extra:
-            dictUrl[name] = args[name] if name in args else None
-            for sub, var in dictUrl[name]:
-                menuItem(itemlist, filename,
-                             title = sub + ' ',
-                             url = host + var[0] if len(var) > 0 else '',
-                             action = var[1] if len(var) > 1 else 'peliculas',
-                             args=var[2] if len(var) > 2 else '',
-                             contentType= var[3] if len(var) > 3 else 'movie',)
+        if not global_search:
+            for name, var in args.items():
+                if name not in listUrls and name != 'item':
+                   listUrls_extra.append(name)
+            for name in listUrls_extra:
+                dictUrl[name] = args[name] if name in args else None
+                for sub, var in dictUrl[name]:
+                    menuItem(itemlist, filename,
+                                 title = sub + ' ',
+                                 url = host + var[0] if len(var) > 0 else '',
+                                 action = var[1] if len(var) > 1 else 'peliculas',
+                                 args=var[2] if len(var) > 2 else '',
+                                 contentType= var[3] if len(var) > 3 else 'movie',)
 
-        if global_search:
-            menuItem(itemlist, filename, config.get_localized_string(70741) % '… bold', 'search', host + dictUrl['search'])
+        if single_search:
+            menuItem(itemlist, filename, config.get_localized_string(70741) % '… bold', 'search', host + dictUrl['search'], style=not global_search)
 
-        if 'get_channel_results' not in inspect.stack()[1][3]:
+        if not global_search:
             autoplay.init(item.channel, list_servers, list_quality)
             autoplay.show_option(item.channel, itemlist)
-        channel_config(item, itemlist)
+            channel_config(item, itemlist)
 
         return itemlist
 
