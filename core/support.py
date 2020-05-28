@@ -688,12 +688,6 @@ def menuItem(itemlist, filename, title='', action='', url='', contentType='movie
         contentType = contentType
     ))
 
-    # Apply auto Thumbnails at the menus
-    if style:
-        from channelselector import thumb
-        thumb(itemlist)
-    return itemlist
-
 
 def menu(func):
     def wrapper(*args):
@@ -701,6 +695,7 @@ def menu(func):
         args = func(*args)
 
         item = args['item']
+        log(item.channel + ' start')
         host = func.__globals__['host']
         list_servers = func.__globals__['list_servers'] if 'list_servers' in func.__globals__ else ['directo']
         list_quality = func.__globals__['list_quality'] if 'list_quality' in func.__globals__ else ['default']
@@ -712,7 +707,7 @@ def menu(func):
         listUrls_extra = []
         dictUrl = {}
 
-        global_search = 'get_channel_results' in inspect.stack()[1][3]
+        global_search = item.global_search
 
         # Main options
         itemlist = []
@@ -786,6 +781,10 @@ def menu(func):
             autoplay.show_option(item.channel, itemlist)
             channel_config(item, itemlist)
 
+            # Apply auto Thumbnails at the menus
+            from channelselector import thumb
+            thumb(itemlist)
+        log(item.channel + ' end')
         return itemlist
 
     return wrapper

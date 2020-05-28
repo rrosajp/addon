@@ -201,8 +201,24 @@ def channel_search(item):
                                              str(searching_titles))
     config.set_setting('tmdb_active', False)
 
+    search_action_list = []
+    module_dict = {}
+    logger.info('start import')
+    for ch in channel_list:
+        # ch_params = channeltools.get_channel_parameters(ch)
+        module = __import__('channels.%s' % ch, fromlist=["channels.%s" % ch])
+        mainlist = getattr(module, 'mainlist')(Item(channel=ch, global_search=True))
+
+        module_dict[ch] = module
+        search_action_list.extend([elem for elem in mainlist if
+                         elem.action == "search" and (item.mode == 'all' or elem.contentType == item.mode)])
+    logger.info('end import')
     with futures.ThreadPoolExecutor(max_workers=set_workers()) as executor:
-        c_results = [executor.submit(get_channel_results, ch, item) for ch in channel_list]
+        c_results = []
+        for search_action in search_action_list:
+            c_results.append(executor.submit(get_channel_results, item, module_dict, search_action))
+            if progress.iscanceled():
+                break
 
         for res in futures.as_completed(c_results):
             cnt += 1
@@ -295,21 +311,14 @@ def channel_search(item):
     return valid + results
 
 
-def get_channel_results(ch, item):
+def get_channel_results(item, module_dict, search_action):
+    ch = search_action.channel
     max_results = 10
     results = list()
+    module = module_dict[ch]
+
     try:
-        ch_params = channeltools.get_channel_parameters(ch)
-
-        module = __import__('channels.%s' % ch_params["channel"], fromlist=["channels.%s" % ch_params["channel"]])
-        mainlist = getattr(module, 'mainlist')(Item(channel=ch_params["channel"]))
-        search_action = [elem for elem in mainlist if elem.action == "search" and (item.mode == 'all' or elem.contentType == item.mode)]
-
-        if search_action:
-            for search_ in search_action:
-                results.extend(module.search(search_, item.text))
-        else:
-            results.extend(module.search(item, item.text))
+        results.extend(module.search(search_action, item.text))
 
         if len(results) < 0 and len(results) < max_results and item.mode != 'all':
 
