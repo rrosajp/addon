@@ -791,8 +791,10 @@ def menu(func):
 
 
 def typo(string, typography=''):
-
+    # string = string.strip()
     kod_color = '0xFF65B3DA' #'0xFF0081C2'
+    # listTypo = ['capitalize', 'uppercase', 'lowercase', '[]', '()', 'submenu', 'bold', 'italic', '_', '']
+
     try: string = str(string)
     except: string = str(string.encode('utf8'))
 
@@ -809,41 +811,43 @@ def typo(string, typography=''):
         VLT = False
     # Otherwise it uses the typographical attributes of the string
     # else:
+
     if 'capitalize' in string.lower():
-        string = re.sub(r'\s*capitalize','',string).capitalize()
+        string = string.replace(' capitalize', '').capitalize()
     if 'uppercase' in string.lower():
-        string =  re.sub(r'\s*uppercase','',string).upper()
+        string = string.replace(' uppercase', '').upper()
     if 'lowercase' in string.lower():
-        string =  re.sub(r'\s*lowercase','',string).lower()
+        string = string.replace(' lowercase', '').lower()
     if '[]' in string:
-        string = '[' + re.sub(r'\s*\[\]','',string) + ']'
+        string = '[' + string.replace(' []', '').strip() + ']'
     if '()' in string:
-        string = '(' + re.sub(r'\s*\(\)','',string) + ')'
+        string = '(' + string.replace(' ()', '').strip() + ')'
     if 'submenu' in string:
         if VLT:
-            string = "•• " + re.sub(r'\s*submenu','',string)
+            string = "•• " + string.replace(' submenu', '').strip()
         else:
-            string = re.sub(r'\s*submenu','',string)
+            string = string.replace(' submenu', '')
+    if 'color kod' in string:
+        string = '[COLOR ' + kod_color + ']' + string.replace(' color kod', '') + '[/COLOR]'
     if 'color' in string:
         color = scrapertools.find_single_match(string, 'color ([a-z]+)')
-        if color == 'kod' or '': color = kod_color
-        string = '[COLOR '+ color +']' + re.sub(r'\scolor\s([a-z]+)','',string) + '[/COLOR]'
+        string = '[COLOR ' + color + ']' + re.sub(r'\scolor\s([a-z]+)','',string) + '[/COLOR]'
     if 'bold' in string:
-        string = '[B]' + re.sub(r'\s*bold','',string) + '[/B]'
+        string = '[B]' + string.replace(' bold', '').strip() + '[/B]'
     if 'italic' in string:
-        string = '[I]' + re.sub(r'\s*italic','',string) + '[/I]'
+        string = '[I]' + string.replace(' italic', '').strip() + '[/I]'
     if '_' in string:
-        string = ' ' + re.sub(r'\s*_','',string)
+        string = ' ' + string.replace(' _', '').strip()
     if '--' in string:
-        string = ' - ' + re.sub(r'\s*--','',string)
+        string = ' - ' + string.replace(' --', '').strip()
     if 'bullet' in string:
         if VLT:
-            string = '[B]' + "•" + '[/B] ' + re.sub(r'\s*bullet','',string)
+            string = '[B]' + "•" + '[/B] ' + string.replace(' bullet', '').strip()
         else:
-            string = re.sub(r'\s*bullet','',string)
+            string = string.replace(' bullet', '').strip()
     if '{}' in string:
-        string = re.sub(r'\s*\{\}','',string)
-
+        string = string.replace(' {}', '').strip()
+    # string = string.strip()
     return string
 
 
