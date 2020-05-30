@@ -90,6 +90,8 @@ def start(itemlist, item):
     :param item: item (the main item of the channel)
     :return: try to auto-reproduce, in case of failure it returns the itemlist that it received in the beginning
     '''
+    if item.global_search:
+        return itemlist
     logger.info()
 
     global PLAYED

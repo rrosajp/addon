@@ -266,12 +266,11 @@ def channel_search(item):
             if len(value) == 1:
                 if not value[0].action or config.get_localized_string(70006).lower() in value[0].title.lower():
                     continue
-            tmdb.set_infoLabels_itemlist(value, True, forced=True)
             for elem in value:
                 if not elem.infoLabels.get('year', ""):
                     elem.infoLabels['year'] = '-'
-                    tmdb.set_infoLabels_item(elem, True)
-
+            tmdb.set_infoLabels_itemlist(value, True, forced=True)
+            for elem in value:
                 if elem.infoLabels['tmdb_id'] == searched_id:
                     elem.from_channel = key
                     if not config.get_setting('unify'):
@@ -312,14 +311,30 @@ def channel_search(item):
             results.append(Item(channel='search', title=title,
                                 action='get_from_temp', thumbnail=ch_thumb, itemlist=[ris.tourl() for ris in grouped], plot=plot, page=1))
 
+    progress.close()
+    # "All Together" and movie mode -> search servers
+    if config.get_setting('result_mode') == 1 and mode == 'movie':
+        progress = platformtools.dialog_progress(config.get_localized_string(30993) % item.title, config.get_localized_string(60683))
+        valid_servers = []
+        with futures.ThreadPoolExecutor(max_workers=set_workers()) as executor:
+            c_results = [executor.submit(get_servers, v, module_dict) for v in valid]
+            completed = 0
 
+            for res in futures.as_completed(c_results):
+                if progress.iscanceled():
+                    break
+                if res.result():
+                    completed += 1
+                    valid_servers.extend(res.result())
+                    progress.update(old_div(completed * 100, len(valid)))
+        valid = valid_servers
+        progress.close()
 
     # send_to_temp(to_temp)
-    config.set_setting('tmdb_active', True)
 
     results = sorted(results, key=lambda it: it.title)
     results_statistic = config.get_localized_string(59972) % (item.title, time.time() - start)
-    if item.mode == 'all':
+    if mode == 'all':
         results.insert(0, Item(title=typo(results_statistic, 'color kod bold'), thumbnail=get_thumb('search.png')))
     else:
         valid.insert(0, Item(title=typo(results_statistic, 'color kod bold'), thumbnail=get_thumb('search.png')))
@@ -350,6 +365,19 @@ def get_channel_results(item, module_dict, search_action):
         return [search_action, results]
     except:
         return [search_action, results]
+
+
+def get_servers(item, module_dict):
+    item.global_search = True
+    ch = item.channel
+    results = list()
+    module = module_dict[ch]
+    try:
+        results = getattr(module, item.action)(item)
+    except:
+        import traceback
+        logger.error(traceback.format_exc())
+    return [r.clone(title=r.title + typo(item.channel, '_ [] color kod')) for r in results if r.action == 'play']
 
 
 def get_info(itemlist):
