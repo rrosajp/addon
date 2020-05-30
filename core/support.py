@@ -727,7 +727,7 @@ def menu(func):
                 if not global_search:
                     for sub, var in dictUrl['top']:
                         menuItem(itemlist, filename,
-                                 title = sub + ' italic bold',
+                                 title = sub + '{italic bold}',
                                  url = host + var[0] if len(var) > 0 else '',
                                  action = var[1] if len(var) > 1 else 'peliculas',
                                  args=var[2] if len(var) > 2 else '',
@@ -742,7 +742,7 @@ def menu(func):
 
                 if not global_search:
                     menuItem(itemlist, filename,
-                             title + ' bullet bold', 'peliculas',
+                             title + '{bullet bold}', 'peliculas',
                              host + url,
                              contentType='movie' if name == 'film' else 'tvshow')
                     if len(dictUrl[name]) > 0:
@@ -750,13 +750,13 @@ def menu(func):
                     if dictUrl[name] is not None and type(dictUrl[name]) is not str:
                         for sub, var in dictUrl[name]:
                             menuItem(itemlist, filename,
-                                 title = sub + ' submenu  {' + title + '}',
+                                 title = sub + '{submenu}  {' + title + '}',
                                  url = host + var[0] if len(var) > 0 else '',
                                  action = var[1] if len(var) > 1 else 'peliculas',
                                  args=var[2] if len(var) > 2 else '',
                                  contentType= var[3] if len(var) > 3 else 'movie' if name == 'film' else 'tvshow')
                 # add search menu for category
-                if 'search' not in args: menuItem(itemlist, filename, config.get_localized_string(70741) % title + ' … submenu bold', 'search', host + url, contentType='movie' if name == 'film' else 'tvshow', style=not global_search)
+                if 'search' not in args: menuItem(itemlist, filename, config.get_localized_string(70741) % title + '… {submenu bold}', 'search', host + url, contentType='movie' if name == 'film' else 'tvshow', style=not global_search)
 
         # Make EXTRA MENU (on bottom)
         if not global_search:
@@ -774,7 +774,7 @@ def menu(func):
                                  contentType= var[3] if len(var) > 3 else 'movie',)
 
         if single_search:
-            menuItem(itemlist, filename, config.get_localized_string(70741) % '… bold', 'search', host + dictUrl['search'], style=not global_search)
+            menuItem(itemlist, filename, config.get_localized_string(70741) % '… {bold}', 'search', host + dictUrl['search'], style=not global_search)
 
         if not global_search:
             autoplay.init(item.channel, list_servers, list_quality)
@@ -791,63 +791,58 @@ def menu(func):
 
 
 def typo(string, typography=''):
-    # string = string.strip()
+
     kod_color = '0xFF65B3DA' #'0xFF0081C2'
-    # listTypo = ['capitalize', 'uppercase', 'lowercase', '[]', '()', 'submenu', 'bold', 'italic', '_', '']
 
     try: string = str(string)
     except: string = str(string.encode('utf8'))
 
-    if typography:
-        string = string + ' ' + typography
     if config.get_localized_string(30992) in string:
         string = string + ' >'
 
-    # If there are no attributes, it applies the default ones
-    attribute = ['[]','()','submenu','color','bold','italic','_','--','[B]','[I]','[COLOR]']
     if int(config.get_setting('view_mode_channel').split(',')[-1]) in [0, 50, 55]:
        VLT = True
     else:
         VLT = False
-    # Otherwise it uses the typographical attributes of the string
-    # else:
 
-    if 'capitalize' in string.lower():
-        string = string.replace(' capitalize', '').capitalize()
-    if 'uppercase' in string.lower():
-        string = string.replace(' uppercase', '').upper()
-    if 'lowercase' in string.lower():
-        string = string.replace(' lowercase', '').lower()
-    if '[]' in string:
-        string = '[' + string.replace(' []', '').strip() + ']'
-    if '()' in string:
-        string = '(' + string.replace(' ()', '').strip() + ')'
-    if 'submenu' in string:
-        if VLT:
-            string = "•• " + string.replace(' submenu', '').strip()
-        else:
-            string = string.replace(' submenu', '')
-    if 'color kod' in string:
-        string = '[COLOR ' + kod_color + ']' + string.replace(' color kod', '') + '[/COLOR]'
-    if 'color' in string:
-        color = scrapertools.find_single_match(string, 'color ([a-z]+)')
-        string = '[COLOR ' + color + ']' + re.sub(r'\scolor\s([a-z]+)','',string) + '[/COLOR]'
-    if 'bold' in string:
-        string = '[B]' + string.replace(' bold', '').strip() + '[/B]'
-    if 'italic' in string:
-        string = '[I]' + string.replace(' italic', '').strip() + '[/I]'
-    if '_' in string:
-        string = ' ' + string.replace(' _', '').strip()
-    if '--' in string:
-        string = ' - ' + string.replace(' --', '').strip()
-    if 'bullet' in string:
-        if VLT:
-            string = '[B]' + "•" + '[/B] ' + string.replace(' bullet', '').strip()
-        else:
-            string = string.replace(' bullet', '').strip()
-    if '{}' in string:
-        string = string.replace(' {}', '').strip()
-    # string = string.strip()
+
+    if not typography and '{' in string:
+        typography = string.split('{')[1].strip(' }').lower()
+        string = string.replace('{' + typography + '}','').strip()
+    else:
+        string = string.strip()
+        typography.lower()
+
+
+    if 'capitalize' in typography:
+        string = string.capitalize()
+    if 'uppercase' in typography:
+        string = string.upper()
+    if 'lowercase' in typography:
+        string = string.lower()
+    if '[]' in typography:
+        string = '[' + string + ']'
+    if '()' in typography:
+        string = '(' + string + ')'
+    if 'submenu' in typography:
+        if VLT: string = "•• " + string
+        else: string = string
+    if 'color kod' in typography:
+        string = '[COLOR ' + kod_color + ']' + string + '[/COLOR]'
+    elif 'color' in typography:
+        color = scrapertools.find_single_match(typography, 'color ([a-zA-Z0-9]+)')
+        string = '[COLOR ' + color + ']' + string + '[/COLOR]'
+    if 'bold' in typography:
+        string = '[B]' + string + '[/B]'
+    if 'italic' in typography:
+        string = '[I]' + string + '[/I]'
+    if '_' in typography:
+        string = ' ' + string
+    if '--' in typography:
+        string = ' - ' + string
+    if 'bullet' in typography:
+        if VLT: string = '[B]' + "•" + '[/B] ' + string
+        else: string = string
     return string
 
 
