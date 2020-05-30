@@ -1176,7 +1176,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
     AP, HS = autoplay.get_channel_AP_HS(item)
 
     # Check Links
-    if not AP and (config.get_setting('checklinks') or config.get_setting('checklinks', item.channel)):
+    if not AP and not item.global_search and (config.get_setting('checklinks') or config.get_setting('checklinks', item.channel)):
         if config.get_setting('checklinks', item.channel):
             checklinks_number = config.get_setting('checklinks_number', item.channel)
         elif config.get_setting('checklinks'):
