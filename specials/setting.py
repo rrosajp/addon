@@ -316,8 +316,7 @@ def servers_blacklist(item):
                    "visible": True}
         list_controls.append(control)
 
-    return platformtools.show_channel_settings(list_controls=list_controls, dict_values=dict_values,
-                                               caption=config.get_localized_string(60550), callback="cb_servers_blacklist")
+    return platformtools.show_channel_settings(list_controls=list_controls, dict_values=dict_values, caption=config.get_localized_string(60550), callback="cb_servers_blacklist")
 
 
 def cb_servers_blacklist(item, dict_values):
@@ -331,7 +330,7 @@ def cb_servers_blacklist(item, dict_values):
         else:
             config.set_setting("black_list", v, server=k)
             if v:  # If the server is blacklisted it cannot be in the favorites list
-                config.set_setting("favorites_servers_list", 100, server=k)
+                config.set_setting("favorites_servers_list", 0, server=k)
                 f = True
                 progreso.update(old_div((i * 100), n), config.get_localized_string(60559) % k)
         i += 1
@@ -385,6 +384,7 @@ def servers_favorites(item):
 
 def cb_servers_favorites(server_names, dict_values):
     dict_name = {}
+    dict_favorites = {}
     progreso = platformtools.dialog_progress(config.get_localized_string(60557), config.get_localized_string(60558))
 
     for i, v in list(dict_values.items()):
@@ -398,11 +398,18 @@ def cb_servers_favorites(server_names, dict_values):
     i = 1
     for server, server_parameters in servers_list:
         if server_parameters['name'] in list(dict_name.keys()):
+            dict_favorites[dict_name[server_parameters['name']]] = server
             config.set_setting("favorites_servers_list", dict_name[server_parameters['name']], server=server)
         else:
             config.set_setting("favorites_servers_list", 0, server=server)
         progreso.update(old_div((i * 100), n), config.get_localized_string(60559) % server_parameters['name'])
         i += 1
+    c = 1
+    favorites_servers_list = []
+    while c in dict_favorites:
+        favorites_servers_list.append(dict_favorites[c])
+        c += 1
+    config.set_setting("favorites_servers_list", favorites_servers_list, 'autoplay')
 
     if not dict_name:  # If there is no server in the list, deactivate it
         config.set_setting("favorites_servers", False)

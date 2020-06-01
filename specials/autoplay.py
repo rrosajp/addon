@@ -22,6 +22,13 @@ autoplay_node = {}
 
 colorKOD = '0xFF65B3DA'
 
+default_quality_list = ['4k', '2k',
+                        'fullhd', 'fullhd 1080', 'fullhd 1080p', 'full hd', 'full hd 1080', 'full hd 1080p', 'hd1080', 'hd1080p', 'hd 1080', 'hd 1080p', '1080', '1080p',
+                        'hd', 'hd720', 'hd720p', 'hd 720', 'hd 720p', '720', '720p', 'hdtv',
+                        'sd', '480p', '480',
+                        '360p', '360',
+                        '240p', '240']
+
 
 def context():
     '''
@@ -100,7 +107,7 @@ def start(itemlist, item):
 
     base_item = item
 
-    
+
     if not config.is_xbmc():
         # platformtools.dialog_notification('AutoPlay ERROR', 'Sólo disponible para XBMC/Kodi')
         return itemlist
@@ -108,6 +115,7 @@ def start(itemlist, item):
     if not autoplay_node:
         # Get AUTOPLAY node from json
         autoplay_node = jsontools.get_node_from_file('autoplay', 'AUTOPLAY')
+        general_settings_node = jsontools.get_node_from_file('autoplay', 'settings')
 
     channel_id = item.channel
     if item.channel == 'videolibrary':
@@ -145,8 +153,9 @@ def start(itemlist, item):
         user_config_setting_action = config.get_setting("default_action")
         user_config_setting_player = config.get_setting("player_mode")
         # Enable the "View in high quality" action (if the server returns more than one quality, eg gdrive)
-        if user_config_setting_action != 2:
-            config.set_setting("default_action", 2)
+        if not user_config_setting_action:
+            select = platformtools.dialog_select(config.get_localized_string(707417),[config.get_localized_string(30007),config.get_localized_string(30008)])
+            config.set_setting("default_action", select + 1)
         if user_config_setting_player != 0:
             config.set_setting("player_mode", 0)
 
@@ -179,10 +188,17 @@ def start(itemlist, item):
             quality_list =['default']
 
         # The texts of each server and quality are stored in lists, e.g. favorite_servers = ['verystream', 'openload', 'streamcloud']
-        for num in range(1, 4):
-            favorite_servers.append(channel_node['servers'][settings_node['server_%s' % num]].lower())
-            favorite_quality.append(channel_node['quality'][settings_node['quality_%s' % num]])
-
+        # from core.support import dbg;dbg()
+        if get_setting('autoplay') and 'favorites_servers_list' in general_settings_node:
+            favorite_servers = general_settings_node['favorites_servers_list']
+            if get_setting('default_action') == 1:
+                default_quality_list.reverse()
+            favorite_quality = default_quality_list
+        else:
+            for num in range(1, 4):
+                favorite_servers.append(channel_node['servers'][settings_node['server_%s' % num]].lower())
+                favorite_quality.append(channel_node['quality'][settings_node['quality_%s' % num]].lower())
+        logger.info('LISTA Q: '+ str(get_setting('default_action')) + str(favorite_quality))
         # Itemlist links are filtered and correspond to autoplay values
         for n, item in enumerate(itemlist):
             autoplay_elem = dict()
@@ -212,15 +228,14 @@ def start(itemlist, item):
             if priority < 2:  # 0: Servers and qualities or 1: Qualities and servers
 
                 # if the server and the quality are not in the favorites lists or the url is repeated, we discard the item
-                if item.server.lower() not in favorite_servers or item.quality not in favorite_quality \
-                        or item.url in url_list_valid:
+                if item.server.lower() not in favorite_servers or item.quality.lower() not in favorite_quality or item.url in url_list_valid:
                     item.type_b = True
                     b_dict['videoitem']= item
                     autoplay_b.append(b_dict)
                     continue
                 autoplay_elem["indice_lang"] = favorite_langs.index(item.language)
                 autoplay_elem["indice_server"] = favorite_servers.index(item.server.lower())
-                autoplay_elem["indice_quality"] = favorite_quality.index(item.quality)
+                autoplay_elem["indice_quality"] = favorite_quality.index(item.quality.lower())
 
             elif priority == 2:  # Servers only
 
@@ -242,7 +257,7 @@ def start(itemlist, item):
                     autoplay_b.append(b_dict)
                     continue
                 autoplay_elem["indice_lang"] = favorite_langs.index(item.language)
-                autoplay_elem["indice_quality"] = favorite_quality.index(item.quality)
+                autoplay_elem["indice_quality"] = favorite_quality.index(item.quality.lower())
 
             else:  # Do not order
 
@@ -370,7 +385,7 @@ def start(itemlist, item):
             platformtools.dialog_notification("AutoPlay", config.get_localized_string(60076), sound=False)
 
         # Restore if necessary the previous value of "Action and Player Mode" in preferences
-        if user_config_setting_action != 2:
+        if not user_config_setting_action:
             config.set_setting("default_action", user_config_setting_action)
         if user_config_setting_player != 0:
             config.set_setting("player_mode", user_config_setting_player)
