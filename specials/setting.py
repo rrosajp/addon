@@ -368,7 +368,7 @@ def servers_favorites(item):
         if orden > 0:
             dict_values[orden] = len(server_names) - 1
 
-    for x in range(1, 6):
+    for x in range(1, 11):
         control = {'id': x,
                    'type': "list",
                    'label': config.get_localized_string(60597) % x,
@@ -404,6 +404,7 @@ def cb_servers_favorites(server_names, dict_values):
             config.set_setting("favorites_servers_list", 0, server=server)
         progreso.update(old_div((i * 100), n), config.get_localized_string(60559) % server_parameters['name'])
         i += 1
+
     c = 1
     favorites_servers_list = []
     while c in dict_favorites:

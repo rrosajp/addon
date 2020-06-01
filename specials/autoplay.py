@@ -189,7 +189,7 @@ def start(itemlist, item):
 
         # The texts of each server and quality are stored in lists, e.g. favorite_servers = ['verystream', 'openload', 'streamcloud']
         # from core.support import dbg;dbg()
-        if get_setting('autoplay') and 'favorites_servers_list' in general_settings_node:
+        if get_setting('autoplay') and 'favorites_servers_list' in general_settings_node and get_setting('favorites_servers'):
             favorite_servers = general_settings_node['favorites_servers_list']
             if get_setting('default_action') == 1:
                 default_quality_list.reverse()
