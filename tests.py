@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import sys
 import unittest
@@ -6,7 +7,7 @@ import parameterized
 from platformcode import config
 librerias = os.path.join(config.get_runtime_path(), 'lib')
 sys.path.insert(0, librerias)
-
+from core.support import typo
 from core.item import Item
 import channelselector
 
@@ -50,6 +51,9 @@ class GenericChannelTest(unittest.TestCase):
             self.assertTrue(itemlist, 'channel ' + self.ch + ' -> ' + it.title + ' is empty')
             for resIt in itemlist:
                 self.assertLess(len(resIt.fulltitle), 100, 'channel ' + self.ch + ' -> ' + it.title + ' might contain wrong titles\n' + resIt.fulltitle)
+                if resIt.title == typo(config.get_localized_string(30992), 'color kod bold'):  # next page
+                    nextPageItemlist = getattr(self.module, resIt.action)(resIt)
+                    self.assertTrue(nextPageItemlist, 'channel ' + self.ch + ' -> ' + it.title + ' has nextpage not working')
         self.assertTrue(hasChannelConfig, 'channel ' + self.ch + ' has no channel config')
         self.assertTrue(hasAutoplayConfig, 'channel ' + self.ch + ' has not autoplay config')
 
