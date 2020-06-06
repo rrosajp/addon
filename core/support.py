@@ -787,8 +787,8 @@ def menu(func):
             menuItem(itemlist, filename, config.get_localized_string(70741) % '… {bold}', 'search', host + dictUrl['search'], style=not global_search)
 
         if not global_search:
-            autoplay.init(item.channel, list_servers, list_quality)
-            autoplay.show_option(item.channel, itemlist)
+            # autoplay.init(item.channel, list_servers, list_quality)
+            # autoplay.show_option(item.channel, itemlist)
             channel_config(item, itemlist)
 
             # Apply auto Thumbnails at the menus
@@ -1183,10 +1183,10 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         addQualityTag(item, verifiedItemlist, data, patronTag)
 
     # Auto Play & Hide Links
-    AP, HS = autoplay.get_channel_AP_HS(item)
+    AP = config.get_setting('autoplay')
 
     # Check Links
-    if not AP and not item.global_search and (config.get_setting('checklinks') or config.get_setting('checklinks', item.channel)):
+    if not item.global_search and (config.get_setting('checklinks') or config.get_setting('checklinks', item.channel)):
         if config.get_setting('checklinks', item.channel):
             checklinks_number = config.get_setting('checklinks_number', item.channel)
         elif config.get_setting('checklinks'):
@@ -1200,10 +1200,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         videolibrary(verifiedItemlist, item, function_level=3)
     if Download:
         download(verifiedItemlist, item, function_level=3)
-
-    if not AP or not HS:
-        # for it in verifiedItemlist:
-        #     log(it)
+    if item.contentChannel == 'videolibrary' or not config.get_setting('autoplay') or not config.get_setting('hide_servers'):
         return verifiedItemlist
 
 
@@ -1215,12 +1212,12 @@ def filterLang(item, itemlist):
         itemlist = filtertools.get_links(itemlist, item, list_language)
     return itemlist
 
-def aplay(item, itemlist, list_servers='', list_quality=''):
-    if inspect.stack()[1][3] == 'mainlist':
-        autoplay.init(item.channel, list_servers, list_quality)
-        autoplay.show_option(item.channel, itemlist)
-    else:
-        autoplay.start(itemlist, item)
+# def aplay(item, itemlist, list_servers='', list_quality=''):
+#     if inspect.stack()[1][3] == 'mainlist':
+#         autoplay.init(item.channel, list_servers, list_quality)
+#         autoplay.show_option(item.channel, itemlist)
+#     else:
+#         autoplay.start(itemlist, item)
 
 
 def log(*args):

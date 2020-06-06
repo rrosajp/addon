@@ -320,6 +320,7 @@ def servers_blacklist(item):
 
 
 def cb_servers_blacklist(item, dict_values):
+    blaklisted = []
     f = False
     progreso = platformtools.dialog_progress(config.get_localized_string(60557), config.get_localized_string(60558))
     n = len(dict_values)
@@ -331,10 +332,11 @@ def cb_servers_blacklist(item, dict_values):
             config.set_setting("black_list", v, server=k)
             if v:  # If the server is blacklisted it cannot be in the favorites list
                 config.set_setting("favorites_servers_list", 0, server=k)
+                blaklisted.append(k)
                 f = True
                 progreso.update(old_div((i * 100), n), config.get_localized_string(60559) % k)
         i += 1
-
+    config.set_setting("black_list", blaklisted, server='servers')
     if not f:  # If there is no server in the list, deactivate it
         config.set_setting('filter_servers', False)
 
@@ -410,7 +412,7 @@ def cb_servers_favorites(server_names, dict_values):
     while c in dict_favorites:
         favorites_servers_list.append(dict_favorites[c])
         c += 1
-    config.set_setting("favorites_servers_list", favorites_servers_list, 'autoplay')
+    config.set_setting("favorites_servers_list", favorites_servers_list, server='servers')
 
     if not dict_name:  # If there is no server in the list, deactivate it
         config.set_setting("favorites_servers", False)
