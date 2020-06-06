@@ -158,17 +158,18 @@ def findvideos(data, skip=False):
     for serverid in servers_list:
         '''if not is_server_enabled(serverid):
             continue'''
-        if config.get_setting("filter_servers") == True and config.get_setting("black_list", server=serverid):
-            is_filter_servers = True
+        if config.get_setting('servers_blacklist') and serverid not in config.get_setting("black_list", server='servers'):
+        # if config.get_setting("filter_servers") == True and config.get_setting("black_list", server=serverid):
+        #     is_filter_servers = True
             continue
         devuelve.extend(findvideosbyserver(data, serverid))
         if skip and len(devuelve) >= skip:
             devuelve = devuelve[:skip]
             break
-    if config.get_setting("filter_servers") == False:  is_filter_servers = False
-    if not devuelve and is_filter_servers:
-        platformtools.dialog_ok(config.get_localized_string(60000), config.get_localized_string(60001))
-
+    # if config.get_setting("filter_servers") == False:  is_filter_servers = False
+    # logger.info('DEVUELVE: ' + str(devuelve))
+    # if not devuelve and is_filter_servers:
+    #     platformtools.dialog_ok(config.get_localized_string(60000), config.get_localized_string(60001))
     return devuelve
 
 

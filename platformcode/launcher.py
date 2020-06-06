@@ -492,7 +492,7 @@ def play_from_library(item):
 
         itemlist = videolibrary.findvideos(item)
 
-        if check_next_ep and autoplay.is_active(item.contentChannel):
+        if check_next_ep:
             p_dialog.update(100, '')
             sleep(0.5)
             p_dialog.close()
