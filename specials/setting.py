@@ -348,12 +348,19 @@ def servers_favorites(item):
     dict_values = {}
 
     list_controls = [{'id': 'favorites_servers',
-                      'type': "bool",
+                      'type': 'bool',
                       'label': config.get_localized_string(60577),
                       'default': False,
                       'enabled': True,
+                      'visible': True},
+                     {'id': 'quality_priority',
+                      'type': 'bool',
+                      'label': config.get_localized_string(30069),
+                      'default': False,
+                      'enabled': 'eq(-1,True)',
                       'visible': True}]
     dict_values['favorites_servers'] = config.get_setting('favorites_servers')
+    dict_values['quality_priority'] = config.get_setting('quality_priority')
     if dict_values['favorites_servers'] == None:
         dict_values['favorites_servers'] = False
 
@@ -368,15 +375,15 @@ def servers_favorites(item):
         orden = config.get_setting("favorites_servers_list", server=server)
 
         if orden > 0:
-            dict_values[orden] = len(server_names) - 1
+            dict_values[orden] = len(server_names) - 2
 
-    for x in range(1, 11):
+    for x in range(2, 12):
         control = {'id': x,
-                   'type': "list",
+                   'type': 'list',
                    'label': config.get_localized_string(60597) % x,
                    'lvalues': server_names,
                    'default': 0,
-                   'enabled': "eq(-%s,True)" % x,
+                   'enabled': 'eq(-%s,True)' % x,
                    'visible': True}
         list_controls.append(control)
 
@@ -392,6 +399,8 @@ def cb_servers_favorites(server_names, dict_values):
     for i, v in list(dict_values.items()):
         if i == "favorites_servers":
             config.set_setting("favorites_servers", v)
+        if i == "quality_priority":
+            config.set_setting("quality_priority", v)
         elif int(v) > 0:
             dict_name[server_names[v]] = int(i)
 
