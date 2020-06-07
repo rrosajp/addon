@@ -102,4 +102,4 @@ def newest(categoria):
 
 def findvideos(item):
     support.log('findvideos', item)
-    return support.server(item, headers=headers)
+    return support.server(item, support.match(item, patron='<ul class="playernav">.*?</ul>', headers=headers).match)
