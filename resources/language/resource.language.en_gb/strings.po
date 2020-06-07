@@ -223,6 +223,10 @@ msgctxt "#30068"
 msgid "Filter by servers"
 msgstr ""
 
+msgctxt "#30069"
+msgid "Priority to quality"
+msgstr ""
+
 msgctxt "#30100"
 msgid "Settings"
 msgstr ""

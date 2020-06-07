@@ -108,10 +108,14 @@ def start(itemlist, item):
             if 'server' not in item:
                 continue
 
+            if item.server.lower() in blacklisted_servers:
+                continue
+
             # If it does not have a defined quality, it assigns a 'default' quality.
             if item.quality == '':
                 item.quality = 'default'
             # The list for custom settings is created
+
             if priority < 2:  # 0: Servers and qualities or 1: Qualities and servers
 
                 # if the server and the quality are not in the favorites lists or the url is repeated, we discard the item
@@ -152,14 +156,37 @@ def start(itemlist, item):
             # If the item reaches here we add it to the list of valid urls and to autoplay_list
             url_list_valid.append(item.url)
             item.plan_b=True
+
             autoplay_elem['videoitem'] = item
             autoplay_list.append(autoplay_elem)
 
         # We order according to priority
-        if priority == 0: autoplay_list.sort(key=lambda orden: (orden['indice_server'], orden['indice_quality'])) # Servers and qualities
+        if priority == 0: autoplay_list.sort(key=lambda orden: (orden['indice_quality'], orden['indice_server'])) # Servers and qualities
         elif priority == 1: autoplay_list.sort(key=lambda orden: (orden['indice_quality'], orden['indice_server'])) # Qualities and servers
         elif priority == 2: autoplay_list.sort(key=lambda orden: (orden['indice_server'])) # Servers only
         elif priority == 3: autoplay_list.sort(key=lambda orden: (orden['indice_quality'])) # Only qualities
+
+        # if quality priority is active
+        if priority == 0 and config.get_setting('quality_priority'):
+            max_quality = autoplay_list[0]["indice_quality"]
+            for n, item in enumerate(itemlist):
+                if 'server' not in item:
+                    continue
+
+                if item.server.lower() in blacklisted_servers:
+                    continue
+
+                # If it does not have a defined quality, it assigns a 'default' quality.
+                if item.quality == '':
+                    item.quality = 'default'
+
+                if favorite_quality.index(item.quality.lower()) < max_quality:
+                    item.type_b = False
+                    autoplay_elem["indice_server"] = n
+                    autoplay_elem["indice_quality"] = favorite_quality.index(item.quality.lower())
+                    autoplay_elem['videoitem'] = item
+                    autoplay_list.append(autoplay_elem)
+            autoplay_list.sort(key=lambda orden: (orden['indice_quality'], orden['indice_server']))
 
         # Plan b is prepared, in case it is active the non-favorite elements are added at the end
         try: plan_b = settings_node['plan_b']
