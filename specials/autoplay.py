@@ -8,7 +8,8 @@ from builtins import range
 
 import os
 
-from core import channeltools, jsontools
+import xbmcaddon
+from core import channeltools, jsontools, filetools
 from core.item import Item
 from platformcode import config, logger, platformtools, launcher
 from time import sleep
@@ -64,12 +65,15 @@ def start(itemlist, item):
         autoplay_b = []
         favorite_quality = []
 
-        # Get Blacklisted Servers
-        try: blacklisted_servers = config.get_setting('black_list', server='servers')
-        except: blacklisted_servers = []
-        # Get Favourite Servers
-        try: favorite_servers = list(set(config.get_setting('favorites_servers_list', server='servers')) - set(blacklisted_servers))
-        except: favorite_servers = []
+        file_settings = filetools.join(config.get_data_path(), "settings_servers", "servers_data.json")
+        if not filetools.exists(file_settings):
+            config.set_setting('black_list', [], server='servers')
+            config.set_setting('favorites_servers_list', [], server='servers')
+            blacklisted_servers = []
+            favorite_servers = []
+        else:
+            blacklisted_servers = config.get_setting('black_list', server='servers')
+            favorite_servers = list(set(config.get_setting('favorites_servers_list', server='servers')) - set(blacklisted_servers))
 
         # Save the current value of "Action and Player Mode" in preferences
         user_config_setting_action = config.get_setting("default_action")
