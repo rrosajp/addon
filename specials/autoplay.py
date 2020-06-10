@@ -1,27 +1,13 @@
 # -*- coding: utf-8 -*-
 
-#from builtins import str
-import sys
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
-from builtins import range
-
-import os
-
-import xbmcaddon
-from core import channeltools, jsontools, filetools
+from core import filetools
 from core.item import Item
-from platformcode import config, logger, platformtools, launcher
+from platformcode import config, logger, platformtools
 from time import sleep
-from platformcode.config import get_setting
 
 __channel__ = "autoplay"
 
 PLAYED = False
-
-autoplay_node = {}
-
-colorKOD = '0xFF65B3DA'
 
 quality_list = ['4k', '2k',
                 'fullhd', 'fullhd 1080', 'fullhd 1080p', 'full hd', 'full hd 1080', 'full hd 1080p', 'hd1080', 'hd1080p', 'hd 1080', 'hd 1080p', '1080', '1080p',
@@ -59,7 +45,7 @@ def start(itemlist, item):
         channel_id = item.contentChannel
 
 
-    if get_setting('autoplay'): 
+    if config.get_setting('autoplay'):
         url_list_valid = []
         autoplay_list = []
         autoplay_b = []
@@ -90,17 +76,16 @@ def start(itemlist, item):
         #       2: Servers only
         #       3: Only qualities
         #       4: Do not order
-        if config.get_setting('favorites_servers') and favorite_servers and config.get_setting('default_action'): # (settings_node['custom_servers'] and settings_node['custom_quality']) or get_setting('autoplay'):
+        if config.get_setting('favorites_servers') and favorite_servers and config.get_setting('default_action'):
             priority = 0  # 0: Servers and qualities or 1: Qualities and servers
-        elif config.get_setting('favorites_servers') and favorite_servers: # settings_node['custom_servers']:
+        elif config.get_setting('favorites_servers') and favorite_servers:
             priority = 2  # Servers only
-        elif config.get_setting('default_action'): # settings_node['custom_quality']:
+        elif config.get_setting('default_action'):
             priority = 3  # Only qualities
         else:
             priority = 4  # Do not order
 
-        # from core.support import dbg;dbg()
-        if get_setting('default_action') == 1:
+        if config.get_setting('default_action') == 1:
             quality_list.reverse()
         favorite_quality = quality_list
 
@@ -201,7 +186,6 @@ def start(itemlist, item):
 
         if autoplay_list or (plan_b and autoplay_b):
 
-            # played = False
             max_intentos = 5
             max_intentos_servers = {}
 
@@ -292,7 +276,7 @@ def play_multi_channel(item, itemlist):
     video_dict = dict()
 
     for video_item in itemlist:
-        if get_setting('autoplay'):
+        if config.get_setting('autoplay'):
             if video_item.contentChannel not in video_dict.keys():
                 video_dict[video_item.contentChannel] = [video_item]
             else:
