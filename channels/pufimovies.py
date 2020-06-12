@@ -77,7 +77,7 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            support.log({0}.format(line))
+            support.logger.error("%s" % line)
         return []
 
     return itemlist

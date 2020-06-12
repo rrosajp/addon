@@ -34,8 +34,6 @@ headers = [['Referer', host]]
 
 def mainlist(item):
     logger.info('[filmsenzalimiticc.py] mainlist')
-    
-    autoplay.init(item.channel, list_servers, list_quality) # Necessario per Autoplay
 
     # Menu Principale
     itemlist = [Item(channel=item.channel,
@@ -66,8 +64,6 @@ def mainlist(item):
                      title='[B]Cerca... (non funziona)[/B]',
                      thumbnail='')
                 ]
-    
-    autoplay.show_option(item.channel, itemlist) # Necessario per Autoplay (Menu Configurazione)
     
     return itemlist
     

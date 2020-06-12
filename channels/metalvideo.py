@@ -38,8 +38,6 @@ def mainlist(item):
                 action='search',
                 thumbnail=support.thumb(thumb='search.png')))
 
-        support.autoplay.init(item.channel, list_servers, list_quality)
-        support.autoplay.show_option(item.channel, itemlist)
         support.channel_config(item, itemlist)
         return itemlist
     return locals()

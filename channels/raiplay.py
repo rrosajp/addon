@@ -83,14 +83,14 @@ def submenu(item):
 
 def replay_menu(item):
     support.log()
-    import datetime, xbmc
+    import datetime
 
     # create day and month list
     days = []
     months = []
-    days.append(xbmc.getLocalizedString(17))
-    for day in range(11, 17): days.append(xbmc.getLocalizedString(day))
-    for month in range(21, 33): months.append(xbmc.getLocalizedString(month))
+    days.append(support.config.get_localized_string(17))
+    for day in range(11, 17): days.append(support.config.get_localized_string(day))
+    for month in range(21, 33): months.append(support.config.get_localized_string(month))
 
     # make menu
     itemlist = []

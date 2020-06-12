@@ -58,7 +58,7 @@ def peliculas(item):
         # support.regexDbg(item, patron, headers)
     else:
         patronNext = r'<a class="nextpostslink" rel="next" href="([^"]+)">'
-        patron = r'<div class="mediaWrap mediaWrapAlt">\s?<a href="(?P<url>[^"]+)"(?:[^>]+>|)>?\s?<img[^s]+src="([^"]+)"[^>]+>\s?<\/a>[^>]+>[^>]+>[^>]+>(?P<title>.+?)(?:[ ]<lang>[sSuUbB\-iItTaA]+)?(?:[ ]?\((?P<year>[\-\d+]+)\)).[^<]+[^>]+><\/a>.+?<p>\s*(?P<quality>[a-zA-Z-0-9\.]+)\s*<\/p>[^>]+>'
+        patron = r'<div class="mediaWrap mediaWrapAlt">\s?<a href="(?P<url>[^"]+)"(?:[^>]+>|)>?\s?<img[^s]+src="([^"]+)"[^>]+>\s?<\/a>[^>]+>[^>]+>[^>]+>(?P<title>.+?)(?:[ ]<lang>[sSuUbB\-iItTaA]+)?(?:[ ]?\((?P<year>\d+)[\-\d+]+)\).[^<]+[^>]+><\/a>.+?<p>\s*(?P<quality>[a-zA-Z-0-9\.]+)\s*<\/p>[^>]+>'
         patronBlock = r'<div id="main_col">(?P<block>.*?)<!\-\- main_col \-\->'
 
     # if item.args != 'all' and item.args != 'search':

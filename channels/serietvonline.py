@@ -64,6 +64,7 @@ def peliculas(item):
     blacklist = ['DMCA', 'Contatti', 'Attenzione NON FARTI OSCURARE', 'Lista Cartoni Animati e Anime']
     patronBlock = r'<h1>.+?</h1>(?P<block>.*?)<div class="footer_c">'
     patronNext = r'<div class="siguiente"><a href="([^"]+)" >'
+    # debug = True
 
     if item.args == 'search':
         patronBlock = r'>Lista Serie Tv</a></li></ul></div><div id="box_movies">(?P<block>.*?)<div id="paginador">'
