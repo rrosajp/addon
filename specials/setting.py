@@ -375,7 +375,7 @@ def servers_favorites(item):
         orden = config.get_setting("favorites_servers_list", server=server)
 
         if orden > 0:
-            dict_values[orden] = len(server_names) - 2
+            dict_values[orden] = len(server_names) - 1
 
     for x in range(2, 12):
         control = {'id': x,
@@ -399,7 +399,7 @@ def cb_servers_favorites(server_names, dict_values):
     for i, v in list(dict_values.items()):
         if i == "favorites_servers":
             config.set_setting("favorites_servers", v)
-        if i == "quality_priority":
+        elif i == "quality_priority":
             config.set_setting("quality_priority", v)
         elif int(v) > 0:
             dict_name[server_names[v]] = int(i)
@@ -416,7 +416,7 @@ def cb_servers_favorites(server_names, dict_values):
         progreso.update(old_div((i * 100), n), config.get_localized_string(60559) % server_parameters['name'])
         i += 1
 
-    c = 1
+    c = 2
     favorites_servers_list = []
     while c in dict_favorites:
         favorites_servers_list.append(dict_favorites[c])

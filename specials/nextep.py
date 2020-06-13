@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-import xbmc, xbmcgui
+import xbmc, xbmcgui, os
 from platformcode import config, platformtools
 from time import time, sleep
 from core import jsontools, filetools
-from core.support import log
+from core.support import log, dbg
 from core.item import Item
 from platformcode.launcher import play_from_library
 
@@ -50,6 +50,7 @@ def videolibrary(item):
 
 def next_ep(item):
     log()
+
     condition = config.get_setting('next_ep')
     item.next_ep = False
     item.show_server = True
@@ -79,7 +80,6 @@ def next_ep(item):
         if condition == 1: # hide server afther x second
             item.show_server = False
         elif condition == 2: # play next file if exist
-
             # check if next file exist
             current_filename = filetools.basename(item.strm_path)
             base_path = filetools.basename(filetools.dirname(item.strm_path))
@@ -112,7 +112,7 @@ def next_ep(item):
                     contentTitle= next_ep,
                     contentType= 'episode',
                     infoLabels= {'episode': episode, 'mediatype': 'episode', 'season': season, 'title': next_ep},
-                    strm_path= filetools.join(base_path, next_file))
+                    strm_path= os.sep + filetools.join(base_path, next_file))
 
                 global INFO
                 INFO = filetools.join(path, next_file.replace("strm", "nfo"))
