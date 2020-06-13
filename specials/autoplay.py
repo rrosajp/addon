@@ -51,15 +51,16 @@ def start(itemlist, item):
         autoplay_b = []
         favorite_quality = []
 
-        file_settings = filetools.join(config.get_data_path(), "settings_servers", "servers_data.json")
-        if not filetools.exists(file_settings):
+        blacklisted_servers = config.get_setting('black_list', server='servers')
+        if not blacklisted_servers:
             config.set_setting('black_list', [], server='servers')
-            config.set_setting('favorites_servers_list', [], server='servers')
             blacklisted_servers = []
+        favorite_servers = config.get_setting('favorites_servers_list', server='servers')
+        if not favorite_servers:
+            config.set_setting('favorites_servers_list', [], server='servers')
             favorite_servers = []
         else:
-            blacklisted_servers = config.get_setting('black_list', server='servers')
-            favorite_servers = list(set(config.get_setting('favorites_servers_list', server='servers')) - set(blacklisted_servers))
+            favorite_servers = list(set(favorite_servers) - set(blacklisted_servers))
 
         # Save the current value of "Action and Player Mode" in preferences
         user_config_setting_action = config.get_setting("default_action")

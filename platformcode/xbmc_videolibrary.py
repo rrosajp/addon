@@ -25,7 +25,7 @@ def mark_auto_as_watched(item):
                 vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_movies")))
                 path = '%s [%s]' % (item.contentTitle, item.infoLabels['IMDBNumber'])
                 item.nfo = filetools.join(vl, path, path + '.nfo')
-                item.strm_path = filetools.join(path, item.contentTitle + '.strm')
+                if not item.strm_path: item.strm_path = filetools.join(path, item.contentTitle + '.strm')
             else:
                 vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows")))
                 path = '%s [%s]' % (item.contentSerieName, item.infoLabels['IMDBNumber'])
@@ -35,7 +35,7 @@ def mark_auto_as_watched(item):
                 else:
                     season, episode = scrapertools.find_single_match(item.title, r'(\d+)x(\d+)')
                     title = season + 'x' + episode.zfill(2)
-                item.strm_path = filetools.join(path, title + '.strm')
+                if not item.strm_path: item.strm_path = filetools.join(path, title + '.strm')
         condicion = config.get_setting("watched_setting", "videolibrary")
 
         time_limit = time.time() + 30
