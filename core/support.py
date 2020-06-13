@@ -128,7 +128,8 @@ def regexDbg(item, patron, headers, data=''):
 
         if not data:
             html = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data.replace("'", '"')
-            html = re.sub('\n|\t', ' ', html)
+            html = html.replace('\n', ' ')
+            html = html.replace('\t', ' ')
         else:
             html = data
         headers = {'content-type': 'application/json'}
@@ -167,6 +168,14 @@ def cleantitle(title):
     title = scrapertools.decodeHtmlentities(title)
     cleantitle = title.replace('"', "'").replace('×', 'x').replace('–', '-').strip()
     return cleantitle
+
+def unifyEp(ep):
+    # ep = re.sub(r'\s-\s|-|&#8211;|&#215;|×', 'x', scraped['episode'])
+    ep = ep.replace('-', 'x')
+    ep = ep.replace('&#8211;', 'x')
+    ep = ep.replace('&#215;', 'x')
+    ep = ep.replace('×', 'x')
+    return ep
 
 def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang, sceneTitle):
     itemlist = []
@@ -216,10 +225,10 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
         if scraped['season']:
             stagione = scraped['season']
-            ep = re.sub(r'\s-\s|-|x|&#8211|&#215;|×', 'x', scraped['episode'])
+            ep = unifyEp(scraped['episode'])
             if 'x' in ep:
-                episode = ep.split('x')[0]
-                second_episode = ep.split('x')[1]
+                episode = ep.split('x')[0].strip()
+                second_episode = ep.split('x')[1].strip()
             else:
                 episode = ep
                 second_episode = ''
@@ -234,7 +243,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             item.news = 'season_completed'
             episode = ''
         else:
-            episode = re.sub(r'\s-\s|-|x|&#8211|&#215;|×', 'x', scraped['episode']) if scraped['episode'] else ''
+            episode = unifyEp(scraped['episode']) if scraped['episode'] else ''
             if 'x' in episode:
                 ep = episode.split('x')
                 episode = str(int(ep[0])).zfill(1) + 'x' + str(int(ep[1])).zfill(2)
@@ -434,7 +443,8 @@ def scrape(func):
             if not data:
                 page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True)
                 data = page.data.replace("'", '"')
-                data = re.sub('\n|\t', ' ', data)
+                data = data.replace('\n', ' ')
+                data = data.replace('\t', ' ')
                 data = re.sub(r'>\s+<', '> <', data)
                 # replace all ' with " and eliminate newline, so we don't need to worry about
             scrapingTime = time()
@@ -915,8 +925,9 @@ def match(item_url_string, **args):
         data = httptools.downloadpage(url, **args).data.replace("'", '"')
 
     # format page data
-    data = re.sub(r'\n|\t', ' ', data)
-    data = re.sub(r'>\s\s*<', '><', data)
+    data = data.replace('\n', ' ')
+    data = data.replace('\t', ' ')
+    data = re.sub(r'>\s+<', '><', data)
 
     # collect blocks of a page
     if patronBlock:
@@ -1102,7 +1113,7 @@ def nextPage(itemlist, item, data='', patron='', function_or_level=1, next_page=
         if resub: next_page = re.sub(resub[0], resub[1], next_page)
         if 'http' not in next_page:
             next_page = scrapertools.find_single_match(item.url, 'https?://[a-z0-9.-]+') + (next_page if next_page.startswith('/') else '/' + next_page)
-        next_page = re.sub('&amp;', '&',next_page)
+        next_page = next_page.replace('&amp;', '&')
         log('NEXT= ', next_page)
         itemlist.append(
             Item(channel=item.channel,
