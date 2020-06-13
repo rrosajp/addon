@@ -14,8 +14,8 @@ from xml.dom import minidom
 host = 'https://metalvideo.com'
 headers={'X-Requested-With': 'XMLHttpRequest'}
 
-list_servers = ['youtube']
-list_quality = ['default']
+
+
 
 @support.scrape
 def mainlist(item):

@@ -17,8 +17,8 @@ from platformcode import config
 host = config.get_channel_url()
 headers = [['Referer', host]]
 
-list_servers = ['mixdrop,vudeo,doodstream,onlystream']
-list_quality = ['default']
+
+
 
 @support.menu
 def mainlist(item):

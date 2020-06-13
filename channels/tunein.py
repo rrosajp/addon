@@ -13,8 +13,8 @@ from xml.dom import minidom
 
 host = 'http://api.radiotime.com'
 headers = [['Referer', host]]
-list_servers = ['directo']
-list_quality = ['default']
+
+
 
 @support.scrape
 def mainlist(item):

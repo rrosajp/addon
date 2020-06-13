@@ -15,8 +15,8 @@ headers = ""
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
-list_servers = ['wstream']
-list_quality = ['1080p', 'HD', 'SD', 'CAM']
+
+
 
 
 @support.menu

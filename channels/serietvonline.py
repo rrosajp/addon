@@ -28,8 +28,8 @@ def findhost():
 host = config.get_channel_url(findhost)
 headers = [['Referer', host]]
 
-list_servers = ['akvideo', 'wstream', 'backin', 'vidtome', 'nowvideo']
-list_quality = ['default']
+
+
 
 
 @support.menu

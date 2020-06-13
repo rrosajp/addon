@@ -19,8 +19,8 @@ def findhost():
 
 host = config.get_channel_url(findhost)
 headers = [['Referer', host]]
-list_servers = ['verystream', 'openload', 'streamango', 'vidlox', 'youtube']
-list_quality = ['default']
+
+
 
 
 @support.menu

@@ -11,8 +11,8 @@ la lista delle pagine non sarà affatto 'uniforme' (a seconda di come viene pres
 
 host = config.get_channel_url()
 headers = [['Referer', 'org.telegram.messenger']]
-list_servers = ['directo']
-list_quality = ['default']
+
+
 
 downPrefix = 'https://stsh.ml/Down-'
 

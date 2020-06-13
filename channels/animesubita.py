@@ -9,8 +9,8 @@ from core import support
 host = support.config.get_channel_url()
 headers = {'Upgrade-Insecure-Requests': '1', 'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0'}
 
-list_servers = ['directo']
-list_quality = ['default']
+
+
 
 
 @support.menu

@@ -13,8 +13,8 @@ else:
     from urllib import unquote
 
 
-list_servers = ['verystream', 'openload', 'wstream']
-list_quality = ['1080p', 'HD', 'DVDRIP', 'SD', 'CAM']
+
+
 
 def findhost():
     data = httptools.downloadpage('https://www.popcornstream-nuovo-indirizzo.online/').data

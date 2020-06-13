@@ -17,8 +17,8 @@ headers = [['Referer', host]]
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
-list_servers = ['gounlimited', 'rapidgator', 'uploadedto', 'vidtome']
-list_quality = ['default']
+
+
 
 @support.menu
 def mainlist(item):

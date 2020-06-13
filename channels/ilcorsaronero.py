@@ -15,8 +15,8 @@ support.log('HOST',host)
 # host = 'https://ilcorsaronero.xyz'
 headers = [['Referer', host]]
 
-list_servers = ['torrent']
-list_quality = ['default']
+
+
 
 @support.menu
 def mainlist(item):

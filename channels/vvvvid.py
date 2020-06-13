@@ -30,8 +30,8 @@ except:
 
 main_host = host
 host += '/vvvvid/ondemand/'
-list_servers = ['vvvvid']
-list_quality = ['default']
+
+
 
 @support.menu
 def mainlist(item):

@@ -13,8 +13,8 @@ host = config.get_channel_url()
 
 headers = [['Accept', 'application/ld+json']]
 
-list_servers = ['directo']
-list_quality = ['1080p','720p','480p','360p']
+
+
 
 @support.menu
 def mainlist(item):

@@ -21,8 +21,8 @@ host = config.get_channel_url()
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
-list_servers = ['verystream', 'openload', 'vidlox', 'youtube']
-list_quality = ['default']
+
+
 
 # Necessario per Verifica Link
 checklinks = config.get_setting('checklinks', 'filmsenzalimiticc')

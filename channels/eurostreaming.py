@@ -16,8 +16,8 @@ host = support.config.get_channel_url(findhost)
 headers = [['Referer', host]]
 
 
-list_servers = ['akstream', 'wstream', 'mixdrop', 'vidtome', 'turbovid', 'speedvideo', 'flashx', 'nowvideo', 'deltabit']
-list_quality = ['default']
+
+
 
 @support.menu
 def mainlist(item):

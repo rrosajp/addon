@@ -21,8 +21,8 @@ def findhost():
 host = config.get_channel_url(findhost)
 headers = [['Referer', host]]
 
-list_servers = ['mixdrop', 'akstream', 'wstream', 'backin']
-list_quality = ['HD', 'SD', 'default']
+
+
 
 checklinks = config.get_setting('checklinks', 'cineblog01')
 checklinks_number = config.get_setting('checklinks_number', 'cineblog01')

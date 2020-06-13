@@ -7,8 +7,8 @@ from core import support
 
 host = support.config.get_channel_url()
 
-list_servers = ['directo', 'vvvvid']
-list_quality = ['default']
+
+
 
 
 headers = [['Referer', host]]

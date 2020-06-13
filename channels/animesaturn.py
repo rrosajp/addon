@@ -9,8 +9,8 @@ host = support.config.get_channel_url()
 headers={'X-Requested-With': 'XMLHttpRequest'}
 
 
-list_servers = ['directo', 'fembed', 'animeworld']
-list_quality = ['default', '480p', '720p', '1080p']
+
+
 
 @support.menu
 def mainlist(item):

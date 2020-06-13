@@ -7,8 +7,8 @@ from core import support
 
 host = support.config.get_channel_url()
 
-list_servers = ['mixdrop', 'wstream', 'vupplayer', 'supervideo', 'cloudvideo', 'gounlimited']
-list_quality = ['default','1080p', '720p', '480p', '360p']
+
+
 
 headers = [['Referer', host]]
 

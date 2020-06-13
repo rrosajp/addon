@@ -23,8 +23,8 @@ from platformcode import config
 
 host = config.get_channel_url()
 headers = [['Referer', host]]
-list_servers = ['wstream', 'upstream', 'flashx', 'vidoza', 'vidtome']
-list_quality = ['default']
+
+
 
 
 @support.menu

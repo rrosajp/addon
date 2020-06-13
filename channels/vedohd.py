@@ -13,8 +13,8 @@ headers = ""
 
 IDIOMAS = {'Italiano': 'IT'}
 list_language = IDIOMAS.values()
-list_servers = ['verystream', 'openload', 'streamango', 'wstream']
-list_quality = ['HD', 'SD']
+
+
 
 #esclusione degli articoli 'di servizio'
 blacklist = ['CB01.UNO &#x25b6; TROVA L&#8217;INDIRIZZO UFFICIALE ', 'AVVISO IMPORTANTE – CB01.UNO', 'GUIDA VEDOHD']

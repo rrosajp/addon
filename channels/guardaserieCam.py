@@ -17,8 +17,8 @@ from platformcode import logger, config
 host = config.get_channel_url()
 headers = [['Referer', host]]
 
-list_servers = ['supervideo']
-list_quality = ['default']
+
+
 
 
 @support.menu

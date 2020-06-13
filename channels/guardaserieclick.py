@@ -22,8 +22,8 @@ from core.support import log
 host = config.get_channel_url()
 headers = [['Referer', host]]
 
-list_servers = ['speedvideo', 'openload']
-list_quality = ['default']
+
+
 
 @support.menu
 def mainlist(item):

@@ -11,8 +11,8 @@ __channel__ = "altadefinizione01_link"
 host = config.get_channel_url()
 headers = [['Referer', host]]
 
-list_servers = ['mixdrop', 'vup', 'supervideo']
-list_quality = ['default']
+
+
 
 # =========== home menu ===================
 @support.menu

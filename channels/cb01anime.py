@@ -9,8 +9,8 @@ from core import support
 host = support.config.get_channel_url() + '/cb01-anime-cartoon'
 
 Blacklist = ['AVVISO IMPORTANTE – CB01.ROCKS', 'Lista Alfabetica Completa Anime/Cartoon', 'CB01.UNO ▶ TROVA L’INDIRIZZO UFFICIALE','Lista Richieste Up &amp; Re-Up']
-list_servers = ['verystream', 'openload', 'streamango', 'thevideome']
-list_quality = ['1080p', '720p', '480p', '360']
+
+
 headers = [['Referer', host]]
 
 @support.menu

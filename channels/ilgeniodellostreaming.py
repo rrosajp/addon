@@ -14,8 +14,8 @@ from platformcode import config
 
 host = config.get_channel_url()
 
-list_servers = ['verystream', 'openload', 'streamango']
-list_quality = ['default']
+
+
 
 headers = [['Referer', host]]
 
