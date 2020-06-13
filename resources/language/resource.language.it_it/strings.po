@@ -191,6 +191,10 @@ msgctxt "#30044"
 msgid "Play mode"
 msgstr "Modalità di riproduzione"
 
+msgctxt "#30045"
+msgid "Resume from:"
+msgstr "Riprendi da:"
+
 msgctxt "#30050"
 msgid "Server connection error"
 msgstr "Errore connessione server"

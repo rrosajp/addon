@@ -5,7 +5,7 @@
 from future import standard_library
 standard_library.install_aliases()
 #from builtins import str
-import sys, os, threading, time, re, math, xbmc
+import sys, os, threading, time, re, math, xbmc, xbmcgui
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
@@ -34,36 +34,43 @@ def mark_auto_as_watched(item):
                     title = str(item.contentSeason) + 'x' + str(item.contentEpisodeNumber).zfill(2)
                 else:
                     season, episode = scrapertools.find_single_match(item.title, r'(\d+)x(\d+)')
+                    item.contentSeason = int(season)
+                    item.contentEpisodeNumber = int(episode)
                     title = season + 'x' + episode.zfill(2)
                 if not item.strm_path: item.strm_path = filetools.join(path, title + '.strm')
-        condicion = config.get_setting("watched_setting", "videolibrary")
 
         time_limit = time.time() + 30
         while not platformtools.is_playing() and time.time() < time_limit:
             time.sleep(1)
 
-        sync_with_trakt = False
+        # check if the video hasn't played until the end
+        # load nfo file
+        from core import videolibrarytools
+        if item.contentType == 'movie': nfo_path = item.nfo
+        elif xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows"))) in item.strm_path:
+            nfo_path = item.strm_path.replace('strm','nfo')
+        else:
+            nfo_path = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows"),item.strm_path.replace('strm','nfo')))
+        head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
 
+        #show Window
+        if item_nfo.played_time and (config.get_setting("player_mode") not in [1, 3] or item.play_from == 'window'):
+            while not xbmcgui.getCurrentWindowId() == 12005:
+                time.sleep(1)
+            m, s = divmod(item_nfo.played_time, 60)
+            h, m = divmod(m, 60)
+            if platformtools.dialog_yesno(item.title, '[B]' + config.get_localized_string(30045) +' %02d:%02d:%02d[/B]' % (h, m, s)):
+                xbmc.Player().seekTime(item_nfo.played_time)
+
+        sync_with_trakt = False
         while platformtools.is_playing():
-            tiempo_actual = xbmc.Player().getTime()
+            percentage = config.get_setting("watched_setting") / 100
+            actual_time = xbmc.Player().getTime()
             totaltime = xbmc.Player().getTotalTime()
 
-            mark_time = 0
-            if condicion == 0:  # '5 minutos'
-                mark_time = 300
-            elif condicion == 1:  # '30%'
-                mark_time = totaltime * 0.3
-            elif condicion == 2:  # '50%'
-                mark_time = totaltime * 0.5
-            elif condicion == 3:  # '80%'
-                mark_time = totaltime * 0.8
-            elif condicion == 4:  # '0 seg'
-                mark_time = -1
+            mark_time = totaltime * percentage
 
-            # logger.debug(str(tiempo_actual))
-            # logger.debug(str(mark_time))
-
-            if tiempo_actual > mark_time:
+            if actual_time > mark_time:
                 logger.debug("Marked as Watched")
                 item.playcount = 1
                 sync_with_trakt = True
@@ -71,7 +78,15 @@ def mark_auto_as_watched(item):
                 videolibrary.mark_content_as_watched2(item)
                 break
 
-            time.sleep(5)
+            time.sleep(1)
+
+        # Set played time
+        if not sync_with_trakt and actual_time > 120:
+            played_time = actual_time
+        else:
+            played_time = 0
+        item_nfo.played_time = int(played_time)
+        filetools.write(nfo_path, head_nfo + item_nfo.tojson())
 
         # Silent sync with Trakt
         if sync_with_trakt and config.get_setting("trakt_sync"):
