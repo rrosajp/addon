@@ -158,7 +158,7 @@ def start(itemlist, item):
 
         # if quality priority is active
         if priority == 0 and config.get_setting('quality_priority'):
-            max_quality = autoplay_list[0]["indice_quality"]
+            max_quality = autoplay_list[0]["indice_quality"] if autoplay_list and "indice_quality" in autoplay_list[0] else 0
             for n, item in enumerate(itemlist):
                 if 'server' not in item:
                     continue
