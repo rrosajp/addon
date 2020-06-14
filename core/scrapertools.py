@@ -41,7 +41,7 @@ def printMatches(matches):
 def find_single_match(data, patron, index=0):
     try:
         if index == 0:
-            matches = re.search(patron, data, flags=re.DOTALL)
+            matches = re.search(patron, data, flags=re.DOTALL).groups()
         else:
             matches = re.findall(patron, data, flags=re.DOTALL)
         return matches[index]
