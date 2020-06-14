@@ -70,7 +70,7 @@ class GenericChannelTest(unittest.TestCase):
                 self.assertLess(len(resIt.fulltitle), 100, 'channel ' + self.ch + ' -> ' + it.title + ' might contain wrong titles\n' + resIt.fulltitle)
                 if resIt.url:
                     self.assertIsNotNone(re.match(validUrlRegex, resIt.url), 'channel ' + self.ch + ' -> ' + it.title + ' -> ' + resIt.title + ' might contain wrong url\n' + resIt.url)
-                if 'year' in resIt.infoLabels:
+                if 'year' in resIt.infoLabels and resIt.infoLabels['year']:
                     msgYear = 'channel ' + self.ch + ' -> ' + it.title + ' might contain wrong infolabels year\n' + str(resIt.infoLabels['year'])
                     self.assert_(type(resIt.infoLabels['year']) is int or resIt.infoLabels['year'].isdigit(), msgYear)
                     self.assert_(int(resIt.infoLabels['year']) > 1900 and int(resIt.infoLabels['year']) < 2100, msgYear)

@@ -489,8 +489,8 @@ def scrape(func):
             else:
                 break
 
-        if (pagination and len(matches) <= pag * pagination) or not pagination: # next page with pagination
-            if patronNext and inspect.stack()[1][3] != 'newest':
+        if (pagination and len(matches) <= pag * pagination) or not pagination:  # next page with pagination
+            if patronNext and inspect.stack()[1][3] not in ['newest', 'search']:
                 nextPage(itemlist, item, data, patronNext, function)
 
         # next page for pagination
@@ -1105,6 +1105,7 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
 def nextPage(itemlist, item, data='', patron='', function_or_level=1, next_page='', resub=[]):
     # Function_level is useful if the function is called by another function.
     # If the call is direct, leave it blank
+    log()
     action = inspect.stack()[function_or_level][3] if type(function_or_level) == int else function_or_level
     if next_page == '':
         next_page = scrapertools.find_single_match(data, patron)

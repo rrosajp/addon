@@ -40,7 +40,10 @@ def printMatches(matches):
 
 def find_single_match(data, patron, index=0):
     try:
-        matches = re.findall(patron, data, flags=re.DOTALL)
+        if index == 0:
+            matches = re.search(patron, data, flags=re.DOTALL)
+        else:
+            matches = re.findall(patron, data, flags=re.DOTALL)
         return matches[index]
     except:
         return ""
