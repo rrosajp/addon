@@ -26,9 +26,10 @@ def mainlist(item):
 @support.scrape
 def search(item, texto):
     search = texto
+    # debug = True
     item.contentType = 'tvshow'
     anime = True
-    patron = r'<a href="(?P<url>[^"]+)"[^>]+> <span>(?P<title>[^<\(]+)(?:\s*\((?P<year>\d+)\))?(?:\s*\((?P<lang>[A-Za-z-]+)\))?'
+    patron = r'href="(?P<url>[^"]+)"[^>]*>(?P<title>[^<]+)(?:\((?P<lang>ITA)\))?(?:(?P<year>\((\d+)\)))?</a>.*?<p[^>]+>(?P<plot>[^<]+).*?<img src="(?P<thumbnail>[^"]+)'
     action = 'check'
     return locals()
 
@@ -62,6 +63,7 @@ def menu(item):
 @support.scrape
 def peliculas(item):
     anime = True
+    # debug = True
 
     deflang= 'Sub-ITA'
     action = 'check'
@@ -97,7 +99,7 @@ def peliculas(item):
             if item.args == 'incorso':
                 patron = r'<a href="(?P<url>[^"]+)"[^>]+>(?P<title>[^<(]+)(?:\s*\((?P<year>\d+)\))?(?:\s*\((?P<lang>[A-za-z-]+)\))?</a>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>\s*<img width="[^"]+" height="[^"]+" src="(?P<thumb>[^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>(?P<plot>[^<]+)<'
             else:
-                patron = r'href="(?P<url>[^"]+)"[^>]+>[^>]+>(?P<title>.+?)(?:\((?P<lang>ITA)\))?(?:(?P<year>\((\d+)\)))?</span>'
+                patron = r'href="(?P<url>[^"]+)"[^>]*>(?P<title>[^<]+)(?:\((?P<lang>ITA)\))?(?:(?P<year>\((\d+)\)))?</a>.*?<p[^>]+>(?P<plot>[^<]+).*?<img src="(?P<thumbnail>[^"]+)'
 
     return locals()
 
