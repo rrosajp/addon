@@ -124,7 +124,7 @@ def resume_playback(item):
     head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
 
     # Show Window
-    if (config.get_setting("player_mode") not in [3] or item.play_from == 'window') and item_nfo.played_time > 0:
+    if (config.get_setting("player_mode") not in [3] or item.play_from == 'window') and item_nfo.played_time:
         Dialog = ResumePlayback('ResumePlayback.xml', config.get_runtime_path(), item=item_nfo)
         Dialog.show()
         t = 0
