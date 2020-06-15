@@ -16,57 +16,21 @@ from xml.dom import minidom
 
 
 def mark_auto_as_watched(item):
-    def mark_as_watched_subThread(item):
+    def mark_as_watched_subThread(item, nfo_path, head_nfo, item_nfo):
         logger.info()
         # logger.debug("item:\n" + item.tostring('\n'))
-        # if nfo and strm_path not exist
-        if not item.nfo:
-            if item.contentType == 'movie':
-                vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_movies")))
-                path = '%s [%s]' % (item.contentTitle, item.infoLabels['IMDBNumber'])
-                item.nfo = filetools.join(vl, path, path + '.nfo')
-                if not item.strm_path: item.strm_path = filetools.join(path, item.contentTitle + '.strm')
-            else:
-                vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows")))
-                path = '%s [%s]' % (item.contentSerieName, item.infoLabels['IMDBNumber'])
-                item.nfo = filetools.join(vl, path, 'tvshow.nfo')
-                if item.contentSeason and item.contentEpisodeNumber:
-                    title = str(item.contentSeason) + 'x' + str(item.contentEpisodeNumber).zfill(2)
-                else:
-                    season, episode = scrapertools.find_single_match(item.title, r'(\d+)x(\d+)')
-                    item.contentSeason = int(season)
-                    item.contentEpisodeNumber = int(episode)
-                    title = season + 'x' + episode.zfill(2)
-                if not item.strm_path: item.strm_path = filetools.join(path, title + '.strm')
 
         time_limit = time.time() + 30
         while not platformtools.is_playing() and time.time() < time_limit:
             time.sleep(1)
-
-        # check if the video hasn't played until the end
-        # load nfo file
-        from core import videolibrarytools
-        if item.contentType == 'movie': nfo_path = item.nfo
-        elif xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows"))) in item.strm_path:
-            nfo_path = item.strm_path.replace('strm','nfo')
-        else:
-            nfo_path = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows"),item.strm_path.replace('strm','nfo')))
-        head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
-
-        #show Window
-        if item_nfo.played_time and (config.get_setting("player_mode") not in [1, 3] or item.play_from == 'window'):
-            while not xbmcgui.getCurrentWindowId() == 12005:
-                time.sleep(1)
-            m, s = divmod(item_nfo.played_time, 60)
-            h, m = divmod(m, 60)
-            if platformtools.dialog_yesno(item.title, '[B]' + config.get_localized_string(30045) +' %02d:%02d:%02d[/B]' % (h, m, s)):
-                xbmc.Player().seekTime(item_nfo.played_time)
 
         sync_with_trakt = False
         while platformtools.is_playing():
             percentage = float(config.get_setting("watched_setting")) / 100
             actual_time = xbmc.Player().getTime()
             totaltime = xbmc.Player().getTotalTime()
+            if item_nfo.played_time and actual_time < item_nfo.played_time:
+                xbmc.Player().seekTime(item_nfo.played_time)
 
             mark_time = totaltime * percentage
 
@@ -81,22 +45,94 @@ def mark_auto_as_watched(item):
             time.sleep(1)
 
         # Set played time
-        if not sync_with_trakt and actual_time > 120:
-            played_time = actual_time
-        else:
-            played_time = 0
-        item_nfo.played_time = int(played_time)
+        if not sync_with_trakt and actual_time > 120: item_nfo.played_time = int(actual_time)
+        else: item_nfo.played_time = 0
         filetools.write(nfo_path, head_nfo + item_nfo.tojson())
 
         # Silent sync with Trakt
-        if sync_with_trakt and config.get_setting("trakt_sync"):
-            sync_trakt_kodi()
-
-            # logger.debug("Fin del hilo")
+        if sync_with_trakt and config.get_setting("trakt_sync"):sync_trakt_kodi()
 
     # If it is configured to mark as seen
     if config.get_setting("mark_as_watched", "videolibrary"):
-        threading.Thread(target=mark_as_watched_subThread, args=[item]).start()
+        item, nfo_path, head_nfo, item_nfo = resume_playback(item)
+        threading.Thread(target=mark_as_watched_subThread, args=[item, nfo_path, head_nfo, item_nfo]).start()
+
+
+def resume_playback(item):
+    class ResumePlayback(xbmcgui.WindowXMLDialog):
+        Close = False
+        Resume = False
+
+        def __init__(self, *args, **kwargs):
+            self.action_exitkeys_id = [xbmcgui.ACTION_BACKSPACE, xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]
+            self.progress_control = None
+            self.item = kwargs.get('item')
+            m, s = divmod(float(self.item.played_time), 60)
+            h, m = divmod(m, 60)
+            self.setProperty("title", config.get_localized_string(30045) +' %02d:%02d:%02d' % (h, m, s))
+
+        def set_values(self, value):
+            self.Resume = value
+            self.Close = True
+
+        def is_close(self):
+            return self.Close
+
+        def onClick(self, controlId):
+            if controlId == 3012:  # Resume
+                self.set_values(True)
+                self.close()
+            elif controlId == 3013:  # Cancel
+                self.set_values(False)
+                self.close()
+
+        def onAction(self, action):
+            if action in self.action_exitkeys_id:
+                self.set_values(False)
+                self.close()
+
+
+    from core import videolibrarytools
+
+    # if nfo and strm_path not exist
+    if not item.nfo:
+        if item.contentType == 'movie':
+            # vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_movies")))
+            path = '%s [%s]' % (item.contentTitle, item.infoLabels['IMDBNumber'])
+            item.nfo = filetools.join(path, path + '.nfo')
+            if not item.strm_path: item.strm_path = filetools.join(path, item.contentTitle + '.strm')
+        else:
+            # vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows")))
+            path = '%s [%s]' % (item.contentSerieName, item.infoLabels['IMDBNumber'])
+            item.nfo = filetools.join(path, 'tvshow.nfo')
+            if item.contentSeason and item.contentEpisodeNumber:
+                title = str(item.contentSeason) + 'x' + str(item.contentEpisodeNumber).zfill(2)
+            else:
+                season, episode = scrapertools.find_single_match(item.title, r'(\d+)x(\d+)')
+                item.contentSeason = int(season)
+                item.contentEpisodeNumber = int(episode)
+                title = season + 'x' + episode.zfill(2)
+            if not item.strm_path: item.strm_path = filetools.join(path, title + '.strm')
+
+    # Read NFO FILE
+    if item.contentType == 'movie':
+        nfo_path = item.nfo
+    elif xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows"))) in item.strm_path:
+        nfo_path = item.strm_path.replace('strm','nfo')
+    else:
+        nfo_path = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows"),item.strm_path.replace('strm','nfo')))
+    head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
+
+    # Show Window
+    if (config.get_setting("player_mode") not in [1, 3] or item.play_from == 'window') and item_nfo.played_time > 0:
+        Dialog = ResumePlayback('ResumePlayback.xml', config.get_runtime_path(), item=item_nfo)
+        Dialog.show()
+        t = 0
+        while not Dialog.is_close() and t < 50:
+            t += 1
+            xbmc.sleep(100)
+        if not Dialog.Resume: item_nfo.played_time = 0
+    return item, nfo_path, head_nfo, item_nfo
 
 
 def sync_trakt_addon(path_folder):
