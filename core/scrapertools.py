@@ -50,7 +50,7 @@ def find_single_match(data, patron, index=0):
                 else:
                     return matches.group()
             else:
-                return []
+                return ""
         else:
             matches = re.findall(patron, data, flags=re.DOTALL)
             return matches[index]
