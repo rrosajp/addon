@@ -471,8 +471,12 @@ def play_from_library(item):
         xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")
 
     else:
+        # from core.support import dbg;dbg()
         # Pop-up window
-        if not config.get_setting('autoplay') and not config.get_setting('hide_servers'): item.show_server = True
+        if config.get_setting('autoplay') and config.get_setting('hide_servers'):
+            item.show_server = False
+        else:
+            item.show_server = True
 
         from specials import videolibrary, autoplay
         p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(60683))
@@ -484,9 +488,9 @@ def play_from_library(item):
 
         if check_next_ep:
             item.show_server = True
-            p_dialog.update(100, '')
-            sleep(0.5)
-            p_dialog.close()
+            # p_dialog.update(100, '')
+            # sleep(0.5)
+            # p_dialog.close()
             if not config.get_setting('autoplay'): show_server(item, itemlist, p_dialog)
             item = nextep.return_item(item)
             if item.next_ep: return play_from_library(item)

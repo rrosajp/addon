@@ -192,7 +192,7 @@ def render_items(itemlist, parent_item):
         listitem.setArt({'icon': icon_image, 'thumb': item.thumbnail, 'poster': item.thumbnail,
                          'fanart': item.fanart if item.fanart else default_fanart})
 
-        if config.get_setting("player_mode") == 1 and item.action == "play":
+        if config.get_setting("player_mode") == 1 and item.action == "play" and not item.nfo:
             listitem.setProperty('IsPlayable', 'true')
 
         set_infolabels(listitem, item)
@@ -506,16 +506,10 @@ def is_playing():
 def play_video(item, strm=False, force_direct=False, autoplay=False):
     logger.info()
     # logger.debug(item.tostring('\n'))
-    logger.debug('item play: %s' % item)
-    xbmc_player = XBMCPlayer()
     if item.channel == 'downloads':
-        logger.info("Reproducir video local: %s [%s]" % (item.title, item.url))
+        logger.info("Play local video: %s [%s]" % (item.title, item.url))
         xlistitem = xbmcgui.ListItem(path=item.url)
-        if config.get_platform(True)['num_version'] >= 16.0:
-            xlistitem.setArt({"thumb": item.thumbnail})
-        else:
-            xlistitem.setThumbnailImage(item.thumbnail)
-
+        xlistitem.setArt({"thumb": item.thumbnail})
         set_infolabels(xlistitem, item, True)
         set_player(item, xlistitem, item.url, True, None) # Fix Play From Download Section
         return
@@ -525,13 +519,11 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
 
     # Open the selection dialog to see the available options
     opciones, video_urls, seleccion, salir = get_dialogo_opciones(item, default_action, strm, autoplay)
-    if salir:
-        return
+    if salir: return
 
     # get default option of addon configuration
     seleccion = get_seleccion(default_action, opciones, seleccion, video_urls)
-    if seleccion < 0:  # Canceled box
-        return
+    if seleccion < 0: return # Canceled box
 
     logger.info("selection=%d" % seleccion)
     logger.info("selection=%s" % opciones[seleccion])
@@ -543,42 +535,20 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
 
     # we get the selected video
     mediaurl, view, mpd = get_video_seleccionado(item, seleccion, video_urls)
-    if mediaurl == "":
-        return
-    # # no certificate verification
-    # mediaurl = mediaurl.replace('https://', 'http://')
+    if not mediaurl: return
 
     # video information is obtained.
-    if not item.contentThumbnail:
-        thumb = item.thumbnail
-    else:
-        thumb = item.contentThumbnail
-
     xlistitem = xbmcgui.ListItem(path=item.url)
-    if config.get_platform(True)['num_version'] >= 16.0:
-        xlistitem.setArt({"thumb": thumb})
-    else:
-        xlistitem.setThumbnailImage(thumb)
-
+    xlistitem.setArt({"thumb": item.contentThumbnail if item.contentThumbnail else item.thumbnail})
     set_infolabels(xlistitem, item, True)
 
-    # if it is a video in mpd format, the listitem is configured to play it
-    # with the inpustreamaddon addon implemented in Kodi 17
+    # if it is a video in mpd format, the listitem is configured to play it ith the inpustreamaddon addon implemented in Kodi 17
     if mpd:
         xlistitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
         xlistitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
 
-    # player launches
-    if force_direct:  # when it comes from a window and not directly from the addon base
-        # We add the listitem to a playlist
-        playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-        playlist.clear()
-        playlist.add(mediaurl, xlistitem)
-
-        # Reproduce
-        xbmc_player.play(playlist, xlistitem)
-    else:
-        set_player(item, xlistitem, mediaurl, view, strm)
+    if force_direct: item.play_from = 'window'
+    set_player(item, xlistitem, mediaurl, view, strm)
 
 
 def stop_video():
@@ -917,55 +887,57 @@ def set_player(item, xlistitem, mediaurl, view, strm):
     # If it is a strm file, play is not necessary
     elif strm:
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xlistitem)
-        if item.subtitle != "":
+        if item.subtitle:
             xbmc.sleep(2000)
             xbmc_player.setSubtitles(item.subtitle)
 
     else:
-        logger.info("player_mode=%s" % config.get_setting("player_mode"))
+        player_mode = config.get_setting("player_mode")
+        if (player_mode == 3 and mediaurl.startswith("rtmp")) or item.play_from == 'window' or item.nfo: player_mode = 0
+        elif "megacrypter.com" in mediaurl: player_mode = 3
         logger.info("mediaurl=" + mediaurl)
-        if config.get_setting("player_mode") == 3 or "megacrypter.com" in mediaurl:
-            from platformcode import download_and_play
-            download_and_play.download_and_play(mediaurl, "download_and_play.tmp", config.get_setting("downloadpath"))
-            return
 
-        elif config.get_setting("player_mode") == 0 or item.play_from == 'window' or \
-                (config.get_setting("player_mode") == 3 and mediaurl.startswith("rtmp")):
-            # We add the listitem to a playlist
+        if player_mode == 0:
+            logger.info('Player Mode: Direct')
+            # Add the listitem to a playlist
             playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
             playlist.clear()
             playlist.add(mediaurl, xlistitem)
 
             # Reproduce
-            # xbmc_player = xbmc_player
             xbmc_player.play(playlist, xlistitem)
             if config.get_setting('trakt_sync'):
                 trakt_tools.wait_for_update_trakt()
 
-        # elif config.get_setting("player_mode") == 1 or item.isPlayable:
-        elif config.get_setting("player_mode") == 1:
-            logger.info("Tras setResolvedUrl")
+        elif player_mode == 1:
+            logger.info('Player Mode: setResolvedUrl')
             # if it is a video library file send to mark as seen
-
             if strm or item.strm_path:
                 from platformcode import xbmc_videolibrary
                 xbmc_videolibrary.mark_auto_as_watched(item)
-            logger.debug(item)
             xlistitem.setPath(mediaurl)
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xlistitem)
             xbmc.sleep(2500)
 
-        elif config.get_setting("player_mode") == 2:
+        elif player_mode == 2:
+            logger.info('Player Mode: Built-In')
             xbmc.executebuiltin("PlayMedia(" + mediaurl + ")")
 
+        elif player_mode == 3:
+            logger.info('Player Mode: Download and Play')
+            from platformcode import download_and_play
+            download_and_play.download_and_play(mediaurl, "download_and_play.tmp", config.get_setting("downloadpath"))
+            return
+
     # ALL LOOKING TO REMOVE VIEW
-    if item.subtitle != "" and view:
-        logger.info("Subtítulos externos: " + item.subtitle)
+    if item.subtitle and view:
+        logger.info("External subtitles: " + item.subtitle)
         xbmc.sleep(2000)
         xbmc_player.setSubtitles(item.subtitle)
 
     # if it is a video library file send to mark as seen
     if strm or item.strm_path:
+        from core.support import dbg;dbg()
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.mark_auto_as_watched(item)
 
