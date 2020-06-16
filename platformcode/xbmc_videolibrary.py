@@ -54,7 +54,7 @@ def mark_auto_as_watched(item):
 
     # If it is configured to mark as seen
     if config.get_setting("mark_as_watched", "videolibrary"):
-        item, nfo_path, head_nfo, item_nfo = resume_playback(item)
+        nfo_path, head_nfo, item_nfo = resume_playback(item)
         threading.Thread(target=mark_as_watched_subThread, args=[item, nfo_path, head_nfo, item_nfo]).start()
 
 
@@ -93,18 +93,19 @@ def resume_playback(item):
 
 
     from core import videolibrarytools
+    # from core.support import dbg;dbg()
 
     # if nfo and strm_path not exist
     if not item.nfo:
         if item.contentType == 'movie':
-            # vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_movies")))
+            vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_movies")))
             path = '%s [%s]' % (item.contentTitle, item.infoLabels['IMDBNumber'])
-            item.nfo = filetools.join(path, path + '.nfo')
+            item.nfo = filetools.join(vl, path, path + '.nfo')
             if not item.strm_path: item.strm_path = filetools.join(path, item.contentTitle + '.strm')
         else:
-            # vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows")))
+            vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows")))
             path = '%s [%s]' % (item.contentSerieName, item.infoLabels['IMDBNumber'])
-            item.nfo = filetools.join(path, 'tvshow.nfo')
+            item.nfo = filetools.join(vl, path, 'tvshow.nfo')
             if item.contentSeason and item.contentEpisodeNumber:
                 title = str(item.contentSeason) + 'x' + str(item.contentEpisodeNumber).zfill(2)
             else:
@@ -134,7 +135,7 @@ def resume_playback(item):
         if not Dialog.Resume: item_nfo.played_time = 0
     else:
         item_nfo.played_time = 0
-    return item, nfo_path, head_nfo, item_nfo
+    return nfo_path, head_nfo, item_nfo
 
 
 def sync_trakt_addon(path_folder):
