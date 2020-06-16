@@ -135,7 +135,7 @@ def save_movie(item, silent=False):
 
     for raiz, subcarpetas, ficheros in filetools.walk(MOVIES_PATH):
         for c in subcarpetas:
-            code = scrapertools.find_single_match(c, '\[(.*?)\]')
+            code = scrapertools.find_single_match(c, r'\[(.*?)\]')
             if code and code in item.infoLabels['code']:
                 path = filetools.join(raiz, c)
                 _id = code
@@ -364,7 +364,7 @@ def filter_list(episodelist, action=None, path=None):
         stop = False
         while not stop:
             for episode in episodelist:
-                title = scrapertools.find_single_match(episode.title, '(\d+x\d+)')
+                title = scrapertools.find_single_match(episode.title, r'(\d+x\d+)')
                 if not any(title in word for word in ep_list) and episode.contentLanguage == langs[count]:
                     ep_list.append(episode.title)
             if count < len(langs)-1: count += 1
@@ -386,14 +386,14 @@ def filter_list(episodelist, action=None, path=None):
         stop = False
         while not stop:
             for episode in episodelist:
-                title = scrapertools.find_single_match(episode.title, '(\d+x\d+)')
+                title = scrapertools.find_single_match(episode.title, r'(\d+x\d+)')
                 if not any(title in word for word in ep_list) and episode.quality.lower() in quality_dict[quality_list[selection]]:
                     ep_list.append(episode.title)
             if selection != 0: selection = selection - 1
             else: stop = True
             if quality_list[selection] == 'N/A':
                 for episode in episodelist:
-                    title = scrapertools.find_single_match(episode.title, '(\d+x\d+)')
+                    title = scrapertools.find_single_match(episode.title, r'(\d+x\d+)')
                     if not any(title in word for word in ep_list):
                         ep_list.append(episode.title)
 
@@ -473,7 +473,7 @@ def save_tvshow(item, episodelist, silent=False):
 
     for raiz, subcarpetas, ficheros in filetools.walk(TVSHOWS_PATH):
         for c in subcarpetas:
-            code = scrapertools.find_single_match(c, '\[(.*?)\]')
+            code = scrapertools.find_single_match(c, r'\[(.*?)\]')
             if code and code != 'None' and code in item.infoLabels['code']:
                 path = filetools.join(raiz, c)
                 _id = code
@@ -679,8 +679,8 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
 
         high_sea = e.contentSeason
         high_epi = e.contentEpisodeNumber
-        if scrapertools.find_single_match(e.title, '[a|A][l|L]\s*(\d+)'):
-            high_epi = int(scrapertools.find_single_match(e.title, 'al\s*(\d+)'))
+        if scrapertools.find_single_match(e.title, r'[a|A][l|L]\s*(\d+)'):
+            high_epi = int(scrapertools.find_single_match(e.title, r'al\s*(\d+)'))
         max_sea = e.infoLabels["number_of_seasons"]
         max_epi = 0
         if e.infoLabels["number_of_seasons"] and (e.infoLabels["temporada_num_episodios"] or e.infoLabels["number_of_seasons"] == 1):
@@ -981,8 +981,8 @@ def add_tvshow(item, channel=None):
 
         if not channel:
             try:
-                # channel = __import__('channels.%s' % item.channel, fromlist=["channels.%s" % item.channel])
-                channel = __import__('specials.%s' % channel_alt, fromlist=["specials.%s" % channel_alt])
+                channel = __import__('channels.%s' % item.channel, fromlist=["channels.%s" % item.channel])
+                # channel = __import__('specials.%s' % item.channel, fromlist=["specials.%s" % item.channel])
             except ImportError:
                 exec("import channels." + item.channel + " as channel")
 
