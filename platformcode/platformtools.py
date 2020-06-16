@@ -937,7 +937,6 @@ def set_player(item, xlistitem, mediaurl, view, strm):
 
     # if it is a video library file send to mark as seen
     if strm or item.strm_path:
-        from core.support import dbg;dbg()
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.mark_auto_as_watched(item)
 
