@@ -428,15 +428,24 @@ def play_from_library(item):
                 while not xbmc.Monitor().abortRequested():
                     # The user chooses the mirror
                     options = []
-                    for item in itemlist: options.append(item.title)
+                    selection_implementation =0
+                    for item in itemlist:
+                        item.thumbnail = "https://github.com/kodiondemand/media/raw/master/resources/servers/" + item.server.lower() + '.png'
+                        quality = '[B][' + item.quality + '][/B]' if item.quality else ''
+                        if item.server:
+                            it = xbmcgui.ListItem('\n[B]%s[/B] %s - %s' % (item.server, quality, item.contentTitle))
+                            it.setArt({'thumb':item.thumbnail})
+                            options.append(it)
+                        else:
+                            selection_implementation += 1
                     # The selection window opens
                     if (item.contentSerieName and item.contentSeason and item.contentEpisodeNumber): head = ("%s - %sx%s | %s" % (item.contentSerieName, item.contentSeason, item.contentEpisodeNumber, config.get_localized_string(30163)))
                     else: head = config.get_localized_string(30163)
-                    selection = platformtools.dialog_select(head, options)
+                    selection = platformtools.dialog_select(head, options, preselect= -1, useDetails=True)
                     if selection == -1:
                         return
                     else:
-                        item = videolibrary.play(itemlist[selection])[0]
+                        item = videolibrary.play(itemlist[selection  + selection_implementation])[0]
                         item.play_from = 'window'
                         platformtools.play_video(item)
                     if (platformtools.is_playing() and item.action) or item.server == 'torrent' or config.get_setting('autoplay'): break
@@ -463,7 +472,7 @@ def play_from_library(item):
 
     else:
         # Pop-up window
-        item.show_server = True
+        if not config.get_setting('autoplay') and not config.get_setting('hide_servers'): item.show_server = True
 
         from specials import videolibrary, autoplay
         p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(60683))
@@ -471,12 +480,14 @@ def play_from_library(item):
 
         itemlist = videolibrary.findvideos(item)
 
-        if not config.get_setting('autoplay'): show_server(item, itemlist, p_dialog)
+        # if not config.get_setting('autoplay'): show_server(item, itemlist, p_dialog)
 
         if check_next_ep:
+            item.show_server = True
             p_dialog.update(100, '')
             sleep(0.5)
             p_dialog.close()
+            if not config.get_setting('autoplay'): show_server(item, itemlist, p_dialog)
             item = nextep.return_item(item)
             if item.next_ep: return play_from_library(item)
         else:
@@ -484,7 +495,7 @@ def play_from_library(item):
                 sleep(5)
             p_dialog.update(50, '')
 
-        if item.show_server: show_server(item, itemlist, p_dialog)
+        show_server(item, itemlist, p_dialog)
 
         if item.show_server and check_next_ep:
             nextep.run(item)

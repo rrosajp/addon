@@ -25,8 +25,8 @@ def mark_auto_as_watched(item):
             time.sleep(1)
 
         sync_with_trakt = False
+        percentage = float(config.get_setting("watched_setting")) / 100
         while platformtools.is_playing():
-            percentage = float(config.get_setting("watched_setting")) / 100
             actual_time = xbmc.Player().getTime()
             totaltime = xbmc.Player().getTotalTime()
             if item_nfo.played_time and actual_time < item_nfo.played_time:
