@@ -83,7 +83,7 @@ def list_movies(item, silent=False):
                 # Verify the existence of the channels. If the channel does not exist, ask yourself if you want to remove the links from that channel.
 
                 for canal_org in new_item.library_urls:
-                    canal = generictools.verify_channel(canal_org)
+                    canal = canal_org
                     try:
                         if canal in ['community', 'downloads']:
                             channel_verify = __import__('specials.%s' % canal, fromlist=["channels.%s" % canal])
@@ -207,7 +207,6 @@ def list_tvshows(item):
                 # Verify the existence of the channels. If the channel does not exist, ask yourself if you want to remove the links from that channel.
 
                 for canal in item_tvshow.library_urls:
-                    canal = generictools.verify_channel(canal)
                     try:
                         if canal in ['community', 'downloads']:
                             channel_verify = __import__('specials.%s' % canal, fromlist=["channels.%s" % canal])

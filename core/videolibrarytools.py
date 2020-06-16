@@ -192,7 +192,7 @@ def save_movie(item, silent=False):
             headers = {}
             if item.headers:
                 headers = item.headers
-            channel = generictools.verify_channel(item.channel)
+            channel = item.channel
             if config.get_setting("emergency_urls", channel) in [1, 3]:
                 item = emergency_urls(item, None, json_path, headers=headers)
                 if item_nfo.emergency_urls and not isinstance(item_nfo.emergency_urls, dict):
@@ -602,12 +602,12 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
         p_dialog = platformtools.dialog_progress(config.get_localized_string(20000), config.get_localized_string(60064))
         p_dialog.update(0, config.get_localized_string(60065))
 
-    channel_alt = generictools.verify_channel(serie.channel)            # We prepare to add the emergency urls
+    channel_alt = serie.channels                                                    # We prepare to add the emergency urls
     emergency_urls_stat = config.get_setting("emergency_urls", channel_alt)         # Does the channel want emergency urls?
     emergency_urls_succ = False
     try: channel = __import__('specials.%s' % channel_alt, fromlist=["specials.%s" % channel_alt])
     except: channel = __import__('channels.%s' % channel_alt, fromlist=["channels.%s" % channel_alt])
-    if serie.torrent_caching_fail:                              # If the conversion process has failed, they are not cached
+    if serie.torrent_caching_fail:                                                  # If the conversion process has failed, they are not cached
         emergency_urls_stat = 0
         del serie.torrent_caching_fail
 
@@ -1066,7 +1066,7 @@ def emergency_urls(item, channel=None, path=None, headers={}):
     # we launched a "lookup" in the "findvideos" of the channel to obtain the emergency links
     try:
         if channel == None:                             # If the caller has not provided the channel structure, it is created
-            channel = generictools.verify_channel(item.channel)             # It is verified if it is a clone, which returns "newpct1"
+            channel = item.channel                      # It is verified if it is a clone, which returns "newpct1"
             #channel = __import__('channels.%s' % channel, fromlist=["channels.%s" % channel])
             channel = __import__('specials.%s' % channel_alt, fromlist=["specials.%s" % channel_alt])
         if hasattr(channel, 'findvideos'):                                  # If the channel has "findvideos" ...
@@ -1099,7 +1099,7 @@ def emergency_urls(item, channel=None, path=None, headers={}):
         try:
             referer = None
             post = None
-            channel_bis = generictools.verify_channel(item.channel)
+            channel_bis =item.channel
             if config.get_setting("emergency_urls_torrents", channel_bis) and item_res.emergency_urls and path != None:
                 videolibrary_path = config.get_videolibrary_path()          # we detect the absolute path of the title
                 movies = config.get_setting("folder_movies")
