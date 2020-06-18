@@ -1072,11 +1072,11 @@ def resume_playback(item, return_played_time=False):
         if return_played_time:
             return item_nfo.played_time
         # Show Window
-        elif (config.get_setting("player_mode") not in [1, 3] or item.play_from == 'window') and item_nfo.played_time:
+        elif (config.get_setting("player_mode") not in [3] or item.play_from == 'window') and item_nfo.played_time:
             Dialog = ResumePlayback('ResumePlayback.xml', config.get_runtime_path(), item=item_nfo)
             Dialog.show()
             t = 0
-            while not Dialog.is_close() and t < 50:
+            while not Dialog.is_close() and t < 100:
                 t += 1
                 xbmc.sleep(100)
             if not Dialog.Resume: item_nfo.played_time = 0
