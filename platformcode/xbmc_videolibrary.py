@@ -52,6 +52,9 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
                 if item.contentType == 'movie' or not config.get_setting('next_ep'):
                     EXIT = True
 
+            # Silent sync with Trakt
+            if sync_with_trakt and config.get_setting("trakt_sync"): sync_trakt_kodi()
+
             # check for next Episode
             if item.contentType != 'movie' and total_time > time_from_end >= difference:
                 next_dialogs = ['NextDialog.xml', 'NextDialogExtended.xml', 'NextDialogCompact.xml']
@@ -81,8 +84,7 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
         else: item_nfo.played_time = 0
         filetools.write(nfo_path, head_nfo + item_nfo.tojson())
 
-        # Silent sync with Trakt
-        if sync_with_trakt and config.get_setting("trakt_sync"):sync_trakt_kodi()
+
         while platformtools.is_playing():
             xbmc.sleep(100)
         if not show_server and item.play_from != 'window':
@@ -228,7 +230,7 @@ def sync_trakt_kodi(silent=True):
     # So that the synchronization is not silent it is worth with silent = False
     if xbmc.getCondVisibility('System.HasAddon("script.trakt")'):
         notificacion = True
-        if (not config.get_setting("sync_trakt_notification", "videolibrary") and platformtools.is_playing()):
+        if not config.get_setting("sync_trakt_notification", "videolibrary") and platformtools.is_playing():
             notificacion = False
 
         xbmc.executebuiltin('RunScript(script.trakt,action=sync,silent=%s)' % silent)
@@ -1291,7 +1293,8 @@ def next_ep(item):
 
             global INFO
             INFO = filetools.join(path, next_file.replace("strm", "nfo"))
-            # logger.info('Next Info:\n' + str(INFO))
+        else:
+            item=None
 
     return item
 
