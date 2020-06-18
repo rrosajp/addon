@@ -20,7 +20,7 @@
         <setting id="player_mode" type="select" lvalues="30026|30027|30028|30029" label="30044" default="1"/>
         <setting id="default_action" type="select" lvalues="30006|30007|30008" label="30005" default="0"/>
         <setting id="autoplay" type="bool" label="70562" default="false" visible="true"/>
-        <setting id="hide_servers" type="bool" label="70747" default="false" visible="eq(-1,true)" subsetting="true"/>
+        <!-- <setting id="hide_servers" type="bool" label="70747" default="false" visible="eq(-1,true)" subsetting="true"/> -->
         <setting id="checklinks" type="bool" label="30020" default="false"/>
         <setting id="checklinks_number" type="slider" option="int" range="5,5,20" label="30021" default="5" visible="eq(-1,true)" subsetting="true"/>
     </category>
@@ -35,10 +35,10 @@
         <setting id="videolibrary_kodi" type="bool" label="70120" default="false"/>
         <setting label="59997" type="lsep"/>
         <setting id="videolibrary_max_quality" type="bool" label="70729" default="false" visible="true"/>
-        <setting id="next_ep" type="select" label="70746" lvalues="70752|70747|70748" default="0"/>
-        <setting id="next_ep_type" type="select" label="70754" lvalues="70755|70756|70757" default="0" visible="eq(-1,2)" subsetting="true"/>
-        <setting id="next_ep_seconds" type="slider" option="int" range="20,10,120" label="70749" default="40" visible="!eq(-2,0)" subsetting="true"/>
-        <setting id="watched_setting" type="slider" option="int" range="20,10,100" label="60634" default="80"/>
+        <setting id="next_ep" type="bool" label="70746" default="true"/>
+        <setting id="next_ep_type" type="select" label="70754" lvalues="70755|70756|70757" default="0" visible="eq(-1,true)" subsetting="true"/>
+        <setting id="next_ep_seconds" type="slider" option="int" range="20,10,240" label="70749" default="40" visible="eq(-2,true)" subsetting="true"/>
+        <setting id="watched_setting" type="slider" option="int" range="20,10,90" label="60634" default="80"/>
         <setting id="trakt_sync" type="bool" label="70109" default="false"/>
         <setting label="30030" type="lsep"/>
         <setting id="vidolibrary_preferences" type="action" label="60542" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAiY2hhbm5lbF9jb25maWciLA0KICAgICJjaGFubmVsIjogInZpZGVvbGlicmFyeSINCn0==)"/>

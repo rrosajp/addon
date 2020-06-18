@@ -267,4 +267,4 @@ def findvid_serie(item):
 
 def play(item):
     support.log()
-    return servertools.find_video_items(data=item.url)
+    return servertools.find_video_items(item, data=item.url)

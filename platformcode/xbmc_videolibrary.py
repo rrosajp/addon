@@ -15,7 +15,7 @@ from core import scrapertools
 from xml.dom import minidom
 
 
-def mark_auto_as_watched(item):
+def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
     def mark_as_watched_subThread(item, nfo_path, head_nfo, item_nfo):
         logger.info()
         # logger.debug("item:\n" + item.tostring('\n'))
@@ -25,22 +25,54 @@ def mark_auto_as_watched(item):
             time.sleep(1)
 
         sync_with_trakt = False
+        next_episode = None
+        show_server = True
+        EXIT = False
+
         percentage = float(config.get_setting("watched_setting")) / 100
-        while platformtools.is_playing():
+        time_from_end = config.get_setting('next_ep_seconds')
+
+        while platformtools.is_playing() and not EXIT:
             actual_time = xbmc.Player().getTime()
-            totaltime = xbmc.Player().getTotalTime()
-            if item_nfo.played_time and actual_time < item_nfo.played_time:
+            total_time = xbmc.Player().getTotalTime()
+            if item_nfo.played_time and item_nfo.played_time > actual_time > 1:
                 xbmc.Player().seekTime(item_nfo.played_time)
 
-            mark_time = totaltime * percentage
+            mark_time = total_time * percentage
+            difference = total_time - actual_time
 
+            # Mark as Watched
             if actual_time > mark_time:
                 logger.debug("Marked as Watched")
                 item.playcount = 1
                 sync_with_trakt = True
                 from specials import videolibrary
                 videolibrary.mark_content_as_watched2(item)
-                break
+                show_server = False
+                if item.contentType == 'movie' or not config.get_setting('next_ep'):
+                    EXIT = True
+
+            # check for next Episode
+            if item.contentType != 'movie' and total_time > time_from_end >= difference:
+                next_dialogs = ['NextDialog.xml', 'NextDialogExtended.xml', 'NextDialogCompact.xml']
+                next_ep_type = config.get_setting('next_ep_type')
+                ND = next_dialogs[next_ep_type]
+                next_episode = next_ep(item)
+                if next_episode:
+                    nextdialog = NextDialog(ND, config.get_runtime_path())
+                    nextdialog.show()
+                    while platformtools.is_playing() and not nextdialog.is_exit():
+                        xbmc.sleep(100)
+                        pass
+                    EXIT = True
+                    nextdialog.close()
+                    if nextdialog.continuewatching:
+                        next_episode.next_ep = True
+                else:
+                    EXIT = True
+
+                if next_episode and next_episode.next_ep:
+                    xbmc.Player().stop()
 
             time.sleep(1)
 
@@ -51,91 +83,23 @@ def mark_auto_as_watched(item):
 
         # Silent sync with Trakt
         if sync_with_trakt and config.get_setting("trakt_sync"):sync_trakt_kodi()
+        while platformtools.is_playing():
+            xbmc.sleep(100)
+        if not show_server and item.play_from != 'window':
+            xbmc.sleep(700)
+            xbmc.executebuiltin('Action(Back)')
+            xbmc.sleep(500)
+        if next_episode:
+            if next_episode.next_ep:
+                from platformcode.launcher import play_from_library
+                return play_from_library(next_episode)
 
     # If it is configured to mark as seen
     if config.get_setting("mark_as_watched", "videolibrary"):
-        nfo_path, head_nfo, item_nfo = resume_playback(item)
         threading.Thread(target=mark_as_watched_subThread, args=[item, nfo_path, head_nfo, item_nfo]).start()
 
 
-def resume_playback(item):
-    class ResumePlayback(xbmcgui.WindowXMLDialog):
-        Close = False
-        Resume = False
 
-        def __init__(self, *args, **kwargs):
-            self.action_exitkeys_id = [xbmcgui.ACTION_BACKSPACE, xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]
-            self.progress_control = None
-            self.item = kwargs.get('item')
-            m, s = divmod(float(self.item.played_time), 60)
-            h, m = divmod(m, 60)
-            self.setProperty("title", config.get_localized_string(30045) +' %02d:%02d:%02d' % (h, m, s))
-
-        def set_values(self, value):
-            self.Resume = value
-            self.Close = True
-
-        def is_close(self):
-            return self.Close
-
-        def onClick(self, controlId):
-            if controlId == 3012:  # Resume
-                self.set_values(True)
-                self.close()
-            elif controlId == 3013:  # Cancel
-                self.set_values(False)
-                self.close()
-
-        def onAction(self, action):
-            if action in self.action_exitkeys_id:
-                self.set_values(False)
-                self.close()
-
-
-    from core import videolibrarytools
-    # from core.support import dbg;dbg()
-
-    # if nfo and strm_path not exist
-    if not item.nfo:
-        if item.contentType == 'movie':
-            vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_movies")))
-            path = '%s [%s]' % (item.contentTitle, item.infoLabels['IMDBNumber'])
-            item.nfo = filetools.join(vl, path, path + '.nfo')
-            if not item.strm_path: item.strm_path = filetools.join(path, item.contentTitle + '.strm')
-        else:
-            vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows")))
-            path = '%s [%s]' % (item.contentSerieName, item.infoLabels['IMDBNumber'])
-            item.nfo = filetools.join(vl, path, 'tvshow.nfo')
-            if item.contentSeason and item.contentEpisodeNumber:
-                title = str(item.contentSeason) + 'x' + str(item.contentEpisodeNumber).zfill(2)
-            else:
-                season, episode = scrapertools.find_single_match(item.title, r'(\d+)x(\d+)')
-                item.contentSeason = int(season)
-                item.contentEpisodeNumber = int(episode)
-                title = season + 'x' + episode.zfill(2)
-            if not item.strm_path: item.strm_path = filetools.join(path, title + '.strm')
-
-    # Read NFO FILE
-    if item.contentType == 'movie':
-        nfo_path = item.nfo
-    elif xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows"))) in item.strm_path:
-        nfo_path = item.strm_path.replace('strm','nfo')
-    else:
-        nfo_path = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows"),item.strm_path.replace('strm','nfo')))
-    head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
-
-    # Show Window
-    if (config.get_setting("player_mode") not in [3] or item.play_from == 'window') and item_nfo.played_time:
-        Dialog = ResumePlayback('ResumePlayback.xml', config.get_runtime_path(), item=item_nfo)
-        Dialog.show()
-        t = 0
-        while not Dialog.is_close() and t < 50:
-            t += 1
-            xbmc.sleep(100)
-        if not Dialog.Resume: item_nfo.played_time = 0
-    else:
-        item_nfo.played_time = 0
-    return nfo_path, head_nfo, item_nfo
 
 
 def sync_trakt_addon(path_folder):
@@ -164,7 +128,7 @@ def sync_trakt_addon(path_folder):
         shows = list(shows.items())
 
         # we get the series id to compare
-        _id = re.findall("\[(.*?)\]", path_folder, flags=re.DOTALL)[0]
+        _id = re.findall(r"\[(.*?)\]", path_folder, flags=re.DOTALL)[0]
         logger.debug("the id is %s" % _id)
 
         if "tt" in _id:
@@ -206,7 +170,7 @@ def sync_trakt_addon(path_folder):
                         logger.debug("dict_trakt_show %s " % dict_trakt_show)
 
                         # we get the keys that are episodes
-                        regex_epi = re.compile('\d+x\d+')
+                        regex_epi = re.compile(r'\d+x\d+')
                         keys_episodes = [key for key in serie.library_playcounts if regex_epi.match(key)]
                         # we get the keys that are seasons
                         keys_seasons = [key for key in serie.library_playcounts if 'season ' in key]
@@ -330,7 +294,6 @@ def mark_content_as_watched_on_kodi(item, value=1):
             path = filetools.join(tail, filename)
 
             for d in data['result']['episodes']:
-
                 if d['file'].replace("/", "\\").endswith(path.replace("/", "\\")):
                     # logger.debug("I mark the episode as seen")
                     episodeid = d['episodeid']
@@ -430,7 +393,7 @@ def mark_content_as_watched_on_kod(path):
         path1 = path.replace("\\\\", "\\")                              # Windows format
         if not path2:
             path2 = path1.replace("\\", "/")                            # Format no Windows
-        nfo_name = scrapertools.find_single_match(path2, '\]\/(.*?)$')  # I build the name of the .nfo
+        nfo_name = scrapertools.find_single_match(path2, r'\]\/(.*?)$')  # I build the name of the .nfo
         path1 = path1.replace(nfo_name, '')                             # for SQL I just need the folder
         path2 = path2.replace(nfo_name, '')                             # for SQL I just need the folder
     path2 = filetools.remove_smb_credential(path2)                      # If the file is on an SMB server, we remove the credentials
@@ -448,7 +411,7 @@ def mark_content_as_watched_on_kod(path):
         if contentType == "episode_view":
             title_plain = title.replace('.strm', '')                    # If it is Serial, we remove the suffix .strm
         else:
-            title_plain = scrapertools.find_single_match(item.strm_path, '.(.*?\s\[.*?\])') # if it's a movie, we remove the title
+            title_plain = scrapertools.find_single_match(item.strm_path, r'.(.*?\s\[.*?\])') # if it's a movie, we remove the title
         if playCount is None or playCount == 0:                         # not yet seen, we set it to 0
             playCount_final = 0
         elif playCount >= 1:
@@ -463,7 +426,7 @@ def mark_content_as_watched_on_kod(path):
     if item.infoLabels['mediatype'] == "tvshow":                        # We update the Season and Series playCounts
         for season in item.library_playcounts:
             if "season" in season:                                      # we look for the tags "season" inside playCounts
-                season_num = int(scrapertools.find_single_match(season, 'season (\d+)'))    # we save the season number
+                season_num = int(scrapertools.find_single_match(season, r'season (\d+)'))    # we save the season number
                 item = videolibrary.check_season_playcount(item, season_num)    # We call the method that updates Temps. and series
 
     filetools.write(path, head_nfo + item.tojson())
@@ -551,7 +514,7 @@ def update(folder_content=config.get_setting("folder_tvshows"), folder=""):
             # update_path = filetools.join(videolibrarypath, folder_content, folder) + "/"   # Encoder problems in "folder"
             update_path = filetools.join(videolibrarypath, folder_content, ' ').rstrip()
 
-        if videolibrarypath.startswith("special:") or not scrapertools.find_single_match(update_path, '(^\w+:\/\/)'):
+        if videolibrarypath.startswith("special:") or not scrapertools.find_single_match(update_path, r'(^\w+:\/\/)'):
             payload["params"] = {"directory": update_path}
 
     while xbmc.getCondVisibility('Library.IsScanningVideo()'):
@@ -593,7 +556,7 @@ def set_content(content_type, silent=False, custom=False):
             if not xbmc.getCondVisibility('System.HasAddon(metadata.themoviedb.org)'):
                 if not silent:
                     # Ask if we want to install metadata.themoviedb.org
-                    install = platformtools.dialog_yesno(config.get_localized_string(60046))
+                    install = platformtools.dialog_yesno(config.get_localized_string(60046),'')
                 else:
                     install = True
 
@@ -617,7 +580,7 @@ def set_content(content_type, silent=False, custom=False):
                 continuar = False
                 if not silent:
                     # Ask if we want to install metadata.universal
-                    install = platformtools.dialog_yesno(config.get_localized_string(70095))
+                    install = platformtools.dialog_yesno(config.get_localized_string(70095),'')
                 else:
                     install = True
 
@@ -647,7 +610,7 @@ def set_content(content_type, silent=False, custom=False):
             if not xbmc.getCondVisibility('System.HasAddon(metadata.tvdb.com)'):
                 if not silent:
                     #Ask if we want to install metadata.tvdb.com
-                    install = platformtools.dialog_yesno(config.get_localized_string(60048))
+                    install = platformtools.dialog_yesno(config.get_localized_string(60048),'')
                 else:
                     install = True
 
@@ -671,7 +634,7 @@ def set_content(content_type, silent=False, custom=False):
                 continuar = False
                 if not silent:
                     # Ask if we want to install metadata.tvshows.themoviedb.org
-                    install = platformtools.dialog_yesno(config.get_localized_string(60050))
+                    install = platformtools.dialog_yesno(config.get_localized_string(60050),'')
                 else:
                     install = True
 
@@ -705,7 +668,7 @@ def set_content(content_type, silent=False, custom=False):
         if sql_videolibrarypath.startswith("special://"):
             sql_videolibrarypath = sql_videolibrarypath.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')
             sep = '/'
-        elif scrapertools.find_single_match(sql_videolibrarypath, '(^\w+:\/\/)'):
+        elif scrapertools.find_single_match(sql_videolibrarypath, r'(^\w+:\/\/)'):
             sep = '/'
         else:
             sep = os.sep
@@ -1283,3 +1246,112 @@ def ask_set_content(silent=False):
     else:
         platformtools.dialog_ok(config.get_localized_string(80026), config.get_localized_string(80023))
         do_config(True)
+
+
+def next_ep(item):
+    from core.item import Item
+    logger.info()
+    item.next_ep = False
+
+    if config.get_setting('next_ep'): # play next file if exist
+        # check if next file exist
+        current_filename = filetools.basename(item.strm_path)
+        base_path = filetools.basename(filetools.dirname(item.strm_path))
+        path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"),base_path)
+        fileList = []
+        for file in filetools.listdir(path):
+            if file.endswith('.strm'):
+                fileList.append(file)
+
+        fileList.sort()
+
+        nextIndex = fileList.index(current_filename) + 1
+        if nextIndex == 0 or nextIndex == len(fileList):
+            next_file = None
+        else:
+            next_file = fileList[nextIndex]
+            logger.info('Next File:' + next_file)
+
+        # start next episode window afther x time
+        if next_file:
+            season_ep = next_file.split('.')[0]
+            season = season_ep.split('x')[0]
+            episode = season_ep.split('x')[1]
+            next_ep = '%sx%s' % (season, episode)
+            item = Item(
+                action= 'play_from_library',
+                channel= 'videolibrary',
+                contentEpisodeNumber= episode,
+                contentSeason= season,
+                contentTitle= next_ep,
+                contentType= 'episode',
+                infoLabels= {'episode': episode, 'mediatype': 'episode', 'season': season, 'title': next_ep},
+                strm_path= filetools.join(base_path, next_file),
+                play_from = item.play_from)
+
+            global INFO
+            INFO = filetools.join(path, next_file.replace("strm", "nfo"))
+            # logger.info('Next Info:\n' + str(INFO))
+
+    return item
+
+
+class NextDialog(xbmcgui.WindowXMLDialog):
+    item = None
+    cancel = False
+    EXIT = False
+    continuewatching = True
+
+    def __init__(self, *args, **kwargs):
+        self.action_exitkeys_id = [xbmcgui.ACTION_STOP, xbmcgui.ACTION_BACKSPACE, xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]
+        self.progress_control = None
+
+        # set info
+        f = filetools.file_open(INFO, 'r')
+        full_info = f.read().split('\n')
+        full_info = full_info[1:]
+        f.close()
+        full_info = "".join(full_info)
+        info = jsontools.load(full_info)
+        if "thumbnail" in info:
+            img = info["thumbnail"]
+        else:
+            img = filetools.join(config.get_runtime_path(), "resources", "noimage.png")
+        self.setProperty("next_img", img)
+        info = info["infoLabels"]
+        self.setProperty("title", info["tvshowtitle"])
+        self.setProperty("ep_title", "%dx%02d - %s" % (info["season"], info["episode"], info["title"]))
+
+    def set_exit(self, EXIT):
+        self.EXIT = EXIT
+
+    def set_continue_watching(self, continuewatching):
+        self.continuewatching = continuewatching
+
+    def is_exit(self):
+        return self.EXIT
+
+    def onFocus(self, controlId):
+        pass
+
+    def doAction(self):
+        pass
+
+    def closeDialog(self):
+        self.close()
+
+    def onClick(self, controlId):
+        if controlId == 3012:  # Still watching
+            self.set_exit(True)
+            self.set_continue_watching(True)
+            self.close()
+        elif controlId == 3013:  # Cancel
+            self.set_exit(True)
+            self.set_continue_watching(False)
+            self.close()
+
+    def onAction(self, action):
+        if action in self.action_exitkeys_id:
+            self.set_exit(True)
+            self.set_continue_watching(False)
+            self.close()

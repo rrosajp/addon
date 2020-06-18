@@ -28,6 +28,7 @@ def start(itemlist, item):
     :param item: item (the main item of the channel)
     :return: try to auto-reproduce, in case of failure it returns the itemlist that it received in the beginning
     '''
+    from inspect import stack
     if item.global_search:
         return itemlist
     logger.info()
@@ -111,6 +112,7 @@ def start(itemlist, item):
                 # if the server and the quality are not in the favorites lists or the url is repeated, we discard the item
                 if item.server.lower() not in favorite_servers or item.quality.lower() not in favorite_quality or item.url in url_list_valid:
                     item.type_b = True
+                    item.play_from = base_item.play_from
                     b_dict['videoitem']= item
                     autoplay_b.append(b_dict)
                     continue
@@ -122,6 +124,7 @@ def start(itemlist, item):
                 # if the server is not in the favorites list or the url is repeated, we discard the item
                 if item.server.lower() not in favorite_servers or item.url in url_list_valid:
                     item.type_b = True
+                    item.play_from = base_item.play_from
                     b_dict['videoitem'] = item
                     autoplay_b.append(b_dict)
                     continue
@@ -132,6 +135,7 @@ def start(itemlist, item):
                 # if the quality is not in the favorites list or the url is repeated, we discard the item
                 if item.quality.lower() not in favorite_quality or item.url in url_list_valid:
                     item.type_b = True
+                    item.play_from = base_item.play_from
                     b_dict['videoitem'] = item
                     autoplay_b.append(b_dict)
                     continue
@@ -140,13 +144,14 @@ def start(itemlist, item):
             else:  # Do not order
 
                 # if the url is repeated, we discard the item
+                item.play_from = base_item.play_from
                 if item.url in url_list_valid:
                     continue
 
             # If the item reaches here we add it to the list of valid urls and to autoplay_list
             url_list_valid.append(item.url)
             item.plan_b=True
-
+            item.play_from = base_item.play_from
             autoplay_elem['videoitem'] = item
             autoplay_list.append(autoplay_elem)
 
@@ -225,13 +230,11 @@ def start(itemlist, item):
                             else: videoitem = resolved_item[0]
 
                     # If not directly reproduce and mark as seen
-
                     # Check if the item comes from the video library
                     try:
-                        if base_item.contentChannel == 'videolibrary':
+                        if base_item.contentChannel == 'videolibrary' or base_item.nfo:
                             # Mark as seen
                             from platformcode import xbmc_videolibrary
-                            xbmc_videolibrary.mark_auto_as_watched(base_item)
                             # Fill the video with the data of the main item and play
                             play_item = base_item.clone(url=videoitem)
                             platformtools.play_video(play_item.url, autoplay=True)

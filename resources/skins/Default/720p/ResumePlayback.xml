@@ -6,53 +6,45 @@
     <controls>
         <control type="group">
             <animation type="WindowOpen" reversible="false">
-                <effect type="fade" start="0" end="100" time="600" />
-                <effect type="slide" start="115,0" end="0,0" time="600" />
+                <effect type="fade" start="0" end="100" time="300" />
             </animation>
             <animation type="WindowClose" reversible="false">
-                <effect type="fade" start="100" end="0" time="400" />
-                <effect type="slide" start="0,0" end="115,0" time="400" />
+                <effect type="fade" start="100" end="0" time="300" />
             </animation>
-            <right>0</right>
-            <top>15</top>
+            <right>440</right>
+            <top>320</top>
             <height>40</height>
-            <width>100%</width>
+            <width>400</width>
             <control type="grouplist" id="20">
-                <orientation>horizontal</orientation>
-                <height>40</height>
+                <orientation>vertical</orientation>
+                <height>80</height>
                 <itemgap>0</itemgap>
-                <align>right</align>
+                <align>center</align>
                 <control type="button" id="3012">
-                    <label>$INFO[Window.Property(title)]</label>
+                    <label>$ADDON[plugin.video.kod 30045] $INFO[Window.Property(time)]</label>
                     <onclick>SendClick(3012)</onclick>
                     <height>40</height>
-                    <width min="50">auto</width>
+                    <width>400</width>
                     <font>font30_title</font>
                     <textoffsetx>20</textoffsetx>
-                    <textcolor>80FFFFFF</textcolor>
-                    <focusedcolor>FFFFFFFF</focusedcolor>
-                    <selectedcolor>80FFFFFF</selectedcolor>
-                    <shadowcolor>22000000</shadowcolor>
+                    <textcolor>FFFFFFFF</textcolor>
                     <aligny>center</aligny>
                     <align>center</align>
-                    <texturefocus border="10" colordiffuse="88232323">NextDialog/background-diffuse.png</texturefocus>
-                    <texturenofocus border="10" colordiffuse="88232323">NextDialog/background-diffuse.png</texturenofocus>
+                    <texturefocus border="10" colordiffuse="FF0082C2">white.png</texturefocus>
+                    <texturenofocus border="10" colordiffuse="FF232323">white.png</texturenofocus>
                     <pulseonselect>no</pulseonselect>
                 </control>
                 <control type="button" id="3013">
-                    <label>$ADDON[plugin.video.kod  60396]</label>
+                    <label>$ADDON[plugin.video.kod 30046]</label>
                     <height>40</height>
-                    <width min="50">auto</width>
+                    <width>400</width>
                     <font>font30_title</font>
                     <textoffsetx>20</textoffsetx>
-                    <textcolor>80FFFFFF</textcolor>
-                    <focusedcolor>FFFFFFFF</focusedcolor>
-                    <selectedcolor>80FFFFFF</selectedcolor>
-                    <shadowcolor>22000000</shadowcolor>
+                    <textcolor>FFFFFFFF</textcolor>
                     <aligny>center</aligny>
                     <align>center</align>
-                    <texturefocus border="10" colordiffuse="88232323">NextDialog/background-diffuse.png</texturefocus>
-                    <texturenofocus border="10" colordiffuse="88232323">NextDialog/background-diffuse.png</texturenofocus>
+                    <texturefocus border="10" colordiffuse="FF0082C2">white.png</texturefocus>
+                    <texturenofocus border="10" colordiffuse="FF232323">white.png</texturenofocus>
                     <pulseonselect>no</pulseonselect>
                 </control>
             </control>

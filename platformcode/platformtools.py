@@ -548,7 +548,10 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
         xlistitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
 
     if force_direct: item.play_from = 'window'
-    set_player(item, xlistitem, mediaurl, view, strm)
+
+
+    nfo_path, head_nfo, item_nfo = resume_playback(item)
+    set_player(item, xlistitem, mediaurl, view, strm, nfo_path, head_nfo, item_nfo)
 
 
 def stop_video():
@@ -876,9 +879,9 @@ def get_video_seleccionado(item, seleccion, video_urls):
     return mediaurl, view, mpd
 
 
-def set_player(item, xlistitem, mediaurl, view, strm):
+def set_player(item, xlistitem, mediaurl, view, strm, nfo_path=None, head_nfo=None, item_nfo=None):
     logger.info()
-    logger.debug("item:\n" + item.tostring('\n'))
+    # logger.debug("item:\n" + item.tostring('\n'))
     # Moved del conector "torrent" here
     if item.server == "torrent":
         play_torrent(item, xlistitem, mediaurl)
@@ -914,7 +917,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
             # if it is a video library file send to mark as seen
             if strm or item.strm_path:
                 from platformcode import xbmc_videolibrary
-                xbmc_videolibrary.mark_auto_as_watched(item)
+                xbmc_videolibrary.mark_auto_as_watched(item, nfo_path, head_nfo, item_nfo)
             xlistitem.setPath(mediaurl)
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xlistitem)
             xbmc.sleep(2500)
@@ -938,7 +941,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
     # if it is a video library file send to mark as seen
     if strm or item.strm_path:
         from platformcode import xbmc_videolibrary
-        xbmc_videolibrary.mark_auto_as_watched(item)
+        xbmc_videolibrary.mark_auto_as_watched(item, nfo_path, head_nfo, item_nfo)
 
 
 def torrent_client_installed(show_tuple=False):
@@ -999,3 +1002,88 @@ def play_torrent(item, xlistitem, mediaurl):
 
 def log(texto):
     xbmc.log(texto, xbmc.LOGNOTICE)
+
+def resume_playback(item, return_played_time=False):
+    class ResumePlayback(xbmcgui.WindowXMLDialog):
+        Close = False
+        Resume = False
+
+        def __init__(self, *args, **kwargs):
+            self.action_exitkeys_id = [xbmcgui.ACTION_BACKSPACE, xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]
+            self.progress_control = None
+            self.item = kwargs.get('item')
+            m, s = divmod(float(self.item.played_time), 60)
+            h, m = divmod(m, 60)
+            self.setProperty("time", '%02d:%02d:%02d' % (h, m, s))
+
+        def set_values(self, value):
+            self.Resume = value
+            self.Close = True
+
+        def is_close(self):
+            return self.Close
+
+        def onClick(self, controlId):
+            if controlId == 3012:  # Resume
+                self.set_values(True)
+                self.close()
+            elif controlId == 3013:  # Cancel
+                self.set_values(False)
+                self.close()
+
+        def onAction(self, action):
+            if action in self.action_exitkeys_id:
+                self.set_values(False)
+                self.close()
+
+
+    from core import videolibrarytools, filetools
+
+    # if nfo and strm_path not exist
+    if not item.nfo:
+        if item.contentType == 'movie':
+            vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_movies")))
+            path = '%s [%s]' % (item.contentTitle, item.infoLabels['IMDBNumber'])
+            item.nfo = filetools.join(vl, path, path + '.nfo')
+            if not item.strm_path: item.strm_path = filetools.join(path, item.contentTitle + '.strm')
+        else:
+            vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows")))
+            path = '%s [%s]' % (item.contentSerieName, item.infoLabels['IMDBNumber'])
+            item.nfo = filetools.join(vl, path, 'tvshow.nfo')
+            if item.contentSeason and item.contentEpisodeNumber:
+                title = str(item.contentSeason) + 'x' + str(item.contentEpisodeNumber).zfill(2)
+            else:
+                season, episode = scrapertools.find_single_match(item.title, r'(\d+)x(\d+)')
+                item.contentSeason = int(season)
+                item.contentEpisodeNumber = int(episode)
+                title = season + 'x' + episode.zfill(2)
+            if not item.strm_path: item.strm_path = filetools.join(path, title + '.strm')
+
+    # Read NFO FILE
+    if item.contentType == 'movie':
+        nfo_path = item.nfo
+    elif xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows"))) in item.strm_path:
+        nfo_path = item.strm_path.replace('strm','nfo')
+    else:
+        nfo_path = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows"),item.strm_path.replace('strm','nfo')))
+    if filetools.isfile(nfo_path):
+        head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
+
+        if return_played_time:
+            return item_nfo.played_time
+        # Show Window
+        elif (config.get_setting("player_mode") not in [1, 3] or item.play_from == 'window') and item_nfo.played_time:
+            Dialog = ResumePlayback('ResumePlayback.xml', config.get_runtime_path(), item=item_nfo)
+            Dialog.show()
+            t = 0
+            while not Dialog.is_close() and t < 50:
+                t += 1
+                xbmc.sleep(100)
+            if not Dialog.Resume: item_nfo.played_time = 0
+        else:
+            item_nfo.played_time = 0
+
+        return nfo_path, head_nfo, item_nfo
+    else:
+        item.nfo = item.strm_path = ""
+        return None, None, None

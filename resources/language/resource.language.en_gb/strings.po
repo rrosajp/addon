@@ -195,6 +195,10 @@ msgctxt "#30045"
 msgid "Resume from:"
 msgstr ""
 
+msgctxt "#30046"
+msgid "Resume from start"
+msgstr ""
+
 msgctxt "#30050"
 msgid "Server connection error"
 msgstr ""

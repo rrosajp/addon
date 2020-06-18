@@ -400,7 +400,6 @@ def limit_itemlist(itemlist):
 
 
 def play_from_library(item):
-    # from core.support import dbg;dbg()
     """
         The .strm files when played from kodi, this expects it to be a "playable" file so it cannot contain
         more items, at most a selection dialog can be placed.
@@ -413,96 +412,65 @@ def play_from_library(item):
     """
     import xbmcgui, xbmcplugin, xbmc
     from time import sleep, time
-    from specials import nextep
-
-    def show_server(item, itemlist, p_dialog):
-        if item.show_server:
-            # The number of links to show is limited
-            if config.get_setting("max_links", "videolibrary") != 0: itemlist = limit_itemlist(itemlist)
-            # The list of links is slightly "cleaned"
-            if config.get_setting("replace_VD", "videolibrary") == 1: itemlist = reorder_itemlist(itemlist)
-
-            p_dialog.update(100, ''); sleep(0.5); p_dialog.close()
-
-            if len(itemlist) > 0:
-                while not xbmc.Monitor().abortRequested():
-                    # The user chooses the mirror
-                    options = []
-                    selection_implementation =0
-                    for item in itemlist:
-                        item.thumbnail = "https://github.com/kodiondemand/media/raw/master/resources/servers/" + item.server.lower() + '.png'
-                        quality = '[B][' + item.quality + '][/B]' if item.quality else ''
-                        if item.server:
-                            it = xbmcgui.ListItem('\n[B]%s[/B] %s - %s' % (item.server, quality, item.contentTitle))
-                            it.setArt({'thumb':item.thumbnail})
-                            options.append(it)
-                        else:
-                            selection_implementation += 1
-                    # The selection window opens
-                    if (item.contentSerieName and item.contentSeason and item.contentEpisodeNumber): head = ("%s - %sx%s | %s" % (item.contentSerieName, item.contentSeason, item.contentEpisodeNumber, config.get_localized_string(30163)))
-                    else: head = config.get_localized_string(30163)
-                    selection = platformtools.dialog_select(head, options, preselect= -1, useDetails=True)
-                    if selection == -1:
-                        return
-                    else:
-                        item = videolibrary.play(itemlist[selection  + selection_implementation])[0]
-                        item.play_from = 'window'
-                        platformtools.play_video(item)
-                    if (platformtools.is_playing() and item.action) or item.server == 'torrent' or config.get_setting('autoplay'): break
 
     itemlist=[]
     item.fromLibrary = True
     logger.info()
-    logger.debug("item: \n" + item.tostring('\n'))
+    # logger.debug("item: \n" + item.tostring('\n'))
 
-    # We try to reproduce an image (this does nothing and also does not give an error)
+    # Try to reproduce an image (this does nothing and also does not give an error)
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
     xbmc.Player().stop()
 
-    # we modify the action (currently the video library needs "findvideos" since this is where the sources are searched
+    # Modify the action (currently the video library needs "findvideos" since this is where the sources are searched
     item.action = "findvideos"
-    check_next_ep = nextep.check(item)
 
     window_type = config.get_setting("window_type", "videolibrary")
-
-    # and we launch kodi again
+    # and launch kodi again
     if xbmc.getCondVisibility('Window.IsMedia') and not window_type == 1:
         # Conventional window
         xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")
 
     else:
-        # from core.support import dbg;dbg()
         # Pop-up window
-        if config.get_setting('autoplay') and config.get_setting('hide_servers'):
-            item.show_server = False
-        else:
-            item.show_server = True
-
         from specials import videolibrary, autoplay
         p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(60683))
         p_dialog.update(0, '')
-
+        item.play_from = 'window'
         itemlist = videolibrary.findvideos(item)
+        p_dialog.update(100, ''); sleep(0.5); p_dialog.close()
+        while platformtools.is_playing(): # Conventional window
+            sleep(1)
+        play_time = platformtools.resume_playback(item, True)
+        if not play_time:
+            return
 
-        # if not config.get_setting('autoplay'): show_server(item, itemlist, p_dialog)
+        # The number of links to show is limited
+        if config.get_setting("max_links", "videolibrary") != 0: itemlist = limit_itemlist(itemlist)
+        # The list of links is slightly "cleaned"
+        if config.get_setting("replace_VD", "videolibrary") == 1: itemlist = reorder_itemlist(itemlist)
 
-        if check_next_ep:
-            item.show_server = True
-            # p_dialog.update(100, '')
-            # sleep(0.5)
-            # p_dialog.close()
-            if not config.get_setting('autoplay'): show_server(item, itemlist, p_dialog)
-            item = nextep.return_item(item)
-            if item.next_ep: return play_from_library(item)
-        else:
-            while platformtools.is_playing(): # Conventional window
-                sleep(5)
-            p_dialog.update(50, '')
-
-        show_server(item, itemlist, p_dialog)
-
-        if item.show_server and check_next_ep:
-            nextep.run(item)
-            sleep(0.5)
-            p_dialog.close()
-
+        if len(itemlist) > 0:
+            while not xbmc.Monitor().abortRequested():
+                # The user chooses the mirror
+                options = []
+                selection_implementation = 0
+                for item in itemlist:
+                    item.thumbnail = "https://github.com/kodiondemand/media/raw/master/resources/servers/" + item.server.lower() + '.png'
+                    quality = '[B][' + item.quality + '][/B]' if item.quality else ''
+                    if item.server:
+                        it = xbmcgui.ListItem('\n[B]%s[/B] %s - %s' % (item.server, quality, item.contentTitle))
+                        it.setArt({'thumb':item.thumbnail})
+                        options.append(it)
+                    else:
+                        selection_implementation += 1
+                # The selection window opens
+                if (item.contentSerieName and item.contentSeason and item.contentEpisodeNumber): head = ("%s - %sx%s | %s" % (item.contentSerieName, item.contentSeason, item.contentEpisodeNumber, config.get_localized_string(30163)))
+                else: head = config.get_localized_string(30163)
+                selection = platformtools.dialog_select(head, options, preselect= -1, useDetails=True)
+                if selection == -1:
+                    return
+                else:
+                    item = videolibrary.play(itemlist[selection  + selection_implementation])[0]
+                    platformtools.play_video(item)
+                if (platformtools.is_playing() and item.action) or item.server == 'torrent' or config.get_setting('autoplay'): break

@@ -1192,9 +1192,6 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
     if patronTag:
         addQualityTag(item, verifiedItemlist, data, patronTag)
 
-    # Auto Play & Hide Links
-    AP = config.get_setting('autoplay')
-
     # Check Links
     if not item.global_search and (config.get_setting('checklinks') or config.get_setting('checklinks', item.channel)):
         if config.get_setting('checklinks', item.channel):
@@ -1210,8 +1207,8 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         videolibrary(verifiedItemlist, item)
     if Download:
         download(verifiedItemlist, item, function_level=3)
-    if item.contentChannel == 'videolibrary' or not config.get_setting('autoplay') or not config.get_setting('hide_servers'):
-        return verifiedItemlist
+    # if item.contentChannel == 'videolibrary' or not config.get_setting('autoplay'):
+    return verifiedItemlist
 
 
 def filterLang(item, itemlist):

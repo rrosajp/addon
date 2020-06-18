@@ -582,6 +582,7 @@ def findvideos(item):
 
             # We run find_videos, from the channel or common
             item_json.contentChannel = 'videolibrary'
+            item_json.play_from = item.play_from
             if hasattr(channel, 'findvideos'):
                 from core import servertools
                 if item_json.videolibray_emergency_urls:
@@ -629,10 +630,7 @@ def findvideos(item):
 
     if autoplay.play_multi_channel(item, itemlist):  # hideserver
         return []
-    from inspect import stack
-    from specials import nextep
-    if nextep.check(item) and stack()[1][3] == 'run':
-        nextep.videolibrary(item)
+
     add_download_items(item, itemlist)
     return itemlist
 
