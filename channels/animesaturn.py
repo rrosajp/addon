@@ -9,9 +9,6 @@ host = support.config.get_channel_url()
 headers={'X-Requested-With': 'XMLHttpRequest'}
 
 
-
-
-
 @support.menu
 def mainlist(item):
 
@@ -54,9 +51,13 @@ def newest(categoria):
 
 @support.scrape
 def menu(item):
-    patronMenu = r'<div class="col-md-13 bg-dark-as-box-shadow p-2 text-white text-center">(?P<title>[^"<]+)<(?P<url>.*?)(?:"lista-top"|"clearfix")'
+    patronMenu = r'<div class="col-md-13 bg-dark-as-box-shadow p-2 text-white text-center">(?P<title>[^"<]+)<(?P<other>.*?)(?:"lista-top"|"clearfix")'
     action = 'peliculas'
     item.args = 'top'
+    def itemHook(item2):
+        item2.url = item.url
+        return item2
+
     return locals()
 
 
@@ -72,9 +73,8 @@ def peliculas(item):
     post = "page=" + str(item.page if item.page else 1) if item.page > 1 else None
 
     if item.args == 'top':
-        data=item.url
-        patron = r'light">(?P<title2>[^<]+)</div>\s(?P<title>[^<]+)[^>]+>[^>]+>\s<a href="(?P<url>[^"]+)">(?:<a[^>]+>|\s*)<img alt="[^"]+" src="(?P<thumb>[^"]+)"'
-
+        data = item.other
+        patron = r'light">(?P<title2>[^<]+)</div>\s(?P<title>[^<]+)[^>]+>[^>]+>\s<a href="(?P<url>[^"]+)">(?:<a[^>]+>|\s*)<img.*?src="(?P<thumb>[^"]+)"'
     else:
         data = support.match(item, post=post, headers=headers).data
         if item.args == 'updated':
