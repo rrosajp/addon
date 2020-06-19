@@ -998,9 +998,8 @@ def add_tvshow(item, channel=None):
         #    del item.tmdb_stat          # We clean the status so that it is not recorded in the Video Library
 
         # Get the episode list
-
         itemlist = getattr(channel, item.action)(item)
-        if itemlist and not scrapertools.find_single_match(itemlist[0].title, r'(\d+.\d+)'):
+        if itemlist and not scrapertools.find_single_match(itemlist[0].title, r'(\d+x\d+)'):
             from specials.autorenumber import select_type, renumber, check
             if not check(item):
                 action = item.action
