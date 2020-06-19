@@ -7,6 +7,7 @@ import re
 
 try:
     import urllib.parse as urllib
+    # unichr = chr
 except ImportError:
     import urllib
 
@@ -31,6 +32,18 @@ def test_video_exists(page_url):
         # logger.info('WCODE=' + code)
         page_url = 'https://116.202.226.34/video.php?file_code=' + code
         data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True, verify=False).data
+
+    if 'nored.icu' in str(headers):
+        var = scrapertools.find_single_match(data, r'var [a-zA-Z0-9]+ = \[([^\]]+).*?')
+        value = scrapertools.find_single_match(data, r'String\.fromCharCode\(parseInt\(value\) \D (\d+)')
+        if var and value:
+            dec = ''
+            for v in var.split(','):
+                dec += chr(int(v) - int(value))
+            page_url = scrapertools.find_single_match(dec, "src='([^']+)")
+            new_data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True, verify=False).data
+            if new_data:
+                data = new_data
 
     real_url = page_url
     if "Not Found" in data or "File was deleted" in data or 'Video is processing' in data or 'Sorry this video is unavailable' in data:

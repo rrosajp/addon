@@ -553,12 +553,13 @@ def dooplay_get_links(item, host):
     for type, post, nume, title, server in matches:
         postData = urlencode({
             "action": "doo_player_ajax",
-            "post": post,
+            "post": post, 
             "nume": nume,
             "type": type
         })
         dataAdmin = httptools.downloadpage(host + '/wp-admin/admin-ajax.php', post=postData,headers={'Referer': item.url}).data
-        link = scrapertools.find_single_match(dataAdmin, "<iframe.*src='([^']+)'")
+        link = scrapertools.find_single_match(dataAdmin, r"<iframe.*src='([^']+)'")
+        if not link: link = scrapertools.find_single_match(dataAdmin, r'"embed_url":"([^"]+)"').replace('\\','')
         ret.append({
             'url': link,
             'title': title,
