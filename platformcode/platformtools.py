@@ -886,7 +886,6 @@ def set_player(item, xlistitem, mediaurl, view, strm, nfo_path=None, head_nfo=No
     if item.server == "torrent":
         play_torrent(item, xlistitem, mediaurl)
         return
-
     # If it is a strm file, play is not necessary
     elif strm:
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xlistitem)
@@ -914,10 +913,6 @@ def set_player(item, xlistitem, mediaurl, view, strm, nfo_path=None, head_nfo=No
 
         elif player_mode == 1:
             logger.info('Player Mode: setResolvedUrl')
-            # if it is a video library file send to mark as seen
-            if strm or item.strm_path:
-                from platformcode import xbmc_videolibrary
-                xbmc_videolibrary.mark_auto_as_watched(item, nfo_path, head_nfo, item_nfo)
             xlistitem.setPath(mediaurl)
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xlistitem)
             xbmc.sleep(2500)

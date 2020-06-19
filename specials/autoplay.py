@@ -234,8 +234,8 @@ def start(itemlist, item):
                             # Mark as seen
                             from platformcode import xbmc_videolibrary
                             # Fill the video with the data of the main item and play
-                            play_item = base_item.clone(url=videoitem)
-                            platformtools.play_video(play_item.url, autoplay=True)
+                            play_item = base_item.clone(**videoitem.__dict__)
+                            platformtools.play_video(play_item, autoplay=True)
                         else:
                             # If it doesn't come from the video library, just play
                             platformtools.play_video(videoitem, autoplay=True)
