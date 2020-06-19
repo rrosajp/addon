@@ -550,7 +550,7 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
     if force_direct: item.play_from = 'window'
 
 
-    nfo_path, head_nfo, item_nfo = resume_playback(item)
+    item, nfo_path, head_nfo, item_nfo = resume_playback(item)
     set_player(item, xlistitem, mediaurl, view, strm, nfo_path, head_nfo, item_nfo)
 
 
@@ -1041,14 +1041,21 @@ def resume_playback(item, return_played_time=False):
 
     # if nfo and strm_path not exist
     if not item.nfo:
+        ID = item.infoLabels['IMDBNumber']
         if item.contentType == 'movie':
+            ID = ID if ID else item.infoLabels['tmdb_id']
             vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_movies")))
-            path = '%s [%s]' % (item.contentTitle, item.infoLabels['IMDBNumber'])
+            name = item.contentTitle if not config.get_setting('original_title_folder', 'videolibrary') else item.infoLabels['originaltitle']
+            name = name if not config.get_setting('lowerize_title', 'videolibrary') else name.lower()
+            path = filetools.validate_path('%s [%s]' % (name, ID))
             item.nfo = filetools.join(vl, path, path + '.nfo')
             if not item.strm_path: item.strm_path = filetools.join(path, item.contentTitle + '.strm')
         else:
+            ID = ID if ID else 'tmdb_' + item.infoLabels['tmdb_id'] if config.get_setting('scraper_tvshows', 'videolibrary') == 0 else 'tvdb_' + item.infoLabels['tvdb_id']
             vl = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows")))
-            path = '%s [%s]' % (item.contentSerieName, item.infoLabels['IMDBNumber'])
+            name = item.contentSerieName if not config.get_setting('original_title_folder', 'videolibrary') else item.infoLabels['originaltitle']
+            name = name if not config.get_setting('lowerize_title', 'videolibrary') else name.lower()
+            path = filetools.validate_path('%s [%s]' % (name, ID))
             item.nfo = filetools.join(vl, path, 'tvshow.nfo')
             if item.contentSeason and item.contentEpisodeNumber:
                 title = str(item.contentSeason) + 'x' + str(item.contentEpisodeNumber).zfill(2)
@@ -1066,6 +1073,7 @@ def resume_playback(item, return_played_time=False):
         nfo_path = item.strm_path.replace('strm','nfo')
     else:
         nfo_path = xbmc.translatePath(filetools.join(config.get_setting("videolibrarypath"), config.get_setting("folder_tvshows"),item.strm_path.replace('strm','nfo')))
+
     if filetools.isfile(nfo_path):
         head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
 
@@ -1083,7 +1091,7 @@ def resume_playback(item, return_played_time=False):
         else:
             item_nfo.played_time = 0
 
-        return nfo_path, head_nfo, item_nfo
+        return item, nfo_path, head_nfo, item_nfo
     else:
         item.nfo = item.strm_path = ""
-        return None, None, None
+        return item, None, None, None

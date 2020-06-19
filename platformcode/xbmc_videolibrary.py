@@ -24,15 +24,19 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
         while not platformtools.is_playing() and time.time() < time_limit:
             time.sleep(1)
 
-        sync_with_trakt = False
+        marked = False
         next_episode = None
         show_server = True
-        EXIT = False
 
         percentage = float(config.get_setting("watched_setting")) / 100
         time_from_end = config.get_setting('next_ep_seconds')
+        if item.contentType != 'movie' or not config.get_setting('next_ep'):
+            next_dialogs = ['NextDialog.xml', 'NextDialogExtended.xml', 'NextDialogCompact.xml']
+            next_ep_type = config.get_setting('next_ep_type')
+            ND = next_dialogs[next_ep_type]
+            next_episode = next_ep(item)
 
-        while platformtools.is_playing() and not EXIT:
+        while platformtools.is_playing():
             actual_time = xbmc.Player().getTime()
             total_time = xbmc.Player().getTotalTime()
             if item_nfo.played_time and item_nfo.played_time > actual_time > 1:
@@ -45,45 +49,34 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
             if actual_time > mark_time:
                 logger.debug("Marked as Watched")
                 item.playcount = 1
-                sync_with_trakt = True
+                marked = True
+                show_server = False
                 from specials import videolibrary
                 videolibrary.mark_content_as_watched2(item)
-                show_server = False
-                if item.contentType == 'movie' or not config.get_setting('next_ep'):
-                    EXIT = True
-
-            # Silent sync with Trakt
-            if sync_with_trakt and config.get_setting("trakt_sync"): sync_trakt_kodi()
+                if not next_episode:
+                    break
 
             # check for next Episode
-            if item.contentType != 'movie' and total_time > time_from_end >= difference:
-                next_dialogs = ['NextDialog.xml', 'NextDialogExtended.xml', 'NextDialogCompact.xml']
-                next_ep_type = config.get_setting('next_ep_type')
-                ND = next_dialogs[next_ep_type]
-                next_episode = next_ep(item)
-                if next_episode:
-                    nextdialog = NextDialog(ND, config.get_runtime_path())
-                    nextdialog.show()
-                    while platformtools.is_playing() and not nextdialog.is_exit():
-                        xbmc.sleep(100)
-                        pass
-                    EXIT = True
-                    nextdialog.close()
-                    if nextdialog.continuewatching:
-                        next_episode.next_ep = True
-                else:
-                    EXIT = True
-
-                if next_episode and next_episode.next_ep:
+            if next_episode and total_time > time_from_end >= difference:
+                nextdialog = NextDialog(ND, config.get_runtime_path())
+                nextdialog.show()
+                while platformtools.is_playing() and not nextdialog.is_exit():
+                    xbmc.sleep(100)
+                nextdialog.close()
+                if nextdialog.continuewatching:
+                    next_episode.next_ep = True
+                if next_episode.next_ep:
                     xbmc.Player().stop()
+                break
 
             time.sleep(1)
 
         # Set played time
-        if not sync_with_trakt and actual_time > 120: item_nfo.played_time = int(actual_time)
-        else: item_nfo.played_time = 0
+        item_nfo.played_time = int(actual_time) if not marked and actual_time > 120 else 0
         filetools.write(nfo_path, head_nfo + item_nfo.tojson())
 
+        # Silent sync with Trakt
+        if marked and config.get_setting("trakt_sync"): sync_trakt_kodi()
 
         while platformtools.is_playing():
             xbmc.sleep(100)
@@ -1255,46 +1248,42 @@ def next_ep(item):
     logger.info()
     item.next_ep = False
 
-    if config.get_setting('next_ep'): # play next file if exist
-        # check if next file exist
-        current_filename = filetools.basename(item.strm_path)
-        base_path = filetools.basename(filetools.dirname(item.strm_path))
-        path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"),base_path)
-        fileList = []
-        for file in filetools.listdir(path):
-            if file.endswith('.strm'):
-                fileList.append(file)
+    # check if next file exist
+    current_filename = filetools.basename(item.strm_path)
+    base_path = filetools.basename(filetools.dirname(item.strm_path))
+    path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"),base_path)
+    fileList = []
+    for file in filetools.listdir(path):
+        if file.endswith('.strm'):
+            fileList.append(file)
+    fileList.sort()
 
-        fileList.sort()
+    nextIndex = fileList.index(current_filename) + 1
+    if nextIndex == 0 or nextIndex == len(fileList): next_file = None
+    else: next_file = fileList[nextIndex]
+    logger.info('Next File:' + str(next_file))
 
-        nextIndex = fileList.index(current_filename) + 1
-        if nextIndex == 0 or nextIndex == len(fileList):
-            next_file = None
-        else:
-            next_file = fileList[nextIndex]
-            logger.info('Next File:' + next_file)
+    # start next episode window afther x time
+    if next_file:
+        season_ep = next_file.split('.')[0]
+        season = season_ep.split('x')[0]
+        episode = season_ep.split('x')[1]
+        next_ep = '%sx%s' % (season, episode)
+        item = Item(
+            action= 'play_from_library',
+            channel= 'videolibrary',
+            contentEpisodeNumber= episode,
+            contentSeason= season,
+            contentTitle= next_ep,
+            contentType= 'episode',
+            infoLabels= {'episode': episode, 'mediatype': 'episode', 'season': season, 'title': next_ep},
+            strm_path= filetools.join(base_path, next_file),
+            play_from = item.play_from)
 
-        # start next episode window afther x time
-        if next_file:
-            season_ep = next_file.split('.')[0]
-            season = season_ep.split('x')[0]
-            episode = season_ep.split('x')[1]
-            next_ep = '%sx%s' % (season, episode)
-            item = Item(
-                action= 'play_from_library',
-                channel= 'videolibrary',
-                contentEpisodeNumber= episode,
-                contentSeason= season,
-                contentTitle= next_ep,
-                contentType= 'episode',
-                infoLabels= {'episode': episode, 'mediatype': 'episode', 'season': season, 'title': next_ep},
-                strm_path= filetools.join(base_path, next_file),
-                play_from = item.play_from)
-
-            global INFO
-            INFO = filetools.join(path, next_file.replace("strm", "nfo"))
-        else:
-            item=None
+        global INFO
+        INFO = filetools.join(path, next_file.replace("strm", "nfo"))
+    else:
+        item=None
 
     return item
 
