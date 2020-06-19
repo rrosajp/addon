@@ -122,14 +122,10 @@ def findvideos(item):
         itemlist = support.server(item, data=urls_video)
 
         itemlist.append(
-            Item(channel=item.channel,
-                 title=support.typo("Vai alla Serie Completa: " + item.fulltitle, ' bold'),
-                 fulltitle=item.fulltitle,
-                 show=item.show,
-                 contentType='tvshow',
-                 url=url_serie,
-                 action='episodios',
-                 thumbnail = support.thumb(thumb='tvshow.png')
-                ))
+            item.colone(title=support.typo("Vai alla Serie Completa: " + item.fulltitle, ' bold'),
+                        contentType='tvshow',
+                        url=url_serie,
+                        action='episodios',
+                        thumbnail = support.thumb(thumb='tvshow.png')))
 
         return itemlist

@@ -152,7 +152,7 @@ def findvideos(data, skip=False):
     servers_list = list(get_servers_list().keys())
 
 
-    is_filter_servers = False
+    # is_filter_servers = False
 
     # Run findvideos on each active server
     for serverid in servers_list:

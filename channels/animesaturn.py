@@ -84,15 +84,7 @@ def peliculas(item):
             action = 'findvideos'
             def itemlistHook(itemlist):
                 if page:
-                    itemlist.append(
-                        support.Item(channel=item.channel,
-                            action = item.action,
-                            contentType=item.contentType,
-                            title=support.typo(support.config.get_localized_string(30992), 'color kod bold'),
-                            url=item.url,
-                            page= page,
-                            args=item.args,
-                            thumbnail=support.thumb()))
+                    itemlist.append(item(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'),page= page, thumbnail=support.thumb()))
                     return itemlist
         else:
             pagination = ''
@@ -133,17 +125,7 @@ def findvideos(item):
     if url:
         links = support.match(url, patron=r'(?:<source type="[^"]+"\s*src=|file:\s*)"([^"]+)"', headers=headers, debug=False).matches
         for link in links:
-            itemlist.append(
-                support.Item(channel=item.channel,
-                            action="play",
-                            title='Diretto',
-                            quality='',
-                            url=link,
-                            server='directo',
-                            fulltitle=item.fulltitle,
-                            show=item.show,
-                            contentType=item.contentType,
-                            folder=False))
+            itemlist.append(item.clone(action="play", title='Diretto', url=link, server='directo'))
     return support.server(item, itemlist=itemlist)
 
 

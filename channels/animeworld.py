@@ -156,20 +156,7 @@ def findvideos(item):
 
         if serverid == '18':
             url = support.match('%s/ajax/episode/serverPlayer?id=%s' % (host, ID), patron=r'source src="([^"]+)"', debug=False).match
-            itemlist.append(
-                support.Item(
-                    channel=item.channel,
-                    action="play",
-                    title='diretto',
-                    quality='',
-                    url=url,
-                    server='directo',
-                    fulltitle=item.fulltitle,
-                    contentSerieName=item.contentSerieName,
-                    contentTitle=item.contentTitle,
-                    show=item.show,
-                    contentType=item.contentType,
-                    folder=False))
+            itemlist.append(item.clone(action="play", title='diretto', url=url, server='directo'))
 
         elif serverid == '26':
             matches = support.match('%s/ajax/episode/serverPlayer?id=%s' % (host, item.url.split('/')[-1]), patron=r'<a href="([^"]+)"', ).matches

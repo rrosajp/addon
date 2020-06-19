@@ -68,14 +68,7 @@ def findvideos(item):
     matches = support.match(item, patron=r'filename: "(.*?)"').matches
 
     for url in matches:
-        itemlist.append(
-            Item(
-                channel=item.channel,
-                action="play",
-                title='Diretto',
-                server='directo',
-                url=host + url,
-                folder=False))
+        itemlist.append(item.clone(action="play", title='Diretto', server='directo', url=host + url))
 
     return support.server(item, itemlist=itemlist)
 

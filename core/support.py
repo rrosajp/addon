@@ -114,7 +114,7 @@ def search(channel, item, texto):
 
 def dbg():
     if config.dev_mode():
-        import web_pdb;
+        import web_pdb
         if not web_pdb.WebPdb.active_instance:
             import webbrowser
             webbrowser.open('http://127.0.0.1:5555')
@@ -1178,6 +1178,8 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
         videoitem.contentType = item.contentType
         videoitem.infoLabels = item.infoLabels
         videoitem.quality = quality
+        # videoitem.nfo = item.nfo
+        # videoitem.strm_path = item.strm_path
         return videoitem
 
     with futures.ThreadPoolExecutor() as executor:

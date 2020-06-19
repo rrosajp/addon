@@ -57,7 +57,8 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
                     break
 
             # check for next Episode
-            if next_episode and total_time > time_from_end >= difference:
+            if next_episode and marked and time_from_end >= difference:
+                # from core.support import dbg;dbg()
                 nextdialog = NextDialog(ND, config.get_runtime_path())
                 nextdialog.show()
                 while platformtools.is_playing() and not nextdialog.is_exit():

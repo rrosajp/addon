@@ -39,16 +39,10 @@ def mainlist(item):
 
 def menu(item):
     support.log()
-    itemlist = [support.Item(channel= item.channel, title = support.typo('Tutti','bullet bold'),
-                             url = item.url, action = 'peliculas'),
-
-                support.Item(channel= item.channel, title = support.typo('Generi','submenu'),
-                             url = item.url, args = 'genre', action = 'submenu'),
-
-                support.Item(channel= item.channel, title = support.typo('A-Z','submenu'),
-                             url = item.url, args = 'az', action = 'submenu'),
-                support.Item(channel= item.channel, title = support.typo('Cerca','submenu'),
-                             url = item.url, action = 'search')]
+    itemlist = [item.clone(title = support.typo('Tutti','bullet bold'), action = 'peliculas'),
+                item.clone(title = support.typo('Generi','submenu'), args = 'genre', action = 'submenu'),
+                item.clone(title = support.typo('A-Z','submenu'), args = 'az', action = 'submenu'),
+                item.clone(title = support.typo('Cerca','submenu'), action = 'search')]
 
     return support.thumb(itemlist)
 
@@ -58,8 +52,8 @@ def learning(item):
     itemlist =[]
     json = current_session.get(item.url).json()['contents']
     for key in json:
-        itemlist.append(support.Item(channel = item.channel, title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'],
-                                     url = key['contents'], thumbnail = item.thumbnail, action = 'peliculas', args = item.args))
+        itemlist.append(item.clone(title = support.typo(key['name'],'bold'), fulltitle = key['name'],
+                                   show = key['name'], url = key['contents'], action = 'peliculas'))
     return itemlist
 
 
@@ -71,34 +65,35 @@ def submenu(item):
         json_url = getUrl(json[-1]['path_id'])
         json = current_session.get(json_url).json()['contents']
         for key in json:
-            itemlist.append(support.Item(channel = item.channel, title = support.typo(key,'bold'), fulltitle = key, show = key,
-                                         url = json[key], thumbnail = item.thumbnail, action = 'peliculas', args = item.args))
+            itemlist.append(item.clone(title = support.typo(key,'bold'), fulltitle = key,
+                                       show = key, url = json[key], action = 'peliculas'))
     else:
         for key in json:
-            itemlist.append(support.Item(channel = item.channel, title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'],
-                                         thumbnail = getUrl(key['image']), url = getUrl(key['path_id']), action = 'peliculas', args = item.args))
+            itemlist.append(item.clone(title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'],
+                                       thumbnail = getUrl(key['image']), url = getUrl(key['path_id']), action = 'peliculas'))
         itemlist.pop(-1)
     return support.thumb(itemlist)
 
 
 def replay_menu(item):
     support.log()
-    import datetime
+    import datetime, xbmc
 
     # create day and month list
     days = []
     months = []
-    days.append(support.config.get_localized_string(17))
-    for day in range(11, 17): days.append(support.config.get_localized_string(day))
-    for month in range(21, 33): months.append(support.config.get_localized_string(month))
+    days.append(xbmc.getLocalizedString(17))
+    for day in range(11, 17): days.append(xbmc.getLocalizedString(day))
+    for month in range(21, 33): months.append(xbmc.getLocalizedString(month))
 
     # make menu
     itemlist = []
     today = datetime.date.today()
     for d in range(7):
         day = today - datetime.timedelta(days=d)
-        itemlist.append(support.Item(channel = item.channel, thumbnail = item.thumbnail, action = 'replay_channels', url = item.url, date = day.strftime("%d-%m-%Y"),
-                                     title = support.typo(days[int(day.strftime("%w"))] + " " + day.strftime("%d") + " " + months[int(day.strftime("%m"))-1], 'bold')))
+        support.log(day)
+        itemlist.append(item.clone(action = 'replay_channels', date = day.strftime("%d-%m-%Y"),
+                                   title = support.typo(days[int(day.strftime("%w"))] + " " + day.strftime("%d") + " " + months[int(day.strftime("%m"))-1], 'bold')))
     return itemlist
 
 
@@ -107,8 +102,8 @@ def replay_channels(item):
     itemlist = []
     json = current_session.get(item.url).json()['dirette']
     for key in json:
-        itemlist.append(support.Item(channel = item.channel, title = support.typo(key['channel'], 'bold'), fulltitle = key['channel'], show = key['channel'],plot = item.title, action = 'replay',
-                                     thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"), url = '%s/palinsesto/app/old/%s/%s.json' % (host, key['channel'].lower().replace(' ','-'), item.date)))
+        itemlist.append(item.clone(title = support.typo(key['channel'], 'bold'), fulltitle = key['channel'], show = key['channel'], plot = item.title, action = 'replay',
+                                   thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"), url = '%s/palinsesto/app/old/%s/%s.json' % (host, key['channel'].lower().replace(' ','-'), item.date)))
     return itemlist
 
 
@@ -118,8 +113,8 @@ def replay(item):
     json = current_session.get(item.url).json()[item.fulltitle][0]['palinsesto'][0]['programmi']
     for key in json:
         support.log('KEY=',key)
-        if key and key['pathID']: itemlist.append(support.Item(channel = item.channel, thumbnail = getUrl(key['images']['landscape']), fanart = getUrl(key['images']['landscape']), url = getUrl(key['pathID']),
-                                             title = support.typo(key['timePublished'], 'color kod bold') + support.typo(' | ' + key['name'], ' bold'), fulltitle = key['name'], show = key['name'], plot = key['testoBreve'], action = 'findvideos'))
+        if key and key['pathID']: itemlist.append(item.clone(thumbnail = getUrl(key['images']['landscape']), fanart = getUrl(key['images']['landscape']), url = getUrl(key['pathID']), fulltitle = key['name'], show = key['name'],
+                                                             title = support.typo(key['timePublished'], 'color kod bold') + support.typo(' | ' + key['name'], ' bold'), plot = key['testoBreve'], action = 'findvideos'))
     return itemlist
 
 def search(item, text):
@@ -134,9 +129,9 @@ def search(item, text):
             for key in json:
                 for key in json[key]:
                     if 'PathID' in key and (text.lower() in key['name'].lower()):
-                        itemlist.append(support.Item(channel = item.channel, title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'], url = key['PathID'].replace('/?json', '.json'), action = 'Type',
-                                                     thumbnail = getUrl(key['images']['portrait'] if 'portrait' in key['images'] else key['images']['portrait43'] if 'portrait43' in key['images'] else key['images']['landscape']),
-                                                     fanart = getUrl(key['images']['landscape'] if 'landscape' in key['images'] else key['images']['landscape43'])))
+                        itemlist.append(item.clone(title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'], url = key['PathID'].replace('/?json', '.json'), action = 'Type',
+                                                   thumbnail = getUrl(key['images']['portrait'] if 'portrait' in key['images'] else key['images']['portrait43'] if 'portrait43' in key['images'] else key['images']['landscape']),
+                                                   fanart = getUrl(key['images']['landscape'] if 'landscape' in key['images'] else key['images']['landscape43'])))
     except:
         import sys
         for line in sys.exc_info():
@@ -162,9 +157,9 @@ def dirette(item):
     json = current_session.get(item.url).json()['dirette']
     onAir = current_session.get(onair).json()['on_air']
     for i, key in enumerate(json):
-        itemlist.append(support.Item(channel = item.channel, title = support.typo(key['channel'], 'bold'), fulltitle = key['channel'], show = key['channel'],
-                                     thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"),forcethumb=True , fanart = getUrl(onAir[i]['currentItem']['image']), url = key['video']['contentUrl'],
-                                     plot = support.typo(onAir[i]['currentItem']['name'],'bold')+ '\n\n' + onAir[i]['currentItem']['description'], action = 'play'))
+        itemlist.append(item.clone(title = support.typo(key['channel'], 'bold'), fulltitle = key['channel'], show = key['channel'], url = key['video']['contentUrl'],
+                                   thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"),forcethumb=True , fanart = getUrl(onAir[i]['currentItem']['image']),
+                                   plot = support.typo(onAir[i]['currentItem']['name'],'bold')+ '\n\n' + onAir[i]['currentItem']['description'], action = 'play'))
     return itemlist
 
 
@@ -212,10 +207,7 @@ def peliculas(item):
     itemlist = sorted(itemlist, key=lambda it: it.title)
 
     if len(keys) > pag * pagination and not item.search:
-        itemlist.append(support.Item(channel=item.channel, action = item.action, contentType=item.contentType,
-                                     title=support.typo(support.config.get_localized_string(30992), 'color kod bold'),
-                                     fulltitle= item.fulltitle, show= item.show, url=item.url, args=item.args, page=pag + 1,
-                                     thumbnail=support.thumb()))
+        itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), page=pag + 1, thumbnail=support.thumb()))
     return itemlist
 
 
@@ -224,8 +216,7 @@ def select(item):
     itemlist = []
     json = current_session.get(item.url).json()['blocks']
     for key in json:
-        itemlist.append(support.Item(channel = item.channel, title = support.typo(key['name'],'bold'), fulltitle = item.fulltitle,
-                                     show = item.show, thumbnail = item.thumbnail, url = key['sets'], action = 'episodios', args = item.args))
+        itemlist.append(item.clone(title = support.typo(key['name'],'bold'), url = key['sets'], action = 'episodios'))
     if len(itemlist) == 1:
         return episodios(itemlist[0])
     else:
@@ -237,9 +228,7 @@ def episodios(item):
     itemlist = []
     if type(item.url) in [list, dict] and len(item.url) > 1 and ('name' in item.url[0] and 'stagione' not in item.url[0]['name'].lower()):
         for key in item.url:
-            itemlist.append(support.Item(channel = item.channel, title = support.typo(key['name'], 'bold'), fulltitle = item.fulltitle, show = item.show, thumbnail = item.thumbnail,
-                                        fanart = item.fanart, url = getUrl(key['path_id']), plot = item.plot, contentType = 'tvshow',
-                                        action = 'episodios'))
+            itemlist.append(item.clone(title = support.typo(key['name'], 'bold'), url = getUrl(key['path_id']), contentType = 'tvshow', action = 'episodios'))
 
     elif type(item.url) in [list, dict]:
         with futures.ThreadPoolExecutor() as executor:
@@ -269,9 +258,8 @@ def episodios(item):
             # title = key['subtitle'].strip()
             if not title:
                 title = key['name']
-            itemlist.append(support.Item(channel = item.channel, title = support.typo(title, 'bold'), fulltitle = item.fulltitle, show = item.show, thumbnail = item.thumbnail,
-                                        fanart = getUrl(key['images']['landscape']), url = key['video_url'], plot = key['description'], contentType = 'episode',
-                                        action = 'findvideos', VL=True if ep else False))
+            itemlist.append(item.clone(title = support.typo(title, 'bold'), action = 'findvideos', VL=True if ep else False, plot = key['description'],
+                                       fanart = getUrl(key['images']['landscape']), url = key['video_url'], contentType = 'episode'))
 
         if itemlist and itemlist[0].VL: support.videolibrary(itemlist, item)
     return itemlist
@@ -290,8 +278,7 @@ def findvideos(item):
     else:
         url = item.url
 
-    itemlist.append(support.Item(channel = item.channel, server = 'directo', title = 'Diretto', fulltitle = item.fulltitle,
-            show = item.show, thumbnail = item.thumbnail, fanart = item.json, url = getUrl(url), action = 'play' ))
+    itemlist.append(item.clone(server = 'directo', title = 'Diretto', fanart = item.json, url = getUrl(url), action = 'play' ))
     return support.server(item, itemlist=itemlist, Download=False)
 
 
@@ -321,8 +308,9 @@ def addinfo(key, item):
     support.log()
     info = current_session.get(getUrl(key['info_url'])).json()
     if not item.search or item.search.lower() in key['name'].lower():
-        it = support.Item( channel = item.channel, title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'],
-                thumbnail = getUrl(key['images']['portrait_logo'] if key['images']['portrait_logo'] else key['images']['landscape']), fanart = getUrl(key['images']['landscape']), url = getUrl(key['path_id']), plot = info['description'])
+        it = item.clone(title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'],
+                        thumbnail = getUrl(key['images']['portrait_logo'] if key['images']['portrait_logo'] else key['images']['landscape']),
+                        fanart = getUrl(key['images']['landscape']), url = getUrl(key['path_id']), plot = info['description'])
         if 'layout' not in key or key['layout'] == 'single':
             it.action = 'findvideos'
             it.contentType = 'movie'
@@ -351,9 +339,9 @@ def load_episodes(key, item):
         if not title:
             title = key['name']
 
-        itemlist.append(support.Item(channel = item.channel, title = support.typo(title, 'bold'), fulltitle = item.fulltitle, show = item.show, thumbnail = item.thumbnail,
-                                     fanart = getUrl(key['images']['landscape']), url = key['video_url'], plot = key['description'], contentType = 'episode',
-                                     action = 'findvideos', VL=True if ep else False, order=order))
+        itemlist.append(item.clone(title = support.typo(title, 'bold'), url = key['video_url'], contentType = 'episode',
+                                   fanart = getUrl(key['images']['landscape']), plot = key['description'],
+                                   action = 'findvideos', VL=True if ep else False, order=order))
     return itemlist
 
 

@@ -571,6 +571,7 @@ def findvideos(item):
 
         item_json = Item().fromjson(filetools.read(json_path))
         list_servers = []
+        # from core.support import dbg;dbg()
 
         try:
             # FILTERTOOLS
@@ -583,6 +584,8 @@ def findvideos(item):
             # We run find_videos, from the channel or common
             item_json.contentChannel = 'videolibrary'
             item_json.play_from = item.play_from
+            item_json.nfo = item.nfo
+            item_json.strm_path = item.strm_path
             if hasattr(channel, 'findvideos'):
                 from core import servertools
                 if item_json.videolibray_emergency_urls:

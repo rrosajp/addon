@@ -120,14 +120,7 @@ def findvideos(item):
         return episodios(item)
 
     if 'vvvvid' in matches.data:
-        itemlist.append(
-                support.Item(channel=item.channel,
-                            action="play",
-                            contentType=item.contentType,
-                            title='vvvid',
-                            url=support.match(matches.data, patron=r'(http://www.vvvvid[^"]+)').match,
-                            server='vvvvid',
-                            ))
+        itemlist.append(item.clone(action="play", title='VVVVID', url=support.match(matches.data, patron=r'(http://www.vvvvid[^"]+)').match, server='vvvvid'))
     else:
     # matches.matches.sort()
         support.log('VIDEO')
@@ -139,17 +132,7 @@ def findvideos(item):
                 language = 'Sub-' + language
             quality = url.split('/')[-1].split('?')[0]
 
-            itemlist.append(
-                support.Item(channel=item.channel,
-                            action="play",
-                            contentType=item.contentType,
-                            title=language,
-                            url=url,
-                            contentLanguage = language,
-                            quality = quality,
-                            order = quality.replace('p','').zfill(4),
-                            server='directo',
-                            ))
+            itemlist.append(item.clone(action="play", title=language, url=url, contentLanguage = language, quality = quality, order = quality.replace('p','').zfill(4), server='directo',))
 
     itemlist.sort(key=lambda x: (x.title, x.order), reverse=False)
     return support.server(item, itemlist=itemlist)

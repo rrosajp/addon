@@ -52,18 +52,7 @@ def findvideos(item):
                 title = server + " [COLOR blue][" + quality + "][/COLOR]"
             else:
                 title = server
-            itemlist.append(
-                Item(channel=item.channel,
-                     action="play",
-                     title=title,
-                     url=link['url'],
-                     server=server,
-                     fulltitle=item.fulltitle,
-                     thumbnail=item.thumbnail,
-                     show=item.show,
-                     quality=quality,
-                     contentType=item.contentType,
-                     folder=False))
+            itemlist.append(item.clone(action="play", title=title, url=link['url'], server=server, quality=quality,))
 
     autoplay.start(itemlist, item)
 

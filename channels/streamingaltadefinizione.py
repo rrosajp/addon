@@ -68,14 +68,8 @@ def findvideos(item):
     matches = support.match(item, patron=r'<a href="([^"]+)[^>]+>Download[^>]+>[^>]+>[^>]+><strong class="quality">([^<]+)<').matches
     for url, quality in matches:
         itemlist.append(
-            Item(channel=item.channel,
-                 action="play",
-                 url=unquote(support.match(url, patron=[r'dest=([^"]+)"',r'/(http[^"]+)">Click']).match),
-                 fulltitle=item.fulltitle,
-                 thumbnail=item.thumbnail,
-                 show=item.show,
-                 quality=quality,
-                 contentType=item.contentType,
-                 folder=False))
+            item.clone(caction="play",
+                       url=unquote(support.match(url, patron=[r'dest=([^"]+)"',r'/(http[^"]+)">Click']).match),
+                       quality=quality))
 
     return support.server(item, itemlist=itemlist)

@@ -184,17 +184,6 @@ def findvideos(item):
             series = support.typo(item.contentSerieName, ' bold color kod')
             itemlist = support.server(item, data=url_video)
 
-            itemlist.append(
-                Item(channel=item.channel,
-                        title=goseries + series,
-                        fulltitle=item.fulltitle,
-                        show=item.show,
-                        contentType='tvshow',
-                        contentSerieName=item.contentSerieName,
-                        url=url_serie,
-                        action='episodios',
-                        contentTitle=item.contentSerieName,
-                        plot = goseries + series + "con tutte le puntate",
-                        ))
+            itemlist.append(item.clone(title=goseries + series, contentType='tvshow', url=url_serie, action='episodios', plot = goseries + series + "con tutte le puntate"))
 
         return itemlist
