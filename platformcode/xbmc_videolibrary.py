@@ -231,7 +231,7 @@ def sync_trakt_kodi(silent=True):
         logger.info("Synchronization with Trakt started")
 
         if notificacion:
-            platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60045), time=2000)
+            platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60045), sound=False, time=2000)
 
 
 def mark_content_as_watched_on_kodi(item, value=1):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from core import filetools
+from core import filetools, jsontools
 from core.item import Item
 from platformcode import config, logger, platformtools
 from time import sleep
@@ -215,8 +215,8 @@ def start(itemlist, item):
                     lang = " "
                     if hasattr(videoitem, 'language') and videoitem.language != "":
                         lang = " '%s' " % videoitem.language
-
-                    platformtools.dialog_notification("AutoPlay %s" %text_b, "%s%s%s" % (videoitem.server.upper(), lang, videoitem.quality.upper()), sound=False)
+                    name = servername(videoitem.server)
+                    platformtools.dialog_notification("AutoPlay %s" %text_b, "%s%s%s" % (name, lang, videoitem.quality.upper()), sound=False)
 
                     # Try to play the links If the channel has its own play method, use it
                     try: channel = __import__('channels.%s' % channel_id, None, None, ["channels.%s" % channel_id])
@@ -254,13 +254,13 @@ def start(itemlist, item):
 
                     # If the maximum number of attempts of this server has been reached, ask if we want to continue testing or ignore it.
                     if max_intentos_servers[videoitem.server.lower()] == 0:
-                        text = config.get_localized_string(60072) % videoitem.server.upper()
+                        text = config.get_localized_string(60072) % name
                         if not platformtools.dialog_yesno("AutoPlay", text, config.get_localized_string(60073)):
                             max_intentos_servers[videoitem.server.lower()] = max_intentos
 
                     # If there are no items in the list, it is reported
                     if autoplay_elem == autoplay_list[-1]:
-                         platformtools.dialog_notification('AutoPlay', config.get_localized_string(60072) % videoitem.server.upper())
+                        platformtools.dialog_notification('AutoPlay', config.get_localized_string(60072) % name)
 
         else:
             platformtools.dialog_notification(config.get_localized_string(60074), config.get_localized_string(60075))
@@ -290,3 +290,7 @@ def play_multi_channel(item, itemlist):
             start(videos, item)
         else:
             break
+
+def servername(server):
+    path = filetools.join(config.get_runtime_path(), 'servers', server + '.json')
+    return jsontools.load(open(path, "r").read())['name'].upper()
