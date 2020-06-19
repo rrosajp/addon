@@ -59,15 +59,7 @@ def findvideos(item):
         if link['title'] != 'Guarda il trailer':
             logger.info(link['title'])
             itemlist.append(
-                Item(channel=item.channel,
-                     action="play",
-                     url=link['url'],
-                     fulltitle=item.fulltitle,
-                     thumbnail=item.thumbnail,
-                     show=item.show,
-                     quality=link['title'],
-                     contentType=item.contentType,
-                     folder=False))
+                item.clone(action="play", url=link['url'], quality=link['title']))
     return support.server(item, itemlist=itemlist)
 
 
