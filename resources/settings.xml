@@ -38,7 +38,7 @@
         <setting id="next_ep" type="bool" label="70748" default="true"/>
         <setting id="next_ep_type" type="select" label="70754" lvalues="70755|70756|70757" default="0" visible="eq(-1,true)" subsetting="true"/>
         <setting id="next_ep_seconds" type="slider" option="int" range="20,10,240" label="70749" default="40" visible="eq(-2,true)" subsetting="true"/>
-        <setting id="watched_setting" type="slider" option="int" range="20,10,90" label="60634" default="80"/>
+        <setting id="watched_setting" type="slider" option="int" range="20,5,90" label="60634" default="80"/>
         <setting id="trakt_sync" type="bool" label="70109" default="false"/>
         <setting label="30030" type="lsep"/>
         <setting id="vidolibrary_preferences" type="action" label="60542" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAiY2hhbm5lbF9jb25maWciLA0KICAgICJjaGFubmVsIjogInZpZGVvbGlicmFyeSINCn0==)"/>

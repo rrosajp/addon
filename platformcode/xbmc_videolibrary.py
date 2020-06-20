@@ -30,7 +30,7 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
 
         percentage = float(config.get_setting("watched_setting")) / 100
         time_from_end = config.get_setting('next_ep_seconds')
-        if item.contentType != 'movie' and not config.get_setting('next_ep'):
+        if item.contentType != 'movie' and config.get_setting('next_ep'):
             next_dialogs = ['NextDialog.xml', 'NextDialogExtended.xml', 'NextDialogCompact.xml']
             next_ep_type = config.get_setting('next_ep_type')
             ND = next_dialogs[next_ep_type]
@@ -41,12 +41,13 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
             total_time = xbmc.Player().getTotalTime()
             if item_nfo.played_time and item_nfo.played_time > actual_time > 1:
                 xbmc.Player().seekTime(item_nfo.played_time)
+                item_nfo.played_time = 0 # Fix for Slow Devices
 
             mark_time = total_time * percentage
             difference = total_time - actual_time
 
             # Mark as Watched
-            if actual_time > mark_time:
+            if actual_time > mark_time and not marked:
                 logger.debug("Marked as Watched")
                 item.playcount = 1
                 marked = True
@@ -58,19 +59,15 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
 
             # check for next Episode
             if next_episode and marked and time_from_end >= difference:
-                # from core.support import dbg;dbg()
                 nextdialog = NextDialog(ND, config.get_runtime_path())
                 nextdialog.show()
                 while platformtools.is_playing() and not nextdialog.is_exit():
                     xbmc.sleep(100)
-                nextdialog.close()
                 if nextdialog.continuewatching:
                     next_episode.next_ep = True
-                if next_episode.next_ep:
                     xbmc.Player().stop()
+                nextdialog.close()
                 break
-
-            time.sleep(1)
 
         # Set played time
         item_nfo.played_time = int(actual_time) if not marked and actual_time > 120 else 0
@@ -85,8 +82,7 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
             xbmc.sleep(700)
             xbmc.executebuiltin('Action(Back)')
             xbmc.sleep(500)
-        if next_episode:
-            if next_episode.next_ep:
+        if next_episode and next_episode.next_ep:
                 from platformcode.launcher import play_from_library
                 return play_from_library(next_episode)
 
