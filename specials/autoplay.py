@@ -292,5 +292,5 @@ def play_multi_channel(item, itemlist):
             break
 
 def servername(server):
-    path = filetools.join(config.get_runtime_path(), 'servers', server + '.json')
+    path = filetools.join(config.get_runtime_path(), 'servers', server.lower() + '.json')
     return jsontools.load(open(path, "r").read())['name'].upper()

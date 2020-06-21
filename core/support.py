@@ -39,13 +39,8 @@ def hdpass_get_servers(item):
         for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
             mir_url = scrapertools.decodeHtmlentities(mir_url)
             log(mir_url)
-            it = Item(channel=item.channel,
-                            action="play",
-                            fulltitle=item.fulltitle,
+            it = item.clone(action="play",
                             quality=quality,
-                            show=item.show,
-                            thumbnail=item.thumbnail,
-                            contentType=item.contentType,
                             title=srv,
                             server=srv,
                             url= mir_url)
