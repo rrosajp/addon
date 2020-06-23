@@ -21,6 +21,47 @@ validUrlRegex = re.compile(
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
 chBlackList = ['url']
+chNumRis = {
+    'altadefinizione01': {
+        'film': 20
+    },
+    'altadefinizione01_link': {
+            'film': 16,
+            'serie': 16,
+        },
+    'altadefinizioneclick': {
+            'film': 36,
+            'serie': 12,
+        },
+    'casacinema': {
+            'film': 10,
+            'serie': 10,
+        },
+    'cineblog01': {
+            'film': 12,
+            'serie': 13
+        },
+    'cinemalibero': {
+            'film': 20,
+            'serie': 20,
+        },
+    'cinetecadibologna': {
+            'film': 10
+        },
+    'eurostreaming': {
+            'serie': 18
+        },
+    'filmpertutti': {
+            'film': 24,
+            'serie': 24,
+        },
+    'guardaserieclick': {
+            'da controllare': 0
+        },
+    'hd4me': {
+            'film': 10
+        },
+}
 
 def getChannels():
     channel_list = channelselector.filterchannels("all")
@@ -46,6 +87,7 @@ def getServers():
         if srv in srvLinkDict:
             ret.append({'srv': srv})
     return ret
+
 
 @parameterized.parameterized_class(getChannels())
 class GenericChannelTest(unittest.TestCase):

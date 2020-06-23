@@ -80,13 +80,13 @@ def genres(item):
     blacklist = ['Altadefinizione01']
     if item.args == 'genres':
         patronBlock = r'<ul class="kategori_list">(?P<block>.*?)<div class="tab-pane fade" id="wtab2">'
-        patron = '<li><a href="(?P<url>[^"]+)">(?P<title>.*?)</a>'
+        patronMenu = '<li><a href="(?P<url>[^"]+)">(?P<title>.*?)</a>'
     elif item.args == 'years':
         patronBlock = r'<ul class="anno_list">(?P<block>.*?)</a></li> </ul> </div>'
-        patron = '<li><a href="(?P<url>[^"]+)">(?P<title>.*?)</a>'
+        patronMenu = '<li><a href="(?P<url>[^"]+)">(?P<title>.*?)</a>'
     elif item.args == 'orderalf':
         patronBlock = r'<div class="movies-letter">(?P<block>.*?)<div class="clearfix">'
-        patron = '<a title=.*?href="(?P<url>[^"]+)"><span>(?P<title>.*?)</span>'
+        patronMenu = '<a title=.*?href="(?P<url>[^"]+)"><span>(?P<title>.*?)</span>'
 
     #debug = True
     return locals()

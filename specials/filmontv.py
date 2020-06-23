@@ -2,226 +2,202 @@
 # ------------------------------------------------------------
 # Canale film in tv
 # ------------------------------------------------------------
-
-import re
-import urllib
-from channelselector import get_thumb
-from core import httptools, scrapertools, support, tmdb, filetools
+import datetime
+import glob
+import time
+import xml.etree.ElementTree as ET
+from core import filetools, downloadtools
 from core.item import Item
-from platformcode import logger, config, platformtools
+from platformcode import logger, config
+import gzip
 
-host = "https://www.superguidatv.it"
-
-TIMEOUT_TOTAL = 60
+host = "http://www.epgitalia.tv/xml/guide.gzip"
 
 
 def mainlist(item):
     logger.info(" mainlist")
-    itemlist = [#Item(channel="search", action='discover_list', title=config.get_localized_string(70309),
-               #search_type='list', list_type='movie/now_playing',
-               #          thumbnail=get_thumb("now_playing.png")),
-               #Item(channel="search", action='discover_list', title=config.get_localized_string(70312),
-               #          search_type='list', list_type='tv/on_the_air', thumbnail=get_thumb("on_the_air.png")),
-            Item(channel=item.channel,
-                     title=config.get_setting("film1", channel="filmontv"),
-                     action="now_on_tv",
-                     url="%s/film-in-tv/" % host,
-                     thumbnail=item.thumbnail),
-            Item(channel=item.channel,
-                     title=config.get_setting("film2", channel="filmontv"),
-                     action="now_on_tv",
-                     url="%s/film-in-tv/oggi/premium/" % host,
-                     thumbnail=item.thumbnail),
-            Item(channel=item.channel,
-                     title=config.get_setting("film3", channel="filmontv"),
-                     action="now_on_tv",
-                     url="%s/film-in-tv/oggi/sky-intrattenimento/" % host,
-                     thumbnail=item.thumbnail),
-            Item(channel=item.channel,
-                     title=config.get_setting("film4", channel="filmontv"),
-                     action="now_on_tv",
-                     url="%s/film-in-tv/oggi/sky-cinema/" % host,
-                     thumbnail=item.thumbnail),
-            Item(channel=item.channel,
-                     title=config.get_setting("film5", channel="filmontv"),
-                     action="now_on_tv",
-                     url="%s/film-in-tv/oggi/sky-primafila/" % host,
-                     thumbnail=item.thumbnail),
-            Item(channel=item.channel,
-                     title=config.get_setting("now1", channel="filmontv"),
-                     action="now_on_misc",
-                     url="%s/ora-in-onda/" % host,
-                     thumbnail=item.thumbnail),
-            Item(channel=item.channel,
-                     title=config.get_setting("now2", channel="filmontv"),
-                     action="now_on_misc",
-                     url="%s/ora-in-onda/premium/" % host,
-                     thumbnail=item.thumbnail),
-            Item(channel=item.channel,
-                     title=config.get_setting("now3", channel="filmontv"),
-                     action="now_on_misc",
-                     url="%s/ora-in-onda/sky-intrattenimento/" % host,
-                     thumbnail=item.thumbnail),
-            Item(channel=item.channel,
-                     title=config.get_setting("now4", channel="filmontv"),
-                     action="now_on_misc",
-                     url="%s/ora-in-onda/sky-doc-e-lifestyle/" % host,
-                     thumbnail=item.thumbnail),
-            Item(channel=item.channel,
-                     title=config.get_setting("now5", channel="filmontv"),
-                     action="now_on_misc_film",
-                     url="%s/ora-in-onda/sky-cinema/" % host,
-                     thumbnail=item.thumbnail),
-            Item(channel=item.channel, 
-                    title="Personalizza Oggi in TV",
-                    action="server_config", 
-                    config="filmontv", 
-                    folder=False, 
-                    thumbnail=item.thumbnail)]
-
-    return itemlist
-
-def server_config(item):
-    return platformtools.show_channel_settings(channelpath=filetools.join(config.get_runtime_path(), "server", item.config))
-
-def now_on_misc_film(item):
-    logger.info("filmontv tvoggi")
     itemlist = []
 
-    # Carica la pagina 
-    data = httptools.downloadpage(item.url).data
-    #patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
-    patron = r'table-cell[;" ]*alt="([^"]+)".*?backdrop" alt="([^"]+)"[ ]*src="([^"]+)'
-    matches = re.compile(patron, re.DOTALL).findall(data)
-    for scrapedchannel, scrapedtitle, scrapedthumbnail in matches:
-    # for scrapedthumbnail, scrapedtitle, scrapedtv in matches:
-        scrapedurl = ""
-        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle).strip()
-        infoLabels = {}
-        #infoLabels["year"] = ""
-        infoLabels['title'] = "movie"
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="new_search",
-                 extra=urllib.quote_plus(scrapedtitle) + '{}' + 'movie',
-                 title="[B]" + scrapedtitle + "[/B] - " + scrapedchannel,
-                 fulltitle=scrapedtitle,
-                 mode='all',
-                 search_text=scrapedtitle,
-                 url=scrapedurl,
-                 thumbnail=scrapedthumbnail.replace("?width=320", "?width=640"),
-                 contentTitle=scrapedtitle,
-                 contentType='movie',
-                 infoLabels=infoLabels,
-                 folder=True))
-
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+    itemlist.append(Item(title='Film in onda oggi', channel=item.channel, action='peliculas', contentType='movie'))
+    itemlist.append(Item(title='Serie Tv in onda oggi', channel=item.channel, action='peliculas', contentType='tvshow'))
+    itemlist.append(Item(title='Guida tv per canale', channel=item.channel, action='listaCanali'))
+    itemlist.append(Item(title='Canali live (Rai Play)', channel=item.channel, action='live'))
 
     return itemlist
 
-def now_on_misc(item):
-    logger.info("filmontv tvoggi")
+
+def getEpg():
+    now = datetime.datetime.now()
+    fileName = config.get_temp_file('guidatv-') + now.strftime('%Y %m %d')
+    archiveName = fileName + '.gz'
+    xmlName = fileName + '.xml'
+    if not filetools.exists(archiveName):
+        logger.info('downloading epg')
+        # cancello quelli vecchi
+        for f in glob.glob(config.get_temp_file('guidatv-') + '*'):
+            filetools.remove(f, silent=True)
+        # inmemory = io.BytesIO(httptools.downloadpage(host).data)
+        downloadtools.downloadfile(host, archiveName)
+        logger.info('opening gzip and writing xml')
+        fStream = gzip.GzipFile(archiveName, mode='rb')
+        guide = fStream.read()
+        with open(xmlName, 'w') as f:
+            f.write(guide)
+
+    guide = open(xmlName).read()
+    return ET.fromstring(guide)
+
+
+def peliculas(item):
     itemlist = []
+    xml = getEpg()
 
-    # Carica la pagina 
-    data = httptools.downloadpage(item.url).data
-    #patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
-    patron = r'table-cell[;" ]*alt="([^"]+)".*?backdrop" alt="([^"]+)"[ ]*src="([^"]+)'
-    matches = re.compile(patron, re.DOTALL).findall(data)
-    for scrapedchannel, scrapedtitle, scrapedthumbnail in matches:
-    # for scrapedthumbnail, scrapedtitle, scrapedtv in matches:
-        scrapedurl = ""
-        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle).strip()
-        infoLabels = {}
-        infoLabels["year"] = ""
-        infoLabels['tvshowtitle'] = scrapedtitle
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="new_search",
-                 extra=urllib.quote_plus(scrapedtitle) + '{}' + 'tvshow',
-                 title="[B]" + scrapedtitle + "[/B] - " + scrapedchannel,
-                 fulltitle=scrapedtitle,
-                 mode='all',
-                 search_text=scrapedtitle,
-                 url=scrapedurl,
-                 thumbnail=scrapedthumbnail.replace("?width=320", "?width=640"),
-                 contentTitle=scrapedtitle,
-                 contentType='tvshow',
-                 infoLabels=infoLabels,
-                 folder=True))
+    for prog in xml.findall('programme[credits]'):  # se hanno il cast probabilmente si tratta di un contenuto cinematografico
+        title = prog.find('title')
+        if title is not None:
+            title = title.text
+            # non mostro 2 volte lo stesso film
+            for it in itemlist:
+                if it.contentTitle == title:
+                    break
+            else:
+                episode = prog.find('episode-num')
+                if episode is not None:
+                    episode = ' (' + episode.text + ')'
+                else:
+                    episode = ''
+                if (episode and item.contentType == 'tvshow') or (not episode and item.contentType == 'movie'):
+                    desc = prog.find('desc')
+                    if desc is not None:
+                        desc = desc.text
+                    actors = prog.find('credits')
+                    if actors is not None:
+                        actors = [(actor.text, actor.attrib['role'] if 'role' in actor.attrib else '') for actor in actors]
+                    date = prog.find('date')
+                    if date is not None:
+                        date = date.text
+                    genres = prog.find('category')
+                    if genres is not None:
+                        genres = ','.join([cat.text for cat in genres])
+                    thumbnail = prog.find('icon')
+                    if thumbnail is not None:
+                        thumbnail = thumbnail.attrib['src']
+                    country = prog.find('country')
+                    if country is not None:
+                        country = country.text
 
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
-
+                    itemlist.append(Item(
+                        channel=item.channel,
+                        action='new_search',
+                        title=title + episode,
+                        search_text=title,
+                        mode=item.contentType,
+                        year=date if date else '-',
+                        thumbnail=thumbnail if thumbnail else '',
+                        contentType=item.contentType,
+                        infoLabels={
+                            'title': title,
+                            'plot': desc if desc else '',
+                            'casta': actors if actors else '',
+                            'genre': genres if genres else '',
+                            'country': country if country else ''
+                        }
+                    ))
+    # tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
     return itemlist
 
-def now_on_tv(item):
-    logger.info("filmontv tvoggi")
+
+def listaCanali(item):
     itemlist = []
+    xml = getEpg()
 
-    # Carica la pagina 
-    data = httptools.downloadpage(item.url).data.replace('\n','')
-    #patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
-    patron = r'alt="([a-zA-Z 0-9]*)".*?spanMovieDuration">([^<]+).*?spanTitleMovie">([A-Za-z ,0-9\.À-ÖØ-öø-ÿ\-\']*).*?GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*).*?src="([a-zA-Z:\/\.0-9?]*).*?Year">([A-Z 0-9a-z]*)'    
-    matches = re.compile(patron, re.DOTALL).findall(data)
-    for scrapedchannel, scrapedduration, scrapedtitle, scrapedgender, scrapedthumbnail, scrapedyear in matches:
-    # for scrapedthumbnail, scrapedtitle, scrapedtv in matches:
-        scrapedurl = ""
-        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle).strip()
-        infoLabels = {}
-        infoLabels["year"] = scrapedyear
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="new_search",
-                 extra=urllib.quote_plus(scrapedtitle) + '{}' + 'movie',
-                 title="[B]" + scrapedtitle + "[/B] - " + scrapedchannel + " - " + scrapedduration,
-                 fulltitle="[B]" + scrapedtitle + "[/B] - " + scrapedchannel+ " - " + scrapedduration,
-                 url=scrapedurl,
-                 mode='all',
-                 search_text=scrapedtitle,
-                 thumbnail=scrapedthumbnail.replace("?width=240", "?width=480"),
-                 contentTitle=scrapedtitle,
-                 contentType='movie',
-                 infoLabels=infoLabels,
-                 folder=True))
+    for ch in xml.iter('channel'):
+        name = ch.attrib['id']
+        try:
+            icon = ch.find('icon').attrib['src']
 
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+            itemlist.append(Item(
+                channel=item.channel,
+                action='guidatv',
+                title=name,
+                thumbnail=icon
+            ))
+        except:
+            pass
 
-    return itemlist
+    return sorted(itemlist, key=lambda x: x.title)
 
-def primafila(item):
-    logger.info("filmontv tvoggi")
+
+def guidatv(item):
     itemlist = []
+    xml = getEpg()
+    import calendar
+    weekday = dict(enumerate(calendar.day_name))
 
-    # Carica la pagina 
-    data = httptools.downloadpage(item.url).data
-    #patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ]*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?=]*)'
-    patron = r'spanTitleMovie">([A-Za-z À-ÖØ-öø-ÿ\-\']*)[a-z \n<>\/="_\-:0-9;A-Z.]*GenresMovie">([\-\'A-Za-z À-ÖØ-öø-ÿ\/]*)[a-z \n<>\/="_\-:0-9;A-Z.%]*src="([a-zA-Z:\/\.0-9?]*)[a-z \n<>\/="_\-:0-9;A-Z.%\-\']*Year">([A-Z 0-9a-z]*)'
-    matches = re.compile(patron, re.DOTALL).findall(data)
-    for scrapedtitle, scrapedgender, scrapedthumbnail, scrapedyear in matches:
-    # for scrapedthumbnail, scrapedtitle, scrapedtv in matches:
-        scrapedurl = ""
-        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle).strip()
-        infoLabels = {}
-        infoLabels["year"] = scrapedyear
-        itemlist.append(
-            Item(channel=item.channel,
-                 action="new_search",
-                 extra=urllib.quote_plus(scrapedtitle) + '{}' + 'movie',
-                 title=scrapedtitle,
-                 fulltitle=scrapedtitle,
-                 url=scrapedurl,
-                 mode='all',
-                 search_text=scrapedtitle,
-                 thumbnail=scrapedthumbnail.replace("?width=240", "?width=480"),
-                 contentTitle=scrapedtitle,
-                 contentType='movie',
-                 infoLabels=infoLabels,
-                 folder=True))
+    for prog in xml.findall("programme[@channel='" + item.title + "']"):
+        start = time.strptime(prog.attrib['start'].split(' ')[0], '%Y%m%d%H%M%S')
+        stop = time.strptime(prog.attrib['stop'].split(' ')[0], '%Y%m%d%H%M%S')
+        title = prog.find('title')
+        if title is not None:
+            title = title.text
+            episode = prog.find('episode-num')
+            if episode is not None:
+                episode = ' (' + episode.text + ')'
+            else:
+                episode = ''
+            desc = prog.find('desc')
+            if desc is not None:
+                desc = desc.text
+            actors = prog.find('credits')
+            if actors is not None:
+                actors = [(actor.text, actor.attrib['role'] if 'role' in actor.attrib else '') for actor in actors]
+            date = prog.find('date')
+            if date is not None:
+                date = date.text
+            genres = prog.find('category')
+            if genres is not None:
+                genres = ','.join([cat.text for cat in genres])
+            thumbnail = prog.find('icon')
+            if thumbnail is not None:
+                thumbnail = thumbnail.attrib['src']
+            country = prog.find('country')
+            if country is not None:
+                country = country.text
 
-    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+            if episode:
+                content = 'tvshow'
+            elif actors:
+                content = 'movie'
+            else:
+                content = ''
+            itemlist.append(Item(
+                channel=item.channel,
+                action='new_search',
+                search_text=title,
+                mode='all',
+                title=title + episode + '\n' + weekday[start.tm_wday] + ' alle ' + str(start.tm_hour).zfill(2) + ':' + str(start.tm_min).zfill(
+                    2) + ' - ' + str(
+                    stop.tm_hour).zfill(2) + ':' + str(stop.tm_min).zfill(2),
+                year=date if date else '-',
+                thumbnail=thumbnail if thumbnail else '',
+                contentType=content,
+                infoLabels={
+                    'title': title,
+                    'plot': desc if desc else '',
+                    'casta': actors if actors else '',
+                    'genre': genres if genres else '',
+                    'country': country if country else ''
+                }
+            ))
 
     return itemlist
+
 
 def new_search(item):
     from specials import search
     return search.new_search(item)
+
+
+def live(item):
+    from channels import raiplay
+    return raiplay.dirette(raiplay.mainlist(Item())[0])
