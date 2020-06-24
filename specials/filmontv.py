@@ -11,7 +11,7 @@ from core.item import Item
 from platformcode import logger, config
 import gzip
 
-host = "http://www.epgitalia.tv/xml/guide.gzip"
+host = "http://www.epgitalia.tv/xml/guide2.gzip"
 
 
 def mainlist(item):
@@ -55,7 +55,7 @@ def peliculas(item):
     for prog in xml.findall('programme[credits]'):  # se hanno il cast probabilmente si tratta di un contenuto cinematografico
         title = prog.find('title')
         if title is not None:
-            title = title.text
+            title = title.text.replace(' - 1^TV', '')
             # non mostro 2 volte lo stesso film
             for it in itemlist:
                 if it.contentTitle == title:
@@ -89,7 +89,7 @@ def peliculas(item):
                     itemlist.append(Item(
                         channel=item.channel,
                         action='new_search',
-                        title=title + episode,
+                        title=title,
                         search_text=title,
                         mode=item.contentType,
                         year=date if date else '-',
