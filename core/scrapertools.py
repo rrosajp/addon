@@ -103,6 +103,8 @@ def unescape(text):
     from Fredrik Lundh
     http://effbot.org/zone/re-sub.htm#unescape-html
     """
+    if not ('&' in text and ';' in text):
+        return text
 
     def fixup(m):
         text = m.group(0)
