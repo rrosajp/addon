@@ -6,8 +6,28 @@ from datetime import datetime
 import glob, time, gzip, xbmc
 from core import filetools, downloadtools, support, scrapertools
 from core.item import Item
+from platformcode import logger
 
 host = "http://www.epgitalia.tv/xml/guide.gzip"
+lCanali = ['Rai 1', 'Rai 2', 'Rai 3', 'Rete 4', 'Canale 5', 'Italia 1', 'Italia 2', 'Mediaset Extra', 'TeleTicino',
+           'la5@it', 'La7D', 'Sky TG24 HD', 'TG Norba24', 'Rai Premium', 'Rai News DTT', 'Rai Movie', 'Rai 4 DTT',
+           'Iris', 'GIALLO DTT', 'Alice', 'RAI Sport', 'Automoto TV', 'Sky Cinema Uno HD', 'Sky Cinema Uno +24 HD',
+           'Sky Cinema Collection HD', 'Sky Cinema Family HD', 'Sky Cinema Romance HD', 'Sky Cinema Comedy HD',
+           'Sky Cinema Action HD', 'Sky Cinema Due HD', 'Sky Cinema Due +24 HD', 'Sky Cinema Drama HD',
+           'Sky Cinema Suspense HD', 'Comedy Central', 'Laeffe', 'Sky Uno HD', 'Classica HD', 'Sky Atlantic', 'Fox HD',
+           'Fox Life HD', 'Fox Crime HD', 'Blaze', 'Paramount Channel Italia', 'Lei', 'Dove', 'CI Crime+ Investigation',
+           'Sky Sport F1 HD', 'Sky Sport MotoGP', 'RaiSportpiuHD', 'Class Horse TV', 'SuperTennis HD', 'Eurosport HD',
+           'Eurosport 2HD', 'Sky Sport 24', 'Sky Sport Uno', 'Sky Sport Football HD', 'Sky Sport Arena',
+           'Sky Sport Serie A', 'Sky Sport NBA', 'Sky Sport Collection HD', 'Inter Channel', 'Lazio Style Channel',
+           'Milan TV', 'Roma TV', 'Torino Channel', 'Sky Arte HD-400', 'Discovery Science HD', 'National Geo HD',
+           'Nat Geo Wild HD', 'History Channel', 'FOCUS', 'DMAX HD', 'Caccia e Pesca', 'Gambero Rosso HD', 'Cielo DTT',
+           'Cartoon Network', 'Baby TV', 'Nickelodeon', 'DeAKids', 'Super! DTT', 'MAN-GA', 'MTV', 'Telelombardia',
+           'Spike tv', 'TV8', 'NOVE', 'Premium Cinema HD', 'Premium Cinema Energy', 'Premium Cinema Emotion',
+           'Premium Cinema Comedy', 'Premium Cinema +24 HD', 'Premium Stories', 'Premium Crime DTT', 'Premium Action',
+           'Top Crime', 'Sportitalia', 'MySports One F', 'MySports 2/Sky 2 F', 'MySports 3/Sky 3 F',
+           'MySports 4/Sky 4 F', 'MySports 5/Sky 5 F', 'MySports 6/Sky 6 F', 'MySports 7/Sky 7 F', 'MySports 8/Sky 8 F',
+           'MySports 9/Sky 9 F', 'Rai Italia', 'Radionorba TV', 'SMtv San Marino', 'Radio 1', 'Italia 7 Gold',
+           'Mediaset', 'HSE 24']
 
 
 def mainlist(item):
@@ -44,8 +64,8 @@ def getEpg():
 
 
 def category(item):
-    itemlist = []
-    category = ['Romance', 'Famiglia', 'Documentario', 'Thriller', 'Azione', 'Crime', 'Drammatico', 'Western', 'Avventura', 'Commedia', 'Fantascienza', 'Fantastico', 'Animazione', 'Horror', 'Mistero', 'Sentimentale', 'Sport', 'Informazione', 'Mondo e Tendenze', 'Intrattenimento', 'Altro', 'Noir', 'Musicale', 'Guerra', 'Storico', 'Biografico', 'Commedia drammatica', 'Poliziesco']
+    itemlist = [Item(title="Tutti", all=True, channel=item.channel, action='peliculas', contentType=item.contentType)]
+    category = ['Famiglia', 'Documentario', 'Thriller', 'Azione', 'Crime', 'Drammatico', 'Western', 'Avventura', 'Commedia', 'Fantascienza', 'Fantastico', 'Animazione', 'Horror', 'Mistero', 'Sport', 'Mondo e Tendenze', 'Intrattenimento', 'Musicale', 'Guerra', 'Storico', 'Biografico', 'Poliziesco']
 
     for cat in category:
         itemlist.append(Item(title=cat, category=cat, channel=item.channel, action='peliculas', contentType=item.contentType))
@@ -68,34 +88,41 @@ def peliculas(item, f=None, ):
     year = ''
     genres = []
     country = ''
+    skip = False
 
     for i, line in enumerate(f.splitlines()):
         if i >= pag:
             if '<programme' in line:
                 channel = scrapertools.find_single_match(line, r'channel="([^"]+)"')
+                if channel not in lCanali:
+                    skip = True
             elif '<title' in line:
                 title = scrapertools.find_single_match(line, r'>([^<]+?)(?: - 1\s*\^\s*TV)?<')
-            elif '<desc' in line:
+                if title in titles:
+                    skip = True
+            elif not skip and '<desc' in line:
                 plot = scrapertools.find_single_match(line, r'>([^<]+)<')
-            elif '<actor' in line:
+            elif not skip and '<actor' in line:
                 match = scrapertools.find_single_match(line, r'(?:role="([^"]*)")?>([^<]+)<')
                 actors.append([match[1], match[0]])
-            elif '<director' in line:
+            elif not skip and '<director' in line:
                 director = scrapertools.find_single_match(line, r'>([^<]+)<')
-            elif '<date' in line:
+            elif not skip and '<date' in line:
                 year = scrapertools.find_single_match(line, r'>([^<]+)<')
-            elif '<category' in line:
+            elif not skip and '<category' in line:
                 genres.append(scrapertools.find_single_match(line, r'>([^<]+)<'))
-            elif '<country' in line:
+            elif not skip and '<country' in line:
                 country = scrapertools.find_single_match(line, r'>([^<]+)<')
-            elif '<episode-num' in line:
+            elif not skip and '<episode-num' in line:
                 episode = scrapertools.find_single_match(line, r'>([^<]+)<')
-            elif '<icon' in line:
+                if item.contentType == 'movie':
+                    skip = True
+            elif not skip and '<icon' in line:
                 thumbnail = scrapertools.find_single_match(line, r'src="([^"]+)"')
             elif '</programme' in line:
-                if title not in titles and (actors or 'Film' in genres):
+                if not skip and (actors or 'Film' in genres):
                     titles.append(title)
-                    if (item.contentType == 'movie' and not episode and item.category in genres) or (item.contentType == 'tvshow' and episode):
+                    if (item.contentType == 'movie' and (item.category in genres or item.all==True)) or (item.contentType == 'tvshow'):
                         itemlist.append(Item(
                             channel=item.channel,
                             action='new_search',
@@ -127,6 +154,7 @@ def peliculas(item, f=None, ):
                 year = ''
                 genres = []
                 country = ''
+                skip = False
 
                 if len(itemlist) >= 40:
                     itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), pag= i + 1, thumbnail=support.thumb(), lastTitle=titles[-1]))
@@ -138,24 +166,33 @@ def listaCanali(item):
     itemlist = []
     f = getEpg()
     thumbnail = None
+    skip = False
 
     for line in f.splitlines():
         if '<channel' in line:
             channel = scrapertools.find_single_match(line, r'id="([^"]+)"')
-        elif '<icon' in line:
+            if channel not in lCanali:
+                skip = True
+        elif not skip and '<icon' in line:
             thumbnail = scrapertools.find_single_match(line, r'src="([^"]+)"')
-        elif '<programme' in line:
+        elif not skip and '<programme' in line:
             break
-        if '</channel' in line and thumbnail:
-            itemlist.append(Item(
-                channel=item.channel,
-                action='guidatv',
-                title=support.typo(channel, 'bold'),
-                channelName=channel,
-                thumbnail=thumbnail
-            ))
+        if '</channel' in line:
+            if not skip and thumbnail: #and 'channel="' + channel + '"' in f:
+                itemlist.append(Item(
+                    channel=item.channel,
+                    action='guidatv',
+                    title=support.typo(channel, 'bold'),
+                    channelName=channel,
+                    thumbnail=thumbnail
+                ))
+                lCanali.remove(channel)
             thumbnail = None
+            skip = False
+        if not lCanali:
+            break
     # return itemlist
+    # logger.info([i.title for i in itemlist])
     return sorted(itemlist, key=lambda x: x.title)
 
 
