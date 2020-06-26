@@ -2,21 +2,21 @@
 # ------------------------------------------------------------
 # Canale film in tv
 # ------------------------------------------------------------
-from datetime import datetime, timedelta
+from datetime import datetime
 import glob, time, gzip, xbmc
 from core import filetools, downloadtools, support, scrapertools
 from core.item import Item
 
-host = "http://www.epgitalia.tv/xml/guide2.gzip"
+host = "http://www.epgitalia.tv/xml/guide.gzip"
 
 
 def mainlist(item):
     support.log()
 
-    itemlist = [Item(title=support.typo('Film in onda oggi','bold'), channel=item.channel, action='peliculas', contentType='movie'),
-                Item(title=support.typo('Serie Tv in onda oggi','bold'), channel=item.channel, action='peliculas', contentType='tvshow'),
-                Item(title=support.typo('Guida tv per canale','bold'), channel=item.channel, action='listaCanali'),
-                Item(title=support.typo('Canali live (Rai Play)','bold'), channel=item.channel, action='live')]
+    itemlist = [Item(title=support.typo('Film in onda oggi', 'bold'), channel=item.channel, action='category', contentType='movie'),
+                Item(title=support.typo('Serie Tv in onda oggi', 'bold'), channel=item.channel, action='peliculas', contentType='tvshow'),
+                Item(title=support.typo('Guida tv per canale', 'bold'), channel=item.channel, action='listaCanali'),
+                Item(title=support.typo('Canali live (Rai Play)', 'bold'), channel=item.channel, action='live')]
 
     return itemlist
 
@@ -38,9 +38,19 @@ def getEpg():
         guide = fStream.read()
         with open(xmlName, 'w') as f:
             f.write(guide)
-
-    guide = open(xmlName).read()
+    else:
+        guide = open(xmlName).read()
     return guide
+
+
+def category(item):
+    itemlist = []
+    category = ['Romance', 'Famiglia', 'Documentario', 'Thriller', 'Azione', 'Crime', 'Drammatico', 'Western', 'Avventura', 'Commedia', 'Fantascienza', 'Fantastico', 'Animazione', 'Horror', 'Mistero', 'Sentimentale', 'Sport', 'Informazione', 'Mondo e Tendenze', 'Intrattenimento', 'Altro', 'Noir', 'Musicale', 'Guerra', 'Storico', 'Biografico', 'Commedia drammatica', 'Poliziesco']
+
+    for cat in category:
+        itemlist.append(Item(title=cat, category=cat, channel=item.channel, action='peliculas', contentType=item.contentType))
+    return itemlist
+
 
 def peliculas(item, f=None, ):
     f = getEpg()
@@ -64,7 +74,7 @@ def peliculas(item, f=None, ):
             if '<programme' in line:
                 channel = scrapertools.find_single_match(line, r'channel="([^"]+)"')
             elif '<title' in line:
-                title = scrapertools.find_single_match(line, r'>([^<]+)<')
+                title = scrapertools.find_single_match(line, r'>([^<]+?)(?: - 1\s*\^\s*TV)?<')
             elif '<desc' in line:
                 plot = scrapertools.find_single_match(line, r'>([^<]+)<')
             elif '<actor' in line:
@@ -82,29 +92,30 @@ def peliculas(item, f=None, ):
                 episode = scrapertools.find_single_match(line, r'>([^<]+)<')
             elif '<icon' in line:
                 thumbnail = scrapertools.find_single_match(line, r'src="([^"]+)"')
-            elif '</programme' in line and title not in titles and (actors or 'Film' in genres):
-                titles.append(title)
-                if (item.contentType == 'movie' and not episode) or (item.contentType == 'tvshow' and episode):
-                    itemlist.append(Item(
-                        channel=item.channel,
-                        action='new_search',
-                        title=support.typo(title + (' - ' + episode if episode else ''), 'bold'),
-                        fulltitle=title,
-                        search_text=title,
-                        mode=item.contentType,
-                        thumbnail=thumbnail if thumbnail else item.thumbnail,
-                        contentType=item.contentType,
-                        channel_name=channel,
-                        infoLabels={
-                            'title': title,
-                            'plot': plot,
-                            'castandrole': actors,
-                            'director': director,
-                            'genre': genres,
-                            'country': country,
-                            'year': year
-                        }
-                    ))
+            elif '</programme' in line:
+                if title not in titles and (actors or 'Film' in genres):
+                    titles.append(title)
+                    if (item.contentType == 'movie' and not episode and item.category in genres) or (item.contentType == 'tvshow' and episode):
+                        itemlist.append(Item(
+                            channel=item.channel,
+                            action='new_search',
+                            title=support.typo(title + (' - ' + episode if episode else ''), 'bold'),
+                            fulltitle=title,
+                            search_text=title,
+                            mode=item.contentType,
+                            thumbnail=thumbnail if thumbnail else item.thumbnail,
+                            contentType=item.contentType,
+                            channel_name=channel,
+                            infoLabels={
+                                'title': title,
+                                'plot': plot,
+                                'castandrole': actors,
+                                'director': director,
+                                'genre': genres,
+                                'country': country,
+                                'year': year
+                            }
+                        ))
 
                 channel = ''
                 title = ''
@@ -126,6 +137,7 @@ def peliculas(item, f=None, ):
 def listaCanali(item):
     itemlist = []
     f = getEpg()
+    thumbnail = None
 
     for line in f.splitlines():
         if '<channel' in line:
@@ -142,6 +154,7 @@ def listaCanali(item):
                 channelName=channel,
                 thumbnail=thumbnail
             ))
+            thumbnail = None
     # return itemlist
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -169,7 +182,7 @@ def guidatv(item):
         if '<programme' in line:
             start, stop, channel = scrapertools.find_single_match(line,r'start="([^"]*)" stop="([^"]*)" channel="([^"]+)"')
         elif '<title' in line:
-            title = scrapertools.find_single_match(line, r'>([^<]+)<')
+            title = scrapertools.find_single_match(line, r'>([^<]+?)<')
         elif '<desc' in line:
             plot = scrapertools.find_single_match(line, r'>([^<]+)<')
         elif '<actor' in line:
@@ -231,7 +244,11 @@ def guidatv(item):
 def new_search(item):
     from specials import search
     item.channel = 'search'
-    return search.new_search(item)
+    # se risultato certo, vai dritto alla ricerca per id
+    if item.infoLabels['tmdb_id']:
+        return search.channel_search(item)
+    else:
+        return search.new_search(item)
 
 
 def live(item):
