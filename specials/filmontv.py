@@ -54,13 +54,13 @@ def getEpg():
         # inmemory = io.BytesIO(httptools.downloadpage(host).data)
         downloadtools.downloadfile(host, archiveName)
         support.log('opening gzip and writing xml')
-        fStream = gzip.GzipFile(archiveName, mode='rb')
-        guide = fStream.read()
-        with open(xmlName, 'w') as f:
-            f.write(guide)
-    else:
-        guide = open(xmlName).read()
-    return guide
+    fStream = gzip.GzipFile(archiveName, mode='rb')
+    #     guide = fStream.read()
+    #     with open(xmlName, 'w') as f:
+    #         f.write(guide)
+    # else:
+    #     guide = open(xmlName).read()
+    return fStream
 
 
 def category(item):
@@ -90,76 +90,79 @@ def peliculas(item, f=None, ):
     country = ''
     skip = False
 
-    for i, line in enumerate(f.splitlines()):
-        if i >= pag:
-            if '<programme' in line:
-                channel = scrapertools.find_single_match(line, r'channel="([^"]+)"')
-                if channel not in lCanali:
-                    skip = True
-            elif '<title' in line:
-                title = scrapertools.find_single_match(line, r'>([^<]+?)(?: - 1\s*\^\s*TV)?<')
-                if title in titles:
-                    skip = True
-            elif not skip and '<desc' in line:
-                plot = scrapertools.find_single_match(line, r'>([^<]+)<')
-            elif not skip and '<actor' in line:
-                match = scrapertools.find_single_match(line, r'(?:role="([^"]*)")?>([^<]+)<')
-                actors.append([match[1], match[0]])
-            elif not skip and '<director' in line:
-                director = scrapertools.find_single_match(line, r'>([^<]+)<')
-            elif not skip and '<date' in line:
-                year = scrapertools.find_single_match(line, r'>([^<]+)<')
-            elif not skip and '<category' in line:
-                genres.append(scrapertools.find_single_match(line, r'>([^<]+)<'))
-            elif not skip and '<country' in line:
-                country = scrapertools.find_single_match(line, r'>([^<]+)<')
-            elif not skip and '<episode-num' in line:
-                episode = scrapertools.find_single_match(line, r'>([^<]+)<')
-                if item.contentType == 'movie':
-                    skip = True
-            elif not skip and '<icon' in line:
-                thumbnail = scrapertools.find_single_match(line, r'src="([^"]+)"')
-            elif '</programme' in line:
-                if not skip and (actors or 'Film' in genres):
-                    titles.append(title)
-                    if (item.contentType == 'movie' and (item.category in genres or item.all==True)) or (item.contentType == 'tvshow'):
-                        itemlist.append(Item(
-                            channel=item.channel,
-                            action='new_search',
-                            title=support.typo(title + (' - ' + episode if episode else ''), 'bold'),
-                            fulltitle=title,
-                            search_text=title,
-                            mode=item.contentType,
-                            thumbnail=thumbnail if thumbnail else item.thumbnail,
-                            contentType=item.contentType,
-                            channel_name=channel,
-                            infoLabels={
-                                'title': title,
-                                'plot': plot,
-                                'castandrole': actors,
-                                'director': director,
-                                'genre': genres,
-                                'country': country,
-                                'year': year
-                            }
-                        ))
+    f.seek(pag)
+    line = True
+    while line:
+        line = f.readline()
+        if '<programme' in line:
+            channel = scrapertools.find_single_match(line, r'channel="([^"]+)"')
+            if channel not in lCanali:
+                skip = True
+        elif '<title' in line:
+            title = scrapertools.find_single_match(line, r'>([^<]+?)(?: - 1\s*\^\s*TV)?<')
+            if title in titles:
+                skip = True
+        elif not skip and '<desc' in line:
+            plot = scrapertools.find_single_match(line, r'>([^<]+)<')
+        elif not skip and '<actor' in line:
+            match = scrapertools.find_single_match(line, r'(?:role="([^"]*)")?>([^<]+)<')
+            actors.append([match[1], match[0]])
+        elif not skip and '<director' in line:
+            director = scrapertools.find_single_match(line, r'>([^<]+)<')
+        elif not skip and '<date' in line:
+            year = scrapertools.find_single_match(line, r'>([^<]+)<')
+        elif not skip and '<category' in line:
+            genres.append(scrapertools.find_single_match(line, r'>([^<]+)<'))
+        elif not skip and '<country' in line:
+            country = scrapertools.find_single_match(line, r'>([^<]+)<')
+        elif not skip and '<episode-num' in line:
+            episode = scrapertools.find_single_match(line, r'>([^<]+)<')
+            if item.contentType == 'movie':
+                skip = True
+        elif not skip and '<icon' in line:
+            thumbnail = scrapertools.find_single_match(line, r'src="([^"]+)"')
+        elif '</programme' in line:
+            if not skip and (actors or 'Film' in genres):
+                titles.append(title)
+                if (item.contentType == 'movie' and (item.category in genres or item.all==True)) or (item.contentType == 'tvshow' and episode):
+                    itemlist.append(Item(
+                        channel=item.channel,
+                        action='new_search',
+                        title=support.typo(title + (' - ' + episode if episode else ''), 'bold'),
+                        fulltitle=title,
+                        search_text=title,
+                        mode=item.contentType,
+                        thumbnail=thumbnail if thumbnail else item.thumbnail,
+                        contentType=item.contentType,
+                        channel_name=channel,
+                        infoLabels={
+                            'title': title,
+                            'plot': plot,
+                            'castandrole': actors,
+                            'director': director,
+                            'genre': genres,
+                            'country': country,
+                            'year': year
+                        }
+                    ))
 
-                channel = ''
-                title = ''
-                episode = ''
-                plot = ''
-                thumbnail = ''
-                actors = []
-                director = ''
-                year = ''
-                genres = []
-                country = ''
-                skip = False
+            channel = ''
+            title = ''
+            episode = ''
+            plot = ''
+            thumbnail = ''
+            actors = []
+            director = ''
+            year = ''
+            genres = []
+            country = ''
+            skip = False
 
-                if len(itemlist) >= 40:
-                    itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), pag= i + 1, thumbnail=support.thumb(), lastTitle=titles[-1]))
-                    break
+            if len(itemlist) >= 40:
+                itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), pag= f.tell(), thumbnail=support.thumb(), lastTitle=titles[-1]))
+                break
     support.tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+    f.close()
     return itemlist
 
 def listaCanali(item):
@@ -167,8 +170,9 @@ def listaCanali(item):
     f = getEpg()
     thumbnail = None
     skip = False
-
-    for line in f.splitlines():
+    line = True
+    while line:
+        line = f.readline()
         if '<channel' in line:
             channel = scrapertools.find_single_match(line, r'id="([^"]+)"')
             if channel not in lCanali:
@@ -214,31 +218,36 @@ def guidatv(item):
     country = ''
     start = ''
     stop = ''
+    skip = False
 
-    for line in f.splitlines():
+    line = True
+    while line:
+        line = f.readline()
         if '<programme' in line:
             start, stop, channel = scrapertools.find_single_match(line,r'start="([^"]*)" stop="([^"]*)" channel="([^"]+)"')
-        elif '<title' in line:
+            if channel != item.channelName:
+                skip = True
+        elif not skip and '<title' in line:
             title = scrapertools.find_single_match(line, r'>([^<]+?)<')
-        elif '<desc' in line:
+        elif not skip and '<desc' in line:
             plot = scrapertools.find_single_match(line, r'>([^<]+)<')
-        elif '<actor' in line:
+        elif not skip and '<actor' in line:
             match = scrapertools.find_single_match(line, r'(?:role="([^"]*)")?>([^<]+)<')
             actors.append([match[1], match[0]])
-        elif '<director' in line:
+        elif not skip and '<director' in line:
             director = scrapertools.find_single_match(line, r'>([^<]+)<')
-        elif '<date' in line:
+        elif not skip and '<date' in line:
             year = scrapertools.find_single_match(line, r'>([^<]+)<')
-        elif '<category' in line:
+        elif not skip and '<category' in line:
             genres.append(scrapertools.find_single_match(line, r'>([^<]+)<'))
-        elif '<country' in line:
+        elif not skip and '<country' in line:
             country = scrapertools.find_single_match(line, r'>([^<]+)<')
-        elif '<episode-num' in line:
+        elif not skip and '<episode-num' in line:
             episode = scrapertools.find_single_match(line, r'>([^<]+)<')
-        elif '<icon' in line:
+        elif not skip and '<icon' in line:
             thumbnail = scrapertools.find_single_match(line, r'src="([^"]+)"')
         elif '</programme' in line:
-            if item.channelName in channel:
+            if not skip:
                 start = time.strptime(str(int(start.split(' ')[0]) + int(start.split('+')[1])), '%Y%m%d%H%M%S')
                 stop = time.strptime(str(int(stop.split(' ')[0]) + int(stop.split('+')[1])), '%Y%m%d%H%M%S')
                 duration = days[start.tm_wday] + ' alle ' + str(start.tm_hour).zfill(2) + ':' + str(start.tm_min).zfill(2) + ' - ' + str(stop.tm_hour).zfill(2) + ':' + str(stop.tm_min).zfill(2) + ' - '
@@ -275,6 +284,7 @@ def guidatv(item):
             country = ''
             start = ''
             stop = ''
+            skip = False
     return itemlist
 
 
