@@ -378,8 +378,8 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                                          textColor=c["color"], font=self.font, isPassword=c["hidden"], window=self)
 
         else:
-            control = xbmcgui.ControlEdit(0, -100, self.controls_width - 5, self.height_control,
-                                          c["label"], self.font, c["color"], '', 4, isPassword=c["hidden"],
+            control = xbmcgui.ControlEdit(0, -100, self.controls_width, self.height_control,
+                                          c["label"], self.font, c["color"], '', 1 | 4, isPassword=c["hidden"],
                                           focusTexture=os.path.join(self.mediapath, 'Controls', 'MenuItemFO.png'),
                                           noFocusTexture=os.path.join(self.mediapath, 'Controls', 'MenuItemNF.png'))
 
@@ -393,7 +393,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
             s = ''
         control.setText(s)
         # control.setText(self.values[c["id"]])
-        control.setWidth(self.controls_width - 5)
+        control.setWidth(self.controls_width + 10)
         control.setHeight(self.height_control)
 
         c["control"] = control
@@ -446,8 +446,8 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                 self.getControl(10006).setLabel(self.custom_button['label'])
             else:
                 self.getControl(10006).setVisible(False)
-                self.getControl(10004).setPosition(self.getControl(10004).getPosition()[0] + 80, self.getControl(10004).getPosition()[1])
-                self.getControl(10005).setPosition(self.getControl(10005).getPosition()[0] + 80, self.getControl(10005).getPosition()[1])
+                # self.getControl(10004).setPosition(self.getControl(10004).getPosition()[0], self.getControl(10004).getPosition()[1])
+                # self.getControl(10005).setPosition(self.getControl(10005).getPosition()[0], self.getControl(10005).getPosition()[1])
 
         # Control Area Dimensions
         self.controls_width = self.getControl(10007).getWidth() - 30
