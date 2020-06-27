@@ -184,7 +184,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                 # The call is made from a channel
                 self.list_controls, default_values = servertools.get_server_controls_settings(self.channel)
                 self.kwargs = {"server": self.channel}
-                self.channelName = servertools.get_server_json(self.channel)['name']
+                self.channelName = servertools.get_server_parameters(self.channel)['name']
 
             # Else Exit
             else:
@@ -225,6 +225,8 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
             c["control"].setVisible(val)
 
     def evaluate_conditions(self):
+        import time
+        t = time.time()
         for c in self.list_controls:
             c["active"] = self.evaluate(self.list_controls.index(c), c["enabled"])
             self.set_enabled(c, c["active"])
@@ -232,6 +234,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
             if not c["show"]:
                 self.set_visible(c, c["show"])
         self.visible_controls = [c for c in self.list_controls if c["show"]]
+        logger.info(time.time()-t)
 
     def evaluate(self, index, cond):
         import re
@@ -506,7 +509,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
             elif c["type"] == 'text': self.add_control_text(c)
             elif c["type"] == 'list': self.add_control_list(c)
             elif c["type"] == 'label': self.add_control_label(c)
-
+            logger.info(time.time()-t)
         self.list_controls = [c for c in self.list_controls if "control" in c]
 
         self.evaluate_conditions()

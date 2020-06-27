@@ -536,35 +536,35 @@ def get_server_parameters(server):
     return dict_servers_parameters[server]
 
 
-def get_server_json(server_name):
-    # logger.info("server_name=" + server_name)
-    try:
-        server_path = filetools.join(config.get_runtime_path(), "servers", server_name + ".json")
-        if not filetools.exists(server_path):
-            server_path = filetools.join(config.get_runtime_path(), "servers", "debriders", server_name + ".json")
-
-        # logger.info("server_path=" + server_path)
-        server_json = jsontools.load(filetools.read(server_path))
-        # logger.info("server_json= %s" % server_json)
-
-    except Exception as ex:
-        template = "An exception of type %s occured. Arguments:\n%r"
-        message = template % (type(ex).__name__, ex.args)
-        logger.error(" %s" % message)
-        server_json = None
-
-    return server_json
+# def get_server_json(server_name):
+#     # logger.info("server_name=" + server_name)
+#     try:
+#         server_path = filetools.join(config.get_runtime_path(), "servers", server_name + ".json")
+#         if not filetools.exists(server_path):
+#             server_path = filetools.join(config.get_runtime_path(), "servers", "debriders", server_name + ".json")
+#
+#         # logger.info("server_path=" + server_path)
+#         server_json = jsontools.load(filetools.read(server_path))
+#         # logger.info("server_json= %s" % server_json)
+#
+#     except Exception as ex:
+#         template = "An exception of type %s occured. Arguments:\n%r"
+#         message = template % (type(ex).__name__, ex.args)
+#         logger.error(" %s" % message)
+#         server_json = None
+#
+#     return server_json
 
 
 def get_server_host(server_name):
     from core import scrapertools
-    return [scrapertools.get_domain_from_url(pattern['url']) for pattern in get_server_json(server_name)['find_videos']['patterns']]
+    return [scrapertools.get_domain_from_url(pattern['url']) for pattern in get_server_parameters(server_name)['find_videos']['patterns']]
 
 
 def get_server_controls_settings(server_name):
     dict_settings = {}
 
-    list_controls = get_server_json(server_name).get('settings', [])
+    list_controls = get_server_parameters(server_name).get('settings', [])
     import copy
     list_controls = copy.deepcopy(list_controls)
 
