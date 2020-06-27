@@ -76,7 +76,7 @@ def getchanneltypes(view="thumb_"):
     logger.info()
 
     # Category List
-    channel_types = ["movie", "tvshow", "anime", "documentary", "vos", "direct", "live", "torrent",  "music"]
+    channel_types = ["movie", "tvshow", "anime", "documentary", "vos", "live", "torrent",  "music"] #, "direct"
 
     # Channel Language
     channel_language = auto_filter()
@@ -296,7 +296,7 @@ def thumb(item_or_itemlist=None, genre=False, thumb=''):
     import re
     icon_dict = {'movie':['film', 'movie'],
                  'tvshow':['serie','tv','episodi','episodio','fiction', 'show'],
-                 'documentary':['documentari','documentario', 'documentary'],
+                 'documentary':['documentari','documentario', 'documentary', 'documentaristico'],
                  'teenager':['ragazzi','teenager', 'teen'],
                  'learning':['learning'],
                  'all':['tutti', 'all'],
@@ -308,17 +308,17 @@ def thumb(item_or_itemlist=None, genre=False, thumb=''):
                  'action':['azione', 'arti marziali', 'action'],
                  'adventure': ['avventura', 'adventure'],
                  'biographical':['biografico', 'biographical'],
-                 'comedy':['comico', 'commedia', 'demenziale', 'comedy'],
+                 'comedy':['comico', 'commedia', 'demenziale', 'comedy', 'brillante'],
                  'adult':['erotico', 'hentai', 'harem', 'ecchi', 'adult'],
                  'drama':['drammatico', 'drama', 'dramma'],
                  'syfy':['fantascienza', 'science fiction', 'syfy', 'sci'],
-                 'fantasy':['fantasy', 'magia', 'magic'],
+                 'fantasy':['fantasy', 'magia', 'magic', 'fantastico'],
                  'crime':['gangster','poliziesco', 'crime', 'crimine'],
                  'grotesque':['grottesco', 'grotesque'],
                  'war':['guerra', 'war'],
                  'children':['bambini', 'kids'],
                  'horror':['horror'],
-                 'music':['musical', 'musica', 'music'],
+                 'music':['musical', 'musica', 'music', 'musicale'],
                  'mistery':['mistero', 'giallo', 'mystery'],
                  'noir':['noir'],
                  'popular' : ['popolari','popolare', 'più visti'],
