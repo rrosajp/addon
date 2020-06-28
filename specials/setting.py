@@ -291,26 +291,26 @@ def server_debrid_config(item):
 
 
 def servers_blacklist(item):
-    progress = platformtools.dialog_progress(config.get_localized_string(60550), config.get_localized_string(50003))
     server_list = servertools.get_servers_list()
     blacklisted = []
+
     list_controls = []
+    list_servers = []
 
     for i, server in enumerate(sorted(server_list.keys())):
         server_parameters = server_list[server]
         defaults = servertools.get_server_parameters(server)
 
-        control = xbmcgui.ListItem(server)
-        control.setArt({'thumb:': server_parameters['thumb'] if 'thumb' in server_parameters else config.get_online_server_thumb(server)})
+        control = server_parameters["name"]
+        # control.setArt({'thumb:': server_parameters['thumb'] if 'thumb' in server_parameters else config.get_online_server_thumb(server)})
         if defaults.get("black_list", False) or config.get_setting("black_list", server=server):
             blacklisted.append(i)
 
         list_controls.append(control)
-        progress.update(old_div(i * 100, len(server_list)))
-    progress.close()
-    ris = platformtools.dialog_multiselect(config.get_localized_string(60550), list_controls, preselect=blacklisted, useDetails=True)
+        list_servers.append(server)
+    ris = platformtools.dialog_multiselect(config.get_localized_string(60550), list_controls, preselect=blacklisted)
     if ris is not None:
-        cb_servers_blacklist({it.getLabel(): True if n in ris else False for n, it in enumerate(list_controls)})
+        cb_servers_blacklist({list_servers[n]: True if n in ris else False for n, it in enumerate(list_controls)})
     # return platformtools.show_channel_settings(list_controls=list_controls, dict_values=dict_values, caption=config.get_localized_string(60550), callback="cb_servers_blacklist")
 
 
@@ -366,13 +366,13 @@ def servers_favorites(item):
         if orden > 0:
             dict_values[orden] = len(server_names) - 1
 
-    for x in range(2, 12):
+    for x in range(1, 12):
         control = {'id': x,
                    'type': 'list',
                    'label': config.get_localized_string(60597) % x,
                    'lvalues': server_names,
                    'default': 0,
-                   'enabled': 'eq(-%s,True)' % x,
+                   'enabled': 'eq(-%s,True)' % str(x + 1),
                    'visible': True}
         list_controls.append(control)
 
