@@ -84,7 +84,7 @@ def peliculas(item):
             action = 'findvideos'
             def itemlistHook(itemlist):
                 if page:
-                    itemlist.append(item(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'),page= page, thumbnail=support.thumb()))
+                    itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'),page= page, thumbnail=support.thumb()))
                     return itemlist
         else:
             pagination = ''

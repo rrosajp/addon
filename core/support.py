@@ -296,7 +296,10 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                     if parsedTitle.get('screen_size'):
                         quality += ' ' + str(parsedTitle.get('screen_size', ''))
                 if not scraped['year']:
-                    infolabels['year'] = parsedTitle.get('year', '')
+                    if type(parsedTitle.get('year', '')) == list:
+                        infolabels['year'] =parsedTitle.get('year', '')[0]
+                    else:
+                        infolabels['year'] = parsedTitle.get('year', '')
                 if parsedTitle.get('episode') and parsedTitle.get('season'):
                     longtitle = title + s
 

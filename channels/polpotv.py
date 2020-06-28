@@ -205,19 +205,19 @@ def get_itemlist_element(element,item):
         next_action='episodios'
         quality=''
         url="%s%s"
+
+    if item.contentType=='movie':
+        support.tmdb.set_infoLabels_itemlist(itemlist)
     itemlist.append(
         item.clone(action=next_action,
-                   title=support.typo(scrapedtitle,'bold') + quality,
+                   title=support.typo(scrapedtitle, 'bold') + quality,
                    fulltitle=scrapedtitle,
                    show=scrapedtitle,
                    plot=scrapedplot,
                    fanart=scrapedfanart,
                    thumbnail=scrapedthumbnail,
                    contentTitle=scrapedtitle,
-                   url=url %(host,element['@id'] ),
+                   url=url % (host, element['@id']),
                    infoLabels=infoLabels))
 
-    if item.contentType=='movie':
-        for item in itemlist:
-            item= support.tmdb.find_and_set_infoLabels(item)
     return itemlist

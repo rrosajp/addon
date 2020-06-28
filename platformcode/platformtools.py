@@ -175,7 +175,7 @@ def render_items(itemlist, parent_item):
         if item.fanart == "":
             item.fanart = parent_item.fanart
         if item.action == 'play' and thumb_type == 1 and not item.forcethumb:
-            item.thumbnail = "https://github.com/kodiondemand/media/raw/master/resources/servers/" + item.server.lower() + '.png'
+            item.thumbnail = config.get_online_server_thumb(item.server)
 
         # if cloudflare and cloudscraper is used, cookies are needed to display images taken from site
         # before checking domain (time consuming), checking if tmdb failed (so, images scraped from website are used)

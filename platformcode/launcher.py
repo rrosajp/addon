@@ -456,7 +456,7 @@ def play_from_library(item):
                 options = []
                 selection_implementation = 0
                 for item in itemlist:
-                    item.thumbnail = "https://github.com/kodiondemand/media/raw/master/resources/servers/" + item.server.lower() + '.png'
+                    item.thumbnail = config.get_online_server_thumb(item.server)
                     quality = '[B][' + item.quality + '][/B]' if item.quality else ''
                     if item.server:
                         it = xbmcgui.ListItem('\n[B]%s[/B] %s - %s' % (item.server, quality, item.contentTitle))
