@@ -144,7 +144,7 @@ class GenericChannelTest(unittest.TestCase):
         self.assertTrue(mainlist, 'channel ' + self.ch + ' has no menu')
 
         for it in mainlist:
-            it.title = it.title.encode('ascii', 'ignore')
+            it.title = it.title.decode('ascii', 'ignore')
             if it.action == 'channel_config':
                 hasChannelConfig = True
                 continue
@@ -156,10 +156,8 @@ class GenericChannelTest(unittest.TestCase):
                 for content in chNumRis[self.ch]:
                     if content in it.title:
                         risNum = len(itemlist) - 1  # - nextpage
-                        self.assertEqual(risNum, chNumRis[self.ch][content],
-                                         'channel ' + self.ch + ' -> ' + it.title + ' returned ' + str(
-                                             risNum) + ' results but should have returned ' + str(
-                                             chNumRis[self.ch][content]))
+                        self.assertEqual(chNumRis[self.ch][content], risNum,
+                                         'channel ' + self.ch + ' -> ' + it.title + ' returned wrong number of results')
                         break
 
             for resIt in itemlist:
