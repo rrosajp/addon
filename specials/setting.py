@@ -291,54 +291,43 @@ def server_debrid_config(item):
 
 
 def servers_blacklist(item):
+    progress = platformtools.dialog_progress(config.get_localized_string(60550), config.get_localized_string(50003))
     server_list = servertools.get_servers_list()
-    dict_values = {}
+    blacklisted = []
+    list_controls = []
 
-    list_controls = [{"id": "filter_servers",
-                      "type": "bool",
-                      "label": "@30068",
-                      "default": False,
-                      "enabled": True,
-                      "visible": True}]
-    dict_values['filter_servers'] = config.get_setting('filter_servers')
-    if dict_values['filter_servers'] == None:
-        dict_values['filter_servers'] = False
     for i, server in enumerate(sorted(server_list.keys())):
         server_parameters = server_list[server]
-        controls, defaults = servertools.get_server_controls_settings(server)
-        dict_values[server] = config.get_setting("black_list", server=server)
+        defaults = servertools.get_server_parameters(server)
 
-        control = {"id": server,
-                   "type": "bool",
-                   "label": '    %s' % server_parameters["name"],
-                   "default": defaults.get("black_list", False),
-                   "enabled": "eq(-%s,True)" % (i + 1),
-                   "visible": True}
+        control = xbmcgui.ListItem(server)
+        control.setArt({'thumb:': server_parameters['thumb'] if 'thumb' in server_parameters else config.get_online_server_thumb(server)})
+        if defaults.get("black_list", False) or config.get_setting("black_list", server=server):
+            blacklisted.append(i)
+
         list_controls.append(control)
+        progress.update(old_div(i * 100, len(server_list)))
+    progress.close()
+    ris = platformtools.dialog_multiselect(config.get_localized_string(60550), list_controls, preselect=blacklisted, useDetails=True)
+    if ris is not None:
+        cb_servers_blacklist({it.getLabel(): True if n in ris else False for n, it in enumerate(list_controls)})
+    # return platformtools.show_channel_settings(list_controls=list_controls, dict_values=dict_values, caption=config.get_localized_string(60550), callback="cb_servers_blacklist")
 
-    return platformtools.show_channel_settings(list_controls=list_controls, dict_values=dict_values, caption=config.get_localized_string(60550), callback="cb_servers_blacklist")
 
-
-def cb_servers_blacklist(item, dict_values):
+def cb_servers_blacklist(dict_values):
     blaklisted = []
-    f = False
     progreso = platformtools.dialog_progress(config.get_localized_string(60557), config.get_localized_string(60558))
     n = len(dict_values)
     i = 1
     for k, v in list(dict_values.items()):
-        if k == 'filter_servers':
-            config.set_setting('filter_servers', v)
-        else:
-            config.set_setting("black_list", v, server=k)
-            if v:  # If the server is blacklisted it cannot be in the favorites list
-                config.set_setting("favorites_servers_list", 0, server=k)
-                blaklisted.append(k)
-                f = True
-                progreso.update(old_div((i * 100), n), config.get_localized_string(60559) % k)
+        config.set_setting("black_list", v, server=k)
+        if v:  # If the server is blacklisted it cannot be in the favorites list
+            config.set_setting("favorites_servers_list", 0, server=k)
+            blaklisted.append(k)
+            f = True
+            progreso.update(old_div((i * 100), n), config.get_localized_string(60559) % k)
         i += 1
     config.set_setting("black_list", blaklisted, server='servers')
-    if not f:  # If there is no server in the list, deactivate it
-        config.set_setting('filter_servers', False)
 
     progreso.close()
 
@@ -735,7 +724,7 @@ def channels_onoff(item):
 
     # Dialog to select
     # ------------------------
-    ret = xbmcgui.Dialog().multiselect(config.get_localized_string(60545), lista, preselect=preselect, useDetails=True)
+    ret = platformtools.dialog_multiselect(config.get_localized_string(60545), lista, preselect=preselect, useDetails=True)
     if ret == None: return False # order cancel
     seleccionados = [ids[i] for i in ret]
 

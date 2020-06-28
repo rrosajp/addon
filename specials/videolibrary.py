@@ -338,7 +338,7 @@ def configure_update_videolibrary(item):
             preselect.append(i)
 
     # Select Dialog
-    ret = xbmcgui.Dialog().multiselect(config.get_localized_string(60601), lista, preselect=preselect, useDetails=True)
+    ret = platformtools.dialog_multiselect(config.get_localized_string(60601), lista, preselect=preselect, useDetails=True)
     if ret < 0:
         return False  # order cancel
     seleccionados = [ids[i] for i in ret]
