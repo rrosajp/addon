@@ -116,6 +116,8 @@ def peliculas(item, f=None, ):
                         channel=item.channel,
                         action='new_search',
                         title=support.typo(title + (' - ' + episode if episode else ''), 'bold'),
+                        contentTitle=title if item.contentType == 'movie' else '',
+                        contentSerieName=title if item.contentType == 'tvshow' else '',
                         fulltitle=title,
                         search_text=title,
                         mode=item.contentType,
@@ -124,7 +126,6 @@ def peliculas(item, f=None, ):
                         channel_name=channel,
                         plot=plot,
                         infoLabels={
-                            'title': title,
                             'director': director,
                             'genre': genres,
                             'country': country,
