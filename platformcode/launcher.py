@@ -128,7 +128,6 @@ def run(item=None):
             if tmdb.drop_bd():
                 platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60011), time=2000, sound=False)
         elif item.action == "itemInfo":
-            import base64
             platformtools.dialog_textviewer('Item info', item.parent)
         elif item.action == "open_browser":
             import webbrowser
@@ -294,7 +293,7 @@ def run(item=None):
 
         logger.error(traceback.format_exc())
 
-        patron = 'File "' + os.path.join(config.get_runtime_path(), "channels", "").replace("\\", "\\\\") + '([^.]+)\.py"'
+        patron = 'File "' + os.path.join(config.get_runtime_path(), "channels", "").replace("\\", "\\\\") + r'([^.]+)\.py"'
         Channel = scrapertools.find_single_match(traceback.format_exc(), patron)
 
         platformtools.dialog_ok(
@@ -306,7 +305,7 @@ def run(item=None):
 
         logger.error(traceback.format_exc())
 
-        patron = 'File "' + os.path.join(config.get_runtime_path(), "channels", "").replace("\\", "\\\\") + '([^.]+)\.py"'
+        patron = 'File "' + os.path.join(config.get_runtime_path(), "channels", "").replace("\\", "\\\\") + r'([^.]+)\.py"'
         Channel = scrapertools.find_single_match(traceback.format_exc(), patron)
 
         try:
@@ -411,7 +410,7 @@ def play_from_library(item):
         @param item: item with information
     """
     import xbmcgui, xbmcplugin, xbmc
-    from time import sleep, time
+    from time import sleep
 
     itemlist=[]
     item.fromLibrary = True
@@ -433,8 +432,7 @@ def play_from_library(item):
 
     else:
         # Pop-up window
-        from specials import videolibrary, autoplay
-        # from core.support import dbg;dbg()
+        from specials import videolibrary
         p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(60683))
         p_dialog.update(0, '')
         item.play_from = 'window'

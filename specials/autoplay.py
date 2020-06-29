@@ -26,7 +26,7 @@ def start(itemlist, item):
     :param item: item (the main item of the channel)
     :return: try to auto-reproduce, in case of failure it returns the itemlist that it received in the beginning
     '''
-    from inspect import stack
+
     if item.global_search:
         return itemlist
     logger.info()
@@ -101,7 +101,7 @@ def start(itemlist, item):
                 continue
 
             # If it does not have a defined quality, it assigns a 'default' quality.
-            if item.quality == '':
+            if item.quality not in quality_list:
                 item.quality = 'default'
             # The list for custom settings is created
 
@@ -232,8 +232,6 @@ def start(itemlist, item):
                     # Check if the item comes from the video library
                     try:
                         if base_item.contentChannel == 'videolibrary' or base_item.nfo:
-                            # Mark as seen
-                            from platformcode import xbmc_videolibrary
                             # Fill the video with the data of the main item and play
                             play_item = base_item.clone(**videoitem.__dict__)
                             platformtools.play_video(play_item, autoplay=True)
