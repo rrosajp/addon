@@ -40,8 +40,11 @@ def test_video_exists(page_url):
             dec = ''
             for v in var.split(','):
                 dec += chr(int(v) - int(value))
-            page_url = scrapertools.find_single_match(dec, "src='([^']+)")
+            page_url = 'https://116.202.226.34/video.php?file_code=' + scrapertools.find_single_match(dec, "src='([^']+)").split('/')[-1].replace('.html','')
+            headers = [['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0'],['Host', 'wstream.video']]
+            # from core.support import dbg;dbg()
             new_data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True, verify=False).data
+            logger.info('NEW DATA: \n' + new_data)
             if new_data:
                 data = new_data
 
