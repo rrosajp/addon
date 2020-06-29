@@ -9,7 +9,7 @@ from core.item import Item
 from platformcode import logger
 
 host = "http://epg-guide.com/kltv.gz"
-blacklisted_genres = ['attualita', 'scienza', 'religione', 'cucina', 'notiziario', 'altro', 'soap opera', 'viaggi',  'economia', 'tecnologia', 'magazine', 'show', 'reality show', 'lifestyle', 'societa', 'wrestling', 'azione', 'Musica', 'real life', 'real adventure', 'dplay original', 'natura', 'news', 'food', 'sport', 'moda', 'arte e cultura', 'crime', 'box set e serie tv', 'casa', 'storia', 'talk show', 'motori', 'attualit\xc3\xa0 e inchiesta', 'documentari', 'musica', 'spettacolo', 'medical', 'talent show', 'sex and love', 'beauty and style', 'news/current affairs', "children's/youth programmes", 'leisure hobbies', 'social/political issues/economics', 'education/science/factual topics', 'undefined content', 'show/game show', 'music/ballet/dance', 'sports', 'arts/culture', 'biografico', 'informazione']
+blacklisted_genres = ['attualita', 'scienza', 'religione', 'cucina', 'notiziario', 'altro', 'soap opera', 'viaggi',  'economia', 'tecnologia', 'magazine', 'show', 'reality show', 'lifestyle', 'societa', 'wrestling', 'azione', 'Musica', 'real life', 'real adventure', 'dplay original', 'natura', 'news', 'food', 'sport', 'moda', 'arte e cultura', 'crime', 'box set e serie tv', 'casa', 'storia', 'talk show', 'motori', 'attualit\xc3\xa0 e inchiesta', 'documentari', 'musica', 'spettacolo', 'medical', 'talent show', 'sex and love', 'beauty and style', 'news/current affairs', "children's/youth programmes", 'leisure hobbies', 'social/political issues/economics', 'education/science/factual topics', 'undefined content', 'show/game show', 'music/ballet/dance', 'sports', 'arts/culture', 'biografico', 'informazione', 'documentario']
 
 
 def mainlist(item):
@@ -69,6 +69,7 @@ def peliculas(item, f=None, ):
     director = ''
     year = ''
     genres = []
+    genre = ''
     country = ''
     skip = False
 
@@ -80,7 +81,7 @@ def peliculas(item, f=None, ):
             channel = scrapertools.find_single_match(line, r'channel="([^"]+)"')
         elif '<title' in line:
             title = scrapertools.find_single_match(line, r'>([^<]+?)(?: - (?:1\s*\^\s*TV|Prima\s*T[Vv]))?<')
-            if not title or title in titles:
+            if not title or title in titles or title == 'EPG non disponibile':
                 skip = True
         elif not skip and '<desc' in line:
             genre, episode, plot = scrapertools.find_single_match(line, r'>(?:\[([^\]]+)\])?(S[0-9]+\s*Ep?[0-9]+)?(?:\s*-\s*)?([^<]+)')
@@ -111,13 +112,20 @@ def peliculas(item, f=None, ):
             elif genre: genres = genre.split('/')
             if not skip:
                 titles.append(title)
-                if (item.contentType == 'movie' and genres and (item.category in genres or item.all==True)) or (item.contentType == 'tvshow' and episode):
+                if (item.contentType == 'movie' and genres and (item.category in genres or item.all == True)) or (item.contentType == 'tvshow' and episode):
+                    if episode:
+                        episode = scrapertools.get_season_and_episode(episode)
+                        se, ep = episode.split('x')
+                    else:
+                        se, ep = ('', '')
                     itemlist.append(Item(
                         channel=item.channel,
                         action='new_search',
                         title=support.typo(title + (' - ' + episode if episode else ''), 'bold'),
                         contentTitle=title if item.contentType == 'movie' else '',
                         contentSerieName=title if item.contentType == 'tvshow' else '',
+                        contentSeason=se,
+                        contentEpisodeNumber=ep,
                         fulltitle=title,
                         search_text=title,
                         mode=item.contentType,
@@ -129,7 +137,9 @@ def peliculas(item, f=None, ):
                             'director': director,
                             'genre': genres,
                             'country': country,
-                            'year': year
+                            'year': year,
+                            'season': se,
+                            'episode': ep
                         }
                     ))
 
@@ -142,6 +152,7 @@ def peliculas(item, f=None, ):
             director = ''
             year = ''
             genres = []
+            genre = ''
             country = ''
             skip = False
 

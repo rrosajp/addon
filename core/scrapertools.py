@@ -432,7 +432,7 @@ def get_season_and_episode(title):
     """
     filename = ""
 
-    patrons = ["(\d+)\s*[x-]\s*(\d+)", "(\d+)\s*×\s*(\d+)", "(?:[Ss]|[Tt])(\d+)(?:[Ee]|Ep\.)(\d+)",
+    patrons = ["(\d+)\s*[x-]\s*(\d+)", "(\d+)\s*×\s*(\d+)", "(?:[Ss]|[Tt])(\d+)\s?(?:[Ee]|Ep\.?)(\d+)",
                "(?:[Ss]tag|[Ss]eason|[Ss]tagione\w*)\s*(\d+)\s*(?:[Ee]pi|[Ee]pisode|[Ee]pisodio\w*)\s*(\d+)"]
 
     for patron in patrons:
