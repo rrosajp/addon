@@ -182,8 +182,9 @@ def start(itemlist, item):
             autoplay_list.sort(key=lambda orden: (orden['indice_quality'], orden['indice_server']))
 
         # Plan b is prepared, in case it is active the non-favorite elements are added at the end
-        try: plan_b = settings_node['plan_b']
-        except: plan_b = True
+        # try: plan_b = settings_node['plan_b']
+        # except: 
+        plan_b = True
         text_b = ''
         if plan_b: autoplay_list.extend(autoplay_b)
         # If there are elements in the autoplay list, an attempt is made to reproduce each element, until one is found or all fail.

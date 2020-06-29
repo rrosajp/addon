@@ -434,6 +434,7 @@ def play_from_library(item):
     else:
         # Pop-up window
         from specials import videolibrary, autoplay
+        # from core.support import dbg;dbg()
         p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(60683))
         p_dialog.update(0, '')
         item.play_from = 'window'
@@ -442,7 +443,7 @@ def play_from_library(item):
         while platformtools.is_playing(): # Conventional window
             sleep(1)
         play_time = platformtools.resume_playback(item, True)
-        if not play_time:
+        if not play_time and config.get_setting('autoplay'):
             return
 
         # The number of links to show is limited
