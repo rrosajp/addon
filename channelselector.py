@@ -218,31 +218,16 @@ def filterchannels(category, view="thumb_"):
     return channelslist
 
 
-def get_thumb(thumb_name, view="thumb_", auto=False):
-
-    if auto:
-        thumbnail = ''
-
-        thumb_name = unify.set_genre(unify.simplify(thumb_name))
-
-        if thumb_name in thumb_dict:
-            thumbnail = thumb_dict[thumb_name]
-        return thumbnail
-
+def get_thumb(thumb_name, view="thumb_"):
+    from core import filetools
+    if thumb_name.startswith('http'):
+        return thumb_name
+    elif config.get_setting('enable_custom_theme') and config.get_setting('custom_theme') and filetools.isfile(config.get_setting('custom_theme') + view + thumb_name):
+        media_path = config.get_setting('custom_theme')
     else:
         icon_pack_name = config.get_setting('icon_set', default="default")
-        media_path = os.path.join("https://raw.githubusercontent.com/kodiondemand/media/master/themes", icon_pack_name)
-
-        if config.get_setting('enable_custom_theme') and config.get_setting('custom_theme') and os.path.isfile(config.get_setting('custom_theme') + view + thumb_name):
-            media_path = config.get_setting('custom_theme')
-
-        if thumb_name.startswith('http'):
-            thumbnail = thumb_name
-        else:
-            thumbnail = os.path.join(media_path, view + thumb_name)
-        if 'http' in thumbnail:
-            thumbnail = thumbnail.replace('\\','/')
-        return thumbnail
+        media_path = filetools.join("https://raw.githubusercontent.com/kodiondemand/media/master/themes", icon_pack_name)
+    return filetools.join(media_path, view + thumb_name)
 
 
 def set_channel_info(parameters):
