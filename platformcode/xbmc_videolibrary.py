@@ -68,6 +68,7 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
                     xbmc.Player().stop()
                 nextdialog.close()
                 break
+            xbmc.sleep(1000)
 
         # Set played time
         item_nfo.played_time = int(actual_time) if not marked and actual_time > 120 else 0
