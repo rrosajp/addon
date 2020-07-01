@@ -118,8 +118,6 @@ def get_servers_itemlist(itemlist, fnc=None, sort=False):
 
     # We remove the deactivated servers
     # itemlist = filter(lambda i: not i.server or is_server_enabled(i.server), itemlist)
-    # Filter if necessary
-    itemlist = filter_servers(itemlist)
 
     for item in itemlist:
         # We assign "direct" in case the server is not in KoD
@@ -215,8 +213,6 @@ def get_server_from_url(url):
     for serverid in servers_list:
         '''if not is_server_enabled(serverid):
             continue'''
-        if config.get_setting("filter_servers") == True and config.get_setting("black_list", server=serverid):
-            continue
         serverid = get_server_name(serverid)
         if not serverid:
             continue
@@ -721,33 +717,7 @@ def sort_servers(servers_list):
     return servers_list
 
 
-def filter_servers(servers_list):
-    """
-    If the option "Filter by servers" is activated in the server configuration, removes the servers included in the Black List from the entry list.
-    :param servers_list: List of servers to filter. The items in the servers_list can be strings or Item objects. In which case it is necessary that they have an item.server attribute of type str.
-    :return: List of the same type of objects as servers_list filtered based on the Black List.
-    """
-    # We eliminate the inactive
-    if servers_list:
-        servers_list = [i for i in servers_list if not i.server or is_server_enabled(i.server)]
-
-
-    if servers_list and config.get_setting('filter_servers'):
-        if isinstance(servers_list[0], Item):
-            servers_list_filter = [x for x in servers_list if not config.get_setting("black_list", server=x.server)]
-        else:
-            servers_list_filter = [x for x in servers_list if not config.get_setting("black_list", server=x)]
-
-        # If there are no links after filtering
-        if servers_list_filter or not platformtools.dialog_yesno(config.get_localized_string(60000), config.get_localized_string(60010), config.get_localized_string(70281)):
-            servers_list = servers_list_filter
-
-    return servers_list
-
-
-
 # Checking links
-
 def check_list_links(itemlist, numero='', timeout=3):
     """
     Check a list of video links and return it by modifying the title with verification.

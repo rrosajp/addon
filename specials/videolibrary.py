@@ -586,7 +586,6 @@ def findvideos(item):
                 if item_json.videolibray_emergency_urls:
                     del item_json.videolibray_emergency_urls
                 list_servers = getattr(channel, 'findvideos')(item_json)
-                list_servers = servertools.filter_servers(list_servers)
             elif item_json.action == 'play':
                 from platformcode import platformtools
                 # autoplay.set_status(True)

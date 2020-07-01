@@ -68,7 +68,6 @@
         <setting id="httptools_timeout" type="slider" option="int" range="0,5,120" label="70580" default="15"/>
         <setting label="70145" type="lsep"/>
         <setting id="favorites_servers" type="bool" label="60551" default="false" visible="false"/>
-        <setting id="filter_servers" type="bool" label="30068" default="false" visible="false"/>
         <setting id="quality_priority" type="bool" label="30069" default="false" visible="false"/>
 
         <setting id="servers_config" type="action" label="60538" action="RunPlugin(plugin://plugin.video.kod/?ew0KICAgICJhY3Rpb24iOiAic2VydmVyc19tZW51IiwNCiAgICAiY2hhbm5lbCI6ICJzaG9ydGN1dHMiDQp9==)"/>

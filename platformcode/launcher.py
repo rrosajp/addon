@@ -208,7 +208,6 @@ def run(item=None):
                 # First checks if channel has a "findvideos" function
                 if hasattr(channel, 'findvideos'):
                     itemlist = getattr(channel, item.action)(item)
-                    itemlist = servertools.filter_servers(itemlist)
 
                 # If not, uses the generic findvideos function
                 else:
