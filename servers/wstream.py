@@ -96,7 +96,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     video_urls = []
     global data, real_url, headers
     # from core.support import dbg;dbg()
-    logger.info(data)
+    # logger.info(data)
 
     sitekey = scrapertools.find_multiple_matches(data, """data-sitekey=['"] *([^"']+)""")
     if sitekey: sitekey = sitekey[-1]
@@ -119,7 +119,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     headers.append(['Referer', real_url.replace('116.202.226.34', headers[1][1])])
     _headers = urllib.urlencode(dict(headers))
 
-    post_data = scrapertools.find_single_match(data, r"</div>\s*<script type='text/javascript'>(eval.function.p,a,c,k,e,.*?)\s*</script>")
+    post_data = scrapertools.find_single_match(data, r"<script type='text/javascript'>(eval.function.p,a,c,k,e,.*?)\s*</script>")
     if post_data != "":
         from lib import jsunpack
         data = jsunpack.unpack(post_data)
