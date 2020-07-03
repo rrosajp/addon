@@ -248,7 +248,7 @@ def getCurrentView(item=None, parent_item=None):
     elif (item.contentType in ['movie'] and parent_item.action in parent_actions) \
             or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']) \
             or (parent_item.channel in ['favorites'] and parent_item.action in ['mainlist']) \
-            or parent_item.action in ['now_on_tv', 'now_on_misc', 'now_on_misc_film', 'mostrar_perfil']:
+            or parent_item.action in ['now_on_tv', 'now_on_misc', 'now_on_misc_film', 'mostrar_perfil', 'dirette']:
         return 'movie', 'movies'
 
     elif (item.contentType in ['tvshow'] and parent_item.action in parent_actions) \
@@ -543,7 +543,9 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
     set_infolabels(xlistitem, item, True)
 
     # if it is a video in mpd format, the listitem is configured to play it ith the inpustreamaddon addon implemented in Kodi 17
+    # from core.support import dbg;dbg()
     if mpd:
+        if not os.path.exists(os.path.join(xbmc.translatePath('special://home/addons/'),'inputstream.adaptive')): install_inputstream()
         xlistitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
         xlistitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
 
@@ -862,6 +864,9 @@ def get_video_seleccionado(item, seleccion, video_urls):
             wait_time = video_urls[seleccion][2]
         view = True
 
+    if 'mpd' in video_urls[seleccion][0]:
+        mpd = True
+
     # If there is no mediaurl it is because the video is not there :)
     logger.info("mediaurl=" + mediaurl)
     if mediaurl == "":
@@ -1061,3 +1066,18 @@ def resume_playback(item, return_played_time=False):
     else:
         item.nfo = item.strm_path = ""
         return item, None, None, None
+
+def install_inputstream():
+    from xbmcaddon import Addon
+    try:
+        # See if there's an installed repo that has it
+        xbmc.executebuiltin('InstallAddon(inputstream.adaptive)', wait=True)
+
+        # Check if InputStream add-on exists!
+        Addon('inputstream.adaptive')
+
+        logger.info('InputStream add-on installed from repo.')
+        return True
+    except RuntimeError:
+        logger.info('InputStream add-on not installed.')
+        return False

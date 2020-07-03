@@ -18,7 +18,7 @@ def mainlist(item):
     itemlist = [Item(title=support.typo('Film in onda oggi', 'bold'), channel=item.channel, action='category', contentType='movie', thumbnail=support.thumb(thumb='movie.png')),
                 Item(title=support.typo('Serie Tv in onda oggi', 'bold'), channel=item.channel, action='peliculas', contentType='tvshow', thumbnail=support.thumb(thumb='tvshow.png')),
                 Item(title=support.typo('Guida tv per canale', 'bold'), channel=item.channel, action='listaCanali', thumbnail=support.thumb(thumb='on_the_air.png')),
-                Item(title=support.typo('Canali live (Rai Play)', 'bold'), channel=item.channel, action='live', thumbnail=support.thumb(thumb='tvshow_on_the_air.png'))]
+                Item(title=support.typo('Canali live', 'bold'), channel=item.channel, action='live', thumbnail=support.thumb(thumb='tvshow_on_the_air.png'))]
 
     return itemlist
 
@@ -308,5 +308,8 @@ def new_search(item):
 
 
 def live(item):
-    from channels import raiplay
-    return raiplay.dirette(raiplay.mainlist(Item())[0])
+    itemlist = []
+    from channels import raiplay, mediasetplay
+    itemlist += raiplay.dirette(raiplay.mainlist(Item())[0])
+    itemlist += mediasetplay.dirette(mediasetplay.mainlist(Item())[0])
+    return itemlist

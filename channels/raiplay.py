@@ -118,10 +118,11 @@ def replay(item):
     return itemlist
 
 def search(item, text):
+    # support.dbg()
     support.log()
     itemlist =[]
     try:
-        if item.url:
+        if item.url != host:
             item.search = text
             itemlist = peliculas(item)
         else:
@@ -158,7 +159,7 @@ def dirette(item):
     onAir = current_session.get(onair).json()['on_air']
     for i, key in enumerate(json):
         itemlist.append(item.clone(title = support.typo(key['channel'], 'bold'), fulltitle = key['channel'], show = key['channel'], url = key['video']['contentUrl'],
-                                   thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"),forcethumb=True , fanart = getUrl(onAir[i]['currentItem']['image']),
+                                   thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"), forcethumb = True , fanart = getUrl(onAir[i]['currentItem']['image']),
                                    plot = support.typo(onAir[i]['currentItem']['name'],'bold')+ '\n\n' + onAir[i]['currentItem']['description'], action = 'play'))
     return itemlist
 
