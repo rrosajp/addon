@@ -545,7 +545,7 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
     # if it is a video in mpd format, the listitem is configured to play it ith the inpustreamaddon addon implemented in Kodi 17
     # from core.support import dbg;dbg()
     if mpd:
-        if not os.path.exists(os.path.join(xbmc.translatePath('special://home/addons/'),'inputstream.adaptive')): install_inputstream()
+        install_inputstream()
         xlistitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
         xlistitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
 
@@ -1069,15 +1069,20 @@ def resume_playback(item, return_played_time=False):
 
 def install_inputstream():
     from xbmcaddon import Addon
-    try:
-        # See if there's an installed repo that has it
-        xbmc.executebuiltin('InstallAddon(inputstream.adaptive)', wait=True)
+    if not os.path.exists(os.path.join(xbmc.translatePath('special://home/addons/'),'inputstream.adaptive')) and not os.path.exists(os.path.join(xbmc.translatePath('special://xbmcbinaddons/'),'inputstream.adaptive')):
+        try:
+            # See if there's an installed repo that has it
+            xbmc.executebuiltin('InstallAddon(inputstream.adaptive)', wait=True)
 
-        # Check if InputStream add-on exists!
-        Addon('inputstream.adaptive')
+            # Check if InputStream add-on exists!
+            Addon('inputstream.adaptive')
 
-        logger.info('InputStream add-on installed from repo.')
-        return True
-    except RuntimeError:
-        logger.info('InputStream add-on not installed.')
-        return False
+            logger.info('InputStream add-on installed from repo.')
+        except RuntimeError:
+            logger.info('InputStream add-on not installed.')
+    else:
+        try:
+            Addon('inputstream.adaptive')
+        except:
+            xbmc.executebuiltin('UpdateLocalAddons')
+            xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "inputstream.adaptive", "enabled": true }}')
