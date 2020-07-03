@@ -163,7 +163,7 @@
         <!-- <setting id="category" type="select" label="70124" lvalues="70137|30123|30124|60513" default="Film" visible="eq(-3,True)+eq(-1,True)+eq(-2,False)" enable="eq(-3,True)+eq(-1,True)+(-2,false)"/> -->
 		<!-- Others -->
         <setting label="70149" type="lsep"/>
-        <setting id="icon_set" type="select" label="70108" values="default|light|dark" default="default"/>
+        <setting id="icon_set" type="select" label="70108" values="default|light|dark|mike" default="default"/>
         <setting id="only_channel_icons" type="bool" label="30009" default="false"/>
         <setting id="enable_custom_theme" type="bool" label="70564" default="false"/>
         <setting id="custom_theme" type="folder" label="70565" default="" visible="eq(-1,true)"/>
