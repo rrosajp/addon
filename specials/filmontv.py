@@ -310,6 +310,6 @@ def new_search(item):
 def live(item):
     itemlist = []
     from channels import raiplay, mediasetplay
-    itemlist += raiplay.dirette(raiplay.mainlist(Item())[0])
-    itemlist += mediasetplay.dirette(mediasetplay.mainlist(Item())[0])
+    itemlist += raiplay.live(raiplay.mainlist(Item())[0])
+    itemlist += mediasetplay.live(mediasetplay.mainlist(Item())[0])
     return itemlist

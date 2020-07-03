@@ -248,7 +248,7 @@ def getCurrentView(item=None, parent_item=None):
     elif (item.contentType in ['movie'] and parent_item.action in parent_actions) \
             or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']) \
             or (parent_item.channel in ['favorites'] and parent_item.action in ['mainlist']) \
-            or parent_item.action in ['now_on_tv', 'now_on_misc', 'now_on_misc_film', 'mostrar_perfil', 'dirette']:
+            or parent_item.action in ['now_on_tv', 'now_on_misc', 'now_on_misc_film', 'mostrar_perfil', 'live']:
         return 'movie', 'movies'
 
     elif (item.contentType in ['tvshow'] and parent_item.action in parent_actions) \

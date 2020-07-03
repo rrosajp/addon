@@ -17,7 +17,7 @@ onair = host + '/palinsesto/onAir.json'
 
 @support.menu
 def mainlist(item):
-    top =  [('Dirette {bold}', ['/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json', 'dirette']),
+    top =  [('Dirette {bold}', ['/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json', 'live']),
             ('Replay {bold}', ['/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json', 'replay_menu'])]
 
     menu = [('Film {bullet bold}', ['/film/index.json', 'menu']),
@@ -152,7 +152,7 @@ def Type(item):
         return select(item)
 
 
-def dirette(item):
+def live(item):
     support.log()
     itemlist =[]
     json = current_session.get(item.url).json()['dirette']

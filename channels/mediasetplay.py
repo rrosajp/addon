@@ -29,7 +29,7 @@ entries = 'https://api.one.accedo.tv/content/entries?id={id}&locale=it'
 
 @support.menu
 def mainlist(item):
-    top =  [('Dirette {bold}', ['https://feed.entertainment.tv.theplatform.eu/f/PR1GhC/mediaset-prod-all-stations?sort=ShortTitle', 'dirette'])]
+    top =  [('Dirette {bold}', ['https://feed.entertainment.tv.theplatform.eu/f/PR1GhC/mediaset-prod-all-stations?sort=ShortTitle', 'live'])]
 
     menu = [('Film {bullet bold}', ['5acfcbc423eec6000d64a6bb', 'menu', ['Tutti','all','Cinema']]),
             ('Fiction / Serie TV {bullet bold}', ['5acfcb3c23eec6000d64a6a4', 'menu', ['Tutte','all','Fiction'], 'tvshow']),
@@ -68,7 +68,7 @@ def menu(item):
     itemlist.append(item.clone(title=support.typo('Cerca...','submenu bold'), url='', action ='search'))
     return itemlist
 
-def dirette(item):
+def live(item):
     support.log()
     itemlist = []
     json = current_session.get(item.url).json()['entries']
