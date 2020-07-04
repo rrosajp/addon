@@ -318,6 +318,7 @@ def thumb(item_or_itemlist=None, genre=False, thumb=''):
                  'az':['lettera','lista','alfabetico','a-z', 'alphabetical'],
                  'year':['anno', 'anni', 'year'],
                  'update':['replay', 'update'],
+                 'videolibrary':['teche'],
                  'autoplay':[config.get_localized_string(60071)]
                 }
 

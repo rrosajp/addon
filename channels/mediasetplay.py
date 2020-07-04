@@ -127,7 +127,7 @@ def peliculas(item):
                                contentType=contentType if contentType else item.contentType,
                                contentTitle=it['title'] if 'movie' in [contentType, item.contentType] else '',
                                contentSerieName=it['title'] if 'tvshow' in [contentType, item.contentType] else '',
-                               thumbnail=it['thumbnails']['image_vertical-264x396']['url'],
+                               thumbnail=it['thumbnails']['image_vertical-264x396']['url'] if 'image_vertical-264x396' in it['thumbnails'] else '',
                                fanart=it['thumbnails']['image_keyframe_poster-1280x720']['url'] if 'image_keyframe_poster-1280x720' in it['thumbnails'] else '',
                                plot=it['longDescription'] if 'longDescription' in it else it['description'] if 'description' in it else '',
                                url=urls))
@@ -139,6 +139,7 @@ def episodios(item):
     subBrandId = current_session.get('https://feed.entertainment.tv.theplatform.eu/f/PR1GhC/mediaset-prod-all-brands?byCustomValue={brandId}{' + item.url + '}').json()['entries'][-1]['mediasetprogram$subBrandId']
     json = current_session.get('https://feed.entertainment.tv.theplatform.eu/f/PR1GhC/mediaset-prod-all-programs?byCustomValue={subBrandId}{' + subBrandId + '}').json()['entries']
     for it in json:
+        support.log(it)
         urls = []
         if 'media' in it:
             for key in it['media']:
@@ -157,7 +158,7 @@ def episodios(item):
                            show=title,
                            contentType='episode',
                            contentSerieName = title,
-                           thumbnail=it['thumbnails']['image_vertical-264x396']['url'],
+                           thumbnail=it['thumbnails']['image_vertical-264x396']['url'] if 'image_vertical-264x396' in it['thumbnails'] else '',
                            fanart=it['thumbnails']['image_keyframe_poster-1280x720']['url'] if 'image_keyframe_poster-1280x720' in it['thumbnails'] else '',
                            plot=it['longDescription'] if 'longDescription' in it else it['description'],
                            url=urls))
