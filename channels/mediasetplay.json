@@ -1,7 +1,7 @@
 {
     "id": "mediasetplay",
     "name": "Mediaset Play",
-    "active": false,
+    "active": true,
     "language": ["ita"],
     "thumbnail": "mediasetplay.png",
     "banner": "mediasetplay.png",
