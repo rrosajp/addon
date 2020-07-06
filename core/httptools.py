@@ -56,7 +56,7 @@ HTTPTOOLS_DEFAULT_RANDOM_HEADERS = False
 #     with open(CF_LIST_PATH, "rb") as CF_File:
 #         CF_LIST = CF_File.read().splitlines()
 
-FORCE_CLOUDSCRAPER_LIST = []
+# FORCE_CLOUDSCRAPER_LIST = []
 
 def get_user_agent():
     # Returns the global user agent to be used when necessary for the url.
@@ -270,18 +270,18 @@ def downloadpage(url, **opt):
     # global CF_LIST
     CF = False
 
-    if domain in FORCE_CLOUDSCRAPER_LIST:
-        from lib import cloudscraper
-        session = cloudscraper.create_scraper()
-        CF = True
-    else:
-        from lib import requests
-        session = requests.session()
+    # if domain in FORCE_CLOUDSCRAPER_LIST:
+    #     from lib import cloudscraper
+    #     session = cloudscraper.create_scraper()
+    #     CF = True
+    # else:
+    from lib import requests
+    session = requests.session()
 
-        # if domain in CF_LIST or opt.get('CF', False):
-        if opt.get('CF', False):
-            url = 'https://web.archive.org/save/' + url
-            CF = True
+    # if domain in CF_LIST or opt.get('CF', False):
+    if opt.get('CF', False):
+        url = 'https://web.archive.org/save/' + url
+        CF = True
 
     if config.get_setting('resolver_dns') and not opt.get('use_requests', False):
         from specials import resolverdns
