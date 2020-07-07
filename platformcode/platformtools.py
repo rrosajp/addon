@@ -248,7 +248,7 @@ def getCurrentView(item=None, parent_item=None):
     elif (item.contentType in ['movie'] and parent_item.action in parent_actions) \
             or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']) \
             or (parent_item.channel in ['favorites'] and parent_item.action in ['mainlist']) \
-            or parent_item.action in ['now_on_tv', 'now_on_misc', 'now_on_misc_film', 'mostrar_perfil', 'live']:
+            or parent_item.action in ['now_on_tv', 'now_on_misc', 'now_on_misc_film', 'mostrar_perfil', 'live', 'replay']:
         return 'movie', 'movies'
 
     elif (item.contentType in ['tvshow'] and parent_item.action in parent_actions) \
@@ -505,7 +505,7 @@ def is_playing():
 
 def play_video(item, strm=False, force_direct=False, autoplay=False):
     logger.info()
-    # logger.debug(item.tostring('\n'))
+    logger.debug(item.tostring('\n'))
     if item.channel == 'downloads':
         logger.info("Play local video: %s [%s]" % (item.title, item.url))
         xlistitem = xbmcgui.ListItem(path=item.url)
@@ -548,6 +548,11 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
         install_inputstream()
         xlistitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
         xlistitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+        if item.drm and item.license:
+            install_widevine()
+            xlistitem.setProperty("inputstream.adaptive.license_type", item.drm)
+            xlistitem.setProperty("inputstream.adaptive.license_key", item.license)
+            xlistitem.setMimeType('application/dash+xml')
 
     if force_direct: item.play_from = 'window'
 
@@ -1067,6 +1072,9 @@ def resume_playback(item, return_played_time=False):
         item.nfo = item.strm_path = ""
         return item, None, None, None
 
+
+##### INPUTSTREM #####
+
 def install_inputstream():
     from xbmcaddon import Addon
     if not os.path.exists(os.path.join(xbmc.translatePath('special://home/addons/'),'inputstream.adaptive')) and not os.path.exists(os.path.join(xbmc.translatePath('special://xbmcbinaddons/'),'inputstream.adaptive')):
@@ -1086,3 +1094,174 @@ def install_inputstream():
         except:
             xbmc.executebuiltin('UpdateLocalAddons')
             xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "inputstream.adaptive", "enabled": true }}')
+
+
+def install_widevine():
+    platform = get_platform()
+    if platform['os'] != 'android':
+        from core.httptools import downloadpage
+        from xbmcaddon import Addon
+        from core import jsontools
+        from distutils.version import LooseVersion
+        path = xbmc.translatePath(Addon('inputstream.adaptive').getSetting('DECRYPTERPATH'))
+
+        # if Widevine CDM is not installed
+        if not os.path.exists(path):
+            select = dialog_yesno('Widevine CDM', config.get_localized_string(70808))
+            if select > 0:
+                if not 'arm' in platform['arch']:
+                    last_version = downloadpage('https://dl.google.com/widevine-cdm/versions.txt').data.split()[-1]
+                    download_widevine(last_version, platform, path)
+                else:
+                    json = downloadpage('https://dl.google.com/dl/edgedl/chromeos/recovery/recovery.json').data
+                    devices = jsontools.load(json)
+                    download_chromeos_image(devices, platform, path)
+
+        # if Widevine CDM is outdated
+        elif platform['os'] != 'android':
+            select = dialog_yesno(config.get_localized_string(70810),config.get_localized_string(70809))
+            if select > 0:
+                if not 'arm' in platform['arch']:
+                    last_version = downloadpage('https://dl.google.com/widevine-cdm/versions.txt').data.split()[-1]
+                    current_version = jsontools.load(open(os.path.join(path, 'manifest.json')).read())['version']
+                    if LooseVersion(last_version) > LooseVersion(current_version):
+                        download_widevine(last_version, platform, path)
+                else:
+                    devices = jsontools.load(downloadpage('https://dl.google.com/dl/edgedl/chromeos/recovery/recovery.json').data)
+                    current_version = jsontools.load(open(os.path.join(path, 'config.json')).read())['version']
+                    last_version = best_chromeos_image(devices)['version']
+                    if LooseVersion(last_version) > LooseVersion(current_version):
+                        download_chromeos_image(devices, platform, path)
+
+
+def download_widevine(version, platform, path):
+    # for x86 architectures
+    from zipfile import ZipFile
+    from xbmcaddon import Addon
+    from core import downloadtools
+    archiveName = 'https://dl.google.com/widevine-cdm/' + version + '-' + platform['os'] + '-' + platform['arch'] + '.zip'
+    fileName = config.get_temp_file('widevine.zip')
+    if not os.path.exists(archiveName):
+        if not os.path.exists(fileName):
+            downloadtools.downloadfile(archiveName, fileName, header='Download Widevine CDM')
+        zip_obj = ZipFile(fileName)
+        for filename in zip_obj.namelist():
+            zip_obj.extract(filename, path)
+        zip_obj.close()
+        os.remove(fileName)
+
+
+def download_chromeos_image(devices, platform, path):
+    # for arm architectures
+    from core import downloadtools
+    from zipfile import ZipFile
+    from core import jsontools
+    best = best_chromeos_image(devices)
+    archiveName = best['url']
+    version = best['version']
+
+    fileName = config.get_temp_file(archiveName.split('/')[-1])
+    if not os.path.exists(fileName):
+        downloadtools.downloadfile(archiveName, fileName, header='Download Widevine CDM')
+    from lib.arm_chromeos import ChromeOSImage
+    ChromeOSImage(fileName).extract_file(
+                filename='libwidevinecdm.so',
+                extract_path=os.path.join(path),
+                progress=dialog_progress(config.get_localized_string(70811),config.get_localized_string(70812)))
+    recovery_file = os.path.join(path, os.path.basename('https://dl.google.com/dl/edgedl/chromeos/recovery/recovery.json'))
+    config_file = os.path.join(path, 'config.json')
+    if not os.path.exists(path):
+        os.mkdir(path)
+    with open(recovery_file, 'w') as reco_file:
+        reco_file.write(jsontools.dump(devices, indent=4))
+        reco_file.close()
+    with open(config_file, 'w') as conf_file:
+        conf_file.write(jsontools.dump(best))
+        conf_file.close()
+    os.remove(fileName)
+
+def best_chromeos_image(devices):
+    best = None
+    for device in devices:
+        # Select ARM hardware only
+        for arm_hwid in ['BIG','BLAZE','BOB','DRUWL','DUMO','ELM','EXPRESSO','FIEVEL','HANA','JAQ','JERRY','KEVIN','KITTY','MICKEY','MIGHTY','MINNIE','PHASER','PHASER360','PI','PIT','RELM','SCARLET','SKATE','SNOW','SPEEDY','SPRING','TIGER']:
+            if arm_hwid in device['hwidmatch']:
+                hwid = arm_hwid
+                break  # We found an ARM device, rejoice !
+        else:
+            continue  # Not ARM, skip this device
+
+        device['hwid'] = hwid
+
+        # Select the first ARM device
+        if best is None:
+            best = device
+            continue  # Go to the next device
+
+        # Skip identical hwid
+        if hwid == best['hwid']:
+            continue
+
+        # Select the newest version
+        from distutils.version import LooseVersion  # pylint: disable=import-error,no-name-in-module,useless-suppression
+        if LooseVersion(device['version']) > LooseVersion(best['version']):
+            logger.info('%s (%s) is newer than %s (%s)' % (device['hwid'], device['version'], best['hwid'], best['version']))
+            best = device
+
+        # Select the smallest image (disk space requirement)
+        elif LooseVersion(device['version']) == LooseVersion(best['version']):
+            if int(device['filesize']) + int(device['zipfilesize']) < int(best['filesize']) + int(best['zipfilesize']):
+                logger.info('%s (%d) is smaller than %s (%d)' % (device['hwid'], int(device['filesize']) + int(device['zipfilesize']), best['hwid'], int(best['filesize']) + int(best['zipfilesize'])))
+                best = device
+    return best
+
+def get_platform():
+    import platform
+    build = xbmc.getInfoLabel("System.BuildVersion")
+    kodi_version = int(build.split()[0][:2])
+    ret = {
+        "auto_arch": sys.maxsize > 2 ** 32 and "64-bit" or "32-bit",
+        "arch": sys.maxsize > 2 ** 32 and "x64" or "ia32",
+        "os": "",
+        "version": platform.release(),
+        "kodi": kodi_version,
+        "build": build
+    }
+    if xbmc.getCondVisibility("system.platform.android"):
+        ret["os"] = "android"
+        if "arm" in platform.machine() or "aarch" in platform.machine():
+            ret["arch"] = "arm"
+            if "64" in platform.machine() and ret["auto_arch"] == "64-bit":
+                ret["arch"] = "arm64"
+    elif xbmc.getCondVisibility("system.platform.linux"):
+        ret["os"] = "linux"
+        if "aarch" in platform.machine() or "arm64" in platform.machine():
+            if xbmc.getCondVisibility("system.platform.linux.raspberrypi"):
+                ret["arch"] = "armv7"
+            elif ret["auto_arch"] == "32-bit":
+                ret["arch"] = "armv7"
+            elif ret["auto_arch"] == "64-bit":
+                ret["arch"] = "arm64"
+            elif platform.architecture()[0].startswith("32"):
+                ret["arch"] = "arm"
+            else:
+                ret["arch"] = "arm64"
+        elif "armv7" in platform.machine():
+            ret["arch"] = "armv7"
+        elif "arm" in platform.machine():
+            ret["arch"] = "arm"
+    elif xbmc.getCondVisibility("system.platform.xbox"):
+        ret["os"] = "win"
+        ret["arch"] = "x64"
+    elif xbmc.getCondVisibility("system.platform.windows"):
+        ret["os"] = "win"
+        if platform.machine().endswith('64'):
+            ret["arch"] = "x64"
+    elif xbmc.getCondVisibility("system.platform.osx"):
+        ret["os"] = "mac"
+        ret["arch"] = "x64"
+    elif xbmc.getCondVisibility("system.platform.ios"):
+        ret["os"] = "ios"
+        ret["arch"] = "arm"
+
+    return ret
