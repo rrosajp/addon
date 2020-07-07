@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per Mediaset Play
+# Canale per La7
 # ------------------------------------------------------------
 
 import requests
@@ -37,13 +37,14 @@ def mainlist(item):
             ('Replay {bold}', ['', 'replay_channels'])]
 
     menu = [('Programmi TV {bullet bold}', ['/tutti-i-programmi', 'peliculas', '', 'tvshow']),
+            # ('Teche La7 {bullet bold}', ['/i-protagonisti', 'peliculas', '', 'tvshow'])
             # ('Fiction / Serie TV {bullet bold}', ['5acfcb3c23eec6000d64a6a4', 'menu', ['Tutte','all','Fiction'], 'tvshow']),
             # ('Programmi TV{ bullet bold}', ['', 'menu', ['Tutti','all','Programmi Tv'], 'tvshow']),
             # ('Documentari {bullet bold}', ['5bfd17c423eec6001aec49f9', 'menu', ['Tutti','all','Documentari'], 'undefined']),
             # ('Kids {bullet bold}', ['5acfcb8323eec6000d64a6b3', 'menu',['Tutti','all','Kids'], 'undefined']),
            ]
 
-    # search = ''
+    search = ''
     return locals()
 
 
@@ -52,10 +53,12 @@ def live(item):
                 item.clone(title='La7d', url= host + '/live-la7d', action='play', forcethumb = True, thumbnail= icons['la7d'])]
     return itemlist
 
+
 def replay_channels(item):
     itemlist = [item.clone(title='La7', url= host + '/rivedila7/0/la7', action='replay_menu', forcethumb = True,  thumbnail= icons['la7']),
                 item.clone(title='La7d', url= host + '/rivedila7/0/la7d', action='replay_menu', forcethumb = True, thumbnail= icons['la7d'])]
     return itemlist
+
 
 @support.scrape
 def replay_menu(item):
@@ -65,6 +68,7 @@ def replay_menu(item):
         item.title = support.typo(item.day + ' ' + item.num + ' ' + item.month,'bold')
         return item
     return locals()
+
 
 @support.scrape
 def replay(item):
@@ -79,33 +83,49 @@ def replay(item):
         return item
     return locals()
 
+def search(item, text):
+    item.url = host + '/tutti-i-programmi'
+    item.search = text
+    return peliculas(item)
+
 @support.scrape
 def peliculas(item):
-    pagination = 40
+    search = item.search
+    disabletmdb = True
     action = 'episodios'
-    patron = r'<a href="(?P<url>[^"]+)"[^>]+><div class="[^"]+" data-background-image="(?P<thumb>[^"]+)"></div><div class="titolo">\s*(?P<title>[^<]+)<'
+    patron = r'<a href="(?P<url>[^"]+)"[^>]+><div class="[^"]+" data-background-image="(?P<t>[^"]+)"></div><div class="titolo">\s*(?P<title>[^<]+)<'
+    def itemHook(item):
+        item.thumbnail = 'http:' + item.t if item.t.startswith('//') else item.t if item.t else item.thumbnail
+        item.fanart = item.thumb
+        return item
     return locals()
+
 
 @support.scrape
 def episodios(item):
     data = support.match(item).data
-    # debug=True
     action = 'play'
-    if 'ultima puntata' in data:
-        patron = r'<a href="(?P<url>[^"]+)"><div class="[^"]+" data-background-image="(?P<thumb>[^"]+)">[^>]+>[^>]+>[^>]+><div class="title_puntata">\s*(?P<title>[^<]+)'
+    if '>puntate<' in data:
+        patronBlock = r'>puntate<(?P<block>.*?)home-block-outbrain'
+        url = support.match(data, patron=r'>puntate<[^>]+>[^>]+>[^>]+><a href="([^"]+)"').match
+        data += support.match(host + url).data
     else:
         item.url += '/video'
         data = support.match(item).data
-        patron = r'<a href="(?P<url>[^"]+)"><[^>]+><div class="[^"]+" data-background-image="(?P<thumb>[^"]+)"><[^>]+><[^>]+><[^>]+><[^>]+>(?P<title>[^<]+)'
-        patronNext = r'<a href="([^"]+)">›'
+
+    patron = r'<a href="(?P<url>[^"]+)">[^>]+><div class="[^"]+" data-background-image="(?P<t>[^"]*)">[^>]+>[^>]+>[^>]+>(?:[^>]+>)?(?:[^>]+>)?\s*(?P<title>[^<]+)<(?:[^>]+>[^>]+>[^>]+><div class="data">(?P<date>[^<]+))?'
+    patronNext = r'<a href="([^"]+)">›'
     addVideolibrary = False
+
+    def itemHook(item):
+        item.thumbnail = 'http:' + item.t if item.t.startswith('//') else item.t if item.t else item.thumbnail
+        if item.date:
+            item.title = support.re.sub(r'[Pp]untata (?:del )?\d+/\d+/\d+', '', item.title)
+            item.title += support.typo(item.date, '_ [] bold')
+        item.forcethumb = True
+        item.fanart = item.thumbnail
+        return item
     return locals()
-
-
-def findvideos(item):
-    url = 'https://awsvodpkg.iltrovatore.it/local/hls/,/content/entry/data/' + support.match(item, patron='/content/entry/data/(.*?).mp4').match + '.mp4.urlset/master.m3u8'
-    itemlist = [item.clone(title='Direct', url=url, server='directo', action='play')]
-    return support.server(item, itemlist=itemlist, Download=False)
 
 
 def play(item):
