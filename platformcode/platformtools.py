@@ -545,7 +545,8 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
     # if it is a video in mpd format, the listitem is configured to play it ith the inpustreamaddon addon implemented in Kodi 17
     # from core.support import dbg;dbg()
     if mpd:
-        install_inputstream()
+        if not install_inputstream():
+            return
         xlistitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
         xlistitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         if item.drm and item.license:
@@ -1088,12 +1089,17 @@ def install_inputstream():
             logger.info('InputStream add-on installed from repo.')
         except RuntimeError:
             logger.info('InputStream add-on not installed.')
+            dialog_ok(config.get_localized_string(20000), config.get_localized_string(30126))
+            return False
     else:
         try:
             Addon('inputstream.adaptive')
+            logger.info('InputStream add-on is installed and enabled')
         except:
+            logger.info('enabling InputStream add-on')
             xbmc.executebuiltin('UpdateLocalAddons')
             xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "inputstream.adaptive", "enabled": true }}')
+    return True
 
 
 def install_widevine():

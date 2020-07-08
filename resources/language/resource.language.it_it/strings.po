@@ -304,8 +304,8 @@ msgid "Documentaries"
 msgstr "Documentari"
 
 msgctxt "#30126"
-msgid ""
-msgstr ""
+msgid "This video needs inputstream.adaptive addon, but automatic install failed, install it manually"
+msgstr "Questo video necessita dell'addon inputstream.adaptive ma l'installazione automatica è fallita, installalo manualmente."
 
 msgctxt "#30130"
 msgid "News"
