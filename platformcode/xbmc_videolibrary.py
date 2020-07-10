@@ -904,7 +904,7 @@ def clean(path_list=[]):
         if path.startswith("special://"):
             path = path.replace('/profile/', '/%/').replace('/home/userdata/', '/%/')
             sep = '/'
-        elif '://' in path:
+        elif '://' in path or path.startswith('/') or path.startswith('%/'):
             sep = '/'
         else: sep = os.sep
 
@@ -1000,6 +1000,18 @@ def clean(path_list=[]):
     xbmc.sleep(1000)
     progress.close()
 
+def check_if_exist(path):
+    if '\\' in path: sep = '\\'
+    else: sep = '/'
+    if path.endswith(sep): path = path[:-len(sep)]
+    ret = False
+    sql_path = '%' + sep + path.split(sep)[-1] + sep + '%'
+    sql = 'SELECT idShow FROM tvshow_view where strPath LIKE "%s"' % sql_path
+    logger.info('sql: ' + sql)
+    nun_records, records = execute_sql_kodi(sql)
+    if records:
+        ret = True
+    return ret
 
 def execute_sql_kodi(sql):
     """
