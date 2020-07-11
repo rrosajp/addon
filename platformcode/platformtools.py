@@ -1125,19 +1125,19 @@ def install_widevine():
 
         # if Widevine CDM is outdated
         elif platform['os'] != 'android':
-            select = dialog_yesno(config.get_localized_string(70810),config.get_localized_string(70809))
-            if select > 0:
-                if not 'arm' in platform['arch']:
-                    last_version = downloadpage('https://dl.google.com/widevine-cdm/versions.txt').data.split()[-1]
-                    current_version = jsontools.load(open(os.path.join(path, 'manifest.json')).read())['version']
-                    if LooseVersion(last_version) > LooseVersion(current_version):
-                        download_widevine(last_version, platform, path)
-                else:
-                    devices = jsontools.load(downloadpage('https://dl.google.com/dl/edgedl/chromeos/recovery/recovery.json').data)
-                    current_version = jsontools.load(open(os.path.join(path, 'config.json')).read())['version']
-                    last_version = best_chromeos_image(devices)['version']
-                    if LooseVersion(last_version) > LooseVersion(current_version):
-                        download_chromeos_image(devices, platform, path)
+            if not 'arm' in platform['arch']:
+                last_version = downloadpage('https://dl.google.com/widevine-cdm/versions.txt').data.split()[-1]
+                current_version = jsontools.load(open(os.path.join(path, 'manifest.json')).read())['version']
+                if LooseVersion(last_version) > LooseVersion(current_version):
+                    select = dialog_yesno(config.get_localized_string(70810),config.get_localized_string(70809))
+                    if select > 0: download_widevine(last_version, platform, path)
+            else:
+                devices = jsontools.load(downloadpage('https://dl.google.com/dl/edgedl/chromeos/recovery/recovery.json').data)
+                current_version = jsontools.load(open(os.path.join(path, 'config.json')).read())['version']
+                last_version = best_chromeos_image(devices)['version']
+                if LooseVersion(last_version) > LooseVersion(current_version):
+                    select = dialog_yesno(config.get_localized_string(70810),config.get_localized_string(70809))
+                    if select > 0:download_chromeos_image(devices, platform, path)
 
 
 def download_widevine(version, platform, path):

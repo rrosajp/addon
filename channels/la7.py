@@ -4,14 +4,7 @@
 # ------------------------------------------------------------
 
 import requests
-from core import support, httptools
-import sys
-if sys.version_info[0] >= 3:
-    from concurrent import futures
-    from urllib.parse import urlencode, quote
-else:
-    from concurrent_py2 import futures
-    from urllib import urlencode, quote
+from core import support
 
 DRM = 'com.widevine.alpha'
 key_widevine = "https://la7.prod.conax.cloud/widevine/license"
@@ -31,32 +24,29 @@ headers = {
 icons = {'la7':'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/LA7_-_Logo_2011.svg/512px-LA7_-_Logo_2011.svg.png',
          'la7d': 'https://upload.wikimedia.org/wikipedia/it/e/ea/LA7d_LOGO_.png' }
 
+titles = {'la7': support.typo('La7', 'bold'), 'la7d': support.typo('La7d', 'bold')}
+
 @support.menu
 def mainlist(item):
     top =  [('Dirette {bold}', ['', 'live']),
             ('Replay {bold}', ['', 'replay_channels'])]
 
     menu = [('Programmi TV {bullet bold}', ['/tutti-i-programmi', 'peliculas', '', 'tvshow']),
-            # ('Teche La7 {bullet bold}', ['/i-protagonisti', 'peliculas', '', 'tvshow'])
-            # ('Fiction / Serie TV {bullet bold}', ['5acfcb3c23eec6000d64a6a4', 'menu', ['Tutte','all','Fiction'], 'tvshow']),
-            # ('Programmi TV{ bullet bold}', ['', 'menu', ['Tutti','all','Programmi Tv'], 'tvshow']),
-            # ('Documentari {bullet bold}', ['5bfd17c423eec6001aec49f9', 'menu', ['Tutti','all','Documentari'], 'undefined']),
-            # ('Kids {bullet bold}', ['5acfcb8323eec6000d64a6b3', 'menu',['Tutti','all','Kids'], 'undefined']),
-           ]
+            ('Teche La7 {bullet bold}', ['/i-protagonisti', 'peliculas', '', 'tvshow'])]
 
     search = ''
     return locals()
 
 
 def live(item):
-    itemlist = [item.clone(title='La7', url= host + '/dirette-tv', action='play', forcethumb = True,  thumbnail= icons['la7']),
-                item.clone(title='La7d', url= host + '/live-la7d', action='play', forcethumb = True, thumbnail= icons['la7d'])]
+    itemlist = [item.clone(title=titles['la7'], url= host + '/dirette-tv', action='play', forcethumb = True,  thumbnail= icons['la7']),
+                item.clone(title=titles['la7d'], url= host + '/live-la7d', action='play', forcethumb = True, thumbnail= icons['la7d'])]
     return itemlist
 
 
 def replay_channels(item):
-    itemlist = [item.clone(title='La7', url= host + '/rivedila7/0/la7', action='replay_menu', forcethumb = True,  thumbnail= icons['la7']),
-                item.clone(title='La7d', url= host + '/rivedila7/0/la7d', action='replay_menu', forcethumb = True, thumbnail= icons['la7d'])]
+    itemlist = [item.clone(title=titles['la7'], url= host + '/rivedila7/0/la7', action='replay_menu', forcethumb = True,  thumbnail= icons['la7']),
+                item.clone(title=titles['la7d'], url= host + '/rivedila7/0/la7d', action='replay_menu', forcethumb = True, thumbnail= icons['la7d'])]
     return itemlist
 
 
@@ -113,15 +103,18 @@ def episodios(item):
         item.url += '/video'
         data = support.match(item).data
 
-    patron = r'<a href="(?P<url>[^"]+)">[^>]+><div class="[^"]+" data-background-image="(?P<t>[^"]*)">[^>]+>[^>]+>[^>]+>(?:[^>]+>)?(?:[^>]+>)?\s*(?P<title>[^<]+)<(?:[^>]+>[^>]+>[^>]+><div class="data">(?P<date>[^<]+))?'
+    patron = r'(?:<a href="(?P<url>[^"]+)">[^>]+><div class="[^"]+" data-background-image="(?P<t>[^"]*)">[^>]+>[^>]+>[^>]+>(?:[^>]+>)?(?:[^>]+>)?\s*(?P<title>[^<]+)<(?:[^>]+>[^>]+>[^>]+><div class="data">(?P<date>[^<]+))?|class="heading">[^>]+>(?P<Title>[^<]+).*?window.shareUrl = "(?P<Url>[^"]+)".*?poster:\s*"(?P<Thumb>[^"]+)", title: "(?P<desc>[^"]+)")'
     patronNext = r'<a href="([^"]+)">›'
     addVideolibrary = False
 
     def itemHook(item):
+        if item.Thumb: item.t = item.Thumb
         item.thumbnail = 'http:' + item.t if item.t.startswith('//') else item.t if item.t else item.thumbnail
+        if item.Title: item.title = support.typo(item.Title, 'bold')
         if item.date:
             item.title = support.re.sub(r'[Pp]untata (?:del )?\d+/\d+/\d+', '', item.title)
             item.title += support.typo(item.date, '_ [] bold')
+        if item.desc: item.plot = item.desc
         item.forcethumb = True
         item.fanart = item.thumbnail
         return item

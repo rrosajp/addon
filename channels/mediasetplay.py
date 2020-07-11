@@ -4,13 +4,11 @@
 # ------------------------------------------------------------
 
 import requests
-from core import support, httptools
+from core import support
 import sys
 if sys.version_info[0] >= 3:
-    from concurrent import futures
     from urllib.parse import urlencode, quote
 else:
-    from concurrent_py2 import futures
     from urllib import urlencode, quote
 
 current_session = requests.Session()
@@ -174,7 +172,7 @@ def findvideos(item):
 def play(item):
     support.log()
     for url in item.url:
-        url = httptools.downloadpage(url, allow_redirects=True).url
+        url = support.httptools.downloadpage(url, allow_redirects=True).url
         if '.mpd' in url: data = url
     return support.servertools.find_video_items(item, data=data)
 
