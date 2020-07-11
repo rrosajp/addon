@@ -17,7 +17,7 @@ headers = [['Referer', host]]
 @support.menu
 def mainlist(item):
     anime = ['/lista-anime/',
-             ('In Corso',['/lista-anime-in-corso/', 'peliculas', 'corso']),
+             ('In Corso',['/category/anime/anime-in-corso/', 'peliculas', 'corso']),
              ('Ultime Serie',['/category/anime/articoli-principali/','peliculas','last'])
             ]
     return locals()
@@ -64,9 +64,9 @@ def peliculas(item):
     if not item.args:
         pagination = ''
         patron = r'<a\s*href="(?P<url>[^"]+)"\s*title="(?P<title>[^"]+)">'
-    elif item.args == 'corso':
-        pagination = ''
-        patron = r'<strong><a href="(?P<url>[^"]+)">(?P<title>.*?) [Ss][Uu][Bb]'
+    # elif item.args == 'corso':
+    #     pagination = ''
+    #     patron = r'<strong><a href="(?P<url>[^"]+)">(?P<title>.*?) [Ss][Uu][Bb]'
     else:
         patron = r'<a href="(?P<url>[^"]+)"[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt="(?P<title>.*?)(?: Sub| sub| SUB|")'
 
