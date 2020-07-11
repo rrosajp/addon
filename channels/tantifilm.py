@@ -50,7 +50,6 @@ def mainlist(item):
 
 @support.scrape
 def peliculas(item):
-    debug=True
     if item.args == 'search':
         patron = r'<a href="(?P<url>[^"]+)" title="Permalink to\s*(?P<title>[^"]+) \((?P<year>[^<]+)\)[^"]*"[^>]+>\s*<img[^s]+src="(?P<thumb>[^"]+)".*?<div class="calitate">\s*<p>(?P<quality>[^<]+)<\/p>'
         # support.regexDbg(item, patron, headers)
