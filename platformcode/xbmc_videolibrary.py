@@ -1000,7 +1000,8 @@ def clean(path_list=[]):
     xbmc.sleep(1000)
     progress.close()
 
-def check_if_exist(path):
+
+def check_db(path):
     if '\\' in path: sep = '\\'
     else: sep = '/'
     if path.endswith(sep): path = path[:-len(sep)]
@@ -1012,6 +1013,7 @@ def check_if_exist(path):
     if records:
         ret = True
     return ret
+
 
 def execute_sql_kodi(sql):
     """
