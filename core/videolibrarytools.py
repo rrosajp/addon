@@ -622,7 +622,6 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
                         clean_path = '%/' + clean_path.split(sep)[-1] + '/%' + f.replace('x','%') + '%'
                         clean_list.append(clean_path)
                         clean_list.append(clean_path.replace('/','\\'))
-                    from core.support import dbg;dbg()
                     clean(clean_list)
                     update = True
 
@@ -827,7 +826,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     if not silent:
         p_dialog.close()
 
-    if news_in_playcounts or emergency_urls_succ or serie.infoLabels["status"] == "Ended" or serie.infoLabels["status"] == "Canceled" or update:
+    if news_in_playcounts or emergency_urls_succ or serie.infoLabels["status"] == "Ended" or serie.infoLabels["status"] == "Canceled":
         # If there are new episodes we mark them as unseen on tvshow.nfo ...
         tvshow_path = filetools.join(path, "tvshow.nfo")
         try:
