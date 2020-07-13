@@ -566,8 +566,6 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     @return: the number of failed episodes
     """
     logger.info()
-    update = False
-    exist = False
     episodelist = filter_list(episodelist, serie.action, path)
     # No episode list, nothing to save
     if not len(episodelist):
@@ -577,6 +575,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     # process local episodes
     local_episodes_path = ''
     local_episodelist = []
+    update = False
     nfo_path = filetools.join(path, "tvshow.nfo")
     head_nfo, item_nfo = read_nfo(nfo_path)
     if item_nfo.update_last:
@@ -590,9 +589,9 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
         filetools.write(nfo_path, head_nfo + item_nfo.tojson())
 
     if local_episodes_path:
-        from platformcode.xbmc_videolibrary import check_if_exist, clean
-        if check_if_exist(local_episodes_path):
-            exist = True
+        from platformcode.xbmc_videolibrary import check_db, clean
+        # check if the local episodes are in the Kodi video library
+        if check_db(local_episodes_path):
             local_episodelist += get_local_content(local_episodes_path)
             clean_list = []
             for f in filetools.listdir(path):
@@ -609,7 +608,6 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
                             clean_list.append(clean_path)
                             clean_list.append(clean_path.replace('/','\\'))
 
-            # from core.support import dbg;dbg()
             if clean_list:
                 clean(clean_list)
                 update = True
@@ -624,13 +622,12 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
                         clean_path = '%/' + clean_path.split(sep)[-1] + '/%' + f.replace('x','%') + '%'
                         clean_list.append(clean_path)
                         clean_list.append(clean_path.replace('/','\\'))
-                    from core.support import dbg;dbg()
                     clean(clean_list)
                     update = True
 
             item_nfo.local_episodes_list = sorted(local_episodelist)
             filetools.write(nfo_path, head_nfo + item_nfo.tojson())
-
+        # the local episodes are not in the Kodi video library
         else:
             process_local_episodes(local_episodes_path, path)
 
@@ -713,12 +710,13 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
         logger.info("There is no episode list, we go out without creating strm")
         return 0, 0, 0
 
+    local_episodelist += get_local_content(path)
+
     # fix float because division is done poorly in python 2.x
     try:
         t = float(100) / len(new_episodelist)
     except:
         t = 0
-    local_episodelist += get_local_content(path)
     for i, e in enumerate(scraper.sort_episode_list(new_episodelist)):
         if not silent:
             p_dialog.update(int(math.ceil((i + 1) * t)), config.get_localized_string(60064), e.title)
@@ -828,7 +826,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     if not silent:
         p_dialog.close()
 
-    if news_in_playcounts or emergency_urls_succ or serie.infoLabels["status"] == "Ended" or serie.infoLabels["status"] == "Canceled" or update:
+    if news_in_playcounts or emergency_urls_succ or serie.infoLabels["status"] == "Ended" or serie.infoLabels["status"] == "Canceled":
         # If there are new episodes we mark them as unseen on tvshow.nfo ...
         tvshow_path = filetools.join(path, "tvshow.nfo")
         try:
@@ -874,6 +872,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
             # ... if it was correct we update the Kodi video library
             if config.is_xbmc() and config.get_setting("videolibrary_kodi") and not silent:
                 update = True
+
     if update:
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.update()
@@ -952,6 +951,7 @@ def process_local_episodes(local_episodes_path, path):
 
     filetools.write(nfo_path, head_nfo + item_nfo.tojson())
 
+
 def get_local_content(path):
     logger.info()
 
@@ -965,6 +965,7 @@ def get_local_content(path):
     local_episodelist = sorted(set(local_episodelist))
 
     return local_episodelist
+
 
 def add_movie(item):
     """
