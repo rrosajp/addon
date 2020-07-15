@@ -285,7 +285,7 @@ def thumb(item_or_itemlist=None, genre=False, thumb=''):
                  'teenager':['ragazzi','teenager', 'teen'],
                  'learning':['learning'],
                  'all':['tutti', 'all'],
-                 'news':['novità', "novita'", 'aggiornamenti', 'nuovi', 'nuove', 'new', 'newest', 'news'],
+                 'news':['novità', "novita'", 'aggiornamenti', 'nuovi', 'nuove', 'new', 'newest', 'news', 'ultimi'],
                  'now_playing':['cinema', 'in sala'],
                  'anime':['anime'],
                  'genres':['genere', 'generi', 'categorie', 'categoria', 'category'],
