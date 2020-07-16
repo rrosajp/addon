@@ -3,9 +3,12 @@
 # Canale per AnimeUnity
 # ------------------------------------------------------------
 
+import requests, json, copy
 from core import support
-from lib import cloudscraper
-import requests, json
+from specials import autorenumber
+
+try: from lib import cloudscraper
+except: from lib import cloudscraper
 
 host = support.config.get_channel_url()
 response = cloudscraper.create_scraper().get(host + '/archivio')
@@ -19,29 +22,33 @@ headers = {'content-type': 'application/json;charset=UTF-8',
 def mainlist(item):
     top =  [('Ultimi Episodi', ['', 'news'])]
 
-    menu = [('Film {bullet bold}',['', 'peliculas', {'type':'Movie'}]),
-                ('ITA {submenu} {film}',['', 'peliculas', {'type':'Movie', 'title': '(ita)'}]),
-                ('Genere {submenu} {film}',['', 'genres', {'type':'Movie'}]),
-                ('Anno {submenu} {film}',['', 'years', {'type':'Movie'}]),
-            ('TV {bullet bold}',['', 'peliculas', {'type':'TV'}, 'tvshow']),
-                ('ITA {submenu} {tv}',['', 'peliculas', {'type':'TV', 'title': '(ita)'}, 'tvshow']),
-                ('Genere {submenu} {tv}',['', 'genres', {'type':'TV'}, 'tvshow']),
-                ('Anno {submenu} {tv}',['', 'years', {'type':'TV'}, 'tvshow']),
-            ('OVA {bullet bold} {tv}',['', 'peliculas', ['type','OVA'], 'tvshow']),
-                ('ITA {submenu} {tv}',['', 'peliculas', {'type':'OVA', 'title': '(ita)'}, 'tvshow']),
-                ('Genere {submenu} {tv}',['', 'genres', {'type':'OVA'}, 'tvshow']),
-                ('Anno {submenu} {tv}',['', 'years', {'type':'OVA'}, 'tvshow']),
-            ('ONA {bullet bold} {tv}',['', 'peliculas', ['type','ONA'], 'tvshow']),
-                ('ITA {submenu} {tv}',['', 'peliculas', {'type':'ONA', 'title': '(ita)'}, 'tvshow']),
-                ('Genere {submenu} {tv}',['', 'genres', {'type':'ONA'}, 'tvshow']),
-                ('Anno {submenu} {tv}',['', 'years', {'type':'ONA'}, 'tvshow']),
-            ('Special {bullet bold} {tv}',['', 'peliculas', ['type','Special'], 'tvshow']),
-                ('ITA {submenu} {tv}',['', 'peliculas', {'type':'Special', 'title': '(ita)'}, 'tvshow']),
-                ('Genere {submenu} {tv}',['', 'genres', {'type':'Special'}, 'tvshow']),
-                ('Anno {submenu} {tv}',['', 'years', {'type':'Special'}, 'tvshow']),
-            ('Cerca... ', ['', 'search'])
-    ]
+    menu = [('Anime {bullet bold}',['', 'menu', {}, 'tvshow']),
+            ('Film {submenu}',['', 'menu', {'type':'Movie'}]),
+            ('TV {submenu}',['', 'menu', {'type':'TV'}, 'tvshow']),
+            ('OVA {submenu} {tv}',['', 'menu', ['type','OVA'], 'tvshow']),
+            ('ONA {submenu} {tv}',['', 'menu', ['type','ONA'], 'tvshow']),
+            ('Special {submenu} {tv}',['', 'menu', ['type','Special'], 'tvshow'])]
+    search =''
     return locals()
+
+def menu(item):
+    item.action='peliculas'
+    ITA = copy.copy(item.args)
+    ITA['title'] = '(ita)'
+    InCorso = copy.copy(item.args)
+    InCorso['status'] = 'In Corso'
+    Terminato = copy.copy(item.args)
+    Terminato['status'] = 'Terminato'
+    itemlist = [item.clone(title=support.typo('Tutti','bold')),
+                item.clone(title=support.typo('ITA','bold'), args=ITA),
+                item.clone(title=support.typo('Genere','bold'), action='genres'),
+                item.clone(title=support.typo('Anno','bold'), action='years')]
+    if item.contentType == 'tvshow':
+        itemlist += [item.clone(title=support.typo('In Corso','bold'), args=InCorso),
+                     item.clone(title=support.typo('Terminato','bold'), args=Terminato)]
+    itemlist +=[item.clone(title=support.typo('Cerca...','bold'), action='search', thumbnail=support.thumb(thumb='search.png'))]
+    return itemlist
+
 
 def genres(item):
     support.log()
@@ -50,7 +57,7 @@ def genres(item):
     genres = json.loads(support.match(response.text, patron='genres="([^"]+)').match.replace('&quot;','"'))
 
     for genre in genres:
-        item.args['genre']=genre
+        item.args['genres'] = [genre]
         itemlist.append(item.clone(title=support.typo(genre,'bold'), action='peliculas'))
     return support.thumb(itemlist)
 
@@ -70,7 +77,10 @@ def years(item):
 
 def search(item, text):
     support.log('search', item)
-    item.args = {'title':text}
+    if not item.args:
+        item.args = {'title':text}
+    else:
+        item.args['title'] = text
     item.search = text
 
     try:
@@ -113,17 +123,20 @@ def news(item):
 
     for it in js:
         itemlist.append(
-            item.clone(title= support.typo(it['anime']['title'] + ' - EP. ' + it['number'], 'bold'),
-                    server='directo',
-                    thumbnail=it['anime']['imageurl'],
-                    forcethumb = True,
-                    url=it['link'],
-                    plot=it['anime']['plot'],
-                    action='play')
+            support.Item(channel=item.channel,
+                         title= support.typo(it['anime']['title'] + ' - EP. ' + it['number'], 'bold'),
+                         fulltitle=it['anime']['title'],
+                         server='directo',
+                         thumbnail=it['anime']['imageurl'],
+                         forcethumb = True,
+                         url=it['link'],
+                         plot=it['anime']['plot'],
+                         action='play')
         )
     if 'next_page_url' in fullJs:
         itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'),thumbnail=support.thumb(), url=fullJs['next_page_url']))
     return itemlist
+
 
 def peliculas(item):
     support.log()
@@ -170,22 +183,39 @@ def peliculas(item):
             itm.action = 'episodios'
             itm.episodes = it['episodes'] if 'episodes' in it else it['link']
             itm.url = ''
-            itm.contentType == 'episodios'
 
         itemlist.append(itm)
 
+    autorenumber.renumber(itemlist)
     if len(itemlist) >= 30:
-        itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'),thumbnail=support.thumb(),page=page + 1))
+        itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), thumbnail=support.thumb(), page=page + 1))
 
     return itemlist
 
 def episodios(item):
     support.log()
     itemlist = []
-    title = 'Parte ' if item.type.lower() == 'movie' else 'Episodio'
+    title = 'Parte ' if item.type.lower() == 'movie' else 'Episodio '
     for it in item.episodes:
-        itemlist.append(item.clone(title=support.typo(title + it['number'], 'bold'), action='findvideos', url=it['link']))
+        itemlist.append(
+            support.Item(channel=item.channel,
+                         title=support.typo(title + it['number'], 'bold'),
+                         episode = it['number'],
+                         fulltitle=item.title,
+                         show=item.title,
+                         contentTitle='',
+                         contentSerieName=item.contentSerieName,
+                         thumbnail=item.thumbnail,
+                         plot=item.plot,
+                         action='findvideos',
+                         contentType='episode',
+                         url=it['link']))
+
+    autorenumber.renumber(itemlist, item, 'bold')
+    support.videolibrary(itemlist, item)
+    support.download(itemlist, item)
     return itemlist
+
 
 def findvideos(item):
     support.log()
