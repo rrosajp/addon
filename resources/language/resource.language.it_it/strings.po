@@ -3800,8 +3800,8 @@ msgid "Reorder"
 msgstr "Riordina"
 
 msgctxt "#70246"
-msgid "  - Preferred language"
-msgstr "  - Lingua preferita"
+msgid "Preferred language"
+msgstr "Lingua preferita"
 
 msgctxt "#70247"
 msgid "Home page"

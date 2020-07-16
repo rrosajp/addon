@@ -3801,7 +3801,7 @@ msgid "Reorder"
 msgstr ""
 
 msgctxt "#70246"
-msgid "  - Preferred language"
+msgid "Preferred language"
 msgstr ""
 
 msgctxt "#70247"

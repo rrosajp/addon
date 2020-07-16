@@ -546,10 +546,8 @@ def sort_method(item):
     @rtype: int
     """
     lang_orders = {}
-    lang_orders[0] = ["IT", "SUB", "VOSI", "ENG"]
-    lang_orders[1] = ["IT", "ENG", "VOSI", "SUB"]
-    lang_orders[2] = ["ENG", "SUB", "IT", "VOSI"]
-    lang_orders[3] = ["ENG", "SUB", "VOSI", "IT"]
+    lang_orders[0] = ["ITA", "SUB"]
+    lang_orders[1] = ["SUB", "ITA"]
 
     quality_orders = {}
     quality_orders[0] = ["BLURAY", "FULLHD", "HD", "480P", "360P", "240P"]
@@ -557,11 +555,9 @@ def sort_method(item):
     quality_orders[2] = ["HD", "480P", "360P", "240P", "FULLHD", "BLURAY"]
     quality_orders[3] = ["480P", "360P", "240P", "BLURAY", "FULLHD", "HD"]
 
-    order_list_idiomas = lang_orders[int(config.get_setting("language", "downloads"))]
-    match_list_idimas = {"IT": ["ITA", "IT", "Italiano", "italiano", "ITALIANO"],
-                         "SUB": ["Sottotitolato", "SUB", "sub-ita", "SUB-ITA", "Sub-ITA", "Sub-Ita"],
-                         "ENG": ["EN", "ENG", "Inglés", "Ingles", "English"],
-                         "VOSI": ["VOSI"]}
+    order_list_idiomas = lang_orders[int(lang_orders[0].index(config.get_setting("language")))]
+    match_list_idimas = {"ITA": ["ITA", "IT", "Italiano", "italiano", "ITALIANO"],
+                         "SUB": ["Sottotitolato", "SUB", "sub-ita", "SUB-ITA", "Sub-ITA", "Sub-Ita"]}
 
     order_list_calidad = ["BLURAY", "FULLHD", "HD", "480P", "360P", "240P"]
     order_list_calidad = quality_orders[int(config.get_setting("quality"))]
