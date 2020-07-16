@@ -1035,7 +1035,7 @@ def add_tvshow(item, channel=None):
 
     else:
         # This mark is because the item has something else apart in the "extra" attribute
-        item.action = item.extra if item.extra else item.action
+        # item.action = item.extra if item.extra else item.action
         if isinstance(item.extra, str) and "###" in item.extra:
             item.action = item.extra.split("###")[0]
             item.extra = item.extra.split("###")[1]
