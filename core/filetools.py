@@ -244,7 +244,7 @@ def file_open(path, mode="r", silent=False, vfs=True):
             if fileIo:
                 return io.FileIO(path, mode)
             else:
-                return io.open(path, mode)
+                return io.open(path, mode, encoding='utf-8')
     except:
         logger.error("ERROR when opening file: %s, %s" % (path, mode))
         if not silent:
