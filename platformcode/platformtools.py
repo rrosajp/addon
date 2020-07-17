@@ -52,7 +52,7 @@ def dialog_notification(heading, message, icon=3, time=5000, sound=True):
         dialog_ok(heading, message)
 
 
-def dialog_yesno(heading, line1, line2="", line3="", nolabel="No", yeslabel="Si", autoclose=0, customlabel=None):
+def dialog_yesno(heading, line1, line2="", line3="", nolabel=config.get_localized_string(70170), yeslabel=config.get_localized_string(30022), autoclose=0, customlabel=None):
     # customlabel only on kodi 19
     dialog = xbmcgui.Dialog()
     if config.get_platform() == 'kodi-matrix':

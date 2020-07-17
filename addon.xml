@@ -6,6 +6,14 @@
     <import addon="metadata.tvdb.com"/>
     <import addon="script.module.web-pdb" />
   </requires>
+  <extension point="kodi.context.item">
+    <menu id="kodi.core.main">
+      <item library="updatetvshow.py">
+        <label>70269</label>
+        <visible>String.IsEqual(ListItem.dbtype,tvshow)</visible>
+      </item>
+    </menu>
+  </extension>
   <extension point="xbmc.python.pluginsource" library="default.py">
     <provides>video</provides>
   </extension>

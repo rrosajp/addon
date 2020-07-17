@@ -6067,6 +6067,10 @@ msgctxt "#70816"
 msgid "Extracting Widevine CDM from image..."
 msgstr "Estrazione di Widevine CDM dall'immagine..."
 
+msgctxt "#70817"
+msgid "La Serie "%s" non è gestita da KoD, Vuoi cercarla?"
+msgstr "La Serie "%s" non è gestita da KoD, Vuoi cercarla?"
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS check alert"

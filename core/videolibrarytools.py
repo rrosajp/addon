@@ -578,10 +578,11 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     update = False
     nfo_path = filetools.join(path, "tvshow.nfo")
     head_nfo, item_nfo = read_nfo(nfo_path)
+
     if item_nfo.update_last:
         local_episodes_path = item_nfo.local_episodes_path
     elif config.get_setting("local_episodes", "videolibrary"):
-        done, local_episodes_path = config_local_episodes_path(path, serie.show)
+        done, local_episodes_path = config_local_episodes_path(path, serie)
         if done < 0:
             logger.info("An issue has occurred while configuring local episodes, going out without creating strm")
             return 0, 0, done
@@ -884,23 +885,25 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     return insertados, sobreescritos, fallidos
 
 
-def config_local_episodes_path(path, title, silent=False):
-    logger.info()
-
-    local_episodes_path = ''
-    if not silent:
-        silent = platformtools.dialog_yesno(config.get_localized_string(30131), config.get_localized_string(80044) % title)
-    if silent:
-        if config.is_xbmc() and not config.get_setting("videolibrary_kodi"):
-            platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(80043))
-        local_episodes_path = platformtools.dialog_browse(0, config.get_localized_string(80046))
-        if local_episodes_path == '':
-            logger.info("User has canceled the dialog")
-            return -2, local_episodes_path
-        elif path in local_episodes_path:
-            platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(80045))
-            logger.info("Selected folder is the same of the TV show one")
-            return -2, local_episodes_path
+def config_local_episodes_path(path, item, silent=False):
+    logger.info(item)
+    from platformcode.xbmc_videolibrary import search_local_path
+    local_episodes_path=search_local_path(item)
+    if not local_episodes_path:
+        title = item.contentSerieName if item.contentSerieName else item.show
+        if not silent:
+            silent = platformtools.dialog_yesno(config.get_localized_string(30131), config.get_localized_string(80044) % title)
+        if silent:
+            if config.is_xbmc() and not config.get_setting("videolibrary_kodi"):
+                platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(80043))
+            local_episodes_path = platformtools.dialog_browse(0, config.get_localized_string(80046))
+            if local_episodes_path == '':
+                logger.info("User has canceled the dialog")
+                return -2, local_episodes_path
+            elif path in local_episodes_path:
+                platformtools.dialog_ok(config.get_localized_string(30131), config.get_localized_string(80045))
+                logger.info("Selected folder is the same of the TV show one")
+                return -2, local_episodes_path
 
     if local_episodes_path:
         # import artwork
