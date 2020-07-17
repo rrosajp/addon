@@ -40,7 +40,7 @@ def getEpg():
         with open(xmlName, 'w') as f:
             f.write(guide)
     # else:
-    guide = open(xmlName)
+    guide = filetools.file_open(xmlName, vfs=False)
     return guide
 
 
