@@ -82,7 +82,7 @@ def live(item):
                                        contentTitle=it['title'],
                                        thumbnail=it['thumbnails']['channel_logo-100x100']['url'],
                                        forcethumb = True,
-                                       url=urls,
+                                       urls=urls,
                                        plot=plot,
                                        action='play'))
     return itemlist
@@ -128,16 +128,20 @@ def peliculas(item):
                                thumbnail=it['thumbnails']['image_vertical-264x396']['url'] if 'image_vertical-264x396' in it['thumbnails'] else '',
                                fanart=it['thumbnails']['image_keyframe_poster-1280x720']['url'] if 'image_keyframe_poster-1280x720' in it['thumbnails'] else '',
                                plot=it['longDescription'] if 'longDescription' in it else it['description'] if 'description' in it else '',
-                               url=urls))
+                               urls=urls,
+                               url=it['mediasetprogram$pageUrl']))
     return itemlist
 
 def episodios(item):
     support.log()
     itemlist = []
-    subBrandId = current_session.get('https://feed.entertainment.tv.theplatform.eu/f/PR1GhC/mediaset-prod-all-brands?byCustomValue={brandId}{' + item.url + '}').json()['entries'][-1]['mediasetprogram$subBrandId']
+    subBrandId = current_session.get('https://feed.entertainment.tv.theplatform.eu/f/PR1GhC/mediaset-prod-all-brands?byCustomValue={brandId}{' + item.urls + '}').json()
+    for entry in subBrandId['entries']:
+        if 'mediasetprogram$subBrandId' in entry and entry['description'] == 'Episodi':
+            subBrandId = entry['mediasetprogram$subBrandId']
+            break
     json = current_session.get('https://feed.entertainment.tv.theplatform.eu/f/PR1GhC/mediaset-prod-all-programs?byCustomValue={subBrandId}{' + subBrandId + '}').json()['entries']
     for it in json:
-        support.log(it)
         urls = []
         if 'media' in it:
             for key in it['media']:
@@ -159,19 +163,22 @@ def episodios(item):
                            thumbnail=it['thumbnails']['image_vertical-264x396']['url'] if 'image_vertical-264x396' in it['thumbnails'] else '',
                            fanart=it['thumbnails']['image_keyframe_poster-1280x720']['url'] if 'image_keyframe_poster-1280x720' in it['thumbnails'] else '',
                            plot=it['longDescription'] if 'longDescription' in it else it['description'],
-                           url=urls))
+                           urls=urls,
+                           url=it['mediasetprogram$pageUrl']))
     support.videolibrary(itemlist, item)
     return sorted(itemlist, key=lambda it: it.title)
 
 def findvideos(item):
     support.log()
     itemlist = []
-    itemlist.append(support.Item(server = 'directo', title = 'Direct', url = item.url, action = 'play'))
+    itemlist.append(support.Item(server = 'directo', title = 'Direct', url = item.urls, action = 'play'))
     return support.server(item, itemlist=itemlist, Download=False)
 
 def play(item):
     support.log()
-    for url in item.url:
+    if not item.urls: urls = item.url
+    else: urls = item.urls
+    for url in urls:
         url = support.httptools.downloadpage(url, allow_redirects=True).url
         if '.mpd' in url: data = url
     return support.servertools.find_video_items(item, data=data)
@@ -189,7 +196,6 @@ def get_from_id(item):
         id = quote(",".join(json["components"]))
         json = current_session.get(entries.format(id=id)).json()
     if 'entries' in json:
-        support.log(json['entries'])
         return json['entries']
     return {}
 
