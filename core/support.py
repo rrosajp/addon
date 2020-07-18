@@ -1336,9 +1336,9 @@ def addQualityTag(item, itemlist, data, patron):
         else:
             log('nessun tag qualità trovato')
 
-def get_jwplayer_mediaurl(data, srvName):
+def get_jwplayer_mediaurl(data, srvName, onlyHttp=False):
     video_urls = []
-    block = scrapertools.find_single_match(data, r'sources: \[([^\]]+)\]')
+    block = scrapertools.find_single_match(data, r'sources:\s*\[([^\]]+)\]')
     if 'file:' in block:
         sources = scrapertools.find_multiple_matches(block, r'file:\s*"([^"]+)"(?:,label:\s*"([^"]+)")?')
     elif 'src:' in block:
@@ -1348,7 +1348,7 @@ def get_jwplayer_mediaurl(data, srvName):
     for url, quality in sources:
         quality = 'auto' if not quality else quality
         if url.split('.')[-1] != 'mpd':
-            video_urls.append(['.' + url.split('.')[-1] + ' [' + quality + '] [' + srvName + ']', url])
+            video_urls.append(['.' + url.split('.')[-1] + ' [' + quality + '] [' + srvName + ']', url if not onlyHttp else url.replace('https://', 'http://')])
 
     video_urls.sort(key=lambda x: x[0].split()[1])
     return video_urls
