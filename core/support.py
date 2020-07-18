@@ -1096,6 +1096,7 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
                      contentSerieName=contentSerieName,
                      url=item.url,
                      action=action,
+                     from_action=item.action,
                      extra=extra,
                      path=item.path,
                      thumbnail=get_thumb('add_to_videolibrary.png')
