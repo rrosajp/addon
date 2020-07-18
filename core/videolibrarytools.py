@@ -435,7 +435,9 @@ def save_tvshow(item, episodelist, silent=False):
         logger.debug("NOT FOUND contentSerieName or code")
         return 0, 0, -1, path  # Salimos sin guardar
 
+    contentTypeBackup = item.contentType  # Fix errors in some channels
     scraper_return = scraper.find_and_set_infoLabels(item)
+    item.contentType = contentTypeBackup  # Fix errors in some channels
     # At this point we can have:
     #  scraper_return = True: An item with infoLabels with the updated information of the series
     #  scraper_return = False: An item without movie information (it has been canceled in the window)

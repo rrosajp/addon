@@ -840,7 +840,7 @@ def start_download(item):
 
 def get_episodes(item):
     log("contentAction: %s | contentChannel: %s | contentType: %s" % (item.contentAction, item.contentChannel, item.contentType))
-
+    
     if 'dlseason' in item:
         season = True
         season_number = item.dlseason
@@ -864,8 +864,7 @@ def get_episodes(item):
             episodes = getattr(channel, item.contentAction)(item)
 
     itemlist = []
-
-    if episodes and not scrapertools.find_single_match(episodes[0].title, r'(\d+.\d+)'):
+    if episodes and not scrapertools.find_single_match(episodes[0].title, r'(\d+.\d+)') and item.channel not in ['videolibrary']:
         from specials.autorenumber import select_type, renumber, check
         if not check(item):
             select_type(item)
@@ -908,7 +907,7 @@ def get_episodes(item):
 
             episode.downloadFilename = filetools.validate_path(filetools.join(item.downloadFilename, "%dx%0.2d - %s" % (episode.contentSeason, episode.contentEpisodeNumber, episode.contentTitle.strip())))
             if season:
-                if int(scrapertools.find_single_match(episode.title, r'(\d+)x')) == int(season_number):
+                if episode.contentSeason == int(season_number):
                     itemlist.append(episode)
             else:
                 itemlist.append(episode)
@@ -1078,11 +1077,11 @@ def save_download_movie(item):
 
 def save_download_tvshow(item):
     log("contentAction: %s | contentChannel: %s | contentType: %s | contentSerieName: %s" % (item.contentAction, item.contentChannel, item.contentType, item.contentSerieName))
-
     progreso = platformtools.dialog_progress_bg(config.get_localized_string(30101), config.get_localized_string(70188))
     try:
         item.show = item.fulltitle
-        scraper.find_and_set_infoLabels(item)
+        if item.channel not in ['videolibrary']:
+            scraper.find_and_set_infoLabels(item)
 
         if not item.contentSerieName: item.contentSerieName = item.fulltitle
 
