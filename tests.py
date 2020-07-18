@@ -4,7 +4,6 @@ import sys
 import unittest
 import parameterized
 
-from lib import requests
 from platformcode import config
 
 config.set_setting('tmdb_active', False)
@@ -13,6 +12,8 @@ librerias = os.path.join(config.get_runtime_path(), 'lib')
 sys.path.insert(0, librerias)
 from core.support import typo
 from core.item import Item
+from core.httptools import downloadpage
+from core import servertools
 import channelselector
 import re
 
@@ -106,7 +107,7 @@ chNumRis = {
 
 
 def getChannels():
-    channel_list = channelselector.filterchannels("all")[0:2]
+    channel_list = channelselector.filterchannels("all")
     ret = []
     for chItem in channel_list:
         ch = chItem.channel
@@ -141,7 +142,7 @@ class GenericChannelTest(unittest.TestCase):
         self.assertTrue(mainlist, 'channel ' + self.ch + ' has no menu')
 
         for it in mainlist:
-            # it.title = it.title.decode('ascii', 'ignore')
+            print 'testing ' + self.ch + ' -> ' + it.title
             if it.action == 'channel_config':
                 hasChannelConfig = True
                 continue
@@ -161,6 +162,7 @@ class GenericChannelTest(unittest.TestCase):
                 self.assertLess(len(resIt.fulltitle), 110,
                                 'channel ' + self.ch + ' -> ' + it.title + ' might contain wrong titles\n' + resIt.fulltitle)
                 if resIt.url:
+                    self.assertIsInstance(resIt.url, str, 'channel ' + self.ch + ' -> ' + it.title + ' -> ' + resIt.title + ' contain non-string url')
                     self.assertIsNotNone(re.match(validUrlRegex, resIt.url),
                                          'channel ' + self.ch + ' -> ' + it.title + ' -> ' + resIt.title + ' might contain wrong url\n' + resIt.url)
                 if 'year' in resIt.infoLabels and resIt.infoLabels['year']:
@@ -177,17 +179,26 @@ class GenericChannelTest(unittest.TestCase):
             # some sites might have no link inside, but if all results are without servers, there's something wrong
             servers = []
             for resIt in itemlist:
-                servers = getattr(self.module, resIt.action)(resIt)
+                if hasattr(self.module, resIt.action):
+                    servers = getattr(self.module, resIt.action)(resIt)
+                else:
+                    servers = [resIt]
+
                 if servers:
                     break
             self.assertTrue(servers, 'channel ' + self.ch + ' -> ' + it.title + ' has no servers on all results')
             for server in servers:
-                srv = server.server
+                srv = server.server.lower()
+                if not srv:
+                    continue
                 module = __import__('servers.%s' % srv, fromlist=["servers.%s" % srv])
                 page_url = server.url
                 print 'testing ' + page_url
+                self.assert_(hasattr(module, 'test_video_exists'), srv + ' has no test_video_exists')
                 if module.test_video_exists(page_url)[0]:
                     urls = module.get_video_url(page_url)
+                    server_parameters = servertools.get_server_parameters(srv)
+                    self.assertTrue(urls or server_parameters.get("premium"), srv + ' scraper did not return direct urls for ' + page_url)
                     print urls
                     for u in urls:
                         spl = u[1].split('|')
@@ -199,11 +210,17 @@ class GenericChannelTest(unittest.TestCase):
                         if headersUrl:
                             for name in headersUrl.split('&'):
                                 h, v = name.split('=')
-                                headers[h] = v
+                                h = str(h)
+                                headers[h] = str(v)
                             print headers
-                        contentType = requests.head(directUrl, headers=headers, timeout=15).headers['Content-Type']
-                        self.assert_(contentType.startswith('video') or 'mpegurl' in contentType,
-                                     srv + ' scraper did not return valid url for link ' + page_url)
+                        if 'magnet:?' in directUrl:  # check of magnet links not supported
+                            continue
+                        page = downloadpage(directUrl, headers=headers, only_headers=True, use_requests=True)
+                        self.assertTrue(page.success, srv + ' scraper returned an invalid link')
+                        self.assertLess(page.code, 400, srv + ' scraper returned a ' + str(page.code) + ' link')
+                        contentType = page.headers['Content-Type']
+                        self.assert_(contentType.startswith('video') or 'mpegurl' in contentType or 'octet-stream' in contentType or 'dash+xml' in contentType,
+                                     srv + ' scraper did not return valid url for link ' + page_url + '\nDirect url: ' + directUrl + '\nContent-Type: ' + contentType)
 
         self.assertTrue(hasChannelConfig, 'channel ' + self.ch + ' has no channel config')
 
@@ -214,6 +231,7 @@ class GenericChannelTest(unittest.TestCase):
                     itemlist = self.module.newest(cat)
                     self.assertTrue(itemlist, 'channel ' + self.ch + ' returned no news for category ' + cat)
                     break
+
 
 if __name__ == '__main__':
     unittest.main()
