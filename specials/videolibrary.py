@@ -717,9 +717,9 @@ def update_tvshow(item):
     nfo_path = filetools.join(item.path, "tvshow.nfo")
     head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
     if item.active and not item_nfo.active:
-        if not platformtools.dialog_yesno(config.get_localized_string(60037).replace('...',''), config.get_localized_string(70268) % item.contentSerieName):
-            item_nfo.active = 1
-            filetools.write(nfo_path, head_nfo + item_nfo.tojson())
+        # if not platformtools.dialog_yesno(config.get_localized_string(60037).replace('...',''), config.get_localized_string(70268) % item.contentSerieName):
+        item_nfo.active = 1
+        filetools.write(nfo_path, head_nfo + item_nfo.tojson())
 
     platformtools.itemlist_refresh()
 

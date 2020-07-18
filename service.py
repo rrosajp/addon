@@ -129,6 +129,9 @@ def check_for_update(overwrite=True):
 
             for i, tvshow_file in enumerate(show_list):
                 head_nfo, serie = videolibrarytools.read_nfo(tvshow_file)
+                if serie.infoLabels['status'].lower() == 'ended':
+                    serie.active = 0
+                    filetools.write(tvshow_file, head_nfo + serie.tojson())
                 path = filetools.dirname(tvshow_file)
 
                 logger.info("serie=" + serie.contentSerieName)
