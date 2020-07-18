@@ -111,6 +111,7 @@ def check_for_update(overwrite=True):
     update_when_finished = False
     hoy = datetime.date.today()
     estado_verify_playcount_series = False
+    local_ended = True
 
     try:
         if config.get_setting("update", "videolibrary") != 0 or overwrite:
@@ -129,7 +130,9 @@ def check_for_update(overwrite=True):
 
             for i, tvshow_file in enumerate(show_list):
                 head_nfo, serie = videolibrarytools.read_nfo(tvshow_file)
-                if serie.infoLabels['status'].lower() == 'ended':
+                if serie.local_episodes_path:
+                    local_ended = True if serie.infoLabels['number_of_episodes'] == len(serie.local_episodes_list) else False
+                if serie.infoLabels['status'].lower() == 'ended' and local_ended:
                     serie.active = 0
                     filetools.write(tvshow_file, head_nfo + serie.tojson())
                 path = filetools.dirname(tvshow_file)
