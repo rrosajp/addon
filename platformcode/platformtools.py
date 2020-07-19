@@ -109,9 +109,9 @@ def dialog_textviewer(heading, text):  # available from kodi 16
     return xbmcgui.Dialog().textviewer(heading, text)
 
 
-def dialog_browse(_type, heading, default=""):
+def dialog_browse(_type, heading, shares="files", mask="", useThumbs=False, treatAsFolder=False, defaultt="", enableMultiple=False):
     dialog = xbmcgui.Dialog()
-    d = dialog.browse(_type, heading, 'files')
+    d = dialog.browse(_type, heading, shares, mask, useThumbs, treatAsFolder, defaultt, enableMultiple)
     return d
 
 
