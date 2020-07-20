@@ -150,6 +150,7 @@ def epmenu(item):
 def episodios(item):
     support.log()
     itemlist = []
+    episode = ''
     # entries = current_session.get('https://feed.entertainment.tv.theplatform.eu/f/PR1GhC/mediaset-prod-all-brands?byCustomValue={brandId}{' + item.urls + '}').json()['entries']
 
     # for entry in entries:
@@ -170,7 +171,6 @@ def episodios(item):
                 item.infoLabels['season'] = it['tvSeasonNumber']
                 item.infoLabels['episode'] = it['tvSeasonEpisodeNumber']
                 episode = '%dx%02d - ' % (it['tvSeasonNumber'], it['tvSeasonEpisodeNumber'])
-            else: episode = ''
             itemlist.append(
                 item.clone(action='findvideos',
                            title=support.typo(episode + title, 'bold'),
