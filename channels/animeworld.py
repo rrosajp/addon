@@ -23,32 +23,32 @@ def get_data(item, head=[]):
     for h in head:
         headers[h[0]] = h[1]
     if not item.count: item.count = 0
-    if not config.get_setting('KTVSecurity', item.channel):
+    if not config.get_setting('key', item.channel):
         # resolve js for key
-        jshe = 'var document = {}, location = {}'
-        aesjs = str(support.match(host + '/aes.min.js').data)
         jstr = support.match(item.url, patron=r'<script>(.*?)</').match
-        jsret =  'return { key: toHex(slowAES.decrypt(c,2,a,b)), loc: location.href}'
-        key_data = js2py.eval_js( 'function (){ ' + jshe + '\n' + aesjs + '\n' + jstr + '\n' + jsret + '}' )
-        key = key_data()['key']
+        if jstr:
+            jshe = 'var document = {}, location = {}'
+            aesjs = str(support.match(host + '/aes.min.js').data)
+            js_fix = 'window.toHex = window.toHex || function(){for(var d=[],d=1==arguments.length&&arguments[0].constructor==Array?arguments[0]:arguments,e="",f=0;f<d.length;f++)e+=(16>d[f]?"0":"")+d[f].toString(16);return e.toLowerCase()}'
+            jsret =  'return document.cookie'
+            key_data = js2py.eval_js( 'function (){ ' + jshe + '\n' + aesjs + '\n' + js_fix + '\n' + jstr + '\n' + jsret + '}' )
+            key = key_data().split(';')[0]
 
-        # save Key in settings
-        config.set_setting('KTVSecurity', key, item.channel)
+            # save Key in settings
+            config.set_setting('key', key, item.channel)
 
     # set cookie
-    headers['cookie'] = 'KTVSecurity=' + config.get_setting('KTVSecurity', item.channel)
+    headers['cookie'] = config.get_setting('key', item.channel)
     res = support.match(item, headers=headers, patron=r'location.href="([^"]+)')
     if res.match: data = support.match(res.match.replace('http://','https://'), headers=headers).data
     else: data = res.data
 
     #check that the key is still valid
-    if 'toHex(slowAES.decrypt(c,2,a,b))' in data and item.count < 3:
+    if 'document.cookie=' in data and item.count < 3:
         item.count += 1
-        config.set_setting('KTVSecurity', '', item.channel)
+        config.set_setting('key', '', item.channel)
         return get_data(item)
     return data
-
-
 
 
 @support.menu
@@ -61,6 +61,7 @@ def mainlist(item):
            ('Nuove Aggiunte',['/newest', 'peliculas','noorder' ]),
            ('Generi',['/?d=1','genres',])]
     return locals()
+
 
 @support.scrape
 def genres(item):
@@ -196,7 +197,7 @@ def findvideos(item):
         if match:
             ID, url = match
 
-            if serverid == '18':
+            if serverid in ['18', '15']:
                 url = support.match('%s/ajax/episode/serverPlayer?id=%s' % (host, ID), patron=r'source src="([^"]+)"', headers=headers).match
                 itemlist.append(item.clone(action="play", title='Diretto', url=url, server='directo'))
 
