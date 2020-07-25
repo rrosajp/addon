@@ -35,8 +35,7 @@ jobs:
 
     - name: Run tests
       run: |
-        export PYTHONPATH=$GITHUB_WORKSPACE/addon
-        export KODI_HOME=$GITHUB_WORKSPACE/tests/home
+        export PYTHONPATH=$GITHUB_WORKSPACE
         export KODI_INTERACTIVE=0
         python tests/test_generic.py
 
