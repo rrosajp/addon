@@ -3,9 +3,6 @@ import os
 import sys
 import unittest
 
-import HtmlTestRunner
-import parameterized
-
 import xbmc
 
 
@@ -21,6 +18,9 @@ def add_on_info(*args, **kwargs):
 
 # override
 xbmc.get_add_on_info_from_calling_script = add_on_info
+
+import HtmlTestRunner
+import parameterized
 
 from platformcode import config, logger
 
@@ -126,7 +126,7 @@ chNumRis = {
 servers = []
 channels = []
 
-channel_list = channelselector.filterchannels("all")
+channel_list = channelselector.filterchannels("all")[:1]
 ret = []
 for chItem in channel_list:
     try:
@@ -201,30 +201,30 @@ class GenericChannelTest(unittest.TestCase):
      title, itemlist in ch['menuItemlist'].items()])
 class GenericChannelMenuItemTest(unittest.TestCase):
     def test_menu(self):
-        print 'testing ' + self.ch + ' --> ' + title
-        self.assertTrue(itemlist, 'channel ' + self.ch + ' -> ' + title + ' is empty')
+        print 'testing ' + self.ch + ' --> ' + self.title
+        self.assertTrue(itemlist, 'channel ' + self.ch + ' -> ' + self.title + ' is empty')
         self.assertTrue(self.serversFound,
-                        'channel ' + self.ch + ' -> ' + title + ' has no servers on all results')
+                        'channel ' + self.ch + ' -> ' + self.title + ' has no servers on all results')
 
         if self.ch in chNumRis:  # i know how much results should be
             for content in chNumRis[self.ch]:
-                if content in title:
+                if content in self.title:
                     risNum = len([i for i in itemlist if not i.nextPage])  # not count nextpage
                     self.assertEqual(chNumRis[self.ch][content], risNum,
-                                     'channel ' + self.ch + ' -> ' + title + ' returned wrong number of results')
+                                     'channel ' + self.ch + ' -> ' + self.title + ' returned wrong number of results')
                     break
 
         for resIt in itemlist:
-            print resIt.title + ' -> ' + resIt.url
+            print resIt.self.title + ' -> ' + resIt.url
             self.assertLess(len(resIt.fulltitle), 110,
-                            'channel ' + self.ch + ' -> ' + title + ' might contain wrong titles\n' + resIt.fulltitle)
+                            'channel ' + self.ch + ' -> ' + self.title + ' might contain wrong titles\n' + resIt.fulltitle)
             if resIt.url:
                 self.assertIsInstance(resIt.url, str,
-                                      'channel ' + self.ch + ' -> ' + title + ' -> ' + resIt.title + ' contain non-string url')
+                                      'channel ' + self.ch + ' -> ' + self.title + ' -> ' + resIt.title + ' contain non-string url')
                 self.assertIsNotNone(re.match(validUrlRegex, resIt.url),
-                                     'channel ' + self.ch + ' -> ' + title + ' -> ' + resIt.title + ' might contain wrong url\n' + resIt.url)
+                                     'channel ' + self.ch + ' -> ' + self.title + ' -> ' + resIt.title + ' might contain wrong url\n' + resIt.url)
             if 'year' in resIt.infoLabels and resIt.infoLabels['year']:
-                msgYear = 'channel ' + self.ch + ' -> ' + title + ' might contain wrong infolabels year\n' + str(
+                msgYear = 'channel ' + self.ch + ' -> ' + self.title + ' might contain wrong infolabels year\n' + str(
                     resIt.infoLabels['year'])
                 self.assert_(type(resIt.infoLabels['year']) is int or resIt.infoLabels['year'].isdigit(),
                              msgYear)
@@ -234,7 +234,7 @@ class GenericChannelMenuItemTest(unittest.TestCase):
             if resIt.title == typo(config.get_localized_string(30992), 'color kod bold'):  # next page
                 nextPageItemlist = getattr(self.module, resIt.action)(resIt)
                 self.assertTrue(nextPageItemlist,
-                                'channel ' + self.ch + ' -> ' + title + ' has nextpage not working')
+                                'channel ' + self.ch + ' -> ' + self.title + ' has nextpage not working')
 
         print '\ntest passed'
 
@@ -281,5 +281,5 @@ class GenericServerTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main(testRunner=HtmlTestRunner.HTMLTestRunner(report_name='report', add_timestamp=False,
-                                                           combine_reports=True, report_title='KoD Test Suite'))
+    unittest.main(testRunner=HtmlTestRunner.HTMLTestRunner(report_name='report', add_timestamp=False, combine_reports=True,
+                                                           report_title='KoD Test Suite'), exit=False)
