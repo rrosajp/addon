@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Test Suite
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -33,7 +33,10 @@ jobs:
         pip install html-testRunner
 
     - name: Run tests
-      run: python test.py
+      run: |
+        export KODI_HOME=$GITHUB_WORKSPACE/tests/home
+        export KODI_INTERACTIVE=0
+        python tests.py
 
     - uses: actions/upload-artifact@v2
       with:
