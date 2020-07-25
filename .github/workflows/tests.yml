@@ -31,6 +31,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install sakee
         pip install html-testRunner
+        pip install parameterized
 
     - name: Run tests
       run: |
