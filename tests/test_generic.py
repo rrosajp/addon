@@ -6,6 +6,22 @@ import unittest
 import HtmlTestRunner
 import parameterized
 
+import xbmc
+
+
+# custom paths
+def add_on_info(*args, **kwargs):
+    return xbmc.AddonData(
+        kodi_home_path=os.path.join(os.getcwd(), 'tests', 'home'),
+        add_on_id='plugin.video.kod',
+        add_on_path=os.getcwd(),
+        kodi_profile_path=os.path.join(os.getcwd(), 'tests', 'home', 'userdata')
+    )
+
+
+# override
+xbmc.get_add_on_info_from_calling_script = add_on_info
+
 from platformcode import config, logger
 
 config.set_setting('tmdb_active', False)
