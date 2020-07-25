@@ -35,9 +35,10 @@ jobs:
 
     - name: Run tests
       run: |
+        export PYTHONPATH=$GITHUB_WORKSPACE
         export KODI_HOME=$GITHUB_WORKSPACE/tests/home
         export KODI_INTERACTIVE=0
-        python tests.py
+        python tests/test_generic.py
 
     - uses: actions/upload-artifact@v2
       with:

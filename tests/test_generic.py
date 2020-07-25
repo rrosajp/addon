@@ -110,7 +110,7 @@ chNumRis = {
 servers = []
 channels = []
 
-channel_list = channelselector.filterchannels("all")[:1]
+channel_list = channelselector.filterchannels("all")
 ret = []
 for chItem in channel_list:
     try:
