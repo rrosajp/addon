@@ -1207,8 +1207,13 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
             checklinks_number = config.get_setting('checklinks_number')
         verifiedItemlist = servertools.check_list_links(verifiedItemlist, checklinks_number)
 
-    if AutoPlay and not 'downloads' in inspect.stack()[3][1] or not 'downloads' in inspect.stack()[3][1] or not inspect.stack()[4][1]:
-        autoplay.start(verifiedItemlist, item)
+    try:
+        if AutoPlay and not 'downloads' in inspect.stack()[3][1] or not 'downloads' in inspect.stack()[3][1] or not inspect.stack()[4][1]:
+            autoplay.start(verifiedItemlist, item)
+    except:
+        import traceback
+        logger.error(traceback.format_exc())
+        pass
 
     if Videolibrary and item.contentChannel != 'videolibrary':
         videolibrary(verifiedItemlist, item)
@@ -1247,7 +1252,7 @@ def log(*args):
 
 
 def channel_config(item, itemlist):
-    from  channelselector import get_thumb
+    from channelselector import get_thumb
     itemlist.append(
         Item(channel='setting',
              action="channel_config",
