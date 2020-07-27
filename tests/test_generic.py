@@ -1,23 +1,32 @@
 # -*- coding: utf-8 -*-
+# use export PYTHONPATH=addon source code
+# and inside .kodi to run tests locally
+# you can pass specific channel name using KOD_TST_CH environment var
+
+# export PYTHONPATH=/home/user/.kodi/addons/plugin.video.kod
+# export KOD_TST_CH = channel
+# python tests/test_generic.py
+
 import os
 import sys
 import unittest
 
 import xbmc
 
+if 'KOD_TST_CH' not in os.environ:
+    # custom paths
+    def add_on_info(*args, **kwargs):
+        return xbmc.AddonData(
+            kodi_home_path=os.path.join(os.getcwd(), 'tests', 'home'),
+            add_on_id='plugin.video.kod',
+            add_on_path=os.getcwd(),
+            kodi_profile_path=os.path.join(os.getcwd(), 'tests', 'home', 'userdata')
+        )
 
-# custom paths
-def add_on_info(*args, **kwargs):
-    return xbmc.AddonData(
-        kodi_home_path=os.path.join(os.getcwd(), 'tests', 'home'),
-        add_on_id='plugin.video.kod',
-        add_on_path=os.getcwd(),
-        kodi_profile_path=os.path.join(os.getcwd(), 'tests', 'home', 'userdata')
-    )
 
+    # override
+    xbmc.get_add_on_info_from_calling_script = add_on_info
 
-# override
-xbmc.get_add_on_info_from_calling_script = add_on_info
 
 import HtmlTestRunner
 import parameterized
@@ -126,7 +135,7 @@ chNumRis = {
 servers = []
 channels = []
 
-channel_list = channelselector.filterchannels("all")
+channel_list = channelselector.filterchannels("all") if 'KOD_TST_CH' not in os.environ else [Item(channel=os.environ['KOD_TST_CH'], action="mainlist")]
 ret = []
 for chItem in channel_list:
     try:
@@ -140,7 +149,6 @@ for chItem in channel_list:
 
             for it in mainlist:
                 print 'preparing ' + ch + ' -> ' + it.title
-                serversFound[it.title] = []
 
                 if it.action == 'channel_config':
                     hasChannelConfig = True
@@ -152,15 +160,16 @@ for chItem in channel_list:
 
                 # some sites might have no link inside, but if all results are without servers, there's something wrong
                 for resIt in itemlist:
-                    if hasattr(module, resIt.action):
-                        serversFound[it.title] = getattr(module, resIt.action)(resIt)
-                    else:
-                        serversFound[it.title] = [resIt]
+                    if resIt.action == 'findvideos':
+                        if hasattr(module, resIt.action):
+                            serversFound[it.title] = getattr(module, resIt.action)(resIt)
+                        else:
+                            serversFound[it.title] = [resIt]
 
-                    if serversFound[it.title]:
-                        servers.extend(
-                            {'name': srv.server.lower(), 'server': srv} for srv in serversFound[it.title] if srv.server)
-                        break
+                        if serversFound[it.title]:
+                            servers.extend(
+                                {'name': srv.server.lower(), 'server': srv} for srv in serversFound[it.title] if srv.server)
+                            break
 
             channels.append(
                 {'ch': ch, 'hasChannelConfig': hasChannelConfig, 'mainlist': mainlist, 'menuItemlist': menuItemlist,
@@ -197,7 +206,7 @@ class GenericChannelTest(unittest.TestCase):
 
 
 @parameterized.parameterized_class(
-    [{'ch': ch['ch'], 'title': title, 'itemlist': itemlist, 'serversFound': ch['serversFound'][title]} for ch in channels for
+    [{'ch': ch['ch'], 'title': title, 'itemlist': itemlist, 'serversFound': ch['serversFound'][title] if title in ch['serversFound'] else True} for ch in channels for
      title, itemlist in ch['menuItemlist'].items()])
 class GenericChannelMenuItemTest(unittest.TestCase):
     def test_menu(self):
@@ -215,7 +224,7 @@ class GenericChannelMenuItemTest(unittest.TestCase):
                     break
 
         for resIt in itemlist:
-            print resIt.self.title + ' -> ' + resIt.url
+            print resIt.title + ' -> ' + resIt.url
             self.assertLess(len(resIt.fulltitle), 110,
                             'channel ' + self.ch + ' -> ' + self.title + ' might contain wrong titles\n' + resIt.fulltitle)
             if resIt.url:
@@ -281,5 +290,8 @@ class GenericServerTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main(testRunner=HtmlTestRunner.HTMLTestRunner(report_name='report', add_timestamp=False, combine_reports=True,
+    if 'KOD_TST_CH' not in os.environ:
+        unittest.main(testRunner=HtmlTestRunner.HTMLTestRunner(report_name='report', add_timestamp=False, combine_reports=True,
                                                            report_title='KoD Test Suite'), exit=False)
+    else:
+        unittest.main()
