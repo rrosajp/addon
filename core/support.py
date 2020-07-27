@@ -541,14 +541,15 @@ def scrape(func):
     return wrapper
 
 
-def dooplay_get_links(item, host):
+def dooplay_get_links(item, host, paramList=[]):
     # get links from websites using dooplay theme and dooplay_player
     # return a list of dict containing these values: url, title and server
-
-    data = httptools.downloadpage(item.url).data.replace("'", '"')
-    patron = r'<li id="player-option-[0-9]".*?data-type="([^"]+)" data-post="([^"]+)" data-nume="([^"]+)".*?<span class="title".*?>([^<>]+)</span>(?:<span class="server">([^<>]+))?'
-    matches = scrapertools.find_multiple_matches(data, patron)
-
+    if not paramList:
+        data = httptools.downloadpage(item.url).data.replace("'", '"')
+        patron = r'<li id="player-option-[0-9]".*?data-type="([^"]+)" data-post="([^"]+)" data-nume="([^"]+)".*?<span class="title".*?>([^<>]+)</span>(?:<span class="server">([^<>]+))?'
+        matches = scrapertools.find_multiple_matches(data, patron)
+    else:
+        matches = paramList
     ret = []
 
     for type, post, nume, title, server in matches:
