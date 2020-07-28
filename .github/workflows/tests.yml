@@ -7,7 +7,7 @@ name: Test Suite
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 17 * * *'
+    - cron: '00 17 * * *'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -40,7 +40,12 @@ jobs:
         export KODI_HOME=$GITHUB_WORKSPACE/tests/home
         python tests/test_generic.py
 
-    - uses: actions/upload-artifact@v2
+    - name: Pushe to website
+      uses: cpina/github-action-push-to-another-repository@master
+      env:
+        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        name: report
-        path: reports/report.html
+        source-directory: 'report'
+        destination-github-username: 'kodiondemand'
+        destination-repository-name: 'kodiondemand.github.io'
+        user-email: test@test.test
