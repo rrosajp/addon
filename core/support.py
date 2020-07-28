@@ -988,6 +988,7 @@ def match_dbg(data, patron):
 
 def download(itemlist, item, typography='', function_level=1, function=''):
     if config.get_setting('downloadenabled'):
+
         if not typography: typography = 'color kod bold'
 
         if item.contentType == 'movie':
@@ -996,9 +997,14 @@ def download(itemlist, item, typography='', function_level=1, function=''):
         elif item.contentType == 'episode':
             from_action = 'findvideos'
             title = typo(config.get_localized_string(60356), typography) + ' - ' + item.title
-        elif item.contentType == 'tvshow':
-            from_action = 'episodios'
+        elif item.contentType in 'tvshow':
+            if item.channel == 'community' and config.get_setting('show_seasons', item.channel):
+                from_action = 'season'
+            else:
+                from_action = 'episodios'
             title = typo(config.get_localized_string(60355), typography)
+        elif item.contentType in 'season':
+            from_action = 'get_seasons'
         else:  # content type does not support download
             return itemlist
 
@@ -1017,7 +1023,7 @@ def download(itemlist, item, typography='', function_level=1, function=''):
                         break
                 else:
                     show = False
-            if show:
+            if show and item.contentType != 'season':
                 itemlist.append(
                     Item(channel='downloads',
                          from_channel=item.channel,
