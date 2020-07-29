@@ -475,6 +475,9 @@ def scrape(func):
             if 'itemlistHook' in args:
                 itemlist = args['itemlistHook'](itemlist)
 
+            if 'ItemItemlistHook' in args:
+                itemlist = args['ItemItemlistHook'](item, itemlist)
+
             # if url may be changed and channel has findhost to update
             if 'findhost' in func.__globals__ and not itemlist:
                 logger.info('running findhost ' + func.__module__)
