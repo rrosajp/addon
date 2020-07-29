@@ -95,6 +95,10 @@ def saved_search(item):
 def new_search(item):
     logger.info()
 
+    filename = config.get_temp_file('temp-search')
+    if filetools.isfile(filename):
+        filetools.remove(filename)
+
     itemlist = []
     if config.get_setting('last_search'):
         last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
@@ -149,7 +153,7 @@ def new_search(item):
             itemlist.append(new_item)
 
     if item.mode == 'all' or not itemlist:
-        itemlist = channel_search(Item(channel=item.channel,
+        return channel_search(Item(channel=item.channel,
                                        title=searched_text,
                                        text=searched_text,
                                        mode='all',
@@ -159,6 +163,7 @@ def new_search(item):
 
 
 def channel_search(item):
+    from base64 import b64decode, b64encode
     logger.info(item)
 
     start = time.time()
@@ -176,6 +181,17 @@ def channel_search(item):
     elif item.infoLabels['title']:
         item.text = item.infoLabels['title']
         item.title = item.text
+
+    filename = config.get_temp_file('temp-search')
+    if filetools.isfile(filename):
+        itemlist = []
+        f = filetools.read(filename)
+        if f.startswith(item.text):
+            for it in f.split(','):
+                if it: itemlist.append(Item().fromurl(it))
+            return itemlist
+        else:
+            filetools.remove(filename)
 
     searched_id = item.infoLabels['tmdb_id']
 
@@ -330,7 +346,13 @@ def channel_search(item):
         if results:
             results.insert(0, Item(title=typo(config.get_localized_string(30025), 'color kod bold'), thumbnail=get_thumb('search.png')))
     # logger.debug(results_statistic)
-    return valid + results
+    itlist = valid + results
+    writelist = item.text
+    for it in itlist:
+        writelist += ',' + it.tourl()
+    filetools.write(filename, str(writelist))
+
+    return itlist
 
 
 def get_channel_results(item, module_dict, search_action):
