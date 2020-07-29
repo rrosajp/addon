@@ -5,7 +5,7 @@
 	"active": true,
 	"thumbnail": "film4k.png",
 	"banner": "film4k.png",
-	"categories": ["tvshow", "movie"],
+	"categories": ["tvshow", "movie", "anime"],
 	"not_active": ["include_in_newest_peliculas", "include_in_newest_anime", "include_in_newest_series"],
 	"settings": []
 }
