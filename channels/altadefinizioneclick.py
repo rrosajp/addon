@@ -22,7 +22,7 @@ from core.item import Item
 from platformcode import config
 
 def findhost():
-    data = support.httptools.downloadpage('https://altadefinizione-nuovo.link/').data
+    data = support.httptools.downloadpage('https://altadefinizione-nuovo.info/').data
     host = support.scrapertools.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
     return host
 
