@@ -95,9 +95,9 @@ def saved_search(item):
 def new_search(item):
     logger.info()
 
-    filename = config.get_temp_file('temp-search')
-    if filetools.isfile(filename):
-        filetools.remove(filename)
+    temp_search_file = config.get_temp_file('temp-search')
+    if filetools.isfile(temp_search_file):
+        filetools.remove(temp_search_file)
 
     itemlist = []
     if config.get_setting('last_search'):
@@ -154,16 +154,15 @@ def new_search(item):
 
     if item.mode == 'all' or not itemlist:
         return channel_search(Item(channel=item.channel,
-                                       title=searched_text,
-                                       text=searched_text,
-                                       mode='all',
-                                       infoLabels={}))
+                                   title=searched_text,
+                                   text=searched_text,
+                                   mode='all',
+                                   infoLabels={}))
 
     return itemlist
 
 
 def channel_search(item):
-    from base64 import b64decode, b64encode
     logger.info(item)
 
     start = time.time()
@@ -182,16 +181,17 @@ def channel_search(item):
         item.text = item.infoLabels['title']
         item.title = item.text
 
-    filename = config.get_temp_file('temp-search')
-    if filetools.isfile(filename):
+    temp_search_file = config.get_temp_file('temp-search')
+    if filetools.isfile(temp_search_file):
         itemlist = []
-        f = filetools.read(filename)
+        f = filetools.read(temp_search_file)
         if f.startswith(item.text):
             for it in f.split(','):
-                if it: itemlist.append(Item().fromurl(it))
+                if it and it != item.text:
+                    itemlist.append(Item().fromurl(it))
             return itemlist
         else:
-            filetools.remove(filename)
+            filetools.remove(temp_search_file)
 
     searched_id = item.infoLabels['tmdb_id']
 
@@ -346,11 +346,12 @@ def channel_search(item):
         if results:
             results.insert(0, Item(title=typo(config.get_localized_string(30025), 'color kod bold'), thumbnail=get_thumb('search.png')))
     # logger.debug(results_statistic)
+
     itlist = valid + results
     writelist = item.text
     for it in itlist:
         writelist += ',' + it.tourl()
-    filetools.write(filename, str(writelist))
+    filetools.write(temp_search_file, writelist)
 
     return itlist
 
