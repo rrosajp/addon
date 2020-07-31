@@ -245,7 +245,7 @@ def run(item=None):
             # Special action for searching, first asks for the words then call the "search" function
             elif item.action == "search":
                 # from core.support import dbg;dbg()
-                if filetools.isfile(temp_search_file):
+                if filetools.isfile(temp_search_file) and config.get_setting('videolibrary_kodi'):
                     itemlist = []
                     f = filetools.read(temp_search_file)
                     strList = f.split(',')
@@ -356,7 +356,7 @@ def new_search(item, channel=None):
     return itemlist
 
 def set_search_temp(item):
-    if filetools.isfile(temp_search_file):
+    if filetools.isfile(temp_search_file) and config.get_setting('videolibrary_kodi'):
         f = '[V],' + filetools.read(temp_search_file)
         filetools.write(temp_search_file, f)
 
