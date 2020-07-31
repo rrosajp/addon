@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per animeuniverse
+# Canale per animealtadefinizione
 # ----------------------------------------------------------
 
 from core import support
 
 host = support.config.get_channel_url()
-headers = {}
+headers = [['Referer', host]]
 
 perpage_list = ['20','30','40','50','60','70','80','90','100']
-perpage = perpage_list[support.config.get_setting('perpage' , 'animeuniverse')]
+perpage = perpage_list[support.config.get_setting('perpage' , 'animealtadefinizione')]
 epPatron = r'<td>\s*(?P<title>[^<]+)[^>]+>[^>]+>\s*<a href="(?P<url>[^"]+)"'
 
 
@@ -18,15 +18,14 @@ def mainlist(item):
     anime=['/anime/',
            ('Tipo',['', 'menu', 'Anime']),
            ('Anno',['', 'menu', 'Anno']),
-           ('Genere', ['', 'menu','Genere']),
-           ('Hentai', ['/hentai/', 'peliculas'])]
+           ('Genere', ['', 'menu','Genere'])]
     return locals()
 
 
 @support.scrape
 def menu(item):
     action = 'peliculas'
-    data = support.match(item, patron= item.args + r'</a><ul class="sub-menu">(.*?)</ul>').match
+    data = support.match(item, patron= r'<a href="' + host + r'/category/' + item.args.lower() + r'/">' + item.args + r'</a><ul class="sub-menu">(.*?)</ul>').match
     patronMenu = r'<a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
     return locals()
 
@@ -46,7 +45,7 @@ def search(item, texto):
 
 @support.scrape
 def peliculas(item):
-    if '/mos/' in item.url:
+    if '/movie/' in item.url:
         item.contentType = 'movie'
         action='findvideos'
     else:
@@ -61,10 +60,15 @@ def peliculas(item):
     if not item.pag: item.pag = 1
 
     anime=True
-    data = support.match(host + '/wp-content/themes/animeuniverse/functions/ajax.php', post='sorter=recent&location=&loop=main+loop&action=sort&numarticles='+perpage+'&paginated='+str(item.pag)+'&currentquery%5B'+query+'%5D='+searchtext+'&thumbnail=1').data.replace('\\','')
-    patron=r'<a href="(?P<url>[^"]+)"><img width="[^"]+" height="[^"]+" src="(?P<thumb>[^"]+)" class="[^"]+" alt="" title="(?P<title>.*?)\s+(?P<lang>Sub ITA|ITA)'
+    data = support.match(host + '/wp-admin/admin-ajax.php', post='action=itajax-sort&loop=main+loop&location=&thumbnail=1&rating=1sorter=recent&columns=4&numarticles='+perpage+'&paginated='+str(item.pag)+'&currentquery%5B'+query+'%5D='+searchtext).data.replace('\\','')
+    patron=r'<a href="(?P<url>[^"]+)"><img width="[^"]+" height="[^"]+" src="(?P<thumb>[^"]+)" class="[^"]+" alt="" title="(?P<title>.*?)\s+(?P<type>Movie)?\s*(?P<lang>Sub Ita|Ita)'
+
+    typeContentDict = {'movie':['movie']}
+    typeActionDict = {'findvideos':['movie']}
 
     def ItemItemlistHook(item, itemlist):
+        if item.search:
+            itemlist = [ it for it in itemlist if ' Episodio ' not in it.title ]
         if len(itemlist) == int(perpage):
             item.pag += 1
             itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), action='peliculas'))
