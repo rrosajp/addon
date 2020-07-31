@@ -64,10 +64,11 @@ def hdpass_get_servers(item):
 
     data = httptools.downloadpage(url, CF=False).data
     patron_res = '<div class="buttons-bar resolutions-bar">(.*?)<div class="buttons-bar'
-    patron_mir = '<div class="buttons-bar hosts-bar">(.*?)<div id="fake'
-    patron_option = r'<a href="([^"]+?)".*?>([^<]+?)</a>'
+    patron_mir = '<div class="buttons-bar hosts-bar">(.*?)<div id="main-player'
+    patron_option = r'<a href="([^"]+?)"[^>]+>([^<]+?)</a'
 
     res = scrapertools.find_single_match(data, patron_res)
+    # dbg()
 
     with futures.ThreadPoolExecutor() as executor:
         thL = []

@@ -4,7 +4,7 @@
 # you can pass specific channel name using KOD_TST_CH environment var
 
 # export PYTHONPATH=/home/user/.kodi/addons/plugin.video.kod
-# export KOD_TST_CH = channel
+# export KOD_TST_CH=channel
 # python tests/test_generic.py
 
 import os
@@ -86,9 +86,6 @@ chNumRis = {
     'Filmpertutti': {
         'Film': 24,
         'Serie TV': 24,
-    },
-    'guardaSerie TVclick': {
-        'da controllare': 0
     },
     'hd4me': {
         'Film': 10
@@ -206,7 +203,7 @@ class GenericChannelTest(unittest.TestCase):
 
 
 @parameterized.parameterized_class(
-    [{'ch': ch['ch'], 'title': title, 'itemlist': itemlist, 'serversFound': ch['serversFound'][title] if title in ch['serversFound'] else True} for ch in channels for
+    [{'ch': ch['ch'], 'title': title, 'itemlist': itemlist, 'serversFound': ch['serversFound'][title] if title in ch['serversFound'] else True, 'module': ch['module']} for ch in channels for
      title, itemlist in ch['menuItemlist'].items()])
 class GenericChannelMenuItemTest(unittest.TestCase):
     def test_menu(self):
@@ -220,7 +217,9 @@ class GenericChannelMenuItemTest(unittest.TestCase):
                 if content in self.title:
                     risNum = len([i for i in itemlist if not i.nextPage])  # not count nextpage
                     self.assertEqual(chNumRis[self.ch][content], risNum,
-                                     'channel ' + self.ch + ' -> ' + self.title + ' returned wrong number of results')
+                                     'channel ' + self.ch + ' -> ' + self.title + ' returned wrong number of results\n'
+                                     + str(chNumRis[self.ch][content]) + ' but should be ' + str(risNum) + '\n' +
+                                     '\n'.join([i.title for i in itemlist if not i.nextPage]))
                     break
 
         for resIt in itemlist:
