@@ -23,8 +23,8 @@ def get_data(item, head=[]):
     for h in head:
         headers[h[0]] = h[1]
     if not item.count: item.count = 0
-    jstr, location = support.match(item, patron=r'<script>(.*?location.href="([^"]+)";)</').match
-    item.url=location.replace('http://','https://')
+    jstr, location = support.match(item, patron=r'<script>(.*?location.href=".*?(http[^"]+)";)</').match
+    item.url=support.re.sub(r':\d+', '', location).replace('http://','https://')
     if not config.get_setting('key', item.channel) and jstr:
         jshe = 'var document = {}, location = {}'
         aesjs = str(support.match(host + '/aes.min.js').data)
@@ -38,7 +38,7 @@ def get_data(item, head=[]):
 
     # set cookie
     headers['cookie'] = config.get_setting('key', item.channel)
-    res = support.match(item, headers=headers, patron=r';\s*location.href="([^"]+)"')
+    res = support.match(item, headers=headers, patron=r';\s*location.href=".*?(http[^"]+)"')
     if res.match:
         item.url= res.match.replace('http://','https://')
         data = support.match(item, headers=headers).data
@@ -70,8 +70,8 @@ def mainlist(item):
 def genres(item):
     action = 'peliculas'
     data = get_data(item)
-    patronBlock = r'<button class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown"> Generi <span.[^>]+>(?P<block>.*?)</ul>'
-    patronMenu = r'<input.*?name="(?P<name>[^"]+)" value="(?P<value>[^"]+)"\s*>[^>]+>(?P<title>[^<]+)<\/label>'
+    patronBlock = r'dropdown[^>]*>\s*Generi\s*<span.[^>]+>(?P<block>.*?)</ul>'
+    patronMenu = r'<input.*?name="(?P<name>[^"]+)" value="(?P<value>[^"]+)"\s*>[^>]+>(?P<title>[^<]+)</label>'
 
     def itemHook(item):
         item.url = host + '/filter?' + item.name + '=' + item.value + '&sort='
@@ -149,7 +149,7 @@ def peliculas(item):
         action='episodios'
 
     # Controlla la lingua se assente
-    patronNext=r'href="([^"]+)" rel="next"'
+    patronNext=r'</span></a><a href="([^"]+)"'
     typeContentDict={'movie':['movie', 'special']}
     typeActionDict={'findvideos':['movie', 'special']}
     def itemHook(item):

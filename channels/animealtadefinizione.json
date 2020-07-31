@@ -1,10 +1,10 @@
 {
-    "id": "animeuniverse",
-    "name": "AnimeUniverse",
+    "id": "animealtadefinizione",
+    "name": "AnimealtAdefinizione",
     "active": true,
     "language": ["ita", "sub-ita"],
-    "thumbnail": "animeuniverse.png",
-    "banner": "animeuniverse.png",
+    "thumbnail": "animealtadefinizione.png",
+    "banner": "animealtadefinizione.png",
     "categories": ["anime", "sub-ita"],
     "default_off": ["include_in_newest"],
     "settings": [

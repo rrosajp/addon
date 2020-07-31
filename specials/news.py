@@ -453,8 +453,9 @@ def no_group(list_result_canal):
 #        i.text_color = color3
 
         itemlist.append(i.clone())
-
-    return sorted(itemlist, key=lambda it: it.title.lower())
+    if config.get_setting('order','news') == 1:
+        itemlist = sorted(itemlist, key=lambda it: it.title.lower())
+    return itemlist
 
 
 def group_by_channel(list_result_canal):
