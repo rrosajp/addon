@@ -18,7 +18,8 @@ def mainlist(item):
     anime=['/anime/',
            ('Tipo',['', 'menu', 'Anime']),
            ('Anno',['', 'menu', 'Anno']),
-           ('Genere', ['', 'menu','Genere'])]
+           ('Genere', ['', 'menu','Genere']),
+           ('Ultimi Episodi',['', 'peliculas', 'last'])]
     return locals()
 
 
@@ -43,10 +44,29 @@ def search(item, texto):
         return []
 
 
+def newest(categoria):
+    support.log(categoria)
+    item = support.Item()
+    try:
+        if categoria == "anime":
+            item.url = host
+            item.args = "last"
+            return peliculas(item)
+    # Continua la ricerca in caso di errore
+    except:
+        import sys
+        for line in sys.exc_info():
+            support.logger.error("{0}".format(line))
+        return []
+
+
 @support.scrape
 def peliculas(item):
     if '/movie/' in item.url:
         item.contentType = 'movie'
+        action='findvideos'
+    elif item.args == 'last':
+        item.contentType = 'episode'
         action='findvideos'
     else:
         item.contentType = 'tvshow'
@@ -74,8 +94,6 @@ def peliculas(item):
             itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), action='peliculas'))
         return itemlist
     return locals()
-
-
 
 
 @support.scrape

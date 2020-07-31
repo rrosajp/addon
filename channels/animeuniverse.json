@@ -6,7 +6,7 @@
     "thumbnail": "animeuniverse.png",
     "banner": "animeuniverse.png",
     "categories": ["anime", "sub-ita"],
-    "not_active": ["include_in_newest"],
+    "default_off": ["include_in_newest"],
     "settings": [
         {
             "id": "perpage",
