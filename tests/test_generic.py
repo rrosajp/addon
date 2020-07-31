@@ -132,7 +132,7 @@ chNumRis = {
 servers = []
 channels = []
 
-channel_list = channelselector.filterchannels("all")[:4] if 'KOD_TST_CH' not in os.environ else [Item(channel=os.environ['KOD_TST_CH'], action="mainlist")]
+channel_list = channelselector.filterchannels("all") if 'KOD_TST_CH' not in os.environ else [Item(channel=os.environ['KOD_TST_CH'], action="mainlist")]
 ret = []
 for chItem in channel_list:
     try:
@@ -208,6 +208,7 @@ class GenericChannelTest(unittest.TestCase):
 class GenericChannelMenuItemTest(unittest.TestCase):
     def test_menu(self):
         print 'testing ' + self.ch + ' --> ' + self.title
+        self.assertTrue(self.module.host, 'channel ' + self.ch + ' has not a valid hostname')
         self.assertTrue(self.itemlist, 'channel ' + self.ch + ' -> ' + self.title + ' is empty')
         self.assertTrue(self.serversFound,
                         'channel ' + self.ch + ' -> ' + self.title + ' has no servers on all results')

@@ -45,7 +45,7 @@ def encode_log(message=""):
         message = str(message)
 
     if testMode:
-        message = cgi.escape(message)
+        message = cgi.escape(message).replace('\n', '<br>')
 
     return message
 
