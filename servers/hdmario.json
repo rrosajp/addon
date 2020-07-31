@@ -40,8 +40,8 @@
     {
       "default": "",
       "enabled": true,
-      "id": "email",
-      "label": "email",
+      "id": "username",
+      "label": "username",
       "type": "text",
       "visible": true
     },
