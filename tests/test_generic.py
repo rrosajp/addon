@@ -132,7 +132,7 @@ chNumRis = {
 servers = []
 channels = []
 
-channel_list = channelselector.filterchannels("all") if 'KOD_TST_CH' not in os.environ else [Item(channel=os.environ['KOD_TST_CH'], action="mainlist")]
+channel_list = channelselector.filterchannels("all")[:4] if 'KOD_TST_CH' not in os.environ else [Item(channel=os.environ['KOD_TST_CH'], action="mainlist")]
 ret = []
 for chItem in channel_list:
     try:
@@ -177,7 +177,7 @@ for chItem in channel_list:
 
 from specials import news
 dictNewsChannels, any_active = news.get_channels_list()
-
+print channels
 # only 1 server item for single server
 serverNames = []
 serversFinal = []
@@ -208,31 +208,31 @@ class GenericChannelTest(unittest.TestCase):
 class GenericChannelMenuItemTest(unittest.TestCase):
     def test_menu(self):
         print 'testing ' + self.ch + ' --> ' + self.title
-        self.assertTrue(itemlist, 'channel ' + self.ch + ' -> ' + self.title + ' is empty')
+        self.assertTrue(self.itemlist, 'channel ' + self.ch + ' -> ' + self.title + ' is empty')
         self.assertTrue(self.serversFound,
                         'channel ' + self.ch + ' -> ' + self.title + ' has no servers on all results')
 
         if self.ch in chNumRis:  # i know how much results should be
             for content in chNumRis[self.ch]:
                 if content in self.title:
-                    risNum = len([i for i in itemlist if not i.nextPage])  # not count nextpage
+                    risNum = len([i for i in self.itemlist if not i.nextPage])  # not count nextpage
                     self.assertEqual(chNumRis[self.ch][content], risNum,
-                                     'channel ' + self.ch + ' -> ' + self.title + ' returned wrong number of results\n'
-                                     + str(chNumRis[self.ch][content]) + ' but should be ' + str(risNum) + '\n' +
-                                     '\n'.join([i.title for i in itemlist if not i.nextPage]))
+                                     'channel ' + self.ch + ' -> ' + self.title + ' returned wrong number of results<br>'
+                                     + str(risNum) + ' but should be ' + str(chNumRis[self.ch][content]) + '<br>' +
+                                     '<br>'.join([i.title for i in self.itemlist if not i.nextPage]))
                     break
 
-        for resIt in itemlist:
+        for resIt in self.itemlist:
             print resIt.title + ' -> ' + resIt.url
             self.assertLess(len(resIt.fulltitle), 110,
-                            'channel ' + self.ch + ' -> ' + self.title + ' might contain wrong titles\n' + resIt.fulltitle)
+                            'channel ' + self.ch + ' -> ' + self.title + ' might contain wrong titles<br>' + resIt.fulltitle)
             if resIt.url:
                 self.assertIsInstance(resIt.url, str,
                                       'channel ' + self.ch + ' -> ' + self.title + ' -> ' + resIt.title + ' contain non-string url')
                 self.assertIsNotNone(re.match(validUrlRegex, resIt.url),
-                                     'channel ' + self.ch + ' -> ' + self.title + ' -> ' + resIt.title + ' might contain wrong url\n' + resIt.url)
+                                     'channel ' + self.ch + ' -> ' + self.title + ' -> ' + resIt.title + ' might contain wrong url<br>' + resIt.url)
             if 'year' in resIt.infoLabels and resIt.infoLabels['year']:
-                msgYear = 'channel ' + self.ch + ' -> ' + self.title + ' might contain wrong infolabels year\n' + str(
+                msgYear = 'channel ' + self.ch + ' -> ' + self.title + ' might contain wrong infolabels year<br>' + str(
                     resIt.infoLabels['year'])
                 self.assert_(type(resIt.infoLabels['year']) is int or resIt.infoLabels['year'].isdigit(),
                              msgYear)
@@ -244,7 +244,7 @@ class GenericChannelMenuItemTest(unittest.TestCase):
                 self.assertTrue(nextPageItemlist,
                                 'channel ' + self.ch + ' -> ' + self.title + ' has nextpage not working')
 
-        print '\ntest passed'
+        print '<br>test passed'
 
 
 @parameterized.parameterized_class(serversFinal)
@@ -282,7 +282,7 @@ class GenericServerTest(unittest.TestCase):
                     contentType = page.headers['Content-Type']
                     self.assert_(contentType.startswith(
                         'video') or 'mpegurl' in contentType or 'octet-stream' in contentType or 'dash+xml' in contentType,
-                                 self.name + ' scraper did not return valid url for link ' + page_url + '\nDirect url: ' + directUrl + '\nContent-Type: ' + contentType)
+                                 self.name + ' scraper did not return valid url for link ' + page_url + '<br>Direct url: ' + directUrl + '<br>Content-Type: ' + contentType)
         except:
             import traceback
             logger.error(traceback.format_exc())
