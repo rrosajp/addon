@@ -52,8 +52,6 @@ def registerOrLogin(page_url, forced=False):
                                                                 'password': randPsw,
                                                                 'password_confirmation': randPsw}).url
                 if rq:
-                    from core import support
-                    support.dbg()
                     config.set_setting('username', randEmail, server='hdmario')
                     config.set_setting('password', randPsw, server='hdmario')
                     platformtools.dialog_ok('HDmario',
