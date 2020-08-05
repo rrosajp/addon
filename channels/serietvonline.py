@@ -72,7 +72,7 @@ def peliculas(item):
     elif item.contentType == 'episode':
         pagination = 35
         action = 'findvideos'
-        patron = r'<td><a href="(?P<url>[^"]+)"(?:[^>]+)?>\s?(?P<title>[^<]+)(?P<episode>[\d\-x]+)?(?P<title2>[^<]+)?<'
+        patron = r'<td><a href="(?P<url>[^"]+)"(?:[^>]+)?>\s?(?P<title>.*?)(?P<episode>\d+x\d+)[ ]?(?P<title2>[^<]+)?<'
 
     elif item.contentType == 'tvshow':
         # SEZIONE Serie TV- Anime - Documentari

@@ -116,6 +116,7 @@ def newest(categoria):
     try:
         if categoria == "peliculas":
             item.args = 'news'
+            item.contentType = 'movie'
             item.url = host + "/nuove-uscite/"
             item.action = "peliculas"
             itemlist = peliculas(item)

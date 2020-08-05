@@ -435,9 +435,9 @@ def get_title(item):
     if item.quality:
         title += support.typo(item.quality, '_ [] color kod')
 
-    season_ = support.typo(config.get_localized_string(70736), '_ [] color white bold') if (type(item.args) != bool and 'season_completed' in item.news and not item.episode) else ''
-    if season_:
-        title += season_
+    # season_ = support.typo(config.get_localized_string(70736), '_ [] color white bold') if (type(item.args) != bool and 'season_completed' in item.news and not item.episode) else ''
+    # if season_:
+    #     title += season_
     return title
 
 
@@ -473,15 +473,10 @@ def group_by_channel(list_result_canal):
 
     # We add the content found in the list_result list
     for c in sorted(dict_canales):
-        itemlist.append(Item(channel="news", title=channels_id_name[c] + ':', text_color=color1, text_bold=True))
+        channel_params = channeltools.get_channel_parameters(c)
+        itemlist.append(Item(channel="news", title=support.typo(channel_params['title'],'bullet bold color kod'), thumbnail=channel_params['thumbnail']))
 
         for i in dict_canales[c]:
-##            if i.contentQuality:
-##                i.title += ' (%s)' % i.contentQuality
-##            if i.contentLanguage:
-##                i.title += ' [%s]' % i.contentLanguage
-##            i.title = '    %s' % i.title
-####            i.text_color = color3
             itemlist.append(i.clone())
 
     return itemlist
@@ -527,12 +522,10 @@ def group_by_content(list_result_canal):
             else:
                 title += config.get_localized_string(70211) % (', '.join([i for i in canales_no_duplicados]))
 
-            new_item = v[0].clone(channel="news", title=title, action="show_channels",
-                                  sub_list=[i.tourl() for i in v], extra=channels_id_name)
+            new_item = v[0].clone(channel="news", title=title, action="show_channels", sub_list=[i.tourl() for i in v], extra=channels_id_name)
         else:
             new_item = v[0].clone(title=title)
 
-##        new_item.text_color = color3
         list_result.append(new_item)
 
     return sorted(list_result, key=lambda it: it.title.lower())
