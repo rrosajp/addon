@@ -547,6 +547,7 @@ def show_channels(item):
 ##            new_item.title += ' [%s]' % new_item.language
 ##        new_item.title += ' (%s)' % channels_id_name[new_item.channel]
         new_item.text_color = color1
+        new_item.title += typo(new_item.channel, '[]')
 
         itemlist.append(new_item.clone())
 
