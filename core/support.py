@@ -286,7 +286,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
         # make formatted Title [longtitle]
         s = ' - '
         # title = episode + (s if episode and title else '') + title
-        longtitle = episode + (s if episode and title else '') + title + (s if title and title2 else '') + title2
+        longtitle = episode + (s if episode and (title or title2) else '') + title + (s if title and title2 else '') + title2
 
         if sceneTitle:
             from lib.guessit import guessit
