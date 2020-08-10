@@ -96,7 +96,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     logger.info("[Wstream] url=" + page_url)
     video_urls = []
     global data, real_url, headers
-    from core.support import dbg;dbg()
+    # from core.support import dbg;dbg()
     # logger.info(data)
 
     sitekey = scrapertools.find_multiple_matches(data, """data-sitekey=['"] *([^"']+)""")
