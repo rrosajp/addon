@@ -56,7 +56,7 @@ def live(item):
             info = jsontools.load(support.match(host +'/api/on-air?channelId=' + ch_dict[title]).data)
             support.log(info)
             plot= '[B]' + info['seriesTitle'] +'[/B]\n' + info['description'] if 'seriesTitle' in info else ''
-            itemlist.append(item.clone(title=support.typo(title,'bold'), url=host+url, plot=plot, action='findvideos'))
+            itemlist.append(item.clone(title=support.typo(title,'bold'), contentTitle=title, url=host+url, plot=plot, action='findvideos'))
     return itemlist
 
 
@@ -161,13 +161,16 @@ def episodios(item):
 
 def findvideos(item):
     itemlist = []
+    qualities = []
+
     mgid = support.match(item, patron=r'uri":"([^"]+)"').match
     url = 'https://media.mtvnservices.com/pmt/e1/access/index.html?uri=' + mgid + '&configtype=edge&ref=' + item.url
-    ID, rootUrl = support.match('https://media.mtvnservices.com/pmt/e1/access/index.html?uri=' + mgid + '&configtype=edge&ref=' + item.url, patron=[r'"id":"([^"]+)",',r'brightcove_mediagenRootURL":"([^"]+)"']).matches
+    ID, rootUrl = support.match(url, patron=[r'"id":"([^"]+)",',r'brightcove_mediagenRootURL":"([^"]+)"']).matches
     url = jsontools.load(support.match(rootUrl.replace('&device={device}','').format(uri = ID)).data)['package']['video']['item'][0]['rendition'][0]['src']
     video_urls = support.match(url, patron=r'RESOLUTION=(\d+x\d+).*?(http[^ ]+)').matches
-
     for quality, url in video_urls:
-        itemlist.append(item.clone(title='Diretto', server='directo', action='play', url=url, quality=quality))
+        if quality not in qualities:
+            qualities.append(quality)
+            itemlist.append(item.clone(title=support.config.get_localized_string(30137), server='directo', action='play', url=url, quality=quality))
     itemlist.sort(key=lambda item: item.quality)
     return support.server(item, itemlist=itemlist, Download=False)
