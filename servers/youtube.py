@@ -108,7 +108,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     video_id = scrapertools.find_single_match(page_url, '(?:v=|embed/)([A-z0-9_-]{11})')
     try:
         __settings__ = Addon('plugin.video.youtube')
-        if not __settings__.getSetting('kodion.video.quality.mpd') and HasAddon(inputstream.adaptive):
+        if not __settings__.getSetting('kodion.video.quality.mpd'):
             __settings__.setSetting('kodion.video.quality.mpd', 'true')
         video_urls = [[ 'con YouTube', 'plugin://plugin.video.youtube/play/?video_id=' + video_id ]]
     except:
