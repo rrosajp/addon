@@ -98,6 +98,7 @@ def test_video_exists(page_url):
 
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
+    from xbmcaddon import Addon
     logger.info("(page_url='%s')" % page_url)
 
     if not page_url.startswith("http"):
@@ -105,7 +106,13 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         logger.info(" page_url->'%s'" % page_url)
 
     video_id = scrapertools.find_single_match(page_url, '(?:v=|embed/)([A-z0-9_-]{11})')
-    video_urls = extract_videos(video_id)
+    try:
+        __settings__ = Addon('plugin.video.youtube')
+        if not __settings__.getSetting('kodion.video.quality.mpd') and HasAddon(inputstream.adaptive):
+            __settings__.setSetting('kodion.video.quality.mpd', 'true')
+        video_urls = [[ 'con YouTube', 'plugin://plugin.video.youtube/play/?video_id=' + video_id ]]
+    except:
+        video_urls = extract_videos(video_id)
 
     return sorted(video_urls, reverse=True)
 
@@ -209,10 +216,10 @@ def extract_videos(video_id):
                     opt = dict(opt)
                     if "audioQuality" not in opt:
                         continue
-                    if "signatureCipher" in opt and opt['mimeType'].startswith('video'):
+                    if "cipher" in opt:
                         signature = get_signature(youtube_page_data)
-                        cipher = dict(urlparse.parse_qsl(urllib.unquote(opt["signatureCipher"])))
-                        url = re.search('url=(.*)', opt["signatureCipher"]).group(1)
+                        cipher = dict(urlparse.parse_qsl(urllib.unquote(opt["cipher"])))
+                        url = re.search('url=(.*)', opt["cipher"]).group(1)
                         s = cipher.get('s')
                         url = "%s&sig=%s" % (urllib.unquote(url), signature([s]))
                         video_urls.append(["%s" % itag_list.get(opt["itag"], "video"), url])
