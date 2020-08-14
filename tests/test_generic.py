@@ -292,6 +292,6 @@ class GenericServerTest(unittest.TestCase):
 if __name__ == '__main__':
     if 'KOD_TST_CH' not in os.environ:
         unittest.main(testRunner=HtmlTestRunner.HTMLTestRunner(report_name='report', add_timestamp=False, combine_reports=True,
-                                                           report_title='KoD Test Suite'), exit=False)
+                     report_title='KoD Test Suite', template=os.path.join(config.get_runtime_path(), 'tests', 'template.html')), exit=False)
     else:
         unittest.main()
