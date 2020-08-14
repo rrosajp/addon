@@ -46,7 +46,7 @@ def menu(item):
     if item.contentType == 'tvshow':
         itemlist += [item.clone(title=support.typo('In Corso','bold'), args=InCorso),
                      item.clone(title=support.typo('Terminato','bold'), args=Terminato)]
-    itemlist +=[item.clone(title=support.typo('Cerca...','bold'), action='search', thumbnail=support.thumb(thumb='search.png'))]
+    itemlist +=[item.clone(title=support.typo('Cerca...','bold'), action='search', thumbnail=support.thumb('search'))]
     return itemlist
 
 

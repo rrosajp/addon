@@ -17,10 +17,10 @@ blacklisted_genres = ['attualita', 'scienza', 'religione', 'cucina', 'notiziario
 def mainlist(item):
     support.log()
 
-    itemlist = [Item(title=support.typo('Film in onda oggi', 'bold'), channel=item.channel, action='category', contentType='movie', thumbnail=support.thumb(thumb='movie.png')),
-                Item(title=support.typo('Serie Tv in onda oggi', 'bold'), channel=item.channel, action='peliculas', contentType='tvshow', thumbnail=support.thumb(thumb='tvshow.png')),
-                Item(title=support.typo('Guida tv per canale', 'bold'), channel=item.channel, action='listaCanali', thumbnail=support.thumb(thumb='on_the_air.png')),
-                Item(title=support.typo('Canali live', 'bold'), channel=item.channel, action='live', thumbnail=support.thumb(thumb='tvshow_on_the_air.png'))]
+    itemlist = [Item(title=support.typo('Film in onda oggi', 'bold'), channel=item.channel, action='category', contentType='movie', thumbnail=support.thumb('movie')),
+                Item(title=support.typo('Serie Tv in onda oggi', 'bold'), channel=item.channel, action='peliculas', contentType='tvshow', thumbnail=support.thumb('tvshow')),
+                Item(title=support.typo('Guida tv per canale', 'bold'), channel=item.channel, action='listaCanali', thumbnail=support.thumb('on_the_air')),
+                Item(title=support.typo('Canali live', 'bold'), channel=item.channel, action='live', thumbnail=support.thumb('tvshow_on_the_air'))]
 
     return itemlist
 

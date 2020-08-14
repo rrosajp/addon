@@ -90,7 +90,7 @@ def menu(item):
     patronMenu=r'<button[^>]+>\s*(?P<title>[A-Za-z0-9]+)\s*<span.[^>]+>(?P<other>.*?)</ul>'
     def ItemItemlistHook(item, itemlist):
         itemlist.insert(0, item.clone(title=support.typo('Tutti','bold'), action='peliculas'))
-        itemlist.append(item.clone(title=support.typo('Cerca...','bold'), action='search', search=True, thumbnail=support.thumb(thumb='search.png')))
+        itemlist.append(item.clone(title=support.typo('Cerca...','bold'), action='search', search=True, thumbnail=support.thumb('search.png')))
         return itemlist
     return locals()
 

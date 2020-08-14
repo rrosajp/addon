@@ -22,12 +22,12 @@ def mainlist(item):
     action = 'radio'
     patron = r'text="(?P<title>[^"]+)" URL="(?P<url>[^"]+)"'
     def itemHook(item):
-        item.thumbnail = support.thumb(thumb='music.png')
+        item.thumbnail = support.thumb('music')
         item.contentType = 'music'
         return item
     def itemlistHook(itemlist):
         itemlist.append(
-            item.clone(title=support.typo('Cerca...', 'bold color kod'), action='search', thumbnail=support.thumb(thumb='search.png')))
+            item.clone(title=support.typo('Cerca...', 'bold color kod'), action='search', thumbnail=support.thumb('search')))
         support.channel_config(item, itemlist)
         return itemlist
     return locals()
