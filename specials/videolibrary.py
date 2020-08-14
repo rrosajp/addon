@@ -8,9 +8,9 @@ if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
 import xbmc, os, traceback
 
-from channelselector import get_thumb, thumb
+from channelselector import get_thumb
 from core import filetools, scrapertools, videolibrarytools
-from core.support import typo
+from core.support import typo, thumb
 from core.item import Item
 from platformcode import config, logger, platformtools
 from lib import generictools
