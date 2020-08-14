@@ -480,7 +480,7 @@ def scrape(func):
                 break
 
         if (pagination and len(matches) <= pag * pagination) or not pagination:  # next page with pagination
-            if patronNext and inspect.stack()[1][3] not in ['newest', 'search']:
+            if patronNext and inspect.stack()[1][3] not in ['newest']:
                 nextPage(itemlist, item, data, patronNext, function)
 
         # next page for pagination
