@@ -46,7 +46,7 @@ def menu(item):
     if item.contentType == 'tvshow':
         itemlist += [item.clone(title=support.typo('In Corso','bold'), args=InCorso),
                      item.clone(title=support.typo('Terminato','bold'), args=Terminato)]
-    itemlist +=[item.clone(title=support.typo('Cerca...','bold'), action='search', thumbnail=support.thumb(thumb='search.png'))]
+    itemlist +=[item.clone(title=support.typo('Cerca...','bold'), action='search', thumbnail=support.thumb('search'))]
     return itemlist
 
 
@@ -152,11 +152,11 @@ def peliculas(item):
 
     payload = json.dumps(item.args)
     records = requests.post(host + '/archivio/get-animes', headers=headers, data=payload).json()['records']
-    js = []
-    for record in records:
-        js += record
-
-    for it in js:
+    # js = []
+    # support.log(records)
+    # for record in records:
+    #     js += record
+    for it in records:
         lang = support.match(it['title'], patron=r'\(([It][Tt][Aa])\)').match
         title = support.re.sub(r'\s*\([^\)]+\)', '', it['title'])
 

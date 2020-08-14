@@ -1,33 +1,26 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------
 # support functions that are needed by many channels, to no repeat the same code
-import base64
-import inspect
-import os
-import re
-import sys
-from time import time
+import base64, inspect, os, re, sys
 
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 if PY3:
     from concurrent import futures
-else:
-    from concurrent_py2 import futures
-
-try:
     import urllib.request as urllib
     import urllib.parse as urlparse
     from urllib.parse import urlencode
-except ImportError:
+else:
+    from concurrent_py2 import futures
     import urllib, urlparse
     from urllib import urlencode
 
-from channelselector import thumb
+from time import time
 from core import httptools, scrapertools, servertools, tmdb, channeltools
 from core.item import Item
 from lib import unshortenit
-from platformcode import logger, config
+from platformcode import config
+from platformcode.logger import log
 from specials import autoplay
 
 def hdpass_get_servers(item):
@@ -39,28 +32,20 @@ def hdpass_get_servers(item):
         for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
             mir_url = scrapertools.decodeHtmlentities(mir_url)
             log(mir_url)
-            it = item.clone(action="play",
-                            quality=quality,
-                            title=srv,
-                            server=srv,
-                            url= mir_url)
-            if not servertools.get_server_parameters(srv.lower()):  # do not exists or it's empty
-                it = hdpass_get_url(it)[0]
+            it = item.clone(action="play", quality=quality, title=srv, server=srv, url= mir_url)
+            if not servertools.get_server_parameters(srv.lower()): it = hdpass_get_url(it)[0]   # do not exists or it's empty
             ret.append(it)
         return ret
     # Carica la pagina
     itemlist = []
-    if 'hdpass' in item.url or 'hdplayer' in item.url:
-        url = item.url
+    if 'hdpass' in item.url or 'hdplayer' in item.url:  url = item.url
     else:
         data = httptools.downloadpage(item.url, CF=False).data.replace('\n', '')
         patron = r'<iframe(?: id="[^"]+")? width="[^"]+" height="[^"]+" src="([^"]+)"[^>]+><\/iframe>'
         url = scrapertools.find_single_match(data, patron)
         url = url.replace("&download=1", "")
-        if 'hdpass' not in url and 'hdplayer' not in url:
-            return itemlist
-    if not url.startswith('http'):
-        url = 'https:' + url
+        if 'hdpass' not in url and 'hdplayer' not in url: return itemlist
+    if not url.startswith('http'): url = 'https:' + url
 
     data = httptools.downloadpage(url, CF=False).data
     patron_res = '<div class="buttons-bar resolutions-bar">(.*?)<div class="buttons-bar'
@@ -68,7 +53,6 @@ def hdpass_get_servers(item):
     patron_option = r'<a href="([^"]+?)"[^>]+>([^<]+?)</a'
 
     res = scrapertools.find_single_match(data, patron_res)
-    # dbg()
 
     with futures.ThreadPoolExecutor() as executor:
         thL = []
@@ -78,15 +62,14 @@ def hdpass_get_servers(item):
         for res in futures.as_completed(thL):
             if res.result():
                 itemlist.extend(res.result())
-    return server(item, itemlist=itemlist) 
+
+    return server(item, itemlist=itemlist)
 
 def hdpass_get_url(item):
     data = httptools.downloadpage(item.url, CF=False).data
     src = scrapertools.find_single_match(data, r'<iframe allowfullscreen custom-src="([^"]+)')
-    if src:
-        item.url = base64.b64decode(src)
-    else:
-        item.url = scrapertools.find_single_match(data, r'<iframe allowfullscreen src="([^"]+)')
+    if src: item.url = base64.b64decode(src)
+    else: item.url = scrapertools.find_single_match(data, r'<iframe allowfullscreen src="([^"]+)')
     item.url, c = unshortenit.unshorten_only(item.url)
 
     return [item]
@@ -97,8 +80,7 @@ def color(text, color):
 
 def search(channel, item, texto):
     log(item.url + " search " + texto)
-    if 'findhost' in dir(channel):
-        channel.findhost()
+    if 'findhost' in dir(channel): channel.findhost()
     item.url = channel.host + "/?s=" + texto
     try:
         return channel.peliculas(item)
@@ -152,10 +134,8 @@ def scrapeLang(scraped, lang, longtitle):
     language = ''
 
     if scraped['lang']:
-        if 'ita' in scraped['lang'].lower():
-            language = 'ITA'
-        if 'sub' in scraped['lang'].lower():
-            language = 'Sub-' + language
+        if 'ita' in scraped['lang'].lower(): language = 'ITA'
+        if 'sub' in scraped['lang'].lower(): language = 'Sub-' + language
 
     if not language: language = lang
     if language: longtitle += typo(language, '_ [] color kod')
@@ -812,7 +792,6 @@ def menu(func):
             channel_config(item, itemlist)
 
             # Apply auto Thumbnails at the menus
-            from channelselector import thumb
             thumb(itemlist)
         log(item.channel + ' end')
         return itemlist
@@ -1047,7 +1026,7 @@ def download(itemlist, item, typography='', function_level=1, function=''):
                          from_action=from_action,
                          contentTitle=contentTitle,
                          path=item.path,
-                         thumbnail=thumb(thumb='downloads.png'),
+                         thumbnail=thumb('downloads'),
                          downloadItemlist=downloadItemlist
                     ))
             if from_action == 'episodios':
@@ -1064,7 +1043,7 @@ def download(itemlist, item, typography='', function_level=1, function=''):
                          from_action=from_action,
                          contentTitle=contentTitle,
                          download='season',
-                         thumbnail=thumb(thumb='downloads.png'),
+                         thumbnail=thumb('downloads'),
                          downloadItemlist=downloadItemlist
                 ))
 
@@ -1104,7 +1083,6 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
     if (function == 'findvideos' and contentType == 'movie') \
         or (function == 'episodios' and contentType != 'movie'):
         if config.get_videolibrary_support() and len(itemlist) > 0:
-            from channelselector import get_thumb
             itemlist.append(
                 Item(channel=item.channel,
                      title=title,
@@ -1118,7 +1096,7 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
                      from_action=item.action,
                      extra=extra,
                      path=item.path,
-                     thumbnail=get_thumb('add_to_videolibrary.png')
+                     thumbnail=thumb('add_to_videolibrary')
                     ))
 
     return itemlist
@@ -1249,35 +1227,15 @@ def filterLang(item, itemlist):
         itemlist = filtertools.get_links(itemlist, item, list_language)
     return itemlist
 
-# def aplay(item, itemlist, list_servers='', list_quality=''):
-#     if inspect.stack()[1][3] == 'mainlist':
-#         autoplay.init(item.channel, list_servers, list_quality)
-#         autoplay.show_option(item.channel, itemlist)
-#     else:
-#         autoplay.start(itemlist, item)
-
-
-def log(*args):
-    # Function to simplify the log
-    # Automatically returns File Name and Function Name
-    string = ''
-    for arg in args:
-        string += ' '+str(arg)
-    frame = inspect.stack()[1]
-    filename = frame[0].f_code.co_filename
-    filename = os.path.basename(filename)
-    logger.info("[" + filename + "] - [" + inspect.stack()[1][3] + "] " + string)
-
 
 def channel_config(item, itemlist):
-    from channelselector import get_thumb
     itemlist.append(
         Item(channel='setting',
              action="channel_config",
              title=typo(config.get_localized_string(60587), 'color kod bold'),
              config=item.channel,
              folder=False,
-             thumbnail=get_thumb('setting_0.png'))
+             thumbnail=thumb('setting_0'))
     )
 
 
@@ -1285,6 +1243,7 @@ def extract_wrapped(decorated):
     from types import FunctionType
     closure = (c.cell_contents for c in decorated.__closure__)
     return next((c for c in closure if isinstance(c, FunctionType)), None)
+
 
 def addQualityTag(item, itemlist, data, patron):
     if itemlist:
@@ -1377,3 +1336,114 @@ def get_jwplayer_mediaurl(data, srvName, onlyHttp=False):
 
     video_urls.sort(key=lambda x: x[0].split()[1])
     return video_urls
+
+
+def thumb(item_itemlist_string=None, genre=False, live=False):
+    from channelselector import get_thumb
+    if live:
+        if type(item_itemlist_string) == list:
+            for item in item_itemlist_string:
+                item.thumbnail = "https://raw.githubusercontent.com/kodiondemand/media/master/live/" + item.fulltitle.lower().replace(' ','_') + '.png'
+        else:
+            item_itemlist_string.thumbnail = "https://raw.githubusercontent.com/kodiondemand/media/master/live/" + item.fulltitle.lower().replace(' ','_') + '.png'
+        return item_itemlist_string
+
+    import re
+    icon_dict = {'movie':['film', 'movie'],
+                 'tvshow':['serie','tv','episodi','episodio','fiction', 'show'],
+                 'documentary':['documentari','documentario', 'documentary', 'documentaristico'],
+                 'teenager':['ragazzi','teenager', 'teen'],
+                 'learning':['learning'],
+                 'all':['tutti', 'all'],
+                 'news':['novità', "novita'", 'aggiornamenti', 'nuovi', 'nuove', 'new', 'newest', 'news', 'ultimi'],
+                 'now_playing':['cinema', 'in sala'],
+                 'anime':['anime'],
+                 'genres':['genere', 'generi', 'categorie', 'categoria', 'category'],
+                 'animation': ['animazione', 'cartoni', 'cartoon', 'animation'],
+                 'action':['azione', 'arti marziali', 'action'],
+                 'adventure': ['avventura', 'adventure'],
+                 'biographical':['biografico', 'biographical'],
+                 'comedy':['comico', 'commedia', 'demenziale', 'comedy', 'brillante'],
+                 'adult':['erotico', 'hentai', 'harem', 'ecchi', 'adult'],
+                 'drama':['drammatico', 'drama', 'dramma'],
+                 'syfy':['fantascienza', 'science fiction', 'syfy', 'sci'],
+                 'fantasy':['fantasy', 'magia', 'magic', 'fantastico'],
+                 'crime':['gangster','poliziesco', 'crime', 'crimine'],
+                 'grotesque':['grottesco', 'grotesque'],
+                 'war':['guerra', 'war'],
+                 'children':['bambini', 'kids'],
+                 'horror':['horror'],
+                 'music':['musical', 'musica', 'music', 'musicale'],
+                 'mistery':['mistero', 'giallo', 'mystery'],
+                 'noir':['noir'],
+                 'popular' : ['popolari','popolare', 'più visti'],
+                 'thriller':['thriller'],
+                 'top_rated' : ['fortunato', 'votati', 'lucky', 'top'],
+                 'on_the_air' : ['corso', 'onda', 'diretta', 'dirette'],
+                 'western':['western'],
+                 'vos':['sub','sub-ita'],
+                 'romance':['romantico','sentimentale', 'romance', 'soap'],
+                 'family':['famiglia','famiglie', 'family', 'historical'],
+                 'historical':['storico', 'history', 'storia'],
+                 'az':['lettera','lista','alfabetico','a-z', 'alphabetical'],
+                 'year':['anno', 'anni', 'year'],
+                 'update':['replay', 'update'],
+                 'videolibrary':['teche'],
+                 'autoplay':[config.get_localized_string(60071)]
+                }
+
+    suffix_dict = {'_hd':['hd','altadefinizione','alta definizione'],
+                   '_4k':['4K'],
+                   '_az':['lettera','lista','alfabetico','a-z', 'alphabetical'],
+                   '_year':['anno', 'anni', 'year'],
+                   '_genre':['genere', 'generi', 'categorie', 'categoria']}
+
+    search = ['cerca', 'search']
+
+    search_suffix ={'_movie':['film', 'movie'],
+                    '_tvshow':['serie','tv', 'fiction']}
+
+    def autoselect_thumb(item, genre):
+        if genre == False:
+            for thumb, titles in icon_dict.items():
+                if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in search):
+                    thumb = 'search'
+                    for suffix, titles in search_suffix.items():
+                        if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
+                            thumb = thumb + suffix
+                    item.thumbnail = get_thumb(thumb + '.png')
+                elif any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
+                    if thumb == 'movie' or thumb == 'tvshow':
+                        for suffix, titles in suffix_dict.items():
+                            if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
+                                thumb = thumb + suffix
+                        item.thumbnail = get_thumb(thumb + '.png')
+                    else: item.thumbnail = get_thumb(thumb + '.png')
+                else:
+                    thumb = item.thumbnail
+
+        else:
+            for thumb, titles in icon_dict.items():
+                if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
+                    item.thumbnail = get_thumb(thumb + '.png')
+                else:
+                    thumb = item.thumbnail
+
+        item.title = re.sub(r'\s*\{[^\}]+\}','',item.title)
+        return item
+
+    if item_itemlist_string:
+        if type(item_itemlist_string) == list:
+            for item in item_itemlist_string:
+                autoselect_thumb(item, genre)
+            return item_itemlist_string
+
+        elif type(item_itemlist_string) == str:
+            filename, file_extension = os.path.splitext(item_itemlist_string)
+            if not file_extension: item_itemlist_string += '.png'
+            return get_thumb(item_itemlist_string)
+        else:
+            return autoselect_thumb(item_itemlist_string, genre)
+
+    else:
+        return get_thumb('next.png')

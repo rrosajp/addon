@@ -126,6 +126,6 @@ def findvideos(item):
                         contentType='tvshow',
                         url=url_serie,
                         action='episodios',
-                        thumbnail = support.thumb(thumb='tvshow.png')))
+                        thumbnail = support.thumb('tvshow')))
 
         return itemlist

@@ -1132,7 +1132,7 @@ def add_download_items(item, itemlist):
                                 from_action="findvideos",
                                 contentTitle=item.contentTitle,
                                 path=item.path,
-                                thumbnail=thumb(thumb='downloads.png'),
+                                thumbnail=thumb('downloads'),
                                 parent=item.tourl())
             if item.action == 'findvideos':
                 if item.contentType == 'episode':

@@ -6071,6 +6071,10 @@ msgctxt "#70817"
 msgid "La Serie "%s" non è gestita da KoD, Vuoi cercarla?"
 msgstr "La Serie "%s" non è gestita da KoD, Vuoi cercarla?"
 
+msgctxt "#70818"
+msgid "YouTube is installed on your device, but is not active. Do you want to activate it?"
+msgstr "YouTube è installato sul tuo dispositivo, ma non è attivo. Vuoi Attivarlo?"
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS check alert"

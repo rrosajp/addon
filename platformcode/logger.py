@@ -102,6 +102,18 @@ def error(texto=""):
     xbmc.log(texto, xbmc.LOGERROR)
 
 
+def log(*args):
+    # Function to simplify the log
+    # Automatically returns File Name and Function Name
+    import os
+    string = ''
+    for arg in args: string += ' '+str(arg)
+    frame = inspect.stack()[1]
+    filename = frame[0].f_code.co_filename
+    filename = os.path.basename(filename)
+    info("[" + filename + "] - [" + inspect.stack()[1][3] + "] " + string)
+
+
 class WebErrorException(Exception):
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
