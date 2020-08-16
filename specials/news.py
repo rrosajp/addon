@@ -279,7 +279,7 @@ def novedades(item):
                 t.start()
                 threads.append(t)
                 if mode == 'normal':
-                    progreso.update(percentage, "", config.get_localized_string(60520) % channel_title)
+                    progreso.update(percentage, config.get_localized_string(60520) % channel_title)
 
             # Modo single Thread
             else:
@@ -299,7 +299,7 @@ def novedades(item):
                 list_pendent_names = [a.getName() for a in pendent]
                 if mode == 'normal':
                     mensaje = config.get_localized_string(30994) % (", ".join(list_pendent_names))
-                    progreso.update(percentage, config.get_localized_string(60521) % (len(threads) - len(pendent), len(threads)),
+                    progreso.update(percentage, config.get_localized_string(60521) % (len(threads) - len(pendent), len(threads)) + '\n' +
                                 mensaje)
                     logger.debug(mensaje)
 
@@ -311,7 +311,7 @@ def novedades(item):
                 pendent = [a for a in threads if a.isAlive()]
         if mode == 'normal':
             mensaje = config.get_localized_string(60522) % (len(list_newest), time.time() - start_time)
-            progreso.update(100, mensaje, " ", " ")
+            progreso.update(100, mensaje)
             logger.info(mensaje)
             start_time = time.time()
             # logger.debug(start_time)

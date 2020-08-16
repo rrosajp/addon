@@ -205,7 +205,7 @@ def save_movie(item, silent=False):
             logger.error(traceback.format_exc())
 
         if filetools.write(json_path, item.tojson()):
-            if not silent: p_dialog.update(100, config.get_localized_string(60062), item.contentTitle)
+            if not silent: p_dialog.update(100, config.get_localized_string(60062) + '\n' + item.contentTitle)
             item_nfo.library_urls[item.channel] = item.url
 
             if filetools.write(nfo_path, head_nfo + item_nfo.tojson()):
@@ -221,7 +221,7 @@ def save_movie(item, silent=False):
     # If we get to this point it is because something has gone wrong
     logger.error("Could not save %s in the video library" % item.contentTitle)
     if not silent:
-        p_dialog.update(100, config.get_localized_string(60063), item.contentTitle)
+        p_dialog.update(100, config.get_localized_string(60063) + '\n' + item.contentTitle)
         p_dialog.close()
     return 0, 0, -1, path
 

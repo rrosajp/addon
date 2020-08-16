@@ -249,7 +249,7 @@ def channel_search(item):
                 cnt += 1
                 searching_titles.remove(searching_titles[searching.index(channel)])
                 searching.remove(channel)
-                progress.update(old_div(((total_search_actions - len(search_action_list)) * 100), total_search_actions), config.get_localized_string(70744) % str(len(channel_list) - cnt), ', '.join(searching_titles))
+                progress.update(old_div(((total_search_actions - len(search_action_list)) * 100), total_search_actions), config.get_localized_string(70744) % str(len(channel_list) - cnt) + '\n' + ', '.join(searching_titles))
 
     progress.close()
 
@@ -262,7 +262,7 @@ def channel_search(item):
         ch_name = channel_titles[channel_list.index(key)]
         grouped = list()
         cnt += 1
-        progress.update(old_div((cnt * 100), len(ch_list)), config.get_localized_string(60295), config.get_localized_string(60293))
+        progress.update(old_div((cnt * 100), len(ch_list)), config.get_localized_string(60295) + '\n' + config.get_localized_string(60293))
         if len(value) <= max_results and item.mode != 'all':
             if len(value) == 1:
                 if not value[0].action or config.get_localized_string(70006).lower() in value[0].title.lower():

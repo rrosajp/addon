@@ -319,7 +319,7 @@ def updateFromZip(message=config.get_localized_string(80050)):
     if os.path.isfile(localfilename):
         logger.info('il file esiste')
 
-    dp.update(80, config.get_localized_string(20000), config.get_localized_string(80032))
+    dp.update(80, config.get_localized_string(20000) + '\n' + config.get_localized_string(80032))
 
     import zipfile
     try:

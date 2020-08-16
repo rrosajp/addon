@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-import os
-import ssl
-try:
-    import urlparse
-except:
+import os, sys, ssl
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
+if PY3:
     import urllib.parse as urlparse
+    import _ssl
+    DEFAULT_CIPHERS = _ssl._DEFAULT_CIPHERS
+else:
+    DEFAULT_CIPHERS = ssl._DEFAULT_CIPHERS
 
 from lib.requests_toolbelt.adapters import host_header_ssl
 from lib import doh
@@ -25,24 +28,20 @@ elif 'PROTOCOL_SSLv23' in ssl.__dict__:
 else:
     protocol = ssl.PROTOCOL_SSLv3
 
-class CustomSocket(ssl.SSLSocket):
-    def __init__(self, *args, **kwargs):
-        super(CustomSocket, self).__init__(*args, **kwargs)
 
 class CustomContext(ssl.SSLContext):
     def __init__(self, protocol, hostname, *args, **kwargs):
         self.hostname = hostname
-        super(CustomContext, self).__init__(protocol)
+        if PY3:
+            super(CustomContext, self).__init__()
+        else:
+            super(CustomContext, self).__init__(protocol)
+        self.verify_mode = ssl.CERT_NONE
 
-    def wrap_socket(self, sock, server_side=False,
-                    do_handshake_on_connect=True,
-                    suppress_ragged_eofs=True,
-                    server_hostname=None):
-        return CustomSocket(sock=sock, server_side=server_side,
-                         do_handshake_on_connect=do_handshake_on_connect,
-                         suppress_ragged_eofs=suppress_ragged_eofs,
-                         server_hostname=self.hostname,
-                         _context=self)
+    def wrap_socket(self, *args, **kwargs):
+        kwargs['server_hostname'] = self.hostname
+        self.verify_mode = ssl.CERT_NONE
+        return super(CustomContext, self).wrap_socket(*args, **kwargs)
 
 
 class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
@@ -52,7 +51,7 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
         self.cur = self.conn.cursor()
         self.ssl_context = CustomContext(protocol, domain)
         self.CF = CF  # if cloudscrape is in action
-        self.cipherSuite = kwargs.pop('cipherSuite', ssl._DEFAULT_CIPHERS)
+        self.cipherSuite = kwargs.pop('cipherSuite', DEFAULT_CIPHERS)
 
         super(CipherSuiteAdapter, self).__init__(**kwargs)
 

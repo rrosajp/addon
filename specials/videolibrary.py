@@ -212,7 +212,7 @@ def get_results(nfo_path, root, Type, local=False):
             else:
                 update_text = config.get_localized_string(60023)
                 value = 1
-                item.title += " [B]" + u"\u2022".encode('utf-8') + "[/B]"
+                item.title += " [B]" + u"\u2022" + "[/B]"
 
             # Context menu: Delete series / channel
             channels_num = len(item.library_urls)
@@ -645,7 +645,7 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
         return
 
     config.verify_directories_created()
-    progress.update(10, config.get_localized_string(20000), config.get_localized_string(80012))
+    progress.update(10, config.get_localized_string(20000) + '\n' + config.get_localized_string(80012))
     if current_movies_path != new_movies_path:
         if filetools.listdir(current_movies_path):
             dir_util.copy_tree(current_movies_path, new_movies_path)

@@ -653,7 +653,7 @@ def download_from_server(item):
             channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
         if hasattr(channel, "play") and not item.play_menu:
 
-            progreso.update(50, config.get_localized_string(70178) % item.server, config.get_localized_string(70180) % item.contentChannel)
+            progreso.update(50, config.get_localized_string(70178) % item.server + '\n' + config.get_localized_string(70180) % item.contentChannel)
             try:
                 itemlist = getattr(channel, "play")(item.clone(channel=item.contentChannel, action=item.contentAction))
             except:
@@ -732,7 +732,7 @@ def download_from_best_server(item):
             else:
                 channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
 
-            progreso.update(50, config.get_localized_string(70184), config.get_localized_string(70180) % item.contentChannel)
+            progreso.update(50, config.get_localized_string(70184) + '\n' + config.get_localized_string(70180) % item.contentChannel)
 
             if hasattr(channel, item.contentAction):
                 play_items = getattr(channel, item.contentAction)(item.clone(action=item.contentAction, channel=item.contentChannel))
@@ -741,7 +741,7 @@ def download_from_best_server(item):
 
         play_items = [x for x in play_items if x.action == "play" and not "trailer" in x.title.lower()]
 
-        progreso.update(100, config.get_localized_string(70183), config.get_localized_string(70181) % len(play_items))
+        progreso.update(100, config.get_localized_string(70183) + '\n' + config.get_localized_string(70181) % len(play_items))
 
         # if config.get_setting("server_reorder", "downloads") == 1:
         play_items.sort(key=sort_method)
@@ -784,7 +784,7 @@ def select_server(item):
                 channel = __import__('specials.%s' % item.contentChannel, None, None, ['specials.%s' % item.contentChannel])
             else:
                 channel = __import__('channels.%s' % item.contentChannel, None, None, ['channels.%s' % item.contentChannel])
-            progreso.update(50, config.get_localized_string(70184), config.get_localized_string(70180) % item.contentChannel)
+            progreso.update(50, config.get_localized_string(70184) + '\n' + config.get_localized_string(70180) % item.contentChannel)
 
             if hasattr(channel, item.contentAction):
                 play_items = getattr(channel, item.contentAction)(
@@ -793,7 +793,7 @@ def select_server(item):
                 play_items = servertools.find_video_items(item.clone(action=item.contentAction, channel=item.contentChannel))
 
         play_items = [x for x in play_items if x.action == "play" and not "trailer" in x.title.lower()]
-        progreso.update(100, config.get_localized_string(70183), config.get_localized_string(70181) % len(play_items))
+        progreso.update(100, config.get_localized_string(70183) + '\n' + config.get_localized_string(70181) % len(play_items))
     finally:
         progreso.close()
 
@@ -1092,11 +1092,11 @@ def save_download_tvshow(item):
         if config.get_setting("lowerize_title", "videolibrary"):
             item.downloadFilename = item.downloadFilename.lower()
 
-        progreso.update(0, config.get_localized_string(70186), config.get_localized_string(70180) % item.contentChannel)
+        progreso.update(0, config.get_localized_string(70186) + '\n' + config.get_localized_string(70180) % item.contentChannel)
 
         episodes = get_episodes(item)
 
-        progreso.update(0, config.get_localized_string(70190), " ")
+        progreso.update(0, config.get_localized_string(70190))
 
         for x, i in enumerate(episodes):
             progreso.update(old_div(x * 100, len(episodes)), "%dx%0.2d: %s" % (i.contentSeason, i.contentEpisodeNumber, i.contentTitle))

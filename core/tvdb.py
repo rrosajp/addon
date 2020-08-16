@@ -100,12 +100,12 @@ def find_and_set_infoLabels(item):
         otvdb_global = Tvdb(tvdb_id=item.infoLabels['tvdb_id'])
 
     if not item.contentSeason:
-        p_dialog.update(50, config.get_localized_string(60296), config.get_localized_string(60295))
+        p_dialog.update(50, config.get_localized_string(60296) + '\n' + config.get_localized_string(60295))
     results, info_load = otvdb_global.get_list_results()
     logger.debug("results: %s" % results)
 
     if not item.contentSeason:
-        p_dialog.update(100, config.get_localized_string(60296), config.get_localized_string(60297) % len(results))
+        p_dialog.update(100, config.get_localized_string(60296) + '\n' + config.get_localized_string(60297) % len(results))
         p_dialog.close()
 
     if len(results) > 1:

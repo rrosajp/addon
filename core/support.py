@@ -21,7 +21,9 @@ from core.item import Item
 from lib import unshortenit
 from platformcode import config
 from platformcode.logger import log
+from platformcode import logger
 from specials import autoplay
+
 
 def hdpass_get_servers(item):
     def get_hosts(url, quality):
@@ -466,7 +468,7 @@ def scrape(func):
 
             # if url may be changed and channel has findhost to update
             if 'findhost' in func.__globals__ and not itemlist:
-                logger.info('running findhost ' + func.__module__)
+                log('running findhost ' + func.__module__)
                 host = func.__globals__['findhost']()
                 parse = list(urlparse.urlparse(item.url))
                 from core import jsontools

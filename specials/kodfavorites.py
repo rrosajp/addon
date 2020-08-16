@@ -757,7 +757,7 @@ def compartir_lista(item):
         upload_url = scrapertools.find_single_match(data, 'form action="([^"]+)')
         sessionid = scrapertools.find_single_match(upload_url, 'sid=(.+)')
 
-        progreso.update(10, config.get_localized_string(70645), config.get_localized_string(70646))
+        progreso.update(10, config.get_localized_string(70645) + '\n' + config.get_localized_string(70646))
 
         # Sending the file to tinyupload using multipart / form-data
         from future import standard_library
