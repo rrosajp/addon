@@ -286,7 +286,7 @@ class DownloadThread(threading.Thread):
                     logger.log("Force_stop file detected, download is interrupted")
                     f.close()
 
-                    xbmc.executebuiltin("XBMC.Notification(%s,%s,300)" % (config.get_localized_string(60319),config.get_localized_string(60320)))
+                    xbmc.executebuiltin("Notification(%s,%s,300)" % (config.get_localized_string(60319),config.get_localized_string(60320)))
 
                     return
 

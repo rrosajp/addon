@@ -911,7 +911,7 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
     progress.update(100)
     xbmc.sleep(1000)
     progress.close()
-    xbmc.executebuiltin('XBMC.ReloadSkin()')
+    xbmc.executebuiltin('ReloadSkin()')
 
 
 def clean(path_list=[]):

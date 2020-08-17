@@ -136,7 +136,7 @@ def get_system_platform():
 
 def is_autorun_enabled():
     try:
-        if "xbmc.executebuiltin('XBMC.RunAddon(plugin.video.kod)')" in open(os.path.join(xbmc.translatePath('special://userdata'),'autoexec.py')).read():
+        if "xbmc.executebuiltin('RunAddon(plugin.video.kod)')" in open(os.path.join(xbmc.translatePath('special://userdata'),'autoexec.py')).read():
             return True
         else:
             return False
@@ -153,12 +153,12 @@ def enable_disable_autorun(is_enabled):
 
     if is_enabled is False:
         with open(path, append_write) as file: 
-            file.write("import xbmc\nxbmc.executebuiltin('XBMC.RunAddon(plugin.video.kod)')")
+            file.write("import xbmc\nxbmc.executebuiltin('RunAddon(plugin.video.kod)')")
         set_setting('autostart', 'On')
     else:
         file = open(path, "r")
         old_content = file.read() 
-        new_content = old_content.replace("xbmc.executebuiltin('XBMC.RunAddon(plugin.video.kod)')", "")
+        new_content = old_content.replace("xbmc.executebuiltin('RunAddon(plugin.video.kod)')", "")
         file.close()
         with open(path, "w") as file:
             file.write(new_content)
