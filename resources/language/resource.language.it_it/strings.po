@@ -4836,20 +4836,20 @@ msgid "Search in Youtube"
 msgstr "Ricerca in Youtube"
 
 msgctxt "#70508"
-msgid "Search in Abandomoviez"
-msgstr "Ricerca inAbandomoviez"
+msgid "Search in Mymovies"
+msgstr "Ricerca in Mymovies"
 
 msgctxt "#70510"
 msgid "Manual Search in Youtube"
 msgstr "Ricerca Manuale in Youtube"
 
 msgctxt "#70511"
-msgid "Manual Search in Abandomoviez"
-msgstr "Ricerca Manuale in Abandomoviez"
+msgid "Manual Search in Mymovies"
+msgstr "Ricerca Manuale in Mymovies"
 
 msgctxt "#70512"
-msgid "Searching in abandomoviez"
-msgstr "Ricerca in abandomoviez"
+msgid "Searching in Mymovies"
+msgstr "Ricerca in Mymovies"
 
 msgctxt "#70513"
 msgid "Manual Searching in Filmaffinity"

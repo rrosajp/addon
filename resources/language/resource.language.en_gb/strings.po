@@ -4837,7 +4837,7 @@ msgid "Search in Youtube"
 msgstr ""
 
 msgctxt "#70508"
-msgid "Search in Abandomoviez"
+msgid "Search in Mymovies"
 msgstr ""
 
 msgctxt "#70510"
@@ -4845,11 +4845,11 @@ msgid "Manual Search in Youtube"
 msgstr ""
 
 msgctxt "#70511"
-msgid "Manual Search in Abandomoviez"
+msgid "Manual Search in Mymovies"
 msgstr ""
 
 msgctxt "#70512"
-msgid "Searching in abandomoviez"
+msgid "Searching in Mymovies"
 msgstr ""
 
 msgctxt "#70513"
