@@ -648,7 +648,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
         p_dialog = platformtools.dialog_progress(config.get_localized_string(20000), config.get_localized_string(60064))
         p_dialog.update(0, config.get_localized_string(60065))
 
-    channel_alt = serie.channels                                                    # We prepare to add the emergency urls
+    channel_alt = serie.channel                                                    # We prepare to add the emergency urls
     emergency_urls_stat = config.get_setting("emergency_urls", channel_alt)         # Does the channel want emergency urls?
     emergency_urls_succ = False
     try: channel = __import__('specials.%s' % channel_alt, fromlist=["specials.%s" % channel_alt])
@@ -722,7 +722,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
         t = 0
     for i, e in enumerate(scraper.sort_episode_list(new_episodelist)):
         if not silent:
-            p_dialog.update(int(math.ceil((i + 1) * t)), config.get_localized_string(60064), e.title)
+            p_dialog.update(int(math.ceil((i + 1) * t)), config.get_localized_string(60064) + '\n' + e.title)
 
         high_sea = e.contentSeason
         high_epi = e.contentEpisodeNumber
