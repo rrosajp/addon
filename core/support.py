@@ -8,11 +8,13 @@ if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 if PY3:
     from concurrent import futures
     import urllib.request as urllib
+    from urllib.request import Request, urlopen
     import urllib.parse as urlparse
     from urllib.parse import urlencode
 else:
     from concurrent_py2 import futures
     import urllib, urlparse
+    from urllib2 import Request, urlopen
     from urllib import urlencode
 
 from time import time
@@ -123,8 +125,8 @@ def regexDbg(item, patron, headers, data=''):
             'flavor': 'python'
         }
         data = json.dumps(data).encode() if PY3 else json.dumps(data, encoding='latin1')
-        r = urllib.Request(url + '/api/regex', data, headers=headers)
-        r = urllib.urlopen(r).read()
+        r = Request(url + '/api/regex', data, headers=headers)
+        r = urlopen(r).read()
         permaLink = json.loads(r)['permalinkFragment']
         webbrowser.open(url + "/r/" + permaLink)
 
@@ -973,8 +975,8 @@ def match_dbg(data, patron):
         'flavor': 'python'
     }
     js = json.dumps(data).encode() if PY3 else json.dumps(data, encoding='latin1')
-    r = urllib.Request(url + '/api/regex', js, headers=headers)
-    r = urllib.urlopen(r).read()
+    r = Request(url + '/api/regex', js, headers=headers)
+    r = urlopen(r).read()
     permaLink = json.loads(r)['permalinkFragment']
     webbrowser.open(url + "/r/" + permaLink)
 
