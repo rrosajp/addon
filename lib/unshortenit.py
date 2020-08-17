@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-try:
-    from urllib.parse import urlsplit, urlparse, parse_qs, urljoin
-except:
+import os, re, sys, json, time
+
+if sys.version_info[0] >= 3:
+    from urllib.parse import urlsplit, urlparse, parse_qs, urljoin, urlencode
+    from urllib.request import urlopen
+else:
+    from urllib import urlencode, urlopen
     from urlparse import urlsplit, urlparse, parse_qs, urljoin
 
-import json
-import os
-import re
-import time
-import urllib
 from base64 import b64decode
 
 from core import httptools, scrapertools
@@ -61,17 +60,13 @@ class UnshortenIt(object):
                 return uri, "No domain found in URI!"
             had_google_outbound, uri = self._clear_google_outbound_proxy(uri)
 
-            if re.search(self._adfly_regex, domain,
-                         re.IGNORECASE) or type == 'adfly':
+            if re.search(self._adfly_regex, domain, re.IGNORECASE) or type == 'adfly':
                 uri, code = self._unshorten_adfly(uri)
-            if re.search(self._adfocus_regex, domain,
-                         re.IGNORECASE) or type == 'adfocus':
+            if re.search(self._adfocus_regex, domain, re.IGNORECASE) or type == 'adfocus':
                 uri, code = self._unshorten_adfocus(uri)
-            if re.search(self._linkbucks_regex, domain,
-                         re.IGNORECASE) or type == 'linkbucks':
+            if re.search(self._linkbucks_regex, domain, re.IGNORECASE) or type == 'linkbucks':
                 uri, code = self._unshorten_linkbucks(uri)
-            if re.search(self._lnxlu_regex, domain,
-                         re.IGNORECASE) or type == 'lnxlu':
+            if re.search(self._lnxlu_regex, domain, re.IGNORECASE) or type == 'lnxlu':
                 uri, code = self._unshorten_lnxlu(uri)
             if re.search(self._shrink_service_regex, domain, re.IGNORECASE):
                 uri, code = self._unshorten_shrink_service(uri)
@@ -99,7 +94,7 @@ class UnshortenIt(object):
             if oldUri == uri:
                 break
 
-            logger.info(uri)
+            logger.log(uri)
 
         return uri, code
 
@@ -368,7 +363,7 @@ class UnshortenIt(object):
             if len(code) > 0:
                 payload = {'click': code[0]}
                 r = httptools.downloadpage(
-                    'http://lnx.lu?' + urllib.urlencode(payload),
+                    'http://lnx.lu?' + urlencode(payload),
                     timeout=self._timeout)
                 return r.url, r.code
             else:
@@ -400,7 +395,7 @@ class UnshortenIt(object):
                 payload = {'adSessionId': session_id, 'callback': 'c'}
                 r = httptools.downloadpage(
                     'http://sh.st/shortest-url/end-adsession?' +
-                    urllib.urlencode(payload),
+                    urlencode(payload),
                     headers=http_header,
                     timeout=self._timeout)
                 response = r.data[6:-2].decode('utf-8')
@@ -519,7 +514,7 @@ class UnshortenIt(object):
             else:
                 if 'sb/' in uri or 'akv/' in uri or 'wss/' in uri or 'wsd/' in uri:
                     import datetime, hashlib
-                    ip = urllib.urlopen('https://api.ipify.org/').read()
+                    ip = urlopen('https://api.ipify.org/').read()
                     day = datetime.date.today().strftime('%Y%m%d')
                     headers = {
                         "Cookie": hashlib.md5(ip+day).hexdigest() + "=1"
@@ -531,12 +526,12 @@ class UnshortenIt(object):
                 r = httptools.downloadpage(uri, timeout=self._timeout, headers=headers, follow_redirects=False)
                 if 'Wait 1 hour' in r.data:
                     uri = ''
-                    logger.info('IP bannato da vcrypt, aspetta un ora')
+                    logger.log('IP bannato da vcrypt, aspetta un ora')
                 else:
                     prev_uri = uri
                     uri = r.headers['location']
                     if uri == prev_uri:
-                        logger.info('Use Cloudscraper')
+                        logger.log('Use Cloudscraper')
                         uri = httptools.downloadpage(uri, timeout=self._timeout, headers=headers, follow_redirects=False, cf=True).headers['location']
 
             if "4snip" in uri:
@@ -593,7 +588,7 @@ class UnshortenIt(object):
             r = httptools.downloadpage(uri, follow_redirect=True, timeout=self._timeout, cookies=False)
             if 'get/' in r.url:
                 uri = 'https://linkhub.icu/view/' + re.search('\.\./view/([^"]+)', r.data).group(1)
-                logger.info(uri)
+                logger.log(uri)
                 r = httptools.downloadpage(uri, follow_redirect=True, timeout=self._timeout, cookies=False)
             uri = re.search('<div id="text-url".*\n\s+<a href="([^"]+)', r.data).group(0)
             return uri, r.code
@@ -641,7 +636,7 @@ class UnshortenIt(object):
         try:
             id = uri.split('/')[-2]
             reqUrl = 'https://stayonline.pro/ajax/linkView.php'
-            p = urllib.urlencode({"id": id})
+            p = urlencode({"id": id})
             r = httptools.downloadpage(reqUrl, post=p)
             data = r.data
             try:
@@ -683,7 +678,7 @@ def findlinks(text):
         regex = '(?:https?://(?:[\w\d]+\.)?)?(?:' + regex + ')/[a-zA-Z0-9_=/]+'
         for match in re.findall(regex, text):
             matches.append(match)
-    logger.info('matches=' + str(matches))
+    logger.log('matches=' + str(matches))
     if len(matches) == 1:
         text += '\n' + unshorten(matches[0])[0]
     elif matches:

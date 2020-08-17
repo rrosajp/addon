@@ -18,7 +18,7 @@ videolibrary_tvshows_path = u'' + videolibrarytools.TVSHOWS_PATH
 
 
 def export_videolibrary(item):
-    logger.info()
+    logger.log()
 
     zip_file_folder = platformtools.dialog_browse(3, config.get_localized_string(80002))
     if zip_file_folder == "":
@@ -51,7 +51,7 @@ def export_videolibrary(item):
 
 
 def import_videolibrary(item):
-    logger.info()
+    logger.log()
 
     zip_file = u'' + platformtools.dialog_browse(1, config.get_localized_string(80005), mask=".zip")
     if zip_file == "":

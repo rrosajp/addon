@@ -12,7 +12,7 @@ from platformcode import logger, config
 
 
 def test_video_exists(page_url):
-    logger.info("(page_url='%s')" % page_url)
+    logger.log("(page_url='%s')" % page_url)
     global data
     data = httptools.downloadpage(page_url).data.replace('"', "'")
     if "Not Found" in data or "File Does not Exist" in data:
@@ -20,7 +20,7 @@ def test_video_exists(page_url):
     return True, ""
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
-    logger.info("(deltabit page_url='%s')" % page_url)
+    logger.log("(deltabit page_url='%s')" % page_url)
     video_urls = []
     global data
 

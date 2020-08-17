@@ -31,11 +31,11 @@ adult_mal = config.get_setting('adult_mal', "tvmoviedb")
 mal_ck = "MzE1MDQ2cGQ5N2llYTY4Z2xwbGVzZjFzbTY="
 images_predef = "https://raw.githubusercontent.com/master-1970/resources/master/images/genres/"
 default_fan = filetools.join(config.get_runtime_path(), "fanart.jpg")
-logger.info('FANART= '+default_fan)
+logger.log('FANART= '+default_fan)
 
 
 def mainlist(item):
-    logger.info()
+    logger.log()
     itemlist = []
     # TMDB
     itemlist.append(item.clone(title=typo(config.get_localized_string(70021), 'bold'), action=""))
@@ -72,7 +72,7 @@ def configuracion(item):
     return ret
 
 def search_star(item):
-    logger.info()
+    logger.log()
 
     itemlist = []
     item.type='movie'
@@ -114,7 +114,7 @@ def search_(item):
 
 
 def busqueda(item):
-    logger.info()
+    logger.log()
 
     new_item = Item(title=item.contentTitle, text=item.contentTitle.replace("+", " "), mode=item.contentType, infoLabels=item.infoLabels)
 
@@ -734,7 +734,7 @@ def indices_tmdb(item):
 
 
 def filtro(item):
-    logger.info()
+    logger.log()
 
     from datetime import datetime
     list_controls = []
@@ -833,7 +833,7 @@ def filtrado(item, values):
 
 
 def musica_movie(item):
-    logger.info()
+    logger.log()
     itemlist = []
 
     data = httptools.downloadpage(item.url).data
@@ -954,7 +954,7 @@ def listado_imdb(item):
 
 
 def filtro_imdb(item):
-    logger.info()
+    logger.log()
 
     from datetime import datetime
     list_controls = []
@@ -1561,7 +1561,7 @@ def detalles_fa(item):
 
 
 def filtro_fa(item):
-    logger.info()
+    logger.log()
 
     from datetime import datetime
     list_controls = []
@@ -1663,7 +1663,7 @@ def filtrado_fa(item, values):
 
 
 def login_fa():
-    logger.info()
+    logger.log()
 
     try:
         user = config.get_setting("usuariofa", "tvmoviedb")
@@ -1688,7 +1688,7 @@ def login_fa():
             userid = scrapertools.find_single_match(data, 'id-user=(\d+)')
             if userid:
                 config.set_setting("userid", userid, "tvmoviedb")
-            logger.info("Login correcto")
+            logger.log("Login correcto")
             return True, ""
     except:
         import traceback
@@ -1813,7 +1813,7 @@ def acciones_fa(item):
 
 def votar_fa(item):
     # Window to select the vote
-    logger.info()
+    logger.log()
 
     list_controls = []
     valores = {}
@@ -2215,7 +2215,7 @@ def acciones_trakt(item):
 
 
 def order_list(item):
-    logger.info()
+    logger.log()
 
     list_controls = []
     valores1 = ['rating', 'added', 'title', 'released', 'runtime', 'popularity', 'percentage', 'votes']
@@ -2956,7 +2956,7 @@ def info_anidb(item, itemlist, url):
 
 
 def filtro_mal(item):
-    logger.info()
+    logger.log()
 
     list_controls = []
     valores = {}
@@ -3040,7 +3040,7 @@ def callback_mal(item, values):
 
 def musica_anime(item):
     # List available anime and songs similar to the anime title
-    logger.info()
+    logger.log()
     itemlist = []
 
     data = httptools.downloadpage("http://www.freeanimemusic.org/song_search.php", post=item.post).data
@@ -3076,7 +3076,7 @@ def musica_anime(item):
 
 
 def login_mal(from_list=False):
-    logger.info()
+    logger.log()
 
     try:
         user = config.get_setting("usuariomal", "tvmoviedb")
@@ -3103,7 +3103,7 @@ def login_mal(from_list=False):
         else:
             if generic:
                 return False, config.get_localized_string(70381), user
-            logger.info("Login correcto")
+            logger.log("Login correcto")
             return True, "", user
     except:
         import traceback
@@ -3135,7 +3135,7 @@ def cuenta_mal(item):
 
 def items_mal(item):
     # Scraper for personal lists
-    logger.info()
+    logger.log()
     itemlist = []
     data = httptools.downloadpage(item.url).data
     data = re.sub(r"\n|\r|\t|&nbsp;", "", data)

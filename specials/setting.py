@@ -21,7 +21,7 @@ CHANNELNAME = "setting"
 AUTOSTART = config.is_autorun_enabled()
 
 def mainlist(item):
-    logger.info()
+    logger.log()
 
     itemlist = list()
     itemlist.append(Item(channel=CHANNELNAME, title=config.get_localized_string(60535), action="settings", folder=False,
@@ -62,7 +62,7 @@ def mainlist(item):
 
 
 def menu_channels(item):
-    logger.info()
+    logger.log()
     itemlist = list()
 
     itemlist.append(Item(channel=CHANNELNAME, title=config.get_localized_string(60545), action="conf_tools", folder=False,
@@ -98,15 +98,15 @@ def channel_config(item):
 
 def autostart(item):  # item required launcher.py line 265
     if config.enable_disable_autorun(AUTOSTART):
-        logger.info('AUTOSTART ENABLED')
+        logger.log('AUTOSTART ENABLED')
         # xbmcgui.Dialog().ok(config.get_localized_string(20000), config.get_localized_string(70709))
     else:
-        logger.info('AUTOSTART ENABLED')
+        logger.log('AUTOSTART ENABLED')
         # xbmcgui.Dialog().ok(config.get_localized_string(20000), config.get_localized_string(70710))
 
 
 # def setting_torrent(item):
-#     logger.info()
+#     logger.log()
 
 #     LIBTORRENT_PATH = config.get_setting("libtorrent_path", server="torrent", default="")
 #     LIBTORRENT_ERROR = config.get_setting("libtorrent_error", server="torrent", default="")
@@ -243,7 +243,7 @@ def autostart(item):  # item required launcher.py line 265
 #         config.set_setting("magnet2torrent", dict_data_saved["magnet2torrent"], server="torrent")
 
 def menu_servers(item):
-    logger.info()
+    logger.log()
     itemlist = list()
 
     itemlist.append(Item(channel=CHANNELNAME, title=config.get_localized_string(60550), action="servers_blacklist", folder=False,
@@ -272,7 +272,7 @@ def menu_servers(item):
 
     for server in sorted(server_list):
         server_parameters = servertools.get_server_parameters(server)
-        logger.info(server_parameters)
+        logger.log(server_parameters)
         if server_parameters["has_settings"] and [x for x in server_parameters["settings"] if x["id"] not in ["black_list", "white_list"]]:
             itemlist.append(
                 Item(channel=CHANNELNAME, title=".    " + config.get_localized_string(60553) % server_parameters["name"],
@@ -423,7 +423,7 @@ def settings(item):
 
 
 def submenu_tools(item):
-    logger.info()
+    logger.log()
     itemlist = list()
 
     # Custom tools
@@ -464,7 +464,7 @@ def submenu_tools(item):
 
 
 def check_quickfixes(item):
-    logger.info()
+    logger.log()
 
     if not config.dev_mode():
         from platformcode import updater
@@ -475,7 +475,7 @@ def check_quickfixes(item):
 
 
 # def update_quasar(item):
-#     logger.info()
+#     logger.log()
 
 #     from platformcode import custom_code, platformtools
 #     stat = False
@@ -487,7 +487,7 @@ def check_quickfixes(item):
 
 
 def conf_tools(item):
-    logger.info()
+    logger.log()
 
     # Enable or disable channels
     if item.extra == "channels_onoff":
@@ -589,14 +589,14 @@ def conf_tools(item):
                                              action="", folder=False,
                                              thumbnail=channel.thumbnail))
                         continue
-                        # logger.info(channel.channel + " SALTADO!")
+                        # logger.log(channel.channel + " SALTADO!")
 
                     # The json file settings of the channel are loaded
                     file_settings = os.path.join(config.get_data_path(), "settings_channels", channel.channel + "_data.json")
                     dict_settings = {}
                     dict_file = {}
                     if filetools.exists(file_settings):
-                        # logger.info(channel.channel + " Has _data.json file")
+                        # logger.log(channel.channel + " Has _data.json file")
                         channeljson_exists = True
                         # We get saved settings from ../settings/channel_data.json
                         try:
@@ -606,7 +606,7 @@ def conf_tools(item):
                         except EnvironmentError:
                             logger.error("ERROR when reading the file: %s" % file_settings)
                     else:
-                        # logger.info(channel.channel + " No _data.json file")
+                        # logger.log(channel.channel + " No _data.json file")
                         channeljson_exists = False
 
                     if channeljson_exists:
@@ -626,7 +626,7 @@ def conf_tools(item):
                             # Default settings are loaded
                             list_controls, default_settings = channeltools.get_channel_controls_settings(
                                 channel.channel)
-                            # logger.info(channel.title + " | Default: %s" % default_settings)
+                            # logger.log(channel.title + " | Default: %s" % default_settings)
                         except:
                             import traceback
                             logger.error(channel.title + config.get_localized_string(60570) % traceback.format_exc())
@@ -648,7 +648,7 @@ def conf_tools(item):
                                     list_status = config.get_localized_string(60571)
 
                     else:
-                        # logger.info(channel.channel + " - NO correction needed!")
+                        # logger.log(channel.channel + " - NO correction needed!")
                         needsfix = False
 
                     # If the channel status has been set it is added to the list
@@ -747,7 +747,7 @@ def channel_status(item, dict_values):
         for k in dict_values:
 
             if k == "all_channels":
-                logger.info("All channels | Selected state: %s" % dict_values[k])
+                logger.log("All channels | Selected state: %s" % dict_values[k])
                 if dict_values[k] != 0:
                     excluded_channels = ['url', 'search',
                                          'videolibrary', 'setting',
@@ -788,9 +788,9 @@ def channel_status(item, dict_values):
                     continue
 
             else:
-                logger.info("Channel: %s | State: %s" % (k, dict_values[k]))
+                logger.log("Channel: %s | State: %s" % (k, dict_values[k]))
                 config.set_setting("enabled", dict_values[k], k)
-                logger.info("the value is like %s " % config.get_setting("enabled", k))
+                logger.log("the value is like %s " % config.get_setting("enabled", k))
 
         platformtools.itemlist_update(Item(channel=CHANNELNAME, action="mainlist"))
 
@@ -878,7 +878,7 @@ def restore_tools(item):
 
 
 def report_menu(item):
-    logger.info('URL: ' + item.url)
+    logger.log('URL: ' + item.url)
 
     from channelselector import get_thumb
 
@@ -951,7 +951,7 @@ def report_menu(item):
 
 
 def activate_debug(item):
-    logger.info(item.extra)
+    logger.log(item.extra)
     from platformcode import platformtools
 
     #Enable / disable DEBUB option in settings.xml
@@ -1231,7 +1231,7 @@ def report_send(item, description='', fatal=False):
                 continue
 
             status = True                                               # Upload operation completed successfully
-            logger.info('Report created: ' + str(item.url))    # The URL of the user report is saved
+            logger.log('Report created: ' + str(item.url))    # The URL of the user report is saved
             # if fatal:                                                   # For future use, for logger.crash
             #     platformtools.dialog_ok('KoD CREATED ERROR report', 'Report it in the forum by adding FATAL ERROR and this URL: ', '[COLOR gold]%s[/COLOR]' % item.url, pastebin_one_use_msg)
             # else:                                                       # Report URL passed to user

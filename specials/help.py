@@ -37,7 +37,7 @@ if config.is_xbmc():
 
 
 def mainlist(item):
-    logger.info()
+    logger.log()
     itemlist = []
 
     if config.is_xbmc():

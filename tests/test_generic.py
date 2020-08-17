@@ -224,7 +224,7 @@ class GenericChannelMenuItemTest(unittest.TestCase):
                     break
 
         for resIt in self.itemlist:
-            logger.info(resIt.title + ' -> ' + resIt.url)
+            logger.log(resIt.title + ' -> ' + resIt.url)
             self.assertLess(len(resIt.fulltitle), 110,
                             'channel ' + self.ch + ' -> ' + self.title + ' might contain wrong titles<br>' + resIt.fulltitle)
             if resIt.url:

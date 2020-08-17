@@ -1225,7 +1225,7 @@ class related(xbmcgui.WindowDialog):
 
 
 def busqueda_global(item, infoLabels, org_title=False):
-    logger.info()
+    logger.log()
 
     logger.debug(item)
 
@@ -1797,7 +1797,7 @@ class ActorInfo(xbmcgui.WindowDialog):
                     xbmc.sleep(400)
             if exit_loop:
                 break
-        logger.info("salimos carajo xD")
+        logger.log("salimos carajo xD")
 
     def onAction(self, action):
         global exit_loop

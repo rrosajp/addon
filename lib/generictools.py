@@ -25,7 +25,7 @@ intervenido_sucuri = 'Access Denied - Sucuri Website Firewall'
 
 
 def update_title(item):
-    logger.info()
+    logger.log()
     from core import scraper,support
 
 
@@ -41,7 +41,7 @@ def update_title(item):
     The channel must add a method to be able to receive the call from Kodi / Alfa, and be able to call this method:
 
     def actualizar_titulos(item):
-        logger.info()
+        logger.log()
         itemlist = []
         from lib import generictools
         from platformcode import launcher
@@ -205,7 +205,7 @@ def update_title(item):
 
 
 def refresh_screen(item):
-    logger.info()
+    logger.log()
 
     """
     #### Kodi 18 compatibility ####
@@ -239,7 +239,7 @@ def refresh_screen(item):
 
 
 def post_tmdb_listado(item, itemlist):
-    logger.info()
+    logger.log()
     itemlist_fo = []
 
     """
@@ -484,7 +484,7 @@ def post_tmdb_listado(item, itemlist):
 
 
 def post_tmdb_seasons(item, itemlist):
-    logger.info()
+    logger.log()
 
     """
 
@@ -644,7 +644,7 @@ def post_tmdb_seasons(item, itemlist):
 
 
 def post_tmdb_episodios(item, itemlist):
-    logger.info()
+    logger.log()
     itemlist_fo = []
 
     """
@@ -995,7 +995,7 @@ def post_tmdb_episodios(item, itemlist):
 
 
 def post_tmdb_findvideos(item, itemlist):
-    logger.info()
+    logger.log()
 
     """
 
@@ -1215,7 +1215,7 @@ def post_tmdb_findvideos(item, itemlist):
 
 
 def get_field_from_kodi_DB(item, from_fields='*', files='file'):
-    logger.info()
+    logger.log()
     """
 
    Call to read from the Kodi DB the input fields received (from_fields, by default "*") of the video indicated in Item
@@ -1293,7 +1293,7 @@ def get_field_from_kodi_DB(item, from_fields='*', files='file'):
 
 
 def fail_over_newpct1(item, patron, patron2=None, timeout=None):
-    logger.info()
+    logger.log()
     import ast
 
     """
@@ -1494,7 +1494,7 @@ def fail_over_newpct1(item, patron, patron2=None, timeout=None):
 
 
 def web_intervenida(item, data, desactivar=True):
-    logger.info()
+    logger.log()
 
     """
 
@@ -1577,7 +1577,7 @@ def web_intervenida(item, data, desactivar=True):
 
 
 def regenerate_clones():
-    logger.info()
+    logger.log()
     import json
     from core import videolibrarytools
 
@@ -1591,7 +1591,7 @@ def regenerate_clones():
         # Find the paths where to leave the control .json file, and the Video Library
         json_path = filetools.exists(filetools.join(config.get_runtime_path(), 'verify_cached_torrents.json'))
         if json_path:
-            logger.info('Previously repaired video library: WE ARE GOING')
+            logger.log('Previously repaired video library: WE ARE GOING')
             return False
         json_path = filetools.join(config.get_runtime_path(), 'verify_cached_torrents.json')
         filetools.write(json_path, json.dumps({"CINE_verify": True}))   # Prevents another simultaneous process from being launched
@@ -1631,7 +1631,7 @@ def regenerate_clones():
 
                 # Delete the Tvshow.nfo files and check if the .nfo has more than one channel and one is clone Newpct1
                 for file in files:
-                    # logger.info('file - nfos: ' + file)
+                    # logger.log('file - nfos: ' + file)
                     if 'tvshow.nfo' in file:
                         file_path = filetools.join(root, 'tvshow.nfo')
                         filetools.remove(file_path)
@@ -1697,7 +1697,7 @@ def regenerate_clones():
                 for file in files:
                     file_path = filetools.join(root, file)
                     if '.json' in file:
-                        logger.info('** file: ' + file)
+                        logger.log('** file: ' + file)
                         canal_json = scrapertools.find_single_match(file, r'\[(\w+)\].json')
                         if canal_json not in nfo.library_urls:
                             filetools.remove(file_path)                             # we delete the .json is a zombie
@@ -1740,7 +1740,7 @@ def regenerate_clones():
 
 
 def dejuice(data):
-    logger.info()
+    logger.log()
     # Method to unobtrusive JuicyCodes data
 
     import base64

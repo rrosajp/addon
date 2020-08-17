@@ -193,7 +193,7 @@ def listaCanali(item):
             thumbnail = None
             skip = False
     # return itemlist
-    # logger.info([i.title for i in itemlist])
+    # logger.log([i.title for i in itemlist])
     f.close()
     return sorted(itemlist, key=lambda x: x.title)
 

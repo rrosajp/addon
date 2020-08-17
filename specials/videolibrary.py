@@ -8,7 +8,6 @@ if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
 import xbmc, os, traceback
 
-from channelselector import get_thumb
 from core import filetools, scrapertools, videolibrarytools
 from core.support import typo, thumb
 from core.item import Item
@@ -22,18 +21,14 @@ else:
 
 
 def mainlist(item):
-    logger.info()
+    logger.log()
 
     itemlist = [Item(channel=item.channel, action="list_movies", title=config.get_localized_string(60509),
-                     category=config.get_localized_string(70270),
-                     thumbnail=get_thumb("videolibrary_movie.png")),
-                Item(channel=item.channel, action="list_tvshows", title=config.get_localized_string(60600),
-                     category=config.get_localized_string(70271),
-                     thumbnail=get_thumb("videolibrary_tvshow.png"),
+                     category=config.get_localized_string(70270), thumbnail=thumb("videolibrary_movie")),
+                Item(channel=item.channel, action="list_tvshows",title=config.get_localized_string(60600),
+                     category=config.get_localized_string(70271), thumbnail=thumb("videolibrary_tvshow"),
                      context=[{"channel":"videolibrary", "action":"update_videolibrary", "title":config.get_localized_string(70269)}]),
-                Item(channel='shortcuts', action="SettingOnPosition",
-                     category=2, setting=1, title=typo(config.get_localized_string(70287),'bold color kod'),
-                     thumbnail = get_thumb("setting_0.png"))]
+                Item(channel='shortcuts', action="SettingOnPosition", category=2, setting=1, thumbnail = thumb("setting_0"))]
     return itemlist
 
 
@@ -42,7 +37,7 @@ def channel_config(item):
 
 
 def list_movies(item, silent=False):
-    logger.info()
+    logger.log()
     itemlist = []
     movies_path = []
     for root, folders, files in filetools.walk(videolibrarytools.MOVIES_PATH):
@@ -68,7 +63,7 @@ def list_movies(item, silent=False):
 def list_tvshows(item):
     from time import time
     start = time()
-    logger.info()
+    logger.log()
     itemlist = []
     lista = []
     tvshows_path = []
@@ -93,7 +88,7 @@ def list_tvshows(item):
                           title=typo(config.get_localized_string(70269), 'bold color kod'), folder=False),
                      Item(channel=item.channel, action="configure_update_videolibrary", thumbnail=item.thumbnail,
                           title=typo(config.get_localized_string(60599), 'bold color kod'), lista=lista, folder=False)]
-    logger.info('TEMPO= ' + str(time() - start))
+    logger.log('TEMPO= ' + str(time() - start))
     return itemlist
 
 
@@ -192,7 +187,7 @@ def get_results(nfo_path, root, Type, local=False):
                 # Contextual menu: Mark as seen / not seen
                 visto = item.library_playcounts.get(item.contentTitle, 0)
                 item.infoLabels["playcount"] = visto
-                logger.info('item\n' + str(item))
+                logger.log('item\n' + str(item))
                 if visto > 0:
                     seen_text = config.get_localized_string(60020)
                     counter = 0
@@ -264,7 +259,7 @@ def configure_update_videolibrary(item):
 
 
 def get_seasons(item):
-    logger.info()
+    logger.log()
     # logger.debug("item:\n" + item.tostring('\n'))
     itemlist = []
     dict_temp = {}
@@ -323,7 +318,7 @@ def get_seasons(item):
 
 
 def get_episodes(item):
-    logger.info()
+    logger.log()
     # logger.debug("item:\n" + item.tostring('\n'))
     itemlist = []
 
@@ -387,7 +382,7 @@ def get_episodes(item):
 
 def findvideos(item):
     from specials import autoplay
-    logger.info()
+    logger.log()
     # logger.debug("item:\n" + item.tostring('\n'))
     videolibrarytools.check_renumber_options(item)
     itemlist = []
@@ -540,7 +535,7 @@ def findvideos(item):
 
 
 def play(item):
-    logger.info()
+    logger.log()
     # logger.debug("item:\n" + item.tostring('\n'))
 
     if not item.contentChannel == "local":
@@ -580,7 +575,7 @@ def play(item):
 
 
 def update_videolibrary(item=''):
-    logger.info()
+    logger.log()
 
     # Update active series by overwriting
     import service
@@ -600,17 +595,17 @@ def update_videolibrary(item=''):
 
 
 def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_folder, current_tvshows_folder, new_tvshows_folder):
-    logger.info()
+    logger.log()
 
     backup_current_path = current_path
     backup_new_path = new_path
 
-    logger.info('current_path: ' + current_path)
-    logger.info('new_path: ' + new_path)
-    logger.info('current_movies_folder: ' + current_movies_folder)
-    logger.info('new_movies_folder: ' + new_movies_folder)
-    logger.info('current_tvshows_folder: ' + current_tvshows_folder)
-    logger.info('new_tvshows_folder: ' + new_tvshows_folder)
+    logger.log('current_path: ' + current_path)
+    logger.log('new_path: ' + new_path)
+    logger.log('current_movies_folder: ' + current_movies_folder)
+    logger.log('new_movies_folder: ' + new_movies_folder)
+    logger.log('current_tvshows_folder: ' + current_tvshows_folder)
+    logger.log('new_tvshows_folder: ' + new_tvshows_folder)
 
     notify = False
     progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80011))
@@ -621,14 +616,14 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
     current_tvshows_path = u'' + filetools.join(current_path, current_tvshows_folder)
     new_tvshows_path = u'' + filetools.join(new_path, new_tvshows_folder)
 
-    logger.info('current_movies_path: ' + current_movies_path)
-    logger.info('new_movies_path: ' + new_movies_path)
-    logger.info('current_tvshows_path: ' + current_tvshows_path)
-    logger.info('new_tvshows_path: ' + new_tvshows_path)
+    logger.log('current_movies_path: ' + current_movies_path)
+    logger.log('new_movies_path: ' + new_movies_path)
+    logger.log('current_tvshows_path: ' + current_tvshows_path)
+    logger.log('new_tvshows_path: ' + new_tvshows_path)
 
     from platformcode import xbmc_videolibrary
     movies_path, tvshows_path = xbmc_videolibrary.check_sources(new_movies_path, new_tvshows_path)
-    logger.info('check_sources: ' + str(movies_path) + ', ' + str(tvshows_path))
+    logger.log('check_sources: ' + str(movies_path) + ', ' + str(tvshows_path))
     if movies_path or tvshows_path:
         if not movies_path:
             filetools.rmdir(new_movies_path)
@@ -673,7 +668,7 @@ def move_videolibrary(current_path, new_path, current_movies_folder, new_movies_
 
 
 def delete_videolibrary(item):
-    logger.info()
+    logger.log()
 
     if not platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(80037)):
         return
@@ -699,7 +694,7 @@ def delete_videolibrary(item):
 
 # context menu methods
 def update_tvshow(item):
-    logger.info()
+    logger.log()
     # logger.debug("item:\n" + item.tostring('\n'))
 
     heading = config.get_localized_string(60037)
@@ -725,11 +720,11 @@ def update_tvshow(item):
 
 
 def add_local_episodes(item):
-    logger.info()
+    logger.log()
 
     done, local_episodes_path = videolibrarytools.config_local_episodes_path(item.path, item, silent=True)
     if done < 0:
-        logger.info("An issue has occurred while configuring local episodes")
+        logger.log("An issue has occurred while configuring local episodes")
     elif local_episodes_path:
         nfo_path = filetools.join(item.path, "tvshow.nfo")
         head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
@@ -744,7 +739,7 @@ def add_local_episodes(item):
 
 
 def remove_local_episodes(item):
-    logger.info()
+    logger.log()
 
     nfo_path = filetools.join(item.path, "tvshow.nfo")
     head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
@@ -762,7 +757,7 @@ def remove_local_episodes(item):
 
 
 def verify_playcount_series(item, path):
-    logger.info()
+    logger.log()
 
     """
     This method reviews and repairs the PlayCount of a series that has become out of sync with the actual list of episodes in its folder. Entries for missing episodes, seasons, or series are created with the "not seen" mark. Later it is sent to verify the counters of Seasons and Series
@@ -825,7 +820,7 @@ def verify_playcount_series(item, path):
 
 
 def mark_content_as_watched2(item):
-    logger.info()
+    logger.log()
     # logger.debug("item:\n" + item.tostring('\n'))
     if filetools.isfile(item.nfo):
         head_nfo, it = videolibrarytools.read_nfo(item.nfo)
@@ -863,7 +858,7 @@ def mark_content_as_watched2(item):
 
 
 def mark_content_as_watched(item):
-    logger.info()
+    logger.log()
     #logger.debug("item:\n" + item.tostring('\n'))
 
     if filetools.exists(item.nfo):
@@ -901,7 +896,7 @@ def mark_content_as_watched(item):
 
 
 def mark_season_as_watched(item):
-    logger.info()
+    logger.log()
     # logger.debug("item:\n" + item.tostring('\n'))
 
     # Get dictionary of marked episodes
@@ -954,7 +949,7 @@ def mark_season_as_watched(item):
 
 
 def mark_tvshow_as_updatable(item, silent=False):
-    logger.info()
+    logger.log()
     head_nfo, it = videolibrarytools.read_nfo(item.nfo)
     it.active = item.active
     filetools.write(item.nfo, head_nfo + it.tojson())
@@ -987,7 +982,7 @@ def delete(item):
         elif platformtools.dialog_yesno(heading, config.get_localized_string(70081) % filetools.basename(_item.path)):
             filetools.rmdirtree(_item.path)
 
-        logger.info("All links removed")
+        logger.log("All links removed")
         xbmc.sleep(1000)
         platformtools.itemlist_refresh()
 
@@ -1058,7 +1053,7 @@ def delete(item):
             filetools.write(item.nfo, head_nfo + item_nfo.tojson())
 
         msg_txt = config.get_localized_string(70087) % (num_enlaces, canal)
-        logger.info(msg_txt)
+        logger.log(msg_txt)
         platformtools.dialog_notification(heading, msg_txt)
         platformtools.itemlist_refresh()
 
@@ -1068,7 +1063,7 @@ def delete(item):
 
 
 def check_season_playcount(item, season):
-    logger.info()
+    logger.log()
 
     if season:
         episodios_temporada = 0
@@ -1090,7 +1085,7 @@ def check_season_playcount(item, season):
 
 
 def check_tvshow_playcount(item, season):
-    logger.info()
+    logger.log()
     if season:
         temporadas_serie = 0
         temporadas_vistas_serie = 0

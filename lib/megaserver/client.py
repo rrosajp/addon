@@ -45,7 +45,7 @@ class Client(object):
         t= Thread(target=self._auto_shutdown)
         t.setDaemon(True)
         t.start()
-        logger.info("MEGA Server Started")
+        logger.log("MEGA Server Started")
 
     def _auto_shutdown(self):
         while self.running:
@@ -75,7 +75,7 @@ class Client(object):
     def stop(self):
         self.running = False
         self._server.stop()
-        logger.info("MEGA Server Stopped")
+        logger.log("MEGA Server Stopped")
 
     def get_play_list(self):
         if len(self.files) > 1:
@@ -103,7 +103,7 @@ class Client(object):
                     return files
 
             except:
-                logger.info(traceback.format_exc())
+                logger.log(traceback.format_exc())
                 pass
 
         return files

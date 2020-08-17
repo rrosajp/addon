@@ -344,31 +344,31 @@ def list_env(environment={}):
     if environment['debug'] == 'False':
         logger.log_enable(True)
 
-    logger.info(sep)
-    logger.info('KoD environment variables: ' + environment['addon_version'] + ' Debug: ' + environment['debug'])
-    logger.info(sep)
+    logger.log(sep)
+    logger.log('KoD environment variables: ' + environment['addon_version'] + ' Debug: ' + environment['debug'])
+    logger.log(sep)
 
-    logger.info(environment['os_name'] + ' ' + environment['prod_model'] + ' ' +
+    logger.log(environment['os_name'] + ' ' + environment['prod_model'] + ' ' +
                 environment['os_release'] + ' ' + environment['machine'] + ' ' +
                 environment['architecture'] + ' ' + environment['language'])
 
-    logger.info('Kodi ' + environment['num_version'] + ', Vídeo: ' +
+    logger.log('Kodi ' + environment['num_version'] + ', Vídeo: ' +
                 environment['video_db'] + ', Python ' + environment['python_version'])
 
     if environment['cpu_usage']:
-        logger.info('CPU: ' + environment['cpu_usage'])
+        logger.log('CPU: ' + environment['cpu_usage'])
 
     if environment['mem_total'] or environment['mem_free']:
-        logger.info('Memory: Total: ' + environment['mem_total'] + ' MB | Disp.: ' +
+        logger.log('Memory: Total: ' + environment['mem_total'] + ' MB | Disp.: ' +
                     environment['mem_free'] + ' MB | Buffers: ' +
                     str(int(environment['kodi_buffer']) * 3) + ' MB | Buffermode: ' +
                     environment['kodi_bmode'] + ' | Readfactor: ' +
                     environment['kodi_rfactor'])
 
-    logger.info('Userdata: ' + environment['userdata_path'] + ' - Free: ' +
+    logger.log('Userdata: ' + environment['userdata_path'] + ' - Free: ' +
                 environment['userdata_free'].replace('.', ',') + ' GB')
 
-    logger.info('Videolibrary: Series/Episodes: ' + environment['videolab_series'] + '/' +
+    logger.log('Videolibrary: Series/Episodes: ' + environment['videolab_series'] + '/' +
                 environment['videolab_episodios'] + ' - Pelis: ' +
                 environment['videolab_pelis'] + ' - Upd: ' +
                 environment['videolab_update'] + ' - Path: ' +
@@ -380,24 +380,24 @@ def list_env(environment={}):
     #         if x == 0:
     #             cliente_alt = cliente.copy()
     #             del cliente_alt['Torrent_opt']
-    #             logger.info('Torrent: Opt: %s, %s' % (str(cliente['Torrent_opt']), \
+    #             logger.log('Torrent: Opt: %s, %s' % (str(cliente['Torrent_opt']), \
     #                                                   str(cliente_alt).replace('{', '').replace('}', '') \
     #                                                   .replace("'", '').replace('_', ' ')))
     #         elif x == 1 and environment['torrent_error']:
-    #             logger.info('- ' + str(cliente).replace('{', '').replace('}', '') \
+    #             logger.log('- ' + str(cliente).replace('{', '').replace('}', '') \
     #                         .replace("'", '').replace('_', ' '))
     #         else:
     #             cliente_alt = cliente.copy()
     #             del cliente_alt['Plug_in']
     #             cliente_alt['Libre'] = cliente_alt['Libre'].replace('.', ',') + ' GB'
-    #             logger.info('- %s: %s' % (str(cliente['Plug_in']), str(cliente_alt) \
+    #             logger.log('- %s: %s' % (str(cliente['Plug_in']), str(cliente_alt) \
     #                                       .replace('{', '').replace('}', '').replace("'", '') \
     #                                       .replace('\\\\', '\\')))
 
-    # logger.info('Proxy: ' + environment['proxy_active'])
+    # logger.log('Proxy: ' + environment['proxy_active'])
 
-    logger.info('LOG Size: ' + environment['log_size'].replace('.', ',') + ' MB')
-    logger.info(sep)
+    logger.log('LOG Size: ' + environment['log_size'].replace('.', ',') + ' MB')
+    logger.log(sep)
 
     if environment['debug'] == 'False':
         logger.log_enable(False)

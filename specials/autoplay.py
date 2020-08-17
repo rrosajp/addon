@@ -29,7 +29,7 @@ def start(itemlist, item):
 
     if item.global_search:
         return itemlist
-    logger.info()
+    logger.log()
 
     global PLAYED
     PLAYED = False
@@ -272,7 +272,7 @@ def start(itemlist, item):
 
 
 def play_multi_channel(item, itemlist):
-    logger.info()
+    logger.log()
     global PLAYED
     video_dict = dict()
 

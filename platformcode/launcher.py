@@ -19,7 +19,7 @@ def start():
     Within this function all calls should go to
     functions that we want to execute as soon as we open the plugin.
     """
-    logger.info()
+    logger.log()
     # config.set_setting('show_once', True)
     # Test if all the required directories are created
     config.verify_directories_created()
@@ -37,7 +37,7 @@ def start():
         updater.showSavedChangelog()
 
 def run(item=None):
-    logger.info()
+    logger.log()
     if not item:
         # Extract item from sys.argv
         if sys.argv[2]:
@@ -76,7 +76,7 @@ def run(item=None):
             xbmc_videolibrary.ask_set_content(silent=False)
             config.set_setting('show_once', True)
 
-    logger.info(item.tostring())
+    logger.log(item.tostring())
 
     try:
         if not config.get_setting('tmdb_active'):
@@ -84,7 +84,7 @@ def run(item=None):
 
         # If item has no action, stops here
         if item.action == "":
-            logger.info("Item without action")
+            logger.log("Item without action")
             return
 
         # Action for main menu in channelselector
@@ -154,7 +154,7 @@ def run(item=None):
 
             channel_file = os.path.join(config.get_runtime_path(), CHANNELS, item.channel + ".py")
 
-            logger.info("channel_file= " + channel_file + ' - ' + CHANNELS + ' - ' + item.channel)
+            logger.log("channel_file= " + channel_file + ' - ' + CHANNELS + ' - ' + item.channel)
 
             channel = None
 
@@ -164,7 +164,7 @@ def run(item=None):
                 except ImportError:
                     exec("import " + CHANNELS + "." + item.channel + " as channel")
 
-            logger.info("Running channel %s | %s" % (channel.__name__, channel.__file__))
+            logger.log("Running channel %s | %s" % (channel.__name__, channel.__file__))
 
             # Special play action
             if item.action == "play":
@@ -174,12 +174,12 @@ def run(item=None):
                     trakt_tools.set_trakt_info(item)
                 except:
                     pass
-                logger.info("item.action=%s" % item.action.upper())
+                logger.log("item.action=%s" % item.action.upper())
                 # logger.debug("item_toPlay: " + "\n" + item.tostring('\n'))
 
                 # First checks if channel has a "play" function
                 if hasattr(channel, 'play'):
-                    logger.info("Executing channel 'play' method")
+                    logger.log("Executing channel 'play' method")
                     itemlist = channel.play(item)
                     b_favourite = item.isFavourite
                     # Play should return a list of playable URLS
@@ -200,7 +200,7 @@ def run(item=None):
 
                 # If player don't have a "play" function, not uses the standard play from platformtools
                 else:
-                    logger.info("Executing core 'play' method")
+                    logger.log("Executing core 'play' method")
                     platformtools.play_video(item)
 
             # Special action for findvideos, where the plugin looks for known urls
@@ -213,7 +213,7 @@ def run(item=None):
 
                 # If not, uses the generic findvideos function
                 else:
-                    logger.info("No channel 'findvideos' method, "
+                    logger.log("No channel 'findvideos' method, "
                                 "executing core method")
                     itemlist = servertools.find_video_items(item)
 
@@ -258,7 +258,7 @@ def run(item=None):
                     else:
                         filetools.remove(temp_search_file)
 
-                logger.info("item.action=%s" % item.action.upper())
+                logger.log("item.action=%s" % item.action.upper())
                 from core import channeltools
 
                 if config.get_setting('last_search'):
@@ -279,7 +279,7 @@ def run(item=None):
             # For all other actions
             else:
                 # import web_pdb; web_pdb.set_trace()
-                logger.info("Executing channel '%s' method" % item.action)
+                logger.log("Executing channel '%s' method" % item.action)
                 itemlist = getattr(channel, item.action)(item)
                 if config.get_setting('trakt_sync'):
                     from core import trakt_tools
@@ -361,7 +361,7 @@ def set_search_temp(item):
         filetools.write(temp_search_file, f)
 
 def reorder_itemlist(itemlist):
-    logger.info()
+    logger.log()
     # logger.debug("Inlet itemlist size: %i" % len(itemlist))
 
     new_list = []
@@ -399,7 +399,7 @@ def reorder_itemlist(itemlist):
     new_list.extend(mod_list)
     new_list.extend(not_mod_list)
 
-    logger.info("Modified Titles:%i |Unmodified:%i" % (modified, not_modified))
+    logger.log("Modified Titles:%i |Unmodified:%i" % (modified, not_modified))
 
     if len(new_list) == 0:
         new_list = itemlist
@@ -409,7 +409,7 @@ def reorder_itemlist(itemlist):
 
 
 def limit_itemlist(itemlist):
-    logger.info()
+    logger.log()
     # logger.debug("Inlet itemlist size: %i" % len(itemlist))
 
     try:
@@ -442,7 +442,7 @@ def play_from_library(item):
 
     itemlist=[]
     item.fromLibrary = True
-    logger.info()
+    logger.log()
     # logger.debug("item: \n" + item.tostring('\n'))
 
     # Try to reproduce an image (this does nothing and also does not give an error)

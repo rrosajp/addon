@@ -9,7 +9,7 @@ from platformcode import config, logger
 
 
 def test_video_exists(page_url):
-    logger.info("(page_url='%s')" % page_url)
+    logger.log("(page_url='%s')" % page_url)
     global data
     data = httptools.downloadpage(page_url, cookies=False).data
     if 'File Not Found' in data:
@@ -19,7 +19,7 @@ def test_video_exists(page_url):
 
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
-    logger.info("url=" + page_url)
+    logger.log("url=" + page_url)
     video_urls = []
     # data = httptools.downloadpage(page_url).data
     global data
@@ -43,7 +43,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             video_urls.append(['.' + source['file'].split('.')[-1] + ' [' + quality + '] [SuperVideo]', source['file']])
 
     else:
-        logger.info('ELSE!')
+        logger.log('ELSE!')
         matches = scrapertools.find_multiple_matches(data, r'src:\s*"([^"]+)",\s*type:\s*"[^"]+"(?:\s*, res:\s(\d+))?')
         for url, quality in matches:
             if url.split('.')[-1] != 'm3u8':

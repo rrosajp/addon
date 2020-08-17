@@ -65,13 +65,13 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
         try:
             self.cur.execute('select ip from dnscache where domain=?', (domain,))
             ip = self.cur.fetchall()[0][0]
-            logger.info('Cache DNS: ' + domain + ' = ' + str(ip))
+            logger.log('Cache DNS: ' + domain + ' = ' + str(ip))
         except:
             pass
         if not ip:  # not cached
             try:
                 ip = doh.query(domain)[0]
-                logger.info('Query DoH: ' + domain + ' = ' + str(ip))
+                logger.log('Query DoH: ' + domain + ' = ' + str(ip))
                 self.writeToCache(domain, ip)
             except Exception:
                 logger.error('Failed to resolve hostname, fallback to normal dns')
@@ -132,8 +132,8 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
             try:
                 ret = super(CipherSuiteAdapter, self).send(request, **kwargs)
             except Exception as e:
-                logger.info('Request for ' + domain + ' with ip ' + ip + ' failed')
-                logger.info(e)
+                logger.log('Request for ' + domain + ' with ip ' + ip + ' failed')
+                logger.log(e)
                 # if 'SSLError' in str(e):
                 #     # disabilito
                 #     config.set_setting("resolver_dns", False)
@@ -142,7 +142,7 @@ class CipherSuiteAdapter(host_header_ssl.HostHeaderSSLAdapter):
                 # else:
                 tryFlush = True
             if tryFlush and not flushedDns:  # re-request ips and update cache
-                logger.info('Flushing dns cache for ' + domain)
+                logger.log('Flushing dns cache for ' + domain)
                 return self.flushDns(request, domain, **kwargs)
             ret.url = realUrl
         else:

@@ -117,7 +117,7 @@ def dialog_browse(_type, heading, shares="files", mask="", useThumbs=False, trea
 
 def itemlist_refresh():
     # pos = Item().fromurl(xbmc.getInfoLabel('ListItem.FileNameAndPath')).itemlistPosition
-    # logger.info('Current position: ' + str(pos))
+    # logger.log('Current position: ' + str(pos))
     xbmc.executebuiltin("Container.Refresh")
 
     # while Item().fromurl(xbmc.getInfoLabel('ListItem.FileNameAndPath')).itemlistPosition != pos:
@@ -138,7 +138,7 @@ def render_items(itemlist, parent_item):
     """
     Function used to render itemlist on kodi
     """
-    logger.info('START render_items')
+    logger.log('START render_items')
     thumb_type = config.get_setting('video_thumbnail_type')
     from specials import shortcuts
     from core import httptools
@@ -223,7 +223,7 @@ def render_items(itemlist, parent_item):
     set_view_mode(itemlist[0], parent_item)
 
     xbmcplugin.endOfDirectory(_handle)
-    logger.info('END render_items')
+    logger.log('END render_items')
 
 
 def getCurrentView(item=None, parent_item=None):
@@ -280,11 +280,11 @@ def set_view_mode(item, parent_item):
     if content:
         mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
         if mode == 0:
-            logger.info('default mode')
+            logger.log('default mode')
             mode = 55
         xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
         xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
-        logger.info('TYPE: ' + Type + ' - ' + 'CONTENT: ' + content)
+        logger.log('TYPE: ' + Type + ' - ' + 'CONTENT: ' + content)
 
 
 def set_infolabels(listitem, item, player=False):
@@ -504,10 +504,10 @@ def is_playing():
 
 
 def play_video(item, strm=False, force_direct=False, autoplay=False):
-    logger.info()
+    logger.log()
     logger.debug(item.tostring('\n'))
     if item.channel == 'downloads':
-        logger.info("Play local video: %s [%s]" % (item.title, item.url))
+        logger.log("Play local video: %s [%s]" % (item.title, item.url))
         xlistitem = xbmcgui.ListItem(path=item.url)
         xlistitem.setArt({"thumb": item.thumbnail})
         set_infolabels(xlistitem, item, True)
@@ -515,7 +515,7 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
         return
 
     default_action = config.get_setting("default_action")
-    logger.info("default_action=%s" % default_action)
+    logger.log("default_action=%s" % default_action)
 
     # Open the selection dialog to see the available options
     opciones, video_urls, seleccion, salir = get_dialogo_opciones(item, default_action, strm, autoplay)
@@ -525,8 +525,8 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
     seleccion = get_seleccion(default_action, opciones, seleccion, video_urls)
     if seleccion < 0: return # Canceled box
 
-    logger.info("selection=%d" % seleccion)
-    logger.info("selection=%s" % opciones[seleccion])
+    logger.log("selection=%d" % seleccion)
+    logger.log("selection=%s" % opciones[seleccion])
 
     # run the available option, jdwonloader, download, favorites, add to the video library ... IF IT IS NOT PLAY
     salir = set_opcion(item, seleccion, opciones, video_urls)
@@ -687,7 +687,7 @@ def alert_unsopported_server():
 
 
 def handle_wait(time_to_wait, title, text):
-    logger.info("handle_wait(time_to_wait=%d)" % time_to_wait)
+    logger.log("handle_wait(time_to_wait=%d)" % time_to_wait)
     espera = dialog_progress(' ' + title, "")
 
     secs = 0
@@ -706,15 +706,15 @@ def handle_wait(time_to_wait, title, text):
             break
 
     if cancelled:
-        logger.info('Wait canceled')
+        logger.log('Wait canceled')
         return False
     else:
-        logger.info('Wait finished')
+        logger.log('Wait finished')
         return True
 
 
 def get_dialogo_opciones(item, default_action, strm, autoplay):
-    logger.info()
+    logger.log()
     # logger.debug(item.tostring('\n'))
     from core import servertools
 
@@ -798,7 +798,7 @@ def get_dialogo_opciones(item, default_action, strm, autoplay):
 
 
 def set_opcion(item, seleccion, opciones, video_urls):
-    logger.info()
+    logger.log()
     # logger.debug(item.tostring('\n'))
     salir = False
     # You have not chosen anything, most likely because you have given the ESC
@@ -848,7 +848,7 @@ def set_opcion(item, seleccion, opciones, video_urls):
 
 
 def get_video_seleccionado(item, seleccion, video_urls):
-    logger.info()
+    logger.log()
     mediaurl = ""
     view = False
     wait_time = 0
@@ -874,7 +874,7 @@ def get_video_seleccionado(item, seleccion, video_urls):
         mpd = True
 
     # If there is no mediaurl it is because the video is not there :)
-    logger.info("mediaurl=" + mediaurl)
+    logger.log("mediaurl=" + mediaurl)
     if mediaurl == "":
         if item.server == "unknown":
             alert_unsopported_server()
@@ -891,7 +891,7 @@ def get_video_seleccionado(item, seleccion, video_urls):
 
 
 def set_player(item, xlistitem, mediaurl, view, strm, nfo_path=None, head_nfo=None, item_nfo=None):
-    logger.info()
+    logger.log()
     # logger.debug("item:\n" + item.tostring('\n'))
     # Moved del conector "torrent" here
     if item.server == "torrent":
@@ -908,10 +908,10 @@ def set_player(item, xlistitem, mediaurl, view, strm, nfo_path=None, head_nfo=No
         player_mode = config.get_setting("player_mode")
         if (player_mode == 3 and mediaurl.startswith("rtmp")) or item.play_from == 'window' or item.nfo: player_mode = 0
         elif "megacrypter.com" in mediaurl: player_mode = 3
-        logger.info("mediaurl=" + mediaurl)
+        logger.log("mediaurl=" + mediaurl)
 
         if player_mode == 0:
-            logger.info('Player Mode: Direct')
+            logger.log('Player Mode: Direct')
             # Add the listitem to a playlist
             playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
             playlist.clear()
@@ -924,24 +924,24 @@ def set_player(item, xlistitem, mediaurl, view, strm, nfo_path=None, head_nfo=No
                 trakt_tools.wait_for_update_trakt()
 
         elif player_mode == 1:
-            logger.info('Player Mode: setResolvedUrl')
+            logger.log('Player Mode: setResolvedUrl')
             xlistitem.setPath(mediaurl)
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xlistitem)
             xbmc.sleep(2500)
 
         elif player_mode == 2:
-            logger.info('Player Mode: Built-In')
+            logger.log('Player Mode: Built-In')
             xbmc.executebuiltin("PlayMedia(" + mediaurl + ")")
 
         elif player_mode == 3:
-            logger.info('Player Mode: Download and Play')
+            logger.log('Player Mode: Download and Play')
             from platformcode import download_and_play
             download_and_play.download_and_play(mediaurl, "download_and_play.tmp", config.get_setting("downloadpath"))
             return
 
     # ALL LOOKING TO REMOVE VIEW
     if item.subtitle and view:
-        logger.info("External subtitles: " + item.subtitle)
+        logger.log("External subtitles: " + item.subtitle)
         xbmc.sleep(2000)
         xbmc_player.setSubtitles(item.subtitle)
 
@@ -967,7 +967,7 @@ def torrent_client_installed(show_tuple=False):
 
 
 def play_torrent(item, xlistitem, mediaurl):
-    logger.info()
+    logger.log()
     import time
     from servers import torrent
 
@@ -1087,17 +1087,17 @@ def install_inputstream():
             # Check if InputStream add-on exists!
             Addon('inputstream.adaptive')
 
-            logger.info('InputStream add-on installed from repo.')
+            logger.log('InputStream add-on installed from repo.')
         except RuntimeError:
-            logger.info('InputStream add-on not installed.')
+            logger.log('InputStream add-on not installed.')
             dialog_ok(config.get_localized_string(20000), config.get_localized_string(30126))
             return False
     else:
         try:
             Addon('inputstream.adaptive')
-            logger.info('InputStream add-on is installed and enabled')
+            logger.log('InputStream add-on is installed and enabled')
         except:
-            logger.info('enabling InputStream add-on')
+            logger.log('enabling InputStream add-on')
             xbmc.executebuiltin('UpdateLocalAddons')
             xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "inputstream.adaptive", "enabled": true }}')
     return True
@@ -1212,13 +1212,13 @@ def best_chromeos_image(devices):
         # Select the newest version
         from distutils.version import LooseVersion  # pylint: disable=import-error,no-name-in-module,useless-suppression
         if LooseVersion(device['version']) > LooseVersion(best['version']):
-            logger.info('%s (%s) is newer than %s (%s)' % (device['hwid'], device['version'], best['hwid'], best['version']))
+            logger.log('%s (%s) is newer than %s (%s)' % (device['hwid'], device['version'], best['hwid'], best['version']))
             best = device
 
         # Select the smallest image (disk space requirement)
         elif LooseVersion(device['version']) == LooseVersion(best['version']):
             if int(device['filesize']) + int(device['zipfilesize']) < int(best['filesize']) + int(best['zipfilesize']):
-                logger.info('%s (%d) is smaller than %s (%d)' % (device['hwid'], int(device['filesize']) + int(device['zipfilesize']), best['hwid'], int(best['filesize']) + int(best['zipfilesize'])))
+                logger.log('%s (%d) is smaller than %s (%d)' % (device['hwid'], int(device['filesize']) + int(device['zipfilesize']), best['hwid'], int(best['filesize']) + int(best['zipfilesize'])))
                 best = device
     return best
 

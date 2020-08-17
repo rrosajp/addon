@@ -7,12 +7,12 @@ from platformcode import logger, config, platformtools
 baseUrl = 'https://hdmario.live'
 
 def test_video_exists(page_url):
-    logger.info("(page_url='%s')" % page_url)
+    logger.log("(page_url='%s')" % page_url)
     global page, data
 
     page = httptools.downloadpage(page_url)
     data = page.data
-    logger.info(page.url)
+    logger.log(page.url)
 
     if "the page you are looking for could not be found" in data:
         return False, config.get_localized_string(70449) % "HDmario"
@@ -37,13 +37,13 @@ def registerOrLogin(page_url, forced=False):
             setting.server_config(Item(config='hdmario'))
             login()
         else:
-            logger.info('Registrazione automatica in corso')
+            logger.log('Registrazione automatica in corso')
             import random
             import string
             randEmail = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(random.randint(9, 14))) + '@gmail.com'
             randPsw = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(10))
-            logger.info('email: ' + randEmail)
-            logger.info('pass: ' + randPsw)
+            logger.log('email: ' + randEmail)
+            logger.log('pass: ' + randPsw)
             nTry = 0
             while nTry < 5:
                 nTry += 1
@@ -59,7 +59,7 @@ def registerOrLogin(page_url, forced=False):
                     break
             else:
                 platformtools.dialog_ok('HDmario', 'Impossibile registrarsi automaticamente')
-            logger.info('Registrazione completata')
+            logger.log('Registrazione completata')
     global page, data
     page = httptools.downloadpage(page_url)
     data = page.data
@@ -67,7 +67,7 @@ def registerOrLogin(page_url, forced=False):
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     global page, data
     page_url = page_url.replace('?', '')
-    logger.info("url=" + page_url)
+    logger.log("url=" + page_url)
 
     if 'unconfirmed' in page.url:
         from lib import onesecmail
@@ -79,7 +79,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         }
         httptools.downloadpage(page.url, post=postData)
         jsonMail = onesecmail.waitForMail(mail)
-        logger.info(jsonMail)
+        logger.log(jsonMail)
         if jsonMail:
             code = jsonMail['subject'].split(' - ')[0]
             page = httptools.downloadpage(page_url + '?code=' + code)
@@ -91,12 +91,12 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     if 'Registrati' in data:
         platformtools.dialog_ok('HDmario', 'Username/password non validi')
         registerOrLogin(page_url, True)
-    logger.info(data)
+    logger.log(data)
     from lib import jsunpack_js2py
     unpacked = jsunpack_js2py.unpack(scrapertools.find_single_match(data, '<script type="text/javascript">\n*\s*\n*(eval.*)'))
     # p,a,c,k,e,d data -> xhr.setRequestHeader
     secureProof = scrapertools.find_single_match(unpacked, """X-Secure-Proof['"]\s*,\s*['"]([^"']+)""")
-    logger.info('X-Secure-Proof=' + secureProof)
+    logger.log('X-Secure-Proof=' + secureProof)
 
     data = httptools.downloadpage(baseUrl + '/pl/' + page_url.split('/')[-1].replace('?', '') + '.m3u8', headers=[['X-Secure-Proof', secureProof]]).data
     filetools.write(xbmc.translatePath('special://temp/hdmario.m3u8'), data, 'w')

@@ -22,17 +22,17 @@ from platformcode import config, logger
 # Download a file and start playing while downloading
 def download_and_play(url, file_name, download_path):
     # Start thread
-    logger.info("Active threads " + str(threading.active_count()))
-    logger.info("" + repr(threading.enumerate()))
-    logger.info("Starting download thread...")
+    logger.log("Active threads " + str(threading.active_count()))
+    logger.log("" + repr(threading.enumerate()))
+    logger.log("Starting download thread...")
     download_thread = DownloadThread(url, file_name, download_path)
     download_thread.start()
-    logger.info("Download thread started")
-    logger.info("Active threads " + str(threading.active_count()))
-    logger.info("" + repr(threading.enumerate()))
+    logger.log("Download thread started")
+    logger.log("Active threads " + str(threading.active_count()))
+    logger.log("" + repr(threading.enumerate()))
 
     # Wait
-    logger.info("Waiting...")
+    logger.log("Waiting...")
 
     while True:
         cancelled = False
@@ -53,7 +53,7 @@ def download_and_play(url, file_name, download_path):
 
         dialog.close()
 
-        logger.info("End of waiting")
+        logger.log("End of waiting")
 
         # Launch the player
         player = CustomPlayer()
@@ -61,66 +61,66 @@ def download_and_play(url, file_name, download_path):
         player.PlayStream(download_thread.get_file_name())
 
         # End of playback
-        logger.info("End of playback")
+        logger.log("End of playback")
 
         if player.is_stopped():
-            logger.info("Terminated by user")
+            logger.log("Terminated by user")
             break
         else:
             if not download_thread.isAlive():
-                logger.info("Download has finished")
+                logger.log("Download has finished")
                 break
             else:
-                logger.info("Continua la descarga")
+                logger.log("Continua la descarga")
 
     # When the player finishes, if you continue downloading it for now
-    logger.info("Download thread alive=" + str(download_thread.isAlive()))
+    logger.log("Download thread alive=" + str(download_thread.isAlive()))
     if download_thread.isAlive():
-        logger.info("Killing download thread")
+        logger.log("Killing download thread")
         download_thread.force_stop()
 
 
 class CustomPlayer(xbmc.Player):
     def __init__(self, *args, **kwargs):
-        logger.info()
+        logger.log()
         self.actualtime = 0
         self.totaltime = 0
         self.stopped = False
         xbmc.Player.__init__(self)
 
     def PlayStream(self, url):
-        logger.info("url=" + url)
+        logger.log("url=" + url)
         self.play(url)
         self.actualtime = 0
         self.url = url
         while self.isPlaying():
             self.actualtime = self.getTime()
             self.totaltime = self.getTotalTime()
-            logger.info("actualtime=" + str(self.actualtime) + " totaltime=" + str(self.totaltime))
+            logger.log("actualtime=" + str(self.actualtime) + " totaltime=" + str(self.totaltime))
             xbmc.sleep(3000)
 
     def set_download_thread(self, download_thread):
-        logger.info()
+        logger.log()
         self.download_thread = download_thread
 
     def force_stop_download_thread(self):
-        logger.info()
+        logger.log()
 
         if self.download_thread.isAlive():
-            logger.info("Killing download thread")
+            logger.log("Killing download thread")
             self.download_thread.force_stop()
 
             # while self.download_thread.isAlive():
             #    xbmc.sleep(1000)
 
     def onPlayBackStarted(self):
-        logger.info("PLAYBACK STARTED")
+        logger.log("PLAYBACK STARTED")
 
     def onPlayBackEnded(self):
-        logger.info("PLAYBACK ENDED")
+        logger.log("PLAYBACK ENDED")
 
     def onPlayBackStopped(self):
-        logger.info("PLAYBACK STOPPED")
+        logger.log("PLAYBACK STOPPED")
         self.stopped = True
         self.force_stop_download_thread()
 
@@ -131,7 +131,7 @@ class CustomPlayer(xbmc.Player):
 # Download in background
 class DownloadThread(threading.Thread):
     def __init__(self, url, file_name, download_path):
-        # logger.info(repr(file))
+        # logger.log(repr(file))
         self.url = url
         self.download_path = download_path
         self.file_name = os.path.join(download_path, file_name)
@@ -148,16 +148,16 @@ class DownloadThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        logger.info("Download starts...")
+        logger.log("Download starts...")
 
         if "megacrypter.com" in self.url:
             self.download_file_megacrypter()
         else:
             self.download_file()
-        logger.info("Download ends")
+        logger.log("Download ends")
 
     def force_stop(self):
-        logger.info()
+        logger.log()
         force_stop_file = open(self.force_stop_file_name, "w")
         force_stop_file.write("0")
         force_stop_file.close()
@@ -181,38 +181,38 @@ class DownloadThread(threading.Thread):
         return self.total_size
 
     def download_file_megacrypter(self):
-        logger.info()
+        logger.log()
 
         comando = "./megacrypter.sh"
-        logger.info("command= " + comando)
+        logger.log("command= " + comando)
 
         oldcwd = os.getcwd()
-        logger.info("oldcwd= " + oldcwd)
+        logger.log("oldcwd= " + oldcwd)
 
         cwd = os.path.join(config.get_runtime_path(), "tools")
-        logger.info("cwd= " + cwd)
+        logger.log("cwd= " + cwd)
         os.chdir(cwd)
-        logger.info("directory changed to= " + os.getcwd())
+        logger.log("directory changed to= " + os.getcwd())
 
-        logger.info("destination= " + self.download_path)
+        logger.log("destination= " + self.download_path)
 
         os.system(comando + " '" + self.url + "' \"" + self.download_path + "\"")
         # p = subprocess.Popen([comando , self.url , self.download_path], cwd=cwd, stdout=subprocess.PIPE , stderr=subprocess.PIPE )
         # out, err = p.communicate()
-        # logger.info("DownloadThread.download_file out="+out)
+        # logger.log("DownloadThread.download_file out="+out)
 
         os.chdir(oldcwd)
 
     def download_file(self):
-        logger.info("Direct download")
+        logger.log("Direct download")
 
         headers = []
 
         # Ensures that the file can be created
-        logger.info("filename= " + self.file_name)
+        logger.log("filename= " + self.file_name)
         self.file_name = xbmc.makeLegalFilename(self.file_name)
-        logger.info("filename= " + self.file_name)
-        logger.info("url= " + self.url)
+        logger.log("filename= " + self.file_name)
+        logger.log("url= " + self.url)
 
         # Create the file
         existSize = 0
@@ -228,13 +228,13 @@ class DownloadThread(threading.Thread):
                 additional_headers = [additional_headers]
 
             for additional_header in additional_headers:
-                logger.info("additional_header: " + additional_header)
+                logger.log("additional_header: " + additional_header)
                 name = re.findall("(.*?)=.*?", additional_header)[0]
                 value = urllib.parse.unquote_plus(re.findall(".*?=(.*?)$", additional_header)[0])
                 headers.append([name, value])
 
             self.url = self.url.split("|")[0]
-            logger.info("url= " + self.url)
+            logger.log("url= " + self.url)
 
         # Timeout del socket a 60 segundos
         socket.setdefaulttimeout(60)
@@ -243,7 +243,7 @@ class DownloadThread(threading.Thread):
         h = urllib.request.HTTPHandler(debuglevel=0)
         request = urllib.request.Request(self.url)
         for header in headers:
-            logger.info("Header= " + header[0] + ": " + header[1])
+            logger.log("Header= " + header[0] + ": " + header[1])
             request.add_header(header[0], header[1])
 
         # Lanza la petición
@@ -272,18 +272,18 @@ class DownloadThread(threading.Thread):
 
         self.total_size = int(float(totalfichero) / float(1024 * 1024))
 
-        logger.info("Content-Length=%s" % totalfichero)
+        logger.log("Content-Length=%s" % totalfichero)
         blocksize = 100 * 1024
 
         bloqueleido = connexion.read(blocksize)
-        logger.info("Starting file download, blocked= %s" % len(bloqueleido))
+        logger.log("Starting file download, blocked= %s" % len(bloqueleido))
 
         maxreintentos = 10
 
         while len(bloqueleido) > 0:
             try:
                 if os.path.exists(self.force_stop_file_name):
-                    logger.info("Force_stop file detected, download is interrupted")
+                    logger.log("Force_stop file detected, download is interrupted")
                     f.close()
 
                     xbmc.executebuiltin("XBMC.Notification(%s,%s,300)" % (config.get_localized_string(60319),config.get_localized_string(60320)))
@@ -297,7 +297,7 @@ class DownloadThread(threading.Thread):
                 # except:
                 f.write(bloqueleido)
                 grabado = grabado + len(bloqueleido)
-                logger.info("grabado=%d de %d" % (grabado, totalfichero))
+                logger.log("grabado=%d de %d" % (grabado, totalfichero))
                 percent = int(float(grabado) * 100 / float(totalfichero))
                 self.progress = percent
                 totalmb = float(float(totalfichero) / (1024 * 1024))
@@ -323,7 +323,7 @@ class DownloadThread(threading.Thread):
                     except:
                         import sys
                         reintentos = reintentos + 1
-                        logger.info("ERROR in block download, retry %d" % reintentos)
+                        logger.log("ERROR in block download, retry %d" % reintentos)
                         for line in sys.exc_info():
                             logger.error("%s" % line)
 

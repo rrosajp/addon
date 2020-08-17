@@ -21,7 +21,7 @@ def test_video_exists(page_url):
 
     if 'nored.icu' in str(headers): real_host = 'wstream.video'
 
-    logger.info("(page_url='%s')" % page_url)
+    logger.log("(page_url='%s')" % page_url)
     resp = httptools.downloadpage(page_url, headers=headers, verify=False)
 
     global data, real_url
@@ -30,7 +30,7 @@ def test_video_exists(page_url):
     page_url = resp.url.replace(headers[1][1], real_host)
     if '/streaming.php' in page_url in page_url:
         code = httptools.downloadpage(page_url, headers=headers, follow_redirects=False, only_headers=True, verify=False).headers['location'].split('/')[-1].replace('.html', '')
-        # logger.info('WCODE=' + code)
+        # logger.log('WCODE=' + code)
         page_url = 'https://' + real_host + '/video.php?file_code=' + code
         data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True, verify=False).data
 
@@ -45,7 +45,7 @@ def test_video_exists(page_url):
             headers = [['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0'],['Host', 'wstream.video']]
             # from core.support import dbg;dbg()
             new_data = httptools.downloadpage(page_url, headers=headers, follow_redirects=True, verify=False).data
-            logger.info('NEW DATA: \n' + new_data)
+            logger.log('NEW DATA: \n' + new_data)
             if new_data:
                 data = new_data
 
@@ -93,11 +93,11 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             except:
                 pass
 
-    logger.info("[Wstream] url=" + page_url)
+    logger.log("[Wstream] url=" + page_url)
     video_urls = []
     global data, real_url, headers
     # from core.support import dbg;dbg()
-    # logger.info(data)
+    # logger.log(data)
 
     sitekey = scrapertools.find_multiple_matches(data, """data-sitekey=['"] *([^"']+)""")
     if sitekey: sitekey = sitekey[-1]

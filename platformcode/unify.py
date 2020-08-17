@@ -98,7 +98,7 @@ thumb_dict = {"movies": "https://s10.postimg.cc/fxtqzdog9/peliculas.png",
 
 
 def set_genre(string):
-    # logger.info()
+    # logger.log()
 
     genres_dict = {'accion': ['accion', 'action', 'accion y aventura', 'action & adventure'],
                    'adultos': ['adultos', 'adultos +', 'adulto'],
@@ -140,7 +140,7 @@ def set_genre(string):
 
 
 def remove_format(string):
-    # logger.info()
+    # logger.log()
     # logger.debug('enter remove: %s' % string)
     string = string.rstrip()
     string = re.sub(r'(\[|\[\/)(?:color|COLOR|b|B|i|I).*?\]|\[|\]|\(|\)|\:|\.', '', string)
@@ -156,7 +156,7 @@ def normalize(string):
 
 
 def simplify(string):
-    # logger.info()
+    # logger.log()
     # logger.debug('enter simplify: %s'%string)
     string = remove_format(string)
     string = string.replace('-', ' ').replace('_', ' ')
@@ -175,7 +175,7 @@ def simplify(string):
 
 
 def add_languages(title, languages):
-    # logger.info()
+    # logger.log()
 
     if isinstance(languages, list):
         for language in languages:
@@ -186,7 +186,7 @@ def add_languages(title, languages):
 
 
 def add_info_plot(plot, languages, quality):
-    # logger.info()
+    # logger.log()
     last = '[/I][/B]\n'
 
     if languages:
@@ -221,7 +221,7 @@ def add_info_plot(plot, languages, quality):
 
 
 def set_color(title, category):
-    # logger.info()
+    # logger.log()
     from core import jsontools
 
     styles_path = os.path.join(config.get_runtime_path(), 'resources', 'color_styles.json')
@@ -262,7 +262,7 @@ def set_color(title, category):
 
 
 def set_lang(language):
-    # logger.info()
+    # logger.log()
 
     cast = ['castellano', 'español', 'espanol', 'cast', 'esp', 'espaol', 'es', 'zc', 'spa', 'spanish', 'vc']
     ita = ['italiano', 'italian', 'ita', 'it']
@@ -303,7 +303,7 @@ def set_lang(language):
 
 
 def title_format(item):
-    # logger.info()
+    # logger.log()
 
     lang = False
     valid = True
@@ -567,7 +567,7 @@ def title_format(item):
 
 
 def thumbnail_type(item):
-    # logger.info()
+    # logger.log()
     # Check what type of thumbnail will be used in findvideos, Poster or Logo of the server
 
     thumb_type = config.get_setting('video_thumbnail_type')

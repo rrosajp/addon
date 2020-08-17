@@ -7,7 +7,7 @@ from platformcode import config, logger
 
 
 def test_video_exists(page_url):
-    logger.info("(page_url='%s')" % page_url)
+    logger.log("(page_url='%s')" % page_url)
 
     data = httptools.downloadpage(page_url, cookies=False).data
     if 'Not found id' in data:
@@ -17,12 +17,12 @@ def test_video_exists(page_url):
 
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
-    logger.info()
+    logger.log()
     itemlist = []
 
-    logger.info(page_url)
+    logger.log(page_url)
     data = httptools.downloadpage(page_url, post='').data
-    logger.info(data)
+    logger.log(data)
     url = base64.b64decode(data)
 
     itemlist.append([".mp4 [HDLoad]", url])

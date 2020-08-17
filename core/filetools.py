@@ -814,7 +814,7 @@ def remove_tags(title):
     @rtype: str
     @return: string without tags
     """
-    logger.info()
+    logger.log()
 
     title_without_tags = scrapertools.find_single_match(title, r'\[color .+?\](.+)\[\/color\]')
 
@@ -832,7 +832,7 @@ def remove_smb_credential(path):
     @return: chain without credentials
     @rtype: str
     """
-    logger.info()
+    logger.log()
 
     if not scrapertools.find_single_match(path, r'(^\w+:\/\/)'):
         return path

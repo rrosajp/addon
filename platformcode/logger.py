@@ -3,12 +3,9 @@
 # Logger (kodi)
 # --------------------------------------------------------------------------------
 
-import inspect
-
-import xbmc
+import inspect, sys, os, xbmc
 from platformcode import config
 
-import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
@@ -105,13 +102,13 @@ def error(texto=""):
 def log(*args):
     # Function to simplify the log
     # Automatically returns File Name and Function Name
-    import os
-    string = ''
-    for arg in args: string += ' '+str(arg)
-    frame = inspect.stack()[1]
-    filename = frame[0].f_code.co_filename
-    filename = os.path.basename(filename)
-    info("[" + filename + "] - [" + inspect.stack()[1][3] + "] " + string)
+    if loggeractive:
+        string = ''
+        for arg in args: string += ' '+str(arg)
+        frame = inspect.stack()[1]
+        filename = frame[0].f_code.co_filename
+        filename = os.path.basename(filename)
+        xbmc.log("[" + filename + "] [" + inspect.stack()[1][3] + "] " + string, xbmc.LOGNOTICE)
 
 
 class WebErrorException(Exception):

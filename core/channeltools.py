@@ -15,7 +15,7 @@ default_file = dict()
 remote_path = 'https://raw.githubusercontent.com/kodiondemand/media/master/'
 
 def is_enabled(channel_name):
-    logger.info("channel_name=" + channel_name)
+    logger.log("channel_name=" + channel_name)
     return get_channel_parameters(channel_name)["active"] and get_channel_setting("enabled", channel=channel_name,
                                                                                   default=True)
 
@@ -87,7 +87,7 @@ def get_channel_parameters(channel_name):
 
 
 def get_channel_json(channel_name):
-    # logger.info("channel_name=" + channel_name)
+    # logger.log("channel_name=" + channel_name)
     from core import filetools
     channel_json = None
     try:
@@ -101,9 +101,9 @@ def get_channel_json(channel_name):
                                                   channel_name + ".json")
 
         if filetools.isfile(channel_path):
-            # logger.info("channel_data=" + channel_path)
+            # logger.log("channel_data=" + channel_path)
             channel_json = jsontools.load(filetools.read(channel_path))
-            # logger.info("channel_json= %s" % channel_json)
+            # logger.log("channel_json= %s" % channel_json)
 
     except Exception as ex:
         template = "An exception of type %s occured. Arguments:\n%r"
@@ -114,7 +114,7 @@ def get_channel_json(channel_name):
 
 
 def get_channel_controls_settings(channel_name):
-    # logger.info("channel_name=" + channel_name)
+    # logger.log("channel_name=" + channel_name)
     dict_settings = {}
     # import web_pdb; web_pdb.set_trace()
     # list_controls = get_channel_json(channel_name).get('settings', list())
@@ -137,7 +137,7 @@ def get_lang(channel_name):
     if hasattr(channel, 'list_language'):
         for language in channel.list_language:
             list_language.append(language)
-        logger.info(list_language)
+        logger.log(list_language)
     else:
         sub = False
         langs = []

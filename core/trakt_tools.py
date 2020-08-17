@@ -129,7 +129,7 @@ def token_trakt(item):
 
 
 def set_trakt_info(item):
-    logger.info()
+    logger.log()
     import xbmcgui
     # Envia los datos a trakt
     try:
@@ -140,7 +140,7 @@ def set_trakt_info(item):
         pass
 
 def get_trakt_watched(id_type, mediatype, update=False):
-    logger.info()
+    logger.log()
 
     id_list = []
     id_dict = dict()
@@ -228,7 +228,7 @@ def trakt_check(itemlist):
 
 
 def get_sync_from_file():
-    logger.info()
+    logger.log()
     sync_path = os.path.join(config.get_data_path(), 'settings_channels', 'trakt_data.json')
     trakt_node = {}
     if os.path.exists(sync_path):
@@ -240,7 +240,7 @@ def get_sync_from_file():
 
 
 def update_trakt_data(mediatype, trakt_data):
-    logger.info()
+    logger.log()
 
     sync_path = os.path.join(config.get_data_path(), 'settings_channels', 'trakt_data.json')
     if os.path.exists(sync_path):
@@ -250,7 +250,7 @@ def update_trakt_data(mediatype, trakt_data):
 
 
 def ask_install_script():
-    logger.info()
+    logger.log()
 
     from platformcode import platformtools
 
@@ -264,7 +264,7 @@ def ask_install_script():
 
 
 def wait_for_update_trakt():
-    logger.info()
+    logger.log()
     t = Thread(update_all)
     t.setDaemon(True)
     t.start()
@@ -273,7 +273,7 @@ def wait_for_update_trakt():
 def update_all():
     # from core.support import dbg;dbg()
     from time import sleep
-    logger.info()
+    logger.log()
     sleep(20)
     while xbmc.Player().isPlaying():
         sleep(20)

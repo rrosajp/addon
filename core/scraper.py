@@ -61,7 +61,7 @@ def find_and_set_infoLabels(item):
         # Check if there is a 'code'
         if scraper_result and item.infoLabels['code']:
             # correct code
-            logger.info("Identificador encontrado: %s" % item.infoLabels['code'])
+            logger.log("Identificador encontrado: %s" % item.infoLabels['code'])
             scraper.completar_codigos(item)
             return True
         elif scraper_result:
@@ -71,7 +71,7 @@ def find_and_set_infoLabels(item):
             # Content not found
             msg = config.get_localized_string(60228) % title
 
-        logger.info(msg)
+        logger.log(msg)
         # Show box with other options:
         if scrapers_disponibles[scraper_actual] in list_opciones_cuadro:
             list_opciones_cuadro.remove(scrapers_disponibles[scraper_actual])
@@ -95,10 +95,10 @@ def find_and_set_infoLabels(item):
 
         elif index == 1:
             # You have to create a dialog box to enter the data
-            logger.info("Complete information")
+            logger.log("Complete information")
             if cuadro_completar(item):
                 # correct code
-                logger.info("Identifier found: %s" % str(item.infoLabels['code']))
+                logger.log("Identifier found: %s" % str(item.infoLabels['code']))
                 return True
                 # raise
 
@@ -121,7 +121,7 @@ def find_and_set_infoLabels(item):
 
 
 def cuadro_completar(item):
-    logger.info()
+    logger.log()
 
     global dict_default
     dict_default = {}
@@ -234,7 +234,7 @@ def get_nfo(item):
     @rtype: str
     @return:
     """
-    logger.info()
+    logger.log()
     if "infoLabels" in item and "noscrap_id" in item.infoLabels:
         # Create the xml file with the data obtained from the item since there is no active scraper
         info_nfo = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>'
