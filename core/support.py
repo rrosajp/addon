@@ -1291,10 +1291,8 @@ def addQualityTag(item, itemlist, data, patron):
             "RESYNC": "il film è stato lavorato e re sincronizzato con una traccia audio. A volte potresti riscontrare una mancata sincronizzazione tra audio e video.",
         }
         qualityStr = scrapertools.find_single_match(data, patron).strip().upper()
-        if PY3:
-            qualityStr = qualityStr.encode('ascii', 'ignore')
-        else:
-            qualityStr = qualityStr.decode('unicode_escape').encode('ascii', 'ignore')
+        # if PY3: qualityStr = qualityStr.encode('ascii', 'ignore')
+        if not PY3: qualityStr = qualityStr.decode('unicode_escape').encode('ascii', 'ignore')
 
         if qualityStr:
             try:
@@ -1313,12 +1311,12 @@ def addQualityTag(item, itemlist, data, patron):
                     descr += typo(audio + ': ', 'color kod') + defQualAudio.get(audio, '') + '\n'
             except:
                 descr = ''
-            itemlist.insert(0,
-                            Item(channel=item.channel,
-                                 action="",
-                                 title=typo(qualityStr, '[] color kod bold'),
-                                 plot=descr,
-                                 folder=False))
+            itemlist.insert(0,Item(channel=item.channel,
+                                   action="",
+                                   title=typo(qualityStr, '[] color kod bold'),
+                                   plot=descr,
+                                   folder=False,
+                                   thumbnail=thumb('info')))
         else:
             log('nessun tag qualità trovato')
 
