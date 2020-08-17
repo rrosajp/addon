@@ -105,7 +105,7 @@ def dbg():
 
 def regexDbg(item, patron, headers, data=''):
     if config.dev_mode():
-        import json, urllib2, webbrowser
+        import json, webbrowser
         url = 'https://regex101.com'
 
         if not data:
@@ -116,14 +116,15 @@ def regexDbg(item, patron, headers, data=''):
             html = data
         headers = {'content-type': 'application/json'}
         data = {
-            'regex': patron.decode('utf-8'),
+            'regex': patron if PY3 else patron.decode('utf-8'),
             'flags': 'gm',
-            'testString': html.decode('utf-8'),
+            'testString': html if PY3 else html.decode('utf-8'),
             'delimiter': '"""',
             'flavor': 'python'
         }
-        r = urllib2.Request(url + '/api/regex', json.dumps(data, encoding='latin1'), headers=headers)
-        r = urllib2.urlopen(r).read()
+        data = json.dumps(data).encode() if PY3 else json.dumps(data, encoding='latin1')
+        r = urllib.Request(url + '/api/regex', data, headers=headers)
+        r = urllib.urlopen(r).read()
         permaLink = json.loads(r)['permalinkFragment']
         webbrowser.open(url + "/r/" + permaLink)
 
@@ -961,7 +962,7 @@ def match(item_url_string, **args):
 
 
 def match_dbg(data, patron):
-    import json, urllib2, webbrowser
+    import json, webbrowser
     url = 'https://regex101.com'
     headers = {'content-type': 'application/json'}
     data = {
@@ -971,8 +972,9 @@ def match_dbg(data, patron):
         'delimiter': '"""',
         'flavor': 'python'
     }
-    r = urllib2.Request(url + '/api/regex', json.dumps(data, encoding='latin1'), headers=headers)
-    r = urllib2.urlopen(r).read()
+    js = json.dumps(data).encode() if PY3 else json.dumps(data, encoding='latin1')
+    r = urllib.Request(url + '/api/regex', js, headers=headers)
+    r = urllib.urlopen(r).read()
     permaLink = json.loads(r)['permalinkFragment']
     webbrowser.open(url + "/r/" + permaLink)
 

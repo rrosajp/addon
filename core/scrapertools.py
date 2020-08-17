@@ -89,7 +89,8 @@ def decodeHtmlentities(data):
         else:
             cp = html5.get(ent)
             if cp:
-                return cp.decode("unicode-escape").encode('utf-8') + res
+                if PY3: return cp + res
+                else: return cp.decode("unicode-escape").encode('utf-8') + res
             else:
                 return match.group()
 
