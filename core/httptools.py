@@ -417,7 +417,8 @@ def downloadpage(url, **opt):
         response['url'] = response['url'].replace('https://web.archive.org/save/', '')
 
     if type(response['data']) != str:
-        response['data'] = response['data'].decode('UTF-8')
+        try: response['data'] = response['data'].decode('utf-8')
+        except: response['data'] = response['data'].decode('ISO-8859-1')
 
     if not response['data']:
         response['data'] = ''
