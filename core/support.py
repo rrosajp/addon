@@ -1352,7 +1352,6 @@ def thumb(item_itemlist_string=None, genre=False, live=False):
             item_itemlist_string.thumbnail = "https://raw.githubusercontent.com/kodiondemand/media/master/live/" + item.fulltitle.lower().replace(' ','_') + '.png'
         return item_itemlist_string
 
-    import re
     icon_dict = {'movie':['film', 'movie'],
                  'tvshow':['serie','tv','episodi','episodio','fiction', 'show'],
                  'documentary':['documentari','documentario', 'documentary', 'documentaristico'],
