@@ -205,7 +205,7 @@ def save_movie(item, silent=False):
             logger.error(traceback.format_exc())
 
         if filetools.write(json_path, item.tojson()):
-            if not silent: p_dialog.update(100, config.get_localized_string(60062) + '\n' + item.contentTitle)
+            if not silent: p_dialog.update(100, item.contentTitle)
             item_nfo.library_urls[item.channel] = item.url
 
             if filetools.write(nfo_path, head_nfo + item_nfo.tojson()):
@@ -221,7 +221,7 @@ def save_movie(item, silent=False):
     # If we get to this point it is because something has gone wrong
     logger.error("Could not save %s in the video library" % item.contentTitle)
     if not silent:
-        p_dialog.update(100, config.get_localized_string(60063) + '\n' + item.contentTitle)
+        p_dialog.update(100, item.contentTitle)
         p_dialog.close()
     return 0, 0, -1, path
 
@@ -645,8 +645,8 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
     # Silent is to show no progress (for service)
     if not silent:
         # progress dialog
-        p_dialog = platformtools.dialog_progress(config.get_localized_string(20000), config.get_localized_string(60064))
-        p_dialog.update(0, config.get_localized_string(60065))
+        p_dialog = platformtools.dialog_progress(config.get_localized_string(60064) ,'')
+        # p_dialog.update(0, config.get_localized_string(60065))
 
     channel_alt = serie.channel                                                    # We prepare to add the emergency urls
     emergency_urls_stat = config.get_setting("emergency_urls", channel_alt)         # Does the channel want emergency urls?
@@ -673,7 +673,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
             json_path = filetools.join(path, ("%s [%s].json" % (season_episode, e.channel)).lower())    # Path of the episode .json
             if emergency_urls_stat == 1 and not e.emergency_urls and e.contentType == 'episode':     # Do we keep emergency urls?
                 if not silent:
-                    p_dialog.update(0, 'Caching links and .torren filest...', e.title)     # progress dialog
+                    p_dialog.update(0, 'Caching links and .torren filest...\n' + e.title)     # progress dialog
                 if json_path in ficheros:                                   # If there is the .json we get the urls from there
                     if overwrite:                                           # but only if .json are overwritten
                         json_epi = Item().fromjson(filetools.read(json_path))                   #We read the .json
@@ -690,7 +690,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
                 emergency_urls_succ = True                                  # ... is a success and we are going to mark the .nfo
             elif emergency_urls_stat == 3 and e.contentType == 'episode':   # Do we update emergency urls?
                 if not silent:
-                    p_dialog.update(0, 'Caching links and .torrent files...', e.title)     # progress dialog
+                    p_dialog.update(0, 'Caching links and .torrent files...\n' + e.title)     # progress dialog
                 e = emergency_urls(e, channel, json_path, headers=headers)  # we generate the urls
                 if e.emergency_urls:                                        # If we already have urls...
                     emergency_urls_succ = True                              # ... is a success and we are going to mark the .nfo
@@ -722,7 +722,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
         t = 0
     for i, e in enumerate(scraper.sort_episode_list(new_episodelist)):
         if not silent:
-            p_dialog.update(int(math.ceil((i + 1) * t)), config.get_localized_string(60064) + '\n' + e.title)
+            p_dialog.update(int(math.ceil((i + 1) * t)), e.title)
 
         high_sea = e.contentSeason
         high_epi = e.contentEpisodeNumber
