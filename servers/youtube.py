@@ -26,11 +26,12 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         logger.log(" page_url->'%s'" % page_url)
 
     video_id = scrapertools.find_single_match(page_url, '(?:v=|embed/)([A-z0-9_-]{11})')
+    inputstream = platformtools.install_inputstream()
     # from core.support import dbg;dbg()
     try:
         __settings__ = Addon(name)
-        if __settings__.getSetting('kodion.video.quality.mpd') == 'false':
-            __settings__.setSetting('kodion.video.quality.mpd', 'true')
+        if inputstream: __settings__.setSetting('kodion.video.quality.mpd', 'true')
+        else: __settings__.setSetting('kodion.video.quality.mpd', 'false')
         video_urls = [['con YouTube', 'plugin://plugin.video.youtube/play/?video_id=' + video_id ]]
     except:
         if filetools.exists(xbmc.translatePath('special://profile/addon_data/' + name)):
