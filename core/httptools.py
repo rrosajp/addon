@@ -402,6 +402,13 @@ def downloadpage(url, **opt):
     response['data'] = req.content if req.content else ''
     response['url'] = req.url
 
+    if type(response['data']) != str:
+        try: response['data'] = response['data'].decode('utf-8')
+        except: response['data'] = response['data'].decode('ISO-8859-1')
+
+    if not response['data']:
+        response['data'] = ''
+
     if req.headers.get('Server', '').startswith('cloudflare') and response_code in [429, 503, 403]\
             and not opt.get('CF', False) and 'Please turn JavaScript on and reload the page' in response['data']:
         # if domain not in CF_LIST:
@@ -416,16 +423,11 @@ def downloadpage(url, **opt):
         response['data'] = re.sub('["|\']/save/[^"]*(https?://[^"]+)', '"\\1', response['data'])
         response['url'] = response['url'].replace('https://web.archive.org/save/', '')
 
-    if type(response['data']) != str:
-        try: response['data'] = response['data'].decode('utf-8')
-        except: response['data'] = response['data'].decode('ISO-8859-1')
-
-    if not response['data']:
-        response['data'] = ''
     try:
         response['json'] = to_utf8(req.json())
     except:
         response['json'] = dict()
+
     response['code'] = response_code
     response['headers'] = req.headers
     response['cookies'] = req.cookies
