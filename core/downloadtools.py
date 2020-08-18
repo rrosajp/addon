@@ -271,7 +271,7 @@ def downloadfile(url, nombrefichero, headers=None, silent=False, continuar=False
 
         # Create the progress dialog
         if not silent:
-            progreso = platformtools.dialog_progress(header, "Downloading...", url, nombrefichero)
+            progreso = platformtools.dialog_progress(header, "Downloading..." + '\n' + url + '\n' + nombrefichero)
 
         # If the platform does not return a valid dialog box, it assumes silent mode
         if progreso is None:
@@ -520,7 +520,7 @@ def downloadfileGzipped(url, pathfichero):
 
     # Create the progress dialog
     from platformcode import platformtools
-    progreso = platformtools.dialog_progress("addon", config.get_localized_string(60200), url.split("|")[0], nombrefichero)
+    progreso = platformtools.dialog_progress("addon", config.get_localized_string(60200) + '\n' + url.split("|")[0] + '\n' + nombrefichero)
 
     # Socket timeout at 60 seconds
     socket.setdefaulttimeout(10)

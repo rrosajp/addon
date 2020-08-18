@@ -48,8 +48,7 @@ def update(path, p_dialog, i, t, serie, overwrite):
         if channel_enabled:
 
             heading = config.get_localized_string(20000)
-            p_dialog.update(int(math.ceil((i + 1) * t)), heading, config.get_localized_string(60389) % (serie.contentSerieName,
-                                                                              serie.channel.capitalize()))
+            p_dialog.update(int(math.ceil((i + 1) * t)), heading, config.get_localized_string(60389) % (serie.contentSerieName, serie.channel.capitalize()))
             try:
                 pathchannels = filetools.join(config.get_runtime_path(), "channels", serie.channel + '.py')
                 logger.log("loading channel: " + pathchannels + " " +

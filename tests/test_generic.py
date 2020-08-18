@@ -28,7 +28,7 @@ if 'KOD_TST_CH' not in os.environ:
     xbmc.get_add_on_info_from_calling_script = add_on_info
 
 
-import HtmlTestRunner
+# import HtmlTestRunner
 import parameterized
 
 from platformcode import config, logger
@@ -145,7 +145,7 @@ for chItem in channel_list:
             serversFound = {}
 
             for it in mainlist:
-                print 'preparing ' + ch + ' -> ' + it.title
+                print('preparing ' + ch + ' -> ' + it.title)
 
                 if it.action == 'channel_config':
                     hasChannelConfig = True
@@ -177,7 +177,7 @@ for chItem in channel_list:
 
 from specials import news
 dictNewsChannels, any_active = news.get_channels_list()
-print channels
+print(channels)
 # only 1 server item for single server
 serverNames = []
 serversFinal = []
@@ -207,7 +207,7 @@ class GenericChannelTest(unittest.TestCase):
      title, itemlist in ch['menuItemlist'].items()])
 class GenericChannelMenuItemTest(unittest.TestCase):
     def test_menu(self):
-        print 'testing ' + self.ch + ' --> ' + self.title
+        print('testing ' + self.ch + ' --> ' + self.title)
         self.assertTrue(self.module.host, 'channel ' + self.ch + ' has not a valid hostname')
         self.assertTrue(self.itemlist, 'channel ' + self.ch + ' -> ' + self.title + ' is empty')
         self.assertTrue(self.serversFound,
@@ -245,7 +245,7 @@ class GenericChannelMenuItemTest(unittest.TestCase):
                 self.assertTrue(nextPageItemlist,
                                 'channel ' + self.ch + ' -> ' + self.title + ' has nextpage not working')
 
-        print '<br>test passed'
+        print('<br>test passed')
 
 
 @parameterized.parameterized_class(serversFinal)
@@ -253,7 +253,7 @@ class GenericServerTest(unittest.TestCase):
     def test_get_video_url(self):
         module = __import__('servers.%s' % self.name, fromlist=["servers.%s" % self.name])
         page_url = self.server.url
-        print 'testing ' + page_url
+        print('testing ' + page_url)
         self.assert_(hasattr(module, 'test_video_exists'), self.name + ' has no test_video_exists')
         try:
             if module.test_video_exists(page_url)[0]:
@@ -261,7 +261,7 @@ class GenericServerTest(unittest.TestCase):
                 server_parameters = servertools.get_server_parameters(self.name)
                 self.assertTrue(urls or server_parameters.get("premium"),
                                 self.name + ' scraper did not return direct urls for ' + page_url)
-                print urls
+                print(urls)
                 for u in urls:
                     spl = u[1].split('|')
                     if len(spl) == 2:
@@ -274,7 +274,7 @@ class GenericServerTest(unittest.TestCase):
                             h, v = name.split('=')
                             h = str(h)
                             headers[h] = str(v)
-                        print headers
+                        print(headers)
                     if 'magnet:?' in directUrl:  # check of magnet links not supported
                         continue
                     page = downloadpage(directUrl, headers=headers, only_headers=True, use_requests=True)

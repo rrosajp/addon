@@ -30,17 +30,10 @@ class XBMCPlayer(xbmc.Player):
 
 xbmc_player = XBMCPlayer()
 
-def makeMessage(line1, line2, line3):
-    message = line1
-    if line2:
-        message += '\n' + line2
-    if line3:
-        message += '\n' + line3
-    return message
 
-def dialog_ok(heading, line1, line2="", line3=""):
+def dialog_ok(heading, message):
     dialog = xbmcgui.Dialog()
-    return dialog.ok(heading, makeMessage(line1, line2, line3))
+    return dialog.ok(heading, message)
 
 
 def dialog_notification(heading, message, icon=3, time=5000, sound=True):
@@ -52,19 +45,19 @@ def dialog_notification(heading, message, icon=3, time=5000, sound=True):
         dialog_ok(heading, message)
 
 
-def dialog_yesno(heading, line1, line2="", line3="", nolabel=config.get_localized_string(70170), yeslabel=config.get_localized_string(30022), autoclose=0, customlabel=None):
+def dialog_yesno(heading, message, nolabel=config.get_localized_string(70170), yeslabel=config.get_localized_string(30022), autoclose=0, customlabel=None):
     # customlabel only on kodi 19
     dialog = xbmcgui.Dialog()
     if config.get_platform() == 'kodi-matrix':
         if autoclose:
-            return dialog.yesno(heading, makeMessage(line1, line2, line3), nolabel=nolabel, yeslabel=yeslabel, customlabel=customlabel, autoclose=autoclose)
+            return dialog.yesno(heading, message, nolabel=nolabel, yeslabel=yeslabel, customlabel=customlabel, autoclose=autoclose)
         else:
-            return dialog.yesno(heading, makeMessage(line1, line2, line3), nolabel=nolabel, yeslabel=yeslabel, customlabel=customlabel)
+            return dialog.yesno(heading, message, nolabel=nolabel, yeslabel=yeslabel, customlabel=customlabel)
     else:
         if autoclose:
-            return dialog.yesno(heading, makeMessage(line1, line2, line3), nolabel=nolabel, yeslabel=yeslabel, autoclose=autoclose)
+            return dialog.yesno(heading, message, nolabel=nolabel, yeslabel=yeslabel, autoclose=autoclose)
         else:
-            return dialog.yesno(heading, makeMessage(line1, line2, line3), nolabel=nolabel, yeslabel=yeslabel)
+            return dialog.yesno(heading, message, nolabel=nolabel, yeslabel=yeslabel)
 
 
 def dialog_select(heading, _list, preselect=0, useDetails=False):
@@ -75,9 +68,9 @@ def dialog_multiselect(heading, _list, autoclose=0, preselect=[], useDetails=Fal
     return xbmcgui.Dialog().multiselect(heading, _list, autoclose=autoclose, preselect=preselect, useDetails=useDetails)
 
 
-def dialog_progress(heading, line1, line2=" ", line3=" "):
+def dialog_progress(heading, message):
     dialog = xbmcgui.DialogProgress()
-    dialog.create(heading, makeMessage(line1, line2, line3))
+    dialog.create(heading, message)
     return dialog
 
 

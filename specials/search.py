@@ -201,7 +201,7 @@ def channel_search(item):
     searching_titles += channel_titles
     cnt = 0
 
-    progress = platformtools.dialog_progress(config.get_localized_string(30993) % item.title, config.get_localized_string(70744) % len(channel_list), ', '.join(searching_titles))
+    progress = platformtools.dialog_progress(config.get_localized_string(30993) % item.title, config.get_localized_string(70744) % len(channel_list) + '\n' + ', '.join(searching_titles))
     config.set_setting('tmdb_active', False)
 
     search_action_list = []
@@ -254,7 +254,7 @@ def channel_search(item):
     progress.close()
 
     cnt = 0
-    progress = platformtools.dialog_progress(config.get_localized_string(30993) % item.title, config.get_localized_string(60295), config.get_localized_string(60293))
+    progress = platformtools.dialog_progress(config.get_localized_string(30993) % item.title, config.get_localized_string(60295) + '\n' + config.get_localized_string(60293))
 
     config.set_setting('tmdb_active', True)
     # res_count = 0
