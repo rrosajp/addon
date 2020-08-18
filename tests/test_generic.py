@@ -28,7 +28,7 @@ if 'KOD_TST_CH' not in os.environ:
     xbmc.get_add_on_info_from_calling_script = add_on_info
 
 
-# import HtmlTestRunner
+import HtmlTestRunner
 import parameterized
 
 from platformcode import config, logger
