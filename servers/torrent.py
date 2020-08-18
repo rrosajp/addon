@@ -93,7 +93,7 @@ def elementum_download(item):
 def elementum_monitor():
     path = xbmc.translatePath(config.get_setting('downloadlistpath'))
     elementum_setting, elementum_host, TorrentPath = setting()
-    active_torrent = filetools.listdir(TorrentPath)
+    # active_torrent = filetools.listdir(TorrentPath)
 
     if elementum_setting:
         # check if command file exist
