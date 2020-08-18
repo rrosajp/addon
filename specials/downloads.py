@@ -1037,7 +1037,7 @@ def save_download_video(item):
     write_json(item)
 
     if not platformtools.dialog_yesno(config.get_localized_string(30101), config.get_localized_string(70189)):
-        platformtools.dialog_ok(config.get_localized_string(30101), item.contentTitle, config.get_localized_string(30109))
+        platformtools.dialog_ok(config.get_localized_string(30101), item.contentTitle + '\n' + config.get_localized_string(30109))
     else:
         start_download(item)
 
@@ -1064,7 +1064,7 @@ def save_download_movie(item):
     progreso.close()
 
     if not platformtools.dialog_yesno(config.get_localized_string(30101), config.get_localized_string(70189)):
-        platformtools.dialog_ok(config.get_localized_string(30101), item.contentTitle, config.get_localized_string(30109))
+        platformtools.dialog_ok(config.get_localized_string(30101), item.contentTitle + '\n' + config.get_localized_string(30109))
     else:
         play_item = select_server(item)
         if play_item == 'Auto':
@@ -1105,7 +1105,7 @@ def save_download_tvshow(item):
         progreso.close()
 
     if not platformtools.dialog_yesno(config.get_localized_string(30101), config.get_localized_string(70189)):
-        platformtools.dialog_ok(config.get_localized_string(30101), str(len(episodes)) + config.get_localized_string(30110) + item.contentSerieName, config.get_localized_string(30109))
+        platformtools.dialog_ok(config.get_localized_string(30101), str(len(episodes)) + config.get_localized_string(30110) + '\n' + item.contentSerieName + '\n' + config.get_localized_string(30109))
 
     else:
         if len(episodes) == 1:
@@ -1138,4 +1138,4 @@ def show_disclaimer():
     line1 = config.get_localized_string(70690)
     line2 = config.get_localized_string(70691)
     line3 = config.get_localized_string(70692)
-    platformtools.dialog_ok(config.get_localized_string(20000), line1, line2, line3)
+    platformtools.dialog_ok(config.get_localized_string(20000), line1 + '\n' + line2 + '\n' + line3)

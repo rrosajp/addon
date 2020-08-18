@@ -330,15 +330,14 @@ def run(item=None):
 
         if Channel:
             if item.url:
-                if platformtools.dialog_yesno(config.get_localized_string(60087) % Channel, config.get_localized_string(60014), log_message, nolabel='ok', yeslabel=config.get_localized_string(70739)):
+                if platformtools.dialog_yesno(config.get_localized_string(60087) % Channel, config.get_localized_string(60014) + '\n' + log_message, nolabel='ok', yeslabel=config.get_localized_string(70739)):
                     run(Item(action="open_browser", url=item.url))
             else:
-                platformtools.dialog_ok(config.get_localized_string(60087) % Channel, config.get_localized_string(60014), log_message)
+                platformtools.dialog_ok(config.get_localized_string(60087) % Channel, config.get_localized_string(60014) + '\n' + log_message)
         else:
             platformtools.dialog_ok(
                 config.get_localized_string(60038),
-                config.get_localized_string(60015),
-                log_message)
+                config.get_localized_string(60015) + '\n' + log_message)
 
 
 def new_search(item, channel=None):

@@ -1234,7 +1234,7 @@ def ask_set_content(silent=False):
         # ask to configure Kodi video library
         if platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(80015)):
             # ask for custom or default settings
-            if not platformtools.dialog_yesno(config.get_localized_string(80026), config.get_localized_string(80016), "", "", config.get_localized_string(80017), config.get_localized_string(80018)):
+            if not platformtools.dialog_yesno(config.get_localized_string(80026), config.get_localized_string(80016), config.get_localized_string(80017), config.get_localized_string(80018)):
                 # input path and folders
                 path = platformtools.dialog_browse(3, config.get_localized_string(80019), config.get_setting("videolibrarypath"))
                 movies_folder = platformtools.dialog_input(config.get_setting("folder_movies"), config.get_localized_string(80020))
