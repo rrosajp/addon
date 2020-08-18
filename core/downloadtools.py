@@ -408,7 +408,7 @@ def downloadfile(url, nombrefichero, headers=None, silent=False, continuar=False
             error = downloadfileRTMP(url, nombrefichero, silent)
             if error and not silent:
                 from platformcode import platformtools
-            platformtools.dialog_ok("You cannot download that video "," RTMP downloads not yet "," are supported")
+            platformtools.dialog_ok("You cannot download that video "," RTMP downloads not yet supported")
         else:
             import traceback
             from pprint import pprint
@@ -480,7 +480,7 @@ def downloadfileRTMP(url, nombrefichero, silent):
         rtmpdump_exit = spawnv(P_NOWAIT, rtmpdump_cmd, rtmpdump_args)
         if not silent:
             from platformcode import platformtools
-            advertencia = platformtools.dialog_ok("RTMP download option is experimental", "and the video will download in the background.", "No progress bar will be displayed.")
+            advertencia = platformtools.dialog_ok("RTMP download option is experimental", "and the video will download in the background. \n No progress bar will be displayed.")
     except:
         return True
 

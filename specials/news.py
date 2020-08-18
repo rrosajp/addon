@@ -235,8 +235,8 @@ def novedades(item):
 
     if not multithread:
         if platformtools.dialog_yesno(config.get_localized_string(60515),
-                                      config.get_localized_string(60516),
-                                      config.get_localized_string(60517),
+                                      config.get_localized_string(60516) + '\n' +
+                                      config.get_localized_string(60517) + '\n' +
                                       config.get_localized_string(60518)):
             if config.set_setting("multithread", True, "news"):
                 multithread = True
@@ -340,7 +340,7 @@ def novedades(item):
             return ret
     else:
         if mode != 'set_cache':
-            no_channels = platformtools.dialog_ok(config.get_localized_string(30130) + ' - ' + item.extra, config.get_localized_string(70661), config.get_localized_string(70662))
+            no_channels = platformtools.dialog_ok(config.get_localized_string(30130) + ' - ' + item.extra + '\n' + config.get_localized_string(70661) + '\n' + config.get_localized_string(70662))
         return
 
 

@@ -8,8 +8,10 @@
 
 import sys
 if sys.version_info[0] >= 3:
+    PY3 = True
     import urllib.parse as urllib
 else:
+    PY3 = False
     import urllib
 
 import os, xbmc, xbmcgui, xbmcplugin
@@ -48,7 +50,7 @@ def dialog_notification(heading, message, icon=3, time=5000, sound=True):
 def dialog_yesno(heading, message, nolabel=config.get_localized_string(70170), yeslabel=config.get_localized_string(30022), autoclose=0, customlabel=None):
     # customlabel only on kodi 19
     dialog = xbmcgui.Dialog()
-    if config.get_platform() == 'kodi-matrix':
+    if PY3:
         if autoclose:
             return dialog.yesno(heading, message, nolabel=nolabel, yeslabel=yeslabel, customlabel=customlabel, autoclose=autoclose)
         else:
@@ -671,7 +673,7 @@ def show_recaptcha(key, referer):
 
 def alert_no_disponible_server(server):
     # 'The video is no longer in %s', 'Try another server or another channel'
-    dialog_ok(config.get_localized_string(30055), (config.get_localized_string(30057) % server), config.get_localized_string(30058))
+    dialog_ok(config.get_localized_string(30055), (config.get_localized_string(30057) % server) + '\n' + config.get_localized_string(30058))
 
 
 def alert_unsopported_server():
@@ -773,11 +775,11 @@ def get_dialogo_opciones(item, default_action, strm, autoplay):
         if not autoplay:
             if item.server != "":
                 if "<br/>" in motivo:
-                    ret = dialog_yesno(config.get_localized_string(60362), motivo.split("<br/>")[0], motivo.split("<br/>")[1], item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
+                    ret = dialog_yesno(config.get_localized_string(60362), motivo.split("<br/>")[0] + '\n' + motivo.split("<br/>")[1] + '\n' + item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
                 else:
-                    ret = dialog_yesno(config.get_localized_string(60362), motivo, item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
+                    ret = dialog_yesno(config.get_localized_string(60362), motivo + '\n' + item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
             else:
-                ret = dialog_yesno(config.get_localized_string(60362), config.get_localized_string(60363), config.get_localized_string(60364), item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
+                ret = dialog_yesno(config.get_localized_string(60362), config.get_localized_string(60363) + '\n' + config.get_localized_string(60364) + '\n' + item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
             if ret:
                 xbmc.executebuiltin("Container.Update (%s?%s)" % (sys.argv[0], Item(action="open_browser", url=item.url).tourl()))
             if item.channel == "favorites":

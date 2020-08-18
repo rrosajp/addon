@@ -806,7 +806,7 @@ def restore_tools(item):
     import os
 
     seleccion = platformtools.dialog_yesno(config.get_localized_string(60581),
-                                           config.get_localized_string(60582),
+                                           config.get_localized_string(60582) + '\n' +
                                            config.get_localized_string(60583))
     if seleccion == 1:
         # tvshows

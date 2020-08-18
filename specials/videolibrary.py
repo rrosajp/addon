@@ -129,7 +129,7 @@ def get_results(nfo_path, root, Type, local=False):
                                  library_urls=item.library_urls,
                                  infoLabels={'title': item.contentTitle})
 
-                if canal not in dead_list and canal not in zombie_list: confirm = platformtools.dialog_yesno(config.get_localized_string(30131), config.get_localized_string(30132) % canal.upper(), config.get_localized_string(30133))
+                if canal not in dead_list and canal not in zombie_list: confirm = platformtools.dialog_yesno(config.get_localized_string(30131), config.get_localized_string(30132) % canal.upper() + '\n' + config.get_localized_string(30133))
                 elif canal in zombie_list: confirm = False
                 else: confirm = True
 
