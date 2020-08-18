@@ -4,9 +4,11 @@
 import os, re, sys, json, time
 
 if sys.version_info[0] >= 3:
+    PY3 = True
     from urllib.parse import urlsplit, urlparse, parse_qs, urljoin, urlencode
     from urllib.request import urlopen
 else:
+    PY3 = False
     from urllib import urlencode, urlopen
     from urlparse import urlsplit, urlparse, parse_qs, urljoin
 
@@ -516,6 +518,7 @@ class UnshortenIt(object):
                     import datetime, hashlib
                     ip = urlopen('https://api.ipify.org/').read()
                     day = datetime.date.today().strftime('%Y%m%d')
+                    if PY3: day = day.encode()
                     headers = {
                         "Cookie": hashlib.md5(ip+day).hexdigest() + "=1"
                     }
