@@ -502,8 +502,7 @@ def scrape(func):
                          args=item.args,
                          page=pag + 1,
                          thumbnail=thumb()))
-
-        if action != 'play' and function != 'episodios' and 'patronMenu' not in args and item.contentType in ['movie', 'tvshow', 'episode'] and not disabletmdb:
+        if action != 'play' and function != 'episodios' and 'patronMenu' not in args and item.contentType in ['movie', 'tvshow', 'episode', 'undefined'] and not disabletmdb:
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
         if anime:
@@ -683,7 +682,7 @@ def stayonline(id):
     return data
 
 
-def menuItem(itemlist, filename, title='', action='', url='', contentType='movie', args=[], style=True):
+def menuItem(itemlist, filename, title='', action='', url='', contentType='undefined', args=[], style=True):
     # Function to simplify menu creation
 
     # Call typo function
