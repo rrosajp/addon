@@ -571,7 +571,7 @@ def set_content(content_type, silent=False, custom=False):
                 if install:
                     try:
                         # Install metadata.themoviedb.org
-                        xbmc.executebuiltin('xbmc.installaddon(metadata.themoviedb.org)', True)
+                        xbmc.executebuiltin('InstallAddon(metadata.themoviedb.org)', True)
                         logger.log("Instalado el Scraper de películas de TheMovieDB")
                     except:
                         pass
@@ -594,7 +594,7 @@ def set_content(content_type, silent=False, custom=False):
 
                 if install:
                     try:
-                        xbmc.executebuiltin('xbmc.installaddon(metadata.universal)', True)
+                        xbmc.executebuiltin('InstallAddon(metadata.universal)', True)
                         if xbmc.getCondVisibility('System.HasAddon(metadata.universal)'):
                             continuar = True
                     except:
@@ -625,7 +625,7 @@ def set_content(content_type, silent=False, custom=False):
                 if install:
                     try:
                         # Install metadata.tvdb.com
-                        xbmc.executebuiltin('xbmc.installaddon(metadata.tvdb.com)', True)
+                        xbmc.executebuiltin('InstallAddon(metadata.tvdb.com)', True)
                         logger.log("The TVDB series Scraper installed ")
                     except:
                         pass
@@ -649,7 +649,7 @@ def set_content(content_type, silent=False, custom=False):
                 if install:
                     try:
                         # Install metadata.tvshows.themoviedb.org
-                        xbmc.executebuiltin('xbmc.installaddon(metadata.tvshows.themoviedb.org)', True)
+                        xbmc.executebuiltin('InstallAddon(metadata.tvshows.themoviedb.org)', True)
                         if xbmc.getCondVisibility('System.HasAddon(metadata.tvshows.themoviedb.org)'):
                             continuar = True
                     except:
