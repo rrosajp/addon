@@ -7,6 +7,7 @@ if PY3:
     import _ssl
     DEFAULT_CIPHERS = _ssl._DEFAULT_CIPHERS
 else:
+    import urlparse
     DEFAULT_CIPHERS = ssl._DEFAULT_CIPHERS
 
 from lib.requests_toolbelt.adapters import host_header_ssl

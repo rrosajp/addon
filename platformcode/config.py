@@ -134,6 +134,7 @@ def get_system_platform():
         platform = "osx"
     return platform
 
+
 def is_autorun_enabled():
     try:
         if "xbmc.executebuiltin('RunAddon(plugin.video.kod)')" in open(os.path.join(xbmc.translatePath('special://userdata'),'autoexec.py')).read():

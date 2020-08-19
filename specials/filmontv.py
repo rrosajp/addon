@@ -39,7 +39,8 @@ def getEpg():
         downloadtools.downloadfile(host, archiveName)
         support.log('opening gzip and writing xml')
         with gzip.GzipFile(fileobj=filetools.file_open(archiveName, mode='rb', vfs=False)) as f:
-            guide = f.read().replace('\n', ' ').replace('><', '>\n<')
+            guide = f.read().decode('utf-8')
+            guide = guide.replace('\n', ' ').replace('><', '>\n<')
         with open(xmlName, 'w') as f:
             f.write(guide)
     # else:
