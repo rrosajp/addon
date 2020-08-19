@@ -216,7 +216,7 @@ def start(itemlist, item):
                     lang = " "
                     if hasattr(videoitem, 'language') and videoitem.language != "":
                         lang = " '%s' " % videoitem.language
-                    name = servername(videoitem.server)
+                    name = servername(videoitem.server) 
                     platformtools.dialog_notification("AutoPlay %s" %text_b, "%s%s%s" % (name, lang, videoitem.quality.upper()), sound=False)
 
                     # Try to play the links If the channel has its own play method, use it
@@ -291,5 +291,7 @@ def play_multi_channel(item, itemlist):
             break
 
 def servername(server):
+    from core.servertools import translate_server_name
     path = filetools.join(config.get_runtime_path(), 'servers', server.lower() + '.json')
-    return jsontools.load(open(path, "r").read())['name'].upper()
+    name = jsontools.load(open(path, "r").read())['name'].upper()
+    return translate_server_name(name)
