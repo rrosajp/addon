@@ -28,7 +28,8 @@ def mainlist(item):
                 Item(channel=item.channel, action="list_tvshows",title=config.get_localized_string(60600),
                      category=config.get_localized_string(70271), thumbnail=thumb("videolibrary_tvshow"),
                      context=[{"channel":"videolibrary", "action":"update_videolibrary", "title":config.get_localized_string(70269)}]),
-                Item(channel='shortcuts', action="SettingOnPosition", title=config.get_localized_string(60542), category=2, setting=1, thumbnail = thumb("setting_0"))]
+                Item(channel='shortcuts', action="SettingOnPosition", title=typo(config.get_localized_string(70287),'bold color kod'),
+                     category=2, setting=1, thumbnail = thumb("setting_0"))]
     return itemlist
 
 
