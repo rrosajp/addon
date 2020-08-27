@@ -172,7 +172,6 @@ def channel_search(item):
     valid = list()
     ch_list = dict()
     mode = item.mode
-    max_results = 10
 
     if item.infoLabels['tvshowtitle']:
         item.text = item.infoLabels['tvshowtitle'].split('-')[0]
@@ -263,7 +262,7 @@ def channel_search(item):
         grouped = list()
         cnt += 1
         progress.update(old_div((cnt * 100), len(ch_list)), config.get_localized_string(60295) + '\n' + config.get_localized_string(60293))
-        if len(value) <= max_results and item.mode != 'all':
+        if item.mode != 'all':
             if len(value) == 1:
                 if not value[0].action or config.get_localized_string(70006).lower() in value[0].title.lower():
                     continue
