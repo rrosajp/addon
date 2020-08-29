@@ -436,7 +436,7 @@ def fixZipGetHash(zipFile):
             f.write(
                 b'\x00\x00')  # Zip file comment length: 0 byte length; tell zip applications to stop reading.
 
-    return str(hash)
+    return hash.decode('utf-8')
 
 
 def _pbhook(numblocks, blocksize, filesize, url, dp):
