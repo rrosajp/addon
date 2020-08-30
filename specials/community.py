@@ -643,7 +643,7 @@ def load_and_check(item):
         if not 'checked' in channel:
             response = httptools.downloadpage(channel['path'], follow_redirects=True, timeout=5)
             if response.success:
-                channel['path'] = response.url
+                # channel['path'] = response.url
                 channel['channel_name'] = re.sub(r'\[[^\]]+\]', '', channel['channel_name'])
                 channel['check'] = True
 
