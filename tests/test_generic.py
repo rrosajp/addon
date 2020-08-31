@@ -120,7 +120,7 @@ chNumRis = {
         'Serie TV': 12
     },
     'serietvonline': {
-        'Film': 35,
+        'Film': 50,
         'Serie TV': 35
     },
     'tantifilm': {

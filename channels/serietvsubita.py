@@ -94,10 +94,7 @@ def lista_serie(item):
 
     PERPAGE = 15
 
-    p = 1
-    if '{}' in item.url:
-        item.url, p = item.url.split('{}')
-        p = int(p)
+    p = 1 if not item.args else int(item.args)
 
     if '||' in item.data:
         series = item.data.split('\n\n')
@@ -129,7 +126,8 @@ def lista_serie(item):
 
     # Paginazione
     if len(matches) >= p * PERPAGE:
-        support.nextPage(itemlist, item, next_page=(item.url + '{}' + str(p + 1)))
+        item.args = p + 1
+        support.nextPage(itemlist, item, next_page=item.url)
 
     return itemlist
 

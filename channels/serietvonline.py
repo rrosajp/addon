@@ -76,13 +76,13 @@ def peliculas(item):
         pagination = 35
 
         if not item.args and 'anime' not in item.url:
-            patron = r'<div class="movie">[^>]+>.+?src="(?P<thumb>[^"]+)" alt="[^"]+".+?href="(?P<url>[^"]+)">[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[ ](?P<rating>\d+.\d+|\d+)<[^>]+>[^>]+><h2>(?P<title>[^"]+)</h2>[ ]?(?:<span class="year">(?P<year>\d+|\-\d+))?<'
+            patron = r'<div class="movie">[^>]+>.+?src="(?P<thumb>[^"]+)" alt="[^"]+".+? href="(?P<url>[^"]+)">.*?<h2>(?P<title>[^"]+)</h2>\s?(?:<span class="year">(?P<year>\d+|\-\d+))?<'
         else:
             anime = True
             patron = r'(?:<td>)?<a href="(?P<url>[^"]+)"(?:[^>]+)?>\s?(?P<title>[^<]+)(?P<episode>[\d\-x]+)?(?P<title2>[^<]+)?<'
     else:
         # SEZIONE FILM
-        # pagination = 25
+        pagination = 25
 
         if item.args == 'lista':
             patron = r'href="(?P<url>[^"]+)"[^>]+>(?P<title>.*?)(?P<year>\d{4})?<'
