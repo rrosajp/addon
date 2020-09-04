@@ -2920,8 +2920,8 @@ msgid "Search similar"
 msgstr "Cerca simili"
 
 msgctxt "#70021"
-msgid "Search in TMDB"
-msgstr "Cerca in TMDB"
+msgid "Search %s in %s"
+msgstr "Cerca %s in %s"
 
 msgctxt "#70022"
 msgid " - Movies"
@@ -4048,7 +4048,7 @@ msgid "TV shows by Genre"
 msgstr "Serie TV per Genere"
 
 msgctxt "#70311"
-msgid "TV Shows most popular"
+msgid "TV shows most popular"
 msgstr "Serie TV più popolari"
 
 msgctxt "#70312"
@@ -4208,12 +4208,12 @@ msgid "Search in KoD: %s"
 msgstr "Cerca in KoD: %s"
 
 msgctxt "#70351"
-msgid "    Search alternative title: %s"
-msgstr "    Cerca titolo alternativo: %s"
+msgid "Search alternative title: %s"
+msgstr "Cerca titolo alternativo: %s"
 
 msgctxt "#70352"
-msgid "    Search title in english: %s"
-msgstr "    Cerca titolo in inglese: %s"
+msgid "Search title in english: %s"
+msgstr "Cerca titolo in inglese: %s"
 
 msgctxt "#70353"
 msgid "Vídeos (Episodes, Trailers...)"
@@ -4301,11 +4301,11 @@ msgstr "Anime dove appare:"
 
 msgctxt "#70374"
 msgid "Give voice to/in:"
-msgstr "Dai voce a/in:"
+msgstr "Da voce a/in:"
 
 msgctxt "#70375"
 msgid "Staff in animes:"
-msgstr "Staff in anime:"
+msgstr "Staff negli anime:"
 
 msgctxt "#70376"
 msgid "Info in AniDB %s"
@@ -4330,10 +4330,6 @@ msgstr "In Pausa"
 msgctxt "#70381"
 msgid "Dropped"
 msgstr "Abbandonata"
-
-msgctxt "#70381"
-msgid "Myanimelist username and/or password blank"
-msgstr "Username e/o password di Myanimelist vuoti"
 
 msgctxt "#70382"
 msgid "Currently watching"
@@ -4378,6 +4374,10 @@ msgstr "Aggiungi alla lista %s"
 msgctxt "#70392"
 msgid "Rate with a %s"
 msgstr "Dai un punteggio con un %s"
+
+msgctxt "#70393"
+msgid "Myanimelist username and/or password blank"
+msgstr "Username e/o password di Myanimelist vuoti"
 
 msgctxt "#70394"
 msgid "Action"

@@ -442,6 +442,7 @@ def scrape(func):
                 data = re.sub("='([^']+)'", '="\\1"', page.data)
                 data = data.replace('\n', ' ')
                 data = data.replace('\t', ' ')
+                data = data.replace('&nbsp;', ' ')
                 data = re.sub(r'>\s+<', '> <', data)
                 # replace all ' with " and eliminate newline, so we don't need to worry about
             scrapingTime = time()
@@ -928,6 +929,7 @@ def match(item_url_string, **args):
     data = re.sub("='([^']+)'", '="\\1"', data)
     data = data.replace('\n', ' ')
     data = data.replace('\t', ' ')
+    data = data.replace('&nbsp;', ' ')
     data = re.sub(r'>\s+<', '><', data)
     data = re.sub(r'([a-zA-Z])"([a-zA-Z])', "\1'\2", data)
 
@@ -1358,42 +1360,48 @@ def thumb(item_itemlist_string=None, genre=False, live=False):
                  'tvshow':['serie','tv','episodi','episodio','fiction', 'show'],
                  'documentary':['documentari','documentario', 'documentary', 'documentaristico'],
                  'teenager':['ragazzi','teenager', 'teen'],
-                 'learning':['learning'],
+                 'learning':['learning', 'school', 'scuola'],
                  'all':['tutti', 'all'],
-                 'news':['novità', "novita'", 'aggiornamenti', 'nuovi', 'nuove', 'new', 'newest', 'news', 'ultimi'],
+                 'news':['novità', "novita'", 'aggiornamenti', 'nuovi', 'nuove', 'new', 'newest', 'news', 'ultimi', 'notizie'],
                  'now_playing':['cinema', 'in sala'],
                  'anime':['anime'],
                  'genres':['genere', 'generi', 'categorie', 'categoria', 'category'],
                  'animation': ['animazione', 'cartoni', 'cartoon', 'animation'],
-                 'action':['azione', 'arti marziali', 'action'],
+                 'action':['azione', 'marziali', 'action', 'martial'],
                  'adventure': ['avventura', 'adventure'],
-                 'biographical':['biografico', 'biographical'],
-                 'comedy':['comico', 'commedia', 'demenziale', 'comedy', 'brillante'],
+                 'biographical':['biografico', 'biographical', 'biografia'],
+                 'comedy':['comico', 'commedia', 'demenziale', 'comedy', 'brillante', 'demential', 'parody'],
                  'adult':['erotico', 'hentai', 'harem', 'ecchi', 'adult'],
                  'drama':['drammatico', 'drama', 'dramma'],
-                 'syfy':['fantascienza', 'science fiction', 'syfy', 'sci'],
+                 'syfy':['fantascienza', 'science fiction', 'syfy', 'sci-fi'],
                  'fantasy':['fantasy', 'magia', 'magic', 'fantastico'],
-                 'crime':['gangster','poliziesco', 'crime', 'crimine'],
+                 'crime':['gangster','poliziesco', 'crime', 'crimine', 'police'],
                  'grotesque':['grottesco', 'grotesque'],
-                 'war':['guerra', 'war'],
+                 'war':['guerra', 'war', 'military'],
                  'children':['bambini', 'kids'],
-                 'horror':['horror'],
+                 'horror':['horror', 'orrore'],
                  'music':['musical', 'musica', 'music', 'musicale'],
                  'mistery':['mistero', 'giallo', 'mystery'],
                  'noir':['noir'],
-                 'popular' : ['popolari','popolare', 'più visti'],
+                 'popular':['popolari','popolare', 'più visti', 'raccomandati', 'raccomandazioni' 'recommendations'],
                  'thriller':['thriller'],
                  'top_rated' : ['fortunato', 'votati', 'lucky', 'top'],
                  'on_the_air' : ['corso', 'onda', 'diretta', 'dirette'],
                  'western':['western'],
                  'vos':['sub','sub-ita'],
                  'romance':['romantico','sentimentale', 'romance', 'soap'],
-                 'family':['famiglia','famiglie', 'family', 'historical'],
-                 'historical':['storico', 'history', 'storia'],
+                 'family':['famiglia','famiglie', 'family'],
+                 'historical':['storico', 'history', 'storia', 'historical'],
                  'az':['lettera','lista','alfabetico','a-z', 'alphabetical'],
                  'year':['anno', 'anni', 'year'],
                  'update':['replay', 'update'],
                  'videolibrary':['teche'],
+                 'info':['info','information','informazioni'],
+                 'star':['star', 'personaggi', 'interpreti', 'stars', 'characters', 'performers', 'staff', 'actors', 'attori'],
+                 'winter':['inverno', 'winter'],
+                 'spring':['primavera', 'spring'],
+                 'summer':['estate', 'summer'],
+                 'autumn':['autunno', 'autumn'],
                  'autoplay':[config.get_localized_string(60071)]
                 }
 
@@ -1409,18 +1417,19 @@ def thumb(item_itemlist_string=None, genre=False, live=False):
                     '_tvshow':['serie','tv', 'fiction']}
 
     def autoselect_thumb(item, genre):
+        log('SPLIT',re.split(r'\.|\{|\}|\[|\]|\(|\)|/| ',item.title.lower()))
         if genre == False:
             for thumb, titles in icon_dict.items():
-                if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in search):
+                if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)|/| ',item.title.lower()) for word in search):
                     thumb = 'search'
                     for suffix, titles in search_suffix.items():
-                        if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
+                        if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)|/| ',item.title.lower()) for word in titles ):
                             thumb = thumb + suffix
                     item.thumbnail = get_thumb(thumb + '.png')
                 elif any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
                     if thumb == 'movie' or thumb == 'tvshow':
                         for suffix, titles in suffix_dict.items():
-                            if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
+                            if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)|/| ',item.title.lower()) for word in titles ):
                                 thumb = thumb + suffix
                         item.thumbnail = get_thumb(thumb + '.png')
                     else: item.thumbnail = get_thumb(thumb + '.png')
@@ -1429,7 +1438,7 @@ def thumb(item_itemlist_string=None, genre=False, live=False):
 
         else:
             for thumb, titles in icon_dict.items():
-                if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)| ',item.title.lower()) for word in titles ):
+                if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)|/| ',item.title.lower()) for word in titles ):
                     item.thumbnail = get_thumb(thumb + '.png')
                 else:
                     thumb = item.thumbnail
