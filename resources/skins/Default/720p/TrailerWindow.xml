@@ -3,76 +3,85 @@
     <allowoverlays>false</allowoverlays>
     <controls>
         <control type="image" id="10">
-            <posx>0</posx>
-            <posy>0</posy>
-            <width>1920</width>
-            <height>1080</height>
-            <texture>Infoplus/fondo.png</texture>
+            <top>0</top>
+            <left>0</left>
+            <width>1280</width>
+            <height>720</height>
+            <texture colordiffuse="FF000000">white.png</texture>
             <visible>Player.HasVideo</visible>
-            <animation effect="slide" start="0,-2000" time="900">VisibleChange</animation>
-        </control>
-        <control type="image" id="10">
-            <posx>420</posx>
-            <posy>90</posy>
-            <width>1100</width>
-            <height>600</height>
-            <texture>Infoplus/count.gif</texture>
-            <visible>Player.HasVideo</visible>
-            <animation effect="fade" start="0%" end="100%" time="2000" delay="800">VisibleChange</animation>
-            <animation effect="zoom" start="100%" end="0%" delay="1500" time="2" condition="Player.Playing">Conditional</animation>
-            <animation effect="zoom" start="100%" end="0%" time="2" condition="!Player.Playing">Conditional</animation>
-            
+            <animation effect="fade" start="0%" end="100%" time="200">VisibleChange</animation>
         </control>
         <control type="videowindow" id="2">
-            <posx>410</posx>
-            <posy>-13</posy>
-            <width>1110</width>
-            <height>805</height>
+            <top>0</top>
+            <left>0</left>
+            <width>1280</width>
+            <height>720</height>
             <visible>Player.HasVideo</visible>
-            <animation effect="fade" start="0%" end="100%" time="900" delay="1500">VisibleChange</animation>
+            <animation effect="fade" start="0%" end="100%" time="200">VisibleChange</animation>
         </control>
         <control type="image" id="10">
-            <posx>870</posx>
-            <posy>300</posy>
+            <top>260</top>
+            <left>540</left>
             <width>200</width>
             <height>200</height>
             <texture>Infoplus/pause.png</texture>
             <visible>Player.Paused</visible>
-            <animation effect="zoom" start="0" end="100" center="auto" time="500" >VisibleChange</animation>
+            <animation effect="fade" start="0%" end="100%" time="200">VisibleChange</animation>
         </control>
         <control type="image" id="10">
-            <posx>870</posx>
-            <posy>300</posy>
+            <top>260</top>
+            <left>540</left>
             <width>200</width>
             <height>200</height>
             <texture>Infoplus/rewind.png</texture>
             <visible>Player.Rewinding</visible>
-            <animation effect="zoom" start="0" end="100" center="auto" time="500">VisibleChange</animation>
+            <animation effect="fade" start="0%" end="100%" time="200">VisibleChange</animation>
         </control>
         <control type="image" id="10">
-            <posx>870</posx>
-            <posy>300</posy>
+            <top>260</top>
+            <left>540</left>
             <width>200</width>
             <height>200</height>
             <texture>Infoplus/forward.png</texture>
             <visible>Player.Forwarding</visible>
-            <animation effect="zoom" start="0" end="100" center="auto" time="500">VisibleChange</animation>
+            <animation effect="fade" start="0%" end="100%" time="200">VisibleChange</animation>
         </control>
         <control type="image" id="10">
-            <posx>870</posx>
-            <posy>300</posy>
+            <top>260</top>
+            <left>540</left>
             <width>200</width>
             <height>200</height>
             <texture>Infoplus/play.png</texture>
             <visible>Player.Play</visible>
-            <animation effect="zoom" start="0" end="100" center="auto" time="500">VisibleChange</animation>
+            <animation effect="fade" start="0%" end="100%" time="200">VisibleChange</animation>
         </control>
         <control type="button" id="4">
-            <posx>405</posx>
-            <posy>-20</posy>
-            <width>1130</width>
-            <height>850</height>
+            <top>0</top>
+            <left>0</left>
+            <width>426</width>
+            <height>720</height>
             <visible>Player.HasVideo</visible>
+            <onclick>PlayerControl(Rewind)</onclick>
+            <texturefocus></texturefocus>
+            <texturenofocus></texturenofocus>
+        </control>
+        <control type="button" id="5">
+            <top>0</top>
+            <left>426</left>
+            <width>426</width>
+            <height>720</height>
+            <visible>Player.HasVideo</visible>
+            <onclick>PlayerControl(Play)</onclick>
+            <texturefocus></texturefocus>
+            <texturenofocus></texturenofocus>
+        </control>
+        <control type="button" id="6">
+            <top>0</top>
+            <left>853</left>
+            <width>426</width>
+            <height>720</height>
+            <visible>Player.HasVideo</visible>
+            <onclick>PlayerControl(Forward)</onclick>
             <texturefocus></texturefocus>
             <texturenofocus></texturenofocus>
         </control>

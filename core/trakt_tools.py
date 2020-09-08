@@ -198,6 +198,8 @@ def get_trakt_watched(id_type, mediatype, update=False):
 
 
 def trakt_check(itemlist):
+    if type(itemlist) != list:
+        return
     def sync(item, id_result):
         info = item.infoLabels
         try:
