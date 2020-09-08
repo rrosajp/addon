@@ -2921,7 +2921,7 @@ msgid "Search similar"
 msgstr ""
 
 msgctxt "#70021"
-msgid "Search in TMDB"
+msgid "Search %s in %s"
 msgstr ""
 
 msgctxt "#70022"
@@ -4209,11 +4209,11 @@ msgid "Search in KoD: %s"
 msgstr ""
 
 msgctxt "#70351"
-msgid "    Search alternative title: %s"
+msgid "Search alternative title: %s"
 msgstr ""
 
 msgctxt "#70352"
-msgid "    Search title in english: %s"
+msgid "Search title in english: %s"
 msgstr ""
 
 msgctxt "#70353"
@@ -4332,10 +4332,6 @@ msgctxt "#70381"
 msgid "Dropped"
 msgstr ""
 
-msgctxt "#70381"
-msgid "Myanimelist username and/or password blank"
-msgstr ""
-
 msgctxt "#70382"
 msgid "Currently watching"
 msgstr ""
@@ -4378,6 +4374,10 @@ msgstr ""
 
 msgctxt "#70392"
 msgid "Rate with a %s"
+msgstr ""
+
+msgctxt "#70393"
+msgid "Myanimelist username and/or password blank"
 msgstr ""
 
 msgctxt "#70394"
