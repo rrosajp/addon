@@ -44,20 +44,16 @@ def start(itemlist, item):
         autoplay_list = []
         autoplay_b = []
         favorite_quality = []
-        blacklisted_servers = []
         favorite_servers = []
+        blacklisted_servers = config.get_setting("black_list", server='servers')
+        if not blacklisted_servers: blacklisted_servers = []
 
         from core import servertools
         servers_list = list(servertools.get_servers_list().items())
         for server, server_parameters in servers_list:
-            if config.get_setting('black_list', server=server):
-                blacklisted_servers.append(server.lower())
             if config.get_setting('favorites_servers_list', server=server):
                 favorite_servers.append(server.lower())
 
-        if not blacklisted_servers:
-            config.set_setting('black_list', [], server='servers')
-            blacklisted_servers = []
         if not favorite_servers:
             config.set_setting('favorites_servers_list', [], server='servers')
             favorite_servers = []

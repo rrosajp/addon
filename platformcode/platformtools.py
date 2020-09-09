@@ -1053,7 +1053,7 @@ def resume_playback(item, return_played_time=False):
         if return_played_time:
             return item_nfo.played_time
         # Show Window
-        elif (config.get_setting("player_mode") not in [3] or item.play_from == 'window') and item_nfo.played_time:
+        elif (config.get_setting("player_mode") not in [3] or item.play_from == 'window') and item_nfo.played_time and item_nfo.played_time >= 120:
             Dialog = ResumePlayback('ResumePlayback.xml', config.get_runtime_path(), item=item_nfo)
             Dialog.show()
             t = 0
