@@ -92,7 +92,6 @@ def check(background=False):
                 if 'Merge' in commitJson['commit']['message']:
                     continue
                 logger.log('aggiornando a ' + commitJson['sha'])
-                alreadyApplied = True
 
                 # major update
                 if len(commitJson['files']) > 50:
@@ -128,9 +127,7 @@ def check(background=False):
                                 if not os.path.exists(dirname):
                                     os.makedirs(dirname)
                                 urllib.urlretrieve(file['raw_url'], filename)
-                                alreadyApplied = False
-                if not alreadyApplied:  # non mando notifica se già applicata (es. scaricato zip da github)
-                    changelog += commitJson['commit']['message'] + "\n"
+                changelog += commitJson['commit']['message'] + "\n"
         except:
             import traceback
             logger.error(traceback.format_exc())
@@ -172,6 +169,7 @@ def showSavedChangelog():
         os.remove(xbmc.translatePath(changelogFile))
     except:
         pass
+
 
 def calcCurrHash():
     treeHash = githash.tree_hash(addonDir).hexdigest()
