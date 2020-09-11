@@ -71,7 +71,7 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
             xbmc.sleep(1000)
 
         # Set played time
-        item_nfo.played_time = int(actual_time) if not marked and actual_time > 120 else 0
+        item_nfo.played_time = int(actual_time) if not marked else 0
         filetools.write(nfo_path, head_nfo + item_nfo.tojson())
 
         # Silent sync with Trakt
@@ -84,8 +84,8 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
             xbmc.executebuiltin('Action(Back)')
             xbmc.sleep(500)
         if next_episode and next_episode.next_ep:
-                from platformcode.launcher import play_from_library
-                return play_from_library(next_episode)
+            from platformcode.launcher import play_from_library
+            return play_from_library(next_episode)
 
     # If it is configured to mark as seen
     if config.get_setting("mark_as_watched", "videolibrary"):
