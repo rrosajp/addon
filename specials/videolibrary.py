@@ -155,6 +155,7 @@ def get_results(nfo_path, root, Type, local=False):
             sep = '/' if '/' in nfo_path else '\\'
             item.extra = filetools.join(config.get_setting("videolibrarypath"), config.get_setting(folder), item.path.split(sep)[-1])
             strm_path = item.strm_path.replace("\\", "/").rstrip("/")
+            if not item.thumbnail: item.thumbnail = item.infoLabels['thumbnail']
             if '/' in item.path: item.strm_path = strm_path
             # If strm has been removed from kodi library, don't show it
             if not filetools.exists(filetools.join(item.path, filetools.basename(strm_path))) and not local: return Item(), 0
