@@ -12,7 +12,7 @@ def test_video_exists(page_url):
     logger.log("(page_url='%s')" % page_url)
     global data
     data = httptools.downloadpage(page_url, cookies=False).data
-    if 'File Not Found' in data:
+    if 'File is no longer available as it expired or has been deleted' in data:
         return False, config.get_localized_string(70449) % "SuperVideo"
 
     return True, ""
@@ -43,7 +43,6 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             video_urls.append(['.' + source['file'].split('.')[-1] + ' [' + quality + '] [SuperVideo]', source['file']])
 
     else:
-        logger.log('ELSE!')
         matches = scrapertools.find_multiple_matches(data, r'src:\s*"([^"]+)",\s*type:\s*"[^"]+"(?:\s*, res:\s(\d+))?')
         for url, quality in matches:
             if url.split('.')[-1] != 'm3u8':
