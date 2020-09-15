@@ -26,6 +26,9 @@ def test_video_exists(page_url):
 
     global data, real_url
     data = resp.data
+    if not data:
+        resp = httptools.downloadpage(page_url.replace(headers[1][1], real_host), headers=headers, verify=False)
+        data = resp.data
 
     page_url = resp.url.replace(headers[1][1], real_host)
     if '/streaming.php' in page_url in page_url:
@@ -58,6 +61,7 @@ def test_video_exists(page_url):
 
 # Returns an array of possible video url's from the page_url
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
+    from core.support import dbg;dbg()
     def int_bckup_method():
         global data,headers
         page_url = scrapertools.find_single_match(data, r"""<center><a href='(https?:\/\/wstream[^']+)'\s*title='bkg'""")
