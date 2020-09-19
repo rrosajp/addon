@@ -43,7 +43,7 @@ def set_menu_settings(item):
     jsontools.update_node(menu_node, 'menu_settings_data.json', "menu")
 
 def check_user_home(item):
-    logger.log()
+    logger.info()
     if os.path.exists(menu_settings_path):
         menu_node = jsontools.get_node_from_file('menu_settings_data.json', 'menu')
     if 'user_home' in menu_node:
@@ -55,7 +55,7 @@ def check_user_home(item):
     return item
 
 def set_custom_start(item):
-    logger.log()
+    logger.info()
     if os.path.exists(menu_settings_path):
         menu_node = jsontools.get_node_from_file('menu_settings_data.json', 'menu')
     else:
@@ -69,7 +69,7 @@ def set_custom_start(item):
     jsontools.update_node(menu_node, 'menu_settings_data.json', "menu")
 
 def get_start_page():
-    logger.log()
+    logger.info()
 
     dictCategory = {
         config.get_localized_string(70137): 'peliculas',
@@ -356,7 +356,7 @@ class Main(xbmcgui.WindowXMLDialog):
                 self.focus -= 1
 
     def run_action(self, item):
-        logger.log()
+        logger.info()
         if item.menu != True:
             self.close()
         xbmc.executebuiltin("Container.update(%s)"%launcher.run(item))

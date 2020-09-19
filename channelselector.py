@@ -9,7 +9,7 @@ addon = config.__settings__
 downloadenabled = addon.getSetting('downloadenabled')
 
 def getmainlist(view="thumb_"):
-    logger.log()
+    logger.info()
     itemlist = list()
 
     if config.dev_mode():
@@ -62,14 +62,14 @@ def getmainlist(view="thumb_"):
 
 
 def getchanneltypes(view="thumb_"):
-    logger.log()
+    logger.info()
 
     # Category List
     channel_types = ["movie", "tvshow", "anime", "documentary", "vos", "live", "torrent",  "music"] #, "direct"
 
     # Channel Language
     channel_language = auto_filter()
-    logger.log("channel_language=%s" % channel_language)
+    logger.info("channel_language=%s" % channel_language)
 
     # Build Itemlist
     itemlist = list()
@@ -92,7 +92,7 @@ def getchanneltypes(view="thumb_"):
 
 def filterchannels(category, view="thumb_"):
     from core import channeltools
-    logger.log('Filter Channels ' + category)
+    logger.info('Filter Channels ' + category)
 
     channelslist = []
 
@@ -103,17 +103,17 @@ def filterchannels(category, view="thumb_"):
         appenddisabledchannels = True
 
     channel_path = os.path.join(config.get_runtime_path(), 'channels', '*.json')
-    logger.log("channel_path = %s" % channel_path)
+    logger.info("channel_path = %s" % channel_path)
 
     channel_files = glob.glob(channel_path)
-    logger.log("channel_files found %s" % (len(channel_files)))
+    logger.info("channel_files found %s" % (len(channel_files)))
 
     # Channel Language
     channel_language = auto_filter()
-    logger.log("channel_language=%s" % channel_language)
+    logger.info("channel_language=%s" % channel_language)
 
     for channel_path in channel_files:
-        logger.log("channel in for = %s" % channel_path)
+        logger.debug("channel in for = %s" % channel_path)
 
         channel = os.path.basename(channel_path).replace(".json", "")
 
@@ -126,7 +126,7 @@ def filterchannels(category, view="thumb_"):
             # If it's not a channel we skip it
             if not channel_parameters["channel"]:
                 continue
-            logger.log("channel_parameters=%s" % repr(channel_parameters))
+            logger.debug("channel_parameters=%s" % repr(channel_parameters))
 
             # If you prefer the banner and the channel has it, now change your mind
             if view == "banner_" and "banner" in channel_parameters:
@@ -221,7 +221,7 @@ def get_thumb(thumb_name, view="thumb_"):
 
 
 def set_channel_info(parameters):
-    logger.log()
+    logger.info()
 
     info = ''
     language = ''

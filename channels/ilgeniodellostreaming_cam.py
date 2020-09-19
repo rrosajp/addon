@@ -5,7 +5,7 @@
 
 
 from core import support
-from core.support import log
+from core.support import info
 from core.item import Item
 from platformcode import config
 
@@ -54,7 +54,7 @@ def genres(item):
     return locals()
 
 def search(item, text):
-    log(text)
+    info(text)
     text = text.replace(' ', '+')
     item.url = host + "/search/" + text
     try:
@@ -62,12 +62,12 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            log("%s" % line)
+            info("%s" % line)
 
     return []
 
 def newest(categoria):
-    log(categoria)
+    info(categoria)
     itemlist = []
     item = Item()
 
@@ -81,12 +81,12 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            log("{0}".format(line))
+            info("{0}".format(line))
         return []
 
     return itemlist
 
 
 def findvideos(item):
-    log()
+    info()
     return support.server(item)

@@ -9,7 +9,7 @@ import sys
 import xbmc
 from platformcode import config, logger
 
-logger.log("init...")
+logger.info("init...")
 
 librerias = xbmc.translatePath(os.path.join(config.get_runtime_path(), 'lib'))
 sys.path.insert(0, librerias)

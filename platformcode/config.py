@@ -215,23 +215,23 @@ def get_setting(name, channel="", server="", default=None):
 
     # Specific channel setting
     if channel:
-        # logger.log("get_setting reading channel setting '"+name+"' from channel json")
+        # logger.info("get_setting reading channel setting '"+name+"' from channel json")
         from core import channeltools
         value = channeltools.get_channel_setting(name, channel, default)
-        # logger.log("get_setting -> '"+repr(value)+"'")
+        # logger.info("get_setting -> '"+repr(value)+"'")
         return value
 
     # Specific server setting
     elif server:
-        # logger.log("get_setting reading server setting '"+name+"' from server json")
+        # logger.info("get_setting reading server setting '"+name+"' from server json")
         from core import servertools
         value = servertools.get_server_setting(name, server, default)
-        # logger.log("get_setting -> '"+repr(value)+"'")
+        # logger.info("get_setting -> '"+repr(value)+"'")
         return value
 
     # Global setting
     else:
-        # logger.log("get_setting reading main setting '"+name+"'")
+        # logger.info("get_setting reading main setting '"+name+"'")
         value = __settings__.getSetting(name)
         if not value:
             return default

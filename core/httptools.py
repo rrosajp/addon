@@ -125,11 +125,11 @@ def set_cookies(dict_cookie, clear=True, alfa_s=False):
 def load_cookies(alfa_s=False):
     cookies_lock.acquire()
     if os.path.isfile(cookies_file):
-        if not alfa_s: logger.log("Reading cookies file")
+        if not alfa_s: logger.info("Reading cookies file")
         try:
             cj.load(cookies_file, ignore_discard=True)
         except:
-            if not alfa_s: logger.log("The cookie file exists but is illegible, it is deleted")
+            if not alfa_s: logger.info("The cookie file exists but is illegible, it is deleted")
             os.remove(cookies_file)
     cookies_lock.release()
 
@@ -137,7 +137,7 @@ load_cookies()
 
 def save_cookies(alfa_s=False):
     cookies_lock.acquire()
-    if not alfa_s: logger.log("Saving cookies...")
+    if not alfa_s: logger.debug("Saving cookies...")
     cj.save(cookies_file, ignore_discard=True)
     cookies_lock.release()
 
@@ -161,7 +161,7 @@ def random_useragent():
 
 
 def show_infobox(info_dict):
-    logger.log()
+    logger.debug()
     from textwrap import wrap
 
     box_items_kodi = {'r_up_corner': u'\u250c',
@@ -193,9 +193,9 @@ def show_infobox(info_dict):
     else:
         box = box_items
 
-    logger.log('%s%s%s' % (box['r_up_corner'], box['fill'] * width, box['l_up_corner']))
-    logger.log('%s%s%s' % (box['center'], version.center(width), box['center']))
-    logger.log('%s%s%s' % (box['r_center'], box['fill'] * width, box['l_center']))
+    logger.debug('%s%s%s' % (box['r_up_corner'], box['fill'] * width, box['l_up_corner']))
+    logger.debug('%s%s%s' % (box['center'], version.center(width), box['center']))
+    logger.debug('%s%s%s' % (box['r_center'], box['fill'] * width, box['l_center']))
 
     count = 0
     for key, value in info_dict:
@@ -210,19 +210,19 @@ def show_infobox(info_dict):
             for line in text:
                 if len(line) < width:
                     line = line.ljust(width, ' ')
-                logger.log('%s%s%s' % (box['center'], line, box['center']))
+                logger.debug('%s%s%s' % (box['center'], line, box['center']))
         else:
-            logger.log('%s%s%s' % (box['center'], text, box['center']))
+            logger.debug('%s%s%s' % (box['center'], text, box['center']))
         if count < len(info_dict):
-            logger.log('%s%s%s' % (box['r_center'], box['fill'] * width, box['l_center']))
+            logger.debug('%s%s%s' % (box['r_center'], box['fill'] * width, box['l_center']))
         else:
-            logger.log('%s%s%s' % (box['r_dn_corner'], box['fill'] * width, box['l_dn_corner']))
+            logger.debug('%s%s%s' % (box['r_dn_corner'], box['fill'] * width, box['l_dn_corner']))
     return
 
 
 
 def downloadpage(url, **opt):
-    # logger.log()
+    # logger.info()
     """
        Open a url and return the data obtained
 

@@ -62,7 +62,7 @@ def mainlist(item):
 
 
 def search(item, texto):
-    support.log(texto)
+    support.info(texto)
     item.url = host + '/animelist?search=' + texto
     item.contentType = 'tvshow'
     try:
@@ -71,12 +71,12 @@ def search(item, texto):
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("%s" % line)
+            support.infoger.error("%s" % line)
         return []
 
 
 def newest(categoria):
-    support.log()
+    support.info()
     itemlist = []
     item = support.Item()
     try:
@@ -88,7 +88,7 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("{0}".format(line))
+            support.infoger.error("{0}".format(line))
         return []
 
     return itemlist
@@ -163,7 +163,7 @@ def episodios(item):
 
 
 def findvideos(item):
-    support.log()
+    support.info()
     itemlist = []
     page_data = ''
     titles =['Primario', 'Secondario', 'Alternativo Primario', 'Alternativo Secondario']

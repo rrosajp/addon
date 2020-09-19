@@ -107,7 +107,7 @@ def submenu(item):
 
 
 def newest(categoria):
-    support.log(categoria)
+    support.info(categoria)
     item = support.Item()
     try:
         if categoria == "anime":
@@ -118,12 +118,12 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("{0}".format(line))
+            support.infoger.error("{0}".format(line))
         return []
 
 
 def search(item, texto):
-    support.log(texto)
+    support.info(texto)
     if item.search:
         item.url = host + '/filter?dub=' + item.args + '&keyword=' + texto + '&sort='
     else:
@@ -136,7 +136,7 @@ def search(item, texto):
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("%s" % line)
+            support.infoger.error("%s" % line)
         return []
 
 
@@ -187,7 +187,7 @@ def episodios(item):
 
 def findvideos(item):
     import time
-    support.log(item)
+    support.info(item)
     itemlist = []
     urls = []
     resp = support.match(get_data(item), headers=headers, patron=r'data-name="(\d+)">([^<]+)<')

@@ -12,7 +12,7 @@ from past.utils import old_div
 
 from core import channeltools, servertools, scrapertools
 from platformcode import config, logger, platformtools
-from core.support import log, dbg, match
+from core.support import info, dbg, match
 
 
 class SettingsWindow(xbmcgui.WindowXMLDialog):
@@ -141,7 +141,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
     """
 
     def start(self, list_controls=None, dict_values=None, caption="", callback=None, item=None, custom_button=None, channelpath=None):
-        log()
+        info()
 
         # Media Path
         self.mediapath = os.path.join(config.get_runtime_path(), 'resources', 'skins', 'Default', 'media')

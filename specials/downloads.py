@@ -18,7 +18,7 @@ from core import filetools, jsontools, scraper, scrapertools, servertools, video
 from core.downloader import Downloader
 from core.item import Item
 from platformcode import config, logger, platformtools
-from core.support import log, dbg, typo
+from core.support import info, dbg, typo
 from servers import torrent
 
 kb = '0xFF65B3DA'
@@ -40,7 +40,7 @@ extensions_list = ['.aaf', '.3gp', '.asf', '.avi', '.flv', '.mpeg', '.m1v', '.m2
 
 
 def mainlist(item):
-    log()
+    info()
     itemlist = []
 
     # File list
@@ -143,7 +143,7 @@ def settings(item):
 
 
 def browser(item):
-    log()
+    info()
     itemlist = []
 
     for file in filetools.listdir(item.url):
@@ -177,7 +177,7 @@ def del_dir(item):
 
 
 def clean_all(item):
-    log()
+    info()
     stop_all()
     removeFiles = False
     if platformtools.dialog_yesno(config.get_localized_string(20000), config.get_localized_string(30300)):
@@ -203,7 +203,7 @@ def reload(item):
 
 
 def stop_all(item=None):
-    log()
+    info()
 
     for fichero in sorted(filetools.listdir(DOWNLOAD_LIST_PATH)):
         if fichero.endswith(".json"):
@@ -221,7 +221,7 @@ def stop_all(item=None):
 
 
 def clean_ready(item):
-    log()
+    info()
     for fichero in sorted(filetools.listdir(DOWNLOAD_LIST_PATH)):
         if fichero.endswith(".json"):
             download_item = Item().fromjson(filetools.read(filetools.join(DOWNLOAD_LIST_PATH, fichero)))
@@ -233,7 +233,7 @@ def clean_ready(item):
 
 
 def restart_error(item):
-    log()
+    info()
     for fichero in sorted(filetools.listdir(DOWNLOAD_LIST_PATH)):
         if fichero.endswith(".json"):
             download_item = Item().fromjson(filetools.read(filetools.join(DOWNLOAD_LIST_PATH, fichero)))
@@ -272,7 +272,7 @@ def download_all_background(item):
 
 
 def menu(item):
-    log(item)
+    info(item)
     if item.downloadServer:
         servidor = item.downloadServer.get("server", "Auto")
     else:
@@ -312,7 +312,7 @@ def menu(item):
 
     # Show Dialog
     seleccion = platformtools.dialog_select(config.get_localized_string(30163), opciones)
-    logger.log('SELECTION: '+ op[seleccion])
+    logger.info('SELECTION: '+ op[seleccion])
 
     # -1 is cancel
     if seleccion == -1: return
@@ -368,7 +368,7 @@ def menu(item):
 
 
 def move_to_libray(item):
-    log()
+    info()
 
     if item.contentType == 'movie':
         FOLDER = FOLDER_MOVIES
@@ -422,7 +422,7 @@ def move_to_libray(item):
         if filename.startswith(name) and (filename.endswith('.strm') or (filename.endswith('.json') and 'downloads' not in filename)):
             clean = True
             file_path = filetools.join(config.get_setting("videolibrarypath"), FOLDER, path_title, File)
-            log('Delete File:', str(file_path))
+            info('Delete File:', str(file_path))
             filetools.remove(file_path)
             if file_path.endswith('.strm'):
                 file_strm_path = file_path
@@ -578,7 +578,7 @@ def sort_method(item):
 
 
 def download_from_url(url, item):
-    log("Attempting to download:", url)
+    info("Attempting to download:", url)
     if url.lower().split('|')[0].endswith(".m3u8") or url.lower().startswith("rtmp"):
         save_server_statistics(item.server, 0, False)
         platformtools.dialog_notification('m3u8 Download',config.get_localized_string(60364), sound=False)
@@ -607,22 +607,22 @@ def download_from_url(url, item):
     update_json(item.path, {"downloadUrl": d.download_url, "downloadStatus": STATUS_CODES.downloading, "downloadSize": d.size[0],
             "downloadProgress": d.progress, "downloadCompleted": d.downloaded[0], "downloadFilename": file})
 
-    d.start_dialog(config.get_localized_string(60332))
+    d.start_diainfo(config.get_localized_string(60332))
 
     # Download stopped. We get the state:
     # Download failed
     if d.state == d.states.error:
-        log("Error trying to download", url)
+        info("Error trying to download", url)
         status = STATUS_CODES.error
 
     # Download has stopped
     elif d.state == d.states.stopped:
-        log("Stop download")
+        info("Stop download")
         status = STATUS_CODES.canceled
 
     # Download is complete
     elif d.state == d.states.completed:
-        log("Downloaded correctly")
+        info("Downloaded correctly")
         status = STATUS_CODES.completed
 
         if (item.downloadSize and item.downloadSize != d.size[0]) or d.size[0] < 5000000:  # if size don't correspond or file is too little (gounlimited for example send a little video to say the server is overloaded)
@@ -638,7 +638,7 @@ def download_from_url(url, item):
 
 
 def download_from_server(item):
-    log(item.tostring())
+    info(item.tostring())
     unsupported_servers = ["torrent"]
 
     if item.contentChannel == 'local':
@@ -668,11 +668,11 @@ def download_from_server(item):
                     item.video_urls = itemlist
                     if not item.server: item.server = "directo"
                 else:
-                    log("There is nothing to reproduce")
+                    info("There is nothing to reproduce")
                     return {"downloadStatus": STATUS_CODES.error}
     finally:
         progreso.close()
-    log("contentAction: %s | contentChannel: %s | server: %s | url: %s" % (item.contentAction, item.contentChannel, item.server, item.url))
+    info("contentAction: %s | contentChannel: %s | server: %s | url: %s" % (item.contentAction, item.contentChannel, item.server, item.url))
 
     if item.server == 'torrent':
         import xbmcgui
@@ -692,11 +692,11 @@ def download_from_server(item):
 
     # If it is not available, we go out
     if not puedes:
-        log("The video is NOT available")
+        info("The video is NOT available")
         return {"downloadStatus": STATUS_CODES.error}
 
     else:
-        log("YES Video is available")
+        info("YES Video is available")
 
         result = {}
 
@@ -717,14 +717,14 @@ def download_from_server(item):
 
 
 def download_from_best_server(item):
-    log("contentAction: %s | contentChannel: %s | url: %s" % (item.contentAction, item.contentChannel, item.url))
+    info("contentAction: %s | contentChannel: %s | url: %s" % (item.contentAction, item.contentChannel, item.url))
 
     result = {"downloadStatus": STATUS_CODES.error}
     progreso = platformtools.dialog_progress_bg(config.get_localized_string(30101), config.get_localized_string(70179))
 
     try:
         if item.downloadItemlist:
-            log('using cached servers')
+            info('using cached servers')
             play_items = [Item().fromurl(i) for i in item.downloadItemlist]
         else:
             if item.contentChannel in ['community', 'videolibrary']:
@@ -773,11 +773,11 @@ def download_from_best_server(item):
 def select_server(item):
     if item.server:
         return "Auto"
-    log("contentAction: %s | contentChannel: %s | url: %s" % (item.contentAction, item.contentChannel, item.url))
+    info("contentAction: %s | contentChannel: %s | url: %s" % (item.contentAction, item.contentChannel, item.url))
     progreso = platformtools.dialog_progress_bg(config.get_localized_string(30101), config.get_localized_string(70179))
     try:
         if item.downloadItemlist:
-            log('using cached servers')
+            info('using cached servers')
             play_items = [Item().fromurl(i) for i in item.downloadItemlist]
         else:
             if item.contentChannel in ['community', 'videolibrary']:
@@ -819,7 +819,7 @@ def select_server(item):
 
 
 def start_download(item):
-    log("contentAction: %s | contentChannel: %s | url: %s" % (item.contentAction, item.contentChannel, item.url))
+    info("contentAction: %s | contentChannel: %s | url: %s" % (item.contentAction, item.contentChannel, item.url))
     # We already have a server, we just need to download
     if item.contentAction == "play":
         ret = download_from_server(item)
@@ -839,7 +839,7 @@ def start_download(item):
 
 
 def get_episodes(item):
-    log("contentAction: %s | contentChannel: %s | contentType: %s" % (item.contentAction, item.contentChannel, item.contentType))
+    info("contentAction: %s | contentChannel: %s | contentType: %s" % (item.contentAction, item.contentChannel, item.contentType))
 
     if 'dlseason' in item:
         season = True
@@ -916,7 +916,7 @@ def get_episodes(item):
 
         # Any other result is not worth it, we ignore it
         else:
-            log("Omitiendo item no válido:", episode.tostring())
+            info("Omitiendo item no válido:", episode.tostring())
 
     # Any other result is not worth it, we ignore it...
     itemlist = videolibrarytools.filter_list(itemlist)
@@ -925,7 +925,7 @@ def get_episodes(item):
 
 
 def write_json(item):
-    log()
+    info()
 
     channel = item.from_channel if item.from_channel else item.channel
     item.action = "menu"
@@ -970,7 +970,7 @@ def save_download(item):
 
 
 def save_download_background(item):
-    log()
+    info()
     # Menu contextual
     if item.from_action and item.from_channel:
         item.channel = item.from_channel
@@ -1019,7 +1019,7 @@ def save_download_background(item):
 
 
 def save_download_videolibrary(item):
-    log()
+    info()
     show_disclaimer()
     item.contentChannel = 'videolibrary'
     item.channel = "downloads"
@@ -1028,7 +1028,7 @@ def save_download_videolibrary(item):
 
 
 def save_download_video(item):
-    log("contentAction: %s | contentChannel: %s | contentTitle: %s" % (item.contentAction, item.contentChannel, item.contentTitle))
+    info("contentAction: %s | contentChannel: %s | contentTitle: %s" % (item.contentAction, item.contentChannel, item.contentTitle))
 
     set_movie_title(item)
 
@@ -1043,7 +1043,7 @@ def save_download_video(item):
 
 
 def save_download_movie(item):
-    log("contentAction: %s | contentChannel: %s | contentTitle: %s" % ( item.contentAction, item.contentChannel, item.contentTitle))
+    info("contentAction: %s | contentChannel: %s | contentTitle: %s" % ( item.contentAction, item.contentChannel, item.contentTitle))
 
     progreso = platformtools.dialog_progress_bg(config.get_localized_string(30101), config.get_localized_string(70191))
 
@@ -1077,7 +1077,7 @@ def save_download_movie(item):
 
 
 def save_download_tvshow(item):
-    log("contentAction: %s | contentChannel: %s | contentType: %s | contentSerieName: %s" % (item.contentAction, item.contentChannel, item.contentType, item.contentSerieName))
+    info("contentAction: %s | contentChannel: %s | contentType: %s | contentSerieName: %s" % (item.contentAction, item.contentChannel, item.contentType, item.contentSerieName))
     progreso = platformtools.dialog_progress_bg(config.get_localized_string(30101), config.get_localized_string(70188))
     try:
         item.show = item.fulltitle

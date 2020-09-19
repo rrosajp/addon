@@ -20,14 +20,14 @@ def test_video_exists(page_url):
 
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
-    logger.log("url=" + page_url)
+    logger.info("url=" + page_url)
     video_urls = []
     global data
     data = re.sub(r'"|\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
-    # logger.log('GOUN DATA= '+data)
+    # logger.info('GOUN DATA= '+data)
     packed_data = scrapertools.find_single_match(data, "javascript'>(eval.*?)</script>")
     unpacked = jsunpack.unpack(packed_data)
-    # logger.log('GOUN DATA= '+unpacked)
+    # logger.info('GOUN DATA= '+unpacked)
     patron = r"sources..([^\]]+)"
     matches = re.compile(patron, re.DOTALL).findall(unpacked)
     if not matches:

@@ -17,8 +17,8 @@ from core import filetools
 
 class ziptools(object):
     def extract(self, file, dir, folder_to_extract="", overwrite_question=False, backup=False):
-        logger.log("file= %s" % file)
-        logger.log("dir= %s" % dir)
+        logger.info("file= %s" % file)
+        logger.info("dir= %s" % dir)
 
         if not dir.endswith(':') and not filetools.exists(dir):
             filetools.mkdir(dir)
@@ -30,13 +30,13 @@ class ziptools(object):
 
         for nameo in zf.namelist():
             name = nameo.replace(':', '_').replace('<', '_').replace('>', '_').replace('|', '_').replace('"', '_').replace('?', '_').replace('*', '_')
-            logger.log("name=%s" % nameo)
+            logger.info("name=%s" % nameo)
             if not name.endswith('/'):
-                logger.log("it's not a directory")
+                logger.info("it's not a directory")
                 try:
                     (path, filename) = filetools.split(filetools.join(dir, name))
-                    logger.log("path=%s" % path)
-                    logger.log("name=%s" % name)
+                    logger.info("path=%s" % path)
+                    logger.info("name=%s" % name)
                     if folder_to_extract:
                         if path != filetools.join(dir, folder_to_extract):
                             break
@@ -49,7 +49,7 @@ class ziptools(object):
 
                 else:
                     outfilename = filetools.join(dir, name)
-                logger.log("outfilename=%s" % outfilename)
+                logger.info("outfilename=%s" % outfilename)
                 try:
                     if filetools.exists(outfilename) and overwrite_question:
                         from platformcode import platformtools
@@ -74,7 +74,7 @@ class ziptools(object):
         try:
             zf.close()
         except:
-            logger.log("Error closing .zip " + file)
+            logger.info("Error closing .zip " + file)
 
     def _createstructure(self, file, dir):
         self._makedirs(self._listdirs(file), dir)

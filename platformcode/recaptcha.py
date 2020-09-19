@@ -65,7 +65,7 @@ class Recaptcha(xbmcgui.WindowXMLDialog):
 
             data = httptools.downloadpage(self.url, post=post, headers=self.headers).data
             from platformcode import logger
-            logger.log(data)
+            logger.info(data)
             self.result = scrapertools.find_single_match(data, '<div class="fbc-verification-token">.*?>([^<]+)<')
             if self.result:
                 platformtools.dialog_notification("Captcha corretto", "Verifica conclusa")

@@ -34,7 +34,7 @@ def mainlist(item):
 
 
 def radio(item):
-    support.log()
+    support.info()
     itemlist = []
     data = support.match(item, patron= r'text="(?P<title>[^\("]+)(?:\((?P<location>[^\)]+)\))?" URL="(?P<url>[^"]+)" bitrate="(?P<quality>[^"]+)" reliability="[^"]+" guide_id="[^"]+" subtext="(?P<song>[^"]+)" genre_id="[^"]+" formats="(?P<type>[^"]+)" (?:playing="[^"]+" )?(?:playing_image="[^"]+" )?(?:show_id="[^"]+" )?(?:item="[^"]+" )?image="(?P<thumb>[^"]+)"')
     if data.matches:
@@ -85,7 +85,7 @@ def findvideos(item):
 
 
 def search(item, text):
-    support.log(text)
+    support.info(text)
     item.url = host + '/Search.ashx?query=' +text
     try:
         return radio(item)
@@ -93,5 +93,5 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("%s" % line)
+            support.infoger.error("%s" % line)
         return []

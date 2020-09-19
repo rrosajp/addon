@@ -17,7 +17,7 @@ from xml.dom import minidom
 
 def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
     def mark_as_watched_subThread(item, nfo_path, head_nfo, item_nfo):
-        logger.log()
+        logger.info()
         # logger.debug("item:\n" + item.tostring('\n'))
 
         time_limit = time.time() + 30
@@ -99,7 +99,7 @@ def sync_trakt_addon(path_folder):
     """
        Updates the values ​​of episodes seen if
     """
-    logger.log()
+    logger.info()
     # if the addon exists we do the search
     if xbmc.getCondVisibility('System.HasAddon("script.trakt")'):
         # we import dependencies
@@ -225,7 +225,7 @@ def sync_trakt_kodi(silent=True):
             notificacion = False
 
         xbmc.executebuiltin('RunScript(script.trakt,action=sync,silent=%s)' % silent)
-        logger.log("Synchronization with Trakt started")
+        logger.info("Synchronization with Trakt started")
 
         if notificacion:
             platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60045), sound=False, time=2000)
@@ -239,7 +239,7 @@ def mark_content_as_watched_on_kodi(item, value=1):
     @type value: int
     @param value: > 0 for seen, 0 for not seen
     """
-    logger.log()
+    logger.info()
     # logger.debug("item:\n" + item.tostring('\n'))
     payload_f = ''
 
@@ -311,7 +311,7 @@ def mark_season_as_watched_on_kodi(item, value=1):
         @type value: int
         @param value: > 0 for seen, 0 for not seen
         """
-    logger.log()
+    logger.info()
     # logger.debug("item:\n" + item.tostring('\n'))
 
     # We can only mark the season as seen in the Kodi database if the database is local, in case of sharing database this functionality will not work
@@ -345,7 +345,7 @@ def mark_content_as_watched_on_kod(path):
         @type str: path
         @param path: content folder to mark
         """
-    logger.log()
+    logger.info()
     #logger.debug("path: " + path)
 
     FOLDER_MOVIES = config.get_setting("folder_movies")
@@ -435,7 +435,7 @@ def get_data(payload):
     :return:
     """
     import urllib.request, urllib.error
-    logger.log("payload: %s" % payload)
+    logger.info("payload: %s" % payload)
     # Required header for XBMC JSON-RPC calls, otherwise you'll get a 415 HTTP response code - Unsupported media type
     headers = {'content-type': 'application/json'}
 
@@ -452,7 +452,7 @@ def get_data(payload):
             response = f.read()
             f.close()
 
-            logger.log("get_data: response %s" % response)
+            logger.info("get_data: response %s" % response)
             data = jsontools.load(response)
         except Exception as ex:
             template = "An exception of type %s occured. Arguments:\n%r"
@@ -468,7 +468,7 @@ def get_data(payload):
             logger.error("error en xbmc.executeJSONRPC: %s" % message)
             data = ["error"]
 
-    logger.log("data: %s" % data)
+    logger.info("data: %s" % data)
 
     return data
 
@@ -482,7 +482,7 @@ def update(folder_content=config.get_setting("folder_tvshows"), folder=""):
     @type folder: str
     @param folder: name of the folder to scan.
     """
-    logger.log(folder)
+    logger.info(folder)
 
     payload = {
         "jsonrpc": "2.0",
@@ -546,7 +546,7 @@ def set_content(content_type, silent=False, custom=False):
     @type content_type: str ('movie' o 'tvshow')
     @param content_type: content type to configure, series or movies
     """
-    logger.log()
+    logger.info()
     continuar = True
     msg_text = ""
     videolibrarypath = config.get_setting("videolibrarypath")
@@ -572,7 +572,7 @@ def set_content(content_type, silent=False, custom=False):
                     try:
                         # Install metadata.themoviedb.org
                         xbmc.executebuiltin('InstallAddon(metadata.themoviedb.org)', True)
-                        logger.log("Instalado el Scraper de películas de TheMovieDB")
+                        logger.info("Instalado el Scraper de películas de TheMovieDB")
                     except:
                         pass
 
@@ -626,7 +626,7 @@ def set_content(content_type, silent=False, custom=False):
                     try:
                         # Install metadata.tvdb.com
                         xbmc.executebuiltin('InstallAddon(metadata.tvdb.com)', True)
-                        logger.log("The TVDB series Scraper installed ")
+                        logger.info("The TVDB series Scraper installed ")
                     except:
                         pass
 
@@ -721,7 +721,7 @@ def set_content(content_type, silent=False, custom=False):
                 strScraper = 'metadata.universal'
                 path_settings = xbmc.translatePath("special://profile/addon_data/metadata.universal/settings.xml")
             if not os.path.exists(path_settings):
-                logger.log("%s: %s" % (content_type, path_settings + " doesn't exist"))
+                logger.info("%s: %s" % (content_type, path_settings + " doesn't exist"))
                 return continuar
             settings_data = filetools.read(path_settings)
             strSettings = ' '.join(settings_data.split()).replace("> <", "><")
@@ -740,7 +740,7 @@ def set_content(content_type, silent=False, custom=False):
                 strScraper = 'metadata.tvshows.themoviedb.org'
                 path_settings = xbmc.translatePath("special://profile/addon_data/metadata.tvshows.themoviedb.org/settings.xml")
             if not os.path.exists(path_settings):
-                logger.log("%s: %s" % (content_type, path_settings + " doesn't exist"))
+                logger.info("%s: %s" % (content_type, path_settings + " doesn't exist"))
                 return continuar
             settings_data = filetools.read(path_settings)
             strSettings = ' '.join(settings_data.split()).replace("> <", "><")
@@ -750,7 +750,7 @@ def set_content(content_type, silent=False, custom=False):
                 videolibrarypath += sep
             strPath = videolibrarypath + config.get_setting("folder_tvshows") + sep
 
-        logger.log("%s: %s" % (content_type, strPath))
+        logger.info("%s: %s" % (content_type, strPath))
         # We check if strPath already exists in the DB to avoid duplicates
         sql = 'SELECT idPath FROM path where strPath="%s"' % strPath
         nun_records, records = execute_sql_kodi(sql)
@@ -792,15 +792,15 @@ def set_content(content_type, silent=False, custom=False):
         heading = config.get_localized_string(70103) % content_type
         msg_text = config.get_localized_string(70104)
 
-    logger.log("%s: %s" % (heading, msg_text))
+    logger.info("%s: %s" % (heading, msg_text))
     return continuar
 
 
 def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvshows_folder, new_tvshows_folder, progress):
     def path_replace(path, old, new):
 
-        logger.log()
-        logger.log('path: ' + path + ', old: ' + old + ', new: ' + new)
+        logger.info()
+        logger.info('path: ' + path + ', old: ' + old + ', new: ' + new)
 
         if new.startswith("special://") or '://' in new: sep = '/'
         else: sep = os.sep
@@ -811,7 +811,7 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
 
         return path
 
-    logger.log()
+    logger.info()
 
     sql_old_path = old_path
     if sql_old_path.startswith("special://"):
@@ -823,10 +823,10 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
     if not sql_old_path.endswith(sep):
         sql_old_path += sep
 
-    logger.log('sql_old_path: ' + sql_old_path)
+    logger.info('sql_old_path: ' + sql_old_path)
     # search MAIN path in the DB
     sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % sql_old_path
-    logger.log('sql: ' + sql)
+    logger.info('sql: ' + sql)
     nun_records, records = execute_sql_kodi(sql)
 
     # change main path
@@ -834,7 +834,7 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
         idPath = records[0][0]
         strPath = path_replace(records[0][1], old_path, new_path)
         sql = 'UPDATE path SET strPath="%s" WHERE idPath=%s' % (strPath, idPath)
-        logger.log('sql: ' + sql)
+        logger.info('sql: ' + sql)
         nun_records, records = execute_sql_kodi(sql)
     else:
         progress.update(100)
@@ -851,7 +851,7 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
 
         # Search Main Sub Folder
         sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % sql_old_folder
-        logger.log('sql: ' + sql)
+        logger.info('sql: ' + sql)
         nun_records, records = execute_sql_kodi(sql)
 
         # Change Main Sub Folder
@@ -860,13 +860,13 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
                 idPath = record[0]
                 strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
                 sql = 'UPDATE path SET strPath="%s" WHERE idPath=%s' % (strPath, idPath)
-                logger.log('sql: ' + sql)
+                logger.info('sql: ' + sql)
                 nun_records, records = execute_sql_kodi(sql)
 
         # Search if Sub Folder exixt in all paths
         sql_old_folder += '%'
         sql = 'SELECT idPath, strPath FROM path where strPath LIKE "%s"' % sql_old_folder
-        logger.log('sql: ' + sql)
+        logger.info('sql: ' + sql)
         nun_records, records = execute_sql_kodi(sql)
 
         #Change Sub Folder in all paths
@@ -875,7 +875,7 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
                 idPath = record[0]
                 strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
                 sql = 'UPDATE path SET strPath="%s" WHERE idPath=%s' % (strPath, idPath)
-                logger.log('sql: ' + sql)
+                logger.info('sql: ' + sql)
                 nun_records, records = execute_sql_kodi(sql)
 
 
@@ -883,27 +883,27 @@ def update_db(old_path, new_path, old_movies_folder, new_movies_folder, old_tvsh
             # if is Movie Folder
             # search and modify in "movie"
             sql = 'SELECT idMovie, c22 FROM movie where c22 LIKE "%s"' % sql_old_folder
-            logger.log('sql: ' + sql)
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             if records:
                 for record in records:
                     idMovie = record[0]
                     strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
                     sql = 'UPDATE movie SET c22="%s" WHERE idMovie=%s' % (strPath, idMovie)
-                    logger.log('sql: ' + sql)
+                    logger.info('sql: ' + sql)
                     nun_records, records = execute_sql_kodi(sql)
         else:
             # if is TV Show Folder
             # search and modify in "episode"
             sql = 'SELECT idEpisode, c18 FROM episode where c18 LIKE "%s"' % sql_old_folder
-            logger.log('sql: ' + sql)
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             if records:
                 for record in records:
                     idEpisode = record[0]
                     strPath = path_replace(record[1], filetools.join(old_path, OldFolder), filetools.join(new_path, NewFolder))
                     sql = 'UPDATE episode SET c18="%s" WHERE idEpisode=%s' % (strPath, idEpisode)
-                    logger.log('sql: ' + sql)
+                    logger.info('sql: ' + sql)
                     nun_records, records = execute_sql_kodi(sql)
         p += 5
         progress.update(p, config.get_localized_string(20000) + '\n' + config.get_localized_string(80013))
@@ -928,26 +928,26 @@ def clean(path_list=[]):
 
         return path, sep
 
-    logger.log()
+    logger.info()
 
     progress = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(80025))
     progress.update(0)
 
     # if the path list is empty, clean the entire video library
     if not path_list:
-        logger.log('the path list is empty, clean the entire video library')
+        logger.info('the path list is empty, clean the entire video library')
         if not config.get_setting("videolibrary_kodi"):
             sql_path, sep = sql_format(config.get_setting("videolibrarypath"))
             if not sql_path.endswith(sep): sql_path += sep
             sql = 'SELECT idPath FROM path where strPath LIKE "%s"' % sql_path
-            logger.log('sql: ' + sql)
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             idPath = records[0][0]
             sql = 'DELETE from path WHERE idPath=%s' % idPath
-            logger.log('sql: ' + sql)
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             sql = 'DELETE from path WHERE idParentPath=%s' % idPath
-            logger.log('sql: ' + sql)
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
 
         from core import videolibrarytools
@@ -961,7 +961,7 @@ def clean(path_list=[]):
                 if filetools.exists(tvshow_nfo):
                     path_list.append(filetools.join(config.get_setting("videolibrarypath"), videolibrarytools.FOLDER_TVSHOWS, folder))
 
-    logger.log('path_list: ' + str(path_list))
+    logger.info('path_list: ' + str(path_list))
     if path_list: t = float(100) / len(path_list)
     for i, path in enumerate(path_list):
         progress.update(int(math.ceil((i + 1) * t)))
@@ -971,13 +971,13 @@ def clean(path_list=[]):
 
         sql_path, sep = sql_format(path)
         if filetools.isdir(path) and not sql_path.endswith(sep): sql_path += sep
-        logger.log('path: ' + path)
-        logger.log('sql_path: ' + sql_path)
+        logger.info('path: ' + path)
+        logger.info('sql_path: ' + sql_path)
 
         if filetools.isdir(path):
             # search movie in the DB
             sql = 'SELECT idMovie FROM movie where c22 LIKE "%s"' % (sql_path + '%')
-            logger.log('sql: ' + sql)
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             # delete movie
             if records:
@@ -986,7 +986,7 @@ def clean(path_list=[]):
                 continue
             # search TV show in the DB
             sql = 'SELECT idShow FROM tvshow_view where strPath LIKE "%s"' % sql_path
-            logger.log('sql: ' + sql)
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             # delete TV show
             if records:
@@ -995,7 +995,7 @@ def clean(path_list=[]):
         elif config.get_setting("folder_movies") in sql_path:
             # search movie in the DB
             sql = 'SELECT idMovie FROM movie where c22 LIKE "%s"' % sql_path
-            logger.log('sql: ' + sql)
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             # delete movie
             if records:
@@ -1004,7 +1004,7 @@ def clean(path_list=[]):
         else:
             # search episode in the DB
             sql = 'SELECT idEpisode FROM episode where c18 LIKE "%s"' % sql_path
-            logger.log('sql: ' + sql)
+            logger.info('sql: ' + sql)
             nun_records, records = execute_sql_kodi(sql)
             # delete episode
             if records:
@@ -1023,7 +1023,7 @@ def check_db(path):
     ret = False
     sql_path = '%' + sep + path.split(sep)[-1] + sep + '%'
     sql = 'SELECT idShow FROM tvshow_view where strPath LIKE "%s"' % sql_path
-    logger.log('sql: ' + sql)
+    logger.info('sql: ' + sql)
     nun_records, records = execute_sql_kodi(sql)
     if records:
         ret = True
@@ -1040,7 +1040,7 @@ def execute_sql_kodi(sql):
     @return: list with the query result
     @rtype records: list of tuples
     """
-    logger.log()
+    logger.info()
     file_db = ""
     nun_records = 0
     records = None
@@ -1061,14 +1061,14 @@ def execute_sql_kodi(sql):
                 break
 
     if file_db:
-        logger.log("DB file: %s" % file_db)
+        logger.info("DB file: %s" % file_db)
         conn = None
         try:
             import sqlite3
             conn = sqlite3.connect(file_db)
             cursor = conn.cursor()
 
-            logger.log("Running sql: %s" % sql)
+            logger.info("Running sql: %s" % sql)
             cursor.execute(sql)
             conn.commit()
 
@@ -1082,7 +1082,7 @@ def execute_sql_kodi(sql):
                 nun_records = conn.total_changes
 
             conn.close()
-            logger.log("Query executed. Records: %s" % nun_records)
+            logger.info("Query executed. Records: %s" % nun_records)
 
         except:
             logger.error("Error executing sql query")
@@ -1102,7 +1102,7 @@ def check_sources(new_movies_path='', new_tvshows_path=''):
         if not path.endswith(sep): path += sep
         return path
 
-    logger.log()
+    logger.info()
 
     new_movies_path = format_path(new_movies_path)
     new_tvshows_path = format_path(new_tvshows_path)
@@ -1132,7 +1132,7 @@ def check_sources(new_movies_path='', new_tvshows_path=''):
 
 
 def update_sources(new='', old=''):
-    logger.log()
+    logger.info()
     if new == old: return
 
     SOURCES_PATH = xbmc.translatePath("special://userdata/sources.xml")
@@ -1174,9 +1174,9 @@ def update_sources(new='', old=''):
         # create new path
         list_path = [p.firstChild.data for p in paths_node]
         if new in list_path:
-            logger.log("The path %s already exists in sources.xml" % new)
+            logger.info("The path %s already exists in sources.xml" % new)
             return
-        logger.log("The path %s does not exist in sources.xml" % new)
+        logger.info("The path %s does not exist in sources.xml" % new)
 
         # if the path does not exist we create one
         source_node = xmldoc.createElement("source")
@@ -1215,7 +1215,7 @@ def update_sources(new='', old=''):
 
 
 def ask_set_content(silent=False):
-    logger.log()
+    logger.info()
     logger.debug("videolibrary_kodi %s" % config.get_setting("videolibrary_kodi"))
 
     def do_config(custom=False):
@@ -1272,7 +1272,7 @@ def ask_set_content(silent=False):
 
 def next_ep(item):
     from core.item import Item
-    logger.log()
+    logger.info()
     item.next_ep = False
 
     # check if next file exist
@@ -1288,7 +1288,7 @@ def next_ep(item):
     nextIndex = fileList.index(current_filename) + 1
     if nextIndex == 0 or nextIndex == len(fileList): next_file = None
     else: next_file = fileList[nextIndex]
-    logger.log('Next File:' + str(next_file))
+    logger.info('Next File:' + str(next_file))
 
     # start next episode window afther x time
     if next_file:

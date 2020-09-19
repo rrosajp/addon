@@ -298,7 +298,7 @@ class Item(object):
     def tostring(self, separator=", "):
         """
         Generate a text string with the item's data for the log
-        Use: logger.log(item.tostring())
+        Use: logger.info(item.tostring())
         @param separator: string to be used as a separator
         @type separator: str
         '"""

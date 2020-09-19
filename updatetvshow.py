@@ -49,7 +49,7 @@ def search_paths(Id):
 
 
 def execute_sql(sql):
-    logger.log()
+    logger.info()
     file_db = ""
     records = None
 
@@ -69,14 +69,14 @@ def execute_sql(sql):
                 break
 
     if file_db:
-        logger.log("DB file: %s" % file_db)
+        logger.info("DB file: %s" % file_db)
         conn = None
         try:
             import sqlite3
             conn = sqlite3.connect(file_db)
             cursor = conn.cursor()
 
-            logger.log("Running sql: %s" % sql)
+            logger.info("Running sql: %s" % sql)
             cursor.execute(sql)
             conn.commit()
 
@@ -86,7 +86,7 @@ def execute_sql(sql):
                     records = []
 
             conn.close()
-            logger.log("Query executed. Records: %s" % nun_records)
+            logger.info("Query executed. Records: %s" % nun_records)
 
         except:
             logger.error("Error executing sql query")

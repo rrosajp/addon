@@ -37,7 +37,7 @@ class Kdicc():
         self.view_msg = view_msg
         self.lst_site_check_dns = lst_site_check_dns
         self.urls = []
-        #logger.log("check #### INIZIO INIT#### ")
+        #logger.info("check #### INIZIO INIT#### ")
 
     def check_Ip(self):
         """
@@ -248,7 +248,7 @@ def check_channels(inutile=''):
     This is because it can happen that at any time the connection may have problems. If it does, check it
     relative writing of the file is interrupted with a warning message
     """
-    logger.log()
+    logger.info()
 
     folderJson = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('path')).decode('utf-8')
     fileJson = 'channels.json'
@@ -264,7 +264,7 @@ def check_channels(inutile=''):
         # to get an idea of ​​the timing
         # useful only if you control all channels
         # for channels with error 522 about 40 seconds are lost ...
-        logger.log("check #### INIZIO #### channel - host :%s - %s " % (chann, host))
+        logger.info("check #### INIZIO #### channel - host :%s - %s " % (chann, host))
 
         rslt = Kdicc(lst_urls = [host]).http_Resp()
 
@@ -288,10 +288,10 @@ def check_channels(inutile=''):
             # risultato[chann] = 'Errore Sconosciuto - '+str(rslt['code']) +' - '+ host
             risultato[chann] = host
 
-        logger.log("check #### FINE #### rslt :%s  " % (rslt))
+        logger.info("check #### FINE #### rslt :%s  " % (rslt))
 
     fileJson_test = 'channels-test.json'
     # I write the updated file
     with open(folderJson+'/'+fileJson_test, 'w') as f:
         data = json.dump(risultato, f, sort_keys=True, indent=4)
-        logger.log(data)
+        logger.info(data)

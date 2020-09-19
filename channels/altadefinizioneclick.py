@@ -96,7 +96,7 @@ def genres(item):
     return locals()
 
 def search(item, texto):
-    support.log("search ", texto)
+    support.info("search ", texto)
 
     item.args = 'search'
     item.url = host + "/?s=" + texto
@@ -106,11 +106,11 @@ def search(item, texto):
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("%s" % line)
+            support.infoger.error("%s" % line)
         return []
 
 def newest(categoria):
-    support.log(categoria)
+    support.info(categoria)
     itemlist = []
     item = Item()
     try:
@@ -135,7 +135,7 @@ def newest(categoria):
     return itemlist
 
 def findvideos(item):
-    support.log('findvideos', item)
+    support.info('findvideos', item)
     return support.hdpass_get_servers(item)
 
 def play(item):

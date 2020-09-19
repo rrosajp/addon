@@ -14,7 +14,7 @@ remote = None
 
 
 def parse_url(url):
-    # logger.log("Url: %s" % url)
+    # logger.info("Url: %s" % url)
     url = url.strip()
     patron = "^smb://(?:([^;\n]+);)?(?:([^:@\n]+)[:|@])?(?:([^@\n]+)@)?([^/]+)/([^/\n]+)([/]?.*?)$"
     domain, user, password, server_name, share_name, path = re.compile(patron, re.DOTALL).match(url).groups()
@@ -27,7 +27,7 @@ def parse_url(url):
     if path.endswith("/"): path = path[:-1]
     if not path: path = "/"
 
-    # logger.log("Dominio: '%s' |Usuario: '%s' | Password: '%s' | Servidor: '%s' | IP: '%s' | Share Name: '%s' | Path: '%s'" % (domain, user, password, server_name, server_ip, share_name, path))
+    # logger.info("Dominio: '%s' |Usuario: '%s' | Password: '%s' | Servidor: '%s' | IP: '%s' | Share Name: '%s' | Path: '%s'" % (domain, user, password, server_name, server_ip, share_name, path))
     return server_name, server_ip, share_name, unicode(path, "utf8"), user, password, domain
 
 
@@ -46,7 +46,7 @@ def get_server_name_ip(server):
 
 
 def connect(url):
-    # logger.log("Url: %s" % url)
+    # logger.info("Url: %s" % url)
     global remote
     server_name, server_ip, share_name, path, user, password, domain = parse_url(url)
     
@@ -63,7 +63,7 @@ def connect(url):
 
 
 def listdir(url):
-    logger.log("Url: %s" % url)
+    logger.info("Url: %s" % url)
     remote, share_name, path = connect(url)
     try:
         files = [f.filename for f in remote.listPath(share_name, path) if not f.filename in [".", ".."]]
@@ -73,7 +73,7 @@ def listdir(url):
 
 
 def walk(url, topdown=True, onerror=None):
-    logger.log("Url: %s" % url)
+    logger.info("Url: %s" % url)
     remote, share_name, path = connect(url)
 
     try:
@@ -103,7 +103,7 @@ def walk(url, topdown=True, onerror=None):
 
 
 def get_attributes(url):
-    logger.log("Url: %s" % url)
+    logger.info("Url: %s" % url)
     remote, share_name, path = connect(url)
     try:
         return remote.getAttributes(share_name, path)
@@ -112,7 +112,7 @@ def get_attributes(url):
 
 
 def mkdir(url):
-    logger.log("Url: %s" % url)
+    logger.info("Url: %s" % url)
     remote, share_name, path = connect(url)
     try:
         remote.createDirectory(share_name, path)
@@ -121,12 +121,12 @@ def mkdir(url):
 
 
 def smb_open(url, mode):
-    logger.log("Url: %s" % url)
+    logger.info("Url: %s" % url)
     return SMBFile(url, mode)
 
 
 def isfile(url):
-    logger.log("Url: %s" % url)
+    logger.info("Url: %s" % url)
     remote, share_name, path = connect(url)
     try:
         files = [f.filename for f in remote.listPath(share_name, os.path.dirname(path)) if not f.isDirectory]
@@ -136,7 +136,7 @@ def isfile(url):
 
 
 def isdir(url):
-    logger.log("Url: %s" % url)
+    logger.info("Url: %s" % url)
     remote, share_name, path = connect(url)
     try:
         folders = [f.filename for f in remote.listPath(share_name, os.path.dirname(path)) if f.isDirectory]
@@ -146,7 +146,7 @@ def isdir(url):
 
 
 def exists(url):
-    logger.log("Url: %s" % url)
+    logger.info("Url: %s" % url)
     remote, share_name, path = connect(url)
     try:
         files = [f.filename for f in remote.listPath(share_name, os.path.dirname(path))]
@@ -156,7 +156,7 @@ def exists(url):
 
 
 def remove(url):
-    logger.log("Url: %s" % url)
+    logger.info("Url: %s" % url)
     remote, share_name, path = connect(url)
     try:
         remote.deleteFiles(share_name, path)
@@ -165,7 +165,7 @@ def remove(url):
 
 
 def rmdir(url):
-    logger.log("Url: %s" % url)
+    logger.info("Url: %s" % url)
     remote, share_name, path = connect(url)
     try:
         remote.deleteDirectory(share_name, path)
@@ -174,7 +174,7 @@ def rmdir(url):
 
 
 def rename(url, new_name):
-    logger.log("Url: %s" % url)
+    logger.info("Url: %s" % url)
     remote, share_name, path = connect(url)
     _, _, _, new_name, _, _, _ = parse_url(new_name)
     try:

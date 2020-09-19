@@ -33,7 +33,7 @@ def menu(item):
     return locals()
 
 def newest(categoria):
-    support.log()
+    support.info()
     item = Item()
     try:
         if categoria == "documentales":
@@ -45,12 +45,12 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("{0}".format(line))
+            support.infoger.error("{0}".format(line))
         return []
 
 
 def search(item, texto):
-    support.log(texto)
+    support.info(texto)
     item.url = host + "/?s=" + texto
     try:
         return peliculas(item)
@@ -133,7 +133,7 @@ def episodios(item):
 
 
 def findvideos(item):
-    support.log()
+    support.info()
     if item.args == 'raccolta' or item.contentType == 'episode':
         return support.server(item, item.url)
     else:

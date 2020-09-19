@@ -42,7 +42,7 @@ def genre(item):
 
 
 def search(item, text):
-    support.log(text)
+    support.info(text)
     item.url = host + '/?s=' + text
     try:
         return peliculas(item)
@@ -50,7 +50,7 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("search except: %s" % line)
+            support.infoger.error("search except: %s" % line)
         return []
 
 

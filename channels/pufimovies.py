@@ -38,7 +38,7 @@ def menu(item):
 
 
 def search(item, text):
-    support.log('search', item)
+    support.info('search', item)
     itemlist = []
     text = text.replace(' ', '+')
     item.url = host + '/search/keyword/' + text
@@ -52,12 +52,12 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            support.log('search log:', line)
+            support.info('search log:', line)
         return []
 
 
 def newest(categoria):
-    support.log(categoria)
+    support.info(categoria)
     itemlist = []
     item = support.Item()
     item.url = host
@@ -77,7 +77,7 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("%s" % line)
+            support.infoger.error("%s" % line)
         return []
 
     return itemlist
@@ -109,6 +109,6 @@ def episodios(item):
 
 
 def findvideos(item):
-    support.log()
+    support.info()
     # match = support.match(item, patron='wstream', debug=True)
     return support.server(item)

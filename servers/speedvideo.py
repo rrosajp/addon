@@ -5,7 +5,7 @@ from core import httptools, scrapertools
 from platformcode import config, logger
 
 def test_video_exists(page_url):
-    logger.log("(page_url='%s')" % page_url)
+    logger.info("(page_url='%s')" % page_url)
 
     data = httptools.downloadpage(page_url).data
 
@@ -15,22 +15,22 @@ def test_video_exists(page_url):
     return True, ""
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
-    logger.log("url=" + page_url)
+    logger.info("url=" + page_url)
     video_urls = []
     quality ={'MOBILE':1,
               'NORMAL':2,
               'HD':3}
     data = httptools.downloadpage(page_url).data
-    logger.log('SPEEDVIDEO DATA '+ data)
+    logger.info('SPEEDVIDEO DATA '+ data)
 
     media_urls = scrapertools.find_multiple_matches(data, r"file:[^']'([^']+)',\s*label:[^\"]\"([^\"]+)\"")
-    logger.log("speed video - media urls: %s " % media_urls)
+    logger.info("speed video - media urls: %s " % media_urls)
     for media_url, label in media_urls:
         media_url = httptools.downloadpage(media_url, only_headers=True, follow_redirects=False).headers.get("location", "")
 
         if media_url:
             video_urls.append([media_url.split('.')[-1] + ' - ' + label + ' - ' + ' [Speedvideo]', media_url])
-    logger.log("speed video - media urls: %s " % video_urls)
+    logger.info("speed video - media urls: %s " % video_urls)
 
     return sorted(video_urls, key=lambda x: quality[x[0].split(' - ')[1]])
 

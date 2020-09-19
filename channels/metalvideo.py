@@ -56,7 +56,7 @@ def findvideos(item):
 
 
 def search(item, text):
-    support.log(text)
+    support.info(text)
     item.url = host + '/search.php?keywords=' + text + '&video-id='
     try:
         return peliculas(item)
@@ -64,5 +64,5 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("%s" % line)
+            support.infoger.error("%s" % line)
         return []

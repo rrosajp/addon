@@ -11,24 +11,24 @@ from inspect import stack
 try:
     import json
 except:
-    logger.log("json included in the interpreter **NOT** available")
+    logger.info("json included in the interpreter **NOT** available")
 
     try:
         import simplejson as json
     except:
-        logger.log("simplejson included in the interpreter **NOT** available")
+        logger.info("simplejson included in the interpreter **NOT** available")
         try:
             from lib import simplejson as json
         except:
-            logger.log("simplejson in lib directory **NOT** available")
+            logger.info("simplejson in lib directory **NOT** available")
             logger.error("A valid JSON parser was not found")
             json = None
         else:
-            logger.log("Using simplejson in the lib directory")
+            logger.info("Using simplejson in the lib directory")
     else:
-        logger.log("Using simplejson included in the interpreter")
+        logger.info("Using simplejson included in the interpreter")
 # ~ else:
-    # ~ logger.log("Usando json incluido en el interprete")
+    # ~ logger.info("Usando json incluido en el interprete")
 
 import sys
 PY3 = False
@@ -90,7 +90,7 @@ def get_node_from_file(name_file, node, path=None):
     @return: dict with the node to return
     @rtype: dict
     """
-    logger.log()
+    logger.debug()
     from platformcode import config
     from core import filetools
 
@@ -129,7 +129,7 @@ def check_to_backup(data, fname, dict_data):
     @param dict_data: dictionary name
     @type dict_data: dict
     """
-    logger.log()
+    logger.debug()
 
     if not dict_data:
         logger.error("Error loading json from file %s" % fname)
@@ -161,7 +161,7 @@ def update_node(dict_node, name_file, node, path=None, silent=False):
     @return json_data
     @rtype: dict
     """
-    if not silent: logger.log()
+    if not silent: logger.info()
 
     from platformcode import config
     from core import filetools

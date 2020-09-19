@@ -6,7 +6,7 @@ from platformcode import config, logger
 
 
 def test_video_exists(page_url):
-    logger.log("(page_url='%s')" % page_url)
+    logger.info("(page_url='%s')" % page_url)
 
     data = httptools.downloadpage(page_url, cookies=False).data
     if 'File you are looking for is not found.' in data:
@@ -16,8 +16,8 @@ def test_video_exists(page_url):
 
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
-    logger.log("url=" + page_url)
+    logger.info("url=" + page_url)
     data = httptools.downloadpage(page_url).data
-    # logger.log(data)
+    # logger.info(data)
     video_urls = support.get_jwplayer_mediaurl(data, 'Onlystream')
     return video_urls

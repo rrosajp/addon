@@ -42,7 +42,7 @@ menu_settings_path = os.path.join(config.get_data_path(), "settings_channels", '
 
 
 def mainlist(item):
-    logger.log()
+    logger.info()
 
     itemlist = []
     # list_canales, any_active = get_channels_list()
@@ -128,7 +128,7 @@ def set_category_context(item):
 
 
 def get_channels_list():
-    logger.log()
+    logger.info()
 ##    import web_pdb; web_pdb.set_trace()
 ##    list_canales = {'peliculas': [], '4k': [], 'terror': [], 'infantiles': [], 'series': [], 'anime': [],
 ##                    'castellano': [], 'latino':[], 'italiano':[], 'torrent':[], 'documentales': []}
@@ -166,14 +166,14 @@ def get_channels_list():
     return list_canales, any_active
 
 def set_cache(item):
-    logger.log()
+    logger.info()
     item.mode = 'set_cache'
     t = Thread(target=novedades, args=[item])
     t.start()
     #t.join()
 
 def get_from_cache(item):
-    logger.log()
+    logger.info()
     itemlist=[]
     cache_node = jsontools.get_node_from_file('menu_cache_data.json', 'cached')
     first=item.last
@@ -198,7 +198,7 @@ def get_from_cache(item):
     return itemlist
 
 def add_menu_items(item, itemlist):
-    logger.log()
+    logger.info()
 
     menu_icon = get_thumb('menu.png')
     menu = Item(channel="channelselector", action="getmainlist", viewmode="movie", thumbnail=menu_icon, title='Menu')
@@ -215,7 +215,7 @@ def add_menu_items(item, itemlist):
     return itemlist
 
 def novedades(item):
-    logger.log()
+    logger.info()
 
     global list_newest
     threads = []
@@ -231,7 +231,7 @@ def novedades(item):
             return get_from_cache(item)
 
     multithread = config.get_setting("multithread", "news")
-    logger.log("multithread= " + str(multithread))
+    logger.info("multithread= " + str(multithread))
 
     if not multithread:
         if platformtools.dialog_yesno(config.get_localized_string(60515),
@@ -270,7 +270,7 @@ def novedades(item):
 
             # if progreso.iscanceled():
             #     progreso.close()
-            #     logger.log("Búsqueda cancelada")
+            #     logger.info("Búsqueda cancelada")
             #     return itemlist
 
             # Modo Multi Thread
@@ -284,7 +284,7 @@ def novedades(item):
             # Modo single Thread
             else:
                 if mode == 'normal':
-                    logger.log("Obteniendo novedades de channel_id=" + channel_id)
+                    logger.info("Obteniendo novedades de channel_id=" + channel_id)
                     progreso.update(percentage, "", config.get_localized_string(60520) % channel_title)
                 get_newest(channel_id, item.extra)
 
@@ -304,7 +304,7 @@ def novedades(item):
                     logger.debug(mensaje)
 
                     if progreso.iscanceled():
-                        logger.log("Busqueda de novedades cancelada")
+                        logger.info("Busqueda de novedades cancelada")
                         break
 
                 time.sleep(0.5)
@@ -312,7 +312,7 @@ def novedades(item):
         if mode == 'normal':
             mensaje = config.get_localized_string(60522) % (len(list_newest), time.time() - start_time)
             progreso.update(100, mensaje)
-            logger.log(mensaje)
+            logger.info(mensaje)
             start_time = time.time()
             # logger.debug(start_time)
 
@@ -345,7 +345,7 @@ def novedades(item):
 
 
 def get_newest(channel_id, categoria):
-    logger.log("channel_id=" + channel_id + ", categoria=" + categoria)
+    logger.info("channel_id=" + channel_id + ", categoria=" + categoria)
 
     global list_newest
     global list_newest_tourl
@@ -366,9 +366,9 @@ def get_newest(channel_id, categoria):
         if not puede:
             return
 
-        logger.log("running channel " + modulo.__name__ + " " + modulo.__file__)
+        logger.info("running channel " + modulo.__name__ + " " + modulo.__file__)
         list_result = modulo.newest(categoria)
-        logger.log("canal= %s %d resultados" % (channel_id, len(list_result)))
+        logger.info("canal= %s %d resultados" % (channel_id, len(list_result)))
         exist=False
         if os.path.exists(menu_cache_path):
             cache_node = jsontools.get_node_from_file('menu_cache_data.json', 'cached')
@@ -377,7 +377,7 @@ def get_newest(channel_id, categoria):
             cache_node = {}
         # logger.debug('cache node: %s' % cache_node)
         for item in list_result:
-            # logger.log("item="+item.tostring())
+            # logger.info("item="+item.tostring())
             item.channel = channel_id
             list_newest.append(item)
             list_newest_tourl.append(item.tourl())
@@ -393,7 +393,7 @@ def get_newest(channel_id, categoria):
 
 
 def get_title(item):
-    # support.log("ITEM NEWEST ->", item)
+    # support.info("ITEM NEWEST ->", item)
     # item.contentSerieName c'è anche se è un film
     if item.contentSerieName and item.contentType != 'movie':  # Si es una serie
         title = item.contentSerieName
@@ -446,7 +446,7 @@ def no_group(list_result_canal):
     global channels_id_name
 
     for i in list_result_canal:
-        # support.log("NO GROUP i -> ", i)
+        # support.info("NO GROUP i -> ", i)
         canale = channels_id_name[i.channel]
         canale = canale # to differentiate it from the color of the other items
         i.title = get_title(i) + " [" + canale + "]"
@@ -532,7 +532,7 @@ def group_by_content(list_result_canal):
 
 
 def show_channels(item):
-    logger.log()
+    logger.info()
     global channels_id_name
     channels_id_name = item.extra
     itemlist = []

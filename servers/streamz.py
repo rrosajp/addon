@@ -6,7 +6,7 @@ from platformcode import logger
 
 
 def get_video_url(page_url, video_password):
-    logger.log("(page_url='%s')" % page_url)
+    logger.info("(page_url='%s')" % page_url)
     video_urls = []
     url = httptools.downloadpage(page_url).url
     data = httptools.downloadpage(url).data

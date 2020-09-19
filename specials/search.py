@@ -31,7 +31,7 @@ def_lang = info_language[config.get_setting("info_language", "videolibrary")]
 
 
 def mainlist(item):
-    logger.log()
+    logger.info()
 
     itemlist = [Item(channel=item.channel, title=config.get_localized_string(70276), action='new_search', mode='all', thumbnail=get_thumb("search.png")),
                 Item(channel=item.channel, title=config.get_localized_string(70741) % config.get_localized_string(30122), action='new_search', mode='movie', thumbnail=get_thumb("search_movie.png")),
@@ -48,7 +48,7 @@ def mainlist(item):
 
 
 def sub_menu(item):
-    logger.log()
+    logger.info()
 
     itemlist = [Item(channel=item.channel, action='genres_menu', title=config.get_localized_string(70306), mode='movie', thumbnail=get_thumb("movie_genre.png")),
                 Item(channel=item.channel, action='years_menu', title=config.get_localized_string(70742), mode='movie', thumbnail=get_thumb("movie_year.png")),
@@ -66,7 +66,7 @@ def sub_menu(item):
 
 
 def saved_search(item):
-    logger.log()
+    logger.info()
 
     itemlist = list()
     saved_searches_list = get_saved_searches()
@@ -93,7 +93,7 @@ def saved_search(item):
 
 
 def new_search(item):
-    logger.log()
+    logger.info()
 
     temp_search_file = config.get_temp_file('temp-search')
     if filetools.isfile(temp_search_file):
@@ -163,7 +163,7 @@ def new_search(item):
 
 
 def channel_search(item):
-    logger.log(item)
+    logger.debug(item)
 
     start = time.time()
     searching = list()
@@ -389,14 +389,14 @@ def get_servers(item, module_dict):
 
 
 def get_info(itemlist):
-    logger.log()
+    logger.info()
     tmdb.set_infoLabels_itemlist(itemlist, True, forced=True)
 
     return itemlist
 
 
 def get_channels(item):
-    logger.log()
+    logger.info()
 
     channels_list = list()
     title_list = list()
@@ -717,7 +717,7 @@ def discover_list(item):
 
 
 def from_context(item):
-    logger.log()
+    logger.info()
 
     select = setting_channel_new(item)
 
@@ -738,7 +738,7 @@ def from_context(item):
 
 
 def set_context(itemlist):
-    logger.log()
+    logger.info()
 
     for elem in itemlist:
         elem.context = [{"title": config.get_localized_string(60412),
@@ -755,7 +755,7 @@ def set_context(itemlist):
 
 
 def get_from_temp(item):
-    logger.log()
+    logger.info()
 
     n = 30
     nTotal = len(item.itemlist)

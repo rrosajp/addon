@@ -7,13 +7,12 @@ PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 if PY3:
     from concurrent import futures
-    import urllib.request as urllib
     from urllib.request import Request, urlopen
     import urllib.parse as urlparse
     from urllib.parse import urlencode
 else:
     from concurrent_py2 import futures
-    import urllib, urlparse
+    import urlparse
     from urllib2 import Request, urlopen
     from urllib import urlencode
 
@@ -22,7 +21,7 @@ from core import httptools, scrapertools, servertools, tmdb, channeltools
 from core.item import Item
 from lib import unshortenit
 from platformcode import config
-from platformcode.logger import log
+from platformcode.logger import info
 from platformcode import logger
 from specials import autoplay
 
@@ -35,7 +34,7 @@ def hdpass_get_servers(item):
 
         for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
             mir_url = scrapertools.decodeHtmlentities(mir_url)
-            log(mir_url)
+            info(mir_url)
             it = item.clone(action="play", quality=quality, title=srv, server=srv, url= mir_url)
             if not servertools.get_server_parameters(srv.lower()): it = hdpass_get_url(it)[0]   # do not exists or it's empty
             ret.append(it)
@@ -83,7 +82,7 @@ def color(text, color):
 
 
 def search(channel, item, texto):
-    log(item.url + " search " + texto)
+    info(item.url + " search " + texto)
     if 'findhost' in dir(channel): channel.findhost()
     item.url = channel.host + "/?s=" + texto
     try:
@@ -162,11 +161,10 @@ def unifyEp(ep):
 
 def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, typeContentDict, typeActionDict, blacklist, search, pag, function, lang, sceneTitle):
     itemlist = []
-    log("scrapeBlock qui")
     if debug:
         regexDbg(item, patron, headers, block)
     matches = scrapertools.find_multiple_matches_groups(block, patron)
-    log('MATCHES =', matches)
+    logger.debug('MATCHES =', matches)
 
     known_keys = ['url', 'title', 'title2', 'season', 'episode', 'thumb', 'quality', 'year', 'plot', 'duration', 'genere', 'rating', 'type', 'lang', 'other', 'size', 'seed']
     # Legenda known_keys per i groups nei patron
@@ -283,7 +281,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             try:
                 parsedTitle = guessit(title)
                 title = longtitle = parsedTitle.get('title', '')
-                log('TITOLO',title)
+                logger.debug('TITOLO',title)
                 if parsedTitle.get('source'):
                     quality = str(parsedTitle.get('source'))
                     if parsedTitle.get('screen_size'):
@@ -317,7 +315,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                     longtitle += s + parsedTitle.get('episode_title')
                     item.contentEpisodeTitle = parsedTitle.get('episode_title')
             except:
-                log('Error')
+                logger.debug('Error')
 
         longtitle = typo(longtitle, 'bold')
         lang1, longtitle = scrapeLang(scraped, lang, longtitle)
@@ -404,7 +402,7 @@ def scrape(func):
 
         args = func(*args)
         function = func.__name__ if not 'actLike' in args else args['actLike']
-        # log('STACK= ',inspect.stack()[1][3])
+        # info('STACK= ',inspect.stack()[1][3])
 
         item = args['item']
 
@@ -436,7 +434,7 @@ def scrape(func):
         matches = []
 
         for n in range(2):
-            log('PATRON= ', patron)
+            logger.debug('PATRON= ', patron)
             if not data:
                 page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True)
                 data = re.sub("='([^']+)'", '="\\1"', page.data)
@@ -452,7 +450,7 @@ def scrape(func):
                 blocks = scrapertools.find_multiple_matches_groups(data, patronBlock)
                 block = ""
                 for bl in blocks:
-                    # log(len(blocks),bl)
+                    # info(len(blocks),bl)
                     if 'season' in bl and bl['season']:
                         item.season = bl['season']
                     blockItemlist, blockMatches = scrapeBlock(item, args, bl['block'], patron, headers, action, pagination, debug,
@@ -477,7 +475,7 @@ def scrape(func):
 
             # if url may be changed and channel has findhost to update
             if 'findhost' in func.__globals__ and not itemlist:
-                log('running findhost ' + func.__module__)
+                info('running findhost ' + func.__module__)
                 host = func.__globals__['findhost']()
                 parse = list(urlparse.urlparse(item.url))
                 from core import jsontools
@@ -534,7 +532,7 @@ def scrape(func):
         if config.get_setting('trakt_sync'):
             from core import trakt_tools
             trakt_tools.trakt_check(itemlist)
-        log('scraping time: ', time()-scrapingTime)
+        logger.debug('scraping time: ', time()-scrapingTime)
         return itemlist
 
     return wrapper
@@ -712,15 +710,11 @@ def menuItem(itemlist, filename, title='', action='', url='', contentType='undef
 
 def menu(func):
     def wrapper(*args):
-        log()
         args = func(*args)
 
         item = args['item']
-        log(item.channel + ' start')
+        logger.debug(item.channel + ' menu start')
         host = func.__globals__['host']
-        list_servers = func.__globals__['list_servers'] if 'list_servers' in func.__globals__ else ['directo']
-        list_quality = func.__globals__['list_quality'] if 'list_quality' in func.__globals__ else ['default']
-        log('LIST QUALITY', list_quality)
         filename = func.__module__.split('.')[1]
         single_search = False
         # listUrls = ['film', 'filmSub', 'tvshow', 'tvshowSub', 'anime', 'animeSub', 'search', 'top', 'topSub']
@@ -735,7 +729,7 @@ def menu(func):
 
         for name in listUrls:
             dictUrl[name] = args[name] if name in args else None
-            log(dictUrl[name])
+            logger.debug(dictUrl[name])
             if name == 'film': title = 'Film'
             if name == 'tvshow': title = 'Serie TV'
             if name == 'anime': title = 'Anime'
@@ -803,7 +797,7 @@ def menu(func):
 
             # Apply auto Thumbnails at the menus
             thumb(itemlist)
-        log(item.channel + ' end')
+        logger.debug(item.channel + ' menu end')
         return itemlist
 
     return wrapper
@@ -1066,7 +1060,7 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
     # Simply add this function to add video library support
     # Function_level is useful if the function is called by another function.
     # If the call is direct, leave it blank
-    log()
+    info()
 
     if item.contentType == 'movie':
         action = 'add_pelicula_to_library'
@@ -1116,7 +1110,7 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
 def nextPage(itemlist, item, data='', patron='', function_or_level=1, next_page='', resub=[]):
     # Function_level is useful if the function is called by another function.
     # If the call is direct, leave it blank
-    log()
+    info()
     action = inspect.stack()[function_or_level][3] if type(function_or_level) == int else function_or_level
     if next_page == '':
         next_page = scrapertools.find_single_match(data, patron)
@@ -1126,7 +1120,7 @@ def nextPage(itemlist, item, data='', patron='', function_or_level=1, next_page=
         if 'http' not in next_page:
             next_page = scrapertools.find_single_match(item.url, 'https?://[a-z0-9.-]+') + (next_page if next_page.startswith('/') else '/' + next_page)
         next_page = next_page.replace('&amp;', '&')
-        log('NEXT= ', next_page)
+        info('NEXT= ', next_page)
         itemlist.append(
             Item(channel=item.channel,
                  action = action,
@@ -1154,7 +1148,7 @@ def pagination(itemlist, item, page, perpage, function_level=1):
 
 
 def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, Download=True, patronTag=None, Videolibrary=True):
-    log()
+    info()
     blacklisted_servers = config.get_setting("black_list", server='servers')
     if not blacklisted_servers: blacklisted_servers = []
     if not data and not itemlist:
@@ -1167,7 +1161,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
     def getItem(videoitem):
         if not servertools.get_server_parameters(videoitem.server.lower()):  # do not exists or it's empty
             findS = servertools.get_server_from_url(videoitem.url)
-            log(findS)
+            info(findS)
             if not findS:
                 if item.channel == 'community':
                     findS= (config.get_localized_string(30137), videoitem.url, 'directo')
@@ -1175,7 +1169,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
                     videoitem.url = unshortenit.unshorten_only(videoitem.url)[0]
                     findS = servertools.get_server_from_url(videoitem.url)
                     if not findS:
-                        log(videoitem, 'Non supportato')
+                        info(videoitem, 'Non supportato')
                         return
             videoitem.server = findS[2]
             videoitem.title = findS[0]
@@ -1328,7 +1322,7 @@ def addQualityTag(item, itemlist, data, patron):
                                    folder=False,
                                    thumbnail=thumb('info')))
         else:
-            log('nessun tag qualità trovato')
+            info('nessun tag qualità trovato')
 
 def get_jwplayer_mediaurl(data, srvName, onlyHttp=False):
     video_urls = []
@@ -1419,7 +1413,7 @@ def thumb(item_itemlist_string=None, genre=False, live=False):
                     '_tvshow':['serie','tv', 'fiction']}
 
     def autoselect_thumb(item, genre):
-        log('SPLIT',re.split(r'\.|\{|\}|\[|\]|\(|\)|/| ',item.title.lower()))
+        info('SPLIT',re.split(r'\.|\{|\}|\[|\]|\(|\)|/| ',item.title.lower()))
         if genre == False:
             for thumb, titles in icon_dict.items():
                 if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)|/| ',item.title.lower()) for word in search):

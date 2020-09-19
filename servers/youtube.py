@@ -6,7 +6,7 @@ from platformcode import config, logger, platformtools
 name = 'plugin.video.youtube'
 
 def test_video_exists(page_url):
-    logger.log("(page_url='%s')" % page_url)
+    logger.info("(page_url='%s')" % page_url)
 
     data = httptools.downloadpage(page_url).data
 
@@ -18,12 +18,12 @@ def test_video_exists(page_url):
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     import xbmc
     from xbmcaddon import Addon
-    logger.log("(page_url='%s')" % page_url)
+    logger.info("(page_url='%s')" % page_url)
     video_urls = []
 
     if not page_url.startswith("http"):
         page_url = "http://www.youtube.com/watch?v=%s" % page_url
-        logger.log(" page_url->'%s'" % page_url)
+        logger.info(" page_url->'%s'" % page_url)
 
     video_id = scrapertools.find_single_match(page_url, '(?:v=|embed/)([A-z0-9_-]{11})')
     inputstream = platformtools.install_inputstream()

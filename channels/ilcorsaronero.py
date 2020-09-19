@@ -11,7 +11,7 @@ def findhost():
     return url[:-1] if url.endswith('/') else url
 
 host = support.config.get_channel_url(findhost)
-support.log('HOST',host)
+support.info('HOST',host)
 # host = 'https://ilcorsaronero.xyz'
 headers = [['Referer', host]]
 
@@ -64,7 +64,7 @@ def peliculas(item):
 
 
 def search(item, text):
-    support.log(item, text)
+    support.info(item, text)
     if 'all' in item.args:
         item.url += text
     else:
@@ -75,7 +75,7 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("search except: %s" % line)
+            support.infoger.error("search except: %s" % line)
         return []
 
 

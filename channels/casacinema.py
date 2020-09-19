@@ -39,17 +39,17 @@ def genres(item):
 def select(item):
     item.data = support.match(item).data
     if 'continua con il video' in item.data.lower():
-        support.log('select = ### è un film ###')
+        support.info('select = ### è un film ###')
         item.contentType = 'movie'
         return findvideos(item)
     else:
-        support.log('select = ### è una serie ###')
+        support.info('select = ### è una serie ###')
         item.contentType = 'tvshow'
         return episodios(item)
 
 
 def search(item, text):
-    support.log(text)
+    support.info(text)
     text = text.replace(' ', '+')
     item.url = host + '/?s=' + text
     item.args = 'search'
@@ -59,7 +59,7 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            support.log('search log:', line)
+            support.info('search log:', line)
         return []
 
 
@@ -87,7 +87,7 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            support.log("%s" % line)
+            support.info("%s" % line)
         return []
 
     return itemlist
@@ -148,7 +148,7 @@ def findvideos(item):
     data = ''
     from lib.unshortenit import unshorten_only
     for link in links:
-        support.log('URL=',link)
+        support.info('URL=',link)
         url, c = unshorten_only(link.replace('#', 'speedvideo.net'))
         data += url + '\n'
     return support.server(item, data)

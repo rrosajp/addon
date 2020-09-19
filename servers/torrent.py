@@ -3,7 +3,7 @@
 import re, os, sys, time, requests, xbmc, xbmcaddon
 
 from core import filetools, jsontools
-from core.support import dbg, log, match
+from core.support import dbg, info, match
 from platformcode import config, platformtools
 from torrentool.api import Torrent
 from lib.guessit import guessit
@@ -27,7 +27,7 @@ def get_video_url(page_url, premium=False, user='', password='', video_password=
     if len(torrent_options) == 0:
         from specials import elementum_download
         elementum_download.download()
-    log('server=torrent, the url is the good')
+    info('server=torrent, the url is the good')
 
     if page_url.startswith('magnet:'):
         video_urls = [['magnet: [torrent]', page_url]]

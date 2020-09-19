@@ -96,7 +96,7 @@ class UnshortenIt(object):
             if oldUri == uri:
                 break
 
-            logger.log(uri)
+            logger.info(uri)
 
         return uri, code
 
@@ -531,12 +531,12 @@ class UnshortenIt(object):
                 r = httptools.downloadpage(uri, timeout=self._timeout, headers=headers, follow_redirects=False)
                 if 'Wait 1 hour' in r.data:
                     uri = ''
-                    logger.log('IP bannato da vcrypt, aspetta un ora')
+                    logger.info('IP bannato da vcrypt, aspetta un ora')
                 else:
                     prev_uri = uri
                     uri = r.headers['location']
                     if uri == prev_uri:
-                        logger.log('Use Cloudscraper')
+                        logger.info('Use Cloudscraper')
                         uri = httptools.downloadpage(uri, timeout=self._timeout, headers=headers, follow_redirects=False, cf=True).headers['location']
 
             if "4snip" in uri:
@@ -593,7 +593,7 @@ class UnshortenIt(object):
             r = httptools.downloadpage(uri, follow_redirect=True, timeout=self._timeout, cookies=False)
             if 'get/' in r.url:
                 uri = 'https://linkhub.icu/view/' + re.search('\.\./view/([^"]+)', r.data).group(1)
-                logger.log(uri)
+                logger.info(uri)
                 r = httptools.downloadpage(uri, follow_redirect=True, timeout=self._timeout, cookies=False)
             uri = re.search('<div id="text-url".*\n\s+<a href="([^"]+)', r.data).group(0)
             return uri, r.code
@@ -683,7 +683,7 @@ def findlinks(text):
         regex = '(?:https?://(?:[\w\d]+\.)?)?(?:' + regex + ')/[a-zA-Z0-9_=/]+'
         for match in re.findall(regex, text):
             matches.append(match)
-    logger.log('matches=' + str(matches))
+    logger.info('matches=' + str(matches))
     if len(matches) == 1:
         text += '\n' + unshorten(matches[0])[0]
     elif matches:

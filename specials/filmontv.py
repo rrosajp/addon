@@ -15,7 +15,7 @@ blacklisted_genres = ['attualita', 'scienza', 'religione', 'cucina', 'notiziario
 
 
 def mainlist(item):
-    support.log()
+    support.info()
 
     itemlist = [Item(title=support.typo('Film in onda oggi', 'bold'), channel=item.channel, action='category', contentType='movie', thumbnail=support.thumb('movie')),
                 Item(title=support.typo('Serie Tv in onda oggi', 'bold'), channel=item.channel, action='peliculas', contentType='tvshow', thumbnail=support.thumb('tvshow')),
@@ -31,13 +31,13 @@ def getEpg():
     archiveName = fileName + '.gz'
     xmlName = fileName + '.xml'
     if not filetools.exists(xmlName):
-        support.log('downloading epg')
+        support.info('downloading epg')
         # cancello quelli vecchi
         for f in glob.glob(support.config.get_temp_file('guidatv-') + '*'):
             filetools.remove(f, silent=True)
         # inmemory = io.BytesIO(httptools.downloadpage(host).data)
         downloadtools.downloadfile(host, archiveName)
-        support.log('opening gzip and writing xml')
+        support.info('opening gzip and writing xml')
         with gzip.GzipFile(fileobj=filetools.file_open(archiveName, mode='rb', vfs=False)) as f:
             guide = f.read().decode('utf-8')
             guide = guide.replace('\n', ' ').replace('><', '>\n<')
@@ -194,7 +194,7 @@ def listaCanali(item):
             thumbnail = None
             skip = False
     # return itemlist
-    # logger.log([i.title for i in itemlist])
+    # logger.info([i.title for i in itemlist])
     f.close()
     return sorted(itemlist, key=lambda x: x.title)
 

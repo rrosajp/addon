@@ -24,7 +24,7 @@ except:
 
 
 def mainlist(item):
-    logger.log()
+    logger.info()
     itemlist = []
 
     for name, thumb, data in read_favourites():
@@ -81,7 +81,7 @@ def save_favourites(favourites_list):
 
 
 def addFavourite(item):
-    logger.log()
+    logger.info()
     # logger.debug(item.tostring('\n'))
 
     # If you get here through the context menu, you must retrieve the action and channel parameters
@@ -100,7 +100,7 @@ def addFavourite(item):
 
 
 def delFavourite(item):
-    logger.log()
+    logger.info()
     # logger.debug(item.tostring('\n'))
 
     if item.from_title:
@@ -118,7 +118,7 @@ def delFavourite(item):
 
 
 def renameFavourite(item):
-    logger.log()
+    logger.info()
     # logger.debug(item.tostring('\n'))
 
     # Find the item we want to rename in favorites.xml
@@ -137,7 +137,7 @@ def renameFavourite(item):
 ##################################################
 # Features to migrate old favorites (.txt)
 def readbookmark(filepath):
-    logger.log()
+    logger.info()
     import urllib
 
     bookmarkfile = filetools.file_open(filepath)
@@ -230,6 +230,6 @@ try:
     if config.get_setting("bookmarkpath") != "":
         check_bookmark(config.get_setting("bookmarkpath"))
     else:
-        logger.log("No path to old version favorites")
+        logger.info("No path to old version favorites")
 except:
     pass

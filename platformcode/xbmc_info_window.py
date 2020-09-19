@@ -261,7 +261,7 @@ class InfoWindow(xbmcgui.WindowXMLDialog):
         return self.return_value
 
     def onClick(self, _id):
-        logger.log("onClick id=" + repr(_id))
+        logger.info("onClick id=" + repr(_id))
         if _id == ID_BUTTON_PREVIOUS and self.indexList > 0:
             self.indexList -= 1
             self.get_scraper_data(self.listData[self.indexList])
@@ -281,7 +281,7 @@ class InfoWindow(xbmcgui.WindowXMLDialog):
                 self.return_value = None
 
     def onAction(self, action):
-        logger.log("action=" + repr(action.getId()))
+        logger.info("action=" + repr(action.getId()))
         action = action.getId()
 
         # Find Focus

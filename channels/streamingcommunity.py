@@ -37,7 +37,7 @@ def mainlist(item):
 
 
 def genres(item):
-    support.log()
+    support.info()
     itemlist = []
     data = support.scrapertools.decodeHtmlentities(support.match(item).data)
     args = support.match(data, patronBlock=r'genre-options-json="([^\]]+)\]', patron=r'name"\s*:\s*"([^"]+)').matches
@@ -48,7 +48,7 @@ def genres(item):
 
 
 def search(item, text):
-    support.log('search', item)
+    support.info('search', item)
     item.search = text
 
     try:
@@ -57,12 +57,12 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            support.log('search log:', line)
+            support.info('search log:', line)
         return []
 
 
 def newest(category):
-    support.log(category)
+    support.info(category)
     itemlist = []
     item = support.Item()
     item.args = 1
@@ -80,7 +80,7 @@ def newest(category):
     except:
         import sys
         for line in sys.exc_info():
-            support.log(line)
+            support.info(line)
         return []
 
     return itemlist
@@ -88,7 +88,7 @@ def newest(category):
 
 
 def peliculas(item):
-    support.log()
+    support.info()
     itemlist = []
     videoType = 'movie' if item.contentType == 'movie' else 'tv'
 
@@ -147,15 +147,15 @@ def peliculas(item):
     return itemlist
 
 def episodios(item):
-    support.log()
+    support.info()
     itemlist = []
 
     js = json.loads(support.match(item.url, patron=r'seasons="([^"]+)').match.replace('&quot;','"'))
-    support.log(js)
+    support.info(js)
 
     for episodes in js:
         for it in episodes['episodes']:
-            support.log(it)
+            support.info(it)
             itemlist.append(
                 support.Item(channel=item.channel,
                             title=support.typo(str(episodes['number']) + 'x' + str(it['number']).zfill(2) + ' - ' + it['name'], 'bold'),
@@ -174,7 +174,7 @@ def episodios(item):
 
 
 def findvideos(item):
-    support.log()
+    support.info()
     itemlist=[]
     url = support.match(support.match(item).data.replace('&quot;','"').replace('\\',''), patron=r'video_url"\s*:\s*"([^"]+)"').match
     playlist = support.match(url.replace('https','http'), patron=r'\./([^.]+)').matches

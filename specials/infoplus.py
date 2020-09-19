@@ -432,7 +432,7 @@ class main(xbmcgui.WindowDialog):
 
         else:
             for button, title, id, poster in self.idps:
-                logger.log('INFOS',button, title, id, poster)
+                logger.info('INFOS',button, title, id, poster)
                 if control == button:
                     new_item=self.item.clone(title=title, infoLabels={'tmdb_id':id}, contentType=self.item.contentType)
                     self.close()
@@ -602,7 +602,7 @@ class GlobalSearch(xbmcgui.WindowXMLDialog):
 
 
 def globalSearch(item, infoLabels, org_title=False):
-    logger.log()
+    logger.info()
     if item.contentType == "movie": cat = ["movie"]
     else: cat = ["serie"]
     cat += ["infoPlus"]

@@ -34,7 +34,7 @@ changelogFile = "special://profile/addon_data/plugin.video.kod/changelog.txt"
 
 def loadCommits(page=1):
     apiLink = 'https://api.github.com/repos/' + user + '/' + repo + '/commits?sha=' + branch + "&page=" + str(page)
-    logger.log(apiLink)
+    logger.info(apiLink)
     # riprova ogni secondo finchè non riesce (ad esempio per mancanza di connessione)
     for n in range(10):
         try:
@@ -54,7 +54,7 @@ def loadCommits(page=1):
 def check(background=False):
     if not addon.getSetting('addon_update_enabled'):
         return False, False
-    logger.log('Cerco aggiornamenti..')
+    logger.info('Cerco aggiornamenti..')
     commits = loadCommits()
     if not commits:
         return False, False
@@ -66,7 +66,7 @@ def check(background=False):
         localCommitFile = open(os.path.join(addonDir, trackingFile), 'r+')
     localCommitSha = localCommitFile.read()
     localCommitSha = localCommitSha.replace('\n', '') # da testare
-    logger.log('Commit locale: ' + localCommitSha)
+    logger.info('Commit locale: ' + localCommitSha)
     updated = False
     serviceChanged = False
 
@@ -91,7 +91,7 @@ def check(background=False):
                 # evitiamo di applicare i merge commit
                 if 'Merge' in commitJson['commit']['message']:
                     continue
-                logger.log('aggiornando a ' + commitJson['sha'])
+                logger.info('aggiornando a ' + commitJson['sha'])
 
                 # major update
                 if len(commitJson['files']) > 50:
@@ -112,7 +112,7 @@ def check(background=False):
                     if file["filename"] == trackingFile:  # il file di tracking non si modifica
                         continue
                     else:
-                        logger.log(file["filename"])
+                        logger.info(file["filename"])
                         if 'resources/language' in file["filename"]:
                             poFilesChanged = True
                         if 'service.py' in file["filename"]:
@@ -156,7 +156,7 @@ def check(background=False):
             elif changelog:
                 platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(80041) + changelog)
     else:
-        logger.log('Nessun nuovo aggiornamento')
+        logger.info('Nessun nuovo aggiornamento')
 
     return updated, serviceChanged
 
@@ -173,7 +173,7 @@ def showSavedChangelog():
 
 def calcCurrHash():
     treeHash = githash.tree_hash(addonDir).hexdigest()
-    logger.log('tree hash: ' + treeHash)
+    logger.info('tree hash: ' + treeHash)
     commits = loadCommits()
     lastCommitSha = commits[0]['sha']
     page = 1
@@ -193,7 +193,7 @@ def calcCurrHash():
         if found:
             break
     else:
-        logger.log('Non sono riuscito a trovare il commit attuale, scarico lo zip')
+        logger.info('Non sono riuscito a trovare il commit attuale, scarico lo zip')
         hash = updateFromZip()
         # se ha scaricato lo zip si trova di sicuro all'ultimo commit
         localCommitFile = open(os.path.join(xbmc.translatePath("special://home/addons/"), 'plugin.video.kod', trackingFile), 'w')
@@ -228,9 +228,9 @@ def updateFromZip(message=config.get_localized_string(80050)):
     destpathname = xbmc.translatePath("special://home/addons/")
     extractedDir = filetools.join(destpathname, "addon-" + branch)
 
-    logger.log("remotefilename=%s" % remotefilename)
-    logger.log("localfilename=%s" % localfilename)
-    logger.log('extract dir: ' + extractedDir)
+    logger.info("remotefilename=%s" % remotefilename)
+    logger.info("localfilename=%s" % localfilename)
+    logger.info('extract dir: ' + extractedDir)
 
     # pulizia preliminare
     remove(localfilename)
@@ -241,24 +241,24 @@ def updateFromZip(message=config.get_localized_string(80050)):
                            lambda nb, bs, fs, url=remotefilename: _pbhook(nb, bs, fs, url, dp))
     except Exception as e:
         platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(80031))
-        logger.log('Non sono riuscito a scaricare il file zip')
-        logger.log(e)
+        logger.info('Non sono riuscito a scaricare il file zip')
+        logger.info(e)
         dp.close()
         return False
 
     # Lo descomprime
-    logger.log("decompressione...")
-    logger.log("destpathname=%s" % destpathname)
+    logger.info("decompressione...")
+    logger.info("destpathname=%s" % destpathname)
 
     if os.path.isfile(localfilename):
-        logger.log('il file esiste')
+        logger.info('il file esiste')
 
     dp.update(80, config.get_localized_string(20000) + '\n' + config.get_localized_string(80032))
 
     import zipfile
     try:
         hash = fixZipGetHash(localfilename)
-        logger.log(hash)
+        logger.info(hash)
 
         with zipfile.ZipFile(filetools.file_open(localfilename, 'rb', vfs=False)) as zip:
             size = sum([zinfo.file_size for zinfo in zip.filelist])
@@ -269,7 +269,7 @@ def updateFromZip(message=config.get_localized_string(80050)):
                 dp.update(int(80 + cur_size * 15 / size))
 
     except Exception as e:
-        logger.log('Non sono riuscito ad estrarre il file zip')
+        logger.info('Non sono riuscito ad estrarre il file zip')
         logger.error(e)
         import traceback
         logger.error(traceback.print_exc())
@@ -289,7 +289,7 @@ def updateFromZip(message=config.get_localized_string(80050)):
     rename(extractedDir, 'plugin.video.kod')
     addonDir = filetools.join(destpathname, 'plugin.video.kod')
 
-    logger.log("Cancellando il file zip...")
+    logger.info("Cancellando il file zip...")
     remove(localfilename)
 
     dp.update(100)
@@ -318,7 +318,7 @@ def remove(file):
         try:
             os.remove(file)
         except:
-            logger.log('File ' + file + ' NON eliminato')
+            logger.info('File ' + file + ' NON eliminato')
 
 
 def onerror(func, path, exc_info):
@@ -345,7 +345,7 @@ def removeTree(dir):
         try:
             shutil.rmtree(dir, ignore_errors=False, onerror=onerror)
         except Exception as e:
-            logger.log('Cartella ' + dir + ' NON eliminata')
+            logger.info('Cartella ' + dir + ' NON eliminata')
             logger.error(e)
 
 
@@ -353,7 +353,7 @@ def rename(dir1, dir2):
     try:
         filetools.rename(dir1, dir2, silent=True, vfs=False)
     except:
-        logger.log('cartella ' + dir1 + ' NON rinominata')
+        logger.info('cartella ' + dir1 + ' NON rinominata')
 
 
 # https://stackoverflow.com/questions/3083235/unzipping-file-results-in-badzipfile-file-is-not-a-zip-file

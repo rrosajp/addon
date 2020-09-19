@@ -27,7 +27,7 @@ def menu(item):
 
 
 def search(item, text):
-    support.log(text)
+    support.info(text)
 
     item.search = text.replace(' ','+')
     try:
@@ -36,7 +36,7 @@ def search(item, text):
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("%s" % line)
+            support.infoger.error("%s" % line)
         return []
 
 
@@ -54,7 +54,7 @@ def live(item):
         if url not in urls:
             urls.append(url)
             info = jsontools.load(support.match(host +'/api/on-air?channelId=' + ch_dict[title]).data)
-            support.log(info)
+            support.info(info)
             plot= '[B]' + info['seriesTitle'] +'[/B]\n' + info['description'] if 'seriesTitle' in info else ''
             itemlist.append(item.clone(title=support.typo(title,'bold'), contentTitle=title, url=host+url, plot=plot, action='findvideos'))
     return itemlist
@@ -76,7 +76,7 @@ def peliculas(item):
 
     for it in data:
         title = it['meta']['header']['title']
-        support.log(title, it)
+        support.info(title, it)
         d = it['meta']['date'].split('/') if it['meta']['date'] else ['0000','00','00']
         date = int(d[2] + d[1] + d[0])
         if item.search.lower() in title.lower() \
