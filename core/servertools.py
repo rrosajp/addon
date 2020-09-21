@@ -485,6 +485,9 @@ def get_server_parameters(server):
             # Debriders
             elif filetools.isfile(filetools.join(config.get_runtime_path(), "servers", "debriders", server + ".json")):
                 path = filetools.join(config.get_runtime_path(), "servers", "debriders", server + ".json")
+            else:
+                from core.support import dbg
+                dbg()
 
             # When the server is not well defined in the channel (there is no connector), it shows an error because there is no "path" and the channel has to be checked
             dict_server = jsontools.load(filetools.read(path))

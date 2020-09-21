@@ -3,7 +3,7 @@
 import re, os, sys, time, requests, xbmc, xbmcaddon
 
 from core import filetools, jsontools
-from core.support import dbg, info, match
+from core.support import info, match
 from platformcode import config, platformtools
 from torrentool.api import Torrent
 from lib.guessit import guessit
@@ -25,7 +25,7 @@ def test_video_exists(page_url):
 def get_video_url(page_url, premium=False, user='', password='', video_password=''):
     torrent_options = platformtools.torrent_client_installed(show_tuple=True)
     if len(torrent_options) == 0:
-        from specials import elementum_download
+        from platformcode import elementum_download
         elementum_download.download()
     info('server=torrent, the url is the good')
 

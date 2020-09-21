@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #from builtins import str
-import sys, xbmc, os, traceback
+import sys
 
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
@@ -12,7 +12,6 @@ from core import filetools, scrapertools, videolibrarytools
 from core.support import typo, thumb
 from core.item import Item
 from platformcode import config, logger, platformtools
-from lib import generictools
 from distutils import dir_util
 if PY3:
     from concurrent import futures
@@ -383,7 +382,7 @@ def get_episodes(item):
 
 
 def findvideos(item):
-    from specials import autoplay
+    from core import autoplay
     logger.info()
     # logger.debug("item:\n" + item.tostring('\n'))
     videolibrarytools.check_renumber_options(item)

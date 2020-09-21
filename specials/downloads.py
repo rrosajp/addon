@@ -8,7 +8,6 @@ from __future__ import division
 import sys, os
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
-from future.builtins import filter
 from past.utils import old_div
 
 import re, time, unicodedata, xbmc
@@ -18,7 +17,7 @@ from core import filetools, jsontools, scraper, scrapertools, servertools, video
 from core.downloader import Downloader
 from core.item import Item
 from platformcode import config, logger, platformtools
-from core.support import info, dbg, typo
+from core.support import info, typo
 from servers import torrent
 
 kb = '0xFF65B3DA'
@@ -865,7 +864,7 @@ def get_episodes(item):
 
     itemlist = []
     if episodes and not scrapertools.find_single_match(episodes[0].title, r'(\d+.\d+)') and item.channel not in ['videolibrary'] and item.action != 'season':
-        from specials.autorenumber import select_type, renumber, check
+        from core.autorenumber import select_type, renumber, check
         # support.dbg()
         if not check(item):
             select_type(item)

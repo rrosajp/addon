@@ -7,7 +7,6 @@ import re, inspect, xbmcgui
 from core import httptools, jsontools, tmdb, support, filetools
 from core.item import Item
 from platformcode import config, platformtools
-from specials import autoplay
 from channelselector import get_thumb
 from collections import OrderedDict
 
@@ -735,7 +734,6 @@ def relative(key, json, path):
 
 def pagination(item, itemlist = []):
     support.info()
-    import json
     itlist = []
 
     if not itemlist:

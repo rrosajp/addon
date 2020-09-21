@@ -558,7 +558,8 @@ def genres_menu(item):
         itemlist.append(Item(channel=item.channel, title=typo(value, 'bold'), page=1,
                              action='discover_list', discovery=discovery,
                              mode=item.mode))
-    channelselector.thumb(itemlist)
+    from core import support
+    support.thumb(itemlist)
     return sorted(itemlist, key=lambda it: it.title)
 
 

@@ -3,8 +3,7 @@
 # Canale per Paramount Network
 # ------------------------------------------------------------
 
-from core import support, jsontools
-from specials import autorenumber
+from core import support, jsontools, autorenumber
 
 # host = support.config.get_channel_url()
 host = 'https://www.paramountnetwork.it'

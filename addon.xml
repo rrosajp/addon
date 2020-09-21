@@ -11,7 +11,7 @@
   </extension>
   <extension point="kodi.context.item">
     <menu id="kodi.core.main">
-      <item library="updatetvshow.py">
+      <item library="platformcode/updatetvshow.py">
         <label>70269</label>
         <visible>String.IsEqual(ListItem.dbtype,tvshow)</visible>
       </item>
@@ -21,8 +21,8 @@
     <summary lang="en">Kodi on Demand is a Kodi add-on to search and watch contents on the web.</summary>
     <summary lang="it">Kodi on Demand è un addon di Kodi per cercare e guardare contenuti sul web.</summary>
     <assets>
-      <icon>logo.png</icon>
-      <fanart>fanart.jpg</fanart>
+      <icon>resources/media/logo.png</icon>
+      <fanart>resources/media/fanart.jpg</fanart>
       <screenshot>resources/media/themes/ss/1.png</screenshot>
       <screenshot>resources/media/themes/ss/2.png</screenshot>
       <screenshot>resources/media/themes/ss/3.png</screenshot>

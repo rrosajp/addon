@@ -28,7 +28,7 @@ def start():
     # if it has DNS problems start but let in
     # if everything is ok: enter the addon
 
-    from specials.checkhost import test_conn
+    from platformcode.checkhost import test_conn
     import threading
     threading.Thread(target=test_conn, args=(True, not config.get_setting('resolver_dns'), True, [], [], True)).start()
 
@@ -37,7 +37,6 @@ def start():
         updater.showSavedChangelog()
 
 def run(item=None):
-    from core.support import dbg
     logger.info()
     if not item:
         # Extract item from sys.argv
@@ -66,7 +65,7 @@ def run(item=None):
                     category = dictCategory[config.get_setting("category")]
                     item = Item(channel="news", action="novedades", extra=category, mode = 'silent')
                 else:
-                    from specials import side_menu
+                    from platformcode import side_menu
                     item= Item()
                     item = side_menu.check_user_home(item)
                     item.start = True

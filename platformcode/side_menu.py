@@ -10,7 +10,7 @@ import os
 from core.item import Item
 from core import jsontools
 from platformcode import config, logger, launcher
-import xbmc, xbmcgui, xbmcplugin, xbmcaddon
+import xbmc, xbmcgui
 
 media_path = os.path.join(config.get_runtime_path(), "resources/skins/Default/media/side_menu/")
 menu_settings_path = os.path.join(config.get_data_path(), "settings_channels", 'menu_settings_data.json')
@@ -89,7 +89,6 @@ def get_start_page():
     if custom_start == False:
         item = Item(channel="news", action="novedades", extra=category, mode='silent')
     else:
-        from specials import side_menu
         item = Item()
         item = side_menu.check_user_home(item)
     return item

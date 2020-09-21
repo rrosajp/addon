@@ -135,7 +135,7 @@ def render_items(itemlist, parent_item):
     """
     logger.info('START render_items')
     thumb_type = config.get_setting('video_thumbnail_type')
-    from specials import shortcuts
+    from platformcode import shortcuts
     from core import httptools
     _handle = int(sys.argv[1])
     default_fanart = config.get_fanart()
@@ -968,7 +968,7 @@ def play_torrent(item, xlistitem, mediaurl):
 
     torrent_options = torrent_client_installed(show_tuple=True)
     if len(torrent_options) == 0:
-        from specials import elementum_download
+        from platformcode import elementum_download
         elementum_download.download()
         return play_torrent(item, xlistitem, mediaurl)
     elif len(torrent_options) > 1:
@@ -1136,7 +1136,6 @@ def install_widevine():
 def download_widevine(version, platform, path):
     # for x86 architectures
     from zipfile import ZipFile
-    from xbmcaddon import Addon
     from core import downloadtools
     archiveName = 'https://dl.google.com/widevine-cdm/' + version + '-' + platform['os'] + '-' + platform['arch'] + '.zip'
     fileName = config.get_temp_file('widevine.zip')
@@ -1153,7 +1152,6 @@ def download_widevine(version, platform, path):
 def download_chromeos_image(devices, platform, path):
     # for arm architectures
     from core import downloadtools
-    from zipfile import ZipFile
     from core import jsontools
     best = best_chromeos_image(devices)
     archiveName = best['url']

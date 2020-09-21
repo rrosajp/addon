@@ -247,7 +247,7 @@ def novedades(item):
     list_canales, any_active = get_channels_list()
 
     if config.is_xbmc():
-        from specials import side_menu
+        from platformcode import side_menu
         if mode=='silent' and any_active and len(list_canales[item.extra]) > 0:
             side_menu.set_menu_settings(item)
             aux_list=[]

@@ -17,13 +17,12 @@ else:
     from urllib import urlencode
 
 from time import time
-from core import httptools, scrapertools, servertools, tmdb, channeltools
+from core import httptools, scrapertools, servertools, tmdb, channeltools, autoplay
 from core.item import Item
 from lib import unshortenit
 from platformcode import config
 from platformcode.logger import info
 from platformcode import logger
-from specials import autoplay
 
 
 def hdpass_get_servers(item):
@@ -510,7 +509,7 @@ def scrape(func):
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
         if anime:
-            from specials import autorenumber
+            from platformcode import autorenumber
             if function == 'episodios' or item.action == 'episodios': autorenumber.renumber(itemlist, item, 'bold')
             else: autorenumber.renumber(itemlist)
         # if anime and autorenumber.check(item) == False and len(itemlist)>0 and not scrapertools.find_single_match(itemlist[0].title, r'(\d+.\d+)'):
@@ -1229,7 +1228,7 @@ def filterLang(item, itemlist):
     # import channeltools
     list_language = channeltools.get_lang(item.channel)
     if len(list_language) > 1:
-        from specials import filtertools
+        from core import filtertools
         itemlist = filtertools.get_links(itemlist, item, list_language)
     return itemlist
 

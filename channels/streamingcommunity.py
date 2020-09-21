@@ -3,9 +3,8 @@
 # Canale per AnimeUnity
 # ------------------------------------------------------------
 
-import requests, json, copy
-from core import support, jsontools
-from specials import autorenumber
+import requests, json
+from core import support
 
 try: from lib import cloudscraper
 except: from lib import cloudscraper

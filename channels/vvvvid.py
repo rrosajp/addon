@@ -3,12 +3,12 @@
 # Canale per vvvvid
 # ----------------------------------------------------------
 import requests, sys
-from core import  support, tmdb
-from specials import autorenumber
+from core import support, tmdb, autorenumber
+
 if sys.version_info[0] >= 3:
-    from concurrent import futures
+    pass
 else:
-    from concurrent_py2 import futures
+    pass
 
 
 host = support.config.get_channel_url()

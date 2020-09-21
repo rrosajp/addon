@@ -284,7 +284,7 @@ def downloadpage(url, **opt):
         CF = True
 
     if config.get_setting('resolver_dns') and not opt.get('use_requests', False):
-        from specials import resolverdns
+        from core import resolverdns
         session.mount('https://', resolverdns.CipherSuiteAdapter(domain, CF))
 
     req_headers = default_headers.copy()
