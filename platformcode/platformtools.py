@@ -421,7 +421,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
             #if item.infoLabels['tmdb_id'] or item.infoLabels['imdb_id'] or item.infoLabels['tvdb_id'] or \
             #        (item.contentTitle and item.infoLabels["year"]) or item.contentSerieName:
             if item.infoLabels['tmdb_id'] or item.infoLabels['imdb_id'] or item.infoLabels['tvdb_id']:
-                context_commands.append(("InfoPlus", "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'channel=infoplus&action=start&from_channel=' + item.channel)))
+                context_commands.append(("InfoPlus", "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'channel=infoplus&action=Main&from_channel=' + item.channel)))
 
         # Go to the Main Menu (channel.mainlist)
         if parent_item.channel not in ["news", "channelselector", "downloads"] and item.action != "mainlist":

@@ -606,7 +606,7 @@ def download_from_url(url, item):
     update_json(item.path, {"downloadUrl": d.download_url, "downloadStatus": STATUS_CODES.downloading, "downloadSize": d.size[0],
             "downloadProgress": d.progress, "downloadCompleted": d.downloaded[0], "downloadFilename": file})
 
-    d.start_diainfo(config.get_localized_string(60332))
+    d.start_dialog(config.get_localized_string(60332))
 
     # Download stopped. We get the state:
     # Download failed
