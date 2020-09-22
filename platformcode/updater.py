@@ -117,9 +117,9 @@ def check(background=False):
                             poFilesChanged = True
                         if 'service.py' in file["filename"]:
                             serviceChanged = True
-                        if (file['status'] == 'modified' or file['status'] == 'added') and 'patch' not in file:
-                            # è un file NON testuale, lo devo scaricare
-                            # se non è già applicato
+                        if (file['status'] == 'modified' and 'patch' not in file) or file['status'] == 'added':
+                            # è un file NON testuale che è stato modificato, oppure è un file nuovo (la libreria non supporta la creazione di un nuovo file)
+                            # lo devo scaricare
                             filename = os.path.join(addonDir, file['filename'])
                             dirname = os.path.dirname(filename)
                             if not (filetools.isfile(os.path.join(addonDir, file['filename'])) and getSha(filename) == file['sha']):
@@ -127,6 +127,16 @@ def check(background=False):
                                 if not os.path.exists(dirname):
                                     os.makedirs(dirname)
                                 urllib.urlretrieve(file['raw_url'], filename)
+                        elif file['status'] == 'removed':
+                            remove(os.path.join(addonDir, file["filename"]))
+                        elif file['status'] == 'renamed':
+                            # se non è già applicato
+                            if not (filetools.isfile(os.path.join(addonDir, file['filename'])) and getSha(os.path.join(addonDir, file['filename'])) == file['sha']):
+                                dirs = file['filename'].split('/')
+                                for d in dirs[:-1]:
+                                    if not filetools.isdir(os.path.join(addonDir, d)):
+                                        filetools.mkdir(os.path.join(addonDir, d))
+                                filetools.move(os.path.join(addonDir, file['previous_filename']), os.path.join(addonDir, file['filename']))
                 changelog += commitJson['commit']['message'] + "\n"
         except:
             import traceback
