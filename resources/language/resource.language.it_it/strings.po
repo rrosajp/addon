@@ -6083,6 +6083,10 @@ msgctxt "#70820"
 msgid "No results on channel %s, would you like to try Global Search?"
 msgstr "Nessun risultato sul canale %s, vuoi provare con la Ricerca Globale?"
 
+msgctxt "#70821"
+msgid "Search results"
+msgstr "Risultati della ricerca"
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS check alert"
