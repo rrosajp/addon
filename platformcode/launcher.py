@@ -121,6 +121,14 @@ def run(item=None):
             else:
                 return keymaptools.set_key()
 
+        elif item.channel == "infoplus":
+            from platformcode import infoplus
+            return infoplus.Main(item)
+
+        elif item.channel == "shortcuts":
+            from platformcode import shortcuts
+            return getattr(shortcuts, item.action)(item)
+
         elif item.action == "delete_key":
             from platformcode import keymaptools
             return keymaptools.delete_key()

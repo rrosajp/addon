@@ -71,15 +71,16 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            support.infoger.error("{0}".format(line))
+            logger..error("{0}".format(line))
         return []
 
 
 def search(item, text):
-    support.info(item.url, "search", text)
-
+    logger.info(item, "search", text)
+    if item.contentType == 'tvshow': item.url = host + '/serietv/'
+    else: item.url = host
     try:
-        item.url = item.url + "/?s=" + text.replace(' ', '+')
+        item.url = item.url + "?s=" + text.replace(' ', '+')
         return peliculas(item)
 
     # Continua la ricerca in caso di errore
@@ -100,6 +101,7 @@ def peliculas(item):
     # debug= True
     if 'newest' in item.args:
         if '/serietv/' not in item.url:
+            debug = True
             pagination = ''
             patronBlock = r'Ultimi 100 film [^:]+:(?P<block>.*?)<\/td>'
             patron = r'<a href="?(?P<url>[^">]+)"?>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N|SUB-ITA)\])?\s*(?:\[(?P<quality>HD|SD|HD/3D)\])?\s*\((?P<year>[0-9]{4})\)<\/a>'

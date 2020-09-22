@@ -12,12 +12,12 @@ def context():
 
 	# pre-serialised
 	if config.get_setting('quick_menu'): context.append((config.get_localized_string(60360), 'RunPlugin(plugin://plugin.video.kod/?ewogICAgImFjdGlvbiI6ICJzaG9ydGN1dF9tZW51IiwgCiAgICAiY2hhbm5lbCI6ICJzaG9ydGN1dHMiLCAKICAgICJpbmZvTGFiZWxzIjoge30KfQ%3D%3D)'))
-	if config.get_setting('side_menu'): context.append((config.get_localized_string(70737), 'RunPlugin(plugin://plugin.video.kod/?ewogICAgImFjdGlvbiI6ICJzaWRlX21lbnUiLCAKICAgICJjaGFubmVsIjogInNob3J0Y3V0cyIsIAogICAgImluZm9MYWJlbHMiOiB7fQp9)'))
+	if config.get_setting('Side_menu'): context.append((config.get_localized_string(70737), 'RunPlugin(plugin://plugin.video.kod/?ewogICAgImFjdGlvbiI6ICJzaWRlX21lbnUiLCAKICAgICJjaGFubmVsIjogInNob3J0Y3V0cyIsIAogICAgImluZm9MYWJlbHMiOiB7fQp9)'))
 	if config.get_setting('kod_menu'): context.append((config.get_localized_string(60026), 'RunPlugin(plugin://plugin.video.kod/?ewogICAgImFjdGlvbiI6ICJzZXR0aW5nc19tZW51IiwgCiAgICAiY2hhbm5lbCI6ICJzaG9ydGN1dHMiLCAKICAgICJpbmZvTGFiZWxzIjoge30KfQ%3D%3D)'))
 
 	return context
 
-def side_menu(item):
+def Side_menu(item):
 	side_menu.open_menu(item)
 
 def shortcut_menu(item):

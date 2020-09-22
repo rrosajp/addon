@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<window>
+	<depth>0.52</depth>
+	<coordinates>
+		<left>0</left>
+		<top>0</top>
+	</coordinates>
+	<controls>
+		<!-- CLOSE BUTTON / BACKGROUND -->
+		<control type="button">
+			<left>0</left>
+			<top>0</top>
+			<width>100%</width>
+			<height>100%</height>
+			<texturefocus colordiffuse="FF232323">white.png</texturefocus>
+			<texturenofocus colordiffuse="FF232323">white.png</texturenofocus>
+			<animation effect="fade" time="200">WindowOpen</animation>
+			<animation effect="fade" time="200">WindowClose</animation>
+			<onclick>Action(close)</onclick>
+		</control>
+		<!-- GROUP CONTROLS -->
+		<control type="group">
+			<left>0</left>
+			<top>0</top>
+			<animation type="WindowOpen" reversible="false">
+				<effect type="slide" start="0,100" end="0,0" delay="160" time="160" />
+				<effect type="fade" delay="160" end="100" time="100" />
+			</animation>
+			<animation type="WindowClose" reversible="false">
+				<effect type="slide" start="0,0" end="0,100" delay="160" time="160" />
+				<effect type="fade" delay="160" start="100" end="0" time="100" />
+			</animation>
+
+			<!-- BACKGROUND -->
+			<control type="image" id='30000'>
+				<width>1280</width>
+				<height>720</height>
+				<texture colordiffuse="FF888888"></texture>
+			</control>
+
+			<!-- LOADING -->
+			<control type="image" id='30011'>
+				<top>310</top>
+				<left>590</left>
+				<width>100</width>
+				<height>100</height>
+				<texture>Infoplus/loading.png</texture>
+				<animation effect="rotate" center="640,360" start="0" end="-360" time="5000"  loop="true" condition="Control.IsVisible(30011)">Conditional</animation>
+			</control>
+
+            <!-- PREVIOUS -->
+			<control type="button" id='30009'>
+				<left>0</left>
+				<bottom>0</bottom>
+				<width>1280</width>
+				<height>30</height>
+				<texturenofocus colordiffuse="00FFFFFF">white.png</texturenofocus>
+				<texturefocus colordiffuse="00FFFFFF">white.png</texturefocus>
+				<align>center</align>
+			</control>
+
+            <!-- NEXT -->
+			<control type="button" id='30010'>
+				<left>0</left>
+				<top>0</top>
+				<width>1280</width>
+				<height>30</height>
+				<texturenofocus colordiffuse="00FFFFFF">white.png</texturenofocus>
+				<texturefocus colordiffuse="00FFFFFF">white.png</texturefocus>
+				<align>center</align>
+			</control>
+
+			<control type="grouplist">
+				<top>60</top>
+				<orientation>vertical</orientation>
+				<defaultcontrol>30500</defaultcontrol>
+				<width>1280</width>
+				<height>600</height>
+				<onup>30007</onup>
+
+				<!-- RECOMMENDATIONS -->
+				<control type="wraplist" id="30500">
+					<width>1280</width>
+					<height>600</height>
+					<viewtype>wrap</viewtype>
+					<orientation>horizontal</orientation>
+					<scrolltime tween="sine" easing="out">300</scrolltime>
+					<itemlayout height="600" width="220">
+						<!-- Poster -->
+						<control type="image">
+							<bottom>0</bottom>
+							<left>0</left>
+							<width>200</width>
+							<height>300</height>
+							<texture>$INFO[ListItem.Property(thumbnail)]</texture>
+							<aspectratio>scale</aspectratio>
+						</control>
+					</itemlayout>
+					<focusedlayout height="600" width="420">
+						<!-- Title -->
+						<control type="textbox">
+							<left>440</left>
+							<top>0</top>
+							<width>800</width>
+							<height>30</height>
+							<font>font30_title</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<shadowcolor>00000000</shadowcolor>
+							<label>[B]$INFO[ListItem.Label] [COLOR FFAAAAAA]($INFO[ListItem.Property(year)])[/COLOR][/B] </label>
+							<align>left</align>
+							<aligny>center</aligny>
+						</control>
+						<!-- Tagline -->
+						<control type="textbox">
+							<left>440</left>
+							<top>40</top>
+							<width>800</width>
+							<height>30</height>
+							<font>font30</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<shadowcolor>00000000</shadowcolor>
+							<label>$INFO[ListItem.Property(tagline)]</label>
+							<align>left</align>
+						</control>
+						<!-- Plot -->
+						<control type="textbox">
+							<left>440</left>
+							<top>80</top>
+							<width>800</width>
+							<height>180</height>
+							<font>font12</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<shadowcolor>00000000</shadowcolor>
+							<label>$INFO[ListItem.Property(plot)]</label>
+							<align>left</align>
+						</control>
+						<!-- Poster -->
+						<control type="image">
+							<bottom>0</bottom>
+							<left>0</left>
+							<width>400</width>
+							<height>600</height>
+							<texture>$INFO[ListItem.Property(thumbnail)]</texture>
+							<aspectratio>scale</aspectratio>
+						</control>
+					</focusedlayout>
+				</control>
+				<!-- CAST -->
+				<control type="wraplist" id="30501">
+					<width>1280</width>
+					<height>600</height>
+					<viewtype>wrap</viewtype>
+					<orientation>horizontal</orientation>
+					<scrolltime tween="sine" easing="out">300</scrolltime>
+					<itemlayout height="600" width="220">
+						<!-- Poster -->
+						<control type="image">
+							<bottom>0</bottom>
+							<left>0</left>
+							<width>200</width>
+							<height>300</height>
+							<texture>$INFO[ListItem.Property(thumbnail)]</texture>
+							<aspectratio>scale</aspectratio>
+						</control>
+					</itemlayout>
+					<focusedlayout height="600" width="420">
+						<!-- Title -->
+						<control type="textbox">
+							<left>440</left>
+							<top>0</top>
+							<width>800</width>
+							<height>30</height>
+							<font>font30_title</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<shadowcolor>00000000</shadowcolor>
+							<label>[B]$INFO[ListItem.Label][/B] </label>
+							<align>left</align>
+							<aligny>center</aligny>
+						</control>
+						<!-- Tagline -->
+						<control type="textbox">
+							<left>440</left>
+							<top>40</top>
+							<width>800</width>
+							<height>30</height>
+							<font>font30</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<shadowcolor>00000000</shadowcolor>
+							<label>$INFO[ListItem.Property(job)]</label>
+							<align>left</align>
+						</control>
+						<!-- Plot -->
+						<control type="textbox">
+							<left>440</left>
+							<top>80</top>
+							<width>800</width>
+							<height>180</height>
+							<font>font13</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<shadowcolor>00000000</shadowcolor>
+							<label>$INFO[ListItem.Property(bio)]</label>
+                            <autoscroll delay="3000" time="2000" repeat="3000"></autoscroll>
+							<align>left</align>
+						</control>
+						<!-- Poster -->
+						<control type="image">
+							<bottom>0</bottom>
+							<left>0</left>
+							<width>400</width>
+							<height>600</height>
+							<texture>$INFO[ListItem.Property(thumbnail)]</texture>
+							<aspectratio>scale</aspectratio>
+						</control>
+					</focusedlayout>
+				</control>
+			</control>
+
+
+			<control type="group">
+				<top>15</top>
+				<right>15</right>
+				<height>50</height>
+				<width>220</width>
+                <visible allowhiddenfocus="true">!Control.HasFocus(30501)</visible>
+				<control type="image">
+					<width>50</width>
+					<height>50</height>
+					<texture >Infoplus/tmdb.png</texture>
+				</control>
+				<control type="textbox" id="30006">
+					<left>60</left>
+					<width>30</width>
+					<height>50</height>
+					<textcolor>FFFFFFFF</textcolor>
+					<shadowcolor>00000000</shadowcolor>
+					<font>font30_title</font>
+					<label></label>
+					<align>left</align>
+					<aligny>center</aligny>
+				</control>
+				<control type="button" id="30007">
+					<left>110</left>
+					<width>50</width>
+					<height>50</height>
+					<texturenofocus colordiffuse="AAFFFFFF">Infoplus/trailer.png</texturenofocus>
+					<texturefocus colordiffuse="FFFFFFFF">Infoplus/trailer.png</texturefocus>
+					<onup>30501</onup>
+					<ondown>30500</ondown>
+					<onleft>30008</onleft>
+					<onright>30008</onright>
+				</control>
+				<control type="button" id="30008">
+					<left>170</left>
+					<width>50</width>
+					<height>50</height>
+					<texturenofocus colordiffuse="AAFFFFFF">Infoplus/search.png</texturenofocus>
+					<texturefocus colordiffuse="FFFFFFFF">Infoplus/search.png</texturefocus>
+					<onup>30501</onup>
+					<ondown>30500</ondown>
+					<onleft>30007</onleft>
+					<onright>30007</onright>
+				</control>
+			</control>
+		</control> <!-- GROUP CONTROLS END -->
+	</controls>
+</window>
