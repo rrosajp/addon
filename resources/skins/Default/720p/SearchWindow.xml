@@ -35,7 +35,7 @@
             <control type="image" id='30000'>
                 <width>1280</width>
                 <height>720</height>
-                <texture colordiffuse="FF888888"/>
+                <texture colordiffuse="FF555555"/>
             </control>
             <!-- LOADING -->
 			<control type="image" id='30011'>
@@ -49,7 +49,7 @@
             <!-- TITLE -->
             <control type="textbox" id='30001'>
                 <left>40</left>
-                <top>15</top>
+                <top>50</top>
                 <width>1000</width>
                 <height>30</height>
                 <font>font30_title</font>
@@ -62,28 +62,29 @@
 
             <!-- SEARCH ITEM -->
             <control type="fixedlist" id="30500">
-                <top>60</top>
+                <bottom>40</bottom>
                 <width>1280</width>
-                <height>600</height>
+                <height>570</height>
                 <onup>30012</onup>
                 <orientation>horizontal</orientation>
-                <scrolltime tween="sine" easing="out">300</scrolltime>
-                <itemlayout height="600" width="220">
+                <scrolltime tween="cubic" easing="out">300</scrolltime>
+                <itemlayout height="570" width="180">
                     <!-- Poster -->
                     <control type="image">
                         <bottom>0</bottom>
                         <left>0</left>
-                        <width>200</width>
-                        <height>300</height>
+                        <width>180</width>
+                        <height>270</height>
                         <texture>$INFO[ListItem.Property(thumbnail)]</texture>
+                        <bordersize>10</bordersize>
                         <aspectratio>scale</aspectratio>
                     </control>
                 </itemlayout>
-                <focusedlayout height="600" width="420">
+                <focusedlayout height="570" width="380">
                     <!-- Title -->
                     <control type="textbox">
-                        <left>440</left>
-                        <top>0</top>
+                        <left>400</left>
+                        <top>10</top>
                         <width>800</width>
                         <height>30</height>
                         <font>font30_title</font>
@@ -95,23 +96,23 @@
                     </control>
                     <!-- Tagline -->
                     <control type="textbox">
-                        <left>440</left>
-                        <top>40</top>
+                        <left>400</left>
+                        <top>50</top>
                         <width>800</width>
                         <height>30</height>
                         <font>font30</font>
                         <textcolor>FFFFFFFF</textcolor>
                         <shadowcolor>00000000</shadowcolor>
-                        <label>$INFO[ListItem.Property(channel)]</label>
+                        <label>[B]$INFO[ListItem.Property(channel)][/B]</label>
                         <align>left</align>
                     </control>
                     <!-- Plot -->
                     <control type="textbox">
-                        <left>440</left>
-                        <top>80</top>
+                        <left>400</left>
+                        <top>90</top>
                         <width>800</width>
-                        <height>180</height>
-                        <font>font12</font>
+                        <height>170</height>
+                        <font>font13</font>
                         <textcolor>FFFFFFFF</textcolor>
                         <shadowcolor>00000000</shadowcolor>
                         <label>$INFO[ListItem.Property(plot)]</label>
@@ -121,16 +122,17 @@
                     <control type="image">
                         <bottom>0</bottom>
                         <left>0</left>
-                        <width>400</width>
-                        <height>600</height>
+                        <width>380</width>
+                        <height>570</height>
                         <texture>$INFO[ListItem.Property(thumbnail)]</texture>
+                        <bordersize>10</bordersize>
                         <aspectratio>scale</aspectratio>
                     </control>
                 </focusedlayout>
             </control>
             <control type="list" id="30012">
-                <top>15</top>
-                <right>15</right>
+                <top>25</top>
+                <right>25</right>
                 <height>50</height>
                 <width>140</width>
                 <align>right</align>

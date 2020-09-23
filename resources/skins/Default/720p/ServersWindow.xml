@@ -35,7 +35,7 @@
             <control type="image" id='30000'>
                 <width>1280</width>
                 <height>720</height>
-                <texture colordiffuse="FF888888"/>
+                <texture colordiffuse="FF555555"/>
             </control>
             <!-- LOADING -->
 			<control type="image" id='30011'>
@@ -49,7 +49,7 @@
             <!-- TITLE -->
             <control type="textbox" id='30001'>
                 <left>40</left>
-                <top>15</top>
+                <top>50</top>
                 <width>1000</width>
                 <height>30</height>
                 <font>font30_title</font>
@@ -68,7 +68,7 @@
                 <orientation>horizontal</orientation>
                 <onup>30012</onup>
                 <scrolltime tween="sine" easing="out">300</scrolltime>
-                <itemlayout height="400" width="220">
+                <itemlayout height="400" width="200">
                     <!-- Poster -->
                     <control type="image">
                         <bottom>0</bottom>
@@ -76,10 +76,11 @@
                         <width>200</width>
                         <height>200</height>
                         <texture>$INFO[ListItem.Property(thumbnail)]</texture>
+                        <bordersize>10</bordersize>
                         <aspectratio>scale</aspectratio>
                     </control>
                 </itemlayout>
-                <focusedlayout height="400" width="420">
+                <focusedlayout height="400" width="400">
                     <!-- Title -->
                     <control type="textbox">
                         <left>440</left>
@@ -89,29 +90,17 @@
                         <font>font30_title</font>
                         <textcolor>FFFFFFFF</textcolor>
                         <shadowcolor>00000000</shadowcolor>
-                        <label>[B]$INFO[ListItem.Label] [COLOR FFAAAAAA]($INFO[ListItem.Property(server)])[/COLOR][/B] </label>
+                        <label>[B]$INFO[ListItem.Property(server)] [COLOR FFAAAAAA]$INFO[ListItem.Property(quality)][/COLOR][/B] </label>
                         <align>left</align>
                         <aligny>center</aligny>
-                    </control>
-                    <!-- Tagline -->
-                    <control type="textbox">
-                        <left>440</left>
-                        <top>40</top>
-                        <width>800</width>
-                        <height>30</height>
-                        <font>font30</font>
-                        <textcolor>FFFFFFFF</textcolor>
-                        <shadowcolor>00000000</shadowcolor>
-                        <label>$INFO[ListItem.Property(quality)]</label>
-                        <align>left</align>
                     </control>
                     <!-- Plot -->
                     <control type="textbox">
                         <left>440</left>
-                        <top>80</top>
+                        <top>40</top>
                         <width>800</width>
-                        <height>180</height>
-                        <font>font12</font>
+                        <height>120</height>
+                        <font>font13</font>
                         <textcolor>FFFFFFFF</textcolor>
                         <shadowcolor>00000000</shadowcolor>
                         <label>$INFO[ListItem.Property(plot)]</label>
@@ -124,14 +113,15 @@
                         <width>400</width>
                         <height>400</height>
                         <texture>$INFO[ListItem.Property(thumbnail)]</texture>
+                        <bordersize>10</bordersize>
                         <aspectratio>scale</aspectratio>
                     </control>
                 </focusedlayout>
             </control>
 
             <control type="list" id="30012">
-                <top>15</top>
-                <right>15</right>
+                <top>25</top>
+                <right>25</right>
                 <height>50</height>
                 <width>140</width>
                 <align>right</align>

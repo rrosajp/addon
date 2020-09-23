@@ -2,8 +2,8 @@
 # ------------------------------------------------------------
 # infoplus window with item information
 # ------------------------------------------------------------
-import xbmc, xbmcgui, json, sys, requests, re
-from core import support, tmdb, filetools
+import xbmc, xbmcgui, sys, requests, re
+from core import support, tmdb, filetools, channeltools, servertools
 from core.item import Item
 from platformcode import config, platformtools
 from platformcode.logger import log
@@ -21,7 +21,6 @@ api = 'k_0tdb8a8y'
 # Control ID
 FANART = 30000
 NUMBER = 30001
-POSTER_BTN = 30010
 TITLE = 30002
 TAGLINE = 30003
 PLOT = 30004
@@ -29,13 +28,11 @@ RATING_ICON = 30005
 RATING = 30006
 TRAILER = 30007
 SEARCH = 30008
-BTN_NEXT = 30009
-BTN_PREV = 30010
 LOADING = 30011
 COMMANDS = 30012
 RECOMANDED = TRAILERS = 30500
-CAST = 30501
-CASTMOVIES = 30502
+ACTORS = 30501
+CAST = 30502
 
 # Actions
 LEFT = 1
@@ -59,32 +56,30 @@ def Main(item):
         Info = item
 
     main = MainWindow('InfoPlus.xml', config.get_runtime_path())
-    add({'class':main, 'info':Info, 'id':RECOMANDED, RECOMANDED:0, CAST:0})
+    add({'class':main, 'info':Info, 'id':RECOMANDED, RECOMANDED:0, ACTORS:0})
     modal()
 
 class MainWindow(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
         self.items = []
         self.cast = []
+        self.actors = []
         self.ids = {}
 
     def onInit(self):
         #### Compatibility with Kodi 18 ####
         if config.get_platform(True)['num_version'] < 18:
             self.setCoordinateResolution(2)
-        if Info.getProperty('id'):
-            for item in get_movies(Info):
-                self.items.append(item)
-        else:
-            for item in get_recomendations(Info):
-                self.items.append(item)
-        for i, item in enumerate(get_cast(Info)):
-            if i == 0: actors_more_info(item)
-            self.cast.append(item)
+        if Info.getProperty('id'):self.items = get_movies(Info)
+        else: self.items = get_recomendations(Info)
+        self.cast, self.actors = get_cast(Info)
         self.getControl(LOADING).setVisible(False)
         self.getControl(RECOMANDED).addItems(self.items)
         self.getControl(FANART).setImage(Info.getProperty('fanart'))
+        self.getControl(ACTORS).addItems(self.actors)
         self.getControl(CAST).addItems(self.cast)
+        if Info.getProperty('mediainfo') != 'movie':
+            self.getControl(CAST).setVisible(False)
         if Info.getProperty('rating'):
             self.getControl(RATING).setText(str(Info.getProperty('rating')))
         getFocus(self)
@@ -94,33 +89,26 @@ class MainWindow(xbmcgui.WindowXMLDialog):
         if control_id in [SEARCH]:
             title = self.getControl(RECOMANDED).getSelectedItem().getProperty('title')
             mode = self.getControl(RECOMANDED).getSelectedItem().getProperty('mediatype')
-            action = 'search'
-            # if title == Info.getProperty('title'): action = 'global_search'
-            # else: action = 'search'
             self.close()
             if self.getControl(RECOMANDED).getSelectedPosition() > 0:
-                Search(ITEM.clone(action=action, search_text=title))
+                Search(ITEM.clone(action='search', search_text=title))
             else:
-                Search(ITEM.clone(action=action, search_text=title, mode=mode))
+                Search(ITEM.clone(channel='search', action='new_search', search_text=title, mode=mode))
         elif control_id in [TRAILER]:
             info = self.getControl(RECOMANDED).getSelectedItem()
             self.close()
             Trailer(info)
-        elif control_id in [CAST]:
+        elif control_id in [ACTORS]:
             self.close()
-            Main(self.getControl(CAST).getSelectedItem())
-        elif control_id in [BTN_NEXT]:
-            self.setFocusId(CAST)
-        elif control_id in [BTN_PREV]:
-            self.setFocusId(RECOMANDED)
-        elif control_id in [RECOMANDED]:
+            Main(self.getControl(ACTORS).getSelectedItem())
+        elif control_id in [RECOMANDED] and self.getControl(RECOMANDED).getSelectedPosition() > 0:
             self.close()
             Main(self.getControl(RECOMANDED).getSelectedItem())
 
     def onAction(self, action):
-        if self.getFocusId() in [CAST, RECOMANDED]:
+        if self.getFocusId() in [ACTORS, RECOMANDED]:
             self.ids[self.getFocusId()] = self.getControl(self.getFocusId()).getSelectedPosition()
-        if self.getFocusId() in [CAST] and action not in [BACKSPACE, EXIT, UP, DOWN]:
+        if self.getFocusId() in [ACTORS, CAST] and action not in [BACKSPACE, EXIT]:
             actors_more_info(self.getControl(self.getFocusId()).getSelectedItem())
         if self.getFocusId() in [RECOMANDED]:
             fanart = self.getControl(self.getFocusId()).getSelectedItem().getProperty('fanart')
@@ -129,10 +117,10 @@ class MainWindow(xbmcgui.WindowXMLDialog):
             self.getControl(FANART).setImage(fanart)
             self.getControl(RATING).setText(rating)
             if self.getFocus() > 0:
-                cast = []
+                cast, actors = get_cast(self.getControl(self.getFocusId()).getSelectedItem())
+                self.getControl(ACTORS).reset()
+                self.getControl(ACTORS).addItems(actors)
                 self.getControl(CAST).reset()
-                for actor in get_cast(self.getControl(self.getFocusId()).getSelectedItem()):
-                    cast.append(actor)
                 self.getControl(CAST).addItems(cast)
         action = action.getId()
         if action in [BACKSPACE]:
@@ -164,8 +152,8 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
         #### Compatibility with Kodi 18 ####
         if config.get_platform(True)['num_version'] < 18:
             self.setCoordinateResolution(2)
-        if not self.items:
-            if Info.action == 'search' and Info.mode:
+        if len(self.items) == 0:
+            if Info.action == 'new_search' and Info.mode:
                 from specials.search import new_search
                 itemlist = new_search(Info)
             elif Info.action == 'channel_search':
@@ -188,11 +176,12 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 if item.action not in ['save_download', 'add_pelicula_to_library', 'add_serie_to_library', ''] and item.infoLabels['title']:
                     if item.action == 'findvideos' and item.contentType in ['episode', 'tvshow']:
                         it = xbmcgui.ListItem(re.sub(r'\[[^\]]+\]', '', item.title))
+                        self.getControl(NUMBER).setText(support.typo(config.get_localized_string(70362),'uppercase bold'))
                     else:
                         it = xbmcgui.ListItem(item.infoLabels['title'])
-                    it.setProperty('channel', item.channel)
+                    it.setProperty('channel', channeltools.get_channel_parameters(item.channel).get('title',''))
                     it.setProperty('action', item.action)
-                    it.setProperty('server', item.server)
+                    it.setProperty('server', servertools.get_server_parameters(item.server.lower()).get('name',item.server))
                     it.setProperty('url', item.url)
                     for key, value in item.infoLabels.items():
                         it.setProperty(key, str(value))
@@ -224,9 +213,9 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
             if self.items:
                 self.getControl(FANART).setImage(self.items[0].getProperty('fanart'))
 
-        self.getControl(RECOMANDED).addItems(self.items)
-        self.getControl(LOADING).setVisible(False)
-        getFocus(self)
+            self.getControl(RECOMANDED).addItems(self.items)
+            self.getControl(LOADING).setVisible(False)
+            getFocus(self)
 
     def onClick(self, control_id):
         setFocus(self)
@@ -367,7 +356,7 @@ def get_recomendations(info):
         else:
             title = result.get("name", '')
             original_title  = result.get("original_name", '')
-        thumbnail ='http://image.tmdb.org/t/p/w342' + result.get("poster_path", "") if result.get("poster_path", "") else imagepath(Type)
+        thumbnail ='http://image.tmdb.org/t/p/w342' + result.get("poster_path", "") if result.get("poster_path", "") else ''
         fanart = 'http://image.tmdb.org/t/p/original' + result.get("backdrop_path", "") if result.get("backdrop_path", "") else ''
         item = xbmcgui.ListItem(title)
         item.setProperties({'title': title,
@@ -385,13 +374,25 @@ def get_recomendations(info):
 
 
 def get_cast(info):
+    cast_list = []
     actors_list = []
     Type = "movie" if info.getProperty('mediatype') == 'movie' else 'tv'
     otmdb = tmdb.Tmdb(id_Tmdb=info.getProperty('tmdb_id'), tipo=Type)
     actors = otmdb.result.get("credits", {}).get("cast", [])
     cast = otmdb.result.get("credits", {}).get("crew", []) if Type == 'movie' else otmdb.result.get("created_by", [])
-    for crew in cast:
-        if crew.get('job', '') == 'Director' or Type != "movie": actors.insert(0, crew)
+    for i, crew in enumerate(cast):
+        if crew.get('job', '') == 'Director' or Type!= "movie":
+            actors.insert(0, crew)
+        else:
+            res = xbmcgui.ListItem(crew.get('name', ''))
+            res.setProperties({'title': crew.get('name', ''),
+                               'job': crew.get('job', '') if crew.get('job', '') else crew.get('character',''),
+                               'thumbnail': "https://image.tmdb.org/t/p/w342" + crew.get('profile_path', '') if crew.get('profile_path', '')  else '',
+                               'department': crew.get('department', ''),
+                               'type': Type,
+                               'id': crew.get('id', ''),
+                               'mediatype': info.getProperty('mediatype')})
+            cast_list.append(res)
     for actor in actors:
         res = xbmcgui.ListItem(actor.get('name', ''))
         res.setProperties({'title': actor.get('name', ''),
@@ -401,7 +402,7 @@ def get_cast(info):
                            'id': actor.get('id', ''),
                            'mediatype': info.getProperty('mediatype')})
         actors_list.append(res)
-    return actors_list
+    return cast_list, actors_list
 
 def imagepath(image):
     if len(image.split('.')) == 1: image += '.png'
@@ -409,13 +410,10 @@ def imagepath(image):
     return path
 
 def actors_more_info(ListItem):
-    api = 'k_0tdb8a8y'
     Type = ListItem.getProperty('type')
     actor_id = ListItem.getProperty('id')
-    more = tmdb.Tmdb(discover={'url': 'person/' + str(actor_id), 'language': 'it', 'append_to_response': Type + '_credits'}).results
-    imdb = requests.get('https://imdb-api.com/it/API/Name/%s/%s' % (api, more['imdb_id'])).json()
-    ListItem.setProperty('bio', imdb['summary'])
-
+    more = tmdb.Tmdb(discover={'url': 'person/' + str(actor_id), 'language': 'en'}).results
+    if more['biography']: ListItem.setProperty('bio', more['biography'])
 
 def get_movies(info):
     Type = info.getProperty('mediatype') if info.getProperty('mediatype') == 'movie' else 'tv'
