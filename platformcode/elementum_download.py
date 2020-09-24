@@ -48,9 +48,9 @@ def extract():
 
     except Exception as e:
         support.info('Non sono riuscito ad estrarre il file zip')
-        support.infoger.error(e)
+        support.logger.error(e)
         import traceback
-        support.infoger.error(traceback.print_exc())
+        support.logger.error(traceback.print_exc())
 
 
 def setting():

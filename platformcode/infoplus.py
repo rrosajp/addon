@@ -77,8 +77,10 @@ class MainWindow(xbmcgui.WindowXMLDialog):
         self.getControl(RECOMANDED).addItems(self.items)
         self.getControl(FANART).setImage(Info.getProperty('fanart'))
         self.getControl(ACTORS).addItems(self.actors)
-        self.getControl(CAST).addItems(self.cast)
-        if Info.getProperty('mediainfo') != 'movie':
+        if self.cast:
+            self.getControl(CAST).setVisible(True)
+            self.getControl(CAST).addItems(self.cast)
+        else:
             self.getControl(CAST).setVisible(False)
         if Info.getProperty('rating'):
             self.getControl(RATING).setText(str(Info.getProperty('rating')))
