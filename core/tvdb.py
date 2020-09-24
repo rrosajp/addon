@@ -335,7 +335,7 @@ class Tvdb(object):
         self.list_results = []
         self.lang = ""
         self.search_name = kwargs['search'] = \
-            re.sub('\[\\\?(B|I|COLOR)\s?[^\]]*\]', '', kwargs.get('search', ''))
+            re.sub(r'\[\\\?(B|I|COLOR)\s?[^\]]*\]', '', kwargs.get('search', ''))
         self.list_episodes = {}
         self.episodes = {}
 
@@ -837,7 +837,7 @@ class Tvdb(object):
 
         except Exception as ex:
             # if isinstance(ex, urllib).HTTPError:
-            logger.debug("code %s " % ex.code)
+            logger.debug("code %s " % ex)
 
             message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
             logger.error("error: %s" % message)

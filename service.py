@@ -331,12 +331,12 @@ class AddonMonitor(xbmc.Monitor):
         if self.settings_pre.get("videolibrarypath", None) != settings_post.get("videolibrarypath", None) or \
                 self.settings_pre.get("folder_movies", None) != settings_post.get("folder_movies", None) or \
                 self.settings_pre.get("folder_tvshows", None) != settings_post.get("folder_tvshows", None):
-            videolibrary.move_videolibrary(self.settings_pre.get("videolibrarypath", None),
-                                           settings_post.get("videolibrarypath", None),
-                                           self.settings_pre.get("folder_movies", None),
-                                           settings_post.get("folder_movies", None),
-                                           self.settings_pre.get("folder_tvshows", None),
-                                           settings_post.get("folder_tvshows", None))
+            videolibrary.move_videolibrary(self.settings_pre.get("videolibrarypath", ''),
+                                           settings_post.get("videolibrarypath", ''),
+                                           self.settings_pre.get("folder_movies", ''),
+                                           settings_post.get("folder_movies", ''),
+                                           self.settings_pre.get("folder_tvshows", ''),
+                                           settings_post.get("folder_tvshows", ''))
 
         # si se ha puesto que se quiere autoconfigurar y se había creado el directorio de la videoteca
         if not self.settings_pre.get("videolibrary_kodi", None) and settings_post.get("videolibrary_kodi", None):

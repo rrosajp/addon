@@ -69,7 +69,7 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            support.infoger.error("{0}".format(line))
+            support.logger.error("{0}".format(line))
         return []
 
 

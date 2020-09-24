@@ -41,7 +41,7 @@ def search(item, texto):
     except:
         import sys
         for line in sys.exc_info():
-            support.infoger.error("%s" % line)
+            support.logger.error("%s" % line)
         return []
 
 

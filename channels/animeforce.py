@@ -49,7 +49,7 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            support.infoger.error("{0}".format(line))
+            support.logger.error("{0}".format(line))
         return []
 
     return itemlist
@@ -65,7 +65,7 @@ def search(item, texto):
     except:
         import sys
         for line in sys.exc_info():
-            support.infoger.error("%s" % line)
+            support.logger.error("%s" % line)
         return []
 
 

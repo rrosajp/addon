@@ -82,7 +82,7 @@ def search(item, text):
         except:
             import sys
             for line in sys.exc_info():
-                support.infoger.error("%s" % line)
+                support.logger.error("%s" % line)
             return []
     return itemlist
 

@@ -33,8 +33,8 @@ except:
     xbmcgui = None
 import re, base64, json, inspect
 from core import jsontools, tvdb, scrapertools, filetools
-from core.support import typo, info
-from platformcode import config, platformtools
+from core.support import typo
+from platformcode import config, platformtools, logger
 
 TAG_TVSHOW_RENUMERATE = "TVSHOW_AUTORENUMBER"
 TAG_ID = "ID"
@@ -49,7 +49,7 @@ TAG_TYPE = "Type"
 
 
 def renumber(itemlist, item='', typography=''):
-    info()
+    logger.info()
     dict_series = load(itemlist[0]) if len(itemlist) > 0 else {}
 
     if item:
@@ -103,7 +103,7 @@ def renumber(itemlist, item='', typography=''):
 
 
 def config_item(item, itemlist=[], typography='', active=False):
-    info()
+    logger.info()
     # Configurazione Automatica, Tenta la numerazione Automatica degli episodi
     title = item.fulltitle.rstrip()
 
@@ -140,7 +140,7 @@ def config_item(item, itemlist=[], typography='', active=False):
 
 
 def semiautomatic_config_item(item):
-    info()
+    logger.info()
     # Configurazione Semi Automatica, utile in caso la numerazione automatica fallisca
 
     tvdb.find_and_set_infoLabels(item)
@@ -254,7 +254,7 @@ def renumeration (itemlist, item, typography, dict_series, ID, Season, Episode, 
 
 
 def manual_renumeration(item, modify=False):
-    info()
+    logger.info()
     _list = []
     if item.from_channel: item.channel = item.from_channel
     title = item.fulltitle.rstrip()
@@ -342,7 +342,7 @@ def manual_renumeration(item, modify=False):
 
 
 def delete_renumeration(item):
-    info()
+    logger.info()
     if item.from_channel: item.channel = item.from_channel
     title = item.fulltitle.rstrip()
 
@@ -352,7 +352,7 @@ def delete_renumeration(item):
 
 
 def make_list(itemlist, item, typography, dict_series, ID, Season, Episode, Mode, title):
-    info()
+    logger.info()
     exist = True
     item.infoLabels['tvdb_id'] = ID
     tvdb.set_infoLabels_item(item)
@@ -372,6 +372,7 @@ def make_list(itemlist, item, typography, dict_series, ID, Season, Episode, Mode
         if check:
             for page in Pages:
                 data = tvdb.otvdb_global.get_list_episodes(ID,page)
+                logger.info('DATA',data)
                 for episodes in data['data']:
                     if episodes['firstAired'] and [episodes['firstAired'], episodes['airedSeason'], episodes['airedEpisodeNumber']] not in EpList:
                         EpList.append([episodes['firstAired'], episodes['airedSeason'], episodes['airedEpisodeNumber']])
@@ -478,7 +479,7 @@ def make_list(itemlist, item, typography, dict_series, ID, Season, Episode, Mode
 
 
 def check(item):
-    info()
+    logger.info()
     dict_series = load(item)
     title = item.fulltitle.rstrip()
     if title in dict_series: title = dict_series[title]
@@ -493,7 +494,7 @@ def error(itemlist):
 
 
 def find_episodes(item):
-    info()
+    logger.info()
     ch = __import__('channels.' + item.channel, fromlist=["channels.%s" % item.channel])
     itemlist = ch.episodios(item)
     return itemlist
@@ -501,7 +502,7 @@ def find_episodes(item):
 
 def RepresentsInt(s):
     # Controllo Numro Stagione
-    info()
+    logger.info()
     try:
         int(s)
         return True
@@ -537,7 +538,7 @@ def select_type(item):
 
 
 def filename(item):
-    info()
+    logger.info()
     name_file = item.channel + "_data.json"
     path = filetools.join(config.get_data_path(), "settings_channels")
     fname = filetools.join(path, name_file)
@@ -546,7 +547,7 @@ def filename(item):
 
 
 def load(item):
-    info()
+    logger.info()
     try:
         json_file = open(filename(item), "r").read()
         json = jsontools.load(json_file)[TAG_TVSHOW_RENUMERATE]
@@ -558,7 +559,7 @@ def load(item):
 
 
 def write(item, json):
-    info()
+    logger.info()
     json_file = open(filename(item), "r").read()
     js = jsontools.load(json_file)
     js[TAG_TVSHOW_RENUMERATE] = json

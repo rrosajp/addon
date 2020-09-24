@@ -5,8 +5,10 @@
 
 
 from core import support
+def findhost():
+    return support.match('https://nuovoindirizzo.info/seriehd/', patron=r'<h2[^>]+><a href="([^"]+)"').match
 
-host = support.config.get_channel_url()
+host = support.config.get_channel_url(findhost)
 headers = [['Referer', host]]
 
 
@@ -36,7 +38,7 @@ def search(item, texto):
     except:
         import sys
         for line in sys.exc_info():
-            support.infoger.error("%s" % line)
+            support.logger.error("%s" % line)
         return []
 
 
@@ -55,7 +57,7 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            support.infoger.error("{0}".format(line))
+            support.logger.error("{0}".format(line))
         return []
 
     return itemlist

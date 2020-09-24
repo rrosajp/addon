@@ -129,6 +129,10 @@ def run(item=None):
             from platformcode import shortcuts
             return getattr(shortcuts, item.action)(item)
 
+        elif item.channel == "autorenumber":
+            from platformcode import autorenumber
+            return getattr(autorenumber, item.action)(item)
+
         elif item.action == "delete_key":
             from platformcode import keymaptools
             return keymaptools.delete_key()
