@@ -18,44 +18,44 @@ def order():
     # Seleziona l'ordinamento dei risultati
     return str(support.config.get_setting("order", __channel__))
 
-def get_data(item, head=[]):
-    global headers
-    jstr = ''
-    for h in head:
-        headers[h[0]] = h[1]
-    if not item.count: item.count = 0
-    if not config.get_setting('key', item.channel):
-        matches = support.match(item, patron=r'<script>(.*?location.href=".*?(http[^"]+)";)</').match
-        if matches:
-            jstr, location = matches
-            item.url=support.re.sub(r':\d+', '', location).replace('http://','https://')
-        if jstr:
-            jshe = 'var document = {}, location = {}'
-            aesjs = str(support.match(host + '/aes.min.js').data)
-            js_fix = 'window.toHex = window.toHex || function(){for(var d=[],d=1==arguments.length&&arguments[0].constructor==Array?arguments[0]:arguments,e="",f=0;f<d.length;f++)e+=(16>d[f]?"0":"")+d[f].toString(16);return e.toLowerCase()}'
-            jsret =  'return document.cookie'
-            key_data = js2py.eval_js( 'function (){ ' + jshe + '\n' + aesjs + '\n' + js_fix + '\n' + jstr + '\n' + jsret + '}' )()
-            key = key_data.split(';')[0]
+# def get_data(item, head=[]):
+#     global headers
+#     jstr = ''
+#     for h in head:
+#         headers[h[0]] = h[1]
+#     if not item.count: item.count = 0
+#     if not config.get_setting('key', item.channel):
+#         matches = support.match(item, patron=r'<script>(.*?location.href=".*?(http[^"]+)";)</').match
+#         if matches:
+#             jstr, location = matches
+#             item.url=support.re.sub(r':\d+', '', location).replace('http://','https://')
+#         if jstr:
+#             jshe = 'var document = {}, location = {}'
+#             aesjs = str(support.match(host + '/aes.min.js').data)
+#             js_fix = 'window.toHex = window.toHex || function(){for(var d=[],d=1==arguments.length&&arguments[0].constructor==Array?arguments[0]:arguments,e="",f=0;f<d.length;f++)e+=(16>d[f]?"0":"")+d[f].toString(16);return e.toLowerCase()}'
+#             jsret =  'return document.cookie'
+#             key_data = js2py.eval_js( 'function (){ ' + jshe + '\n' + aesjs + '\n' + js_fix + '\n' + jstr + '\n' + jsret + '}' )()
+#             key = key_data.split(';')[0]
 
-            # save Key in settings
-            config.set_setting('key', key, item.channel)
+#             # save Key in settings
+#             config.set_setting('key', key, item.channel)
 
-    # set cookie
-    headers['cookie'] = config.get_setting('key', item.channel)
-    res = support.match(item, headers=headers, patron=r';\s*location.href=".*?(http[^"]+)"')
-    if res.match:
-        item.url= res.match.replace('http://','https://')
-        data = support.match(item, headers=headers).data
-    else:
-        data = res.data
+#     # set cookie
+#     headers['cookie'] = config.get_setting('key', item.channel)
+#     res = support.match(item, headers=headers, patron=r';\s*location.href=".*?(http[^"]+)"')
+#     if res.match:
+#         item.url= res.match.replace('http://','https://')
+#         data = support.match(item, headers=headers).data
+#     else:
+#         data = res.data
 
 
-    #check that the key is still valid
-    if 'document.cookie=' in data and item.count < 3:
-        item.count += 1
-        config.set_setting('key', '', item.channel)
-        return get_data(item)
-    return data
+#     #check that the key is still valid
+#     if 'document.cookie=' in data and item.count < 3:
+#         item.count += 1
+#         config.set_setting('key', '', item.channel)
+#         return get_data(item)
+#     return data
 
 
 @support.menu
@@ -73,7 +73,7 @@ def mainlist(item):
 @support.scrape
 def genres(item):
     action = 'peliculas'
-    data = get_data(item)
+    # data = get_data(item)
     patronBlock = r'dropdown[^>]*>\s*Generi\s*<span.[^>]+>(?P<block>.*?)</ul>'
     patronMenu = r'<input.*?name="(?P<name>[^"]+)" value="(?P<value>[^"]+)"\s*>[^>]+>(?P<title>[^<]+)</label>'
 
@@ -86,7 +86,7 @@ def genres(item):
 @support.scrape
 def menu(item):
     action = 'submenu'
-    data = get_data(item)
+    # data = get_data(item)
     patronMenu=r'<button[^>]+>\s*(?P<title>[A-Za-z0-9]+)\s*<span.[^>]+>(?P<other>.*?)</ul>'
     def ItemItemlistHook(item, itemlist):
         itemlist.insert(0, item.clone(title=support.typo('Tutti','bold'), action='peliculas'))
@@ -118,7 +118,7 @@ def newest(categoria):
     except:
         import sys
         for line in sys.exc_info():
-            support.infoger.error("{0}".format(line))
+            support.logger.error("{0}".format(line))
         return []
 
 
@@ -136,22 +136,23 @@ def search(item, texto):
     except:
         import sys
         for line in sys.exc_info():
-            support.infoger.error("%s" % line)
+            support.logger.error("%s" % line)
         return []
 
 
 @support.scrape
 def peliculas(item):
     anime=True
+    # debug =True
     if item.args not in ['noorder', 'updated'] and not item.url[-1].isdigit(): item.url += order() # usa l'ordinamento di configura canale
-    data = get_data(item)
+    # data = get_data(item)
     if item.args == 'updated':
-        data = get_data(item)
+        # data = get_data(item)
         item.contentType='episode'
         patron=r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img.*?src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?[^>]+>[^>]+>\s*<div class="ep">[^\d]+(?P<episode>\d+)[^<]*</div>'
         action='findvideos'
     else:
-        patron= r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img.*?src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<year>\d+)\) )?(?:\((?P<lang>[^\)]+)\))?"[^>]+>[^>]+>(?:\s*<div class="(?P<l>[^"]+)">[^>]+>)?\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?'
+        patron= r'<div class="inner">\s*<a href="(?P<url>[^"]+)" class[^>]+>\s*<img.*?src="(?P<thumb>[^"]+)" alt?="(?P<title>[^\("]+)(?:\((?P<year>\d+)\) )?(?:\((?P<lang>[^\)]+)\))?(?P<title2>[^"]+)?[^>]+>[^>]+>(?:\s*<div class="(?P<l>[^"]+)">[^>]+>)?\s*(?:<div class="[^"]+">(?P<type>[^<]+)</div>)?'
         action='episodios'
 
     # Controlla la lingua se assente
@@ -174,7 +175,7 @@ def peliculas(item):
 def episodios(item):
     anime=True
     pagination = 50
-    data = get_data(item)
+    # data = get_data(item)
     patronBlock= r'<div class="server\s*active\s*"(?P<block>.*?)(?:<div class="server|<link)'
     patron = r'<li[^>]*>\s*<a.*?href="(?P<url>[^"]+)"[^>]*>(?P<episode>[^<]+)<'
     def itemHook(item):
@@ -190,7 +191,8 @@ def findvideos(item):
     support.info(item)
     itemlist = []
     urls = []
-    resp = support.match(get_data(item), headers=headers, patron=r'data-name="(\d+)">([^<]+)<')
+    # resp = support.match(get_data(item), headers=headers, patron=r'data-name="(\d+)">([^<]+)<')
+    resp = support.match(item, headers=headers, patron=r'data-name="(\d+)">([^<]+)<')
     data = resp.data
     for ID, name in resp.matches:
         if not item.number: item.number = support.match(item.title, patron=r'(\d+) -').match
