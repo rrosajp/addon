@@ -2,8 +2,8 @@
 # ------------------------------------------------------------
 # XBMC Library Tools
 # ------------------------------------------------------------
-from future import standard_library
-standard_library.install_aliases()
+# from future import standard_library
+# standard_library.install_aliases()
 #from builtins import str
 import sys, os, threading, time, re, math, xbmc, xbmcgui
 PY3 = False

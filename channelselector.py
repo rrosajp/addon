@@ -2,18 +2,18 @@
 
 import glob, os
 
-from core import channeltools
 from core.item import Item
 from platformcode import config, logger
 addon = config.__settings__
 downloadenabled = addon.getSetting('downloadenabled')
+
 
 def getmainlist(view="thumb_"):
     logger.info()
     itemlist = list()
 
     if config.dev_mode():
-        itemlist.append(Item(title="Redirect", channel="checkhost", action="check_channels", thumbnail='',
+        itemlist.append(Item(title="Redirect", action="check_channels", thumbnail='',
                              category=config.get_localized_string(30119), viewmode="thumbnails"))
     # Main Menu Channels
     if addon.getSetting('enable_news_menu') == "true":
