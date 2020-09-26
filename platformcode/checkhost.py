@@ -61,7 +61,7 @@ class Kdicc():
         r = self.rqst(urls)
         http_errr = 0
         for rslt in r:
-            xbmc.log("check_Adsl rslt: %s" % rslt['code'], level=xbmc.LOGNOTICE)
+            logger.info("check_Adsl rslt: %s" % rslt['code'])
             # Errno -2 could be lack of adsl connection or unreachable site ....
             # even in cases where there is a change of manager.
             if rslt['code'] == '111' or '[Errno -3]' in str(rslt['code']) or 'Errno -2' in str(rslt['code']):
@@ -83,10 +83,10 @@ class Kdicc():
             urls = self.lst_site_check_dns
 
         r = self.rqst(urls)
-        xbmc.log("check_Dns result: %s" % r, level=xbmc.LOGNOTICE)
+        logger.info("check_Dns result: %s" % r)
         http_errr = 0
         for rslt in r:
-            xbmc.log("check_Dns rslt: %s" % rslt['code'], level=xbmc.LOGNOTICE)
+            logger.info("check_Dns rslt: %s" % rslt['code'])
             if rslt['code'] == '111':
                 http_errr +=1
 
@@ -122,7 +122,7 @@ class Kdicc():
                 rslt['rdrcturl'] = str(r.url)
                 rslt['isRedirect'] = is_redirect
                 rslt['history'] = r.history
-                xbmc.log("Risultato nel try: %s" %  (r,), level=xbmc.LOGNOTICE)
+                logger.info("Risultato nel try: %s" %  (r,))
 
             except requests.exceptions.ConnectionError as conn_errr:
                 # Errno 10061 for s.o. win
@@ -155,9 +155,9 @@ class Kdicc():
                 s = httplib2.Http()
                 code, resp = s.request(sito, body=None)
                 if code.previous:
-                    xbmc.log("r1 http_Resp: %s %s %s %s" %
+                    logger.info("r1 http_Resp: %s %s %s %s" %
                              (code.status, code.reason, code.previous['status'],
-                              code.previous['-x-permanent-redirect-url']), level=xbmc.LOGNOTICE)
+                              code.previous['-x-permanent-redirect-url']))
                     rslt['code'] = code.previous['status']
                     rslt['redirect'] = code.previous['-x-permanent-redirect-url']
                     rslt['status'] = code.status
@@ -221,10 +221,10 @@ def test_conn(is_exit, check_dns, view_msg,
             if view_msg == True:
                 ktest.view_Advise(config.get_localized_string(70722))
 
-    xbmc.log("############ Start Check DNS ############", level=xbmc.LOGNOTICE)
-    xbmc.log("## IP: %s" %  (ktest.ip_addr), level=xbmc.LOGNOTICE)
-    xbmc.log("## DNS: %s" %  (ktest.dns), level=xbmc.LOGNOTICE)
-    xbmc.log("############# End Check DNS #############", level=xbmc.LOGNOTICE)
+    logger.info("############ Start Check DNS ############")
+    logger.info("## IP: %s" %  (ktest.ip_addr))
+    logger.info("## DNS: %s" %  (ktest.dns))
+    logger.info("############# End Check DNS #############")
     # if check_dns == True:
     #     if ktest.check_Ip() == True and ktest.check_Adsl() == True and ktest.check_Dns() == True:
     #         return True
