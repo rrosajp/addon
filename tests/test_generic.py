@@ -52,7 +52,7 @@ validUrlRegex = re.compile(
     r'(?::\d+)?'  # optional port
     r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
-chBlackList = ['url']
+chBlackList = ['url', 'mediasetplay']
 chNumRis = {
     'altadefinizione01': {
         'Film': 20
@@ -133,6 +133,7 @@ servers = []
 channels = []
 
 channel_list = channelselector.filterchannels("all") if 'KOD_TST_CH' not in os.environ else [Item(channel=os.environ['KOD_TST_CH'], action="mainlist")]
+logger.info(channel_list)
 ret = []
 for chItem in channel_list:
     try:

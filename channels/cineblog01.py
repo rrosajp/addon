@@ -101,7 +101,7 @@ def peliculas(item):
     # debug= True
     if 'newest' in item.args:
         if '/serietv/' not in item.url:
-            debug = True
+            # debug = True
             pagination = ''
             patronBlock = r'Ultimi 100 film [^:]+:(?P<block>.*?)<\/td>'
             patron = r'<a href="?(?P<url>[^">]+)"?>(?P<title>[^<([]+)(?:\[(?P<lang>Sub-ITA|B/N|SUB-ITA)\])?\s*(?:\[(?P<quality>HD|SD|HD/3D)\])?\s*\((?P<year>[0-9]{4})\)<\/a>'

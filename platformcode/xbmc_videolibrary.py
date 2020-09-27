@@ -9,6 +9,11 @@ import sys, os, threading, time, re, math, xbmc, xbmcgui
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 
+if PY3:
+    import urllib.request as urllib2                                # Es muy lento en PY2.  En PY3 es nativo
+else:
+    import urllib2                                                  # Usamos el nativo de PY2 que es más rápido
+
 from core import filetools, jsontools
 from platformcode import config, logger, platformtools
 from core import scrapertools
@@ -434,7 +439,10 @@ def get_data(payload):
     @param payload: data
     :return:
     """
-    import urllib.request, urllib.error
+    try:
+        import urllib.request as urllib
+    except ImportError:
+        import urllib
     logger.info("payload: %s" % payload)
     # Required header for XBMC JSON-RPC calls, otherwise you'll get a 415 HTTP response code - Unsupported media type
     headers = {'content-type': 'application/json'}
@@ -447,8 +455,8 @@ def get_data(payload):
                 xbmc_port = 0
 
             xbmc_json_rpc_url = "http://" + config.get_setting("xbmc_host", "videolibrary") + ":" + str(xbmc_port) + "/jsonrpc"
-            req = urllib.request.Request(xbmc_json_rpc_url, data=jsontools.dump(payload), headers=headers)
-            f = urllib.request.urlopen(req)
+            req = urllib2.Request(xbmc_json_rpc_url, data=jsontools.dump(payload), headers=headers)
+            f = urllib.urlopen(req)
             response = f.read()
             f.close()
 
