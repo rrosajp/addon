@@ -104,7 +104,7 @@ class MainWindow(xbmcgui.WindowXMLDialog):
             Trailer(info)
         elif control_id in [ACTORS, CAST]:
             self.close()
-            Main(self.getControl(ACTORS).getSelectedItem())
+            Main(self.getControl(self.getFocusId()).getSelectedItem())
         elif control_id in [RECOMANDED] and self.getControl(RECOMANDED).getSelectedPosition() > 0:
             self.close()
             Main(self.getControl(RECOMANDED).getSelectedItem())
