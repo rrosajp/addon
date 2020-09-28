@@ -1718,8 +1718,8 @@ def imagenes(item):
             itemlist.append(item.clone(title="Fanart.Tv", args=""))
         if "imdb" in item.images:
             itemlist.append(item.clone(title="Imdb", args=""))
-        if "filmaffinity" in item.images:
-            itemlist.append(item.clone(title="Filmaffinity", args=""))
+        # if "filmaffinity" in item.images:
+        #     itemlist.append(item.clone(title="Filmaffinity", args=""))
         if "myanimelist" in item.images:
             images = match(item.url + "/pics", cookies=False, patron=R'<div class="picSurround"><a href="([^"]+)" title="([^"]+)"').matches
             if images:
@@ -1764,7 +1764,7 @@ def imagenes(item):
 
     if item.images:
         from platformcode import infoplus
-        for key, value in item.images.iteritems():
+        for key, value in item.images.items():
             if key == "tmdb" and "Tmdb" in item.title:
                 if item.folder:
                     for tipo, child in value.iteritems():
@@ -1789,14 +1789,14 @@ def imagenes(item):
                 else:
                     imagesWindow = infoplus.images(fanartv=value).doModal()
 
-            elif key == "filmaffinity" and "Filmaffinity" in item.title:
-                if item.folder:
-                    for thumb, title in value:
-                        thumb = thumb.replace("-s200", "-large")
-                        itemlist.append(Item(channel=item.channel, action="", thumbnail=thumb, fanart=thumb,
-                                             title=title, infoLabels=item.infoLabels))
-                else:
-                    imagesWindow = infoplus.images(fa=value).doModal()
+            # elif key == "filmaffinity" and "Filmaffinity" in item.title:
+            #     if item.folder:
+            #         for thumb, title in value:
+            #             thumb = thumb.replace("-s200", "-large")
+            #             itemlist.append(Item(channel=item.channel, action="", thumbnail=thumb, fanart=thumb,
+            #                                  title=title, infoLabels=item.infoLabels))
+            #     else:
+            #         imagesWindow = infoplus.images(fa=value).doModal()
 
             elif key == "imdb" and "Imdb" in item.title:
                 if item.folder:
@@ -2772,7 +2772,7 @@ def login_mal(from_list=False):
     except:
         import traceback
         error(traceback.format_exc())
-        return False, config.get_localized_string(70331)
+        return False, config.get_localized_string(70331) , ''
 
 
 def cuenta_mal(item):

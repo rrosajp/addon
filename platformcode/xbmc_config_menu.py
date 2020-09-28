@@ -375,7 +375,6 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                                     c["label"], self.font, c["color"], '', 1 | 4,
                                     focusTexture='',
                                     noFocusTexture='')
-        if c['hidden']: control.setType(xbmcgui.INPUT_TYPE_PASSWORD)
 
         image = xbmcgui.ControlImage(0, -100, self.controls_width + 10, self.height_control, os.path.join(self.mediapath, 'Controls', 'MenuItemFO.png'))
 
@@ -385,6 +384,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
 
         control.setVisible(False)
         control.setLabel(c["label"])
+        if c['hidden']: control.setType(xbmcgui.INPUT_TYPE_PASSWORD, c["label"])
         # frodo fix
         s = self.values[c["id"]]
         if s is None: s = c['default'] if 'default' in c else ''
