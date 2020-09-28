@@ -309,7 +309,7 @@
 				<top>25</top>
 				<right>25</right>
 				<height>50</height>
-				<width>220</width>
+				<width>240</width>
                 <visible allowhiddenfocus="true">Control.HasFocus(30500) | Control.HasFocus(30006) | Control.HasFocus(30007) | Control.HasFocus(30008)</visible>
 				<control type="image">
 					<width>50</width>
@@ -318,7 +318,7 @@
 				</control>
 				<control type="textbox" id="30006">
 					<left>60</left>
-					<width>30</width>
+					<width>40</width>
 					<height>50</height>
 					<textcolor>FFFFFFFF</textcolor>
 					<shadowcolor>00000000</shadowcolor>
@@ -328,7 +328,7 @@
 					<aligny>center</aligny>
 				</control>
 				<control type="button" id="30007">
-					<left>110</left>
+					<left>120</left>
 					<width>50</width>
 					<height>50</height>
 					<texturenofocus colordiffuse="AAFFFFFF">Infoplus/trailer.png</texturenofocus>
@@ -338,7 +338,7 @@
 					<onright>30008</onright>
 				</control>
 				<control type="button" id="30008">
-					<left>170</left>
+					<left>180</left>
 					<width>50</width>
 					<height>50</height>
 					<texturenofocus colordiffuse="AAFFFFFF">Infoplus/search.png</texturenofocus>

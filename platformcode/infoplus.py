@@ -84,8 +84,9 @@ class MainWindow(xbmcgui.WindowXMLDialog):
             self.getControl(CAST).addItems(self.cast)
         else:
             self.getControl(CAST).setVisible(False)
-        if Info.getProperty('rating'):
-            self.getControl(RATING).setText(str(Info.getProperty('rating')))
+        if Info.getProperty('rating'): rating = str(Info.getProperty('rating'))
+        else: rating = 'N/A'
+        self.getControl(RATING).setText(rating)
         getFocus(self)
 
     def onClick(self, control_id):
