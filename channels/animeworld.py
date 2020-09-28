@@ -156,7 +156,7 @@ def peliculas(item):
         action='episodios'
 
     # Controlla la lingua se assente
-    patronNext=r'</span></a><a href="([^"]+)"'
+    patronNext=r'<a href="([^"]+)" class="[^"]+" id="go-next'
     typeContentDict={'movie':['movie', 'special']}
     typeActionDict={'findvideos':['movie', 'special']}
     def itemHook(item):

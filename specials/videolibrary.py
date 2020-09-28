@@ -469,7 +469,6 @@ def findvideos(item):
 
         item_json = Item().fromjson(filetools.read(json_path))
         list_servers = []
-        # from core.support import dbg;dbg()
 
         try:
             # FILTERTOOLS
@@ -995,13 +994,13 @@ def delete(item):
         heading = config.get_localized_string(70085)
     if item.multichannel:
         # Get channel list
+        channels = []
+        opciones = []
+        for k in list(item.library_urls.keys()):
+            if k != "downloads":
+                opciones.append(config.get_localized_string(70086) % k.capitalize())
+                channels.append(k)
         if item.dead == '':
-            opciones = []
-            channels = []
-            for k in list(item.library_urls.keys()):
-                if k != "downloads":
-                    opciones.append(config.get_localized_string(70086) % k.capitalize())
-                    channels.append(k)
             opciones.insert(0, heading)
 
             index = platformtools.dialog_select(config.get_localized_string(30163), opciones)

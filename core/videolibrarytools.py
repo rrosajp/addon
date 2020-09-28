@@ -254,7 +254,7 @@ def add_renumber_options(item, head_nfo, path):
     return ret
 
 def check_renumber_options(item):
-    from core.autorenumber import load, write
+    from platformcode.autorenumber import load, write
     for key in item.channel_prefs:
         if 'TVSHOW_AUTORENUMBER' in item.channel_prefs[key]:
             item.channel = key
@@ -1073,7 +1073,7 @@ def add_tvshow(item, channel=None):
         # Get the episode list
         itemlist = getattr(channel, item.action)(item)
         if itemlist and not scrapertools.find_single_match(itemlist[0].title, r'(\d+x\d+)'):
-            from core.autorenumber import select_type, renumber, check
+            from platformcode.autorenumber import select_type, renumber, check
             if not check(item):
                 action = item.action
                 select_type(item)

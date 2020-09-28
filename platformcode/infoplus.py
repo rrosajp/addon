@@ -28,6 +28,8 @@ RATING_ICON = 30005
 RATING = 30006
 TRAILER = 30007
 SEARCH = 30008
+NEXT = 30009
+PREVIOUS = 30010
 LOADING = 30011
 COMMANDS = 30012
 RECOMANDED = TRAILERS = 30500
@@ -118,12 +120,11 @@ class MainWindow(xbmcgui.WindowXMLDialog):
             if not rating: rating = 'N/A'
             self.getControl(FANART).setImage(fanart)
             self.getControl(RATING).setText(rating)
-            if self.getFocus() > 0:
-                cast, actors = get_cast(self.getControl(self.getFocusId()).getSelectedItem())
-                self.getControl(ACTORS).reset()
-                self.getControl(ACTORS).addItems(actors)
-                self.getControl(CAST).reset()
-                self.getControl(CAST).addItems(cast)
+            cast, actors = get_cast(self.getControl(self.getFocusId()).getSelectedItem())
+            self.getControl(ACTORS).reset()
+            self.getControl(ACTORS).addItems(actors)
+            self.getControl(CAST).reset()
+            self.getControl(CAST).addItems(cast)
         action = action.getId()
         if action in [BACKSPACE]:
             self.close()
@@ -342,6 +343,75 @@ class TrailerWindow(xbmcgui.WindowXMLDialog):
             remove()
             modal()
         elif action in [EXIT]:
+            self.close()
+
+class images(xbmcgui.WindowDialog):
+    def __init__(self, *args, **kwargs):
+        self.tmdb = kwargs.get("tmdb", {})
+        self.imdb = kwargs.get("imdb", {})
+        self.mal = kwargs.get("mal", {})
+        self.fanartv = kwargs.get("fanartv", {})
+
+        self.image_list = []
+
+        for key, value in self.tmdb.items():
+            for detail in value: self.image_list.append('http://image.tmdb.org/t/p/original' + detail["file_path"])
+        for image in self.imdb: self.image_list.append(image["src"])
+        for image, title in self.mal: self.image_list.append(image)
+        for key, value in self.fanartv.items():
+            for image in value: self.image_list.append(image["url"])
+
+        #### Kodi 18 Compatibility ####
+        if config.get_platform(True)['num_version'] < 18: self.setCoordinateResolution(2)
+        log
+        self.background = xbmcgui.ControlImage(0, 0, 1280, 720, imagepath('white'), colorDiffuse='FF232323')
+        self.addControl(self.background)
+        main_image = self.image_list[0] if self.image_list else ''
+        self.main_image = xbmcgui.ControlImage(0, 0, 1280, 720, main_image, 2)
+        self.addControl(self.main_image)
+
+        self.close_btn = xbmcgui.ControlButton(0, 0, 1280, 720, '' ,'', '')
+        self.addControl(self.close_btn)
+
+        # BUTTON LEFT
+        self.btn_left = xbmcgui.ControlButton(0, 330, 60, 60, '', imagepath('previous_focus'), imagepath('previous_nofocus'))
+        self.addControl(self.btn_left)
+        self.btn_left.setAnimations([('WindowOpen', 'effect=slide start=-60,0 end=0,0 delay=100 time=200'),('WindowClose', 'effect=slide start=0,0 end=-60,0 delay=100 time=200')])
+
+        # BUTTON RIGHT
+        self.btn_right = xbmcgui.ControlButton(1220, 330, 60, 60, '', imagepath('next_focus'), imagepath('next_nofocus'))
+        self.addControl(self.btn_right)
+        self.btn_right.setAnimations([('WindowOpen', 'effect=slide start=60,0 end=0,0 delay=100 time=200'),('WindowClose', 'effect=slide start=0,0 end=60,0 delay=100 time=200')])
+
+        self.count = 0
+
+    def onAction(self, action):
+        if action in [BACKSPACE, EXIT]:
+            self.close()
+
+        if action in [RIGHT, DOWN]:
+            self.count += 1
+            if self.count > len(self.image_list) -1: self.count = 0
+            self.main_image.setImage(self.image_list[self.count])
+
+        if action in [LEFT, UP]:
+            self.count -= 1
+            if self.count < 0: self.count = len(self.image_list) -1
+            self.main_image.setImage(self.image_list[self.count])
+
+
+    def onControl(self, control):
+        if control.getId() == self.btn_right.getId():
+            self.count += 1
+            if self.count > len(self.image_list) -1: self.count = 0
+            self.main_image.setImage(self.image_list[self.count])
+
+        elif control.getId()  == self.btn_left.getId():
+            self.count -= 1
+            if self.count < 0: self.count = len(self.image_list) -1
+            self.main_image.setImage(self.image_list[self.count])
+
+        else:
             self.close()
 
 

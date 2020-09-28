@@ -53,7 +53,6 @@ def renumber(itemlist, item='', typography=''):
     dict_series = load(itemlist[0]) if len(itemlist) > 0 else {}
 
     if item:
-        # from core.support import dbg;dbg()
         item.channel = item.from_channel if item.from_channel else item.channel
         title = item.fulltitle.rstrip()
         already_renumbered = scrapertools.find_single_match(itemlist[0].title, r'(\d+\D\d+)')
@@ -142,7 +141,6 @@ def config_item(item, itemlist=[], typography='', active=False):
 def semiautomatic_config_item(item):
     logger.info()
     # Configurazione Semi Automatica, utile in caso la numerazione automatica fallisca
-
     tvdb.find_and_set_infoLabels(item)
     item.channel = item.from_channel if item.from_channel else item.channel
     dict_series = load(item)
@@ -295,14 +293,14 @@ def manual_renumeration(item, modify=False):
             dict_series[title] = dict_renumerate
 
     itemlist = find_episodes(item)
-    for item in itemlist:
-        Title = re.sub(r'\d+x\d+ - ', '', item.title)
+    for it in itemlist:
+        Title = re.sub(r'\d+x\d+ - ', '', it.title)
         if modify == True:
             ep = int(scrapertools.find_single_match(Title, r'(\d+)'))
-            if item.action == 'findvideos' and str(ep) not in EpisodeDict:
+            if it.action == 'findvideos' and str(ep) not in EpisodeDict:
                 _list.append(Title)
         else:
-            if item.action == 'findvideos':
+            if it.action == 'findvideos':
                 _list.append(Title)
 
     count = 1
@@ -317,6 +315,8 @@ def manual_renumeration(item, modify=False):
         season = ''
         while not season:
             season = platformtools.dialog_numeric(0, config.get_localized_string(70733))
+            count = int(platformtools.dialog_numeric(0, config.get_localized_string(70733)))
+
         for select in selected:
             ep = int(scrapertools.find_single_match(_list[select], r'(\d+)'))
             if season == '0':

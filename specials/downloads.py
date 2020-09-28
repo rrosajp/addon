@@ -864,7 +864,7 @@ def get_episodes(item):
 
     itemlist = []
     if episodes and not scrapertools.find_single_match(episodes[0].title, r'(\d+.\d+)') and item.channel not in ['videolibrary'] and item.action != 'season':
-        from core.autorenumber import select_type, renumber, check
+        from platformcode.autorenumber import select_type, renumber, check
         # support.dbg()
         if not check(item):
             select_type(item)

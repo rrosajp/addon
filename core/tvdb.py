@@ -1032,33 +1032,33 @@ class Tvdb(object):
         fanarts = requests.get(HOST + '/series/' + str(origen['id']) + '/images/query?keyType=fanart').json()
         if 'data' in fanarts:
             ret_infoLabels['fanart'] = HOST_IMAGE + fanarts['data'][0]['fileName']
-        elif 'poster' in origen and origen['fanart']:
+        elif 'fanart' in origen and origen['fanart']:
             ret_infoLabels['thumbnail'] = origen['fanart']
-        if 'overview' in origen:
+        if 'overview' in origen and origen['overview']:
             ret_infoLabels['plot'] = origen['overview']
         if 'duration' in origen and origen['duration']:
             ret_infoLabels['duration'] = int(origen['duration']) * 60
         if 'firstAired' in origen and origen['firstAired']:
             ret_infoLabels['year'] = int(origen['firstAired'][:4])
             ret_infoLabels['premiered'] = origen['firstAired'].split("-")[2] + "/" + origen['firstAired'].split("-")[1] + "/" + origen['firstAired'].split("-")[0]
-        if 'siteRating' in origen:
+        if 'siteRating' in origen and origen['siteRating']:
             ret_infoLabels['rating'] = float(origen['siteRating'])
-        if 'siteRatingCount' in origen and origen['siteRating']:
+        if 'siteRatingCount' in origen and origen['siteRatingCount']:
             ret_infoLabels['votes'] = origen['siteRatingCount']
-        if 'status' in origen:
+        if 'status' in origen and origen['status']:
             ret_infoLabels['status'] = origen['status']
-        if 'network' in origen:
+        if 'network' in origen and origen['network']:
             ret_infoLabels['studio'] = origen['network']
-        if 'imdbId' in origen:
+        if 'imdbId' in origen and origen['rating']:
             ret_infoLabels['imdb_id'] = origen['imdbId']
-        if 'rating' in origen:
+        if 'rating' in origen and origen['rating']:
             ret_infoLabels['mpaa'] = origen['rating']
-        if 'genre' in origen:
+        if 'genre' in origen and origen['genre']:
             for genre in origen['genre']:
                 genre_list = ""
                 genre_list += genre + ', '
                 ret_infoLabels['genre'] = genre_list.rstrip(', ')
-        if 'cast' in origen:
+        if 'cast' in origen and origen['cast']:
             dic_aux = dict((name, character) for (name, character) in l_castandrole)
             l_castandrole.extend([(p['name'], p['role']) for p in origen['cast'] if p['name'] not in list(dic_aux.keys())])
             ret_infoLabels['castandrole'] = l_castandrole
