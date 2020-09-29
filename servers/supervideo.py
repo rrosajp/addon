@@ -39,7 +39,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         # lQuality.reverse()
 
         for source in lSrc:
-            quality = source['label'] if source.has_key('label') else 'auto'
+            quality = source['label'] if 'label' in source else 'auto'
             video_urls.append(['.' + source['file'].split('.')[-1] + ' [' + quality + '] [SuperVideo]', source['file']])
 
     else:
