@@ -84,8 +84,9 @@ class MainWindow(xbmcgui.WindowXMLDialog):
             self.getControl(CAST).addItems(self.cast)
         else:
             self.getControl(CAST).setVisible(False)
-        if Info.getProperty('rating'):
-            self.getControl(RATING).setText(str(Info.getProperty('rating')))
+        if Info.getProperty('rating'): rating = str(Info.getProperty('rating'))
+        else: rating = 'N/A'
+        self.getControl(RATING).setText(rating)
         getFocus(self)
 
     def onClick(self, control_id):
@@ -102,9 +103,9 @@ class MainWindow(xbmcgui.WindowXMLDialog):
             info = self.getControl(RECOMANDED).getSelectedItem()
             self.close()
             Trailer(info)
-        elif control_id in [ACTORS]:
+        elif control_id in [ACTORS, CAST]:
             self.close()
-            Main(self.getControl(ACTORS).getSelectedItem())
+            Main(self.getControl(self.getFocusId()).getSelectedItem())
         elif control_id in [RECOMANDED] and self.getControl(RECOMANDED).getSelectedPosition() > 0:
             self.close()
             Main(self.getControl(RECOMANDED).getSelectedItem())

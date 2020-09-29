@@ -67,37 +67,6 @@
       ]
     },
     {
-      "id": "label1",
-      "type": "label",
-      "label": "",
-      "enabled": false,
-      "visible": true
-    },
-    {
-      "id": "filmaff",
-      "type": "list",
-      "label": "@70428",
-      "default": 0,
-      "enabled": true,
-      "visible": true,
-      "lvalues": [
-        "auto",
-        "@70429",
-        "@70430",
-        "@70431",
-        "@70432",
-        "@70433",
-        "@70434"
-      ]
-    },
-    {
-      "id": "label2",
-      "type": "label",
-      "label": "",
-      "enabled": false,
-      "visible": true
-    },
-    {
       "id": "usuariomal",
       "type": "text",
       "label": "@70441",

@@ -40,12 +40,12 @@
 
 			<!-- LOADING -->
 			<control type="image" id='30011'>
-				<top>310</top>
-				<left>590</left>
-				<width>100</width>
-				<height>100</height>
-				<texture>Infoplus/loading.png</texture>
-				<animation effect="rotate" center="640,360" start="0" end="-360" time="5000"  loop="true" condition="Control.IsVisible(30011)">Conditional</animation>
+				<top>355</top>
+				<left>490</left>
+				<width>300</width>
+				<height>10</height>
+				<texture>white.png</texture>
+				<animation effect="zoom" pulse ="true" center="auto" start="0,100" end="100,100" time="1000" condition="Control.IsVisible(30011)">Conditional</animation>
 			</control>
 
 			<control type="grouplist">
@@ -309,7 +309,7 @@
 				<top>25</top>
 				<right>25</right>
 				<height>50</height>
-				<width>220</width>
+				<width>240</width>
                 <visible allowhiddenfocus="true">Control.HasFocus(30500) | Control.HasFocus(30006) | Control.HasFocus(30007) | Control.HasFocus(30008)</visible>
 				<control type="image">
 					<width>50</width>
@@ -318,7 +318,7 @@
 				</control>
 				<control type="textbox" id="30006">
 					<left>60</left>
-					<width>30</width>
+					<width>40</width>
 					<height>50</height>
 					<textcolor>FFFFFFFF</textcolor>
 					<shadowcolor>00000000</shadowcolor>
@@ -328,7 +328,7 @@
 					<aligny>center</aligny>
 				</control>
 				<control type="button" id="30007">
-					<left>110</left>
+					<left>120</left>
 					<width>50</width>
 					<height>50</height>
 					<texturenofocus colordiffuse="AAFFFFFF">Infoplus/trailer.png</texturenofocus>
@@ -338,7 +338,7 @@
 					<onright>30008</onright>
 				</control>
 				<control type="button" id="30008">
-					<left>170</left>
+					<left>180</left>
 					<width>50</width>
 					<height>50</height>
 					<texturenofocus colordiffuse="AAFFFFFF">Infoplus/search.png</texturenofocus>

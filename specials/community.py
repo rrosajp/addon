@@ -53,7 +53,7 @@ def show_channels(item):
 
     for key, channel in json['channels'].items():
         path = filetools.dirname(channel['path']) # relative path
-        channel_json = load_json(channel['path']) # read channel json
+        channel_json = load_json(channel) # read channel json
 
         # retrieve information from json
         thumbnail = relative('thumbnail', channel_json, path)
@@ -63,7 +63,7 @@ def show_channels(item):
 
         itemlist.append(Item(channel=item.channel,
                              title=support.typo(channel['channel_name'],'bold'),
-                             url=channel['path'],
+                             url=channel['url'],
                              thumbnail=thumbnail,
                              fanart=fanart,
                              plot=plot,
@@ -613,7 +613,7 @@ def load_json(item, no_order=False):
         url = item.url
         filterkey = item.filterkey
     else:
-        url = item
+        url = item['url'] if 'url' in item else item
         filterkey = ''
     try:
         if url.startswith('http'):
@@ -639,9 +639,10 @@ def load_and_check(item):
     json = jsontools.load(file.read())
 
     for key, channel in json['channels'].items():
-        if not 'checked' in channel:
+        if not 'check' in channel:
             response = httptools.downloadpage(channel['path'], follow_redirects=True, timeout=5)
             if response.success:
+                channel['url'] = channel['path']
                 channel['path'] = response.url
                 channel['channel_name'] = re.sub(r'\[[^\]]+\]', '', channel['channel_name'])
                 channel['check'] = True
