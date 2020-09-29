@@ -3,13 +3,8 @@
 # Canale per vvvvid
 # ----------------------------------------------------------
 import requests, sys
-from core import support, tmdb, autorenumber
-
-if sys.version_info[0] >= 3:
-    pass
-else:
-    pass
-
+from core import support, tmdb
+from platformcode import autorenumber
 
 host = support.config.get_channel_url()
 

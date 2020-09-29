@@ -4,7 +4,8 @@
 # ------------------------------------------------------------
 
 import requests, json, copy
-from core import support, autorenumber
+from core import support
+from platformcode import autorenumber
 
 try: from lib import cloudscraper
 except: from lib import cloudscraper

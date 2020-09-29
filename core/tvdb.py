@@ -6,6 +6,10 @@
 # Used to obtain series data for the video library
 # ------------------------------------------------------------
 
+import sys
+if sys.version_info[0] >= 3: PY3 = True
+else: PY3 = False
+
 from future import standard_library
 standard_library.install_aliases()
 from future.builtins import object
@@ -390,9 +394,11 @@ class Tvdb(object):
 
         url = HOST + "/login"
         params = {"apikey": apikey}
+        if PY3: params = jsontools.dump(params).encode()
+        else: params = jsontools.dump(params)
 
         try:
-            req = urllib.request.Request(url, data=jsontools.dump(params), headers=DEFAULT_HEADERS)
+            req = urllib.request.Request(url, data=params, headers=DEFAULT_HEADERS)
             response = urllib.request.urlopen(req)
             html = response.read()
             response.close()
