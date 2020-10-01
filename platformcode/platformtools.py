@@ -945,6 +945,13 @@ def set_player(item, xlistitem, mediaurl, view, strm, nfo_path=None, head_nfo=No
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.mark_auto_as_watched(item, nfo_path, head_nfo, item_nfo)
 
+    # for cases where the audio playback window appears in place of the video one
+    if item.focusOnVideoPlayer:
+        while is_playing and xbmcgui.getCurrentWindowId() != 12006:
+            continue
+        xbmc.sleep(500)
+        xbmcgui.Window(12005).show()
+
 
 def torrent_client_installed(show_tuple=False):
     # External plugins found in servers / torrent.json node clients
