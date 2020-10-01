@@ -5,7 +5,6 @@
 
 import datetime, xbmc, os, shutil
 
-from lib.sambatools import libsmb as samba
 from zipfile import ZipFile
 from core import videolibrarytools, filetools
 from platformcode import logger, config, platformtools, xbmc_videolibrary
@@ -43,7 +42,6 @@ def export_videolibrary(item):
     p_dialog.update(75)
 
     zip(videolibrary_temp_path, zip_file)
-    xbmc.sleep(1000)
     shutil.rmtree(temp_path)
 
     p_dialog.update(100)
@@ -74,7 +72,6 @@ def import_videolibrary(item):
     if config.is_xbmc() and config.get_setting("videolibrary_kodi"):
         xbmc_videolibrary.clean()
     p_dialog.update(30)
-    xbmc.sleep(1000)
     shutil.rmtree(videolibrary_movies_path)
     shutil.rmtree(videolibrary_tvshows_path)
     p_dialog.update(50)
