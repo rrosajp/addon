@@ -136,7 +136,7 @@ def render_items(itemlist, parent_item):
     logger.info('START render_items')
     thumb_type = config.get_setting('video_thumbnail_type')
     from platformcode import shortcuts
-    from core import httptools
+    # from core import httptools
     _handle = int(sys.argv[1])
     default_fanart = config.get_fanart()
     def_context_commands = shortcuts.context()
