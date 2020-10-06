@@ -26,7 +26,7 @@ class Mailbox:
 
     def waitForMail(self, timeout=50):
         info = 'verifica tramite mail richiesta dal sito, sono in attesa di nuove mail sulla casella ' + self.address
-        info += '\nTimeout tra ' + str(timeout) + ' secondi'
+        # info += '\nTimeout tra ' + str(timeout) + ' secondi'
         dialog = platformtools.dialog_progress(config.get_localized_string(20000), info)
         secs = 0
         while secs < timeout:
@@ -73,7 +73,6 @@ class OneSecMailbox(Mailbox):
 
     def inbox(self):
         """
-        :param user: user@1secmail.com
         :return: json containing inbox id and subjects
         """
         apiUrl = self.baseUrl + '?action=getMessages&login=' + self.user + '&domain=' + self.domain
@@ -124,8 +123,9 @@ class Gmailnator(Mailbox):
             self.user, id = support.match(inbox[0]['content'], patron='([^\/]+)\/messageid\/#([a-z0-9]+)').match
             #<b>subject</b><div>2 minutes ago</div><hr /><div dir="ltr">body</div>
             html = httptools.downloadpage(self.baseUrl + 'mailbox/get_single_message/', post={'csrf_gmailnator_token': self.csrf, 'action': 'get_message', 'message_id': id, 'email': self.user}).data
+            logger.debug(html)
             m = Email()
-            m.subject, m.date, m.body = support.match(html, patron='<b>([^<]+)<\/b><div>([^<]+)<\/div><hr \/><div dir="ltr">(.*)').match
+            m.subject, m.date, m.body = support.match(html, patron='<b>([^<]+)<\/b><div>([^<]+)<\/div><hr \/>(.*)').match
 
             return m
         return inbox
