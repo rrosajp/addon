@@ -21,59 +21,75 @@ def test_video_exists(page_url):
 
 
 def login():
-    httptools.downloadpage(page.url.replace('/unauthorized', '/login'),
+    r = httptools.downloadpage(page.url.replace('/unauthorized', '/login'),
                            post={'email': config.get_setting('username', server='hdmario'),
                                  'password': config.get_setting('password', server='hdmario')})
+    if not r.success or 'Email o Password non validi' in r.data:
+        platformtools.dialog_ok('HDmario', 'Username/password non validi')
+        return False
+
+    return True
 
 
-def registerOrLogin(page_url, forced=False):
-    if not forced and config.get_setting('username', server='hdmario') and config.get_setting('password', server='hdmario'):
-        login()
-    else:
-        if platformtools.dialog_yesno('HDmario',
-                                      'Questo server necessita di un account, ne hai già uno oppure vuoi tentare una registrazione automatica?',
-                                      yeslabel='Accedi', nolabel='Tenta registrazione'):
-            from specials import setting
-            from core.item import Item
-            setting.server_config(Item(config='hdmario'))
-            login()
+def registerOrLogin(page_url):
+    if config.get_setting('username', server='hdmario') and config.get_setting('password', server='hdmario'):
+        if login():
+            return True
+
+    if platformtools.dialog_yesno('HDmario',
+                                  'Questo server necessita di un account, ne hai già uno oppure vuoi tentare una registrazione automatica?',
+                                  yeslabel='Accedi', nolabel='Tenta registrazione'):
+        from specials import setting
+        from core.item import Item
+        user_pre = config.get_setting('username', server='hdmario')
+        password_pre = config.get_setting('password', server='hdmario')
+        setting.server_config(Item(config='hdmario'))
+        user_post = config.get_setting('username', server='hdmario')
+        password_post = config.get_setting('password', server='hdmario')
+
+        if user_pre != user_post or password_pre != password_post:
+            return registerOrLogin(page_url)
         else:
-            import random
-            import string
-            logger.info('Registrazione automatica in corso')
-            mailbox = Gmailnator()
-            randPsw = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(10))
-            captcha = httptools.downloadpage(baseUrl + '/captchaInfo').json
-            logger.info('email: ' + mailbox.address)
-            logger.info('pass: ' + randPsw)
-            reg = platformtools.dialog_register(baseUrl + '/register/', email=True, password=True, email_default=mailbox.address, password_default=randPsw, captcha_img=captcha['captchaUrl'])
-            if not reg:
-                return False
-            regPost = httptools.downloadpage(baseUrl + '/register/',
-                                                      post={'email': reg['email'], 'email_confirmation': reg['email'],
-                                                            'password': reg['password'],
-                                                            'password_confirmation': reg['password'],
-                                                            'captchaUuid': captcha['captchaUuid'],
-                                                            'captcha': reg['captcha']})
-            if reg['email'] == mailbox.address:
-                mail = mailbox.waitForMail()
-                if mail:
-                    checkUrl = scrapertools.find_single_match(mail.body, "https://ilcontrollore\.com/article\.php\?[^\s]+")
-                    httptools.downloadpage(checkUrl)
-                    config.set_setting('username', mailbox.address, server='hdmario')
-                    config.set_setting('password', randPsw, server='hdmario')
-                    platformtools.dialog_ok('HDmario',
-                                            'Registrato automaticamente con queste credenziali:\nemail:' + mailbox.address + '\npass: ' + randPsw)
-                else:
-                    platformtools.dialog_ok('HDmario', 'Impossibile registrarsi automaticamente')
-                    return False
+            return False
+    else:
+        import random
+        import string
+        logger.info('Registrazione automatica in corso')
+        mailbox = Gmailnator()
+        randPsw = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(10))
+        captcha = httptools.downloadpage(baseUrl + '/captchaInfo').json
+        logger.info('email: ' + mailbox.address)
+        logger.info('pass: ' + randPsw)
+        reg = platformtools.dialog_register(baseUrl + '/register/', email=True, password=True, email_default=mailbox.address, password_default=randPsw, captcha_img=captcha['captchaUrl'])
+        if not reg:
+            return False
+        regPost = httptools.downloadpage(baseUrl + '/register/',
+                                                  post={'email': reg['email'], 'email_confirmation': reg['email'],
+                                                        'password': reg['password'],
+                                                        'password_confirmation': reg['password'],
+                                                        'captchaUuid': captcha['captchaUuid'],
+                                                        'captcha': reg['captcha']})
+        if '/register' in regPost.url:
+            error = scrapertools.htmlclean(scrapertools.find_single_match(regPost.data, 'Impossibile proseguire.*?</div>'))
+            error = scrapertools.unescape(scrapertools.re.sub('\n\s+', ' ', error))
+            platformtools.dialog_ok('HDmario', error)
+            return False
+        if reg['email'] == mailbox.address:
+            mail = mailbox.waitForMail()
+            if mail:
+                checkUrl = scrapertools.find_single_match(mail.body, 'href="([^"]+)">Premi qui')
+                httptools.downloadpage(checkUrl)
+                config.set_setting('username', mailbox.address, server='hdmario')
+                config.set_setting('password', randPsw, server='hdmario')
+                platformtools.dialog_ok('HDmario',
+                                        'Registrato automaticamente con queste credenziali:\nemail:' + mailbox.address + '\npass: ' + randPsw)
             else:
-                platformtools.dialog_ok('HDmario', 'Hai modificato la mail quindi KoD non sarà in grado di effettuare la verifica in autonomia, apri la casella ' + reg['email']
-                                        + ' e clicca sul link. Premi ok quando fatto')
-            logger.info('Registrazione completata')
-    global page, data
-    page = httptools.downloadpage(page_url)
-    data = page.data
+                platformtools.dialog_ok('HDmario', 'Impossibile registrarsi automaticamente')
+                return False
+        else:
+            platformtools.dialog_ok('HDmario', 'Hai modificato la mail quindi KoD non sarà in grado di effettuare la verifica in autonomia, apri la casella ' + reg['email']
+                                    + ' e clicca sul link. Premi ok quando fatto')
+        logger.info('Registrazione completata')
 
     return True
 
@@ -102,11 +118,9 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         httptools.set_cookies({}, True)  # clear cookies
         if not registerOrLogin(page_url):
             return []
+        page = httptools.downloadpage(page_url)
+        data = page.data
 
-    elif 'Registrati' in data:
-        platformtools.dialog_ok('HDmario', 'Username/password non validi')
-        if not registerOrLogin(page_url, True):
-            return []
     logger.info(data)
     from lib import jsunpack_js2py
     unpacked = jsunpack_js2py.unpack(scrapertools.find_single_match(data, '<script type="text/javascript">\n*\s*\n*(eval.*)'))
