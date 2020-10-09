@@ -82,7 +82,6 @@ def color(text, color):
 
 def search(channel, item, texto):
     info(item.url + " search " + texto)
-    if 'findhost' in dir(channel): channel.findhost()
     item.url = channel.host + "/?s=" + texto
     try:
         return channel.peliculas(item)
@@ -479,10 +478,10 @@ def scrape(func):
             # if url may be changed and channel has findhost to update
             if 'findhost' in func.__globals__ and not itemlist:
                 info('running findhost ' + func.__module__)
-                host = func.__globals__['findhost']()
+                ch = func.__module__.split('.')[-1]
+                host = config.get_channel_url(func.__globals__['findhost'], ch, True)
+
                 parse = list(urlparse.urlparse(item.url))
-                from core import jsontools
-                jsontools.update_node(host, func.__module__.split('.')[-1], 'url')
                 parse[1] = scrapertools.get_domain_from_url(host)
                 item.url = urlparse.urlunparse(parse)
                 data = None
