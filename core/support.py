@@ -317,7 +317,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                     longtitle += s + parsedTitle.get('episode_title')
                     item.contentEpisodeTitle = parsedTitle.get('episode_title')
             except:
-                logger.debug('Error')
+                import traceback
+                logger.error(traceback.format_exc())
 
         longtitle = typo(longtitle, 'bold')
         lang1, longtitle = scrapeLang(scraped, lang, longtitle)
