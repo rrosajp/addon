@@ -491,6 +491,9 @@ def scrape(func):
             else:
                 break
 
+        if action != 'play' and function != 'episodios' and 'patronMenu' not in args and item.contentType in ['movie', 'tvshow', 'episode', 'undefined'] and not disabletmdb:
+            tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+
         if (pagination and len(matches) <= pag * pagination) or not pagination:  # next page with pagination
             if patronNext and inspect.stack()[1][3] not in ['newest']:
                 nextPage(itemlist, item, data, patronNext, function)
@@ -509,8 +512,6 @@ def scrape(func):
                          args=item.args,
                          page=pag + 1,
                          thumbnail=thumb()))
-        if action != 'play' and function != 'episodios' and 'patronMenu' not in args and item.contentType in ['movie', 'tvshow', 'episode', 'undefined'] and not disabletmdb:
-            tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
         if anime:
             from platformcode import autorenumber
