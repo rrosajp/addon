@@ -174,10 +174,10 @@ def channel_search(item):
     mode = item.mode
 
     if item.infoLabels['tvshowtitle']:
-        item.text = item.infoLabels['tvshowtitle'].split('-')[0]
+        item.text = item.infoLabels['tvshowtitle'].split(' - ')[0]
         item.title = item.text
     elif item.infoLabels['title']:
-        item.text = item.infoLabels['title'].split('-')[0]
+        item.text = item.infoLabels['title'].split(' - ')[0]
         item.title = item.text
 
     temp_search_file = config.get_temp_file('temp-search')
@@ -363,7 +363,6 @@ def get_channel_results(item, module_dict, search_action):
                     if not config.get_setting('unify'):
                         elem.title += ' [%s]' % ch
                     valid.append(elem)
-                    break
 
         # if len(results) < 0 and len(results) < max_results and item.mode != 'all':
         #

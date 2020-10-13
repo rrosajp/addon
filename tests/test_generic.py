@@ -120,7 +120,7 @@ chNumRis = {
         'Serie TV': 12
     },
     'serietvonline': {
-        'Film': 50,
+        'Film': 25,
         'Serie TV': 35
     },
     'tantifilm': {
@@ -303,7 +303,7 @@ class GenericServerTest(unittest.TestCase):
                     print(headers)
                 if 'magnet:?' in directUrl:  # check of magnet links not supported
                     continue
-                page = downloadpage(directUrl, headers=headers, only_headers=True, use_requests=True)
+                page = downloadpage(directUrl, headers=headers, only_headers=True, use_requests=True, verify=False)
                 self.assertTrue(page.success, self.name + ' scraper returned an invalid link')
                 self.assertLess(page.code, 400, self.name + ' scraper returned a ' + str(page.code) + ' link')
                 contentType = page.headers['Content-Type']
