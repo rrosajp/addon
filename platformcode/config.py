@@ -149,7 +149,7 @@ def is_autorun_enabled():
 
 
 def enable_disable_autorun(is_enabled):
-    # using autoexec.py and not service.py to force autorun
+    # old method, now using service.py
 
     path = os.path.join(xbmc.translatePath('special://userdata'),'autoexec.py')
     append_write = 'a' if os.path.exists(path) else 'w'
@@ -165,7 +165,7 @@ def enable_disable_autorun(is_enabled):
         file.close()
         with open(path, "w") as file:
             file.write(new_content)
-        set_setting('autostart', 'Off')
+        set_setting('autostart', True)
     return True
 
 def get_all_settings_addon():

@@ -396,6 +396,12 @@ class AddonMonitor(xbmc.Monitor):
 
 if __name__ == "__main__":
     logger.info('Starting KoD service')
+    if config.get_setting('autostart'):
+        xbmc.executebuiltin('RunAddon(plugin.video.' + config.PLUGIN_NAME + ')')
+
+    # handling old autoexec method
+    if config.is_autorun_enabled():
+        config.enable_disable_autorun(True)
     monitor = AddonMonitor()
 
     # mark as stopped all downloads (if we are here, probably kodi just started)
