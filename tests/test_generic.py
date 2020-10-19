@@ -242,7 +242,7 @@ class GenericChannelMenuItemTest(unittest.TestCase):
         if self.ch in chNumRis:  # i know how much results should be
             for content in chNumRis[self.ch]:
                 if content in self.title:
-                    risNum = len([i for i in self.itemlist if not i.nextPage])  # not count nextpage
+                    risNum = len([i for i in self.itemlist if i.title != typo(config.get_localized_string(30992), 'color kod bold')])  # not count nextpage
                     self.assertEqual(chNumRis[self.ch][content], risNum,
                                      'channel ' + self.ch + ' -> ' + self.title + ' returned wrong number of results<br>'
                                      + str(risNum) + ' but should be ' + str(chNumRis[self.ch][content]) + '<br>' +

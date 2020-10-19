@@ -8,6 +8,12 @@ import traceback
 import xbmc
 import xbmcgui
 from platformcode import config
+# on kodi 18 its xbmc.translatePath, on 19 xbmcvfs.translatePath
+try:
+    import xbmcvfs
+    xbmc.translatePath = xbmcvfs.translatePath
+except:
+    pass
 librerias = xbmc.translatePath(os.path.join(config.get_runtime_path(), 'lib'))
 sys.path.insert(0, librerias)
 
