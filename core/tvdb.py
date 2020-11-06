@@ -89,7 +89,7 @@ def find_and_set_infoLabels(item):
 
     title = item.contentSerieName
     # If the title includes the (year) we will remove it
-    year = scrapertools.find_single_match(title, "^.+?\s*(\(\d{4}\))$")
+    year = scrapertools.find_single_match(title, r"^.+?\s*(\(\d{4}\))$")
     if year:
         title = title.replace(year, "").strip()
         item.infoLabels['year'] = year[1:-1]
@@ -114,6 +114,9 @@ def find_and_set_infoLabels(item):
 
     if len(results) > 1:
         tvdb_result = platformtools.show_video_info(results, item=item, scraper=Tvdb, caption=config.get_localized_string(60298) % title)
+        if not tvdb_result:
+            res =  platformtools.dialog_info(item, 'tvdb')
+            if res: return find_and_set_infoLabels(res)
     elif len(results) > 0:
         tvdb_result = results[0]
 
@@ -398,19 +401,13 @@ class Tvdb(object):
         else: params = jsontools.dump(params)
 
         try:
-            req = urllib.request.Request(url, data=params, headers=DEFAULT_HEADERS)
-            response = urllib.request.urlopen(req)
-            html = response.read()
-            response.close()
+            dict_html = requests.post(url, data=params, headers=DEFAULT_HEADERS).json()
 
         except Exception as ex:
             message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
             logger.error("error: %s" % message)
 
         else:
-            dict_html = jsontools.load(html)
-            # logger.debug("dict_html %s" % dict_html)
-
             if "token" in dict_html:
                 token = dict_html["token"]
                 DEFAULT_HEADERS["Authorization"] = "Bearer " + token
@@ -424,17 +421,14 @@ class Tvdb(object):
         is_success = False
 
         url = HOST + "/refresh_token"
-
         try:
-            req = urllib.request.Request(url, headers=DEFAULT_HEADERS)
-            response = urllib.request.urlopen(req)
-            html = response.read()
-            response.close()
+            req = requests.get(url, headers=DEFAULT_HEADERS)
 
-        except urllib.error.HTTPError as err:
-            logger.error("err.code %s" % err.code)
+
+        except req as err:
+            logger.error("err.code %s" % err.status_code)
             # if there is error 401 it is that the token has passed the time and we have to call login again
-            if err.code == 401:
+            if err.status_code == 401:
                 cls.__login()
             else:
                 raise
@@ -444,13 +438,15 @@ class Tvdb(object):
             logger.error("error: %s" % message)
 
         else:
-            dict_html = jsontools.load(html)
+            dict_html = req.json()
             # logger.error("tokencito %s" % dict_html)
             if "token" in dict_html:
                 token = dict_html["token"]
                 DEFAULT_HEADERS["Authorization"] = "Bearer " + token
                 TOKEN = config.set_setting("tvdb_token", token)
                 is_success = True
+            else:
+                cls.__login()
 
         return is_success
 
@@ -531,18 +527,16 @@ class Tvdb(object):
             DEFAULT_HEADERS["Accept-Language"] = lang
             logger.debug("url: %s, \nheaders: %s" % (url, DEFAULT_HEADERS))
 
-            req = urllib.request.Request(url, headers=DEFAULT_HEADERS)
-            response = urllib.request.urlopen(req)
-            html = response.read()
-            response.close()
+            req = requests.get(url, headers=DEFAULT_HEADERS)
 
         except Exception as ex:
             message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
             logger.error("error: %s" % message)
 
         else:
-            dict_html = jsontools.load(html)
-
+            dict_html = req.json()
+            if 'Error' in dict_html:
+                logger.debug("code %s " % dict_html['Error'])
             if "data" in dict_html and "id" in dict_html["data"][0]:
                 self.get_episode_by_id(dict_html["data"][0]["id"], lang)
                 return dict_html["data"]
@@ -590,25 +584,12 @@ class Tvdb(object):
         """
         logger.info()
 
-        try:
-            url = HOST + "/series/%s/episodes?page=%s" % (_id, page)
-            logger.debug("url: %s, \nheaders: %s" % (url, DEFAULT_HEADERS))
 
-            req = urllib.request.Request(url, headers=DEFAULT_HEADERS)
-            response = urllib.request.urlopen(req)
-            html = response.read()
-            response.close()
-
-        except Exception as ex:
-            message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
-            logger.error("error: %s" % message)
-
-        else:
-            self.list_episodes[page] = jsontools.load(html)
-
-            # logger.info("dict_html %s" % self.list_episodes)
-
-            return self.list_episodes[page]
+        url = HOST + "/series/%s/episodes?page=%s" % (_id, page)
+        logger.debug("url: %s, \nheaders: %s" % (url, DEFAULT_HEADERS))
+        js = requests.get(url, headers=DEFAULT_HEADERS).json()
+        self.list_episodes[page] = js if 'Error' not in js else {}
+        return self.list_episodes[page]
 
     def get_episode_by_id(self, _id, lang=DEFAULT_LANG, semaforo=None):
         """
@@ -681,24 +662,17 @@ class Tvdb(object):
         try:
             DEFAULT_HEADERS["Accept-Language"] = lang
             logger.debug("url: %s, \nheaders: %s" % (url, DEFAULT_HEADERS))
-            req = urllib.request.Request(url, headers=DEFAULT_HEADERS)
-            response = urllib.request.urlopen(req)
-            html = response.read()
-            response.close()
+            dict_html = requests.get(url, headers=DEFAULT_HEADERS).json
 
         except Exception as ex:
             # if isinstance(ex, urllib).HTTPError:
-            logger.debug("code %s " % ex.code)
-
+            logger.debug("code %s " % ex)
             message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
             logger.error("error en: %s" % message)
 
         else:
-            dict_html = jsontools.load(html)
-            dict_html = dict_html.pop("data")
-
-            logger.info("dict_html %s" % dict_html)
-            self.episodes[_id] = dict_html
+            # logger.info("dict_html %s" % dict_html)
+            self.episodes[_id] = dict_html.pop("data") if 'Error' not in dict_html else {}
 
         if semaforo:
             semaforo.release()
@@ -730,37 +704,28 @@ class Tvdb(object):
         """
         logger.info()
 
-        try:
+        params = {}
+        if name:
+            params["name"] = name
+        elif imdb_id:
+            params["imdbId"] = imdb_id
+        elif zap2it_id:
+            params["zap2itId"] = zap2it_id
 
-            params = {}
-            if name:
-                params["name"] = name
-            elif imdb_id:
-                params["imdbId"] = imdb_id
-            elif zap2it_id:
-                params["zap2itId"] = zap2it_id
+        params = urllib.parse.urlencode(params)
 
-            params = urllib.parse.urlencode(params)
+        DEFAULT_HEADERS["Accept-Language"] = lang
+        url = HOST + "/search/series?%s" % params
+        logger.debug("url: %s, \nheaders: %s" % (url, DEFAULT_HEADERS))
 
-            DEFAULT_HEADERS["Accept-Language"] = lang
-            url = HOST + "/search/series?%s" % params
-            logger.debug("url: %s, \nheaders: %s" % (url, DEFAULT_HEADERS))
+        dict_html =  requests.get(url, headers=DEFAULT_HEADERS).json()
 
-            req = urllib.request.Request(url, headers=DEFAULT_HEADERS)
-            response = urllib.request.urlopen(req)
-            html = response.read()
-            logger.info(html)
-            response.close()
 
-        except Exception as ex:
+        if 'Error' in dict_html:
             # if isinstance(ex, urllib.parse).HTTPError:
-            logger.debug("code %s " % ex.code)
-
-            message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
-            logger.error("error: %s" % message)
+            logger.debug("code %s " % dict_html['Error'])
 
         else:
-            dict_html = jsontools.load(html)
 
             if "errors" in dict_html and "invalidLanguage" in dict_html["errors"]:
                 # no hay información en idioma por defecto
@@ -834,12 +799,8 @@ class Tvdb(object):
 
         try:
             DEFAULT_HEADERS["Accept-Language"] = lang
-            req = urllib.request.Request(url, headers=DEFAULT_HEADERS)
+            req = requests.get(url, headers=DEFAULT_HEADERS)
             logger.debug("url: %s, \nheaders: %s" % (url, DEFAULT_HEADERS))
-
-            response = urllib.request.urlopen(req)
-            html = response.read()
-            response.close()
 
         except Exception as ex:
             # if isinstance(ex, urllib).HTTPError:
@@ -849,26 +810,24 @@ class Tvdb(object):
             logger.error("error: %s" % message)
 
         else:
-            dict_html = jsontools.load(html)
-
+            dict_html = req.json()
             if "errors" in dict_html and "invalidLanguage" in dict_html["errors"]:
                 return {}
-            else:
-                resultado1 = dict_html["data"]
-                if not resultado1 and from_get_list:
-                    return self.__get_by_id(_id, "en")
+            resultado1 = dict_html["data"]
+            if not resultado1 and from_get_list:
+                return self.__get_by_id(_id, "en")
 
-                logger.debug("Result %s" % dict_html)
-                resultado2 = {"image_poster": [{'keyType': 'poster', 'fileName': 'posters/%s-1.jpg' % _id}]}
-                resultado3 = {"image_fanart": [{'keyType': 'fanart', 'fileName': 'fanart/original/%s-1.jpg' % _id}]}
+            logger.debug("Result %s" % dict_html)
+            resultado2 = {"image_poster": [{'keyType': 'poster', 'fileName': 'posters/%s-1.jpg' % _id}]}
+            resultado3 = {"image_fanart": [{'keyType': 'fanart', 'fileName': 'fanart/original/%s-1.jpg' % _id}]}
 
-                resultado = resultado1.copy()
-                resultado.update(resultado2)
-                resultado.update(resultado3)
+            resultado = resultado1.copy()
+            resultado.update(resultado2)
+            resultado.update(resultado3)
 
-                logger.debug("total result %s" % resultado)
-                self.list_results = [resultado]
-                self.result = resultado
+            logger.debug("total result %s" % resultado)
+            self.list_results = [resultado]
+            self.result = resultado
 
         return resultado
 
@@ -909,24 +868,26 @@ class Tvdb(object):
             url = HOST + "/series/%s/images/query?%s" % (_id, params)
             logger.debug("url: %s, \nheaders: %s" % (url, DEFAULT_HEADERS))
 
-            req = urllib.request.Request(url, headers=DEFAULT_HEADERS)
-            response = urllib.request.urlopen(req)
-            html = response.read()
-            response.close()
+            res = requests.get(url, headers=DEFAULT_HEADERS)
 
         except Exception as ex:
+            # if isinstance(ex, urllib).HTTPError:
+            logger.debug("code %s " % ex)
+
             message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
             logger.error("error: %s" % message)
 
-            return {}
 
         else:
-            dict_html = jsontools.load(html)
+            dict_html = res.json()
+            if 'Error' in dict_html:
+                # if isinstance(ex, urllib.parse).HTTPError:
+                logger.debug("code %s " % dict_html['Error'])
+            else:
+                dict_html["image_" + image] = dict_html.pop("data")
+                self.result.update(dict_html)
 
-            dict_html["image_" + image] = dict_html.pop("data")
-            self.result.update(dict_html)
-
-            return dict_html
+                return dict_html
 
     def get_tvshow_cast(self, _id, lang=DEFAULT_LANG):
         """
@@ -943,15 +904,18 @@ class Tvdb(object):
         url = HOST + "/series/%s/actors" % _id
         DEFAULT_HEADERS["Accept-Language"] = lang
         logger.debug("url: %s, \nheaders: %s" % (url, DEFAULT_HEADERS))
-
-        req = urllib.request.Request(url, headers=DEFAULT_HEADERS)
-        response = urllib.request.urlopen(req)
-        html = response.read()
-        response.close()
-
-        dict_html = jsontools.load(html)
-
-        dict_html["cast"] = dict_html.pop("data")
+        try:
+            req = requests.get(url, headers=DEFAULT_HEADERS)
+        except Exception as ex:
+            logger.debug("code %s " % ex)
+            message = "An exception of type %s occured. Arguments:\n%s" % (type(ex).__name__, repr(ex.args))
+            logger.error("error en: %s" % message)
+        else:
+            dict_html = req.json()
+        if 'Error' in dict_html:
+            logger.debug("code %s " % dict_html['Error'])
+        else:
+            dict_html["cast"] = dict_html.pop("data")
         self.result.update(dict_html)
 
     def get_id(self):
@@ -1034,12 +998,12 @@ class Tvdb(object):
         if 'data' in thumbs:
             ret_infoLabels['thumbnail'] = HOST_IMAGE + thumbs['data'][0]['fileName']
         elif 'poster' in origen and origen['poster']:
-            ret_infoLabels['thumbnail'] = origen['poster']
+            ret_infoLabels['thumbnail'] = HOST_IMAGE + origen['poster']
         fanarts = requests.get(HOST + '/series/' + str(origen['id']) + '/images/query?keyType=fanart').json()
         if 'data' in fanarts:
             ret_infoLabels['fanart'] = HOST_IMAGE + fanarts['data'][0]['fileName']
         elif 'fanart' in origen and origen['fanart']:
-            ret_infoLabels['thumbnail'] = origen['fanart']
+            ret_infoLabels['fanart'] = HOST_IMAGE + origen['fanart']
         if 'overview' in origen and origen['overview']:
             ret_infoLabels['plot'] = origen['overview']
         if 'duration' in origen and origen['duration']:

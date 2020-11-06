@@ -56,7 +56,7 @@
         <viewtype>wrap</viewtype>
         <orientation>horizontal</orientation>
         <scrolltime tween="cubic" easing="out">300</scrolltime>
-        <itemlayout height="640" width="180">
+        <itemlayout width="180">
           <!-- Poster -->
           <control type="image">
             <bottom>0</bottom>
@@ -68,12 +68,12 @@
             <bordersize>10</bordersize>
           </control>
         </itemlayout>
-        <focusedlayout height="640" width="480">
+        <focusedlayout width="427">
           <!-- Title -->
           <control type="textbox">
-            <left>500</left>
+            <left>447</left>
             <top>10</top>
-            <width>730</width>
+            <width>783</width>
             <height>30</height>
             <font>font30_title</font>
             <textcolor>FFFFFFFF</textcolor>
@@ -84,9 +84,9 @@
           </control>
           <!-- info -->
           <control type="textbox">
-            <left>500</left>
+            <left>447</left>
             <top>50</top>
-            <width>730</width>
+            <width>783</width>
             <height>30</height>
             <font>font13</font>
             <textcolor>FFFFFFFF</textcolor>
@@ -96,9 +96,9 @@
           </control>
           <!-- Plot -->
           <control type="textbox">
-            <left>500</left>
+            <left>447</left>
             <top>90</top>
-            <width>730</width>
+            <width>783</width>
             <height>250</height>
             <font>font13</font>
             <textcolor>FFFFFFFF</textcolor>
@@ -111,7 +111,7 @@
           <control type="image">
             <bottom>0</bottom>
             <left>0</left>
-            <width>480</width>
+            <width>427</width>
             <height>640</height>
             <texture>$INFO[ListItem.Property(thumbnail)]</texture>
             <aspectratio>scale</aspectratio>

@@ -351,7 +351,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 quality=quality,
                 url=scraped["url"],
                 infoLabels=infolabels,
-                thumbnail=item.thumbnail if not scraped["thumb"] else scraped["thumb"],
+                thumbnail=item.prevthumb if item.prevthumb else item.thumbnail if not scraped["thumb"] else scraped["thumb"],
                 args=item.args,
                 contentSerieName= title if 'movie' not in [contentType] and function != 'episodios' else item.contentSerieName,
                 contentTitle= title if 'movie' in [contentType] and function == 'peliculas' else item.contentTitle,
@@ -473,9 +473,6 @@ def scrape(func):
             if 'itemlistHook' in args:
                 itemlist = args['itemlistHook'](itemlist)
 
-            if 'ItemItemlistHook' in args:
-                itemlist = args['ItemItemlistHook'](item, itemlist)
-
             # if url may be changed and channel has findhost to update
             if 'findhost' in func.__globals__ and not itemlist:
                 info('running findhost ' + func.__module__)
@@ -511,20 +508,23 @@ def scrape(func):
                          url=item.url,
                          args=item.args,
                          page=pag + 1,
-                         thumbnail=thumb()))
+                         thumbnail=thumb(),
+                         prevthumb=item.prevthumb if item.prevthumb else item.thumbnail))
 
-        if anime:
+        if anime and inspect.stack()[1][3] not in ['find_episodes']:
             from platformcode import autorenumber
-            if function == 'episodios' or item.action == 'episodios': autorenumber.renumber(itemlist, item, 'bold')
-            else: autorenumber.renumber(itemlist)
+            if (function == 'episodios' or item.action == 'episodios'): autorenumber.start(itemlist, item)
+            else: autorenumber.start(itemlist)
         # if anime and autorenumber.check(item) == False and len(itemlist)>0 and not scrapertools.find_single_match(itemlist[0].title, r'(\d+.\d+)'):
         #     pass
         # else:
-        if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
-            # item.fulltitle = item.infoLabels["title"]
-            videolibrary(itemlist, item, function=function)
-        if function == 'episodios' or function == 'findvideos':
-            download(itemlist, item, function=function)
+        if inspect.stack()[1][3] not in ['find_episodes']:
+            if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
+                # item.fulltitle = item.infoLabels["title"]
+                videolibrary(itemlist, item, function=function)
+            if function == 'episodios' or function == 'findvideos':
+                download(itemlist, item, function=function)
+
         if 'patronMenu' in args and itemlist:
             itemlist = thumb(itemlist, genre=True)
 

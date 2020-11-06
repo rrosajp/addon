@@ -85,7 +85,7 @@ def peliculas(item):
     typeContentDict = {'movie':['movie']}
     typeActionDict = {'findvideos':['movie']}
 
-    def ItemItemlistHook(item, itemlist):
+    def itemlistHook(itemlist):
         if item.search:
             itemlist = [ it for it in itemlist if ' Episodio ' not in it.title ]
         if len(itemlist) == int(perpage):

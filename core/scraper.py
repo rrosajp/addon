@@ -54,70 +54,20 @@ def find_and_set_infoLabels(item):
         import traceback
         logger.error(traceback.format_exc())
 
-    while scraper:
-        # We call the find_and_set_infoLabels function of the selected scraper
-        scraper_result = scraper.find_and_set_infoLabels(item)
-
-        # Check if there is a 'code'
-        if scraper_result and item.infoLabels['code']:
-            # correct code
-            logger.info("Identificador encontrado: %s" % item.infoLabels['code'])
-            scraper.completar_codigos(item)
-            return True
-        elif scraper_result:
-            # Content found but no 'code'
-            msg = config.get_localized_string(60227) % title
-        else:
-            # Content not found
-            msg = config.get_localized_string(60228) % title
-
-        logger.info(msg)
-        # Show box with other options:
-        if scrapers_disponibles[scraper_actual] in list_opciones_cuadro:
-            list_opciones_cuadro.remove(scrapers_disponibles[scraper_actual])
-        index = platformtools.dialog_select(msg, list_opciones_cuadro)
-
-        if index < 0:
-            logger.debug("You have clicked 'cancel' in the window '%s'" % msg)
-            return False
-
-        elif index == 0:
-            # Ask the title
-            title = platformtools.dialog_input(title, config.get_localized_string(60229) % tipo_contenido)
-            if title:
-                if item.contentType == "movie":
-                    item.contentTitle = title
-                else:
-                    item.contentSerieName = title
-            else:
-                logger.debug("I clicked 'cancel' in the window 'Enter the correct name'")
-                return False
-
-        elif index == 1:
-            # You have to create a dialog box to enter the data
-            logger.info("Complete information")
-            if cuadro_completar(item):
-                # correct code
-                logger.info("Identifier found: %s" % str(item.infoLabels['code']))
-                return True
-                # raise
-
-        elif list_opciones_cuadro[index] in list(scrapers_disponibles.values()):
-            # Get the name of the scraper module
-            for k, v in list(scrapers_disponibles.items()):
-                if list_opciones_cuadro[index] == v:
-                    if scrapers_disponibles[scraper_actual] not in list_opciones_cuadro:
-                        list_opciones_cuadro.append(scrapers_disponibles[scraper_actual])
-                    # We import the scraper k
-                    scraper_actual = k
-                    try:
-                        scraper = None
-                        scraper = __import__('core.%s' % scraper_actual, fromlist=["core.%s" % scraper_actual])
-                    except ImportError:
-                        exec("import core." + scraper_actual + " as scraper_module")
-                    break
-
-    logger.error("Error importing the scraper module %s" % scraper_actual)
+    # while scraper:
+    # We call the find_and_set_infoLabels function of the selected scraper
+    scraper_result = scraper.find_and_set_infoLabels(item)
+    # from core.support import dbg; dbg()
+    # Check if there is a 'code'
+    if scraper_result and item.infoLabels['code']:
+        # correct code
+        logger.info("Identifier found: %s " % item.infoLabels['code'])
+        scraper.completar_codigos(item)
+        return True
+    else:
+        # Content not found
+        logger.info(logger.info("Identifier not found for: %s " % title))
+        return 
 
 
 def cuadro_completar(item):

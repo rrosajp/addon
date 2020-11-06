@@ -6086,6 +6086,44 @@ msgctxt "#70821"
 msgid "Search results"
 msgstr ""
 
+# RENUMBER
+msgctxt "#70822"
+msgid "Renumber new episodes of: "
+msgstr ""
+
+msgctxt "#70823"
+msgid "Renumber episodes of: "
+msgstr ""
+
+msgctxt "#70824"
+msgid "Select the specials of: "
+msgstr ""
+
+msgctxt "#70825"
+msgid "Select Season"
+msgstr ""
+
+msgctxt "#70826"
+msgid "Select Episode"
+msgstr ""
+
+msgctxt "#70827"
+msgid "Select Specials"
+msgstr ""
+
+msgctxt "#70828"
+msgid "Manual renumbering"
+msgstr ""
+
+msgctxt "#70829"
+msgid "Delete Numbering for: "
+msgstr ""
+
+msgctxt "#70830"
+msgid "The series / episode number should only be changed if the series has relative numbering."
+msgstr ""
+
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS check alert"

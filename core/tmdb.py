@@ -528,6 +528,9 @@ def find_and_set_infoLabels(item):
     if len(results) > 1:
         from platformcode import platformtools
         tmdb_result = platformtools.show_video_info(results, item=item, caption= tipo_contenido % title)
+        if not tmdb_result:
+            res = platformtools.dialog_info(item, 'tmdb')
+            if res: return find_and_set_infoLabels(res)
     elif len(results) > 0:
         tmdb_result = results[0]
 
