@@ -109,7 +109,7 @@ class autorenumber():
                 from specials.videolibrary import update_videolibrary
                 check_renumber_options(self.item)
                 update_videolibrary(self.item)
-            if self.title in self.dictSeries:
+            if self.title in self.dictSeries and ID in self.dictSeries[self.title] and self.dictSeries[self.title][ID] != '0':
                 self.id = self.dictSeries[self.title][ID]
                 self.Episodes = b64(self.dictSeries[self.title][EPISODE], 'decode')
                 self.Season = self.dictSeries[self.title][SEASON]
@@ -161,7 +161,7 @@ class autorenumber():
                 self.renumber()
 
     def renumber(self):
-        if not self.item.renumber and self.itemlist and len(self.Episodes) >= len(self.itemlist) and match(self.itemlist[0].title, patron=r'(\d+)').match in self.Episodes:
+        if not self.item.renumber and self.itemlist and match(self.itemlist[0].title, patron=r'(\d+)').match.lstrip('0') in self.Episodes:
             if '|' in self.Season:
                 season = int(self.Season.split('|')[0])
                 addNumber = int(self.Season.split('|')[-1]) - 1
@@ -170,16 +170,16 @@ class autorenumber():
                 addNumber = 0
 
             for item in self.itemlist:
-                number = match(item.title, patron=r'(\d+)').match
-                number = number.lstrip('0')
-                if number:
-                    if number in self.Episodes:
-                        if season > 0: item.title = typo(self.Episodes[number] + ' - ', 'bold') + item.title
-                        else: item.title = typo('0x%s - ' % str(int(number) + addNumber), 'bold') + item.title
-                    else:
-                        self.makelist()
-                        if season > 0: item.title = typo(self.Episodes[number] + ' - ', 'bold') + item.title
-                        else: item.title = typo('0x%s - ' % str(int(number) + addNumber), 'bold') + item.title
+                if not match(item.title, patron=r'(\d+)x(\d+)').match:
+                    number = match(item.title, patron=r'(\d+)').match.lstrip('0')
+                    if number:
+                        if number in self.Episodes:
+                            if season > 0: item.title = typo(self.Episodes[number] + ' - ', 'bold') + item.title
+                            else: item.title = typo('0x%s - ' % str(int(number) + addNumber), 'bold') + item.title
+                        else:
+                            self.makelist()
+                            if season > 0: item.title = typo(self.Episodes[number] + ' - ', 'bold') + item.title
+                            else: item.title = typo('0x%s - ' % str(int(number) + addNumber), 'bold') + item.title
         else:
             self.makelist()
 
@@ -269,24 +269,25 @@ class autorenumber():
             # specialsCount = 1
             # pdialog.update(80, 'rinumerazione')
             for item in itemlist:
-                # Otiene Numerazione Episodi
-                scraped_ep = match(re.sub(r'\[[^\]]+\]','',item.title), patron=r'(\d+)').match
-                if scraped_ep:
-                    episode = int(scraped_ep)
-                    number = episode + FirstOfSeason - addiction
-                    if episode == 0:
-                        self.Episodes[str(episode)] = str(self.complete[self.regular[FirstOfSeason+1][2]][0])
-                    elif episode in Specials:
-                            self.Episodes[str(episode)] = Specials[episode]
-                            addiction +=  1
-                    elif number <= len(self.regular) and number in self.regular:
-                        self.Episodes[str(episode)] = str(self.regular[number][0])
-                    else:
-                        try: Episodes[str(episode)] = str(self.complete[self.regular[number+2][2]][0])
-                        except: self.Episodes[str(episode)] = '0x0'
+                if not match(re.sub(r'\[[^\]]+\]','',item.title), patron=r'(\d+)x(\d+)').match:
+                    # Otiene Numerazione Episodi
+                    scraped_ep = match(re.sub(r'\[[^\]]+\]','',item.title), patron=r'(\d+)').match
+                    if scraped_ep:
+                        episode = int(scraped_ep)
+                        number = episode + FirstOfSeason - addiction
+                        if episode == 0:
+                            self.Episodes[str(episode)] = str(self.complete[self.regular[FirstOfSeason+1][2]][0])
+                        elif episode in Specials:
+                                self.Episodes[str(episode)] = Specials[episode]
+                                addiction +=  1
+                        elif number <= len(self.regular) and number in self.regular:
+                            self.Episodes[str(episode)] = str(self.regular[number][0])
+                        else:
+                            try: Episodes[str(episode)] = str(self.complete[self.regular[number+2][2]][0])
+                            except: self.Episodes[str(episode)] = '0x0'
 
 
-        self.dictSeries[self.title][EPISODE] = b64(jsontools.dump(self.Episodes))
+        if self.Episodes: self.dictSeries[self.title][EPISODE] = b64(jsontools.dump(self.Episodes))
         self.dictSeries[self.title][EPLIST] = b64(jsontools.dump(self.EpList))
         self.dictSeries[self.title][MODE] = self.Mode
         self.dictSeries[self.title][SEASON] = self.Season
@@ -396,7 +397,7 @@ class SelectreNumerationWindow(xbmcgui.WindowXMLDialog):
             ep = '1'
             position = 0
             for i, item in enumerate(self.itemlist):
-                title = match(item.title, patron=r'(\d+)').match
+                title = match(item.title, patron=r'(\d+)').match.lstrip('0')
                 it = xbmcgui.ListItem(title)
                 if int(title) <= len(self.episodes):
                     se, ep = self.episodes[title].split('x')
@@ -419,11 +420,11 @@ class SelectreNumerationWindow(xbmcgui.WindowXMLDialog):
             self.getControl(SPECIALS).setVisible(False)
             self.getControl(MANUAL).setVisible(False)
 
-            for i, item in enumerate(self.itemlist):
-                title = match(item.title, patron=r'(\d+)').match
-                it = xbmcgui.ListItem(title)
-                it.setProperty('index', str(i))
-                self.items.append(it)
+            for item in self.itemlist:
+                if not match(item.title, patron=r'(\d+)x(\d+)').match:
+                    title = match(item.title, patron=r'(\d+)').match.lstrip('0')
+                    it = xbmcgui.ListItem(title)
+                    self.items.append(it)
 
             self.getControl(POSTER).setImage(thumb)
             self.getControl(MPOSTER).setImage(thumb)
