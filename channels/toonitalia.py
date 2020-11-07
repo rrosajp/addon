@@ -30,7 +30,7 @@ def search(item, texto):
     support.info(texto)
     item.args='search'
     item.contentType='tvshow'
-    item.url = host + '/wp-json/wp/v2/search?search=' + texto
+    item.url = host + '/wp-json/wp/v2/search?per_page=100&search=' + texto
     try:
         return peliculas(item)
     # Continua la ricerca in caso di errore
