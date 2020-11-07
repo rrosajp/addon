@@ -13,6 +13,7 @@ else:
 BACKGROUND = 30000
 LOADING = 30001
 SELECT = 30002
+CLOSE = 30003
 EXIT = 10
 BACKSPACE = 92
 
@@ -64,7 +65,9 @@ class InfoWindow(xbmcgui.WindowXMLDialog):
     def onClick(self, control_id):
         if control_id == SELECT:
             self.response = self.results[self.getControl(SELECT).getSelectedPosition()]
-        self.close()
+            self.close()
+        elif control_id == CLOSE:
+            self.close()
 
     def onAction(self, action):
         if self.getFocusId() in [SELECT]:

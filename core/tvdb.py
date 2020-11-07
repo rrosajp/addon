@@ -116,7 +116,7 @@ def find_and_set_infoLabels(item):
         tvdb_result = platformtools.show_video_info(results, item=item, scraper=Tvdb, caption=config.get_localized_string(60298) % title)
         if not tvdb_result:
             res =  platformtools.dialog_info(item, 'tvdb')
-            if res: return find_and_set_infoLabels(res)
+            if not res.exit: return find_and_set_infoLabels(res)
     elif len(results) > 0:
         tvdb_result = results[0]
 

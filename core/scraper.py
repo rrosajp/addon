@@ -57,8 +57,9 @@ def find_and_set_infoLabels(item):
     while scraper or not item.exit:
         # We call the find_and_set_infoLabels function of the selected scraper
         scraper_result = scraper.find_and_set_infoLabels(item)
+        if item.exit: return False
         # Check if there is a 'code'
-        if scraper_result and item.infoLabels['code']:
+        elif scraper_result and item.infoLabels['code']:
             # correct code
             logger.info("Identifier found: %s " % item.infoLabels['code'])
             scraper.completar_codigos(item)

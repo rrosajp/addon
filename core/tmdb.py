@@ -524,13 +524,12 @@ def find_and_set_infoLabels(item):
         otmdb_global = Tmdb(id_Tmdb=item.infoLabels['tmdb_id'], tipo=tipo_busqueda, idioma_busqueda=def_lang)
 
     results = otmdb_global.get_list_resultados()
-
     if len(results) > 1:
         from platformcode import platformtools
         tmdb_result = platformtools.show_video_info(results, item=item, caption= tipo_contenido % title)
         if not tmdb_result:
             res = platformtools.dialog_info(item, 'tmdb')
-            if res: return find_and_set_infoLabels(res)
+            if not res.exit: return find_and_set_infoLabels(res)
     elif len(results) > 0:
         tmdb_result = results[0]
 
