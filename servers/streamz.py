@@ -19,15 +19,17 @@ def test_video_exists(page_url):
 def get_video_url(page_url, video_password):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
+    from core.support import match
+    matches = match(data, patron=r'(eval\(function\(p,a,c,k,e,d\).*?)\s+</script>').matches
+    unpacked = ''
+    for packed in matches:
+        unpacked += jsunpack.unpack(packed) + '\n'
 
-    packed = scrapertools.find_single_match(data, r'(eval\(function\(p,a,c,k,e,d\).*?)\s+</script>')
-    unpacked = jsunpack.unpack(packed)
+    urls = match(unpacked, patron=r"videojs\d+[^;]+[^']+'[^']+'[^']+'(https://streamz.*?/get.*?.dll)").matches
 
-    url = scrapertools.find_single_match(unpacked, '(https://streamz.*?/get.*?.dll)')
-
-    url = url.replace("getmp4", "getlink").replace("getIink", "getlink")
-
-    url += "|User-Agent=%s" % httptools.get_user_agent()
-    video_urls.append(["[streamZ]", url])
+    for url in urls:
+        url = url + "|User-Agent=%s" % httptools.get_user_agent()
+        if not video_urls or url not in video_urls[-1]:
+            video_urls.append(["[streamZ]", url])
 
     return video_urls
