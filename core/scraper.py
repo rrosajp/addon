@@ -54,20 +54,22 @@ def find_and_set_infoLabels(item):
         import traceback
         logger.error(traceback.format_exc())
 
-    # while scraper:
-    # We call the find_and_set_infoLabels function of the selected scraper
-    scraper_result = scraper.find_and_set_infoLabels(item)
-    # from core.support import dbg; dbg()
-    # Check if there is a 'code'
-    if scraper_result and item.infoLabels['code']:
-        # correct code
-        logger.info("Identifier found: %s " % item.infoLabels['code'])
-        scraper.completar_codigos(item)
-        return True
-    else:
-        # Content not found
-        logger.info(logger.info("Identifier not found for: %s " % title))
-        return 
+    while scraper or not item.exit:
+        from core.support import dbg;dbg()
+        # We call the find_and_set_infoLabels function of the selected scraper
+        scraper_result = scraper.find_and_set_infoLabels(item)
+        # from core.support import dbg; dbg()
+        # Check if there is a 'code'
+        if scraper_result and item.infoLabels['code']:
+            # correct code
+            logger.info("Identifier found: %s " % item.infoLabels['code'])
+            scraper.completar_codigos(item)
+            return True
+        else:
+            # Content not found
+            logger.info(logger.info("Identifier not found for: %s " % title))
+            item = platformtools.dialog_info(item, scraper_actual)
+            if item.exit: return False
 
 
 def cuadro_completar(item):

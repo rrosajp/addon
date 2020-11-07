@@ -139,10 +139,13 @@ class autorenumber():
         # Pulizia del Titolo
         if any( word in self.title.lower() for word in ['specials', 'speciali']):
             self.title = re.sub(r'\s*specials|\s*speciali', '', self.title.lower())
-            tvdb.find_and_set_infoLabels(self.item)
         elif not self.item.infoLabels['tvdb_id']:
             self.item.contentSerieName = self.title.rstrip('123456789 ')
+
+        while not self.item.exit:
+            self.item = platformtools.dialog_info(self.item, 'tvdb') # <- Enter title to search
             tvdb.find_and_set_infoLabels(self.item)
+            if self.item.infoLabels['tvdb_id']: self.item.exit = True
 
         # Rinumerazione Automatica
         if (not self.id and self.auto) or self.item.renumber:

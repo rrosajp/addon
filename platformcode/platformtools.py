@@ -1432,7 +1432,8 @@ class TitleOrIDWindow(xbmcgui.WindowXMLDialog):
     def onClick(self, control):
         if control in [10003]:
             if self.getControl(10001).getText():
-                self.item.contentTitle = self.getControl(10001).getText()
+                if self.scraper == 'tmdb': self.item.contentTitle = self.getControl(10001).getText()
+                else: self.item.contentSerieName = self.getControl(10001).getText()
             if self.scraper == 'tmdb' and self.getControl(10002).getText():
                 self.item.infoLabels['tmdb_id'] = self.getControl(10002).getText()
             elif self.scraper == 'tvdb' and self.getControl(10002).getText():
@@ -1440,10 +1441,10 @@ class TitleOrIDWindow(xbmcgui.WindowXMLDialog):
             self.close()
 
         elif control in [10004, 10005]:
-            self.item = None
+            self.item.exit = True
             self.close()
 
     def onAction(self, action):
         if (action in [92] and self.getFocusId() not in [10001, 10002]) or action in [10]:
-            self.item = None
+            self.item.exit = True
             self.close()
