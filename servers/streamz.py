@@ -12,7 +12,7 @@ def test_video_exists(page_url):
     data = httptools.downloadpage(page_url).data
 
     if "<font color=\"red\"><b>File not found, sorry!" in data:
-        return False, config.get_localized_string(70449) % "Streamz"
+        return False, config.get_localized_string(70449) % "streamZ"
     return True, ""
 
 
@@ -28,6 +28,6 @@ def get_video_url(page_url, video_password):
     url = url.replace("getmp4", "getlink").replace("getIink", "getlink")
 
     url += "|User-Agent=%s" % httptools.get_user_agent()
-    video_urls.append(["[streamz]", url])
+    video_urls.append(["[streamZ]", url])
 
     return video_urls
