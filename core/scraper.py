@@ -55,10 +55,8 @@ def find_and_set_infoLabels(item):
         logger.error(traceback.format_exc())
 
     while scraper or not item.exit:
-        from core.support import dbg;dbg()
         # We call the find_and_set_infoLabels function of the selected scraper
         scraper_result = scraper.find_and_set_infoLabels(item)
-        # from core.support import dbg; dbg()
         # Check if there is a 'code'
         if scraper_result and item.infoLabels['code']:
             # correct code
