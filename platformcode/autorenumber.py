@@ -143,7 +143,6 @@ class autorenumber():
             self.item.contentSerieName = self.title.rstrip('123456789 ')
 
         while not self.item.exit:
-            self.item = platformtools.dialog_info(self.item, 'tvdb') # <- Enter title to search
             tvdb.find_and_set_infoLabels(self.item)
             if self.item.infoLabels['tvdb_id']: self.item.exit = True
 
