@@ -163,7 +163,7 @@ def set_infoLabels_item(item):
         if 'infoLabels' in item and 'fanart' in item.infoLabels['fanart']:
             item.fanart = item.infoLabels['fanart']
 
-    if 'infoLabels' in item and 'season' in item.infoLabels:
+    if 'infoLabels' in item and 'season' in item.infoLabels and item.contentType == 'episode':
         try:
             int_season = int(item.infoLabels['season'])
         except ValueError:
@@ -659,10 +659,12 @@ class Tvdb(object):
 
         url = HOST + "/episodes/%s" % _id
 
+        # from core.support import dbg;dbg()
+
         try:
             DEFAULT_HEADERS["Accept-Language"] = lang
             logger.debug("url: %s, \nheaders: %s" % (url, DEFAULT_HEADERS))
-            dict_html = requests.get(url, headers=DEFAULT_HEADERS).json
+            req = requests.get(url, headers=DEFAULT_HEADERS)
 
         except Exception as ex:
             # if isinstance(ex, urllib).HTTPError:
@@ -671,6 +673,7 @@ class Tvdb(object):
             logger.error("error en: %s" % message)
 
         else:
+            dict_html = req.json()
             # logger.info("dict_html %s" % dict_html)
             self.episodes[_id] = dict_html.pop("data") if 'Error' not in dict_html else {}
 

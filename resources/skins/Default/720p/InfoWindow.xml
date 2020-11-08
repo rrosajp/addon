@@ -20,6 +20,13 @@
 			</animation>
 
 			<!-- BACKGROUND -->
+			<control type="image">
+				<width>1280</width>
+				<height>720</height>
+				<texture colordiffuse="FF232323">white.png</texture>
+			</control>
+
+      <!-- FANART -->
 			<control type="image" id='30000'>
 				<width>1280</width>
 				<height>720</height>
