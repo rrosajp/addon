@@ -9,6 +9,7 @@ from core import jsontools, tvdb, scrapertools, filetools
 from core.item import Item
 from core.support import typo, match, dbg, Item
 from platformcode import config, platformtools, logger
+PY3 = True if sys.version_info[0] >= 3 else False
 
 # Json Var
 TVSHOW_RENUMERATE = "TVSHOW_AUTORENUMBER"
@@ -60,8 +61,10 @@ def write(item, json):
         file.close()
 
 def b64(json, mode = 'encode'):
+    if PY3: json = bytes(json, 'ascii')
     if mode == 'encode':
         ret = base64.b64encode(json)
+        if PY3: ret = ret.decode()
     else:
         ret = jsontools.load(base64.b64decode(json))
     return ret
