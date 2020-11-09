@@ -34,7 +34,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         else: __settings__.setSetting('kodion.video.quality.mpd', 'false')
         video_urls = [['con YouTube', 'plugin://plugin.video.youtube/play/?video_id=' + video_id ]]
     except:
-        if filetools.exists(xbmc.translatePath('special://profile/addon_data/' + name)):
+        if filetools.exists(xbmc.translatePath('special://profile/addons/' + name)):
             if platformtools.dialog_yesno(config.get_localized_string(70784), config.get_localized_string(70818)):
                 xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "' + name + '", "enabled": true }}')
             else: return [['','']]
