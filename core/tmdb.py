@@ -19,7 +19,7 @@ import ast, copy, re, sqlite3, time, xbmcaddon
 
 from core import filetools, httptools, jsontools, scrapertools
 from core.item import InfoLabels
-from platformcode import config, logger
+from platformcode import config, logger, platformtools
 
 info_language = ["de", "en", "es", "fr", "it", "pt"] # from videolibrary.json
 def_lang = info_language[config.get_setting("info_language", "videolibrary")]
@@ -525,13 +525,15 @@ def find_and_set_infoLabels(item):
 
     results = otmdb_global.get_list_resultados()
     if len(results) > 1:
-        from platformcode import platformtools
         tmdb_result = platformtools.show_video_info(results, item=item, caption= tipo_contenido % title)
         if not tmdb_result:
             res = platformtools.dialog_info(item, 'tmdb')
             if not res.exit: return find_and_set_infoLabels(res)
     elif len(results) > 0:
         tmdb_result = results[0]
+    else:
+        res = platformtools.dialog_info(item, 'tmdb')
+        if not res.exit: return find_and_set_infoLabels(res)
 
     if isinstance(item.infoLabels, InfoLabels):
         infoLabels = item.infoLabels

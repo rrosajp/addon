@@ -120,6 +120,10 @@ def find_and_set_infoLabels(item):
     elif len(results) > 0:
         tvdb_result = results[0]
 
+    else:
+        res =  platformtools.dialog_info(item, 'tvdb')
+        if not res.exit: return find_and_set_infoLabels(res)
+
     # todo revisar
     if isinstance(item.infoLabels, InfoLabels):
         logger.debug("is an instance of infoLabels")
