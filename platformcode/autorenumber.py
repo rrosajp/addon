@@ -173,7 +173,7 @@ class autorenumber():
                 addNumber = 0
 
             for item in self.itemlist:
-                if not match(item.title, patron=r'(\d+)x(\d+)').match:
+                if not match(item.title, patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)?[Ee]?[Pp]?(\d+)').match:
                     number = match(item.title, patron=r'(\d+)').match.lstrip('0')
                     if number:
                         if number in self.Episodes:
@@ -223,11 +223,11 @@ class autorenumber():
             self.Episodes = Seasons
 
         else:
-
             # Ricava Informazioni da TVDB
             checkpages = []
             exist = True
             Page = self.Pages[-1]
+            Episode = ep
 
             while exist:
                 data = tvdb.Tvdb(tvdb_id=self.id).get_list_episodes(self.id, Page)
@@ -272,7 +272,7 @@ class autorenumber():
             # specialsCount = 1
             # pdialog.update(80, 'rinumerazione')
             for item in itemlist:
-                if not match(re.sub(r'\[[^\]]+\]','',item.title), patron=r'(\d+)x(\d+)').match:
+                if not match(re.sub(r'\[[^\]]+\]','',item.title), patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)?[Ee]?[Pp]?(\d+)').match:
                     # Otiene Numerazione Episodi
                     scraped_ep = match(re.sub(r'\[[^\]]+\]','',item.title), patron=r'(\d+)').match
                     if scraped_ep:
@@ -424,7 +424,7 @@ class SelectreNumerationWindow(xbmcgui.WindowXMLDialog):
             self.getControl(MANUAL).setVisible(False)
 
             for item in self.itemlist:
-                if not match(item.title, patron=r'(\d+)x(\d+)').match:
+                if not match(item.title, patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)?[Ee]?[Pp]?(\d+)').match:
                     title = match(item.title, patron=r'(\d+)').match.lstrip('0')
                     it = xbmcgui.ListItem(title)
                     self.items.append(it)

@@ -167,7 +167,7 @@ def set_infoLabels_item(item):
         if 'infoLabels' in item and 'fanart' in item.infoLabels['fanart']:
             item.fanart = item.infoLabels['fanart']
 
-    if 'infoLabels' in item and 'season' in item.infoLabels and item.contentType == 'episode':
+    if 'infoLabels' in item and 'season' in item.infoLabels and item.contentType != 'tvshow':
         try:
             int_season = int(item.infoLabels['season'])
         except ValueError:

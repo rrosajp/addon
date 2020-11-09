@@ -19,10 +19,10 @@
                 <texture colordiffuse="CC232323">white.png</texture>
             </control>
             <control type="textbox">
-                <top>60</top>
-                <left>370</left>
-                <height>140</height>
-                <width>540</width>
+                <top>640</top>
+                <left>40</left>
+                <height>40</height>
+                <width>1200</width>
                 <align>center</align>
                 <aligny>center</aligny>
                 <textcolor>80FFFFFF</textcolor>
