@@ -102,11 +102,13 @@ class autorenumber():
         self.itemlist = itemlist
         self.auto = False
         self.dictSeries = load(self.itemlist[0]) if self.itemlist else load(item) if item else {}
+        self.Episodes = {}
+        self.sp = False
         if self.item:
             self.auto = config.get_setting('autorenumber', item.channel)
             self.title = self.item.fulltitle.strip()
             if match(self.itemlist[0].title, patron=r'(\d+\D\d+)').match:
-                return itemlist
+                return 
             elif self.item.channel in self.item.channel_prefs and TVSHOW_RENUMERATE in self.item.channel_prefs[item.channel] and self.title not in self.dictSeries:
                 from core.videolibrarytools import check_renumber_options
                 from specials.videolibrary import update_videolibrary
@@ -114,7 +116,7 @@ class autorenumber():
                 update_videolibrary(self.item)
             if self.title in self.dictSeries and ID in self.dictSeries[self.title] and self.dictSeries[self.title][ID] != '0':
                 self.id = self.dictSeries[self.title][ID]
-                self.Episodes = b64(self.dictSeries[self.title][EPISODE], 'decode')
+                self.Episodes = b64(self.dictSeries[self.title][EPISODE], 'decode') if EPISODE in self.dictSeries[self.title] else {}
                 self.Season = self.dictSeries[self.title][SEASON]
                 self.Mode = self.dictSeries[self.title].get(MODE, False)
                 self.Type = self.dictSeries[self.title].get(TYPE, False)
@@ -158,22 +160,19 @@ class autorenumber():
                 if any(word in self.title.lower() for word in ['specials', 'speciali']): season = '0'
                 elif RepresentsInt(self.title.split()[-1]): season = self.title.split()[-1]
                 else: season = '1'
-                # self.dictRenumber[EPISODE] = {}
                 self.Season = self.dictRenumber[SEASON] = season
-                # self.Episodes = self.dictRenumber[EPISODE]
                 self.renumber()
 
     def renumber(self):
-        if not self.item.renumber and self.itemlist and match(self.itemlist[0].title, patron=r'(\d+)').match.lstrip('0') in self.Episodes:
+        if not self.item.renumber and self.itemlist:
             if '|' in self.Season:
                 season = int(self.Season.split('|')[0])
                 addNumber = int(self.Season.split('|')[-1]) - 1
             else:
                 season = int(self.Season)
                 addNumber = 0
-
             for item in self.itemlist:
-                if not match(item.title, patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)?[Ee]?[Pp]?(\d+)').match:
+                if not match(item.title, patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)[Ee]?[Pp]?(\d+)').match:
                     number = match(item.title, patron=r'(\d+)').match.lstrip('0')
                     if number:
                         if number in self.Episodes:
@@ -203,7 +202,6 @@ class autorenumber():
             season = int(self.Season)
             ep = 1
 
-        # pdialog = platformtools.dialog_progress_bg('Rinumerazione', 'creazione lista episodi')
         itemlist = find_episodes(self.item)
 
         if self.item.renumber:
@@ -214,6 +212,11 @@ class autorenumber():
             if ep != 1: self.Season = '%s|%s' % (Season, Episode)
             else: self.Season = str(Season)
 
+        elif self.Episodes and not self.Mode:
+            self.s = season
+            self.e = ep
+            self.sp = True
+            Season, Episode, self.Mode, Specials, Seasons, Exit = SelectreNumeration(self, itemlist)
 
         if self.Mode:
             if not Seasons:
@@ -261,7 +264,6 @@ class autorenumber():
                         ep = ep + 1
                     allep = allep + 1
 
-            self.Episodes = {}
             if season > 1:
                 for numbers, data in self.regular.items():
                     if data[0] == str(season) + 'x1':
@@ -269,10 +271,8 @@ class autorenumber():
             else: FirstOfSeason = Episode - 1
 
             addiction = 0
-            # specialsCount = 1
-            # pdialog.update(80, 'rinumerazione')
             for item in itemlist:
-                if not match(re.sub(r'\[[^\]]+\]','',item.title), patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)?[Ee]?[Pp]?(\d+)').match:
+                if not match(re.sub(r'\[[^\]]+\]','',item.title), patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)[Ee]?[Pp]?(\d+)').match:
                     # Otiene Numerazione Episodi
                     scraped_ep = match(re.sub(r'\[[^\]]+\]','',item.title), patron=r'(\d+)').match
                     if scraped_ep:
@@ -289,14 +289,13 @@ class autorenumber():
                             try: Episodes[str(episode)] = str(self.complete[self.regular[number+2][2]][0])
                             except: self.Episodes[str(episode)] = '0x0'
 
-
         if self.Episodes: self.dictSeries[self.title][EPISODE] = b64(jsontools.dump(self.Episodes))
         self.dictSeries[self.title][EPLIST] = b64(jsontools.dump(self.EpList))
         self.dictSeries[self.title][MODE] = self.Mode
         self.dictSeries[self.title][SEASON] = self.Season
         self.dictSeries[self.title][CHECK] = self.Pages
         write(self.item, self.dictSeries)
-        # pdialog.close()
+
         if self.auto: self.renumber()
 
 
@@ -366,6 +365,7 @@ class SelectreNumerationWindow(xbmcgui.WindowXMLDialog):
         self.season = opt.s
         self.episode = opt.e
         self.mode = opt.Mode
+        self.sp = opt.sp
         self.manual = opt.manual
         self.offset = 0
         self.Exit = False
@@ -385,10 +385,11 @@ class SelectreNumerationWindow(xbmcgui.WindowXMLDialog):
         if config.get_platform(True)['num_version'] < 18: self.setCoordinateResolution(2)
         fanart = self.item.fanart
         thumb = self.item.thumbnail
+        self.getControl(SELECT).setVisible(False)
+        self.getControl(SPECIALS).setVisible(False)
+        self.getControl(MANUAL).setVisible(False)
         # MANUAL
         if self.manual:
-            self.getControl(SELECT).setVisible(False)
-            self.getControl(SPECIALS).setVisible(False)
             self.getControl(MANUAL).setVisible(True)
             self.getControl(MPOSTER).setImage(thumb)
             if fanart: self.getControl(MBACKGROUND).setImage(fanart)
@@ -417,14 +418,10 @@ class SelectreNumerationWindow(xbmcgui.WindowXMLDialog):
             self.getControl(MLIST).addItems(self.items)
             self.setFocusId(MLIST)
             self.getControl(MLIST).selectItem(position)
-        # SPECIALS
+        # MAIN / SPECIALS
         else:
-            self.getControl(SELECT).setVisible(True)
-            self.getControl(SPECIALS).setVisible(False)
-            self.getControl(MANUAL).setVisible(False)
-
             for item in self.itemlist:
-                if not match(item.title, patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)?[Ee]?[Pp]?(\d+)').match:
+                if not match(item.title, patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)[Ee]?[Pp]?(\d+)').match:
                     title = match(item.title, patron=r'(\d+)').match.lstrip('0')
                     it = xbmcgui.ListItem(title)
                     self.items.append(it)
@@ -437,12 +434,16 @@ class SelectreNumerationWindow(xbmcgui.WindowXMLDialog):
             self.getControl(INFO).setLabel(typo(config.get_localized_string(70824) + self.title, 'bold'))
             self.getControl(LIST).addItems(self.items)
 
-            self.getControl(S).setLabel(str(self.season))
-            # self.getControl(S).setType(1, config.get_localized_string(60385))
-            self.getControl(E).setLabel(str(self.episode))
-            # self.getControl(E).setType(1, config.get_localized_string(60386))
+            if self.sp:
+                self.getControl(SPECIALS).setVisible(True)
+                self.setFocusId(OK)
+            else:
+                self.getControl(SELECT).setVisible(True)
 
-            self.setFocusId(O)
+                self.getControl(S).setLabel(str(self.season))
+                self.getControl(E).setLabel(str(self.episode))
+
+                self.setFocusId(O)
 
     def onFocus(self, focus):
         if focus in [S]: self.getControl(108).setLabel(typo(config.get_localized_string(70825), 'bold'))
