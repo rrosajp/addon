@@ -107,7 +107,8 @@ class autorenumber():
         if self.item:
             self.auto = config.get_setting('autorenumber', item.channel)
             self.title = self.item.fulltitle.strip()
-            if match(self.itemlist[0].title, patron=r'(\d+\D\d+)').match:
+            if match(self.itemlist[0].title, patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)[Ee]?[Pp]?(\d+)').match:
+                item.exit = True
                 return 
             elif self.item.channel in self.item.channel_prefs and TVSHOW_RENUMERATE in self.item.channel_prefs[item.channel] and self.title not in self.dictSeries:
                 from core.videolibrarytools import check_renumber_options

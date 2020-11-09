@@ -94,11 +94,13 @@ def find_and_set_infoLabels(item):
         title = title.replace(year, "").strip()
         item.infoLabels['year'] = year[1:-1]
 
-    if not item.infoLabels.get("tvdb_id"):
-        if not item.infoLabels.get("imdb_id"):
+    if item.infoLabels.get("tvdb_id") in ['', 'None']:
+        if item.infoLabels['year']:
             otvdb_global = Tvdb(search=title, year=item.infoLabels['year'])
-        else:
+        elif item.infoLabels.get("imdb_id"):
             otvdb_global = Tvdb(imdb_id=item.infoLabels.get("imdb_id"))
+        else:
+            otvdb_global = Tvdb(search=title)
 
     elif not otvdb_global or otvdb_global.get_id() != item.infoLabels['tvdb_id']:
         otvdb_global = Tvdb(tvdb_id=item.infoLabels['tvdb_id'])
@@ -117,7 +119,7 @@ def find_and_set_infoLabels(item):
         if not tvdb_result:
             res =  platformtools.dialog_info(item, 'tvdb')
             if not res.exit: return find_and_set_infoLabels(res)
-    elif len(results) > 0:
+    elif len(results) > 0 and results[0]['seriesId']:
         tvdb_result = results[0]
 
     else:
@@ -818,7 +820,7 @@ class Tvdb(object):
 
         else:
             dict_html = req.json()
-            if "errors" in dict_html and "invalidLanguage" in dict_html["errors"]:
+            if "Error" in dict_html and "invalidLanguage" in dict_html["Error"]:
                 return {}
             resultado1 = dict_html["data"]
             if not resultado1 and from_get_list:

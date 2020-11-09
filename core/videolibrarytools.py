@@ -1079,7 +1079,7 @@ def add_tvshow(item, channel=None):
         # Get the episode list
         # from core.support import dbg;dbg()
         itemlist = getattr(channel, item.action)(item)
-        if itemlist and not scrapertools.find_single_match(itemlist[0].title, r'[Ss]?(\d+)(?:x|_|\.|\s+)?[Ee]?[Pp]?(\d+)'):
+        if itemlist and not scrapertools.find_single_match(itemlist[0].title, r'[Ss]?(\d+)(?:x|_|\.|\s+)[Ee]?[Pp]?(\d+)'):
             from platformcode.autorenumber import start, check
             if not check(item):
                 action = item.action
@@ -1087,7 +1087,8 @@ def add_tvshow(item, channel=None):
                 start(item)
                 item.renumber = False
                 item.action = action
-                return add_tvshow(item, channel)
+                if not item.exit:
+                    return add_tvshow(item, channel)
             else:
                 itemlist = getattr(channel, item.action)(item)
 
