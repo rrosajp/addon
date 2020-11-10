@@ -119,7 +119,7 @@ def find_and_set_infoLabels(item):
         if not tvdb_result:
             res =  platformtools.dialog_info(item, 'tvdb')
             if not res.exit: return find_and_set_infoLabels(res)
-    elif len(results) > 0 and results[0]['seriesId']:
+    elif len(results) > 0:
         tvdb_result = results[0]
 
     else:

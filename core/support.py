@@ -827,7 +827,7 @@ def typo(string, typography=''):
         typography = string.split('{')[1].strip(' }').lower()
         string = string.replace('{' + typography + '}','').strip()
     else:
-        string = string.strip()
+        string = string
         typography.lower()
 
 
