@@ -135,6 +135,11 @@ def run(item=None):
             from platformcode import infoplus
             return infoplus.Main(item)
 
+        # elif item.channel == "search" and item.action == 'new_search':
+        #     from specials import search
+        #     item.mode = 'all'
+        #     return search.new_search(item)
+
         elif item.channel == "backup":
             from platformcode import backup
             return getattr(backup, item.action)(item)
