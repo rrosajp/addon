@@ -973,7 +973,10 @@ def set_player(item, xlistitem, mediaurl, view, strm, nfo_path=None, head_nfo=No
             xbmc_player.setSubtitles(item.subtitle)
 
     else:
-        player_mode = config.get_setting("player_mode")
+        if item.player_mode:
+            player_mode = item.player_mode
+        else:
+            player_mode = config.get_setting("player_mode")
         if (player_mode == 3 and mediaurl.startswith("rtmp")) or item.play_from == 'window' or item.nfo: player_mode = 0
         elif "megacrypter.com" in mediaurl: player_mode = 3
         logger.info("mediaurl=" + mediaurl)
@@ -993,9 +996,10 @@ def set_player(item, xlistitem, mediaurl, view, strm, nfo_path=None, head_nfo=No
 
         elif player_mode == 1:
             logger.info('Player Mode: setResolvedUrl')
-            xlistitem.setPath(mediaurl)
-            xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xlistitem)
-            xbmc.sleep(2500)
+            # xlistitem.setPath(mediaurl)
+            par = int(sys.argv[1])
+            xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=mediaurl))
+            # xbmc.sleep(2500)
 
         elif player_mode == 2:
             logger.info('Player Mode: Built-In')

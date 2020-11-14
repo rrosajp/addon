@@ -33,5 +33,5 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             url = url.split(',')
             video_url = url[0]
             quality = url[1].replace('label:','')
-        video_urls.append(['VUP Player [%s]' % quality, video_url])
+        video_urls.append(['VUP Player [%s]' % quality, video_url.replace(',','')])
     return video_urls

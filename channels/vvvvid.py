@@ -126,7 +126,7 @@ def peliculas(item):
     if 'category' in item.args:
         support.thumb(itemlist,genre=True)
     elif not 'filter' in item.args:
-        if item.contentType != 'movie': autorenumber.renumber(itemlist)
+        if item.contentType != 'movie': autorenumber.start(itemlist)
         tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
     return itemlist
 
@@ -163,7 +163,7 @@ def episodios(item):
                                url=  host + show_id + '/season/' + str(key['season_id']) + '/',
                                action= 'findvideos',
                                video_id= key['video_id']))
-    autorenumber.renumber(itemlist, item, 'bold')
+    autorenumber.start(itemlist, item)
     if autorenumber.check(item) == True \
         or support.match(itemlist[0].title, patron=r"(\d+x\d+)").match:
         support.videolibrary(itemlist,item)
