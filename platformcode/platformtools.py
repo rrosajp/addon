@@ -1415,6 +1415,7 @@ class Register(xbmcgui.WindowXMLDialog):
 class TitleOrIDWindow(xbmcgui.WindowXMLDialog):
     def Start(self, item, scraper):
         self.item = item
+        self.item.exit = False
         self.title = item.show if item.show else item.fulltitle
         self.id = item.infoLabels.get('tmdb_id','') if scraper == 'tmdb' else item.infoLabels.get('tvdb_id','')
         self.scraper = scraper

@@ -78,6 +78,7 @@ otvdb_global = None
 
 def find_and_set_infoLabels(item):
     logger.info()
+    # from core.support import dbg;dbg()
     # logger.info("item es %s" % item)
 
     p_dialog = None
@@ -94,7 +95,7 @@ def find_and_set_infoLabels(item):
         title = title.replace(year, "").strip()
         item.infoLabels['year'] = year[1:-1]
 
-    if item.infoLabels.get("tvdb_id") in ['', 'None']:
+    if item.infoLabels.get("tvdb_id", '') in ['', 'None']:
         if item.infoLabels['year']:
             otvdb_global = Tvdb(search=title, year=item.infoLabels['year'])
         elif item.infoLabels.get("imdb_id"):
