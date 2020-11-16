@@ -151,6 +151,7 @@ class autorenumber():
         while not self.item.exit:
             tvdb.find_and_set_infoLabels(self.item)
             if self.item.infoLabels['tvdb_id']: self.item.exit = True
+            else: self.item = platformtools.dialog_info(self.item, 'tvdb')
 
         # Rinumerazione Automatica
         if (not self.id and self.auto) or self.item.renumber:

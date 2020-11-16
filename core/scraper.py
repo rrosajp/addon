@@ -21,6 +21,7 @@ def find_and_set_infoLabels(item):
         :param item:
         :return: Boolean indicating if the 'code' could be found
     """
+    # from core.support import dbg;dbg()
     global scraper
     scraper = None
     # logger.debug("item:\n" + item.tostring('\n'))
@@ -32,7 +33,7 @@ def find_and_set_infoLabels(item):
     # Get the default Scraper of the configuration according to the content type
     if item.contentType == "movie":
         scraper_actual = ['tmdb'][config.get_setting("scraper_movies", "videolibrary")]
-        tipo_contenido = config.get_localized_string(70283)
+        tipo_contenido = "movie"
         title = item.contentTitle
         # Complete list of options for this type of content
         list_opciones_cuadro.append(scrapers_disponibles['tmdb'])

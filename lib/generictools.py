@@ -129,7 +129,8 @@ def update_title(item):
         scraper_return = scraper.find_and_set_infoLabels(item)
 
         if not scraper_return:  # If the user has canceled, we restore the data to the initial situation and leave
-            item = new_item.clone()
+            return
+            # item = new_item.clone()
         else:
             # If the user has changed the data in "Complete Information" you must see the final title in TMDB
             if not item.infoLabels['tmdb_id']:

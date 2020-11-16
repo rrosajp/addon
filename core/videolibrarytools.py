@@ -1073,6 +1073,7 @@ def add_tvshow(item, channel=None):
         # If the second screen is canceled, the variable "scraper_return" will be False. The user does not want to continue
 
         item = generictools.update_title(item) # We call the method that updates the title with tmdb.find_and_set_infoLabels
+        if not item: return
         #if item.tmdb_stat:
         #    del item.tmdb_stat          # We clean the status so that it is not recorded in the Video Library
 
@@ -1089,6 +1090,7 @@ def add_tvshow(item, channel=None):
                 item.action = action
                 if not item.exit:
                     return add_tvshow(item, channel)
+                itemlist = getattr(channel, item.action)(item)
             else:
                 itemlist = getattr(channel, item.action)(item)
 

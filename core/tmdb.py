@@ -526,14 +526,8 @@ def find_and_set_infoLabels(item):
     results = otmdb_global.get_list_resultados()
     if len(results) > 1:
         tmdb_result = platformtools.show_video_info(results, item=item, caption= tipo_contenido % title)
-        if not tmdb_result:
-            res = platformtools.dialog_info(item, 'tmdb')
-            if not res.exit: return find_and_set_infoLabels(res)
     elif len(results) > 0:
         tmdb_result = results[0]
-    else:
-        res = platformtools.dialog_info(item, 'tmdb')
-        if not res.exit: return find_and_set_infoLabels(res)
 
     if isinstance(item.infoLabels, InfoLabels):
         infoLabels = item.infoLabels
