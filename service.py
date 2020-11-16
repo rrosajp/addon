@@ -329,6 +329,8 @@ class AddonMonitor(xbmc.Monitor):
         if settings_post:  # backup settings
             filetools.copy(os.path.join(config.get_data_path(), "settings.xml"),
                            os.path.join(config.get_data_path(), "settings.bak"), True)
+            logger.debug({k: self.settings_pre[k] for k in self.settings_pre
+                          if k in settings_post and self.settings_pre[k] != settings_post[k]})
         from platformcode import xbmc_videolibrary
 
         if self.settings_pre.get('downloadpath', None) != settings_post.get('downloadpath', None):
