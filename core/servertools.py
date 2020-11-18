@@ -489,6 +489,8 @@ def get_server_parameters(server):
             # When the server is not well defined in the channel (there is no connector), it shows an error because there is no "path" and the channel has to be checked
             dict_server = jsontools.load(filetools.read(path))
 
+            dict_server["name"] = translate_server_name(dict_server["name"])
+
             # Images: url and local files are allowed inside "resources / images"
             if dict_server.get("thumbnail") and "://" not in dict_server["thumbnail"]:
                 dict_server["thumbnail"] = filetools.join(config.get_runtime_path(), "resources", "media",

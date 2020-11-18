@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <window>
+	<depth>0.52</depth>
+	<coordinates>
+		<left>0</left>
+		<top>0</top>
+	</coordinates>
     <controls>
 
         <!-- control groups -->
@@ -31,7 +36,7 @@
 
 
             <!-- LOADING -->
-            <control type="image">
+            <!-- <control type="image">
                 <top>355</top>
                 <left>490</left>
                 <width>300</width>
@@ -39,7 +44,7 @@
                 <texture>white.png</texture>
                 <visible allowhiddenfocus="true">!Integer.IsGreater(Container(102).NumItems, 0)</visible>
                 <animation effect="zoom" pulse="true" center="auto" start="0,100" end="100,100" time="1000" condition="!Integer.IsGreater(Container(200).NumItems, 0)">Conditional</animation>
-            </control>
+            </control> -->
             <!-- FANART -->
             <control type="image">
                 <width>100%</width>
@@ -217,40 +222,91 @@
                                 <align>center</align>
                                 <aligny>center</aligny>
                             </control>
+                            <!-- <control type="textbox">
+                                <bottom>0</bottom>
+                                <width>100%</width>
+                                <height>30</height>
+                                <font>font30_title</font>
+                                <textcolor>88FFFFFF</textcolor>
+                                <shadowcolor>00000000</shadowcolor>
+                                <label>[B]$INFO[ListItem.Property(time)][/B]</label>
+                                <align>center</align>
+                                <aligny>center</aligny>
+                            </control> -->
                         </focusedlayout>
                     </control>
                 </control>
                 <!-- PROGRESS -->
                 <!-- <control type='image' id='100'/> -->
-                <control type="progress" id="100">
-                    <top>0</top>
-                    <left>-10</left>
-                    <width>1330</width>
-                    <height>7</height>
-                    <reveal>false</reveal>
-                    <lefttexture colordiffuse="10000000">white.png</lefttexture>
-                    <righttexture colordiffuse="10000000">white.png</righttexture>
-                    <texturebg colordiffuse="88232323">progress.png</texturebg>
-                    <midtexture colordiffuse="FF0082C2">progress.png</midtexture>
-                    <visible>Integer.IsGreater(Container(102).NumItems, 0)</visible>
-                </control>
-                <control type="textbox" id="104">
-                    <top>30</top>
-                    <right>30</right>
-                    <width>200</width>
-                    <height>40</height>
-                    <font>font30_title</font>
-                    <textcolor>FFFFFFFF</textcolor>
-                    <shadowcolor>00000000</shadowcolor>
-                    <align>right</align>
-                    <aligny>center</aligny>
-                    <visible>Integer.IsGreater(Container(102).NumItems, 0)</visible>
-                </control>
             </control>
 
             <!-- EPISODES -->
             <control type="group" id="20">
                 <visible>Control.IsVisible(2)</visible>
+                <control type="image">
+                    <description>Poster</description>
+                    <top>0</top>
+                    <left>0</left>
+                    <width>480</width>
+                    <height>720</height>
+                    <texture>$INFO[Container(103).ListItem.Property(thumb)]</texture>
+                </control>
+                <control type="textbox" id="99">
+                    <description>Title</description>
+                    <left>520</left>
+                    <top>40</top>
+                    <width>1150</width>
+                    <height>30</height>
+                    <font>font30_title</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <shadowcolor>00000000</shadowcolor>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[Container(103).ListItem.Label()]</label>
+                </control>
+
+                <control type="list" id="200">
+                    <bottom>40</bottom>
+                    <left>520</left>
+                    <width>700</width>
+                    <height>570</height>
+                    <!-- <orientation>horizontal</orientation> -->
+                    <scrolltime tween="cubic" easing="out">300</scrolltime>
+                    <itemlayout height="60" width="700">
+                        <control type="textbox">
+                            <description>Title</description>
+                            <left>20</left>
+                            <width>660</width>
+                            <height>60</height>
+                            <font>font30_title</font>
+                            <textcolor>FFFFFFFF</textcolor>
+                            <shadowcolor>00000000</shadowcolor>
+                            <align>left</align>
+                            <aligny>center</aligny>
+                            <label>[COLOR FFAAAAAA]$INFO[ListItem.Label()][/COLOR]</label>
+                        </control>
+                    </itemlayout>
+                    <focusedlayout height="60" width="700">
+                        <control type="image">
+                            <width>700</width>
+                            <height>60</height>
+                            <texture colordiffuse="88000000">white.png</texture>
+                            <aspectratio>scale</aspectratio>
+                        </control>
+                        <control type="textbox">
+                            <description>Title</description>
+                            <left>20</left>
+                            <width>660</width>
+                            <height>60</height>
+                            <font>font30_title</font>
+                            <textcolor>FFFFFFFF</textcolor>
+                            <shadowcolor>00000000</shadowcolor>
+                            <align>left</align>
+                            <aligny>center</aligny>
+                            <label>$INFO[ListItem.Label]</label>
+                        </control>
+                    </focusedlayout>
+                </control>
             </control>
 
             <!-- SERVERS -->
@@ -367,6 +423,34 @@
                     </focusedlayout>
                 </control>
             </control>
+        </control>
+
+        <control type="progress" id="100">
+            <top>350</top>
+            <left>240</left>
+            <width>800</width>
+            <height>20</height>
+            <reveal>true</reveal>
+            <lefttexture colordiffuse="FF232323">white.png</lefttexture>
+            <righttexture colordiffuse="FF0082C2">white.png</righttexture>
+            <texturebg colordiffuse="22ffffff">progress.png</texturebg>
+            <midtexture colordiffuse="FF0082C2">progress.png</midtexture>
+            <animation effect="zoom" center="auto" end="163,40" time="600" condition="Integer.IsGreater(Container(102).NumItems, 0)">Conditional</animation>
+            <animation effect="slide" tween="linear" center="auto" end="0,-890" time="600" condition="Integer.IsGreater(Container(102).NumItems, 0)">Conditional</animation>
+            <!-- <visible>Integer.IsGreater(Container(102).NumItems, 0)</visible> -->
+        </control>
+        <control type="textbox" id="104">
+            <top>340</top>
+            <right>130</right>
+            <width>200</width>
+            <height>40</height>
+            <font>font30_title</font>
+            <textcolor>FFFFFFFF</textcolor>
+            <shadowcolor>00000000</shadowcolor>
+            <align>right</align>
+            <aligny>center</aligny>
+            <animation effect="slide" tween="linear" center="auto" end="90,-320" time="200" condition="Integer.IsGreater(Container(102).NumItems, 0)">Conditional</animation>
+            <visible allowhiddenfocus="true">Control.IsVisible(1)</visible>
         </control>
         <!-- GROUP CONTROLS END -->
     </controls>
