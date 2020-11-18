@@ -1082,7 +1082,7 @@ def play_torrent(item, xlistitem, mediaurl):
 
             torrent.mark_auto_as_watched(item)
 
-            while is_playing() and not xbmc.abortRequested:
+            while is_playing() and not xbmc.Monitor().abortRequested():
                 time.sleep(3)
 
 
