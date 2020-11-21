@@ -137,6 +137,7 @@ def run(item=None):
 
         elif config.get_setting('new_search') and item.channel == "search" and item.action == 'new_search':
             from platformcode.globalsearch import Search
+            item.contextual = True
             Search(item)
             return
 

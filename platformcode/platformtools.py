@@ -1416,7 +1416,7 @@ class TitleOrIDWindow(xbmcgui.WindowXMLDialog):
     def Start(self, item, scraper):
         self.item = item
         self.item.exit = False
-        self.title = item.show if item.show else item.fulltitle
+        self.title = item.contentTitle if item.contentType == 'movie' else item.contentSerieName
         self.id = item.infoLabels.get('tmdb_id','') if scraper == 'tmdb' else item.infoLabels.get('tvdb_id','')
         self.scraper = scraper
         self.label = 'TMDB ID:' if scraper == 'tmdb' else 'TVDB ID:'
@@ -1437,7 +1437,7 @@ class TitleOrIDWindow(xbmcgui.WindowXMLDialog):
     def onClick(self, control):
         if control in [10003]:
             if self.getControl(10001).getText():
-                if self.scraper == 'tmdb': self.item.contentTitle = self.getControl(10001).getText()
+                if self.item.contentType == 'movie': self.item.contentTitle = self.getControl(10001).getText()
                 else: self.item.contentSerieName = self.getControl(10001).getText()
             if self.scraper == 'tmdb' and self.getControl(10002).getText():
                 self.item.infoLabels['tmdb_id'] = self.getControl(10002).getText()
