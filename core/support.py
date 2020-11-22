@@ -17,7 +17,7 @@ else:
     from urllib import urlencode
 
 from time import time
-from core import httptools, scrapertools, servertools, tmdb, channeltools, autoplay
+from core import httptools, scrapertools, servertools, tmdb, channeltools, autoplay, scraper
 from core.item import Item
 from lib import unshortenit
 from platformcode import config
@@ -391,6 +391,9 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
 
 def html_uniform(data):
+    """ 
+        replace all ' with " and eliminate newline, so we don't need to worry about
+    """
     return re.sub("='([^']+)'", '="\\1"', data.replace('\n', ' ').replace('\t', ' ').replace('&nbsp;', ' '))
 
 
@@ -431,6 +434,7 @@ def scrape(func):
         lang = args.get('deflang', '')
         sceneTitle = args.get('sceneTitle')
         group = args.get('group', False)
+        downloadEnabled = args.get('downloadEnabled', True)
         pag = item.page if item.page else 1  # pagination
         matches = []
 
@@ -438,8 +442,8 @@ def scrape(func):
             logger.debug('PATRON= ', patron)
             if not data:
                 page = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True)
-                # replace all ' with " and eliminate newline, so we don't need to worry about
-                data = html_uniform(page.data)
+                data = page.data
+            data = html_uniform(data)
             scrapingTime = time()
             if patronBlock:
                 if debugBlock:
@@ -506,6 +510,9 @@ def scrape(func):
             if patronNext and inspect.stack()[1][3] not in ['newest']:
                 nextPage(itemlist, item, data, patronNext, function)
 
+        if function == 'episodios':
+            scraper.sort_episode_list(itemlist)
+
         # next page for pagination
         if pagination and len(matches) > pag * pagination and not search:
             if inspect.stack()[1][3] not in ['newest','get_newest']:
@@ -533,7 +540,7 @@ def scrape(func):
             if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
                 # item.fulltitle = item.infoLabels["title"]
                 videolibrary(itemlist, item, function=function)
-            if function == 'episodios' or function == 'findvideos':
+            if downloadEnabled and function == 'episodios' or function == 'findvideos':
                 download(itemlist, item, function=function)
 
         if 'patronMenu' in args and itemlist:
@@ -643,63 +650,6 @@ def dooplay_menu(item, type):
     action = 'peliculas'
 
     return locals()
-
-
-def swzz_get_url(item):
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:59.0) Gecko/20100101 Firefox/59.0'}
-    # dbg()
-    if "/link/" in item.url:
-        data = httptools.downloadpage(item.url, headers=headers).data
-        if "link =" in data:
-            data = scrapertools.find_single_match(data, 'link = "([^"]+)"')
-            if 'http' not in data:
-                data = 'https:' + data
-        elif 'linkId = ' in data:
-            id = scrapertools.find_single_match(data, 'linkId = "([^"]+)"')
-            data = stayonline(id)
-        else:
-            match = scrapertools.find_single_match(data, r'<meta name="og:url" content="([^"]+)"')
-            match = scrapertools.find_single_match(data, r'URL=([^"]+)">') if not match else match
-
-            if not match:
-                from lib import jsunpack
-
-                try:
-                    data = scrapertools.find_single_match(data.replace('\n', ''), r"(eval\s?\(function\(p,a,c,k,e,d.*?)</script>")
-                    data = jsunpack.unpack(data)
-
-                    logger.debug("##### play /link/ unpack ##\n%s\n##" % data)
-                except:
-                    logger.debug("##### The content is yet unpacked ##\n%s\n##" % data)
-
-                data = scrapertools.find_single_match(data, r'var link(?:\s)?=(?:\s)?"([^"]+)";')
-                data, c = unshortenit.unwrap_30x_only(data)
-            else:
-                data = match
-        if data.startswith('/'):
-            data = urlparse.urljoin("http://swzz.xyz", data)
-            if not "vcrypt" in data:
-                data = httptools.downloadpage(data).data
-        logger.debug("##### play /link/ data ##\n%s\n##" % data)
-
-    elif 'stayonline.pro' in item.url:
-        id = item.url.split('/')[-2]
-        data = stayonline(id)
-    else:
-        data = item.url
-
-    return data.replace('\\','')
-
-def stayonline(id):
-    reqUrl = 'https://stayonline.pro/ajax/linkView.php'
-    p = urlencode({"id": id})
-    data = httptools.downloadpage(reqUrl, post=p).data
-    try:
-        import json
-        data = json.loads(data)['data']['value']
-    except:
-        data = scrapertools.find_single_match(data, r'"value"\s*:\s*"([^"]+)"')
-    return data
 
 
 def menuItem(itemlist, filename, title='', action='', url='', contentType='undefined', args=[], style=True):
