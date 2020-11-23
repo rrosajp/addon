@@ -510,8 +510,8 @@ def scrape(func):
             if patronNext and inspect.stack()[1][3] not in ['newest']:
                 nextPage(itemlist, item, data, patronNext, function)
 
-        if function == 'episodios':
-            scraper.sort_episode_list(itemlist)
+        # if function == 'episodios':
+        #     scraper.sort_episode_list(itemlist)
 
         # next page for pagination
         if pagination and len(matches) > pag * pagination and not search:
