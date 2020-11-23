@@ -1006,17 +1006,17 @@ def add_movie(item):
     item = generictools.update_title(item) # We call the method that updates the title with tmdb.find_and_set_infoLabels
     #if item.tmdb_stat:
     #    del item.tmdb_stat          # We clean the status so that it is not recorded in the Video Library
-    if item:
-        new_item = item.clone(action="findvideos")
-        insertados, sobreescritos, fallidos, path = save_movie(new_item)
+    # if item:
+    new_item = item.clone(action="findvideos")
+    insertados, sobreescritos, fallidos, path = save_movie(new_item)
 
-        if fallidos == 0:
-            platformtools.dialog_ok(config.get_localized_string(30131),
-                                    config.get_localized_string(30135) % new_item.contentTitle)  # 'has been added to the video library'
-        else:
-            filetools.rmdirtree(path)
-            platformtools.dialog_ok(config.get_localized_string(30131),
-                                    config.get_localized_string(60066) % new_item.contentTitle)  # "ERROR, the movie has NOT been added to the video library")
+    if fallidos == 0:
+        platformtools.dialog_ok(config.get_localized_string(30131),
+                                config.get_localized_string(30135) % new_item.contentTitle)  # 'has been added to the video library'
+    else:
+        filetools.rmdirtree(path)
+        platformtools.dialog_ok(config.get_localized_string(30131),
+                                config.get_localized_string(60066) % new_item.contentTitle)  # "ERROR, the movie has NOT been added to the video library")
 
 
 def add_tvshow(item, channel=None):
