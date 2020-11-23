@@ -26,7 +26,7 @@ def set_workers():
 def Search(item):
     xbmc.executebuiltin('Dialog.Close(all,true)')
     SearchWindow('GlobalSearch.xml', config.get_runtime_path()).start(item)
-    xbmc.sleep(700)
+    xbmc.sleep(600)
 
 # Actions
 LEFT = 1
@@ -132,9 +132,6 @@ class SearchWindow(xbmcgui.WindowXML):
         self.item.search_type = 'person'
         tmdb_inf = tmdb.discovery(self.item, dict_=dict_)
         results = tmdb_inf.results
-
-        if not results:
-            return results
 
         for elem in results:
             name = elem.get('name', '')
@@ -535,6 +532,7 @@ class SearchWindow(xbmcgui.WindowXML):
         elif control_id in [SERVERLIST]:
             index = int(self.getControl(control_id).getSelectedItem().getProperty('index'))
             server = self.servers[index]
+            server.player_mode = 0
             run(server)
 
     def Back(self):

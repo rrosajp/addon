@@ -973,7 +973,7 @@ def set_player(item, xlistitem, mediaurl, view, strm, nfo_path=None, head_nfo=No
             xbmc_player.setSubtitles(item.subtitle)
 
     else:
-        if item.player_mode:
+        if type(item.player_mode) == int:
             player_mode = item.player_mode
         else:
             player_mode = config.get_setting("player_mode")
