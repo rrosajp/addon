@@ -1419,7 +1419,7 @@ class TitleOrIDWindow(xbmcgui.WindowXMLDialog):
         self.title = item.contentTitle if item.contentType == 'movie' else item.contentSerieName
         self.id = item.infoLabels.get('tmdb_id','') if scraper == 'tmdb' else item.infoLabels.get('tvdb_id','')
         self.scraper = scraper
-        self.label = 'TMDB ID:' if scraper == 'tmdb' else 'TVDB ID:'
+        self.idtitle = 'TMDB ID' if scraper == 'tmdb' else 'TVDB ID'
         self.doModal()
         return self.item
 
@@ -1427,29 +1427,37 @@ class TitleOrIDWindow(xbmcgui.WindowXMLDialog):
         #### Kodi 18 compatibility ####
         if config.get_platform(True)['num_version'] < 18:
             self.setCoordinateResolution(2)
-        self.getControl(10000).setText(config.get_localized_string(60228) % self.title)
-        self.getControl(10001).setText(self.title)
-        self.getControl(10002).setLabel(self.label)
-        self.getControl(10002).setText(self.id)
-        self.getControl(10002).setType(1, self.label)
-        self.setFocusId(10001)
+        self.HEADER = self.getControl(100)
+        self.TITLE = self.getControl(101)
+        self.ID = self.getControl(102)
+        self.EXIT = self.getControl(103)
+        self.EXIT2 = self.getControl(104)
+
+        self.HEADER.setText(config.get_localized_string(60228) % self.title)
+        self.TITLE.setLabel('[UPPERCASE]' + config.get_localized_string(60230).replace(':','') + '[/UPPERCASE]')
+        self.ID.setLabel('[UPPERCASE]' + self.scraper + 'id [/UPPERCASE]')
+        self.setFocusId(101)
 
     def onClick(self, control):
-        if control in [10003]:
-            if self.getControl(10001).getText():
-                if self.item.contentType == 'movie': self.item.contentTitle = self.getControl(10001).getText()
-                else: self.item.contentSerieName = self.getControl(10001).getText()
-            if self.scraper == 'tmdb' and self.getControl(10002).getText():
-                self.item.infoLabels['tmdb_id'] = self.getControl(10002).getText()
-            elif self.scraper == 'tvdb' and self.getControl(10002).getText():
-                self.item.infoLabels['tvdb_id'] = self.getControl(10002).getText()
-            self.close()
+        if control in [101]:
+            result = dialog_input(self.title)
+            if result:
+                if self.item.contentType == 'movie': self.item.contentTitle = result
+                else: self.item.contentSerieName = result
+                self.close()
+        elif control in [102]:
+            result = dialog_numeric(0, self.idtitle, self.id)
+            if result:
+                if self.scraper == 'tmdb': self.item.infoLabels['tmdb_id'] = result
+                elif self.scraper == 'tvdb': self.item.infoLabels['tvdb_id'] = result
+                self.close()
 
-        elif control in [10004, 10005]:
+        elif control in [103, 104]:
             self.item.exit = True
             self.close()
 
     def onAction(self, action):
-        if (action in [92] and self.getFocusId() not in [10001, 10002]) or action in [10]:
+        action = action.getId()
+        if action in [92, 10]:
             self.item.exit = True
             self.close()

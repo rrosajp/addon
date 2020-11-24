@@ -8,7 +8,8 @@
         <effect type="fade" start="100" end="0" time="300" />
     </animation>
     <controls>
-        <control type="button" id="10005">
+        <control type="button" id="104">
+            <description>CLOSE</description>
             <top>0</top>
             <left>0</left>
             <height>100%</height>
@@ -16,92 +17,80 @@
             <texturefocus colordiffuse="80232323">white.png</texturefocus>
             <texturenofocus colordiffuse="80232323">white.png</texturenofocus>
         </control>
+        <control type="textbox" id="100">
+            <description>Not Found</description>
+            <top>150</top>
+            <left>40</left>
+            <height>40</height>
+            <width>1200</width>
+            <font>font30_title</font>
+            <textcolor>CCFFFFFF</textcolor>
+            <aligny>center</aligny>
+            <align>center</align>
+            <label/>
+        </control>
         <control type="group">
-            <top>210</top>
-            <left>175</left>
-            <height>300</height>
-            <width>930</width>
-            <!-- Beckground -->
+            <top>260</top>
+            <left>400</left>
+            <height>200</height>
+            <width>480</width>
             <control type="image">
+                <description>Background</description>
                 <height>100%</height>
                 <width>100%</width>
                 <texture colordiffuse="FF232323">white.png</texture>
             </control>
-            <!-- Header -->
-            <control type="textbox" id="10000">
+            <control type="textbox">
+                <description>Modify</description>
                 <top>40</top>
                 <left>40</left>
                 <height>40</height>
-                <width>850</width>
+                <width>100</width>
                 <font>font30_title</font>
                 <textcolor>FFFFFFFF</textcolor>
-                <label></label>
+                <label>$ADDON[plugin.video.kod 70714]</label>
+                <aligny>center</aligny>
+                <align>left</align>
+                <label/>
             </control>
-            <!-- divisor -->
-            <control type="image">
-                <top>90</top>
+            <control type="button" id="103">
+                <description>CLOSE</description>
+                <top>40</top>
+                <right>40</right>
+                <height>40</height>
+                <width>40</width>
+                <texturefocus colordiffuse="FFFFFFFF">close.png</texturefocus>
+                <texturenofocus colordiffuse="88FFFFFF">close.png</texturenofocus>
+                <ondown>101</ondown>
+            </control>
+            <control type="grouplist">
+                <bottom>40</bottom>
                 <left>40</left>
-                <height>1</height>
-                <width>850</width>
-                <texture colordiffuse="FFFFFFFF">white.png</texture>
-            </control>
-            <!-- titolo -->
-            <control type="edit" id="10001">
-                <top>120</top>
-                <left>40</left>
-                <height>60</height>
-                <width>630</width>
-                <textcolor>FFFFFFFF</textcolor>
-                <texturefocus colordiffuse="FF0082C2">white.png</texturefocus>
-                <texturenofocus colordiffuse="FF232323">white.png</texturenofocus>
-                <aligny>center</aligny>
-                <label>$ADDON[plugin.video.kod 60230]</label>
-                <ondown>10002</ondown>
-                <onright>10003</onright>
-            </control>
-            <!-- id -->
-            <control type="edit" id="10002">
-                <top>200</top>
-                <left>40</left>
-                <height>60</height>
-                <width>630</width>
-                <textcolor>FFFFFFFF</textcolor>
-                <texturefocus colordiffuse="FF0082C2">white.png</texturefocus>
-                <texturenofocus colordiffuse="FF232323">white.png</texturenofocus>
-                <aligny>center</aligny>
-                <label></label>
-                <onup>10001</onup>
-                <onright>10003</onright>
-            </control>
-            <!-- ok -->
-            <control type="button" id="10003">
-                <top>120</top>
-                <left>690</left>
-                <label>$ADDON[plugin.video.kod 70001]</label>
-                <height>60</height>
-                <width>200</width>
-                <textcolor>FFFFFFFF</textcolor>
-                <aligny>center</aligny>
-                <align>center</align>
-                <texturefocus border="10" colordiffuse="FF0082C2">white.png</texturefocus>
-                <texturenofocus border="10" colordiffuse="FF232323">white.png</texturenofocus>
-                <ondown>10004</ondown>
-                <onleft>10001</onleft>
-            </control>
-            <!-- annulla -->
-            <control type="button" id="10004">
-                <top>200</top>
-                <left>690</left>
-                <label>$ADDON[plugin.video.kod 70002]</label>
-                <height>60</height>
-                <width>200</width>
-                <textcolor>FFFFFFFF</textcolor>
-                <aligny>center</aligny>
-                <align>center</align>
-                <texturefocus border="10" colordiffuse="FF0082C2">white.png</texturefocus>
-                <texturenofocus border="10" colordiffuse="FF232323">white.png</texturenofocus>
-                <onup>10003</onup>
-                <onleft>10001</onleft>
+                <height>40</height>
+                <width>400</width>
+                <orientation>horizontal</orientation>
+                <itemgap>40</itemgap>
+                <onup>103</onup>
+                <control type="button" id="101">
+                    <description>Title</description>
+                    <height>40</height>
+                    <width>180</width>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <aligny>center</aligny>
+                    <align>center</align>
+                    <texturefocus border="10" colordiffuse="22FFFFFF">white.png</texturefocus>
+                    <texturenofocus border="10"></texturenofocus>
+                </control>
+                <control type="button" id="102">
+                    <description>ID</description>
+                    <height>40</height>
+                    <width>180</width>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <aligny>center</aligny>
+                    <align>center</align>
+                    <texturefocus border="10" colordiffuse="22FFFFFF">white.png</texturefocus>
+                    <texturenofocus border="10"></texturenofocus>
+                </control>
             </control>
         </control>
     </controls>
