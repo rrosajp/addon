@@ -121,7 +121,7 @@ def episodios(item):
     action = 'findvideos'
 
     def itemlistHook(itemlist):
-        itemlist.sort(key=lambda item: (item.season, item.episode))
+        itemlist.sort(key=lambda item: (item.infoLabels['season'], item.infoLabels['episode']))
         return itemlist
 
     return locals()
