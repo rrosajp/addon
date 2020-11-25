@@ -8,7 +8,6 @@ from __future__ import division
 # from builtins import str
 import io
 
-from future.builtins import range
 from past.utils import old_div
 import sys
 PY3 = False

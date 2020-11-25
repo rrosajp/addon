@@ -385,7 +385,10 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 it.__setattr__(lg, match[lg])
 
             if 'itemHook' in args:
-                it = args['itemHook'](it)
+                try:
+                    it = args['itemHook'](it)
+                except:
+                    raise logger.ChannelScraperException
             itemlist.append(it)
 
     return itemlist, matches
@@ -407,7 +410,6 @@ def scrape(func):
         args = func(*args)
         function = func.__name__ if not 'actLike' in args else args['actLike']
         # info('STACK= ',inspect.stack()[1][3])
-
         item = args['item']
 
         action = args.get('action', 'findvideos')
@@ -469,22 +471,32 @@ def scrape(func):
                                        typeActionDict, blacklist, search, pag, function, lang, sceneTitle, group)
 
             if 'itemlistHook' in args:
-                itemlist = args['itemlistHook'](itemlist)
+                try:
+                    itemlist = args['itemlistHook'](itemlist)
+                except:
+                    raise logger.ChannelScraperException
 
             # if url may be changed and channel has findhost to update
             if 'findhost' in func.__globals__ and not itemlist:
                 info('running findhost ' + func.__module__)
                 ch = func.__module__.split('.')[-1]
-                host = config.get_channel_url(func.__globals__['findhost'], ch, True)
+                try:
+                    host = config.get_channel_url(func.__globals__['findhost'], ch, True)
 
-                parse = list(urlparse.urlparse(item.url))
-                parse[1] = scrapertools.get_domain_from_url(host)
-                item.url = urlparse.urlunparse(parse)
+                    parse = list(urlparse.urlparse(item.url))
+                    parse[1] = scrapertools.get_domain_from_url(host)
+                    item.url = urlparse.urlunparse(parse)
+                except:
+                    raise logger.ChannelScraperException
                 data = None
                 itemlist = []
                 matches = []
             else:
                 break
+
+        if not data:
+            from platformcode.logger import WebErrorException
+            raise WebErrorException(urlparse.urlparse(item.url)[1], item.channel)
 
         if group and item.grouped or args.get('groupExplode'):
             import copy
@@ -548,7 +560,10 @@ def scrape(func):
             itemlist = thumb(itemlist, genre=True)
 
         if 'fullItemlistHook' in args:
-            itemlist = args['fullItemlistHook'](itemlist)
+            try:
+                itemlist = args['fullItemlistHook'](itemlist)
+            except:
+                raise logger.ChannelScraperException
 
         # itemlist = filterLang(item, itemlist)   # causa problemi a newest
 

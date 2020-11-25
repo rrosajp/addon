@@ -341,13 +341,10 @@ def run(item=None):
 
         logger.error(traceback.format_exc())
 
-        patron = 'File "' + os.path.join(config.get_runtime_path(), "channels", "").replace("\\", "\\\\") + r'([^.]+)\.py"'
-        Channel = scrapertools.find_single_match(traceback.format_exc(), patron)
-
         platformtools.dialog_ok(
-            config.get_localized_string(59985) + Channel,
-            config.get_localized_string(60013) %(e))
-    except:
+            config.get_localized_string(59985) % e.channel,
+            config.get_localized_string(60013) % e.url)
+    except Exception as e:
         import traceback
         from core import scrapertools
 
@@ -356,26 +353,15 @@ def run(item=None):
         patron = 'File "' + os.path.join(config.get_runtime_path(), "channels", "").replace("\\", "\\\\") + r'([^.]+)\.py"'
         Channel = scrapertools.find_single_match(traceback.format_exc(), patron)
 
-        try:
-            import xbmc
-            if config.get_platform(True)['num_version'] < 14:
-                log_name = "xbmc.log"
-            else:
-                log_name = "kodi.log"
-            log_message = config.get_localized_string(50004) + xbmc.translatePath("special://logpath") + log_name
-        except:
-            log_message = ""
-
-        if Channel:
+        if Channel or e.__class__ == logger.ChannelScraperException:
             if item.url:
-                if platformtools.dialog_yesno(config.get_localized_string(60087) % Channel, config.get_localized_string(60014) + '\n' + log_message, nolabel='ok', yeslabel=config.get_localized_string(70739)):
+                if platformtools.dialog_yesno(config.get_localized_string(60087) % Channel, config.get_localized_string(60014), nolabel='ok', yeslabel=config.get_localized_string(70739)):
                     run(Item(action="open_browser", url=item.url))
             else:
-                platformtools.dialog_ok(config.get_localized_string(60087) % Channel, config.get_localized_string(60014) + '\n' + log_message)
+                platformtools.dialog_ok(config.get_localized_string(60087) % Channel, config.get_localized_string(60014))
         else:
-            platformtools.dialog_ok(
-                config.get_localized_string(60038),
-                config.get_localized_string(60015) + '\n' + log_message)
+            if platformtools.dialog_yesno(config.get_localized_string(60038), config.get_localized_string(60015)):
+                run(Item(channel="setting", action="report_menu"))
 
 
 def new_search(item, channel=None):
