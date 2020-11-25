@@ -353,7 +353,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                     AC = name
                     break
                 else: AC = action
-        if (scraped["title"] not in blacklist) and (search.lower() in longtitle.lower()):
+
+        if (not scraped['title'] or scraped["title"] not in blacklist) and (search.lower() in longtitle.lower()):
             contentType = 'episode' if function == 'episodios' else CT if CT else item.contentType
             it = Item(
                 channel=item.channel,
@@ -391,7 +392,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
 
 def html_uniform(data):
-    """ 
+    """
         replace all ' with " and eliminate newline, so we don't need to worry about
     """
     return re.sub("='([^']+)'", '="\\1"', data.replace('\n', ' ').replace('\t', ' ').replace('&nbsp;', ' '))

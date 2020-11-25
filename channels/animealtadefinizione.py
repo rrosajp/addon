@@ -26,7 +26,7 @@ def mainlist(item):
 @support.scrape
 def menu(item):
     action = 'peliculas'
-    data = support.match(item, patron= r'<a href="' + host + r'/category/' + item.args.lower() + r'/">' + item.args + r'</a><ul class="sub-menu">(.*?)</ul>').match
+    patronBlock= r'<a href="' + host + r'/category/' + item.args.lower() + r'/">' + item.args + r'</a>\s*<ul class="sub-menu">(?P<block>.*?)</ul>'
     patronMenu = r'<a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
     return locals()
 
