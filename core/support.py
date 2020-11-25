@@ -507,7 +507,7 @@ def scrape(func):
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
         if not group and not args.get('groupExplode') and ((pagination and len(matches) <= pag * pagination) or not pagination):  # next page with pagination
-            if patronNext and inspect.stack()[1][3] not in ['newest']:
+            if patronNext and inspect.stack()[1][3] not in ['newest'] and inspect.stack()[2][3] not in ['get_channel_results']:
                 nextPage(itemlist, item, data, patronNext, function)
 
         # if function == 'episodios':

@@ -192,7 +192,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 n = list_cat.index('anime')
                 list_cat[n] = 'tvshow'
 
-            if self.item.type in list_cat:
+            if self.item.mode == 'all' or self.item.type in list_cat:
                 if config.get_setting("include_in_global_search", channel) and ch_param.get("active", False):
                     channels_list.append(channel)
 
@@ -205,8 +205,7 @@ class SearchWindow(xbmcgui.WindowXML):
         try:
             module = __import__('channels.%s' % channel, fromlist=["channels.%s" % channel])
             mainlist = getattr(module, 'mainlist')(Item(channel=channel, global_search=True))
-            logger.info('TYPE= ', self.item.type)
-            action = [elem for elem in mainlist if elem.action == "search" and (self.item.mode == 'all' or elem.contentType in [self.item.type, 'undefined'])]
+            action = [elem for elem in mainlist if elem.action == "search" and (self.item.mode == 'all' or elem.contentType in [self.item.mode, 'undefined'])]
             return module, action
         except:
             import traceback
@@ -410,7 +409,7 @@ class SearchWindow(xbmcgui.WindowXML):
             pos = self.RESULTS.getSelectedPosition()
             self.CHANNELS.getSelectedItem().setProperty('position', str(pos))
 
-        elif action in [BACKSPACE]:
+        if action in [BACKSPACE]:
             self.Back()
 
         elif action in [EXIT]:
@@ -465,11 +464,11 @@ class SearchWindow(xbmcgui.WindowXML):
             else:
                 self.pos = self.EPISODESLIST.getSelectedPosition()
                 item = self.episodes[self.pos]
-
+            # dbg()
             self.channel = __import__('channels.%s' % item.channel, fromlist=["channels.%s" % item.channel])
             self.itemsResult = getattr(self.channel, item.action)(item)
 
-            if item.action in ['findvideos']:
+            if self.itemsResult and self.itemsResult[0].action in ['play']:
 
                 if config.get_setting('checklinks') and not config.get_setting('autoplay'):
                     self.itemsResult = servertools.check_list_links(self.itemsResult, config.get_setting('checklinks_number'))

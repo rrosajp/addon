@@ -1435,7 +1435,7 @@ class TitleOrIDWindow(xbmcgui.WindowXMLDialog):
 
         self.HEADER.setText(config.get_localized_string(60228) % self.title)
         self.TITLE.setLabel('[UPPERCASE]' + config.get_localized_string(60230).replace(':','') + '[/UPPERCASE]')
-        self.ID.setLabel('[UPPERCASE]' + self.scraper + 'id [/UPPERCASE]')
+        self.ID.setLabel('[UPPERCASE]' + self.idtitle + '[/UPPERCASE]')
         self.setFocusId(101)
 
     def onClick(self, control):

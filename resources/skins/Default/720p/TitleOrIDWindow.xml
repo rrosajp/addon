@@ -42,7 +42,7 @@
             </control>
             <control type="textbox">
                 <description>Modify</description>
-                <top>40</top>
+                <top>20</top>
                 <left>40</left>
                 <height>40</height>
                 <width>100</width>
@@ -53,10 +53,18 @@
                 <align>left</align>
                 <label/>
             </control>
+            <control type="image">
+                <description>Separator</description>
+                <top>80</top>
+                <left>0</left>
+                <height>1</height>
+                <width>480</width>
+                <texture colordiffuse="FFFFFFFF">white.png</texture>
+            </control>
             <control type="button" id="103">
                 <description>CLOSE</description>
-                <top>40</top>
-                <right>40</right>
+                <top>20</top>
+                <right>20</right>
                 <height>40</height>
                 <width>40</width>
                 <texturefocus colordiffuse="FFFFFFFF">close.png</texturefocus>
@@ -64,7 +72,7 @@
                 <ondown>101</ondown>
             </control>
             <control type="grouplist">
-                <bottom>40</bottom>
+                <top>120</top>
                 <left>40</left>
                 <height>40</height>
                 <width>400</width>
