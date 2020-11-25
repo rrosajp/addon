@@ -7,7 +7,7 @@ from platformcode import logger, config
 
 def test_video_exists(page_url):
     global data
-    logger.info('page url=', page_url)
+    logger.debug('page url=', page_url)
     response = httptools.downloadpage(page_url)
 
     if response.code == 404 or 'File you are looking for is not found' in response.data:
@@ -20,7 +20,7 @@ def test_video_exists(page_url):
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     # from core.support import dbg;dbg()
     global data
-    logger.info("URL", page_url)
+    logger.debug("URL", page_url)
 
     video_urls = list()
     host = "https://dood.to"
@@ -28,7 +28,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     new_url = scrapertools.find_single_match(data, r'<iframe src="([^"]+)"')
     if new_url:
         data = httptools.downloadpage(host + new_url).data
-        logger.info('DATA', data)
+        logger.debug('DATA', data)
 
     label = scrapertools.find_single_match(data, r'type:\s*"video/([^"]+)"')
 

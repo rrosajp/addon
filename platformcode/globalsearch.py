@@ -59,7 +59,7 @@ SERVERLIST = 300
 
 class SearchWindow(xbmcgui.WindowXML):
     def start(self, item):
-        logger.info()
+        logger.debug()
         self.exit = False
         self.item = item
         self.lastSearch()
@@ -81,7 +81,7 @@ class SearchWindow(xbmcgui.WindowXML):
         self.doModal()
 
     def lastSearch(self):
-        logger.info()
+        logger.debug()
         if not self.item.text:
             if config.get_setting('last_search'): last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
             else: last_search = ''
@@ -89,7 +89,7 @@ class SearchWindow(xbmcgui.WindowXML):
             if self.item.text: channeltools.set_channel_setting('Last_searched', self.item.text, 'search')
 
     def select(self):
-        logger.info()
+        logger.debug()
         self.PROGRESS.setVisible(False)
         items = []
         if self.persons:
@@ -122,7 +122,7 @@ class SearchWindow(xbmcgui.WindowXML):
             self.NORESULTS.setVisible(True)
 
     def actors(self):
-        logger.info()
+        logger.debug()
         self.PROGRESS.setVisible(False)
         items = []
 
@@ -174,7 +174,7 @@ class SearchWindow(xbmcgui.WindowXML):
             self.NORESULTS.setVisible(True)
 
     def get_channels(self):
-        logger.info()
+        logger.debug()
         channels_list = []
         all_channels = channelselector.filterchannels('all')
 
@@ -196,12 +196,12 @@ class SearchWindow(xbmcgui.WindowXML):
                 if config.get_setting("include_in_global_search", channel) and ch_param.get("active", False):
                     channels_list.append(channel)
 
-        logger.info('search in channels:',channels_list)
+        logger.debug('search in channels:',channels_list)
 
         return channels_list
 
     def getModule(self, channel):
-        logger.info()
+        logger.debug()
         try:
             module = __import__('channels.%s' % channel, fromlist=["channels.%s" % channel])
             mainlist = getattr(module, 'mainlist')(Item(channel=channel, global_search=True))
@@ -233,7 +233,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 executor.submit(self.get_channel_results, self.item, self.moduleDict, searchAction)
 
     def get_channel_results(self, item, module_dict, search_action):
-        logger.info()
+        logger.debug()
         channel = search_action.channel
         results = []
         valid = []
@@ -266,7 +266,7 @@ class SearchWindow(xbmcgui.WindowXML):
         else: self.update(channel, valid + other)
 
     def makeItem(self, item):
-        logger.info()
+        logger.debug()
         thumb = item.thumbnail if item.thumbnail else 'Infoplus/' + item.contentType.replace('show','')
         it = xbmcgui.ListItem(item.title)
         it.setProperty('thumb', thumb)
@@ -282,7 +282,7 @@ class SearchWindow(xbmcgui.WindowXML):
         return it
 
     def update(self, channel, results):
-        logger.info('Search on channel', channel)
+        logger.debug('Search on channel', channel)
         if results:
             channelParams = channeltools.get_channel_parameters(channel)
             name = channelParams['title']

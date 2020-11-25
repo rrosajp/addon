@@ -206,7 +206,7 @@ def render_items(itemlist, parent_item):
     """
     Function used to render itemlist on kodi
     """
-    logger.info('START render_items')
+    logger.debug('START render_items')
     thumb_type = config.get_setting('video_thumbnail_type')
     from platformcode import shortcuts
     # from core import httptools
@@ -291,7 +291,7 @@ def render_items(itemlist, parent_item):
     set_view_mode(itemlist[0], parent_item)
 
     xbmcplugin.endOfDirectory(_handle)
-    logger.info('END render_items')
+    logger.debug('END render_items')
 
 
 def getCurrentView(item=None, parent_item=None):
@@ -348,11 +348,11 @@ def set_view_mode(item, parent_item):
     if content:
         mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
         if mode == 0:
-            logger.info('default mode')
+            logger.debug('default mode')
             mode = 55
         xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
         xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
-        logger.info('TYPE: ' + Type + ' - ' + 'CONTENT: ' + content)
+        logger.debug('TYPE: ' + Type + ' - ' + 'CONTENT: ' + content)
 
 
 def set_infolabels(listitem, item, player=False):
@@ -572,10 +572,10 @@ def is_playing():
 
 
 def play_video(item, strm=False, force_direct=False, autoplay=False):
-    logger.info()
+    logger.debug()
     logger.debug(item.tostring('\n'))
     if item.channel == 'downloads':
-        logger.info("Play local video: %s [%s]" % (item.title, item.url))
+        logger.debug("Play local video: %s [%s]" % (item.title, item.url))
         xlistitem = xbmcgui.ListItem(path=item.url)
         xlistitem.setArt({"thumb": item.thumbnail})
         set_infolabels(xlistitem, item, True)
@@ -583,7 +583,7 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
         return
 
     default_action = config.get_setting("default_action")
-    logger.info("default_action=%s" % default_action)
+    logger.debug("default_action=%s" % default_action)
 
     # Open the selection dialog to see the available options
     opciones, video_urls, seleccion, salir = get_dialogo_opciones(item, default_action, strm, autoplay)
@@ -593,8 +593,8 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
     seleccion = get_seleccion(default_action, opciones, seleccion, video_urls)
     if seleccion < 0: return # Canceled box
 
-    logger.info("selection=%d" % seleccion)
-    logger.info("selection=%s" % opciones[seleccion])
+    logger.debug("selection=%d" % seleccion)
+    logger.debug("selection=%s" % opciones[seleccion])
 
     # run the available option, jdwonloader, download, favorites, add to the video library ... IF IT IS NOT PLAY
     salir = set_opcion(item, seleccion, opciones, video_urls)
@@ -755,7 +755,7 @@ def alert_unsopported_server():
 
 
 def handle_wait(time_to_wait, title, text):
-    logger.info("handle_wait(time_to_wait=%d)" % time_to_wait)
+    logger.debug("handle_wait(time_to_wait=%d)" % time_to_wait)
     espera = dialog_progress(' ' + title, "")
 
     secs = 0
@@ -774,15 +774,15 @@ def handle_wait(time_to_wait, title, text):
             break
 
     if cancelled:
-        logger.info('Wait canceled')
+        logger.debug('Wait canceled')
         return False
     else:
-        logger.info('Wait finished')
+        logger.debug('Wait finished')
         return True
 
 
 def get_dialogo_opciones(item, default_action, strm, autoplay):
-    logger.info()
+    logger.debug()
     # logger.debug(item.tostring('\n'))
     from core import servertools
 
@@ -866,7 +866,7 @@ def get_dialogo_opciones(item, default_action, strm, autoplay):
 
 
 def set_opcion(item, seleccion, opciones, video_urls):
-    logger.info()
+    logger.debug()
     # logger.debug(item.tostring('\n'))
     salir = False
     # You have not chosen anything, most likely because you have given the ESC
@@ -916,7 +916,7 @@ def set_opcion(item, seleccion, opciones, video_urls):
 
 
 def get_video_seleccionado(item, seleccion, video_urls):
-    logger.info()
+    logger.debug()
     mediaurl = ""
     view = False
     wait_time = 0
@@ -942,7 +942,7 @@ def get_video_seleccionado(item, seleccion, video_urls):
         mpd = True
 
     # If there is no mediaurl it is because the video is not there :)
-    logger.info("mediaurl=" + mediaurl)
+    logger.debug("mediaurl=" + mediaurl)
     if mediaurl == "":
         if item.server == "unknown":
             alert_unsopported_server()
@@ -959,7 +959,7 @@ def get_video_seleccionado(item, seleccion, video_urls):
 
 
 def set_player(item, xlistitem, mediaurl, view, strm, nfo_path=None, head_nfo=None, item_nfo=None):
-    logger.info()
+    logger.debug()
     # logger.debug("item:\n" + item.tostring('\n'))
     # Moved del conector "torrent" here
     if item.server == "torrent":
@@ -1046,7 +1046,7 @@ def torrent_client_installed(show_tuple=False):
 
 
 def play_torrent(item, xlistitem, mediaurl):
-    logger.info()
+    logger.debug()
     import time
     from servers import torrent
 

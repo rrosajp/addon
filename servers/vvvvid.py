@@ -19,7 +19,7 @@ payload = {'conn_id': conn_id}
 
 
 def test_video_exists(page_url):
-    logger.info("(page_url='%s')" % page_url)
+    logger.debug("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url).data
     if "Not Found" in data or "File was deleted" in data:
         return False, config.get_localized_string(70449) % "VVVVID"
@@ -45,7 +45,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     # Getting info from Site
     json_url = "https://www.vvvvid.it/vvvvid/ondemand/" + show_id + '/season/' +season_id + '/'
     json_file = current_session.get(json_url, headers=headers, params=payload).json()
-    logger.info(json_file['data'])
+    logger.debug(json_file['data'])
 
     # Search for the correct episode
     for episode in json_file['data']:

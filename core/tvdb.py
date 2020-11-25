@@ -77,9 +77,9 @@ otvdb_global = None
 
 
 def find_and_set_infoLabels(item):
-    logger.info()
+    logger.debug()
     # from core.support import dbg;dbg()
-    # logger.info("item es %s" % item)
+    # logger.debug("item es %s" % item)
 
     p_dialog = None
     if not item.contentSeason:
@@ -382,7 +382,7 @@ class Tvdb(object):
 
     @classmethod
     def __check_token(cls):
-        # logger.info()
+        # logger.debug()
         if TOKEN == "":
             cls.__login()
         else:
@@ -397,7 +397,7 @@ class Tvdb(object):
 
     @staticmethod
     def __login():
-        # logger.info()
+        # logger.debug()
         global TOKEN
 
         apikey = "106B699FDC04301C"
@@ -423,7 +423,7 @@ class Tvdb(object):
 
     @classmethod
     def __refresh_token(cls):
-        # logger.info()
+        # logger.debug()
         global TOKEN
         is_success = False
 
@@ -521,7 +521,7 @@ class Tvdb(object):
             ]
         }
         """
-        logger.info()
+        logger.debug()
         if id_episode and self.episodes.get(id_episode):
             return self.episodes.get(id_episode)
 
@@ -589,7 +589,7 @@ class Tvdb(object):
             }
         }
         """
-        logger.info()
+        logger.debug()
 
 
         url = HOST + "/series/%s/episodes?page=%s" % (_id, page)
@@ -662,7 +662,7 @@ class Tvdb(object):
         """
         if semaforo:
             semaforo.acquire()
-        logger.info()
+        logger.debug()
 
         url = HOST + "/episodes/%s" % _id
 
@@ -681,7 +681,7 @@ class Tvdb(object):
 
         else:
             dict_html = req.json()
-            # logger.info("dict_html %s" % dict_html)
+            # logger.debug("dict_html %s" % dict_html)
             self.episodes[_id] = dict_html.pop("data") if 'Error' not in dict_html else {}
 
         if semaforo:
@@ -712,7 +712,7 @@ class Tvdb(object):
           "status": "string"
         }
         """
-        logger.info()
+        logger.debug()
 
         params = {}
         if name:
@@ -802,7 +802,7 @@ class Tvdb(object):
             }
         }
         """
-        logger.info()
+        logger.debug()
         resultado = {}
 
         url = HOST + "/series/%s" % _id
@@ -855,7 +855,7 @@ class Tvdb(object):
         @rtype: dict
 
         """
-        logger.info()
+        logger.debug()
 
         if self.result.get('image_season_%s' % season):
             return self.result['image_season_%s' % season]
@@ -909,7 +909,7 @@ class Tvdb(object):
         @return: dictionary with actors
         @rtype: dict
         """
-        logger.info()
+        logger.debug()
 
         url = HOST + "/series/%s/actors" % _id
         DEFAULT_HEADERS["Accept-Language"] = lang
@@ -942,7 +942,7 @@ class Tvdb(object):
         @rtype: list
         @return: list of results
         """
-        logger.info()
+        logger.debug()
         list_results = []
 
         # if we have a result and it has seriesName, we already have the info of the series, it is not necessary to search again

@@ -8,7 +8,7 @@ from platformcode import logger, config
 
 
 def test_video_exists(page_url):
-    logger.info("(page_url='%s')" % page_url)
+    logger.debug("(page_url='%s')" % page_url)
     global data, real_url
     page = httptools.downloadpage(page_url)
     data = page.data.replace('"', "'")
@@ -20,7 +20,7 @@ def test_video_exists(page_url):
 
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
-    logger.info("(deltabit page_url='%s')" % page_url)
+    logger.debug("(deltabit page_url='%s')" % page_url)
     global data, real_url
     post = {k: v for k, v in scrapertools.find_multiple_matches(data, "name='([^']+)' value='([^']*)'")}
     time.sleep(2.5)

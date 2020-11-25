@@ -25,14 +25,14 @@ TYPE = "Type"
 
 # helper Functions
 def check(item):
-    logger.info()
+    logger.debug()
     dict_series = load(item)
     title = item.fulltitle.rstrip()
     if title in dict_series: title = dict_series[title]
     return True if ID in title and EPISODE in title else False
 
 def filename(item):
-    logger.info()
+    logger.debug()
     name_file = item.channel + "_data.json"
     path = filetools.join(config.get_data_path(), "settings_channels")
     fname = filetools.join(path, name_file)
@@ -40,7 +40,7 @@ def filename(item):
 
 
 def load(item):
-    logger.info()
+    logger.debug()
     try:
         json_file = open(filename(item), "r").read()
         json = jsontools.load(json_file)[TVSHOW_RENUMERATE]
@@ -52,7 +52,7 @@ def load(item):
 
 
 def write(item, json):
-    logger.info()
+    logger.debug()
     json_file = open(filename(item), "r").read()
     js = jsontools.load(json_file)
     js[TVSHOW_RENUMERATE] = json
@@ -71,7 +71,7 @@ def b64(json, mode = 'encode'):
 
 def RepresentsInt(s):
     # Controllo Numro Stagione
-    logger.info()
+    logger.debug()
     try:
         int(s)
         return True
@@ -79,7 +79,7 @@ def RepresentsInt(s):
         return False
 
 def find_episodes(item):
-    logger.info()
+    logger.debug()
     ch = __import__('channels.' + item.channel, fromlist=["channels.%s" % item.channel])
     itemlist = ch.episodios(item)
     return itemlist
@@ -705,7 +705,7 @@ class SelectreNumerationWindow(xbmcgui.WindowXMLDialog):
             items.append(item)
             self.seasons[item.getLabel()] =  '%sx%s' % (item.getProperty('season'), item.getProperty('episode'))
         self.items = items
-        logger.info('SELF',self.seasons)
+        logger.debug('SELF',self.seasons)
 
     def addseasons(self):
         seasonlist = []

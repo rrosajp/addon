@@ -87,7 +87,7 @@ create_bd()
 
 # The function name is the name of the decorator and receives the function that decorates.
 def cache_response(fn):
-    logger.info()
+    logger.debug()
 
     # import time
     # start_time = time.time()
@@ -495,7 +495,7 @@ def set_infoLabels_item(item, seekTmdb=True, idioma_busqueda=def_lang, lock=None
 
 
 def find_and_set_infoLabels(item):
-    logger.info()
+    logger.debug()
 
     global otmdb_global
     tmdb_result = None
@@ -902,7 +902,7 @@ class Tmdb(object):
             cls.dic_generos[idioma][tipo] = {}
             url = ('http://api.themoviedb.org/3/genre/%s/list?api_key=a1ab8b8669da03637a4b98fa39c39228&language=%s' % (tipo, idioma))
             try:
-                logger.info("[Tmdb.py] Filling in dictionary of genres")
+                logger.debug("[Tmdb.py] Filling in dictionary of genres")
 
                 resultado = cls.get_json(url)
                 if not isinstance(resultado, dict):
@@ -934,7 +934,7 @@ class Tmdb(object):
                        '&language=%s' % (self.busqueda_id, source, self.busqueda_idioma))
                 buscando = "%s: %s" % (source.capitalize(), self.busqueda_id)
 
-            logger.info("[Tmdb.py] Searching %s:\n%s" % (buscando, url))
+            logger.debug("[Tmdb.py] Searching %s:\n%s" % (buscando, url))
             resultado = self.get_json(url)
             if not isinstance(resultado, dict):
                 resultado = ast.literal_eval(resultado.decode('utf-8'))
@@ -981,7 +981,7 @@ class Tmdb(object):
                     url += '&year=%s' % self.busqueda_year
 
             buscando = self.busqueda_texto.capitalize()
-            logger.info("[Tmdb.py] Searching %s on page %s:\n%s" % (buscando, page, url))
+            logger.debug("[Tmdb.py] Searching %s on page %s:\n%s" % (buscando, page, url))
             resultado = self.get_json(url)
             if not isinstance(resultado, dict):
                 resultado = ast.literal_eval(resultado.decode('utf-8'))
@@ -1042,7 +1042,7 @@ class Tmdb(object):
             url = ('http://api.themoviedb.org/3/%s?api_key=a1ab8b8669da03637a4b98fa39c39228&%s'
                    % (type_search, "&".join(params)))
 
-            logger.info("[Tmdb.py] Searcing %s:\n%s" % (type_search, url))
+            logger.debug("[Tmdb.py] Searcing %s:\n%s" % (type_search, url))
             resultado = self.get_json(url, cache=False)
             if not isinstance(resultado, dict):
                 resultado = ast.literal_eval(resultado.decode('utf-8'))
@@ -1107,7 +1107,7 @@ class Tmdb(object):
         return True
 
     def get_list_resultados(self, num_result=20):
-        # logger.info("self %s" % str(self))
+        # logger.debug("self %s" % str(self))
         res = []
 
         if num_result <= 0:
@@ -1327,7 +1327,7 @@ class Tmdb(object):
                   "&append_to_response=credits" % (self.result["id"], numtemporada, self.busqueda_idioma)
 
             buscando = "id_Tmdb: " + str(self.result["id"]) + " season: " + str(numtemporada) + "\nURL: " + url
-            logger.info("[Tmdb.py] Searcing " + buscando)
+            logger.debug("[Tmdb.py] Searcing " + buscando)
             try:
                 self.temporada[numtemporada] = self.get_json(url)
                 if not isinstance(self.temporada[numtemporada], dict):
@@ -1516,7 +1516,7 @@ class Tmdb(object):
 
             items.extend(list(self.get_episodio(ret_infoLabels['season'], episodio).items()))
 
-        # logger.info("ret_infoLabels" % ret_infoLabels)
+        # logger.debug("ret_infoLabels" % ret_infoLabels)
 
         for k, v in items:
             if not v:

@@ -76,7 +76,7 @@ def newest(categoria):
 
 
 def search(item, text):
-    logger.info(item, "search", text)
+    logger.info("search", text)
     if item.contentType == 'tvshow': item.url = host + '/serietv/'
     else: item.url = host
     try:
@@ -189,14 +189,14 @@ def findvideos(item):
 
     def load_links(itemlist, re_txt, desc_txt, quality=""):
         streaming = scrapertools.find_single_match(data, re_txt).replace('"', '')
-        support.info('STREAMING', streaming)
-        support.info('STREAMING=', streaming)
+        logger.debug('STREAMING', streaming)
+        logger.debug('STREAMING=', streaming)
         matches = support.match(streaming, patron = r'<td><a.*?href=([^ ]+) [^>]+>([^<]+)<').matches
         for scrapedurl, scrapedtitle in matches:
             logger.debug("##### findvideos %s ## %s ## %s ##" % (desc_txt, scrapedurl, scrapedtitle))
             itemlist.append(item.clone(action="play", title=scrapedtitle, url=scrapedurl, server=scrapedtitle, quality=quality))
 
-    support.info()
+    logger.debug()
 
     itemlist = []
 
@@ -228,12 +228,12 @@ def findvideos(item):
 
 
 def findvid_serie(item):
-    support.info()
+    logger.debug()
     data = re.sub(r'((?:<p>|<strong>)?[^\d]*\d*(?:&#215;|Ã)[0-9]+[^<]+)', '', item.other)
 
     return support.server(item, data=data)
 
 
 def play(item):
-    support.info()
+    logger.debug()
     return servertools.find_video_items(item, data=item.url)

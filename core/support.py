@@ -33,7 +33,7 @@ def hdpass_get_servers(item):
 
         for mir_url, srv in scrapertools.find_multiple_matches(mir, patron_option):
             mir_url = scrapertools.decodeHtmlentities(mir_url)
-            info(mir_url)
+            logger.debug(mir_url)
             it = item.clone(action="play", quality=quality, title=srv, server=srv, url= mir_url)
             if not servertools.get_server_parameters(srv.lower()): it = hdpass_get_url(it)[0]   # do not exists or it's empty
             ret.append(it)
@@ -1022,7 +1022,7 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
     # Simply add this function to add video library support
     # Function_level is useful if the function is called by another function.
     # If the call is direct, leave it blank
-    info()
+    logger.debug()
 
     if item.contentType == 'movie':
         action = 'add_pelicula_to_library'
@@ -1073,7 +1073,7 @@ def videolibrary(itemlist, item, typography='', function_level=1, function=''):
 def nextPage(itemlist, item, data='', patron='', function_or_level=1, next_page='', resub=[]):
     # Function_level is useful if the function is called by another function.
     # If the call is direct, leave it blank
-    info()
+    logger.debug()
     action = inspect.stack()[function_or_level][3] if type(function_or_level) == int else function_or_level
     if next_page == '':
         next_page = scrapertools.find_single_match(data, patron)
@@ -1083,7 +1083,7 @@ def nextPage(itemlist, item, data='', patron='', function_or_level=1, next_page=
         if 'http' not in next_page:
             next_page = scrapertools.find_single_match(item.url, 'https?://[a-z0-9.-]+') + (next_page if next_page.startswith('/') else '/' + next_page)
         next_page = next_page.replace('&amp;', '&')
-        info('NEXT= ', next_page)
+        logger.debug('NEXT= ', next_page)
         itemlist.append(
             item.clone(channel=item.channel,
                  action = action,
@@ -1110,7 +1110,7 @@ def pagination(itemlist, item, page, perpage, function_level=1):
 
 
 def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, Download=True, patronTag=None, Videolibrary=True):
-    info()
+    logger.debug()
     blacklisted_servers = config.get_setting("black_list", server='servers')
     if not blacklisted_servers: blacklisted_servers = []
     if not data and not itemlist:
@@ -1375,7 +1375,7 @@ def thumb(item_itemlist_string=None, genre=False, live=False):
                     '_tvshow':['serie','tv', 'fiction']}
 
     def autoselect_thumb(item, genre):
-        info('SPLIT',re.split(r'\.|\{|\}|\[|\]|\(|\)|/| ',item.title.lower()))
+        logger.debug('SPLIT',re.split(r'\.|\{|\}|\[|\]|\(|\)|/| ',item.title.lower()))
         if genre == False:
             for thumb, titles in icon_dict.items():
                 if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)|/| ',item.title.lower()) for word in search):

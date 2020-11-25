@@ -32,7 +32,7 @@ class InfoWindow(xbmcgui.WindowXMLDialog):
         self.scraper = scraper
 
         self.doModal()
-        logger.info('RESPONSE',self.response)
+        logger.debug('RESPONSE',self.response)
         return self.response
 
     def make_items(self, i, result):
@@ -52,7 +52,7 @@ class InfoWindow(xbmcgui.WindowXMLDialog):
             self.setCoordinateResolution(2)
         with futures.ThreadPoolExecutor() as executor:
             for i, result in enumerate(self.results):
-                logger.info(result)
+                logger.debug(result)
                 if ('seriesName' in result and result['seriesName']) or ('name' in result and result['name']) or ('title' in result and result['title']):
                     self.items += [executor.submit(self.make_items, i, result).result()]
         self.items.sort(key=lambda it: int(it.getProperty('position')))
