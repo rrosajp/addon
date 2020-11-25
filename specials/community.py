@@ -325,8 +325,10 @@ def episodios(item, json ='', key='', itemlist =[]):
             season_number = int(match[0])
         else:
             season_number = option['season'] if 'season' in option else season if season else 1
-            episode_number = option['number'] if 'number' in option else ''
-            if not episode_number.isdigit():
+            episode_number = option['number'] if 'number' in option else option['episode'] if 'episode' else ''
+            if type(episode_number) == int:
+                pass
+            elif not episode_number.isdigit():
                 episode_number = support.match(option['title'], patron=r'(?P<episode>\d+)').match
             ep = int(episode_number) if episode_number else ep
             if not episode_number:
