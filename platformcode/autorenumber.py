@@ -4,7 +4,7 @@
 # --------------------------------------------------------------------------------
 
 
-import xbmcgui, re, base64, inspect, sys
+import xbmc, xbmcgui, re, base64, inspect, sys
 from core import jsontools, tvdb, scrapertools, filetools
 from core.item import Item
 from core.support import typo, match, dbg, Item
@@ -84,7 +84,9 @@ def find_episodes(item):
     itemlist = ch.episodios(item)
     return itemlist
 
-
+def busy(state):
+    if state: xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+    else: xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
 # Main
 def start(itemlist, item=None):
@@ -94,8 +96,11 @@ def start(itemlist, item=None):
             item.channel = item.from_channel
             item.action = item.from_action
             item.renumber = True
+        busy(True)
         itemlist = find_episodes(item)
+        busy(False)
     return autorenumber(itemlist, item)
+
 class autorenumber():
     def __init__(self, itemlist, item=None):
         self.item = item
@@ -107,7 +112,7 @@ class autorenumber():
         if self.item:
             self.auto = config.get_setting('autorenumber', item.channel)
             self.title = self.item.fulltitle.strip()
-            if match(self.itemlist[0].title, patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)[Ee]?[Pp]?(\d+)').match:
+            if match(self.itemlist[0].title, patron=r'[Ss]?(\d+)(?:x|_|\s+)[Ee]?[Pp]?(\d+)').match:
                 item.exit = True
                 return 
             elif self.item.channel in self.item.channel_prefs and TVSHOW_RENUMERATE in self.item.channel_prefs[item.channel] and self.title not in self.dictSeries:
@@ -174,7 +179,7 @@ class autorenumber():
                 season = int(self.Season)
                 addNumber = 0
             for item in self.itemlist:
-                if not match(item.title, patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)[Ee]?[Pp]?(\d+)').match:
+                if not match(item.title, patron=r'[Ss]?(\d+)(?:x|_|\s+)[Ee]?[Pp]?(\d+)').match:
                     number = match(item.title, patron=r'(\d+)').match.lstrip('0')
                     if number:
                         if number in self.Episodes:
@@ -204,7 +209,9 @@ class autorenumber():
             season = int(self.Season)
             ep = 1
 
+        busy(True)
         itemlist = find_episodes(self.item)
+        busy(False)
 
         if self.item.renumber:
             self.s = season
@@ -274,7 +281,7 @@ class autorenumber():
 
             addiction = 0
             for item in itemlist:
-                if not match(re.sub(r'\[[^\]]+\]','',item.title), patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)[Ee]?[Pp]?(\d+)').match:
+                if not match(re.sub(r'\[[^\]]+\]','',item.title), patron=r'[Ss]?(\d+)(?:x|_|\s+)[Ee]?[Pp]?(\d+)').match:
                     # Otiene Numerazione Episodi
                     scraped_ep = match(re.sub(r'\[[^\]]+\]','',item.title), patron=r'(\d+)').match
                     if scraped_ep:
@@ -423,7 +430,7 @@ class SelectreNumerationWindow(xbmcgui.WindowXMLDialog):
         # MAIN / SPECIALS
         else:
             for item in self.itemlist:
-                if not match(item.title, patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)[Ee]?[Pp]?(\d+)').match:
+                if not match(item.title, patron=r'[Ss]?(\d+)(?:x|_|\s+)[Ee]?[Pp]?(\d+)').match:
                     title = match(item.title, patron=r'(\d+)').match.lstrip('0')
                     it = xbmcgui.ListItem(title)
                     self.items.append(it)

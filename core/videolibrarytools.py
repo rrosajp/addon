@@ -601,7 +601,7 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
             local_episodelist += get_local_content(local_episodes_path)
             clean_list = []
             for f in filetools.listdir(path):
-                match = scrapertools.find_single_match(f, r'[Ss]?(\d+)(?:x|_|\.|\s+)?[Ee]?[Pp]?(\d+)')
+                match = scrapertools.find_single_match(f, r'[Ss]?(\d+)(?:x|_|\s+)?[Ee]?[Pp]?(\d+)')
                 if match:
                     ep = '%dx%02d' % (int(match[0]), int(match[1]))
                     if ep in local_episodelist:
@@ -1080,7 +1080,7 @@ def add_tvshow(item, channel=None):
         # Get the episode list
         # from core.support import dbg;dbg()
         itemlist = getattr(channel, item.action)(item)
-        if itemlist and not scrapertools.find_single_match(itemlist[0].title, r'[Ss]?(\d+)(?:x|_|\.|\s+)[Ee]?[Pp]?(\d+)'):
+        if itemlist and not scrapertools.find_single_match(itemlist[0].title, r'[Ss]?(\d+)(?:x|_|\s+)[Ee]?[Pp]?(\d+)'):
             from platformcode.autorenumber import start, check
             if not check(item):
                 action = item.action
