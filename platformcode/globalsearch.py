@@ -392,8 +392,8 @@ class SearchWindow(xbmcgui.WindowXML):
             index = xbmcgui.Dialog().contextmenu(context)
             if index > 0: xbmc.executebuiltin(context_commands[index])
 
-        elif action == SWIPEUP:
-            self.focusID(CHANNELS)
+        elif action in [SWIPEUP]:
+            self.setFocusId(CHANNELS)
 
         elif action in [LEFT, RIGHT] and focus in [CHANNELS]:
             items = []
@@ -433,7 +433,7 @@ class SearchWindow(xbmcgui.WindowXML):
             self.RESULTS.addItems(items)
             self.RESULTS.selectItem(subpos)
             self.CHANNELS.getSelectedItem().setProperty('position', str(subpos))
-            self.setFocusId(RESULTS)
+            # self.setFocusId(RESULTS)
 
         elif control_id in [BACK]:
             self.Back()
