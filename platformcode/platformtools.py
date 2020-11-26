@@ -186,7 +186,7 @@ def dialog_info(item, scraper):
             self.title = item.show if item.show else item.fulltitle
             self.id = item.infoLabels.get('tmdb_id', '') if scraper == 'tmdb' else item.infoLabels.get('tvdb_id', '')
             self.scraper = scraper
-            self.label = 'TMDB ID:' if scraper == 'tmdb' else 'TVDB ID:'
+            self.idtitle = 'TMDB ID' if scraper == 'tmdb' else 'TVDB ID'
             self.doModal()
             return self.item
 
@@ -202,7 +202,7 @@ def dialog_info(item, scraper):
 
             self.HEADER.setText(config.get_localized_string(60228) % self.title)
             self.TITLE.setLabel('[UPPERCASE]' + config.get_localized_string(60230).replace(':','') + '[/UPPERCASE]')
-            self.ID.setLabel('[UPPERCASE]' + self.idtitle + '[/UPPERCASE]')
+            self.ID.setLabel(self.idtitle)
             self.setFocusId(101)
 
         def onClick(self, control):
