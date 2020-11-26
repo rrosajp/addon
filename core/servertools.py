@@ -353,7 +353,7 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
                         video_urls.extend(response)
                     except:
                         logger.error("Error getting url in free mode")
-                        error_messages.append(config.get_localized_string(60006) % server_name)
+                        error_messages.append(config.get_localized_string(60014))
                         import traceback
                         logger.error(traceback.format_exc())
 
@@ -370,10 +370,10 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
                         elif response and response[0][0]:
                             error_messages.append(response[0][0])
                         else:
-                            error_messages.append(config.get_localized_string(60006) % server_name)
+                            error_messages.append(config.get_localized_string(60014))
                     except:
                         logger.error("Server errorr: %s" % opcion)
-                        error_messages.append(config.get_localized_string(60006) % server_name)
+                        error_messages.append(config.get_localized_string(60014))
                         import traceback
                         logger.error(traceback.format_exc())
 
@@ -394,7 +394,7 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
 
             # If we do not have urls or error messages, we put a generic one
             elif not video_urls and not error_messages:
-                error_messages.append(config.get_localized_string(60006) % get_server_parameters(server)["name"])
+                error_messages.append(config.get_localized_string(60014))
 
     return video_urls, len(video_urls) > 0, "<br/>".join(error_messages)
 

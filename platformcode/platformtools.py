@@ -183,10 +183,10 @@ def dialog_info(item, scraper):
         def Start(self, item, scraper):
             self.item = item
             self.item.exit = False
-            self.title = item.contentTitle if item.contentType == 'movie' else item.contentSerieName
-            self.id = item.infoLabels.get('tmdb_id','') if scraper == 'tmdb' else item.infoLabels.get('tvdb_id','')
+            self.title = item.show if item.show else item.fulltitle
+            self.id = item.infoLabels.get('tmdb_id', '') if scraper == 'tmdb' else item.infoLabels.get('tvdb_id', '')
             self.scraper = scraper
-            self.idtitle = 'TMDB ID' if scraper == 'tmdb' else 'TVDB ID'
+            self.label = 'TMDB ID:' if scraper == 'tmdb' else 'TVDB ID:'
             self.doModal()
             return self.item
 
@@ -637,11 +637,11 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
 
     # Open the selection dialog to see the available options
     opciones, video_urls, seleccion, salir = get_dialogo_opciones(item, default_action, strm, autoplay)
-    if salir: return
+    if salir: exit()
 
     # get default option of addon configuration
     seleccion = get_seleccion(default_action, opciones, seleccion, video_urls)
-    if seleccion < 0: return # Canceled box
+    if seleccion < 0: exit() # Canceled box
 
     logger.debug("selection=%d" % seleccion)
     logger.debug("selection=%s" % opciones[seleccion])
@@ -898,13 +898,14 @@ def get_dialogo_opciones(item, default_action, strm, autoplay):
         if not autoplay:
             if item.server != "":
                 if "<br/>" in motivo:
-                    ret = dialog_yesno(config.get_localized_string(60362), motivo.split("<br/>")[0] + '\n' + motivo.split("<br/>")[1] + '\n' + item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
+                    ret = dialog_yesno(config.get_localized_string(60362) % item.server, motivo.split("<br/>")[0] + '\n' + motivo.split("<br/>")[1], nolabel='ok', yeslabel=config.get_localized_string(70739))
                 else:
-                    ret = dialog_yesno(config.get_localized_string(60362), motivo + '\n' + item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
+                    ret = dialog_yesno(config.get_localized_string(60362) % item.server, motivo, nolabel='ok', yeslabel=config.get_localized_string(70739))
             else:
-                ret = dialog_yesno(config.get_localized_string(60362), config.get_localized_string(60363) + '\n' + config.get_localized_string(60364) + '\n' + item.url, nolabel='ok', yeslabel=config.get_localized_string(70739))
+                ret = dialog_yesno(config.get_localized_string(60362) % item.server, config.get_localized_string(60363) + '\n' + config.get_localized_string(60364), nolabel='ok', yeslabel=config.get_localized_string(70739))
             if ret:
-                xbmc.executebuiltin("Container.Update (%s?%s)" % (sys.argv[0], Item(action="open_browser", url=item.url).tourl()))
+                xbmc.executebuiltin("Container.Update (%s?%s)" %
+                                    (sys.argv[0], Item(action="open_browser", url=item.url).tourl()))
             if item.channel == "favorites":
                 # "Remove from favorites"
                 opciones.append(config.get_localized_string(30154))

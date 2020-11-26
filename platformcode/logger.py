@@ -53,5 +53,11 @@ def log(*args, **kwargs):
 
 
 class WebErrorException(Exception):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, url, channel, *args, **kwargs):
+        self.url = url
+        self.channel = channel
         Exception.__init__(self, *args, **kwargs)
+
+
+class ChannelScraperException(Exception):
+    pass
