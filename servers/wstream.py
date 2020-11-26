@@ -12,6 +12,9 @@ from core import httptools, scrapertools
 from platformcode import logger, config, platformtools
 
 # real_host = 'wstream.video'
+errorsStr = ['Sorry this file is not longer available', 'Sorry this video is unavailable', 'Video is processing'
+             'File was deleted', 'Not Found']
+
 
 def test_video_exists(page_url):
     global headers
@@ -50,10 +53,10 @@ def test_video_exists(page_url):
                 data = new_data
 
     real_url = page_url
-    if "Not Found" in data or "File was deleted" in data or 'Video is processing' in data or 'Sorry this video is unavailable' in data:
-        return False, config.get_localized_string(70449) % 'Wstream'
-    else:
-        return True, ""
+    for e in errorsStr:
+        if e in data:
+            return False, config.get_localized_string(70449) % 'Wstream'
+    return True, ""
 
 
 # Returns an array of possible video url's from the page_url
