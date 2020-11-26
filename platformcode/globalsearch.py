@@ -394,6 +394,8 @@ class SearchWindow(xbmcgui.WindowXML):
 
         elif action in [SWIPEUP]:
             self.setFocusId(CHANNELS)
+            pos = self.CHANNELS.getSelectedPosition()
+            self.CHANNELS.selectItem(pos)
 
         elif action in [LEFT, RIGHT] and focus in [CHANNELS]:
             items = []
