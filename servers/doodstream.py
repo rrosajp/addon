@@ -21,15 +21,12 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     # from core.support import dbg;dbg()
     global data
     logger.debug("URL", page_url)
-
+    # from core.support import dbg;dbg()
     video_urls = []
+    host = scrapertools.find_single_match(page_url, r'http[s]?://[^/]+')
 
     new_url = scrapertools.find_single_match(data, r'<iframe src="([^"]+)"')
-    if new_url:
-        host = scrapertools.find_single_match(new_url, r'http[s]?://[^/]+')
-        data = httptools.downloadpage(host + new_url).data
-    else:
-        host = scrapertools.find_single_match(page_url, r'http[s]?://[^/]+')
+    if new_url: data = httptools.downloadpage(host + new_url).data
 
     label = scrapertools.find_single_match(data, r'type:\s*"video/([^"]+)"')
 
