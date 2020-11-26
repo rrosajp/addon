@@ -20,7 +20,9 @@ jobs:
       run: |
         python tools/updateDomains.py
 
-    - uses: mikeal/publish-to-github-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
-        BRANCH_NAME: '' #optional defaults to master
+    - name: Commit & Push changes
+      uses: actions-js/push@master
+      with:
+        message: "Aggiornamento domini"
+        branch: "master"
+        github_token: ${{ secrets.API_TOKEN_GITHUB }}
