@@ -151,6 +151,7 @@ def newest(categoria):
 
     return itemlist
 
+
 def check(item):
     support.info()
     data = support.match(item.url, headers=headers).data
@@ -170,10 +171,11 @@ def check(item):
 
         else:
             item.contentType = 'movie'
-            item.url = data
+            item.data = data
             return findvideos(item)
+
 
 def findvideos(item):
     support.info()
-    item.url = item.url.replace('http://rapidcrypt.net/verys/', '').replace('http://rapidcrypt.net/open/', '') #blocca la ricerca
-    return support.server(item, data= item.url)
+    item.data = item.data.replace('http://rapidcrypt.net/verys/', '').replace('http://rapidcrypt.net/open/', '') #blocca la ricerca
+    return support.server(item, data=item.data)
