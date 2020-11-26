@@ -1392,7 +1392,7 @@ def thumb(item_itemlist_string=None, genre=False, live=False):
                     '_tvshow':['serie','tv', 'fiction']}
 
     def autoselect_thumb(item, genre):
-        logger.debug('SPLIT',re.split(r'\.|\{|\}|\[|\]|\(|\)|/| ',item.title.lower()))
+        # logger.debug('SPLIT',re.split(r'\.|\{|\}|\[|\]|\(|\)|/| ',item.title.lower()))
         if genre == False:
             for thumb, titles in icon_dict.items():
                 if any(word in re.split(r'\.|\{|\}|\[|\]|\(|\)|/| ',item.title.lower()) for word in search):
