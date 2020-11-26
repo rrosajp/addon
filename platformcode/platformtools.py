@@ -179,6 +179,56 @@ def dialog_register(heading, user=False, email=False, password=False, user_defau
     return dialog
 
 def dialog_info(item, scraper):
+    class TitleOrIDWindow(xbmcgui.WindowXMLDialog):
+        def Start(self, item, scraper):
+            self.item = item
+            self.item.exit = False
+            self.title = item.contentTitle if item.contentType == 'movie' else item.contentSerieName
+            self.id = item.infoLabels.get('tmdb_id','') if scraper == 'tmdb' else item.infoLabels.get('tvdb_id','')
+            self.scraper = scraper
+            self.idtitle = 'TMDB ID' if scraper == 'tmdb' else 'TVDB ID'
+            self.doModal()
+            return self.item
+
+        def onInit(self):
+            #### Kodi 18 compatibility ####
+            if config.get_platform(True)['num_version'] < 18:
+                self.setCoordinateResolution(2)
+            self.HEADER = self.getControl(100)
+            self.TITLE = self.getControl(101)
+            self.ID = self.getControl(102)
+            self.EXIT = self.getControl(103)
+            self.EXIT2 = self.getControl(104)
+
+            self.HEADER.setText(config.get_localized_string(60228) % self.title)
+            self.TITLE.setLabel('[UPPERCASE]' + config.get_localized_string(60230).replace(':','') + '[/UPPERCASE]')
+            self.ID.setLabel('[UPPERCASE]' + self.idtitle + '[/UPPERCASE]')
+            self.setFocusId(101)
+
+        def onClick(self, control):
+            if control in [101]:
+                result = dialog_input(self.title)
+                if result:
+                    if self.item.contentType == 'movie': self.item.contentTitle = result
+                    else: self.item.contentSerieName = result
+                    self.close()
+            elif control in [102]:
+                result = dialog_numeric(0, self.idtitle, self.id)
+                if result:
+                    if self.scraper == 'tmdb': self.item.infoLabels['tmdb_id'] = result
+                    elif self.scraper == 'tvdb': self.item.infoLabels['tvdb_id'] = result
+                    self.close()
+
+            elif control in [103, 104]:
+                self.item.exit = True
+                self.close()
+
+        def onAction(self, action):
+            action = action.getId()
+            if action in [92, 10]:
+                self.item.exit = True
+                self.close()
+
     dialog = TitleOrIDWindow('TitleOrIDWindow.xml', config.get_runtime_path()).Start(item, scraper)
     return dialog
 
@@ -1346,118 +1396,3 @@ def get_platform():
         ret["arch"] = "arm"
 
     return ret
-
-
-class Register(xbmcgui.WindowXMLDialog):
-    def Start(self, heading, user, email, password, user_default, email_default, password_default, captcha_img):
-        self.result = {}
-        self.heading = heading
-        self.user = user
-        self.email = email
-        self.password = password
-        self.user_default = user_default
-        self.email_default = email_default
-        self.password_default = password_default
-        self.captcha_img = captcha_img
-        self.doModal()
-
-        return self.result
-
-    def __init__(self, *args, **kwargs):
-        self.mensaje = kwargs.get("mensaje")
-        self.imagen = kwargs.get("imagen")
-
-    def onInit(self):
-        #### Kodi 18 compatibility ####
-        if config.get_platform(True)['num_version'] < 18:
-            self.setCoordinateResolution(2)
-        height = 90
-        self.getControl(10002).setText(self.heading)
-        if self.user:
-            self.getControl(10003).setText(self.user_default)
-            height+=70
-        else:
-            self.getControl(10003).setVisible(False)
-        if self.email:
-            self.getControl(10004).setText(self.email_default)
-            height+=70
-        else:
-            self.getControl(10004).setVisible(False)
-        if self.password:
-            self.getControl(10005).setText(self.password_default)
-            height+=70
-        else:
-            self.getControl(10005).setVisible(False)
-        if self.captcha_img:
-
-            self.getControl(10007).setImage(self.captcha_img)
-            height+=240
-        else:
-            self.getControl(10005).setVisible(False)
-        height +=40
-        if height < 250: height = 250
-        self.getControl(10000).setHeight(height)
-        self.getControl(10001).setHeight(height)
-        self.getControl(10000).setPosition(255, (720-height)/2)
-        self.setFocusId(30000)
-
-    def onClick(self, control):
-        if control in [10010]:
-            self.close()
-
-        elif control in [10009]:
-            if self.user: self.result['user'] = self.getControl(10003).getText()
-            if self.email: self.result['email'] = self.getControl(10004).getText()
-            if self.password: self.result['password'] = self.getControl(10005).getText()
-            if self.captcha_img: self.result['captcha'] = self.getControl(10006).getText()
-            self.close()
-
-class TitleOrIDWindow(xbmcgui.WindowXMLDialog):
-    def Start(self, item, scraper):
-        self.item = item
-        self.item.exit = False
-        self.title = item.contentTitle if item.contentType == 'movie' else item.contentSerieName
-        self.id = item.infoLabels.get('tmdb_id','') if scraper == 'tmdb' else item.infoLabels.get('tvdb_id','')
-        self.scraper = scraper
-        self.idtitle = 'TMDB ID' if scraper == 'tmdb' else 'TVDB ID'
-        self.doModal()
-        return self.item
-
-    def onInit(self):
-        #### Kodi 18 compatibility ####
-        if config.get_platform(True)['num_version'] < 18:
-            self.setCoordinateResolution(2)
-        self.HEADER = self.getControl(100)
-        self.TITLE = self.getControl(101)
-        self.ID = self.getControl(102)
-        self.EXIT = self.getControl(103)
-        self.EXIT2 = self.getControl(104)
-
-        self.HEADER.setText(config.get_localized_string(60228) % self.title)
-        self.TITLE.setLabel('[UPPERCASE]' + config.get_localized_string(60230).replace(':','') + '[/UPPERCASE]')
-        self.ID.setLabel('[UPPERCASE]' + self.idtitle + '[/UPPERCASE]')
-        self.setFocusId(101)
-
-    def onClick(self, control):
-        if control in [101]:
-            result = dialog_input(self.title)
-            if result:
-                if self.item.contentType == 'movie': self.item.contentTitle = result
-                else: self.item.contentSerieName = result
-                self.close()
-        elif control in [102]:
-            result = dialog_numeric(0, self.idtitle, self.id)
-            if result:
-                if self.scraper == 'tmdb': self.item.infoLabels['tmdb_id'] = result
-                elif self.scraper == 'tvdb': self.item.infoLabels['tvdb_id'] = result
-                self.close()
-
-        elif control in [103, 104]:
-            self.item.exit = True
-            self.close()
-
-    def onAction(self, action):
-        action = action.getId()
-        if action in [92, 10]:
-            self.item.exit = True
-            self.close()

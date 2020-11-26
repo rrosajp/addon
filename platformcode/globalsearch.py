@@ -35,6 +35,8 @@ UP = 3
 DOWN = 4
 EXIT = 10
 BACKSPACE = 92
+SWIPEUP = 531
+CONTEXT = 117
 
 # Container
 SEARCH = 1
@@ -369,7 +371,7 @@ class SearchWindow(xbmcgui.WindowXML):
     def onAction(self, action):
         action = action.getId()
         focus = self.getFocusId()
-        if action in [117] and focus in [RESULTS]:
+        if action in [CONTEXT] and focus in [RESULTS]:
             pos = self.RESULTS.getSelectedPosition()
             name = self.CHANNELS.getSelectedItem().getLabel()
             item = self.results[name][0][pos]
@@ -389,6 +391,9 @@ class SearchWindow(xbmcgui.WindowXML):
                                      "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&download=season&from_channel=' + item.channel +'&from_action=' + item.action)]
             index = xbmcgui.Dialog().contextmenu(context)
             if index > 0: xbmc.executebuiltin(context_commands[index])
+
+        elif action == SWIPEUP:
+            self.focusID(CHANNELS)
 
         elif action in [LEFT, RIGHT] and focus in [CHANNELS]:
             items = []
