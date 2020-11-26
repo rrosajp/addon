@@ -16,9 +16,9 @@ jobs:
       with:
         python-version: 2.7
 
-    - name: Run tests
+    - name: Update domains
       run: |
-        python tests/test_generic.py
+        python tools/updateDomains.py
 
     - uses: mikeal/publish-to-github-action@master
       env:
