@@ -105,7 +105,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     captcha = platformtools.show_recaptcha(sitekey, page_url.replace('116.202.226.34', headers[1][1]).replace('nored.icu', headers[1][1])) if sitekey else ''
 
     possibleParam = scrapertools.find_multiple_matches(data,r"""<input.*?(?:name=["']([^'"]+).*?value=["']([^'"]*)['"]>|>)""")
-    if possibleParam[0][0]:
+    if possibleParam and possibleParam[0][0]:
         post = {param[0]: param[1] for param in possibleParam if param[0]}
         if captcha: post['g-recaptcha-response'] = captcha
         if post:
