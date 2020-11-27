@@ -249,7 +249,7 @@ class SearchWindow(xbmcgui.WindowXML):
             results.extend(module.search(search_action, item.text))
             if len(results) == 1:
                 if not results[0].action or config.get_localized_string(70006).lower() in results[0].title.lower():
-                    results.clear()
+                    results = []
 
             if self.item.mode != 'all':
                 for elem in results:
@@ -271,7 +271,8 @@ class SearchWindow(xbmcgui.WindowXML):
 
     def makeItem(self, item):
         logger.debug()
-        thumb = item.thumbnail if item.thumbnail else 'Infoplus/' + item.contentType.replace('show','')
+        thumb = item.thumbnail if item.thumbnail else 'Infoplus/' + item.contentType.replace('show','') + 'png'
+        logger.info('THUMB', thumb)
         it = xbmcgui.ListItem(item.title)
         it.setProperty('thumb', thumb)
         it.setProperty('fanart', item.fanart)

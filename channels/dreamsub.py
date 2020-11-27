@@ -92,6 +92,11 @@ def peliculas(item):
         patron = r'<div class="showStreaming"> +<b>(?P<title>[^<]+)[^>]+>[^>]+>\s*<span>Lingua:\s*(?P<lang>[^>]+)?>[<>br\s]+a href="(?P<url>[^"]+)"[^>]+>.*?--image-url:url\(/*(?P<thumb>[^\)]+).*?Anno di inizio</b>:\s*(?P<year>[0-9]{4})'
         patronNext = '<li class="currentPage">[^>]+><li[^<]+<a href="([^"]+)">'
 
+    def itemHook(item):
+        if item.thumbnail and not item.thumbinail.startswith('http'):
+            item.thumbnail = 'http://' + item.thumbnail
+        return item
+
     return locals()
 
 
