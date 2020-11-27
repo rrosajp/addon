@@ -197,7 +197,7 @@
                     </control>
                     <control type="image">
                         <top>10</top>
-                        <right>10</right>
+                        <left>290</left>
                         <height>40</height>
                         <width>40</width>
                         <texture colordiffuse="FFFFFFFF">add.png</texture>
