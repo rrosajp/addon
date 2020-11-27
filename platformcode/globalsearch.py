@@ -213,6 +213,7 @@ class SearchWindow(xbmcgui.WindowXML):
             import traceback
             logger.error('error importing/getting search items of ' + channel)
             logger.error(traceback.format_exc())
+            return None, None
 
     def search(self):
         count = 0
@@ -222,8 +223,9 @@ class SearchWindow(xbmcgui.WindowXML):
             for channel in self.channelsList:
                 if self.exit: break
                 module, action = executor.submit(self.getModule, channel).result()
-                self.moduleDict[channel] = module
-                self.searchActions += action
+                if module and action:
+                    self.moduleDict[channel] = module
+                    self.searchActions += action
                 count += 1
                 percent = (float(count) / len(self.channelsList)) * 100
                 self.PROGRESS.setPercent(percent)
