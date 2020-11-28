@@ -1127,8 +1127,6 @@ def pagination(itemlist, item, page, perpage, function_level=1):
 
 def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=True, Download=True, patronTag=None, Videolibrary=True):
     logger.debug()
-    blacklisted_servers = config.get_setting("black_list", server='servers')
-    if not blacklisted_servers: blacklisted_servers = []
     if not data and not itemlist:
         data = httptools.downloadpage(item.url, headers=headers, ignore_response_code=True).data
     if data:
@@ -1174,7 +1172,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
     with futures.ThreadPoolExecutor() as executor:
         thL = [executor.submit(getItem, videoitem) for videoitem in itemlist if videoitem.url]
         for it in futures.as_completed(thL):
-            if it.result() and it.result().server.lower() not in blacklisted_servers:
+            if it.result() and not config.get_setting("black_list", server=it.result().server.lower()):
                 verifiedItemlist.append(it.result())
     try:
         verifiedItemlist.sort(key=lambda it: int(re.sub(r'\D','',it.quality)))

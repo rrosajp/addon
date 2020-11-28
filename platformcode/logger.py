@@ -3,7 +3,7 @@
 # Logger (kodi)
 # --------------------------------------------------------------------------------
 from __future__ import unicode_literals
-import inspect, os, xbmc, sys
+import inspect,os, xbmc, sys
 from platformcode import config
 
 # for test suite

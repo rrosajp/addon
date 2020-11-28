@@ -269,11 +269,9 @@ def cb_servers_blacklist(dict_values):
     n = len(dict_values)
     i = 1
     for k, v in list(dict_values.items()):
-        config.set_setting("black_list", v, server=k)
         if v:  # If the server is blacklisted it cannot be in the favorites list
             config.set_setting("favorites_servers_list", 0, server=k)
             blaklisted.append(k)
-            f = True
             progreso.update(old_div((i * 100), n), config.get_localized_string(60559) % k)
         i += 1
     config.set_setting("black_list", blaklisted, server='servers')
