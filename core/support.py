@@ -364,7 +364,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 fulltitle=item.fulltitle if function == 'episodios' else title,
                 show=item.show if function == 'episodios' else title,
                 quality=quality,
-                url=scraped["url"],
+                url=scraped["url"] if scraped["url"] else item.url,
                 infoLabels=infolabels,
                 thumbnail=item.prevthumb if item.prevthumb else item.thumbnail if not scraped["thumb"] else scraped["thumb"],
                 args=item.args,
