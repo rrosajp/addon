@@ -99,7 +99,7 @@
                         <width>100%</width>
                         <height>570</height>
                         <ondown>101</ondown>
-                        <onup>502</onup>
+                        <onup>503</onup>
                         <orientation>horizontal</orientation>
                         <scrolltime tween="cubic" easing="out">300</scrolltime>
                         <itemlayout height="570" width="180">
@@ -302,8 +302,8 @@
                     <left>520</left>
                     <width>700</width>
                     <height>570</height>
-                    <onleft>502</onleft>
-                    <onright>502</onright>
+                    <onleft>503</onleft>
+                    <onright>503</onright>
                     <scrolltime tween="cubic" easing="out">300</scrolltime>
                     <itemlayout height="60" width="700">
                         <control type="textbox">
@@ -376,8 +376,8 @@
                     <left>520</left>
                     <width>700</width>
                     <height>570</height>
-                    <onleft>502</onleft>
-                    <onright>502</onright>
+                    <onleft>503</onleft>
+                    <onright>503</onright>
                     <scrolltime tween="cubic" easing="out">300</scrolltime>
                     <itemlayout height="140" width="700">
                         <control type="image">
