@@ -26,7 +26,7 @@ def set_workers():
 def Search(item):
     xbmc.executebuiltin('Dialog.Close(all,true)')
     SearchWindow('GlobalSearch.xml', config.get_runtime_path()).start(item)
-    xbmc.sleep(600)
+    xbmc.sleep(700)
 
 # Actions
 LEFT = 1
@@ -52,8 +52,9 @@ RESULTS = 102
 
 PROGRESS = 500
 COUNT = 501
-CLOSE = 502
+MENU = 502
 BACK = 503
+CLOSE = 504
 
 # Servers
 EPISODESLIST = 200
@@ -375,25 +376,7 @@ class SearchWindow(xbmcgui.WindowXML):
         action = action.getId()
         focus = self.getFocusId()
         if action in [CONTEXT] and focus in [RESULTS]:
-            pos = self.RESULTS.getSelectedPosition()
-            name = self.CHANNELS.getSelectedItem().getLabel()
-            item = self.results[name][0][pos]
-            context = [config.get_localized_string(70739), config.get_localized_string(70557), config.get_localized_string(60359)]
-            context_commands = ["RunPlugin(%s?%s)" % (sys.argv[0], 'action=open_browser&url=' + item.url),
-                                "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=kodfavorites&action=addFavourite&from_channel=' + item.channel + '&from_action=' + item.action),
-                                "RunPlugin(%s?%s)" % (sys.argv[0], 'channel=trailertools&action=buscartrailer&contextual=True&search_title=' + item.contentTitle if item.contentTitle else item.fulltitle)]
-            if item.contentType == 'movie':
-                context += [config.get_localized_string(60353), config.get_localized_string(60354)]
-                context_commands += ["RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'action=add_pelicula_to_library&from_action=' + item.action),
-                                     "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' +item.action)]
-
-            else:
-                context += [config.get_localized_string(60352), config.get_localized_string(60355), config.get_localized_string(60357)]
-                context_commands += ["RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'action=add_serie_to_library&from_action=' + item.action),
-                                     "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' + item.action),
-                                     "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&download=season&from_channel=' + item.channel +'&from_action=' + item.action)]
-            index = xbmcgui.Dialog().contextmenu(context)
-            if index > 0: xbmc.executebuiltin(context_commands[index])
+            self.context()
 
         elif action in [SWIPEUP]:
             self.setFocusId(CHANNELS)
@@ -410,9 +393,9 @@ class SearchWindow(xbmcgui.WindowXML):
             self.RESULTS.addItems(items)
             self.RESULTS.selectItem(subpos)
 
-        elif action in [DOWN] and focus in [BACK, CLOSE]:
-            if self.EPISODES.isVisible(): self.setFocusId(EPISODES)
-            if self.SERVERS.isVisible(): self.setFocusId(SERVERS)
+        elif action in [DOWN] and focus in [BACK, CLOSE, MENU]:
+            if self.SERVERS.isVisible(): self.setFocusId(SERVERLIST)
+            if self.EPISODES.isVisible(): self.setFocusId(EPISODESLIST)
             else: self.setFocusId(RESULTS)
 
         elif focus in [RESULTS] and self.item.mode == 'all':
@@ -446,6 +429,9 @@ class SearchWindow(xbmcgui.WindowXML):
         elif control_id in [CLOSE]:
             self.Close()
 
+        elif control_id in [MENU]:
+            self.context()
+
         elif search:
             pos = self.RESULTS.getSelectedPosition()
             if search == 'next':
@@ -475,8 +461,14 @@ class SearchWindow(xbmcgui.WindowXML):
                 self.pos = self.EPISODESLIST.getSelectedPosition()
                 item = self.episodes[self.pos]
             # dbg()
-            self.channel = __import__('channels.%s' % item.channel, fromlist=["channels.%s" % item.channel])
-            self.itemsResult = getattr(self.channel, item.action)(item)
+            try:
+                self.channel = __import__('channels.%s' % item.channel, fromlist=["channels.%s" % item.channel])
+                self.itemsResult = getattr(self.channel, item.action)(item)
+            except:
+                import traceback
+                logger.error('error importing/getting search items of ' + item.channel)
+                logger.error(traceback.format_exc())
+                self.itemsResult = []
 
             if self.itemsResult and self.itemsResult[0].action in ['play']:
 
@@ -554,6 +546,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 self.setFocusId(RESULTS)
                 self.RESULTS.selectItem(self.pos)
         elif self.EPISODES.isVisible():
+            self.episodes = []
             self.Focus(SEARCH)
             self.setFocusId(RESULTS)
             self.RESULTS.selectItem(self.pos)
@@ -570,3 +563,24 @@ class SearchWindow(xbmcgui.WindowXML):
             while self.thread.is_alive(): xbmc.sleep(200)
             busy(False)
         self.close()
+
+    def context(self):
+        pos = self.RESULTS.getSelectedPosition()
+        name = self.CHANNELS.getSelectedItem().getLabel()
+        item = self.results[name][0][pos]
+        context = [config.get_localized_string(70739), config.get_localized_string(70557), config.get_localized_string(60359)]
+        context_commands = ["RunPlugin(%s?%s)" % (sys.argv[0], 'action=open_browser&url=' + item.url),
+                            "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=kodfavorites&action=addFavourite&from_channel=' + item.channel + '&from_action=' + item.action),
+                            "RunPlugin(%s?%s)" % (sys.argv[0], 'channel=trailertools&action=buscartrailer&contextual=True&search_title=' + item.contentTitle if item.contentTitle else item.fulltitle)]
+        if item.contentType == 'movie':
+            context += [config.get_localized_string(60353), config.get_localized_string(60354)]
+            context_commands += ["RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'action=add_pelicula_to_library&from_action=' + item.action),
+                                    "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' +item.action)]
+
+        else:
+            context += [config.get_localized_string(60352), config.get_localized_string(60355), config.get_localized_string(60357)]
+            context_commands += ["RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'action=add_serie_to_library&from_action=' + item.action),
+                                    "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' + item.action),
+                                    "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&download=season&from_channel=' + item.channel +'&from_action=' + item.action)]
+        index = xbmcgui.Dialog().contextmenu(context)
+        if index > 0: xbmc.executebuiltin(context_commands[index])
