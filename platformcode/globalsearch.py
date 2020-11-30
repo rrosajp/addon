@@ -375,7 +375,7 @@ class SearchWindow(xbmcgui.WindowXML):
     def onAction(self, action):
         action = action.getId()
         focus = self.getFocusId()
-        if action in [CONTEXT] and focus in [RESULTS]:
+        if action in [CONTEXT] and focus in [RESULTS, EPISODESLIST, SERVERLIST]:
             self.context()
 
         elif action in [SWIPEUP]:
@@ -575,12 +575,19 @@ class SearchWindow(xbmcgui.WindowXML):
         if item.contentType == 'movie':
             context += [config.get_localized_string(60353), config.get_localized_string(60354)]
             context_commands += ["RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'action=add_pelicula_to_library&from_action=' + item.action),
-                                    "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' +item.action)]
+                                 "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' +item.action)]
 
         else:
             context += [config.get_localized_string(60352), config.get_localized_string(60355), config.get_localized_string(60357)]
             context_commands += ["RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'action=add_serie_to_library&from_action=' + item.action),
-                                    "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' + item.action),
-                                    "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&download=season&from_channel=' + item.channel +'&from_action=' + item.action)]
+                                 "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' + item.action),
+                                 "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&download=season&from_channel=' + item.channel +'&from_action=' + item.action)]
+
+            if self.EPISODES.isVisible() or self.SERVERS.isVisible():
+                pos = self.EPISODESLIST.getSelectedPosition()
+                item = self.episodes[pos]
+                context += [config.get_localized_string(60356)]
+                context_commands += ["RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' +item.action)]
+
         index = xbmcgui.Dialog().contextmenu(context)
         if index > 0: xbmc.executebuiltin(context_commands[index])
