@@ -395,7 +395,7 @@ class SearchWindow(xbmcgui.WindowXML):
 
         elif action in [DOWN] and focus in [BACK, CLOSE, MENU]:
             if self.SERVERS.isVisible(): self.setFocusId(SERVERLIST)
-            if self.EPISODES.isVisible(): self.setFocusId(EPISODESLIST)
+            elif self.EPISODES.isVisible(): self.setFocusId(EPISODESLIST)
             else: self.setFocusId(RESULTS)
 
         elif focus in [RESULTS] and self.item.mode == 'all':
