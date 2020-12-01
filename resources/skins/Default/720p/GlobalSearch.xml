@@ -612,7 +612,7 @@
 
         <control type="textbox" id="505">
             <description>Load Channels</description>
-            <top>680</top>
+            <top>670</top>
             <right>20</right>
             <width>200</width>
             <height>40</height>
@@ -620,6 +620,7 @@
             <shadowcolor>00000000</shadowcolor>
             <align>right</align>
             <aligny>center</aligny>
+            <visible>Control.IsVisible(3)</visible>
         </control>
 
     </controls>
