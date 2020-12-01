@@ -104,6 +104,7 @@ class SearchWindow(xbmcgui.WindowXML):
             results = tmdb_info.results
 
         for result in results:
+            logger.info(result)
             result = tmdb_info.get_infoLabels(result, origen=result)
             movie = result.get('title','')
             tvshow = result.get('name','')
@@ -116,6 +117,11 @@ class SearchWindow(xbmcgui.WindowXML):
             it.setProperty('fanart', result.get('fanart',''))
             it.setProperty('plot', result.get('overview', ''))
             it.setProperty('search','search')
+            year = result.get('release_date','')
+            if year: it.setProperty('year','[' + year.split('/')[-1] + ']')
+            else:
+                year = result.get('first_air_date','')
+                if year: it.setProperty('year','[' + year.split('-')[0] + ']')
             items.append(it)
 
         if items:
@@ -276,6 +282,7 @@ class SearchWindow(xbmcgui.WindowXML):
         thumb = item.thumbnail if item.thumbnail else 'Infoplus/' + item.contentType.replace('show','') + 'png'
         logger.info('THUMB', thumb)
         it = xbmcgui.ListItem(item.title)
+        it.setProperty('year', '[' + str(item.year if item.year else item.infoLabels.get('year','')) + ']')
         it.setProperty('thumb', thumb)
         it.setProperty('fanart', item.fanart)
         it.setProperty('plot', item.plot)
