@@ -44,7 +44,7 @@
 
             <control type="group"> <!-- SEARCH GROUP-->
                 <description>Search Group</description>
-                <visible allowhiddenfocus="true">Control.IsVisible(1)</visible>
+                <visible>Control.IsVisible(1)</visible>
 
                 <control type="textbox" id='100'>
                     <description>Title</description>
@@ -55,14 +55,14 @@
                     <!-- <font>font30_title</font> -->
                     <textcolor>FFFFFFFF</textcolor>
                     <shadowcolor>00000000</shadowcolor>
-                    <visible allowhiddenfocus="true">Integer.IsGreater(Container(101).NumItems, 0)</visible>
+                    <visible>Integer.IsGreater(Container(101).NumItems, 0)</visible>
                     <align>left</align>
                     <aligny>center</aligny>
                 </control>
 
                 <control type="group"> <!-- Search Result Group -->
                     <description>Search Result Group</description>
-                    <visible allowhiddenfocus="true">Integer.IsGreater(Container(102).NumItems, 0)</visible>
+                    <visible>Integer.IsGreater(Container(102).NumItems, 0)</visible>
                     <animation effect="fade" time="200">Visible</animation>
 
                     <control type="textbox">
@@ -271,7 +271,7 @@
 
             <control type="group"> <!-- EPISODES GROUP-->
                 <description>Episodes Group</description>
-                <visible allowhiddenfocus="true">Control.IsVisible(2)</visible>
+                <visible>Control.IsVisible(2)</visible>
 
                 <control type="image">
                     <description>Poster</description>
@@ -345,7 +345,7 @@
 
             <control type="group"> <!-- SERVERS GROUP-->
                 <description>Servers Group</description>
-                <visible allowhiddenfocus="true">Control.IsVisible(3)</visible>
+                <visible>Control.IsVisible(3)</visible>
 
                 <control type="image">
                     <description>Poster</description>
@@ -493,7 +493,7 @@
             <align>right</align>
             <aligny>center</aligny>
             <animation effect="slide" tween="linear" center="auto" end="-40,-311" time="200" condition="Integer.IsGreater(Container(101).NumItems, 0)">Conditional</animation>
-            <visible allowhiddenfocus="true">Control.IsVisible(500)</visible>
+            <visible>Control.IsVisible(500)</visible>
         </control>
 
         <control type="textbox">
@@ -508,7 +508,7 @@
             <align>center</align>
             <aligny>center</aligny>
             <label>[UPPERCASE]$ADDON[plugin.video.kod 60473][/UPPERCASE]</label>
-            <visible allowhiddenfocus="true">Control.IsVisible(4)</visible>
+            <visible>Control.IsVisible(4)</visible>
         </control>
 
         <control type="textbox">
@@ -523,7 +523,7 @@
             <align>center</align>
             <aligny>center</aligny>
             <label>[UPPERCASE]$ADDON[plugin.video.kod 60519][/UPPERCASE]</label>
-            <visible allowhiddenfocus="true">Control.IsVisible(5)</visible>
+            <visible>Control.IsVisible(5)</visible>
         </control>
 
         <control type="button" id="502">
@@ -561,6 +561,18 @@
             <onright>502</onright>
             <texturefocus colordiffuse="FFFFFFFF">close.png</texturefocus>
             <texturenofocus colordiffuse="80FFFFFF">close.png</texturenofocus>
+        </control>
+
+        <control type="textbox" id="505">
+            <description>Load Channels</description>
+            <top>680</top>
+            <right>20</right>
+            <width>200</width>
+            <height>40</height>
+            <textcolor>FFFFFFFF</textcolor>
+            <shadowcolor>00000000</shadowcolor>
+            <align>right</align>
+            <aligny>center</aligny>
         </control>
 
     </controls>

@@ -26,7 +26,7 @@ def set_workers():
 def Search(item):
     xbmc.executebuiltin('Dialog.Close(all,true)')
     SearchWindow('GlobalSearch.xml', config.get_runtime_path()).start(item)
-    xbmc.sleep(700)
+    xbmc.sleep(600)
 
 # Actions
 LEFT = 1
@@ -55,6 +55,7 @@ COUNT = 501
 MENU = 502
 BACK = 503
 CLOSE = 504
+QUALITYTAG = 505
 
 # Servers
 EPISODESLIST = 200
@@ -378,12 +379,12 @@ class SearchWindow(xbmcgui.WindowXML):
         if action in [CONTEXT] and focus in [RESULTS, EPISODESLIST, SERVERLIST]:
             self.context()
 
-        elif action in [SWIPEUP]:
+        elif action in [SWIPEUP] and self.CHANNELS.isVisible() :
             self.setFocusId(CHANNELS)
             pos = self.CHANNELS.getSelectedPosition()
             self.CHANNELS.selectItem(pos)
 
-        elif action in [LEFT, RIGHT] and focus in [CHANNELS]:
+        elif action in [LEFT, RIGHT] and focus in [CHANNELS] and self.CHANNELS.isVisible():
             items = []
             name = self.CHANNELS.getSelectedItem().getLabel()
             subpos = int(self.CHANNELS.getSelectedItem().getProperty('position'))
@@ -460,7 +461,6 @@ class SearchWindow(xbmcgui.WindowXML):
             else:
                 self.pos = self.EPISODESLIST.getSelectedPosition()
                 item = self.episodes[self.pos]
-            # dbg()
             try:
                 self.channel = __import__('channels.%s' % item.channel, fromlist=["channels.%s" % item.channel])
                 self.itemsResult = getattr(self.channel, item.action)(item)
@@ -470,7 +470,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 logger.error(traceback.format_exc())
                 self.itemsResult = []
 
-            if self.itemsResult and self.itemsResult[0].action in ['play']:
+            if self.itemsResult and self.itemsResult[0].action in ['play', '']:
 
                 if config.get_setting('checklinks') and not config.get_setting('autoplay'):
                     self.itemsResult = servertools.check_list_links(self.itemsResult, config.get_setting('checklinks_number'))
@@ -500,6 +500,9 @@ class SearchWindow(xbmcgui.WindowXML):
                         else:
                             it.setProperty('quality', '')
                             unknown.append(it)
+                    elif not item.action:
+                        self.getControl(QUALITYTAG).setText(item.fulltitle)
+
 
                 uhd.sort(key=lambda it: it.getProperty('index'))
                 fhd.sort(key=lambda it: it.getProperty('index'))

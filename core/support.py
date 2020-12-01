@@ -1295,6 +1295,7 @@ def addQualityTag(item, itemlist, data, patron):
             itemlist.insert(0,Item(channel=item.channel,
                                    action="",
                                    title=typo(qualityStr, '[] color kod bold'),
+                                   fulltitle=qualityStr,
                                    plot=descr,
                                    folder=False,
                                    thumbnail=thumb('info')))
