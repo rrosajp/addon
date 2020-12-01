@@ -389,18 +389,35 @@
                             <texture>$INFO[ListItem.Property(thumb)]</texture>
                             <aspectratio>scale</aspectratio>
                         </control>
-                        <control type="image">
-                            <description>Servers Quality</description>
-                            <top>35</top>
-                            <left>150</left>
-                            <width>60</width>
-                            <height>60</height>
-                            <texture>$INFO[ListItem.Property(quality)]</texture>
-                            <aspectratio>scale</aspectratio>
+                        <control type="group">
+                            <visible>ListItem.Property(quality)</visible>
+                            <control type="image">
+                                <description>Servers Quality</description>
+                                <top>35</top>
+                                <left>150</left>
+                                <width>60</width>
+                                <height>60</height>
+                                <texture>$INFO[ListItem.Property(quality)]</texture>
+                                <aspectratio>scale</aspectratio>
+                            </control>
+                            <control type="textbox">
+                                <description>Server Title</description>
+                                <left>220</left>
+                                <top>35</top>
+                                <width>450</width>
+                                <height>60</height>
+                                <!-- <font>font30_title</font> -->
+                                <textcolor>FFFFFFFF</textcolor>
+                                <shadowcolor>00000000</shadowcolor>
+                                <align>left</align>
+                                <aligny>center</aligny>
+                                <label>[B][COLOR FFAAAAAA]$INFO[ListItem.Property(servername)][/COLOR][/B]</label>
+                            </control>
                         </control>
                         <control type="textbox">
-                            <description>Server Name</description>
-                            <left>220</left>
+                            <visible>!ListItem.Property(quality)</visible>
+                            <description>Server Title</description>
+                            <left>150</left>
                             <top>35</top>
                             <width>450</width>
                             <height>60</height>
@@ -439,18 +456,35 @@
                             <texture>$INFO[ListItem.Property(thumb)]</texture>
                             <aspectratio>scale</aspectratio>
                         </control>
-                        <control type="image">
-                            <description>Servers Title</description>
-                            <top>35</top>
-                            <left>150</left>
-                            <width>60</width>
-                            <height>60</height>
-                            <texture>$INFO[ListItem.Property(quality)]</texture>
-                            <aspectratio>scale</aspectratio>
+                        <control type="group">
+                            <visible>ListItem.Property(quality)</visible>
+                            <control type="image">
+                                <description>Servers Quality</description>
+                                <top>35</top>
+                                <left>150</left>
+                                <width>60</width>
+                                <height>60</height>
+                                <texture>$INFO[ListItem.Property(quality)]</texture>
+                                <aspectratio>scale</aspectratio>
+                            </control>
+                            <control type="textbox">
+                                <description>Server Title</description>
+                                <left>220</left>
+                                <top>35</top>
+                                <width>450</width>
+                                <height>60</height>
+                                <!-- <font>font30_title</font> -->
+                                <textcolor>FFFFFFFF</textcolor>
+                                <shadowcolor>00000000</shadowcolor>
+                                <align>left</align>
+                                <aligny>center</aligny>
+                                <label>[B][COLOR FFAAAAAA]$INFO[ListItem.Property(servername)][/COLOR][/B]</label>
+                            </control>
                         </control>
                         <control type="textbox">
+                            <visible>!ListItem.Property(quality)</visible>
                             <description>Server Title</description>
-                            <left>220</left>
+                            <left>150</left>
                             <top>35</top>
                             <width>450</width>
                             <height>60</height>
