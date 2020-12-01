@@ -478,6 +478,7 @@ def get_server_parameters(server):
 
     if server not in dict_servers_parameters:
         try:
+            path = ''
             # Servers
             if filetools.isfile(filetools.join(config.get_runtime_path(), "servers", server + ".json")):
                 path = filetools.join(config.get_runtime_path(), "servers", server + ".json")
