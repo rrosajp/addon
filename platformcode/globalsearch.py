@@ -547,6 +547,7 @@ class SearchWindow(xbmcgui.WindowXML):
             run(server)
 
     def Back(self):
+        self.getControl(QUALITYTAG).setText('')
         if self.SERVERS.isVisible():
             if self.episodes:
                 self.Focus(EPISODES)
