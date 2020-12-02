@@ -582,9 +582,10 @@ class SearchWindow(xbmcgui.WindowXML):
         pos = self.RESULTS.getSelectedPosition()
         name = self.CHANNELS.getSelectedItem().getLabel()
         item = self.results[name][0][pos]
-        context = [config.get_localized_string(70739), config.get_localized_string(70557), config.get_localized_string(60359)]
+        context = [config.get_localized_string(70739), config.get_localized_string(70557), config.get_localized_string(30155), config.get_localized_string(60359)]
         context_commands = ["RunPlugin(%s?%s)" % (sys.argv[0], 'action=open_browser&url=' + item.url),
                             "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=kodfavorites&action=addFavourite&from_channel=' + item.channel + '&from_action=' + item.action),
+                            "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=favorites&action=addFavourite&from_channel=' + item.channel + '&from_action=' + item.action),
                             "RunPlugin(%s?%s)" % (sys.argv[0], 'channel=trailertools&action=buscartrailer&contextual=True&search_title=' + item.contentTitle if item.contentTitle else item.fulltitle)]
         if item.contentType == 'movie':
             context += [config.get_localized_string(60353), config.get_localized_string(60354)]

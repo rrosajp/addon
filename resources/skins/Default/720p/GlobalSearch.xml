@@ -123,7 +123,19 @@
                                 <left>0</left>
                                 <width>180</width>
                                 <height>270</height>
+                                <texture colordiffuse="AAFFFFFF">$INFO[ListItem.Property(thumb)]</texture>
+                                <visible>!Control.HasFocus(102)</visible>
+                                <bordersize>10</bordersize>
+                                <aspectratio>scale</aspectratio>
+                            </control>
+                            <control type="image">
+                                <description>Item Poster</description>
+                                <top>300</top>
+                                <left>0</left>
+                                <width>180</width>
+                                <height>270</height>
                                 <texture>$INFO[ListItem.Property(thumb)]</texture>
+                                <visible>Control.HasFocus(102)</visible>
                                 <bordersize>10</bordersize>
                                 <aspectratio>scale</aspectratio>
                             </control>
@@ -144,9 +156,9 @@
                                 <left>0</left>
                                 <width>380</width>
                                 <height>570</height>
-                                <texture colordiffuse="FF0082C2">white.png</texture>
-                                <visible>Control.HasFocus(102)</visible>
-                                <bordersize>6</bordersize>
+                                <texture colordiffuse="AAFFFFFF">$INFO[ListItem.Property(thumb)]</texture>
+                                <visible>!Control.HasFocus(102)</visible>
+                                <bordersize>10</bordersize>
                                 <aspectratio>scale</aspectratio>
                             </control>
                             <control type="image">
@@ -156,6 +168,7 @@
                                 <width>380</width>
                                 <height>570</height>
                                 <texture>$INFO[ListItem.Property(thumb)]</texture>
+                                <visible>Control.HasFocus(102)</visible>
                                 <bordersize>10</bordersize>
                                 <aspectratio>scale</aspectratio>
                             </control>
