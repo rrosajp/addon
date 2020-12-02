@@ -238,11 +238,14 @@ class SearchWindow(xbmcgui.WindowXML):
                 percent = (float(count) / len(self.channelsList)) * 100
                 self.PROGRESS.setPercent(percent)
                 self.COUNT.setText('%s/%s' % (count, len(self.channelsList)))
+            self.channelsList = []
 
         with futures.ThreadPoolExecutor(max_workers=set_workers()) as executor:
             for searchAction in self.searchActions:
                 if self.exit: break
                 executor.submit(self.get_channel_results, self.item, self.moduleDict, searchAction)
+        self.moduleDict = {}
+        self.searchActions = []
 
     def get_channel_results(self, item, module_dict, search_action):
         logger.debug()
