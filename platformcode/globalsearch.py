@@ -26,7 +26,9 @@ def set_workers():
 def Search(item):
     xbmc.executebuiltin('Dialog.Close(all,true)')
     SearchWindow('GlobalSearch.xml', config.get_runtime_path()).start(item)
-    xbmc.sleep(600)
+
+S = None
+R = None
 
 # Actions
 LEFT = 1
@@ -62,7 +64,7 @@ QUALITYTAG = 505
 EPISODESLIST = 200
 SERVERLIST = 300
 
-class SearchWindow(xbmcgui.WindowXML):
+class SearchWindow(xbmcgui.WindowXMLDialog):
     def start(self, item):
         logger.debug()
         self.exit = False
@@ -473,6 +475,9 @@ class SearchWindow(xbmcgui.WindowXML):
                 item = Item(mode='search', type=result['mode'], contentType=result['mode'], infoLabels=result, selected = True, text=name)
                 if self.item.mode == 'movie': item.contentTitle = self.RESULTS.getSelectedItem().getLabel()
                 else: item.contentSerieName = self.RESULTS.getSelectedItem().getLabel()
+                global S
+                S = self
+                self.close()
                 return Search(item)
 
         elif control_id in [RESULTS, EPISODESLIST]:
@@ -539,6 +544,13 @@ class SearchWindow(xbmcgui.WindowXML):
                 self.SERVERLIST.reset()
                 self.SERVERLIST.addItems(serverlist)
                 self.setFocusId(SERVERLIST)
+                if config.get_setting('autoplay'):
+                    global R
+                    R = self
+                    while not platformtools.is_playing(): pass
+                    self.close()
+                    while platformtools.is_playing(): pass
+                    R.doModal()
 
             else:
                 self.episodes = self.itemsResult
@@ -560,9 +572,16 @@ class SearchWindow(xbmcgui.WindowXML):
             index = int(self.getControl(control_id).getSelectedItem().getProperty('index'))
             server = self.servers[index]
             server.player_mode = 0
+            global R
+            R = self
             run(server)
+            while not platformtools.is_playing(): pass
+            self.close()
+            while platformtools.is_playing(): pass
+            R.doModal()
 
     def Back(self):
+        global S, R
         self.getControl(QUALITYTAG).setText('')
         if self.SERVERS.isVisible():
             if self.episodes:
@@ -580,6 +599,11 @@ class SearchWindow(xbmcgui.WindowXML):
         elif self.item.mode in ['person'] and self.find:
             self.find = []
             self.actors()
+        elif S:
+            self.close()
+            self = S
+            S = None
+            self.doModal()
         else:
             self.Close()
 
