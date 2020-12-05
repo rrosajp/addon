@@ -73,7 +73,7 @@
                         <!-- <font>font30_title</font> -->
                         <textcolor>FFFFFFFF</textcolor>
                         <shadowcolor>00000000</shadowcolor>
-                        <label>$INFO[Container(102).ListItem.Label]   [B][COLOR FFAAAAAA]$INFO[Container(102).ListItem.Property(year)] [CR]$INFO[Container(101).ListItem.Label][/COLOR][/B]</label>
+                        <label>$INFO[Container(102).ListItem.Label]   [B][COLOR FFAAAAAA]$INFO[Container(102).ListItem.Property(year)] [CR]$INFO[Container(102).ListItem.Property(channel)][/COLOR][/B]</label>
                         <align>left</align>
                         <aligny>center</aligny>
                     </control>
@@ -139,15 +139,6 @@
                                 <bordersize>10</bordersize>
                                 <aspectratio>scale</aspectratio>
                             </control>
-                            <control type="image">
-                                <description>Item Verified</description>
-                                <top>315</top>
-                                <left>145</left>
-                                <width>20</width>
-                                <height>20</height>
-                                <texture colordiffuse="FF0082C2">$INFO[ListItem.Property(verified)]</texture>
-                                <aspectratio>scale</aspectratio>
-                            </control>
                         </itemlayout>
                         <focusedlayout height="570" width="380">
                             <control type="image">
@@ -170,15 +161,6 @@
                                 <texture>$INFO[ListItem.Property(thumb)]</texture>
                                 <visible>Control.HasFocus(102)</visible>
                                 <bordersize>10</bordersize>
-                                <aspectratio>scale</aspectratio>
-                            </control>
-                            <control type="image">
-                                <description>Item Verified</description>
-                                <top>15</top>
-                                <left>330</left>
-                                <width>40</width>
-                                <height>40</height>
-                                <texture colordiffuse="FF0082C2">$INFO[ListItem.Property(verified)]</texture>
                                 <aspectratio>scale</aspectratio>
                             </control>
                         </focusedlayout>
@@ -259,15 +241,6 @@
                                 <align>center</align>
                                 <aligny>center</aligny>
                             </control>
-                            <control type="image">
-                                <description>Verified</description>
-                                <top>5</top>
-                                <left>5</left>
-                                <width>30</width>
-                                <height>30</height>
-                                <texture colordiffuse="880082C2">$INFO[ListItem.Property(verified)]</texture>
-                                <aspectratio>scale</aspectratio>
-                            </control>
                         </itemlayout>
                         <focusedlayout height="150" width="150">
                             <control type="image">
@@ -286,15 +259,6 @@
                                 <width>40</width>
                                 <height>40</height>
                                 <texture colordiffuse="880082C2">white.png</texture>
-                                <aspectratio>scale</aspectratio>
-                            </control>
-                            <control type="image">
-                                <description>Verified</description>
-                                <top>5</top>
-                                <left>5</left>
-                                <width>30</width>
-                                <height>30</height>
-                                <texture colordiffuse="FF0082C2">$INFO[ListItem.Property(verified)]</texture>
                                 <aspectratio>scale</aspectratio>
                             </control>
                             <control type="textbox">
