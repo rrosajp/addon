@@ -221,7 +221,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 n = list_cat.index('anime')
                 list_cat[n] = 'tvshow'
 
-            if self.item.mode == 'all' or self.item.mode in list_cat:
+            if self.item.mode == 'all' or self.item.mode in list_cat or self.item.type in list_cat:
                 if config.get_setting("include_in_global_search", channel) and ch_param.get("active", False):
                     channels_list.append(channel)
 
@@ -581,7 +581,7 @@ class SearchWindow(xbmcgui.WindowXML):
         elif control_id in [SERVERLIST]:
             server = Item().fromurl(self.getControl(control_id).getSelectedItem().getProperty('item'))
             server.player_mode = 0
-            run(server)
+            return run(server)
 
     def Back(self):
         self.getControl(QUALITYTAG).setText('')
