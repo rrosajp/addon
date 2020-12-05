@@ -340,7 +340,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 channelResults = self.CHANNELS.getListItem(self.results[name]).getProperty('items').split('|')
                 items = []
                 for result in channelResults:
-                    items.append(self.makeItem(result))
+                    if result: items.append(self.makeItem(result))
                 self.RESULTS.reset()
                 self.RESULTS.addItems(items)
         percent = (float(self.count) / len(self.searchActions)) * 100
@@ -423,7 +423,7 @@ class SearchWindow(xbmcgui.WindowXML):
             subpos = int(self.CHANNELS.getSelectedItem().getProperty('position'))
             channelResults = self.CHANNELS.getListItem(self.results[name]).getProperty('items').split('|')
             for result in channelResults:
-                items.append(self.makeItem(result))
+                if result: items.append(self.makeItem(result))
             self.RESULTS.reset()
             self.RESULTS.addItems(items)
             self.RESULTS.selectItem(subpos)
@@ -455,7 +455,7 @@ class SearchWindow(xbmcgui.WindowXML):
             subpos = int(self.CHANNELS.getSelectedItem().getProperty('position'))
             channelResults = self.CHANNELS.getListItem(self.results[name]).getProperty('items').split('|')
             for result in channelResults:
-                items.append(self.makeItem(result))
+                if result: items.append(self.makeItem(result))
             self.RESULTS.reset()
             self.RESULTS.addItems(items)
             self.RESULTS.selectItem(subpos)
