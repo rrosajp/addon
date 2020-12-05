@@ -38,6 +38,7 @@ EXIT = 10
 BACKSPACE = 92
 SWIPEUP = 531
 CONTEXT = 117
+MOUSEMOVE = 107
 
 # Container
 SEARCH = 1
@@ -404,6 +405,7 @@ class SearchWindow(xbmcgui.WindowXML):
             self.EPISODES.setVisible(False)
             self.SERVERS.setVisible(True)
 
+
     def onAction(self, action):
         action = action.getId()
         focus = self.getFocusId()
@@ -415,7 +417,7 @@ class SearchWindow(xbmcgui.WindowXML):
             pos = self.CHANNELS.getSelectedPosition()
             self.CHANNELS.selectItem(pos)
 
-        elif action in [LEFT, RIGHT] and focus in [CHANNELS] and self.CHANNELS.isVisible():
+        elif action in [LEFT, RIGHT, MOUSEMOVE] and focus in [CHANNELS] and self.CHANNELS.isVisible():
             items = []
             name = self.CHANNELS.getSelectedItem().getLabel()
             subpos = int(self.CHANNELS.getSelectedItem().getProperty('position'))
