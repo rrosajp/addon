@@ -616,7 +616,8 @@ class SearchWindow(xbmcgui.WindowXML):
     def context(self):
         pos = self.RESULTS.getSelectedPosition()
         name = self.CHANNELS.getSelectedItem().getLabel()
-        item = self.results[name][0][pos]
+        item = Item().fromurl(self.RESULTS.getSelectedItem().getProperty('item'))
+ 
         context = [config.get_localized_string(70739), config.get_localized_string(70557), config.get_localized_string(30155), config.get_localized_string(60359)]
         context_commands = ["RunPlugin(%s?%s)" % (sys.argv[0], 'action=open_browser&url=' + item.url),
                             "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=kodfavorites&action=addFavourite&from_channel=' + item.channel + '&from_action=' + item.action),
@@ -628,6 +629,11 @@ class SearchWindow(xbmcgui.WindowXML):
                                  "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' +item.action)]
 
         else:
+            if item.context:
+                for c in item.context:
+                    if 'autorenumber in channel':
+                        context += [c['title']]
+                        context_commands += ["RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'action=start&from_channel=' + c['from_channel'] + '&from_action=' + c['from_action'] +'&channel=autorenumber')]
             context += [config.get_localized_string(60352), config.get_localized_string(60355), config.get_localized_string(60357)]
             context_commands += ["RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'action=add_serie_to_library&from_action=' + item.action),
                                  "RunPlugin(%s?%s&%s)" % (sys.argv[0], item.tourl(), 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' + item.action),
