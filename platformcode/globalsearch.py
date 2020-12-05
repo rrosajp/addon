@@ -282,18 +282,18 @@ class SearchWindow(xbmcgui.WindowXML):
             pass
 
         self.count += 1
-        self.update(channel, valid, other if other else results)
+        if self.item.mode == 'all': self.update(channel, results)
+        else: self.update(channel, valid + other)
 
     def makeItem(self, url):
         item = Item().fromurl(url)
         logger.debug()
-        channelParams = channeltools.get_channel_parameters(item.channel)
         thumb = item.thumbnail if item.thumbnail else 'Infoplus/' + item.contentType.replace('show', '') + '.png'
         logger.info('THUMB', thumb)
         it = xbmcgui.ListItem(item.title)
         it.setProperties({'thumb': thumb, 'fanart': item.fanart, 'verified': item.verified, 'plot': item.plot,
                           'year': '[' + str(item.year if item.year else item.infoLabels.get('year', '')) + ']',
-                          'item': url, 'channel':channelParams['title']})
+                          'item': url})
         if item.server:
             color = scrapertools.find_single_match(item.alive, r'(FF[^\]]+)')
             it.setProperties({'channel': channeltools.get_channel_parameters(item.channel).get('title', ''),
@@ -303,35 +303,10 @@ class SearchWindow(xbmcgui.WindowXML):
 
         return it
 
-    def update(self, channel, valid, results):
+    def update(self, channel, results):
         if self.exit:
             return
         logger.debug('Search on channel', channel)
-        if self.item.mode != 'all' and 'valid' not in self.results:
-            self.results['valid'] = 0
-            item = xbmcgui.ListItem('valid')
-            item.setProperties({'thumb': 'valid.png',
-                                'position': '0',
-                                'results': '0'})
-            self.channels.append(item)
-            pos = self.CHANNELS.getSelectedPosition()
-            self.CHANNELS.reset()
-            self.CHANNELS.addItems(self.channels)
-            self.CHANNELS.selectItem(pos)
-            self.setFocusId(CHANNELS)
-        if valid:
-            item = self.CHANNELS.getListItem(0)
-            resultsList = item.getProperty('items')
-            for result in valid:
-                resultsList += result.tourl() + '|'
-            item.setProperty('items',resultsList)
-            self.channels[0].setProperty('results', str(len(resultsList.split('|')) - 1))
-            channelResults = self.CHANNELS.getListItem(0).getProperty('items').split('|')
-            items = []
-            for result in channelResults:
-                if result: items.append(self.makeItem(result))
-            self.RESULTS.reset()
-            self.RESULTS.addItems(items)
         if results:
             resultsList = ''
             channelParams = channeltools.get_channel_parameters(channel)
@@ -341,7 +316,8 @@ class SearchWindow(xbmcgui.WindowXML):
                 item = xbmcgui.ListItem(name)
                 item.setProperties({'thumb': channelParams['thumbnail'],
                                     'position': '0',
-                                    'results': str(len(results))
+                                    'results': str(len(results)),
+                                    'verified': results[0].verified
                                     })
                 for result in results:
                     resultsList += result.tourl() + '|'
@@ -367,7 +343,6 @@ class SearchWindow(xbmcgui.WindowXML):
                     if result: items.append(self.makeItem(result))
                 self.RESULTS.reset()
                 self.RESULTS.addItems(items)
-
         percent = (float(self.count) / len(self.searchActions)) * 100
         self.LOADING.setVisible(False)
         self.PROGRESS.setPercent(percent)
