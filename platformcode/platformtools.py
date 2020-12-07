@@ -547,7 +547,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
                 context_commands.append(("InfoPlus", "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'channel=infoplus&action=Main&from_channel=' + item.channel)))
 
         # Go to the Main Menu (channel.mainlist)
-        if parent_item.channel not in ["news", "channelselector", "downloads"] and item.action != "mainlist":
+        if parent_item.channel not in ["news", "channelselector", "downloads", "search"] and item.action != "mainlist" and not parent_item.noMainMenu:
             if parent_item.action != "mainlist":
                 context_commands.insert(0, (config.get_localized_string(60349), "Container.Refresh (%s?%s)" % (sys.argv[0], Item(channel=item.channel, action="mainlist").tourl())))
             context_commands.insert(1, (config.get_localized_string(70739), "Container.Update (%s?%s)" % (sys.argv[0], Item(action="open_browser", url=item.url).tourl())))
@@ -556,7 +556,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
         if item.channel not in ["favorites", "videolibrary", "help", ""] and parent_item.channel != "favorites":
             context_commands.append( (config.get_localized_string(70557), "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, urllib.urlencode({'channel': "kodfavorites", 'action': "addFavourite", 'from_channel': item.channel, 'from_action': item.action}))))
         # Search in other channels
-        if item.contentTitle and item.contentType in ['movie', 'tvshow'] and item.channel != 'search' and item.action not in ['play'] and parent_item.action != 'mainlist':
+        if item.contentTitle and item.contentType in ['movie', 'tvshow'] and parent_item.channel != 'search' and item.action not in ['play'] and parent_item.action != 'mainlist':
 
             # Search in other channels
             if item.contentSerieName != '':
@@ -586,7 +586,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
             elif item.action in ["detail", "findvideos"] and item.contentType == 'movie' and item.contentTitle:
                 context_commands.append((config.get_localized_string(60353), "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'action=add_pelicula_to_library&from_action=' + item.action)))
 
-        if not item.local and item.channel not in ["downloads", "filmontv"] and item.server != 'torrent' and parent_item.action != 'mainlist' and config.get_setting('downloadenabled'):
+        if not item.local and item.channel not in ["downloads", "filmontv", "search"] and item.server != 'torrent' and parent_item.action != 'mainlist' and config.get_setting('downloadenabled'):
             # Download movie
             if item.contentType == "movie":
                 context_commands.append((config.get_localized_string(60354), "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' + item.action)))
