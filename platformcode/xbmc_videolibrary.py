@@ -20,8 +20,8 @@ from core import scrapertools
 from xml.dom import minidom
 
 
-def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
-    def mark_as_watched_subThread(item, nfo_path, head_nfo, item_nfo):
+def mark_auto_as_watched(item):
+    def mark_as_watched_subThread(item):
         logger.debug()
         # logger.debug("item:\n" + item.tostring('\n'))
 
@@ -44,9 +44,9 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
         while platformtools.is_playing():
             actual_time = xbmc.Player().getTime()
             total_time = xbmc.Player().getTotalTime()
-            if item_nfo.played_time and xbmcgui.getCurrentWindowId() == 12005:
-                xbmc.Player().seekTime(item_nfo.played_time)
-                item_nfo.played_time = 0 # Fix for Slow Devices
+            # if item_nfo.played_time and xbmcgui.getCurrentWindowId() == 12005:
+            #     xbmc.Player().seekTime(item_nfo.played_time)
+            #     item_nfo.played_time = 0 # Fix for Slow Devices
 
             mark_time = total_time * percentage
             difference = total_time - actual_time
@@ -75,9 +75,9 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
                 break
             xbmc.sleep(1000)
 
-        # Set played time
-        item_nfo.played_time = int(actual_time) if not marked else 0
-        filetools.write(nfo_path, head_nfo + item_nfo.tojson())
+        # # Set played time
+        # item_nfo.played_time = int(actual_time) if not marked else 0
+        # filetools.write(nfo_path, head_nfo + item_nfo.tojson())
 
         # Silent sync with Trakt
         if marked and config.get_setting("trakt_sync"): sync_trakt_kodi()
@@ -94,7 +94,7 @@ def mark_auto_as_watched(item, nfo_path=None, head_nfo=None, item_nfo=None):
 
     # If it is configured to mark as seen
     if config.get_setting("mark_as_watched", "videolibrary"):
-        threading.Thread(target=mark_as_watched_subThread, args=[item, nfo_path, head_nfo, item_nfo]).start()
+        threading.Thread(target=mark_as_watched_subThread, args=[item]).start()
 
 
 
@@ -1340,12 +1340,11 @@ class NextDialog(xbmcgui.WindowXMLDialog):
         f.close()
         full_info = "".join(full_info)
         info = jsontools.load(full_info)
-        if "thumbnail" in info:
-            img = info["thumbnail"]
-        else:
-            img = filetools.join(config.get_runtime_path(), "resources", "noimage.png")
-        self.setProperty("next_img", img)
         info = info["infoLabels"]
+        if "fanart" in info: img = info["fanart"]
+        elif "thumbnail" in info: img = info["thumbnail"]
+        else: img = filetools.join(config.get_runtime_path(), "resources", "noimage.png")
+        self.setProperty("next_img", img)
         self.setProperty("title", info["tvshowtitle"])
         self.setProperty("ep_title", "%dx%02d - %s" % (info["season"], info["episode"], info["title"]))
 

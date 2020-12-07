@@ -489,17 +489,24 @@ def play_from_library(item):
         item.play_from = 'window'
         itemlist = videolibrary.findvideos(item)
         p_dialog.update(100, ''); sleep(0.5); p_dialog.close()
-        # while platformtools.is_playing(): # Conventional window
-        #     sleep(100)
-        play_time = platformtools.resume_playback(item, True)
-        if not play_time and config.get_setting('autoplay'):
+        while platformtools.is_playing(): sleep(1)
+        # from core.support import dbg;dbg()
+        if item.contentType == 'movie': nfo_path = item.nfo
+        else: nfo_path = item.strm_path.replace('strm','nfo')
+        if nfo_path and filetools.isfile(nfo_path):
+            from core import videolibrarytools
+            head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
+            played_time = platformtools.get_played_time(item_nfo)
+        else: played_time = 0
+
+        if not played_time and config.get_setting('autoplay'):
             return
 
         # The number of links to show is limited
         if config.get_setting("max_links", "videolibrary") != 0: itemlist = limit_itemlist(itemlist)
         # The list of links is slightly "cleaned"
         if config.get_setting("replace_VD", "videolibrary") == 1: itemlist = reorder_itemlist(itemlist)
-
+        from core.support import dbg;dbg()
         if len(itemlist) > 0:
             while not xbmc.Monitor().abortRequested():
                 # The user chooses the mirror

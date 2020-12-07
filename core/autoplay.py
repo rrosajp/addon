@@ -67,7 +67,7 @@ def start(itemlist, item):
         # Enable the "View in high quality" action (if the server returns more than one quality, eg gdrive)
         if not user_config_setting_action: config.set_setting("default_action", 2)
 
-        if user_config_setting_player != 0: config.set_setting("player_mode", 0)
+        # if user_config_setting_player != 0: config.set_setting("player_mode", 0)
 
         # Priorities when ordering itemlist:
         #       0: Servers and qualities

@@ -355,8 +355,10 @@ class SearchWindow(xbmcgui.WindowXML):
                 items = []
                 for result in channelResults:
                     if result: items.append(self.makeItem(result))
+                pos = self.RESULTS.getSelectedPosition()
                 self.RESULTS.reset()
                 self.RESULTS.addItems(items)
+                self.RESULTS.selectItem(pos)
         if results:
             resultsList = ''
             channelParams = channeltools.get_channel_parameters(channel)
@@ -648,7 +650,6 @@ class SearchWindow(xbmcgui.WindowXML):
 
         elif control_id in [SERVERLIST]:
             server = Item().fromurl(self.getControl(control_id).getSelectedItem().getProperty('item'))
-            server.player_mode = 0
             return run(server)
 
     def Back(self):
