@@ -1,17 +1,18 @@
 # based on https://github.com/MrCl0wnLab/ProxyGoogleTranslate
 import sys
 if sys.version_info[0] >= 3:
+    from urllib import request
     PY3 = True
+else:
+    PY3 = False
+    import urllib as request
+
 import re
 import time
 
 import requests
 from platformcode import logger
 
-try:
-    from urllib import request
-except:
-    import urllib as request
 HEADERS = {
     'Host': 'translate.google.com',
     'User-Agent': 'android'
