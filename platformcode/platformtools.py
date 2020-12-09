@@ -1094,21 +1094,21 @@ def set_player(item, xlistitem, mediaurl, view, strm):
 
 def viewed(item, played_time):
     from core import filetools, jsontools
-    def viewedThread(item):
+    def viewedThread(item, played_time):
         while is_playing(): 
             total_time = xbmc.Player().getTotalTime()
             actual_time = xbmc.Player().getTime()
             if played_time and xbmcgui.getCurrentWindowId() == 12005 and actual_time < played_time:
                 xbmc.Player().seekTime(played_time)
-            xbmc.sleep(500)
+                played_time = 0
+            # xbmc.sleep(500)
 
         if 120 < actual_time < (total_time / 100) * 80:
             item.played_time = actual_time
         else: item.played_time = 0
         set_played_time(item)
-
     from threading import Thread
-    Thread(target=viewedThread, args=(item,)).start()
+    Thread(target=viewedThread, args=(item, played_time)).start()
 
 
 def torrent_client_installed(show_tuple=False):
