@@ -1038,7 +1038,6 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         elif "megacrypter.com" in mediaurl: player_mode = 3
         logger.info("mediaurl=" + mediaurl)
 
-
         if player_mode in [0,1]:
             logger.info('Player Mode:' + ['Direct', 'Bookmark'][player_mode])
             # Add the listitem to a playlist
