@@ -650,7 +650,7 @@ class SearchWindow(xbmcgui.WindowXML):
 
         elif control_id in [SERVERLIST]:
             server = Item().fromurl(self.getControl(control_id).getSelectedItem().getProperty('item'))
-            server.new_search=True
+            server.globalsearch = True
             return run(server)
 
     def Back(self):

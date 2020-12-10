@@ -230,6 +230,7 @@ def start(itemlist, item):
                             if isinstance(resolved_item[0], list): videoitem.video_urls = resolved_item
                             else: videoitem = resolved_item[0]
 
+                    play_item.autoplay = True
                     # If not directly reproduce and mark as seen
                     # Check if the item comes from the video library
                     try:

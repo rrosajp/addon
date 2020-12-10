@@ -1012,10 +1012,11 @@ def set_player(item, xlistitem, mediaurl, view, strm):
     item.options = {'strm':False, 'continue':False}
     # logger.debug("item:\n" + item.tostring('\n'))
 
-    if item.new_search: xbmc.executebuiltin("PlayMedia(" + os.path.join(config.get_runtime_path(), "resources", "kod.mp4") + ")")
-        # Prevent Busy
-    else: xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
-    xbmc.Player().stop()
+    # Prevent Busy
+    if not item.autoplay:
+        if item.globalsearch: xbmc.executebuiltin("PlayMedia(" + os.path.join(config.get_runtime_path(), "resources", "kod.mp4") + ")")
+        else: xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
+        xbmc.Player().stop()
 
     # Moved del conector "torrent" here
     if item.server == "torrent":

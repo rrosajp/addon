@@ -123,7 +123,7 @@
                                 <left>0</left>
                                 <width>180</width>
                                 <height>270</height>
-                                <texture colordiffuse="AAFFFFFF">$INFO[ListItem.Property(thumb)]</texture>
+                                <texture colordiffuse="FF999999">$INFO[ListItem.Property(thumb)]</texture>
                                 <visible>!Control.HasFocus(102)</visible>
                                 <bordersize>10</bordersize>
                                 <aspectratio>scale</aspectratio>
@@ -147,7 +147,7 @@
                                 <left>0</left>
                                 <width>380</width>
                                 <height>570</height>
-                                <texture colordiffuse="AAFFFFFF">$INFO[ListItem.Property(thumb)]</texture>
+                                <texture colordiffuse="FF999999">$INFO[ListItem.Property(thumb)]</texture>
                                 <visible>!Control.HasFocus(102)</visible>
                                 <bordersize>10</bordersize>
                                 <aspectratio>scale</aspectratio>
