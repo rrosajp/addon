@@ -1009,7 +1009,14 @@ def get_video_seleccionado(item, seleccion, video_urls):
 
 def set_player(item, xlistitem, mediaurl, view, strm):
     logger.debug()
+    item.options = {'strm':False, 'continue':False}
     # logger.debug("item:\n" + item.tostring('\n'))
+
+    if item.new_search: xbmc.executebuiltin("PlayMedia(" + os.path.join(config.get_runtime_path(), "resources", "kod.mp4") + ")")
+        # Prevent Busy
+    else: xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
+    xbmc.Player().stop()
+
     # Moved del conector "torrent" here
     if item.server == "torrent":
         play_torrent(item, xlistitem, mediaurl)
@@ -1030,36 +1037,19 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         elif "megacrypter.com" in mediaurl: player_mode = 3
         logger.info("mediaurl=" + mediaurl)
 
-        if player_mode == 0:
-            logger.info('Player Mode: Direct')
+
+        if player_mode in [0,1]:
+            logger.info('Player Mode:' + ['Direct', 'Bookmark'][player_mode])
             # Add the listitem to a playlist
             playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
             playlist.clear()
             playlist.add(mediaurl, xlistitem)
 
-            # Reproduce
-            xbmc_player.play(playlist, xlistitem)
-            if config.get_setting('trakt_sync'):
-                from core import trakt_tools
-                trakt_tools.wait_for_update_trakt()
-
-        # elif player_mode == 1:
-        #     logger.info('Player Mode: setResolvedUrl')
-        #     xlistitem.setPath(mediaurl)
-        #     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xlistitem)
-        #     # xbmc.sleep(2500)
-        elif player_mode == 1:
-            logger.info('Player Mode: Bookmark')
-            # Add the listitem to a playlist
-            playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-            playlist.clear()
-            playlist.add(mediaurl, xlistitem)
-
-            played_time = resume_playback(get_played_time(item))
+            # played_time = resume_playback(get_played_time(item))
 
             # Reproduce
             xbmc_player.play(playlist, xlistitem)
-            viewed(item, played_time)
+            # viewed(item, played_time)
             if config.get_setting('trakt_sync'):
                 from core import trakt_tools
                 trakt_tools.wait_for_update_trakt()
@@ -1081,34 +1071,17 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         xbmc_player.setSubtitles(item.subtitle)
 
     # if it is a video library file send to mark as seen
-    if strm or item.strm_path:
-        from platformcode import xbmc_videolibrary
-        xbmc_videolibrary.mark_auto_as_watched(item)
+    if strm or item.strm_path: item.options['strm'] = True
+    if player_mode == 1: item.options['continue'] = True
+    from platformcode import xbmc_videolibrary
+    xbmc_videolibrary.mark_auto_as_watched(item)
 
     # for cases where the audio playback window appears in place of the video one
     if item.focusOnVideoPlayer:
-        while is_playing and xbmcgui.getCurrentWindowId() != 12006:
+        while is_playing() and xbmcgui.getCurrentWindowId() != 12006:
             continue
         xbmc.sleep(500)
         xbmcgui.Window(12005).show()
-
-def viewed(item, played_time):
-    from core import filetools, jsontools
-    def viewedThread(item, played_time):
-        while is_playing(): 
-            total_time = xbmc.Player().getTotalTime()
-            actual_time = xbmc.Player().getTime()
-            if played_time and xbmcgui.getCurrentWindowId() == 12005 and actual_time < played_time:
-                xbmc.Player().seekTime(played_time)
-                played_time = 0
-            # xbmc.sleep(500)
-
-        if 120 < actual_time < (total_time / 100) * 80:
-            item.played_time = actual_time
-        else: item.played_time = 0
-        set_played_time(item)
-    from threading import Thread
-    Thread(target=viewedThread, args=(item, played_time)).start()
 
 
 def torrent_client_installed(show_tuple=False):

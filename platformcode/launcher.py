@@ -506,7 +506,7 @@ def play_from_library(item):
         if config.get_setting("max_links", "videolibrary") != 0: itemlist = limit_itemlist(itemlist)
         # The list of links is slightly "cleaned"
         if config.get_setting("replace_VD", "videolibrary") == 1: itemlist = reorder_itemlist(itemlist)
-        from core.support import dbg;dbg()
+        # from core.support import dbg;dbg()
         if len(itemlist) > 0:
             while not xbmc.Monitor().abortRequested():
                 # The user chooses the mirror

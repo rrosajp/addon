@@ -39,14 +39,15 @@ def mark_auto_as_watched(item):
             next_dialogs = ['NextDialog.xml', 'NextDialogExtended.xml', 'NextDialogCompact.xml']
             next_ep_type = config.get_setting('next_ep_type')
             ND = next_dialogs[next_ep_type]
-            next_episode = next_ep(item)
+            try: next_episode = next_ep(item)
+            except: next_episode = False
 
         while platformtools.is_playing():
             actual_time = xbmc.Player().getTime()
             total_time = xbmc.Player().getTotalTime()
-            # if item_nfo.played_time and xbmcgui.getCurrentWindowId() == 12005:
-            #     xbmc.Player().seekTime(item_nfo.played_time)
-            #     item_nfo.played_time = 0 # Fix for Slow Devices
+            if item.played_time and xbmcgui.getCurrentWindowId() == 12005:
+                xbmc.Player().seekTime(item.played_time)
+                item.played_time = 0 # Fix for Slow Devices
 
             mark_time = total_time * percentage
             difference = total_time - actual_time
@@ -55,7 +56,7 @@ def mark_auto_as_watched(item):
             if actual_time > mark_time and not marked:
                 logger.info("Marked as Watched")
                 item.playcount = 1
-                marked = True
+                if item.options['strm'] : marked = True
                 show_server = False
                 from specials import videolibrary
                 videolibrary.mark_content_as_watched2(item)
@@ -75,9 +76,11 @@ def mark_auto_as_watched(item):
                 break
             xbmc.sleep(1000)
 
-        # # Set played time
-        # item_nfo.played_time = int(actual_time) if not marked else 0
-        # filetools.write(nfo_path, head_nfo + item_nfo.tojson())
+        if item.options['continue']:
+            if 120 < actual_time < (total_time / 100) * 80:
+                item.played_time = actual_time
+            else: item.played_time = 0
+            platformtools.set_played_time(item)
 
         # Silent sync with Trakt
         if marked and config.get_setting("trakt_sync"): sync_trakt_kodi()
@@ -94,6 +97,7 @@ def mark_auto_as_watched(item):
 
     # If it is configured to mark as seen
     if config.get_setting("mark_as_watched", "videolibrary"):
+        if item.options['continue']: item.played_time = platformtools.resume_playback(platformtools.get_played_time(item))
         threading.Thread(target=mark_as_watched_subThread, args=[item]).start()
 
 
