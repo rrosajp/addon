@@ -298,7 +298,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 for elem in results:
                     if elem.infoLabels['tmdb_id'] == searched_id:
                         elem.from_channel = channel
-                        elem.verified ='ok.png'
+                        elem.verified = 1
                         valid.append(elem)
                     else:
                         other.append(elem)
@@ -315,9 +315,9 @@ class SearchWindow(xbmcgui.WindowXML):
         thumb = item.thumbnail if item.thumbnail else 'Infoplus/' + item.contentType.replace('show', '') + '.png'
         logger.info('THUMB', thumb)
         it = xbmcgui.ListItem(item.title)
-        it.setProperties({'thumb': thumb, 'fanart': item.fanart, 'verified': item.verified, 'plot': item.plot,
+        it.setProperties({'thumb': thumb, 'fanart': item.fanart, 'plot': item.plot,
                           'year': '[' + str(item.year if item.year else item.infoLabels.get('year', '')) + ']',
-                          'item': url, 'channel':channelParams['title']})
+                          'item': url, 'verified': item.verified, 'channel':channelParams['title'], 'channelthumb': channelParams['thumbnail'] if item.verified else ''})
         if item.server:
             color = scrapertools.find_single_match(item.alive, r'(FF[^\]]+)')
             it.setProperties({'channel': channeltools.get_channel_parameters(item.channel).get('title', ''),
