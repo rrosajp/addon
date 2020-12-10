@@ -139,6 +139,7 @@ class SearchWindow(xbmcgui.WindowXML):
             noThumb = 'Infoplus/' + result['mode'].replace('show','') + '.png'
             fanart = result.get('fanart', '')
             year = result.get('release_date', '')
+            rating = str(result.get('vote_average', ''))
 
             new_item = Item(channel='search',
                             action=True,
@@ -157,9 +158,9 @@ class SearchWindow(xbmcgui.WindowXML):
                 new_item.contentSerieName = result['name']
 
             it = xbmcgui.ListItem(title)
-            it.setProperties({'thumb': result.get('thumbnail', noThumb), 'fanart': result.get('fanart', ''),
+            it.setProperties({'thumb': result.get('thumbnail', noThumb), 'fanart': result.get('fanart', ''), 'rating': '    [' + rating + ']' if rating else '',
                               'plot': result.get('overview', ''), 'search': 'search', 'release_date': '', 'item': new_item.tourl(),
-                              'year': '[' + year.split('/')[-1] + ']' if year else '[' + result.get('first_air_date','').split('-')[0] + ']'})
+                              'year': '   [' + year.split('/')[-1] + ']' if year else '    [' + result.get('first_air_date','').split('-')[0] + ']'})
             self.items.append(it)
 
         if self.items:
@@ -310,13 +311,15 @@ class SearchWindow(xbmcgui.WindowXML):
 
     def makeItem(self, url):
         item = Item().fromurl(url)
-        logger.debug()
+        logger.debug(item)
         channelParams = channeltools.get_channel_parameters(item.channel)
         thumb = item.thumbnail if item.thumbnail else 'Infoplus/' + item.contentType.replace('show', '') + '.png'
         logger.info('THUMB', thumb)
         it = xbmcgui.ListItem(item.title)
+        year = str(item.year if item.year else item.infoLabels.get('year', ''))
+        rating = str(item.infoLabels.get('rating', ''))
         it.setProperties({'thumb': thumb, 'fanart': item.fanart, 'plot': item.plot,
-                          'year': '[' + str(item.year if item.year else item.infoLabels.get('year', '')) + ']',
+                          'year': '    [' + year + ']' if year else '', 'rating':'    [' + rating + ']' if rating else '',
                           'item': url, 'verified': item.verified, 'channel':channelParams['title'], 'channelthumb': channelParams['thumbnail'] if item.verified else ''})
         if item.server:
             color = scrapertools.find_single_match(item.alive, r'(FF[^\]]+)')
