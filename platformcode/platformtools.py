@@ -1147,7 +1147,7 @@ def resume_playback(played_time):
         Resume = False
 
         def __init__(self, *args, **kwargs):
-            self.action_exitkeys_id = [xbmcgui.ACTION_BACKSPACE, xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]
+            self.action_exitkeys_id = [92, 10]
             self.progress_control = None
             played_time = kwargs.get('played_time')
             m, s = divmod(played_time, 60)
@@ -1182,6 +1182,7 @@ def resume_playback(played_time):
             xbmc.sleep(100)
         if not Dialog.Resume: played_time = 0
     else: played_time = 0
+    xbmc.sleep(300)
     return played_time
 
 ##### INPUTSTREM #####
