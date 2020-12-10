@@ -24,10 +24,12 @@ def mark_auto_as_watched(item):
     def mark_as_watched_subThread(item):
         logger.debug()
         # logger.debug("item:\n" + item.tostring('\n'))
+        if item.options['continue']: item.played_time = platformtools.resume_playback(platformtools.get_played_time(item))
 
         time_limit = time.time() + 30
         while not platformtools.is_playing() and time.time() < time_limit:
             time.sleep(1)
+
 
         marked = False
         next_episode = None
@@ -97,7 +99,6 @@ def mark_auto_as_watched(item):
 
     # If it is configured to mark as seen
     if config.get_setting("mark_as_watched", "videolibrary"):
-        if item.options['continue']: item.played_time = platformtools.resume_playback(platformtools.get_played_time(item))
         threading.Thread(target=mark_as_watched_subThread, args=[item]).start()
 
 
