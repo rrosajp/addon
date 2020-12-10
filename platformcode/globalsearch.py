@@ -100,7 +100,10 @@ class SearchWindow(xbmcgui.WindowXML):
             if config.get_setting('last_search'): last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
             else: last_search = ''
             if not self.item.text: self.item.text = platformtools.dialog_input(default=last_search, heading='')
-            if self.item.text: channeltools.set_channel_setting('Last_searched', self.item.text, 'search')
+            if self.item.text:
+                channeltools.set_channel_setting('Last_searched', self.item.text, 'search')
+                from specials.search import save_search
+                save_search(self.item.text)
 
     def getActions(self):
         logger.debug()
