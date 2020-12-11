@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import xbmc, xbmcgui, sys, channelselector, time
+import xbmc, xbmcgui, sys, channelselector, time, gc
 from core.support import dbg, typo, tmdb
 from core.item import Item
 from core import channeltools, servertools, scrapertools
@@ -24,9 +24,12 @@ def set_workers():
     return workers
 
 def Search(*args):
-    xbmc.executebuiltin('Dialog.Close(all,true)')
-    SearchWindow('GlobalSearch.xml', config.get_runtime_path()).start(*args)
-    xbmc.sleep(600)
+    xbmc.executebuiltin('Dialog.Close(all)')
+    w = SearchWindow('GlobalSearch.xml', config.get_runtime_path())
+    w.start(*args)
+    del w
+    gc.collect()
+    # xbmc.sleep(600)
 
 # Actions
 LEFT = 1
