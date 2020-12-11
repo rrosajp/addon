@@ -28,8 +28,7 @@ def Search(*args):
     w = SearchWindow('GlobalSearch.xml', config.get_runtime_path())
     w.start(*args)
     del w
-    gc.collect()
-    # xbmc.sleep(600)
+    xbmc.sleep(1000)
 
 # Actions
 LEFT = 1
@@ -132,7 +131,6 @@ class SearchWindow(xbmcgui.WindowXML):
             results = tmdb_info.results
 
         for result in results:
-            logger.info(result)
             result = tmdb_info.get_infoLabels(result, origen=result)
             if self.item.mode == 'movie':
                 title = result['title']
@@ -284,26 +282,25 @@ class SearchWindow(xbmcgui.WindowXML):
         with futures.ThreadPoolExecutor(max_workers=set_workers()) as executor:
             for searchAction in self.searchActions:
                 if self.exit: return
-                executor.submit(self.get_channel_results, self.item, self.moduleDict, searchAction)
+                executor.submit(self.get_channel_results, searchAction)
+                logger.debug('end search for:', searchAction.channel)
 
-    def get_channel_results(self, item, module_dict, search_action):
+    def get_channel_results(self, searchAction):
         logger.debug()
-        channel = search_action.channel
+        channel = searchAction.channel
         results = []
         valid = []
         other = []
-        module = module_dict[channel]
-        searched_id = item.infoLabels['tmdb_id']
 
         try:
-            results.extend(module.search(search_action, item.text))
+            results = self.moduleDict[channel].search(searchAction, self.item.text)
             if len(results) == 1:
                 if not results[0].action or config.get_localized_string(70006).lower() in results[0].title.lower():
                     results = []
 
             if self.item.mode != 'all':
                 for elem in results:
-                    if elem.infoLabels['tmdb_id'] == searched_id:
+                    if elem.infoLabels['tmdb_id'] == self.item.infoLabels['tmdb_id']:
                         elem.from_channel = channel
                         elem.verified = 1
                         valid.append(elem)
@@ -313,7 +310,7 @@ class SearchWindow(xbmcgui.WindowXML):
             pass
 
         self.count += 1
-        self.update(channel, valid, other if other else results)
+        return self.update(channel, valid, other if other else results)
 
     def makeItem(self, url):
         item = Item().fromurl(url)

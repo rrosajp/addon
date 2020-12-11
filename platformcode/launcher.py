@@ -92,6 +92,10 @@ def run(item=None):
         if not config.get_setting('tmdb_active'):
             config.set_setting('tmdb_active', True)
 
+        if config.get_setting('new_search') and item.channel == "search" and item.action == 'new_search':
+            item.channel = 'globalsearch'
+            item.action = 'Search'
+
         # If item has no action, stops here
         if item.action == "":
             logger.debug("Item without action")
@@ -134,12 +138,6 @@ def run(item=None):
         elif item.channel == "infoplus":
             from platformcode import infoplus
             return infoplus.Main(item)
-
-        elif config.get_setting('new_search') and item.channel == "search" and item.action == 'new_search':
-            from platformcode.globalsearch import Search
-            item.contextual = True
-            Search(item)
-            return
 
         elif item.channel == "backup":
             from platformcode import backup
