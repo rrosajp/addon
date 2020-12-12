@@ -710,12 +710,12 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
         if index > 0: xbmc.executebuiltin(context_commands[index])
 
 
-def play(self, server):
-    server.globalsearch = True
-    run(server)
-    while not platformtools.is_playing():
-        xbmc.sleep(500)
-    self.close()
-    while platformtools.is_playing():
-        xbmc.sleep(500)
-    self.doModal()
+    def play(self, server):
+        server.globalsearch = True
+        run(server)
+        while not platformtools.is_playing():
+            xbmc.sleep(500)
+        self.close()
+        while platformtools.is_playing():
+            xbmc.sleep(500)
+        self.doModal()

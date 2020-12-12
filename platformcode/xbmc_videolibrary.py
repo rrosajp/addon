@@ -23,6 +23,8 @@ from xml.dom import minidom
 def mark_auto_as_watched(item):
     def mark_as_watched_subThread(item):
         logger.debug()
+        actual_time = 0
+        total_time = 0
         # logger.debug("item:\n" + item.tostring('\n'))
         if item.options['continue']: item.played_time = platformtools.resume_playback(platformtools.get_played_time(item))
 
