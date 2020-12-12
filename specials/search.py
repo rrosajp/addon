@@ -38,11 +38,18 @@ def_lang = info_language[config.get_setting("info_language", "videolibrary")]
 def mainlist(item):
     logger.debug()
 
-    itemlist = [Item(channel=item.channel, title=config.get_localized_string(70276), action='new_search', mode='all', thumbnail=get_thumb("search.png")),
-                Item(channel=item.channel, title=config.get_localized_string(70741) % config.get_localized_string(30122), action='new_search', mode='movie', thumbnail=get_thumb("search_movie.png")),
-                Item(channel=item.channel, title=config.get_localized_string(70741) % config.get_localized_string(30123), action='new_search', mode='tvshow', thumbnail=get_thumb("search_tvshow.png")),
-                Item(channel=item.channel, title=config.get_localized_string(70741) % config.get_localized_string(70314), action='new_search', page=1, mode='person', thumbnail=get_thumb("search_star.png")),
-                Item(channel=item.channel, title=config.get_localized_string(59995), action='saved_search', thumbnail=get_thumb('search.png')),
+    if config.get_setting('new_search'):
+        itemlist = [Item(channel='globalsearch', title=config.get_localized_string(70276), action='Search', mode='all', thumbnail=get_thumb("search.png"), folder=False),
+                    Item(channel='globalsearch', title=config.get_localized_string(70741) % config.get_localized_string(30122), action='Search', mode='movie', thumbnail=get_thumb("search_movie.png"),folder=False),
+                    Item(channel='globalsearch', title=config.get_localized_string(70741) % config.get_localized_string(30123), action='Search', mode='tvshow', thumbnail=get_thumb("search_tvshow.png"), folder=False),
+                    Item(channel='globalsearch', title=config.get_localized_string(70741) % config.get_localized_string(70314), action='Search', page=1, mode='person', thumbnail=get_thumb("search_star.png"), folder=False)]
+    else:
+        itemlist = [Item(channel=item.channel, title=config.get_localized_string(70276), action='new_search', mode='all', thumbnail=get_thumb("search.png")),
+                    Item(channel=item.channel, title=config.get_localized_string(70741) % config.get_localized_string(30122), action='new_search', mode='movie', thumbnail=get_thumb("search_movie.png")),
+                    Item(channel=item.channel, title=config.get_localized_string(70741) % config.get_localized_string(30123), action='new_search', mode='tvshow', thumbnail=get_thumb("search_tvshow.png")),
+                    Item(channel=item.channel, title=config.get_localized_string(70741) % config.get_localized_string(70314), action='new_search', page=1, mode='person', thumbnail=get_thumb("search_star.png"))]
+
+    itemlist += [Item(channel=item.channel, title=config.get_localized_string(59995), action='saved_search', thumbnail=get_thumb('search.png')),
                 Item(channel=item.channel, title=config.get_localized_string(60420), action='sub_menu', thumbnail=get_thumb('search.png')),
                 Item(channel="tvmoviedb", title=config.get_localized_string(70274), action="mainlist", thumbnail=get_thumb("search.png")),
                 Item(channel=item.channel, title=typo(config.get_localized_string(59994), 'color kod bold'), action='setting_channel_new', thumbnail=get_thumb('setting_0.png')),

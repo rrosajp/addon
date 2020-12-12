@@ -37,6 +37,7 @@ def start():
         updater.showSavedChangelog()
 
 def run(item=None):
+    # from core.support import dbg;dbg()
     logger.debug()
     if not item:
         # Extract item from sys.argv
@@ -92,9 +93,12 @@ def run(item=None):
         if not config.get_setting('tmdb_active'):
             config.set_setting('tmdb_active', True)
 
-        if config.get_setting('new_search') and item.channel == "search" and item.action == 'new_search':
-            item.channel = 'globalsearch'
+        if item.channel =='globalsearch' or (config.get_setting('new_search') and item.channel == "search" and item.action == 'new_search'):
             item.action = 'Search'
+            item.contextual = True
+            item.mode = 'all'
+            from specials.globalsearch import Search
+            return Search(item)
 
         # If item has no action, stops here
         if item.action == "":

@@ -24,11 +24,9 @@ def set_workers():
     return workers
 
 def Search(*args):
-    xbmc.executebuiltin('Dialog.Close(all)')
     w = SearchWindow('GlobalSearch.xml', config.get_runtime_path())
     w.start(*args)
     del w
-    xbmc.sleep(1000)
 
 # Actions
 LEFT = 1
@@ -65,7 +63,7 @@ QUALITYTAG = 505
 EPISODESLIST = 200
 SERVERLIST = 300
 
-class SearchWindow(xbmcgui.WindowXML):
+class SearchWindow(xbmcgui.WindowXMLDialog):
     def start(self, item, moduleDict={}, searchActions=[]):
         logger.debug()
         self.exit = False
@@ -659,8 +657,9 @@ class SearchWindow(xbmcgui.WindowXML):
 
         elif control_id in [SERVERLIST]:
             server = Item().fromurl(self.getControl(control_id).getSelectedItem().getProperty('item'))
-            server.globalsearch = True
-            return run(server)
+            return play(self, server)
+            # server.globalsearch = True
+            # return run(server)
 
     def Back(self):
         self.getControl(QUALITYTAG).setText('')
@@ -689,7 +688,6 @@ class SearchWindow(xbmcgui.WindowXML):
             self.thread.join()
             busy(False)
         self.close()
-        del self
 
     def context(self):
         focus = self.getFocusId()
@@ -710,3 +708,14 @@ class SearchWindow(xbmcgui.WindowXML):
         context_commands = [c[1].replace('Container.Refresh', 'RunPlugin').replace('Container.Update', 'RunPlugin') for c in commands]
         index = xbmcgui.Dialog().contextmenu(context)
         if index > 0: xbmc.executebuiltin(context_commands[index])
+
+
+def play(self, server):
+    server.globalsearch = True
+    run(server)
+    while not platformtools.is_playing():
+        xbmc.sleep(500)
+    self.close()
+    while platformtools.is_playing():
+        xbmc.sleep(500)
+    self.doModal()
