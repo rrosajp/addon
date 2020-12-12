@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <window>
-    <depth>0.52</depth>
+    <zorder>0.52</zorder>
     <coordinates>
         <left>0</left>
         <top>0</top>

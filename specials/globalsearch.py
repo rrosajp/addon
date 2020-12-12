@@ -570,7 +570,7 @@ class SearchWindow(xbmcgui.WindowXML):
                     return
 
                 if item.action not in ['findvideos', 'episodios']:  # special items (add to videolibrary, download ecc.)
-                    xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?" + item_url)
+                    xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?" + item_url + ")")
                     busy(False)
                     return
 
@@ -594,6 +594,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 hd = []
                 sd = []
                 unknown = []
+                other = []
                 for i, item in enumerate(servers):
                     if item.server:
                         it = self.makeItem(item.tourl())
@@ -615,7 +616,9 @@ class SearchWindow(xbmcgui.WindowXML):
                             unknown.append(it)
                     elif not item.action:
                         self.getControl(QUALITYTAG).setText(item.fulltitle)
-
+                    else:
+                        it = self.makeItem(item.tourl())
+                        other.append(it)
 
                 uhd.sort(key=lambda it: it.getProperty('index'))
                 fhd.sort(key=lambda it: it.getProperty('index'))
@@ -623,7 +626,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 sd.sort(key=lambda it: it.getProperty('index'))
                 unknown.sort(key=lambda it: it.getProperty('index'))
 
-                serverlist = uhd + fhd + hd + sd + unknown
+                serverlist = uhd + fhd + hd + sd + unknown + other
                 if not serverlist:
                     serverlist = [xbmcgui.ListItem(config.get_localized_string(60347))]
                     serverlist[0].setProperty('thumb', channelselector.get_thumb('nofolder.png'))
