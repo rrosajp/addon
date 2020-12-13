@@ -96,7 +96,6 @@ def run(item=None):
         if item.channel =='globalsearch' or (config.get_setting('new_search') and item.channel == "search" and item.action == 'new_search'):
             item.action = 'Search'
             item.contextual = True
-            item.mode = 'all'
             from specials.globalsearch import Search
             return Search(item)
 

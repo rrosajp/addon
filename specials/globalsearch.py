@@ -97,13 +97,19 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
     def lastSearch(self):
         logger.debug()
         if not self.item.text:
-            if config.get_setting('last_search'): last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
-            else: last_search = ''
-            if not self.item.text: self.item.text = platformtools.dialog_input(default=last_search, heading='')
-            if self.item.text:
-                channeltools.set_channel_setting('Last_searched', self.item.text, 'search')
-                from specials.search import save_search
-                save_search(self.item.text)
+            if self.item.contentTitle:
+                self.item.text = self.item.contentTitle
+            elif self.item.contentSerieName:
+                self.item.text = self.item.contentSerieName
+
+            if not self.item.text:
+                if config.get_setting('last_search'): last_search = channeltools.get_channel_setting('Last_searched', 'search', '')
+                else: last_search = ''
+                if not self.item.text: self.item.text = platformtools.dialog_input(default=last_search, heading='')
+                if self.item.text:
+                    channeltools.set_channel_setting('Last_searched', self.item.text, 'search')
+                    from specials.search import save_search
+                    save_search(self.item.text)
 
     def getActions(self):
         logger.debug()
@@ -121,7 +127,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
         logger.debug()
         self.PROGRESS.setVisible(False)
         self.items = []
-        if self.persons:
+        if self.item.mode == 'person_':
             tmdb_info = tmdb.discovery(self.item, dict_=self.item.discovery)
             results = tmdb_info.results.get('cast',[])
         else:
@@ -170,6 +176,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
             self.RESULTS.addItems(self.items)
             self.setFocusId(RESULTS)
         else:
+            self.RESULTS.setVisible(False)
             self.NORESULTS.setVisible(True)
             self.setFocusId(CLOSE)
 
@@ -228,7 +235,9 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
             self.RESULTS.addItems(items)
             self.setFocusId(RESULTS)
         else:
+            self.RESULTS.setVisible(False)
             self.NORESULTS.setVisible(True)
+            self.setFocusId(CLOSE)
 
     def get_channels(self):
         logger.debug()
@@ -439,7 +448,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 if self.item.type: self.item.mode = self.item.type
                 self.thread = Thread(target=self.search)
                 self.thread.start()
-            elif self.item.mode in ['movie', 'tvshow']:
+            elif self.item.mode in ['movie', 'tvshow', 'person_']:
                 self.select()
             elif self.item.mode in ['person']:
                 self.actors()
@@ -460,7 +469,6 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
             self.SEARCH.setVisible(False)
             self.EPISODES.setVisible(False)
             self.SERVERS.setVisible(True)
-
 
     def onAction(self, action):
         action = action.getId()
@@ -487,7 +495,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
         elif action in [DOWN] and focus in [BACK, CLOSE, MENU]:
             if self.SERVERS.isVisible(): self.setFocusId(SERVERLIST)
             elif self.EPISODES.isVisible(): self.setFocusId(EPISODESLIST)
-            else: self.setFocusId(RESULTS)
+            elif self.RESULTS.isVisible(): self.setFocusId(RESULTS)
 
         elif focus in [RESULTS] and self.item.mode == 'all':
             pos = self.RESULTS.getSelectedPosition()
@@ -535,8 +543,10 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 self.page -= 1
                 self.actors()
             elif search == 'persons':
-                self.item.discovery = self.persons[pos]
-                self.select()
+                item = self.item.clone(mode='person_', discovery=self.persons[pos])
+                self.close()
+                Search(item, self.moduleDict, self.searchActions)
+                self.doModal()
             else:
                 item = Item().fromurl(self.RESULTS.getSelectedItem().getProperty('item'))
                 if self.item.mode == 'movie': item.contentTitle = self.RESULTS.getSelectedItem().getLabel()
@@ -550,7 +560,10 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 self.RESULTS.addItems(self.items)
                 self.RESULTS.setVisible(True)
                 self.PROGRESS.setVisible(False)
-                return Search(item, self.moduleDict, self.searchActions)
+
+                self.close()
+                Search(item, self.moduleDict, self.searchActions)
+                self.doModal()
 
         elif control_id in [RESULTS, EPISODESLIST]:
             busy(True)
@@ -657,7 +670,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
 
         elif control_id in [SERVERLIST]:
             server = Item().fromurl(self.getControl(control_id).getSelectedItem().getProperty('item'))
-            return play(self, server)
+            return self.play(server)
             # server.globalsearch = True
             # return run(server)
 
