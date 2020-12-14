@@ -13,6 +13,7 @@ else: from concurrent_py2 import futures
 
 info_language = ["de", "en", "es", "fr", "it", "pt"] # from videolibrary.json
 def_lang = info_language[config.get_setting("info_language", "videolibrary")]
+close_action = False
 
 
 def busy(state):
@@ -279,12 +280,18 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
             logger.error('error importing/getting search items of ' + channel)
             logger.error(traceback.format_exc())
 
+    def timer(self):
+        while self.searchActions:
+            self.COUNT.setText('%s/%s [%s"]' % (self.count, len(self.searchActions), int(time.time() - self.time) ))
+            time.sleep(1)
+
     def search(self):
+        logger.debug()
         self.count = 0
         self.LOADING.setVisible(True)
         if self.thActions:
             self.thActions.join()
-        logger.debug()
+        Thread(target=self.timer).start()
 
         with futures.ThreadPoolExecutor(max_workers=set_workers()) as executor:
             for searchAction in self.searchActions:
@@ -361,7 +368,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
             resultsList = item.getProperty('items')
             for result in valid:
                 resultsList += result.tourl() + '|'
-            item.setProperty('items',resultsList)
+            item.setProperty('items', resultsList)
             self.channels[0].setProperty('results', str(len(resultsList.split('|')) - 1))
             if self.CHANNELS.getSelectedPosition() == 0:
                 channelResults = self.CHANNELS.getListItem(0).getProperty('items').split('|')
@@ -429,7 +436,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
         self.PROGRESS = self.getControl(PROGRESS)
         self.COUNT = self.getControl(COUNT)
         self.MAINTITLE = self.getControl(MAINTITLE)
-        self.MAINTITLE.setText(typo(config.get_localized_string(30993).replace('...','') % '"%s"' % self.item.text, 'bold'))
+        self.MAINTITLE.setText(typo(config.get_localized_string(30993).replace('...', '') % '"%s"' % self.item.text, 'bold'))
         self.SEARCH = self.getControl(SEARCH)
         self.EPISODES = self.getControl(EPISODES)
         self.EPISODESLIST = self.getControl(EPISODESLIST)
@@ -511,6 +518,8 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
             self.Close()
 
     def onClick(self, control_id):
+        global close_action
+
         if self.RESULTS.getSelectedItem(): search = self.RESULTS.getSelectedItem().getProperty('search')
         else: search = None
         if control_id in [CHANNELS]:
@@ -530,6 +539,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
 
         elif control_id in [CLOSE]:
             self.Close()
+            close_action = True
 
         elif control_id in [MENU]:
             self.context()
@@ -546,7 +556,8 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 item = self.item.clone(mode='person_', discovery=self.persons[pos])
                 self.close()
                 Search(item, self.moduleDict, self.searchActions)
-                self.doModal()
+                if not close_action:
+                    self.doModal()
             else:
                 item = Item().fromurl(self.RESULTS.getSelectedItem().getProperty('item'))
                 if self.item.mode == 'movie': item.contentTitle = self.RESULTS.getSelectedItem().getLabel()
@@ -563,7 +574,8 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
 
                 self.close()
                 Search(item, self.moduleDict, self.searchActions)
-                self.doModal()
+                if not close_action:
+                    self.doModal()
 
         elif control_id in [RESULTS, EPISODESLIST]:
             busy(True)
