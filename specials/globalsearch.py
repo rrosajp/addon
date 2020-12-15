@@ -478,6 +478,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
             self.SERVERS.setVisible(True)
 
     def onAction(self, action):
+        global close_action
         action = action.getId()
         focus = self.getFocusId()
         if action in [CONTEXT] and focus in [RESULTS, EPISODESLIST, SERVERLIST]:
@@ -516,6 +517,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
 
         elif action in [EXIT]:
             self.Close()
+            close_action = True
 
     def onClick(self, control_id):
         global close_action
@@ -607,6 +609,9 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 self.itemsResult = []
 
             if self.itemsResult and self.itemsResult[0].action in ['play', '']:
+                if config.get_setting('autoplay'):
+                    busy(False)
+                    self.play()
 
                 if config.get_setting('checklinks') and not config.get_setting('autoplay'):
                     self.itemsResult = servertools.check_list_links(self.itemsResult, config.get_setting('checklinks_number'))
@@ -735,12 +740,13 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
         if index > 0: xbmc.executebuiltin(context_commands[index])
 
 
-    def play(self, server):
-        server.globalsearch = True
-        run(server)
+    def play(self, server=None):
+        if server:
+            server.globalsearch = True
+            run(server)
         while not platformtools.is_playing():
             xbmc.sleep(500)
         self.close()
-        while platformtools.is_playing():
+        while xbmcgui.getCurrentWindowId() in [12005, 12006]:
             xbmc.sleep(500)
         self.doModal()

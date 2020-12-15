@@ -93,12 +93,6 @@ def run(item=None):
         if not config.get_setting('tmdb_active'):
             config.set_setting('tmdb_active', True)
 
-        if item.channel =='globalsearch' or (config.get_setting('new_search') and item.channel == "search" and item.action == 'new_search'):
-            item.action = 'Search'
-            item.contextual = True
-            from specials.globalsearch import Search
-            return Search(item)
-
         # If item has no action, stops here
         if item.action == "":
             logger.debug("Item without action")
