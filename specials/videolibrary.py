@@ -327,7 +327,6 @@ def get_episodes(item):
     head_nfo, item_nfo = videolibrarytools.read_nfo(item.nfo)
 
     # Create an item in the list for each strm found
-    from core.support import dbg;dbg()
     for i in ficheros:
         ext = i.split('.')[-1]
         if ext not in ['json','nfo']:
