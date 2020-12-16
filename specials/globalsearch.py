@@ -40,6 +40,7 @@ BACKSPACE = 92
 SWIPEUP = 531
 CONTEXT = 117
 MOUSEMOVE = 107
+FULLSCREEN = 18
 
 # Container
 SEARCH = 1
@@ -481,6 +482,8 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
         global close_action
         action = action.getId()
         focus = self.getFocusId()
+        if action in [FULLSCREEN]:
+            self.playmonitor()
         if action in [CONTEXT] and focus in [RESULTS, EPISODESLIST, SERVERLIST]:
             self.context()
 
@@ -609,9 +612,6 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 self.itemsResult = []
 
             if self.itemsResult and self.itemsResult[0].action in ['play', '']:
-                if config.get_setting('autoplay'):
-                    busy(False)
-                    self.play()
 
                 if config.get_setting('checklinks') and not config.get_setting('autoplay'):
                     self.itemsResult = servertools.check_list_links(self.itemsResult, config.get_setting('checklinks_number'))
@@ -664,6 +664,10 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 self.SERVERLIST.addItems(serverlist)
                 self.setFocusId(SERVERLIST)
 
+                if config.get_setting('autoplay'):
+                    busy(False)
+                    self.playmonitor()
+
             else:
                 episodes = self.itemsResult if self.itemsResult else []
                 self.itemsResult = []
@@ -687,7 +691,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
 
         elif control_id in [SERVERLIST]:
             server = Item().fromurl(self.getControl(control_id).getSelectedItem().getProperty('item'))
-            return self.play(server)
+            return self.playmonitor(server)
             # server.globalsearch = True
             # return run(server)
 
@@ -740,13 +744,19 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
         if index > 0: xbmc.executebuiltin(context_commands[index])
 
 
-    def play(self, server=None):
+    def playmonitor(self, server=None):
         if server:
             server.globalsearch = True
             run(server)
-        while not platformtools.is_playing():
-            xbmc.sleep(500)
-        self.close()
-        while xbmcgui.getCurrentWindowId() in [12005, 12006]:
-            xbmc.sleep(500)
-        self.doModal()
+        try:
+            while not xbmc.Player().getTime() > 0:
+                xbmc.sleep(500)
+            self.close()
+            while xbmcgui.getCurrentWindowId() in [12005, 12006]:
+                xbmc.sleep(500)
+            if platformtools.is_playing():
+                xbmc.sleep(300)
+                xbmc.executebuiltin('Action(Fullscreen)')
+            self.doModal()
+        except:
+            return
