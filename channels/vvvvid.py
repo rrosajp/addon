@@ -2,7 +2,7 @@
 # ------------------------------------------------------------
 # Canale per vvvvid
 # ----------------------------------------------------------
-import requests, sys
+import requests, sys, inspect
 from core import support, tmdb
 from platformcode import autorenumber, logger
 
@@ -170,7 +170,8 @@ def episodios(item):
                                 url=  host + show_id + '/season/' + str(key['season_id']),
                                 action= 'findvideos',
                                 video_id= key['video_id']))
-    autorenumber.start(itemlist, item)
+    if inspect.stack()[1][3] not in ['find_episodes']:
+        autorenumber.start(itemlist, item)
     if autorenumber.check(item) == True \
         or support.match(itemlist[0].title, patron=r"(\d+x\d+)").match:
         support.videolibrary(itemlist,item)
