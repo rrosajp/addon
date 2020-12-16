@@ -327,6 +327,7 @@ def get_episodes(item):
     head_nfo, item_nfo = videolibrarytools.read_nfo(item.nfo)
 
     # Create an item in the list for each strm found
+    from core.support import dbg;dbg()
     for i in ficheros:
         ext = i.split('.')[-1]
         if ext not in ['json','nfo']:
@@ -344,7 +345,7 @@ def get_episodes(item):
                 head_nfo, epi = videolibrarytools.read_nfo(nfo_path)
 
                 # Set the chapter title if possible
-                if epi.contentTitle:
+                if epi.contentTitle and epi.contentTitle != epi.fulltitle:
                     title_episodie = epi.contentTitle.strip()
                 else:
                     title_episodie = config.get_localized_string(60031) %  (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2))
