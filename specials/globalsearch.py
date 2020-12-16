@@ -360,7 +360,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                                 'results': '0'})
             self.channels.append(item)
             pos = self.CHANNELS.getSelectedPosition()
-            self.CHANNELS.reset()
+            # self.CHANNELS.reset()
             self.CHANNELS.addItems(self.channels)
             self.CHANNELS.selectItem(pos)
             self.setFocusId(CHANNELS)
@@ -377,7 +377,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 for result in channelResults:
                     if result: items.append(self.makeItem(result))
                 pos = self.RESULTS.getSelectedPosition()
-                self.RESULTS.reset()
+                # self.RESULTS.reset()
                 self.RESULTS.addItems(items)
                 self.RESULTS.selectItem(pos)
         if results:
@@ -396,6 +396,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 item.setProperty('items',resultsList)
                 self.channels.append(item)
             else:
+                reset = True
                 item = self.CHANNELS.getListItem(self.results[name])
                 resultsList = item.getProperty('items')
                 for result in results:
