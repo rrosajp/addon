@@ -224,7 +224,7 @@ def get_nfo(item):
 
         return info_nfo
     else:
-        return scraper.get_nfo(item)
+        return ''
 
 
 def sort_episode_list(episodelist):

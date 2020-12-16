@@ -8,6 +8,11 @@ import traceback
 import xbmc
 import xbmcgui
 from platformcode import config
+
+try:
+    from urllib.parse import urlsplit
+except ImportError:
+    from urlparse import urlsplit
 # on kodi 18 its xbmc.translatePath, on 19 xbmcvfs.translatePath
 try:
     import xbmcvfs
@@ -38,6 +43,8 @@ def update(path, p_dialog, i, t, serie, overwrite):
     # logger.debug("%s: %s" %(serie.contentSerieName,str(list_canales) ))
     for channel, url in serie.library_urls.items():
         serie.channel = channel
+        module = __import__('channels.%s' % channel, fromlist=["channels.%s" % channel])
+        url = module.host + urlsplit(url).path
         serie.url = url
 
         ###### Redirección al canal NewPct1.py si es un clone, o a otro canal y url si ha intervención judicial
