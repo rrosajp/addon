@@ -360,7 +360,6 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                                 'results': '0'})
             self.channels.append(item)
             pos = self.CHANNELS.getSelectedPosition()
-            # self.CHANNELS.reset()
             self.CHANNELS.addItems(self.channels)
             self.CHANNELS.selectItem(pos)
             self.setFocusId(CHANNELS)
@@ -370,14 +369,12 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
             for result in valid:
                 resultsList += result.tourl() + '|'
             item.setProperty('items', resultsList)
-            self.channels[0].setProperty('results', str(len(resultsList.split('|')) - 1))
+            self.channels[0].setProperty('results', str(len(resultsList.split('|'))))
             if self.CHANNELS.getSelectedPosition() == 0:
-                channelResults = self.CHANNELS.getListItem(0).getProperty('items').split('|')
                 items = []
-                for result in channelResults:
-                    if result: items.append(self.makeItem(result))
+                for result in valid:
+                    if result: items.append(self.makeItem(result.tourl()))
                 pos = self.RESULTS.getSelectedPosition()
-                self.RESULTS.reset()
                 self.RESULTS.addItems(items)
                 self.RESULTS.selectItem(pos)
         if results:
@@ -385,7 +382,6 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
             channelParams = channeltools.get_channel_parameters(channel)
             name = channelParams['title']
             if name not in self.results:
-                self.results[name] = len(self.results)
                 item = xbmcgui.ListItem(name)
                 item.setProperties({'thumb': channelParams['thumbnail'],
                                     'position': '0',
@@ -394,15 +390,15 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 for result in results:
                     resultsList += result.tourl() + '|'
                 item.setProperty('items',resultsList)
+                self.results[name] = len(self.results)
                 self.channels.append(item)
             else:
-                reset = True
                 item = self.CHANNELS.getListItem(self.results[name])
                 resultsList = item.getProperty('items')
                 for result in results:
                     resultsList += result.tourl() + '|'
                 item.setProperty('items',resultsList)
-                self.channels[int(self.results[name])].setProperty('results', str(len(results)))
+                self.channels[int(self.results[name])].setProperty('results', str(len(resultsList).split('|') - 1))
             pos = self.CHANNELS.getSelectedPosition()
             self.CHANNELS.reset()
             self.CHANNELS.addItems(self.channels)
