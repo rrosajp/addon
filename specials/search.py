@@ -86,10 +86,11 @@ def saved_search(item):
 
     for saved_search_text in saved_searches_list:
         itemlist.append(
-            Item(channel=item.channel,
-                 action="new_search",
+            Item(channel=item.channel if not config.get_setting('new_search') else 'globalsearch',
+                 action="new_search" if not config.get_setting('new_search') else 'Search',
                  title=typo(saved_search_text.split('{}')[0], 'bold'),
                  search_text=saved_search_text.split('{}')[0],
+                 text=saved_search_text.split('{}')[0],
                  mode='all',
                  thumbnail=get_thumb('search.png')))
 

@@ -377,7 +377,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 for result in channelResults:
                     if result: items.append(self.makeItem(result))
                 pos = self.RESULTS.getSelectedPosition()
-                # self.RESULTS.reset()
+                self.RESULTS.reset()
                 self.RESULTS.addItems(items)
                 self.RESULTS.selectItem(pos)
         if results:
@@ -646,6 +646,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                     elif not item.action:
                         self.getControl(QUALITYTAG).setText(item.fulltitle)
                     else:
+                        logger.debug(item)
                         it = self.makeItem(item.tourl())
                         other.append(it)
 

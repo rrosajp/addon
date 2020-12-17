@@ -4,7 +4,7 @@
 # ----------------------------------------------------------
 import requests, sys, inspect
 from core import support, tmdb
-from platformcode import autorenumber, logger
+from platformcode import autorenumber, logger, config
 
 host = support.config.get_channel_url()
 
@@ -197,7 +197,7 @@ def findvideos(item):
                 url = url.split()[-1]
                 itemlist.append(
                     item.clone(action= 'play',
-                               title='direct',
+                               title=config.get_localized_string(30137),
                                url= 'https://or01.top-ix.org/videomg/_definst_/mp4:' + item.url + '/' + url,
                                server= 'directo')
                 )
@@ -207,7 +207,7 @@ def findvideos(item):
 
                 itemlist.append(
                     item.clone(action= 'play',
-                               title='direct',
+                               title=config.get_localized_string(30137),
                                url= item.url + '?' + key,
                                server= 'directo')
                 )

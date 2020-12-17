@@ -498,6 +498,20 @@
                             <aligny>center</aligny>
                             <label>[B][COLOR FFAAAAAA]$INFO[ListItem.Property(servername)][/COLOR][/B]</label>
                         </control>
+                        <control type="textbox">
+                            <description>No Server Title</description>
+                            <left>150</left>
+                            <top>35</top>
+                            <width>450</width>
+                            <height>60</height>
+                            <!-- <font>font30_title</font> -->
+                            <textcolor>FFFFFFFF</textcolor>
+                            <shadowcolor>00000000</shadowcolor>
+                            <align>left</align>
+                            <aligny>center</aligny>
+                            <label>$INFO[ListItem.Label]</label>
+                            <visible>!ListItem.Property(servername)</visible>
+                        </control>
                     </itemlayout>
                     <focusedlayout height="140" width="700">
                         <control type="image">
@@ -564,6 +578,20 @@
                             <align>left</align>
                             <aligny>center</aligny>
                             <label>[B][COLOR FFAAAAAA]$INFO[ListItem.Property(servername)][/COLOR][/B]</label>
+                        </control>
+                        <control type="textbox">
+                            <description>No Server Title</description>
+                            <left>150</left>
+                            <top>35</top>
+                            <width>450</width>
+                            <height>60</height>
+                            <!-- <font>font30_title</font> -->
+                            <textcolor>FFFFFFFF</textcolor>
+                            <shadowcolor>00000000</shadowcolor>
+                            <align>left</align>
+                            <aligny>center</aligny>
+                            <label>$INFO[ListItem.Label]</label>
+                            <visible>!ListItem.Property(servername)</visible>
                         </control>
                     </focusedlayout>
                 </control> <!-- END Servers List -->
