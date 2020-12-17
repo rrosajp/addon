@@ -646,7 +646,6 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                     elif not item.action:
                         self.getControl(QUALITYTAG).setText(item.fulltitle)
                     else:
-                        logger.debug(item)
                         it = self.makeItem(item.tourl())
                         other.append(it)
 

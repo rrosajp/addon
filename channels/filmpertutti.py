@@ -35,7 +35,7 @@ def mainlist(item):
 @support.scrape
 def peliculas(item):
     support.info()
-    debug = True
+    # debug = True
 
     if item.args != 'newest':
         patronBlock = r'<ul class="posts">(?P<block>.*)<\/ul>'
