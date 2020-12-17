@@ -308,17 +308,21 @@ def get_ua_list():
     # https://github.com/alfa-addon/addon/blob/master/plugin.video.alfa/platformcode/updater.py#L273
     logger.info()
     url = "http://omahaproxy.appspot.com/all?csv=1"
-    current_ver = config.get_setting("chrome_ua_version", default="").split(".")
-    data = httptools.downloadpage(url, alfa_s=True).data
-    new_ua_ver = scrapertools.find_single_match(data, "win64,stable,([^,]+),")
 
-    if not current_ver:
-        config.set_setting("chrome_ua_version", new_ua_ver)
-    else:
-        for pos, val in enumerate(new_ua_ver.split('.')):
-            if int(val) > int(current_ver[pos]):
-                config.set_setting("chrome_ua_version", new_ua_ver)
-                break
+    try:
+        current_ver = config.get_setting("chrome_ua_version", default="").split(".")
+        data = httptools.downloadpage(url, alfa_s=True).data
+        new_ua_ver = scrapertools.find_single_match(data, "win64,stable,([^,]+),")
+
+        if not current_ver:
+            config.set_setting("chrome_ua_version", new_ua_ver)
+        else:
+            for pos, val in enumerate(new_ua_ver.split('.')):
+                if int(val) > int(current_ver[pos]):
+                    config.set_setting("chrome_ua_version", new_ua_ver)
+                    break
+    except:
+        logger.error(traceback.format_exc())
 
 
 def run_threaded(job_func, args):
@@ -451,7 +455,10 @@ if __name__ == "__main__":
         logger.error(traceback.format_exc())
 
     while True:
-        schedule.run_pending()
+        try:
+            schedule.run_pending()
+        except:
+            logger.error(traceback.format_exc())
 
         if monitor.waitForAbort(1):  # every second
             break
