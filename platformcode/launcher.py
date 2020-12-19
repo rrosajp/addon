@@ -504,27 +504,28 @@ def play_from_library(item):
         if len(itemlist) > 0:
             while not xbmc.Monitor().abortRequested():
                 # The user chooses the mirror
-                options = []
-                selection_implementation = 0
-                for item in itemlist:
-                    item.thumbnail = config.get_online_server_thumb(item.server)
-                    quality = '[B][' + item.quality + '][/B]' if item.quality else ''
-                    if item.server:
-                        path = filetools.join(config.get_runtime_path(), 'servers', item.server.lower() + '.json')
-                        name = jsontools.load(open(path, "r").read())['name']
-                        if name.startswith('@'): name = config.get_localized_string(int(name.replace('@','')))
-                        it = xbmcgui.ListItem('\n[B]%s[/B] %s - %s' % (name, quality, item.contentTitle))
-                        it.setArt({'thumb':item.thumbnail})
-                        options.append(it)
+                if not platformtools.is_playing():
+                    options = []
+                    selection_implementation = 0
+                    for item in itemlist:
+                        item.thumbnail = config.get_online_server_thumb(item.server)
+                        quality = '[B][' + item.quality + '][/B]' if item.quality else ''
+                        if item.server:
+                            path = filetools.join(config.get_runtime_path(), 'servers', item.server.lower() + '.json')
+                            name = jsontools.load(open(path, "r").read())['name']
+                            if name.startswith('@'): name = config.get_localized_string(int(name.replace('@','')))
+                            it = xbmcgui.ListItem('\n[B]%s[/B] %s - %s' % (name, quality, item.contentTitle))
+                            it.setArt({'thumb':item.thumbnail})
+                            options.append(it)
+                        else:
+                            selection_implementation += 1
+                    # The selection window opens
+                    if (item.contentSerieName and item.contentSeason and item.contentEpisodeNumber): head = ("%s - %sx%s | %s" % (item.contentSerieName, item.contentSeason, item.contentEpisodeNumber, config.get_localized_string(30163)))
+                    else: head = config.get_localized_string(30163)
+                    selection = platformtools.dialog_select(head, options, preselect= -1, useDetails=True)
+                    if selection == -1:
+                        return
                     else:
-                        selection_implementation += 1
-                # The selection window opens
-                if (item.contentSerieName and item.contentSeason and item.contentEpisodeNumber): head = ("%s - %sx%s | %s" % (item.contentSerieName, item.contentSeason, item.contentEpisodeNumber, config.get_localized_string(30163)))
-                else: head = config.get_localized_string(30163)
-                selection = platformtools.dialog_select(head, options, preselect= -1, useDetails=True)
-                if selection == -1:
-                    return
-                else:
-                    item = videolibrary.play(itemlist[selection  + selection_implementation])[0]
-                    platformtools.play_video(item)
-                if (platformtools.is_playing() and item.action) or item.server == 'torrent' or config.get_setting('autoplay'): break
+                        item = videolibrary.play(itemlist[selection  + selection_implementation])[0]
+                        platformtools.play_video(item)
+                # if (platformtools.is_playing() and item.action) or item.server == 'torrent' or config.get_setting('autoplay'): break
