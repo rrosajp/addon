@@ -464,8 +464,7 @@ def play_from_library(item):
     # logger.debug("item: \n" + item.tostring('\n'))
 
     # Try to reproduce an image (this does nothing and also does not give an error)
-    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
-    xbmc.Player().stop()
+    platformtools.prevent_busy(item)
 
     # Modify the action (currently the video library needs "findvideos" since this is where the sources are searched
     item.action = "findvideos"
@@ -485,12 +484,12 @@ def play_from_library(item):
         itemlist = videolibrary.findvideos(item)
         p_dialog.update(100, ''); sleep(0.5); p_dialog.close()
         while platformtools.is_playing(): sleep(1)
-        # from core.support import dbg;dbg()
         if item.contentType == 'movie': nfo_path = item.nfo
         else: nfo_path = item.strm_path.replace('strm','nfo')
         if nfo_path and filetools.isfile(nfo_path):
             from core import videolibrarytools
             head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
+            item_nfo.window = True
             played_time = platformtools.get_played_time(item_nfo)
         else: played_time = 0
 
