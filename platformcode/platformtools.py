@@ -672,7 +672,7 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
     if mpd:
         if not install_inputstream():
             return
-        xlistitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
+        xlistitem.setProperty('inputstream' if PY3 else 'inputstreamaddon', 'inputstream.adaptive')
         xlistitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         if item.drm and item.license:
             install_widevine()
