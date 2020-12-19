@@ -1010,6 +1010,7 @@ def get_video_seleccionado(item, seleccion, video_urls):
 def set_player(item, xlistitem, mediaurl, view, strm):
     logger.debug()
     item.options = {'strm':False, 'continue':False}
+    prevent_busy(item)
     # logger.debug("item:\n" + item.tostring('\n'))
 
     # Moved del conector "torrent" here
@@ -1033,12 +1034,12 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         logger.info("mediaurl=" + mediaurl)
 
         if player_mode in [0,1]:
-            prevent_busy(item)
+            # from core.support import dbg;dbg()
             logger.info('Player Mode:' + ['Direct', 'Bookmark'][player_mode])
             # Add the listitem to a playlist
             playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
             playlist.clear()
-            playlist.add(mediaurl, xlistitem)
+            playlist.add(mediaurl, xlistitem, True)
             # Reproduce
             xbmc_player.play(playlist, xlistitem)
             # viewed(item, played_time)
@@ -1441,3 +1442,4 @@ def prevent_busy(item):
         else: xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
         xbmc.sleep(500)
         xbmc.Player().stop()
+        xbmc.sleep(500)
