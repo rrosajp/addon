@@ -493,7 +493,8 @@ class UnshortenIt(object):
             return uri, str(e)
 
     def _unshorten_vcrypt(self, uri):
-        uri = uri.replace('.net', '.pw')
+        httptools.set_cookies({'domain': 'vcrypt.net', 'name': 'saveMe', 'value': '1'})
+        httptools.set_cookies({'domain': 'vcrypt.pw', 'name': 'saveMe', 'value': '1'})
         try:
             headers = {}
             if 'myfoldersakstream.php' in uri or '/verys/' in uri:
