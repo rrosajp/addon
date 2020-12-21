@@ -21,7 +21,9 @@ def test_video_exists(page_url):
     headers = [['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0']]
 
     logger.debug("(page_url='%s')" % page_url)
-    resp = httptools.downloadpage(page_url, headers=headers, verify=False)
+    disable_directIP = False
+    if 'swvideoid' in page_url: disable_directIP = True
+    resp = httptools.downloadpage(page_url, headers=headers, verify=False, disable_directIP=disable_directIP)
 
     global data, real_url
     data = resp.data

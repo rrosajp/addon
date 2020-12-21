@@ -300,7 +300,7 @@ def downloadpage(url, **opt):
         else:
             req_headers = dict(opt['headers'])
 
-    if domain in directIP.keys():
+    if domain in directIP.keys() and not opt.get('disable_directIP', False):
         req_headers['Host'] = domain
         url = urlparse.urlunparse(parse._replace(netloc=directIP.get(domain)))
 
