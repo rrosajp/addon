@@ -397,7 +397,8 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 for result in results:
                     resultsList += result.tourl() + '|'
                 item.setProperty('items',resultsList)
-                self.channels[int(self.results[name])].setProperty('results', str(len(resultsList).split('|') - 1))
+                logger.log(self.channels[int(self.results[name])])
+                self.channels[int(self.results[name])].setProperty('results', str(len(resultsList.split('|')) - 1))
             pos = self.CHANNELS.getSelectedPosition()
             self.CHANNELS.reset()
             self.CHANNELS.addItems(self.channels)
