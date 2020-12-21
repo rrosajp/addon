@@ -746,9 +746,10 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
             server.window = True
             server.globalsearch = True
             platformtools.prevent_busy(server)
-            run(server)
+            Thread(target=run, args=[server]).start()
+            # run(server)
         try:
-            while not xbmc.Player().getTime() > 0:
+            while not platformtools.is_playing() or not xbmc.Player().getTime() > 0:
                 xbmc.sleep(500)
             self.close()
             xbmc.sleep(500)
