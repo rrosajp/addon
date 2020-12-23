@@ -168,7 +168,7 @@ def live(item):
         channel = key['channel']
         itemlist.append(item.clone(title = support.typo(channel, 'bold'), fulltitle = channel, show = channel, url = key['video']['contentUrl'],
                                    thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"), forcethumb = True , fanart = info[channel]['fanart'],
-                                   plot = info[channel]['plot'], action = 'play'))
+                                   plot = info[channel]['plot'], action = 'play', no_return=True))
     return support.thumb(itemlist, live=True)
 
 
