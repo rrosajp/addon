@@ -473,6 +473,7 @@ def play_from_library(item):
     # and launch kodi again
     if xbmc.getCondVisibility('Window.IsMedia') and not window_type == 1:
         # Conventional window
+        item.window = True
         xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")
 
     else:

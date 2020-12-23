@@ -1036,7 +1036,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         logger.info("mediaurl=" + mediaurl)
 
         if player_mode in [0,1]:
-            prevent_busy(item)
+            if player_mode in [1]: prevent_busy(item)
             logger.info('Player Mode:' + ['Direct', 'Bookmark'][player_mode])
             # Add the listitem to a playlist
             playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
