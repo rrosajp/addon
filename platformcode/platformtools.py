@@ -24,13 +24,13 @@ from platformcode import logger, config
 addon = config.__settings__
 addon_icon = os.path.join( addon.getAddonInfo( "path" ),'resources', 'media', "logo.png" )
 
-class XBMCPlayer(xbmc.Player):
+# class XBMCPlayer(xbmc.Player):
 
-    def __init__(self, *args):
-        pass
+#     def __init__(self, *args):
+#         pass
 
 
-xbmc_player = XBMCPlayer()
+xbmc_player = xbmc.Player()
 
 
 def dialog_ok(heading, message):
