@@ -5,7 +5,7 @@
 
 import requests, sys, inspect
 from core import support
-from platformcode import autorenumber
+from platformcode import autorenumber, logger
 if sys.version_info[0] >= 3:
     from concurrent import futures
 else:
@@ -129,7 +129,7 @@ def search(item, text):
             for key in json:
                 for key in json[key]:
                     if 'PathID' in key and (text.lower() in key['name'].lower()):
-                        itemlist.append(item.clone(title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'], url = getUrl(key['PathID']), action = 'Type',
+                        itemlist.append(item.clone(title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'], url = key['PathID'].replace('/?json', '.json'), action = 'Type',
                                                    thumbnail = getUrl(key['images']['portrait'] if 'portrait' in key['images'] else key['images']['portrait43'] if 'portrait43' in key['images'] else key['images']['landscape']),
                                                    fanart = getUrl(key['images']['landscape'] if 'landscape' in key['images'] else key['images']['landscape43'])))
     except:
@@ -141,6 +141,7 @@ def search(item, text):
 
 
 def Type(item):
+    logger.debug(item.url)
     json = current_session.get(item.url).json()
     if json['program_info']['layout'] == 'single':
         item.contentTitle = item.fulltitle
