@@ -129,7 +129,7 @@ def search(item, text):
             for key in json:
                 for key in json[key]:
                     if 'PathID' in key and (text.lower() in key['name'].lower()):
-                        itemlist.append(item.clone(title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'], url = key['PathID'].replace('/?json', '.json'), action = 'Type',
+                        itemlist.append(item.clone(title = support.typo(key['name'],'bold'), fulltitle = key['name'], show = key['name'], url = getUrl(key['PathID']), action = 'Type',
                                                    thumbnail = getUrl(key['images']['portrait'] if 'portrait' in key['images'] else key['images']['portrait43'] if 'portrait43' in key['images'] else key['images']['landscape']),
                                                    fanart = getUrl(key['images']['landscape'] if 'landscape' in key['images'] else key['images']['landscape43'])))
     except:
@@ -223,6 +223,7 @@ def peliculas(item):
 def select(item):
     support.info()
     itemlist = []
+    # support.dbg()
     if type(item.url) in [list, dict]:
         json = item.url
     else:
@@ -235,10 +236,12 @@ def select(item):
             if not season.isdigit(): season = ''
             itemlist.append(item.clone(title = support.typo(key['name'],'bold'), season = season, url = key['sets'], action = 'select'))
         if len(itemlist) == 1:
-            return episodios(itemlist[0])
+            return select(itemlist[0])
     else:
         for key in item.url:
-            itemlist.append(item.clone(title = support.typo(key['name'], 'bold'), url = getUrl(key['path_id']), contentType = 'tvshow', action = 'episodios'))
+            itemlist.append(item.clone(title = support.typo(key['name'], 'bold'), data = getUrl(key['path_id']), url = getUrl(key['path_id']), contentType = 'tvshow', action = 'episodios'))
+        if len(itemlist) == 1:
+            return episodios(itemlist[0])
     return itemlist
 
 
@@ -260,6 +263,7 @@ def episodios(item):
         if itemlist and itemlist[0].VL:
             # itemlist.reverse()
             itemlist = sorted(itemlist, key=lambda it: it.order)
+            item.action = 'episodios'
             support.videolibrary(itemlist, item)
         else:
             itemlist = sorted(itemlist, key=lambda it: it.title)
@@ -297,6 +301,7 @@ def episodios(item):
                 it.title = support.typo(item.season + 'x' + episode, 'bold') + (' - ' + it.title)
 
         if itemlist and itemlist[0].VL: support.videolibrary(itemlist, item)
+
     if itemlist and not support.match(itemlist[0].title, patron=r'[Ss]?(\d+)(?:x|_|\.|\s+)[Ee]?[Pp]?(\d+)').match and inspect.stack()[1][3] not in ['find_episodes']:
         autorenumber.start(itemlist, item)
     return itemlist
