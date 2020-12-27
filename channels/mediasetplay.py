@@ -9,34 +9,32 @@ from core import support
 if sys.version_info[0] >= 3: from urllib.parse import urlencode, quote
 else: from urllib import urlencode, quote
 
+host = ''
 DRM = 'com.widevine.alpha'
 post_url = '?assetTypes=HD,browser,widevine:HD,browser:SD,browser,widevine:SD,browser:SD&auto=true&balance=true&format=smil&formats=MPEG-DASH,MPEG4,M3U&tracking=true'
+deviceid = '61d27df7-5cbf-4419-ba06-cfd27ecd4588'
+loginUrl = 'https://api-ott-prod-fe.mediaset.net/PROD/play/idm/anonymous/login/v1.0'
+loginData = {"cid": deviceid, "platform": "pc", "appName": "web/mediasetplay-web/d667681"}
+lic_url = 'https://widevine.entitlement.theplatform.eu/wv/web/ModularDrm/getRawWidevineLicense?releasePid=%s&account=http://access.auth.theplatform.com/data/Account/2702976343&schema=1.0&token={token}' + \
+          '|Accept=*/*&Content-Type=&User-Agent=' + support.httptools.get_user_agent() + '|R{{SSM}}|'
+entry = 'https://api.one.accedo.tv/content/entry/{id}?locale=it'
+entries = 'https://api.one.accedo.tv/content/entries?id={id}&locale=it'
+sessionUrl = "https://api.one.accedo.tv/session?appKey=59ad346f1de1c4000dfd09c5&uuid={uuid}&gid=default"
 
 current_session = requests.Session()
 current_session.headers.update({'Content-Type': 'application/json', 'User-Agent': support.httptools.get_user_agent(),
                                 'Referer': support.config.get_channel_url()})
-deviceid = '61d27df7-5cbf-4419-ba06-cfd27ecd4588'
-data = {"cid": deviceid, "platform": "pc", "appName": "web/mediasetplay-web/d667681"}
-res = current_session.post("https://api-ott-prod-fe.mediaset.net/PROD/play/idm/anonymous/login/v1.0", json=data,
-                           verify=False)
 
-current_session.headers.update({'t-apigw': res.headers['t-apigw']})
-current_session.headers.update({'t-cts': res.headers['t-cts']})
-
-lic_url = 'https://widevine.entitlement.theplatform.eu/wv/web/ModularDrm/getRawWidevineLicense?releasePid=%s&account=http://access.auth.theplatform.com/data/Account/2702976343&schema=1.0&token=' + \
-          res.headers['t-cts'] + '|Accept=*/*&Content-Type=&User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36|R{SSM}|'
-
+# login anonimo
+res = current_session.post(loginUrl, json=loginData, verify=False)
+current_session.headers.update({'t-apigw': res.headers['t-apigw'], 't-cts': res.headers['t-cts']})
+lic_url = lic_url.format(token=res.headers['t-cts'])
 tracecid = res.json()['response']['traceCid']
 cwid = res.json()['response']['cwId']
 
-res = current_session.get(
-    "https://api.one.accedo.tv/session?appKey=59ad346f1de1c4000dfd09c5&uuid=" + str(uuid.uuid4()) + '&gid=default',
-    verify=False)
+# sessione
+res = current_session.get(sessionUrl.format(uuid=str(uuid.uuid4())), verify=False)
 current_session.headers.update({'x-session': res.json()['sessionKey']})
-
-host = ''
-entry = 'https://api.one.accedo.tv/content/entry/{id}?locale=it'
-entries = 'https://api.one.accedo.tv/content/entries?id={id}&locale=it'
 
 
 @support.menu
