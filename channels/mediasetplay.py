@@ -2,6 +2,7 @@
 # ------------------------------------------------------------
 # Canale per Mediaset Play
 # ------------------------------------------------------------
+import uuid
 
 import requests, sys
 from core import support
@@ -12,19 +13,25 @@ DRM = 'com.widevine.alpha'
 post_url = '?assetTypes=HD,browser,widevine:HD,browser:SD,browser,widevine:SD,browser:SD&auto=true&balance=true&format=smil&formats=MPEG-DASH,MPEG4,M3U&tracking=true'
 
 current_session = requests.Session()
-
-data = {"cid": "dc4e7d82-89a5-4a96-acac-d3c7f2ca6d67", "platform": "pc", "appName": "web/mediasetplay-web/576ea90"}
-res = current_session.post("https://api-ott-prod-fe.mediaset.net/PROD/play/idm/anonymous/login/v1.0", json=data, verify=False)
+current_session.headers.update({'Content-Type': 'application/json', 'User-Agent': support.httptools.get_user_agent(),
+                                'Referer': support.config.get_channel_url()})
+deviceid = '61d27df7-5cbf-4419-ba06-cfd27ecd4588'
+data = {"cid": deviceid, "platform": "pc", "appName": "web/mediasetplay-web/d667681"}
+res = current_session.post("https://api-ott-prod-fe.mediaset.net/PROD/play/idm/anonymous/login/v1.0", json=data,
+                           verify=False)
 
 current_session.headers.update({'t-apigw': res.headers['t-apigw']})
 current_session.headers.update({'t-cts': res.headers['t-cts']})
 
-lic_url = 'https://widevine.entitlement.theplatform.eu/wv/web/ModularDrm/getRawWidevineLicense?releasePid=%s&account=http://access.auth.theplatform.com/data/Account/2702976343&schema=1.0&token=' + res.headers['t-cts'] + '|Accept=*/*&Content-Type=&User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36|R{SSM}|'
+lic_url = 'https://widevine.entitlement.theplatform.eu/wv/web/ModularDrm/getRawWidevineLicense?releasePid=%s&account=http://access.auth.theplatform.com/data/Account/2702976343&schema=1.0&token=' + \
+          res.headers['t-cts'] + '|Accept=*/*&Content-Type=&User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36|R{SSM}|'
 
-tracecid=res.json()['response']['traceCid']
-cwid=res.json()['response']['cwId']
+tracecid = res.json()['response']['traceCid']
+cwid = res.json()['response']['cwId']
 
-res = current_session.get("https://api.one.accedo.tv/session?appKey=59ad346f1de1c4000dfd09c5&uuid=sdd",verify=False)
+res = current_session.get(
+    "https://api.one.accedo.tv/session?appKey=59ad346f1de1c4000dfd09c5&uuid=" + str(uuid.uuid4()) + '&gid=default',
+    verify=False)
 current_session.headers.update({'x-session': res.json()['sessionKey']})
 
 host = ''
@@ -47,8 +54,8 @@ def mainlist(item):
     return locals()
 
 
-
 def search(item, text):
+    itemlist = []
     support.info(text)
     item.search = text
     if not item.args:
@@ -63,15 +70,19 @@ def search(item, text):
             support.logger.error("%s" % line)
     return itemlist
 
+
 def menu(item):
     support.info()
-    itemlist = [item.clone(title=support.typo(item.args[0],'bullet bold'), url='', action='peliculas')]
+    itemlist = [item.clone(title=support.typo(item.args[0], 'bullet bold'), url='', action='peliculas')]
     if item.url:
         json = get_from_id(item)
         for it in json:
-            if 'uxReference' in it: itemlist.append(item.clone(title=support.typo(it['title'], 'submenu'), url=it['uxReference'], args = '', action='peliculas'))
-    itemlist.append(item.clone(title=support.typo('Cerca...','submenu bold'), url='', action ='search'))
+            if 'uxReference' in it: itemlist.append(
+                item.clone(title=support.typo(it['title'], 'submenu'), url=it['uxReference'], args='',
+                           action='peliculas'))
+    itemlist.append(item.clone(title=support.typo('Cerca...', 'submenu bold'), url='', action='search'))
     return itemlist
+
 
 def live(item):
     support.info()
@@ -89,16 +100,17 @@ def live(item):
             plot = support.typo(guide['currentListing']['mediasetlisting$epgTitle'],'bold') + '\n' + guide['currentListing']['mediasetlisting$shortDescription'] + '\n' + guide['currentListing']['description'] + '\n\n' + support.typo('A Seguire:' + guide['nextListing']['mediasetlisting$epgTitle'], 'bold')
 
             itemlist.append(item.clone(title=support.typo(it['title'], 'bold'),
-                                    fulltitle=it['title'],
-                                    show=it['title'],
-                                    contentTitle=it['title'],
-                                    thumbnail=it['thumbnails']['channel_logo-100x100']['url'],
-                                    forcethumb = True,
-                                    urls=urls,
-                                    plot=plot,
-                                    action='play',
-                                    no_return=True))
+                                       fulltitle=it['title'],
+                                       show=it['title'],
+                                       contentTitle=it['title'],
+                                       thumbnail=it['thumbnails']['channel_logo-100x100']['url'],
+                                       forcethumb=True,
+                                       urls=urls,
+                                       plot=plot,
+                                       action='play',
+                                       no_return=True))
     return support.thumb(itemlist, live=True)
+
 
 def peliculas(item):
     support.info()
@@ -147,6 +159,7 @@ def peliculas(item):
                                url=it['mediasetprogram$pageUrl']))
     return itemlist
 
+
 def epmenu(item):
     support.info()
     itemlist = []
@@ -155,11 +168,10 @@ def epmenu(item):
         if 'mediasetprogram$subBrandId' in entry:
             itemlist.append(
                 item.clone(action='episodios',
-                            title=support.typo(entry['description'], 'bold'),
-                            url=entry['mediasetprogram$subBrandId']))
+                           title=support.typo(entry['description'], 'bold'),
+                           url=entry['mediasetprogram$subBrandId']))
     if len(itemlist) == 1: return episodios(itemlist[0])
     return itemlist
-
 
 
 def episodios(item):
@@ -193,10 +205,12 @@ def episodios(item):
         support.videolibrary(itemlist, item)
     return itemlist
 
+
 def findvideos(item):
     support.info()
-    itemlist = [support.Item(server = 'directo', title = 'Direct', url = item.urls, action = 'play')]
+    itemlist = [support.Item(server='directo', title='Direct', url=item.urls, action='play')]
     return support.server(item, itemlist=itemlist, Download=False)
+
 
 def play(item):
     support.info()
@@ -215,11 +229,13 @@ def play(item):
 
     return support.servertools.find_video_items(item, data=data)
 
+
 def subBrand(json):
     support.info()
     subBrandId = current_session.get('https://feed.entertainment.tv.theplatform.eu/f/PR1GhC/mediaset-prod-all-brands?byCustomValue={brandId}{' + json + '}').json()['entries'][-1]['mediasetprogram$subBrandId']
     json = current_session.get('https://feed.entertainment.tv.theplatform.eu/f/PR1GhC/mediaset-prod-all-programs?byCustomValue={subBrandId}{' + subBrandId + '}').json()['entries']
     return json
+
 
 def get_from_id(item):
     support.info()
@@ -231,8 +247,8 @@ def get_from_id(item):
         return json['entries']
     return {}
 
+
 def get_programs(item, ret=[], args={}):
-    support.info()
     hasMore = False
     if not args:
         if item.url:
@@ -247,10 +263,13 @@ def get_programs(item, ret=[], args={}):
         args['traceCid'] = tracecid
         args['hitsPerPage'] = 500
         args['page'] = '0'
+        args['deviceId'] = deviceid
 
     if 'all' in item.args: url = 'https://api-ott-prod-fe.mediaset.net/PROD/play/rec/azlisting/v1.0?' + urlencode(args)
     else: url="https://api-ott-prod-fe.mediaset.net/PROD/play/rec/cataloguelisting/v1.0?" + urlencode(args)
+    support.logger.info(url)
     json = current_session.get(url).json()
+    support.logger.debug(json)
     if 'response' in json:
         json = json['response']
     if 'hasMore' in json:
