@@ -8,6 +8,8 @@ import requests, sys
 from core import support
 if sys.version_info[0] >= 3: from urllib.parse import urlencode, quote
 else: from urllib import urlencode, quote
+if sys.version_info[0] >= 3: from concurrent import futures
+else: from concurrent_py2 import futures
 
 host = ''
 DRM = 'com.widevine.alpha'
@@ -27,8 +29,9 @@ current_session.headers.update({'Content-Type': 'application/json', 'User-Agent'
 
 # login anonimo
 res = current_session.post(loginUrl, json=loginData, verify=False)
-current_session.headers.update({'t-apigw': res.headers['t-apigw'], 't-cts': res.headers['t-cts']})
-lic_url = lic_url.format(token=res.headers['t-cts'])
+Token = res.headers['t-cts']
+current_session.headers.update({'t-apigw': res.headers['t-apigw'], 't-cts': Token})
+lic_url = lic_url.format(token=Token)
 tracecid = res.json()['response']['traceCid']
 cwid = res.json()['response']['cwId']
 
@@ -36,16 +39,54 @@ cwid = res.json()['response']['cwId']
 res = current_session.get(sessionUrl.format(uuid=str(uuid.uuid4())), verify=False)
 current_session.headers.update({'x-session': res.json()['sessionKey']})
 
+cdict = {'CWFILMTOPVIEWED':'filmPiuVisti24H',
+         'CWFILMCOMEDY':'filmCommedia',
+         'CWFILMACTION':'filmAzioneThrillerAvventura',
+         'CWFILMDRAMATIC':'filmDrammatico',
+         'CWFILMSENTIMENTAL':'filmSentimentale',
+         'CWFILMCLASSIC':'filmClassici',
+         'personToContentFilm':'personToContentFilm',
+         'CWHOMEFICTIONNOWELITE':'stagioniFictionSerieTvSezione',
+         'CWFICTIONSOAP':'mostRecentSoapOpera',
+         'CWFICTIONDRAMATIC':'stagioniFictionDrammatico',
+         'CWFICTIONPOLICE':'stagioniFictionPoliziesco',
+         'CWFICTIONCOMEDY':'stagioniFictionCommedia',
+         'CWFICTIONSITCOM':'stagioniFictionSitCom',
+         'CWFICTIONSENTIMENTAL':'stagioniFictionSentimentale',
+         'CWFICTIONBIOGRAPHICAL':'stagioniFictionBiografico',
+         'CWPROGTVPRIME':'stagioniPrimaSerata',
+         'CWPROGTVDAY':'stagioniDaytime',
+         'CWPROGTVTOPVIEWED':'programmiTvClip24H',
+         'CWPROGTVTALENT':'stagioniReality',
+         'CWPROGTVVARIETY':'stagioniVarieta',
+         'CWPROGTVTALK':'stagioniTalk',
+         'CWPROGTVTG':'mostRecentTg',
+         'CWPROGTVSPORT':'mostRecentSport',
+         'CWPROGTVMAGAZINE':'stagioniCucinaLifestyle',
+         'CWDOCUMOSTRECENT':'mostRecentDocumentariFep',
+         'CWDOCUTOPVIEWED':'stagioniDocumentari',
+         'CWDOCUSPAZIO':'documentariSpazio',
+         'CWDOCUNATURANIMALI':'documentariNatura',
+         'CWDOCUSCIENZATECH':'documentariScienza',
+         'CWDOCUBIOSTORIE':'documentariBioStoria',
+         'CWDOCUINCHIESTE':'documentariInchiesta',
+         'CWFILMDOCU':'filmDocumentario',
+         'CWKIDSBOINGFORYOU':'kidsBoing',
+         'CWKIDSCARTOONITO':'kidsCartoonito',
+         'CWKIDSMEDIASETBRAND':'kidsMediaset',
+         'CWENABLERKIDS':'stagioniKids'}
+
 
 @support.menu
 def mainlist(item):
     top =  [('Dirette {bold}', ['https://feed.entertainment.tv.theplatform.eu/f/PR1GhC/mediaset-prod-all-stations?sort=ShortTitle', 'live'])]
 
-    menu = [('Film {bullet bold}', ['5acfcbc423eec6000d64a6bb', 'menu', ['Tutti','all','Cinema']]),
-            ('Fiction / Serie TV {bullet bold}', ['5acfcb3c23eec6000d64a6a4', 'menu', ['Tutte','all','Fiction'], 'tvshow']),
-            ('Programmi TV{ bullet bold}', ['', 'menu', ['Tutti','all','Programmi Tv'], 'tvshow']),
-            ('Documentari {bullet bold}', ['5bfd17c423eec6001aec49f9', 'menu', ['Tutti','all','Documentari'], 'undefined']),
-            ('Kids {bullet bold}', ['5acfcb8323eec6000d64a6b3', 'menu',['Tutti','all','Kids'], 'undefined']),
+    menu = [('Film {bullet bold}', ['5acfcbc423eec6000d64a6bb', 'menu', ['Tutti','all','searchMovie']]),
+            ('Fiction / Serie TV {bullet bold}', ['5acfcb3c23eec6000d64a6a4', 'menu', ['Tutte','all','searchStagioni'], 'tvshow']),
+            ('Programmi TV{ bullet bold}', ['5acfc8011de1c4000b6ec953', 'menu', ['Tutti','all','searchStagioni'], 'tvshow']),
+            ('Documentari {bullet bold}', ['5bfd17c423eec6001aec49f9', 'menu', ['Tutti','all',''], 'undefined']),
+            ('Kids {bullet bold}', ['5acfcb8323eec6000d64a6b3', 'menu',['Tutti','all',''], 'undefined']),
+            ('Family {bullet bold}', ['5e662d01a0e845001d56875b', 'menu',['Tutti','all',''], 'undefined']),
            ]
 
     search = ''
@@ -56,29 +97,26 @@ def search(item, text):
     itemlist = []
     support.info(text)
     item.search = text
-    if not item.args:
-        item.contentType = 'undefined'
-        item.args=['','all','']
-    itemlist = []
+
     try:
-        itemlist += peliculas(item)
+        itemlist = peliculas(item)
     except:
         import sys
         for line in sys.exc_info():
             support.logger.error("%s" % line)
+
     return itemlist
 
 
 def menu(item):
     support.info()
-    itemlist = [item.clone(title=support.typo(item.args[0], 'bullet bold'), url='', action='peliculas')]
+    itemlist = []
+    # itemlist = [item.clone(title=support.typo(item.args[0], 'bullet bold'), url='', action='peliculas')]
     if item.url:
         json = get_from_id(item)
         for it in json:
             if 'uxReference' in it: itemlist.append(
-                item.clone(title=support.typo(it['title'], 'submenu'), url=it['uxReference'], args='',
-                           action='peliculas'))
-    itemlist.append(item.clone(title=support.typo('Cerca...', 'submenu bold'), url='', action='search'))
+                item.clone(title=support.typo(it['title'], 'bullet bold'), url=it['uxReference'], args='', action='peliculas'))
     return itemlist
 
 
@@ -115,7 +153,14 @@ def peliculas(item):
     itemlist = []
     titlelist = []
     contentType = ''
-    json = get_programs(item)
+    if item.text:
+        json = []
+        with futures.ThreadPoolExecutor() as executor:
+            for arg in ['searchMovie', 'searchStagioni', 'searchClip']:
+                item.args = ['', 'search', arg]
+                json += executor.submit(get_programs, item).result()
+    else:
+        json = get_programs(item)
     for it in json:
         if item.search.lower() in it['title'].lower() and it['title'] not in titlelist:
             titlelist.append(it['title'])
@@ -248,9 +293,21 @@ def get_from_id(item):
 
 def get_programs(item, ret=[], args={}):
     hasMore = False
-    if not args:
-        if item.url:
-            args['uxReference'] = item.url
+    support.info('DICT=',item.url)
+    url = ''
+
+    if 'search' in item.args:
+        args['uxReference'] = item.args[2]
+        args["query"] = item.text
+        args['traceCid'] = tracecid
+        args['cwId'] = cwid
+        args['page'] = 1
+        args['platform'] = 'pc'
+        args['hitsPerPage'] = 500
+        url = 'https://api-ott-prod-fe.mediaset.net/PROD/play/rec2/search/v1.0?' + urlencode(args)
+    elif not args:
+        if item.url in cdict:
+            args['uxReference'] = cdict[item.url]
             args['platform'] = 'pc'
         else:
             args = {"query": "*:*"}
@@ -262,23 +319,26 @@ def get_programs(item, ret=[], args={}):
         args['hitsPerPage'] = 500
         args['page'] = '0'
         args['deviceId'] = deviceid
+        url="https://api-ott-prod-fe.mediaset.net/PROD/play/rec2/cataloguelisting/v1.0?" + urlencode(args)
 
-    if 'all' in item.args: url = 'https://api-ott-prod-fe.mediaset.net/PROD/play/rec/azlisting/v1.0?' + urlencode(args)
-    else: url="https://api-ott-prod-fe.mediaset.net/PROD/play/rec/cataloguelisting/v1.0?" + urlencode(args)
-    support.logger.info(url)
-    json = current_session.get(url).json()
-    support.logger.debug(json)
-    if 'response' in json:
-        json = json['response']
-    if 'hasMore' in json:
-        hasMore = json['hasMore']
-    if 'components' in json:
-        id = quote(",".join(json["components"]))
-        json = current_session.get(entries.format(id=id)).json()
-    if 'entries' in json:
-        ret += json['entries']
-    if hasMore:
-        args['page'] = str(int(args['page']) + 1)
-        return get_programs(item, ret, args)
+    # if 'all' in item.args: url = 'https://api-ott-prod-fe.mediaset.net/PROD/play/rec/azlisting/v1.0?' + urlencode(args)
+    if url:
+        support.logger.info(url)
+        json = current_session.get(url).json()
+        # support.logger.debug(json)
+        if 'response' in json:
+            json = json['response']
+        if 'hasMore' in json:
+            hasMore = json['hasMore']
+        if 'components' in json:
+            id = quote(",".join(json["components"]))
+            json = current_session.get(entries.format(id=id)).json()
+        if 'entries' in json:
+            ret += json['entries']
+        if hasMore:
+            args['page'] = str(int(args['page']) + 1)
+            return get_programs(item, ret, args)
+        else:
+            return ret
     else:
         return ret
