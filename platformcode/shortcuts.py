@@ -49,12 +49,13 @@ def servers_menu(item):
 				ids.append(server)
 
 		select = platformtools.dialog_select(config.get_localized_string(60552), names)
-		ID = ids[select]
+		if select != -1:
+			ID = ids[select]
 
-		it = Item(channel = 'settings',
-				action = action,
-				config = ID)
-		return setting.server_debrid_config(it)
+			it = Item(channel = 'settings',
+					action = action,
+					config = ID)
+			setting.server_debrid_config(it)
 	else:
 		action = 'server_config'
 		server_list = list(servertools.get_servers_list().keys())
@@ -65,13 +66,16 @@ def servers_menu(item):
 				ids.append(server)
 
 		select = platformtools.dialog_select(config.get_localized_string(60538), names)
-		ID = ids[select]
+		if select != -1:
+			ID = ids[select]
 
-		it = Item(channel = 'settings',
-				action = action,
-				config = ID)
+			it = Item(channel = 'settings',
+					action = action,
+					config = ID)
 
-		return setting.server_config(it)
+			setting.server_config(it)
+	if select != -1:
+		servers_menu(item)
 
 def channels_menu(item):
 	import channelselector
@@ -93,13 +97,15 @@ def channels_menu(item):
 			ids.append(channel.channel)
 
 	select = platformtools.dialog_select(config.get_localized_string(60537), names)
-	ID = ids[select]
+	if select != -1:
+		ID = ids[select]
 
-	it = Item(channel='settings',
-			  action="channel_config",
-			  config=ID)
+		it = Item(channel='settings',
+				action="channel_config",
+				config=ID)
 
-	return setting.channel_config(it)
+		setting.channel_config(it)
+		return channels_menu(item)
 
 def check_channels(item):
 	from specials import setting
