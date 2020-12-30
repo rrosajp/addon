@@ -394,7 +394,10 @@ def findvideos(item):
         logger.debug("Unable to search for videos due to lack of parameters")
         return []
 
-    content_title = str(item.contentSeason) + 'x' + (str(item.contentEpisodeNumber) if item.contentEpisodeNumber > 9 else '0' + str(item.contentEpisodeNumber))
+    if item.contentEpisodeNumber:
+        content_title = str(item.contentSeason) + 'x' + (str(item.contentEpisodeNumber) if item.contentEpisodeNumber > 9 else '0' + str(item.contentEpisodeNumber))
+    else:
+        content_title = item.contentTitle.strip().lower()
     if item.contentType == 'movie':
         item.strm_path = filetools.join(videolibrarytools.MOVIES_PATH, item.strm_path)
         path_dir = filetools.dirname(item.strm_path)

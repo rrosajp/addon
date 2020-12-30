@@ -290,7 +290,7 @@ def novedades(item):
 
         # Multi Thread mode: wait for all threads to finish
         if multithread:
-            pendent = [a for a in threads if a.isAlive()]
+            pendent = [a for a in threads if a.is_alive()]
             t = float(100) / len(pendent)
             while pendent:
                 index = (len(threads) - len(pendent)) + 1
@@ -308,7 +308,7 @@ def novedades(item):
                         break
 
                 time.sleep(0.5)
-                pendent = [a for a in threads if a.isAlive()]
+                pendent = [a for a in threads if a.is_alive()]
         if mode == 'normal':
             mensaje = config.get_localized_string(60522) % (len(list_newest), time.time() - start_time)
             progreso.update(100, mensaje)

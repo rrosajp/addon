@@ -142,7 +142,7 @@ servers = []
 channels = []
 
 channel_list = channelselector.filterchannels("all") if 'KOD_TST_CH' not in os.environ else [Item(channel=os.environ['KOD_TST_CH'], action="mainlist")]
-logger.info(channel_list)
+logger.info([c.channel for c in channel_list])
 ret = []
 
 logger.record = True
