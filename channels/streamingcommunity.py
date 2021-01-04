@@ -187,5 +187,8 @@ def findvideos(item):
     itemlist=[]
     url = support.match(support.match(item).data.replace('&quot;','"').replace('\\',''), patron=r'video_url"\s*:\s*"([^"]+)"').match
     for res in ['480p', '720p', '1080p']:
-        itemlist += [item.clone(title=support.config.get_localized_string(30137), server='directo', url='{}/{}'.format(url, res), quality=res, action='play')]
+        newurl = '{}/{}'.format(url, res)
+        support.dbg()
+        if session.get(newurl, headers=headers).status_code == 200:
+            itemlist += [item.clone(title=support.config.get_localized_string(30137), server='directo', url=newurl, quality=res, action='play')]
     return support.server(item, itemlist=itemlist)
