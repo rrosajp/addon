@@ -127,12 +127,13 @@ class Main(xbmcgui.WindowXMLDialog):
 
 
     def onAction(self, action):
+        action = action.getId()
         # exit
-        if action.getId() in [xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]:
+        if action in [xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_NAV_BACK]:
             self.close()
             if submenu: open_shortcut_menu(self=True)
 
-        if action.getId() == xbmcgui.ACTION_CONTEXT_MENU:
+        if action == xbmcgui.ACTION_CONTEXT_MENU:
             config.open_settings()
 
         focus = self.getFocusId()
