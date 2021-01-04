@@ -175,6 +175,9 @@ def findvideos(item):
         item.contentType = 'tvshow'
         item.data = data
         return episodios(item)
+    else:
+        item.contentTitle = item.fulltitle
+        item.contentType = 'movie'
 
     # if 'protectlink' in data:
     #     urls = scrapertools.find_multiple_matches(data, r'<iframe src="[^=]+=(.*?)"')

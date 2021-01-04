@@ -602,7 +602,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
                     context_commands.append((config.get_localized_string(60355), "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' + item.action)))
                     context_commands.append((config.get_localized_string(60357), "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'channel=downloads&action=save_download&download=season&from_channel=' + item.channel + '&from_action=' + item.action)))
                 # Download episode
-                elif item.contentType == "episode" or item.action in ['findvideos']:
+                elif item.contentType == "episode" and item.action in ['findvideos']:
                     context_commands.append((config.get_localized_string(60356), "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' + item.action)))
                 # Download season
                 elif item.contentType == "season":
