@@ -5,6 +5,7 @@
 
 import json, requests
 from core import support
+from platformcode import logger
 
 host = support.config.get_channel_url()
 session = requests.Session()
@@ -185,5 +186,6 @@ def findvideos(item):
     support.info()
     itemlist=[]
     url = support.match(support.match(item).data.replace('&quot;','"').replace('\\',''), patron=r'video_url"\s*:\s*"([^"]+)"').match
-    itemlist=[item.clone(title=support.config.get_localized_string(30137), server='directo', url=url, action='play')]
+    for res in ['480p', '720p', '1080p']:
+        itemlist += [item.clone(title=support.config.get_localized_string(30137), server='directo', url='{}/{}'.format(url, res), quality=res, action='play')]
     return support.server(item, itemlist=itemlist)
