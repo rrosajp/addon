@@ -83,6 +83,8 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
         self.searchActions = searchActions
         self.thread = None
         self.selected = False
+        self.pos = 0
+        selfeppos = 0
         self.items = []
 
         if not searchActions:
@@ -586,7 +588,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 self.pos = self.RESULTS.getSelectedPosition()
                 item = Item().fromurl(self.RESULTS.getSelectedItem().getProperty('item'))
             else:
-                self.pos = self.EPISODESLIST.getSelectedPosition()
+                self.eppos = self.EPISODESLIST.getSelectedPosition()
                 item_url = self.EPISODESLIST.getSelectedItem().getProperty('item')
                 if item_url:
                     item = Item().fromurl(item_url)
@@ -701,7 +703,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
             else:
                 self.Focus(SEARCH)
                 self.setFocusId(RESULTS)
-                self.RESULTS.selectItem(self.pos)
+                self.RESULTS.selectItem(self.eppos)
         elif self.EPISODES.isVisible():
             self.episodes = []
             self.Focus(SEARCH)
