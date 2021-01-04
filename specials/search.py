@@ -697,11 +697,18 @@ def discover_list(item):
             year = scrapertools.find_single_match(release, r'(\d{4})')
 
         if not item.cast_ or (item.cast_ and (int(year) <= int(datetime.datetime.today().year))):
-            new_item = Item(channel='search', title=typo(title, 'bold'), infoLabels=elem,
-                            action='channel_search', text=title,
-                            thumbnail=thumbnail, fanart=fanart,
-                            context='', mode=mode, contentType=mode,
-                            release_date=year)
+            if config.get_setting('new_search'):
+                new_item = Item(channel='globalsearch', title=typo(title, 'bold'), infoLabels=elem,
+                                action='Search', text=title,
+                                thumbnail=thumbnail, fanart=fanart,
+                                context='', mode='search', type = mode, contentType=mode,
+                                release_date=year, folder = False)
+            else:
+                new_item = Item(channel='search', title=typo(title, 'bold'), infoLabels=elem,
+                                action='channel_search', text=title,
+                                thumbnail=thumbnail, fanart=fanart,
+                                context='', mode=mode, contentType=mode,
+                                release_date=year)
 
             if tvshow:
                 new_item.contentSerieName = title
