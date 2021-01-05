@@ -482,7 +482,10 @@ def play_from_library(item):
         item.play_from = 'window'
         itemlist = videolibrary.findvideos(item)
         p_dialog.update(100, ''); sleep(0.5); p_dialog.close()
-        while platformtools.is_playing(): sleep(1)
+        played = False
+        while platformtools.is_playing():
+            played = True
+            sleep(1)
         if item.contentType == 'movie': nfo_path = item.nfo
         else: nfo_path = item.strm_path.replace('strm','nfo')
         if nfo_path and filetools.isfile(nfo_path):
@@ -490,7 +493,7 @@ def play_from_library(item):
             head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
             played_time = platformtools.get_played_time(item_nfo)
         else: played_time = 0
-        if not played_time:
+        if not played_time and played:
             return
 
         # The number of links to show is limited

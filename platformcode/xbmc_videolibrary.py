@@ -93,7 +93,7 @@ def mark_auto_as_watched(item):
             xbmc.sleep(100)
         if not show_server and item.play_from != 'window' and not item.no_return:
             xbmc.sleep(700)
-            xbmc.executebuiltin('Action(Back)')
+            xbmc.executebuiltin('Action(ParentDir)')
             xbmc.sleep(500)
         if next_episode and next_episode.next_ep:
             from platformcode.launcher import play_from_library
