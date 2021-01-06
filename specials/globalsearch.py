@@ -65,7 +65,7 @@ QUALITYTAG = 505
 EPISODESLIST = 200
 SERVERLIST = 300
 
-class SearchWindow(xbmcgui.WindowXMLDialog):
+class SearchWindow(xbmcgui.WindowXML):
     def start(self, item, moduleDict={}, searchActions=[]):
         logger.debug()
         self.exit = False
@@ -481,8 +481,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
         global close_action
         action = action.getId()
         focus = self.getFocusId()
-        if action in [FULLSCREEN]:
-            self.playmonitor()
+
         if action in [CONTEXT] and focus in [RESULTS, EPISODESLIST, SERVERLIST]:
             self.context()
 
@@ -502,7 +501,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
             self.RESULTS.addItems(items)
             self.RESULTS.selectItem(subpos)
 
-        elif action in [DOWN] and focus in [BACK, CLOSE, MENU]:
+        elif (action in [DOWN] and focus in [BACK, CLOSE, MENU]) or focus not in [BACK, CLOSE, MENU, SERVERLIST, EPISODESLIST, RESULTS, CHANNELS]:
             if self.SERVERS.isVisible(): self.setFocusId(SERVERLIST)
             elif self.EPISODES.isVisible(): self.setFocusId(EPISODESLIST)
             elif self.RESULTS.isVisible(): self.setFocusId(RESULTS)
@@ -558,10 +557,10 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 self.actors()
             elif search == 'persons':
                 item = self.item.clone(mode='person_', discovery=self.persons[pos])
-                self.close()
+                # self.close()
                 Search(item, self.moduleDict, self.searchActions)
-                if not close_action:
-                    self.doModal()
+                if close_action:
+                    self.close
             else:
                 item = Item().fromurl(self.RESULTS.getSelectedItem().getProperty('item'))
                 if self.item.mode == 'movie': item.contentTitle = self.RESULTS.getSelectedItem().getLabel()
@@ -576,10 +575,10 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
                 self.RESULTS.setVisible(True)
                 self.PROGRESS.setVisible(False)
 
-                self.close()
+                # self.close()
                 Search(item, self.moduleDict, self.searchActions)
-                if not close_action:
-                    self.doModal()
+                if close_action:
+                    self.close()
 
         elif control_id in [RESULTS, EPISODESLIST]:
             busy(True)
@@ -665,14 +664,12 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
 
                 if config.get_setting('autoplay'):
                     busy(False)
-                    self.playmonitor()
 
             else:
                 self.episodes = self.itemsResult if self.itemsResult else []
                 self.itemsResult = []
                 ep = []
                 for item in self.episodes:
-                    # if item.action == 'findvideos':
                     it = xbmcgui.ListItem(item.title)
                     it.setProperty('item', item.tourl())
                     ep.append(it)
@@ -690,9 +687,7 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
 
         elif control_id in [SERVERLIST]:
             server = Item().fromurl(self.getControl(control_id).getSelectedItem().getProperty('item'))
-            return self.playmonitor(server)
-            # server.globalsearch = True
-            # return run(server)
+            return self.play(server)
 
     def Back(self):
         self.getControl(QUALITYTAG).setText('')
@@ -742,23 +737,9 @@ class SearchWindow(xbmcgui.WindowXMLDialog):
         if index > 0: xbmc.executebuiltin(context_commands[index])
 
 
-    def playmonitor(self, server=None):
-        if server:
-            platformtools.prevent_busy(server)
-            server.window = True
-            server.globalsearch = True
-            if server in ['torrent']: Thread(target=run, args=[server]).start()
-            else: run(server)
-        try:
-            while not platformtools.is_playing() or not xbmc.Player().getTime() > 0:
-                xbmc.sleep(500)
-            self.close()
-            xbmc.sleep(500)
-            while xbmcgui.getCurrentWindowId() in [12005, 12006]:
-                xbmc.sleep(500)
-            if platformtools.is_playing():
-                xbmc.sleep(300)
-                xbmc.executebuiltin('Action(Fullscreen)')
-            self.doModal()
-        except:
-            return
+    def play(self, server=None):
+        platformtools.prevent_busy(server)
+        server.window = True
+        server.globalsearch = True
+        return run(server)
+
