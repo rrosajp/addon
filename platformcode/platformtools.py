@@ -576,11 +576,6 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
 
             context_commands.append( (config.get_localized_string(70561), "Container.Update (%s?%s&%s)" % (sys.argv[0], item_url, 'channel=search&action=from_context&search_type=list&page=1&list_type=%s/%s/similar' % (mediatype, item.infoLabels['tmdb_id']))))
 
-        # Set as Home Page
-        if config.get_setting('start_page'):
-            if item.action not in ['episodios', 'seasons', 'findvideos', 'play']:
-                context_commands.insert(0, (config.get_localized_string(60351), "RunPlugin(%s?%s)" % (sys.argv[0], Item(channel='side_menu', action="set_custom_start", parent=item.tourl()).tourl())))
-
         if item.channel != "videolibrary":
             # Add Series to the video library
             if item.action in ["episodios", "get_episodios", "get_seasons"] and item.contentSerieName:

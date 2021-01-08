@@ -7,19 +7,13 @@ def context():
 	context = []
 	# original
 	# if config.get_setting('quick_menu'): context.append((config.get_localized_string(60360).upper(), "RunPlugin(plugin://plugin.video.kod/?%s)" % Item(channel='shortcuts', action="shortcut_menu").tourl()))
-	# if config.get_setting('side_menu'): context.append((config.get_localized_string(70737).upper(), "RunPlugin(plugin://plugin.video.kod/?%s)" % Item(channel='shortcuts',action="Side_menu").tourl()))
 	# if config.get_setting('kod_menu'): context.append((config.get_localized_string(60026), "RunPlugin(plugin://plugin.video.kod/?%s)" % Item(channel='shortcuts', action="settings_menu").tourl()))
 
 	# pre-serialised
 	if config.get_setting('quick_menu'): context.append((config.get_localized_string(60360), 'RunPlugin(plugin://plugin.video.kod/?ewogICAgImFjdGlvbiI6ICJzaG9ydGN1dF9tZW51IiwgCiAgICAiY2hhbm5lbCI6ICJzaG9ydGN1dHMiLCAKICAgICJpbmZvTGFiZWxzIjoge30KfQ%3D%3D)'))
-	if config.get_setting('Side_menu'): context.append((config.get_localized_string(70737), 'RunPlugin(plugin://plugin.video.kod/?ewogICAgImFjdGlvbiI6ICJTaWRlX21lbnUiLCAKICAgICJjaGFubmVsIjogInNob3J0Y3V0cyIsIAogICAgImluZm9MYWJlbHMiOiB7fQp9)'))
 	if config.get_setting('kod_menu'): context.append((config.get_localized_string(60026), 'RunPlugin(plugin://plugin.video.kod/?ewogICAgImFjdGlvbiI6ICJzZXR0aW5nc19tZW51IiwgCiAgICAiY2hhbm5lbCI6ICJzaG9ydGN1dHMiLCAKICAgICJpbmZvTGFiZWxzIjoge30KfQ%3D%3D)'))
 
 	return context
-
-def Side_menu(item):
-	from platformcode import side_menu
-	side_menu.open_menu(item)
 
 def shortcut_menu(item):
 	from platformcode import keymaptools
@@ -138,6 +132,7 @@ def SettingOnPosition(item):
 
 
 def select(item):
+	from core.support import dbg;dbg()
 	from platformcode import config, platformtools
 	# item.id = setting ID
 	# item.type = labels or values
@@ -152,6 +147,7 @@ def select(item):
 			values.append(config.get_localized_string(int(val)))
 	else:
 		values = item.values.split('|')
+	ID = config.get_setting(item.id) if config.get_setting(item.id) else 0
+	select = platformtools.dialog_select(label, values, ID)
 
-	select = platformtools.dialog_select(label, values, config.get_setting(item.id))
 	config.set_setting(item.id, values[select])
