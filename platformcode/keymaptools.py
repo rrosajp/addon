@@ -35,7 +35,6 @@ class KeyListener(xbmcgui.WindowXMLDialog):
 
     def onInit(self):
         try:
-            logger.debug('ICONA',addon_icon)
             self.getControl(400).setImage(addon_icon)
             self.getControl(401).addLabel(config.get_localized_string(70698))
             self.getControl(402).addLabel(config.get_localized_string(70699) % self.TIMEOUT)
@@ -102,6 +101,7 @@ DOWN = 4
 EXIT = 10
 BACKSPACE = 92
 RIGHTCLICK = 101
+MOUSEMOVE = 107
 
 class Main(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
@@ -148,10 +148,8 @@ class Main(xbmcgui.WindowXMLDialog):
                 xbmc.executebuiltin('ActivateWindow(10025, "plugin://plugin.video.kod/?' + action + '")')
 
         elif control_id in [101]:
-            logger.debug('DOWN')
             self.setFocusId(2)
         elif control_id in [102]:
-            logger.debug('UP')
             self.setFocusId(1)
 
 
@@ -167,7 +165,7 @@ class Main(xbmcgui.WindowXMLDialog):
 
         focus = self.getFocusId()
 
-        if action in [LEFT, RIGHT]:
+        if action in [LEFT, RIGHT, MOUSEMOVE] and self.getFocusId() in [1]:
             if focus in [1]:
                 self.submenu()
             else:
@@ -192,7 +190,6 @@ class Main(xbmcgui.WindowXMLDialog):
         focus = self.getFocusId()
         item_url = self.MENU.getSelectedItem().getProperty('run')
         item = Item().fromurl(item_url)
-        logger.debug(item)
         commands = platformtools.set_context_commands(item, item_url, Item())
         context = [c[0] for c in commands]
         context_commands = [c[1].replace('Container.Refresh', 'RunPlugin').replace('Container.Update', 'RunPlugin') for c in commands]
@@ -201,7 +198,6 @@ class Main(xbmcgui.WindowXMLDialog):
 
 
 def open_shortcut_menu():
-    logger.debug('WID',xbmcgui.getCurrentWindowDialogId())
     if xbmcgui.getCurrentWindowDialogId() == 9999:
         main = Main('ShortCutMenu.xml', config.get_runtime_path())
         main.doModal()
