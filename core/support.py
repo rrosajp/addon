@@ -818,33 +818,48 @@ def typo(string, typography=''):
 
     if 'capitalize' in typography:
         string = string.capitalize()
+        typography.replace('capitalize', '')
     if 'uppercase' in typography:
         string = string.upper()
+        typography.replace('uppercase', '')
     if 'lowercase' in typography:
         string = string.lower()
+        typography.replace('lowercase', '')
     if '[]' in typography:
         string = '[' + string + ']'
+        typography.replace('[]', '')
     if '()' in typography:
         string = '(' + string + ')'
+        typography.replace('()', '')
     if 'submenu' in typography:
         if VLT: string = "•• " + string
         else: string = string
+        typography.replace('submenu', '')
     if 'color kod' in typography:
         string = '[COLOR ' + kod_color + ']' + string + '[/COLOR]'
+        typography.replace('color kod', '')
     elif 'color' in typography:
         color = scrapertools.find_single_match(typography, 'color ([a-zA-Z0-9]+)')
         string = '[COLOR ' + color + ']' + string + '[/COLOR]'
+        typography.replace('color ' + color, '')
     if 'bold' in typography:
         string = '[B]' + string + '[/B]'
+        typography.replace('bold', '')
     if 'italic' in typography:
         string = '[I]' + string + '[/I]'
+        typography.replace('italic', '')
     if '_' in typography:
         string = ' ' + string
+        typography.replace('_', '')
     if '--' in typography:
         string = ' - ' + string
+        typography.replace('--', '')
     if 'bullet' in typography:
         if VLT: string = '[B]' + "•" + '[/B] ' + string
         else: string = string
+        typography.replace('bullet', '')
+    typography = typography.strip()
+    if typography: string = string + '{' + typography + '}'
     return string
 
 
