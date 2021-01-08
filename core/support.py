@@ -849,7 +849,7 @@ def typo(string, typography=''):
         typography = typography.replace('italic', '')
     if '_' in typography:
         string = ' ' + string
-        typography.replace('_', '')
+        typography = typography.replace('_', '')
     if '--' in typography:
         string = ' - ' + string
         typography = typography.replace('--', '')
