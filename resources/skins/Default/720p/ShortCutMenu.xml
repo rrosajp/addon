@@ -89,6 +89,18 @@
 							<aspectratio>keep</aspectratio>
 							<align>center</align>
 						</control>
+						<control type="textbox">
+							<description>Selected Item</description>
+							<left>0</left>
+							<top>180</top>
+							<width>100%</width>
+							<height>40</height>
+							<font>font13</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+							<align>center</align>
+							<aligny>center</aligny>
+						</control>
 					</focusedlayout>
 				</control>
 
@@ -126,36 +138,35 @@
 							<aspectratio>keep</aspectratio>
 							<align>center</align>
 						</control>
+						<control type="textbox">
+							<description>Selected Item</description>
+							<left>0</left>
+							<top>180</top>
+							<width>100%</width>
+							<height>40</height>
+							<font>font13</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+							<align>center</align>
+							<aligny>center</aligny>
+						</control>
 					</focusedlayout>
 				</control>
-			</control>
-
-			<control type="textbox">
-				<description>Selected Item</description>
-				<left>0</left>
-				<top>280</top>
-				<width>100%</width>
-				<height>40</height>
-				<font>font13</font>
-				<textcolor>FFFFFFFF</textcolor>
-				<label>$INFO[ListItem.Label]</label>
-				<align>center</align>
-				<aligny>center</aligny>
 			</control>
 
 			<control type="button" id='101'>
 				<visible>!String.IsEmpty(Container(1).ListItem.Property(sub)) + !Control.HasFocus(2) + !Control.HasFocus(102)</visible>
 				<animation effect="fade" start="0" end="100" time="200" reversible="true" condition="Control.IsVisible(101)">Conditional</animation>
-				<animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(1).Position,0)">Conditional</animation>
+				<!-- <animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(1).Position,0)">Conditional</animation>
 				<animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(1).Position,1)">Conditional</animation>
 				<animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(1).Position,2)">Conditional</animation>
 				<animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(1).Position,3)">Conditional</animation>
 				<animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(1).Position,4)">Conditional</animation>
-				<animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(1).Position,5)">Conditional</animation>
-				<left>90</left>
-				<top>180</top>
-				<width>40</width>
-				<height>40</height>
+				<animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(1).Position,5)">Conditional</animation> -->
+				<left>520</left>
+				<top>240</top>
+				<width>60</width>
+				<height>60</height>
 				<texturefocus colordiffuse="Container(1).ListItem.Property(text)">down.png</texturefocus>
 				<texturenofocus colordiffuse="Container(1).ListItem.Property(text)">down.png</texturenofocus>
 				<aspectratio>keep</aspectratio>
@@ -164,16 +175,16 @@
 			<control type="button" id='102'>
 				<visible>!Control.HasFocus(1) + !Control.HasFocus(101)</visible>
 				<animation effect="fade" start="0" end="100" time="200" reversible="true" condition="Control.IsVisible(102)">Conditional</animation>
-				<animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(2).Position,0)">Conditional</animation>
+				<!-- <animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(2).Position,0)">Conditional</animation>
 				<animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(2).Position,1)">Conditional</animation>
 				<animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(2).Position,2)">Conditional</animation>
 				<animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(2).Position,3)">Conditional</animation>
 				<animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(2).Position,4)">Conditional</animation>
-				<animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(2).Position,5)">Conditional</animation>
-				<left>90</left>
-				<top>0</top>
-				<width>40</width>
-				<height>40</height>
+				<animation effect="slide" end="220,0" condition="Integer.IsGreater(Container(2).Position,5)">Conditional</animation> -->
+				<left>520</left>
+				<top>-80</top>
+				<width>60</width>
+				<height>60</height>
 				<texturefocus colordiffuse="Container(1).ListItem.Property(text)">up.png</texturefocus>
 				<texturenofocus colordiffuse="Container(1).ListItem.Property(text)">up.png</texturenofocus>
 				<aspectratio>keep</aspectratio>

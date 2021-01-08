@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from builtins import map
-import sys, xbmc, xbmcaddon, xbmcgui, base64, json, os, re
+import xbmc, xbmcaddon, xbmcgui, os
 from threading import Timer
 from platformcode import config, logger, platformtools, launcher
+from core import filetools
 from core.item import Item
 import channelselector
-addon_icon = os.path.join( config.__settings__.getAddonInfo( "path" ),'resources', 'media', 'logo.png' )
+addon_icon = filetools.join( config.__settings__.getAddonInfo( "path" ),'resources', 'media', 'logo.png' )
 
 background = 'FF232323'
 text = 'FFFFFFFF'
@@ -130,7 +131,7 @@ class Main(xbmcgui.WindowXMLDialog):
             item.setProperty('channel', menuentry.channel)
             item.setProperty('focus', '0')
             item.setProperty('thumbnail', menuentry.thumbnail)
-            if menuentry.channel in ['news', 'channelselector', 'search', 'videolibrary', 'favorites']:
+            if menuentry.channel not in ['downloads', 'setting', 'help']:
                 item.setProperty('sub', 'true')
             item.setProperty('run', menuentry.tourl())
             itemlist.append(item)
@@ -141,7 +142,7 @@ class Main(xbmcgui.WindowXMLDialog):
         if control_id in [1, 2]:
             action = self.getControl(control_id).getSelectedItem().getProperty('run')
             self.close()
-            if self.getControl(control_id).getSelectedItem().getProperty('folder') == 'False':
+            if Item().fromurl(action).folder == False:
                 xbmc.executebuiltin('RunPlugin("plugin://plugin.video.kod/?' + action + '")')
             else:
                 xbmc.executebuiltin('ActivateWindow(10025, "plugin://plugin.video.kod/?' + action + '")')
@@ -180,7 +181,7 @@ class Main(xbmcgui.WindowXMLDialog):
         if channel_name == 'channelselector':
             import channelselector
             itemlist = self.menulist(channelselector.getchanneltypes())
-        elif channel_name in ['news', 'channelselector', 'search', 'videolibrary', 'favorites']:
+        elif channel_name not in ['downloads', 'setting', 'help']:
             channel = __import__('specials.%s' % channel_name, fromlist=["specials.%s" % channel_name])
             itemlist = self.menulist(channel.mainlist(Item().fromurl(self.MENU.getSelectedItem().getProperty('run'))))
         self.SUBMENU.reset()
