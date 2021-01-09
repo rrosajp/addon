@@ -34,7 +34,7 @@ def mark_auto_as_watched(item):
 
 
         marked = False
-        sync = True
+        sync = False
         next_episode = None
         show_server = True
 
