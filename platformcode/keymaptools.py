@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from builtins import map
-import xbmc, xbmcaddon, xbmcgui, os
+import xbmc, xbmcaddon, xbmcgui, re
 from threading import Timer
 from platformcode import config, logger, platformtools, launcher
 from core import filetools
@@ -124,7 +124,8 @@ class Main(xbmcgui.WindowXMLDialog):
         itemlist = []
         for menuentry in menu:
             # if not menuentry.channel: menuentry.channel = 'news'
-            item = xbmcgui.ListItem(menuentry.title)
+            title = re.sub(r'(\[[/]?COLOR[^\]]*\])','',menuentry.title)
+            item = xbmcgui.ListItem(title)
             item.setProperty('background', background)
             item.setProperty('text', text)
             item.setProperty('select', select)
