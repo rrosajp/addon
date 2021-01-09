@@ -435,6 +435,18 @@ def play_from_library(item):
         @type item: item
         @param item: item with information
     """
+
+    def get_played_time(item):
+        if item.contentType == 'movie': nfo_path = item.nfo
+        else: nfo_path = item.strm_path.replace('strm','nfo')
+        if nfo_path and filetools.isfile(nfo_path):
+            from core import videolibrarytools
+            head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
+            sleep(1)
+            played_time = platformtools.get_played_time(item_nfo)
+        else: played_time = 0
+        return played_time
+
     import xbmcgui, xbmcplugin, xbmc
     from time import sleep
 
@@ -463,18 +475,6 @@ def play_from_library(item):
         itemlist = videolibrary.findvideos(item)
         p_dialog.update(100, ''); sleep(0.5); p_dialog.close()
         played = False
-        while platformtools.is_playing():
-            played = True
-            sleep(1)
-        if item.contentType == 'movie': nfo_path = item.nfo
-        else: nfo_path = item.strm_path.replace('strm','nfo')
-        if nfo_path and filetools.isfile(nfo_path):
-            from core import videolibrarytools
-            head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
-            played_time = platformtools.get_played_time(item_nfo)
-        else: played_time = 0
-        if not played_time and played:
-            return
 
         # The number of links to show is limited
         if config.get_setting("max_links", "videolibrary") != 0: itemlist = limit_itemlist(itemlist)
@@ -482,9 +482,16 @@ def play_from_library(item):
         if config.get_setting("replace_VD", "videolibrary") == 1: itemlist = reorder_itemlist(itemlist)
         # from core.support import dbg;dbg()
         if len(itemlist) > 0:
+            reopen = False
             while not xbmc.Monitor().abortRequested():
+                played = True
                 # The user chooses the mirror
                 if not platformtools.is_playing():
+                    # from core.support import dbg;dbg()
+                    if config.get_setting('autoplay') or reopen:
+                        played_time = get_played_time(item)
+                        if not played_time and played:
+                            return
                     options = []
                     selection_implementation = 0
                     for item in itemlist:
@@ -508,4 +515,6 @@ def play_from_library(item):
                     else:
                         item = videolibrary.play(itemlist[selection  + selection_implementation])[0]
                         platformtools.play_video(item)
+                        reopen = True
                 # if (platformtools.is_playing() and item.action) or item.server == 'torrent' or config.get_setting('autoplay'): break
+

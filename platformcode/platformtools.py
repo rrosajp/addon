@@ -1007,7 +1007,7 @@ def get_video_seleccionado(item, seleccion, video_urls):
 
 def set_player(item, xlistitem, mediaurl, view, strm):
     logger.debug()
-    item.options = {'strm':False, 'continue':False}
+    item.options = {'strm':False}
     # logger.debug("item:\n" + item.tostring('\n'))
 
     # Moved del conector "torrent" here
@@ -1034,7 +1034,6 @@ def set_player(item, xlistitem, mediaurl, view, strm):
             prevent_busy(item)
             if player_mode in [1]:
                 item.played_time = resume_playback(get_played_time(item))
-                item.options['continue'] = True
 
             logger.info('Player Mode:',['Direct', 'Bookmark'][player_mode])
             # Add the listitem to a playlist
