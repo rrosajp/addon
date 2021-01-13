@@ -402,8 +402,8 @@ def findvideos(item):
         json = item.url
     for option in json:
         extra = set_extra_values(item, option, item.path)
-        title = item.fulltitle + (' - '+ option['title'] if 'title' in option else '')
-        title = set_title(title, extra.language, extra.quality, False)
+        title = item.fulltitle + (' - '+option['title'] if 'title' in option else '')
+        title = set_title(title, extra.language, extra.quality)
 
         itemlist.append(Item(channel=item.channel, title=title, url=option['url'], action='play', quality=extra.quality,
                              language=extra.language, infoLabels = item.infoLabels))
@@ -711,25 +711,22 @@ def set_extra_values(item, json, path):
 
 
 # format titles
-def set_title(title, language='', quality='', Bold = True):
+def set_title(title, language='', quality=''):
     logger.debug()
 
     t = support.match(title, patron=r'\{([^\}]+)\}').match
-    bold = ''
-    if Bold:
-        bold = ' bold'
-        if 'bold' not in t: t += ' bold'
-        title = re.sub(r'(\{[^\}]+\})','',title)
-        title = support.typo(title,t)
+    if 'bold' not in t: t += ' bold'
+    title = re.sub(r'(\{[^\}]+\})','',title)
+    title = support.typo(title,t)
 
     if quality:
-        title += support.typo(quality, '_ [] color kod' + bold)
+        title += support.typo(quality, '_ [] color kod bold')
     if language:
         if not isinstance(language, list):
-            title += support.typo(language.upper(), '_ [] color kod' + bold)
+            title += support.typo(language.upper(), '_ [] color kod bold')
         else:
             for lang in language:
-                title += support.typo(lang.upper(), '_ [] color kod' + bold)
+                title += support.typo(lang.upper(), '_ [] color kod bold')
 
     return title
 
