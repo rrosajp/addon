@@ -123,9 +123,9 @@ def peliculas(item):
         js = records
     # support.dbg()
     with futures.ThreadPoolExecutor() as executor:
-        for i, it in enumerate(js):
-            itm = executor.submit(makeItem, i, it, item).result()
-            itemlist.append(itm)
+        itlist = [executor.submit(makeItem, i, it, item) for i, it in enumerate(js)]
+        for res in futures.as_completed(itlist):
+            itemlist.append(res.result())
     # for i, it in enumerate(js):
     #     itm = makeItem(i, it, item)
     #     itemlist.append(itm)
@@ -161,7 +161,7 @@ def makeItem(n, it, item):
         itm.action = 'episodios'
         itm.season_count = info['seasons_count']
         itm.url = host + '/titles/%s-%s' % (it['id'], it['slug'])
-    item.n = n
+    itm.n = n
     return itm
 
 def episodios(item):
