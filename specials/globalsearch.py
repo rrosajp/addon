@@ -25,6 +25,7 @@ def set_workers():
     return workers
 
 def Search(*args):
+    xbmc.executebuiltin('Dialog.Close(all)')
     w = SearchWindow('GlobalSearch.xml', config.get_runtime_path())
     w.start(*args)
     del w
