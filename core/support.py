@@ -217,46 +217,12 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 val = domain + val
             scraped[kk] = val.strip() if type(val) == str else val
 
-        episode = ''
-        if not group or item.grouped:
-            if scraped['season'] and scraped['episode']:
-                stagione = scraped['season']
-                ep = unifyEp(scraped['episode'])
-                if 'x' in ep:
-                    episode = ep.split('x')[0].strip()
-                    second_episode = ep.split('x')[1].strip()
-                else:
-                    episode = ep
-                    second_episode = ''
-                item.infoLabels['season'] = int(scraped['season'])
-                item.infoLabels['episode'] = int(episode)
-                episode = str(int(scraped['season'])) +'x'+ str(int(episode)).zfill(2) + ('x' + str(int(second_episode)).zfill(2) if second_episode else '')
-            elif item.season:
-                item.infoLabels['season'] = int(item.season)
-                item.infoLabels['episode'] = int(scrapertools.find_single_match(scraped['episode'], r'(\d+)'))
-                episode = item.season +'x'+ scraped['episode']
-            elif item.contentType == 'tvshow' and (scraped['episode'] == '' and scraped['season'] == '' and stagione == ''):
-                item.news = 'season_completed'
-                episode = ''
-            else:
-                episode = unifyEp(scraped['episode']) if scraped['episode'] else ''
-                try:
-                    if 'x' in episode:
-                        ep = episode.split('x')
-                        episode = str(int(ep[0])).zfill(1) + 'x' + str(int(ep[1])).zfill(2)
-                        item.infoLabels['season'] = int(ep[0])
-                        item.infoLabels['episode'] = int(ep[1])
-                    second_episode = scrapertools.find_single_match(episode, r'x\d+x(\d+)')
-                    if second_episode: episode = re.sub(r'(\d+x\d+)x\d+',r'\1-', episode) + second_episode.zfill(2)
-                except:
-                    logger.debug('invalid episode: ' + episode)
-                    pass
-
-        #episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
+        # episode = re.sub(r'\s-\s|-|x|&#8211|&#215;', 'x', scraped['episode']) if scraped['episode'] else ''
         title = cleantitle(scraped.get('title', ''))
         if group and scraped.get('title', '') in contents and not item.grouped:  # same title and grouping enabled
             continue
-        if item.grouped and scraped.get('title', '') != item.fulltitle:  # inside a group different tvshow should not be included
+        if item.grouped and scraped.get('title',
+                                        '') != item.fulltitle:  # inside a group different tvshow should not be included
             continue
         contents.append(title)
         title2 = cleantitle(scraped.get('title2', '')) if not group or item.grouped else ''
@@ -278,7 +244,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
             if scraped["plot"]:
                 infolabels['plot'] = plot
             if scraped['duration']:
-                matches = scrapertools.find_multiple_matches(scraped['duration'],r'([0-9])\s*?(?:[hH]|:|\.|,|\\|\/|\||\s)\s*?([0-9]+)')
+                matches = scrapertools.find_multiple_matches(scraped['duration'],
+                                                             r'([0-9])\s*?(?:[hH]|:|\.|,|\\|\/|\||\s)\s*?([0-9]+)')
                 for h, m in matches:
                     scraped['duration'] = int(h) * 60 + int(m)
                 if not matches:
@@ -292,6 +259,41 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 infolabels['genere'] = ", ".join(genres)
             if scraped["rating"]:
                 infolabels['rating'] = scrapertools.decodeHtmlentities(scraped["rating"])
+
+        episode = ''
+        if not group or item.grouped:
+            if scraped['season'] and scraped['episode']:
+                stagione = scraped['season']
+                ep = unifyEp(scraped['episode'])
+                if 'x' in ep:
+                    episode = ep.split('x')[0].strip()
+                    second_episode = ep.split('x')[1].strip()
+                else:
+                    episode = ep
+                    second_episode = ''
+                infolabels['season'] = int(scraped['season'])
+                infolabels['episode'] = int(episode)
+                episode = str(int(scraped['season'])) +'x'+ str(int(episode)).zfill(2) + ('x' + str(int(second_episode)).zfill(2) if second_episode else '')
+            elif item.season:
+                infolabels['season'] = int(item.season)
+                infolabels['episode'] = int(scrapertools.find_single_match(scraped['episode'], r'(\d+)'))
+                episode = item.season +'x'+ scraped['episode']
+            elif item.contentType == 'tvshow' and (scraped['episode'] == '' and scraped['season'] == '' and stagione == ''):
+                item.news = 'season_completed'
+                episode = ''
+            else:
+                episode = unifyEp(scraped['episode']) if scraped['episode'] else ''
+                try:
+                    if 'x' in episode:
+                        ep = episode.split('x')
+                        episode = str(int(ep[0])).zfill(1) + 'x' + str(int(ep[1])).zfill(2)
+                        infolabels['season'] = int(ep[0])
+                        infolabels['episode'] = int(ep[1])
+                    second_episode = scrapertools.find_single_match(episode, r'x\d+x(\d+)')
+                    if second_episode: episode = re.sub(r'(\d+x\d+)x\d+',r'\1-', episode) + second_episode.zfill(2)
+                except:
+                    logger.debug('invalid episode: ' + episode)
+                    pass
 
         # make formatted Title [longtitle]
         s = ' - '
@@ -326,16 +328,16 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                     else:
                         longtitle += 'x' + str(parsedTitle.get('episode')).zfill(2)
 
-                    item.contentSeason = parsedTitle.get('season')
-                    item.contentEpisodeNumber = parsedTitle.get('episode')
+                    infolabels['season'] = parsedTitle.get('season')
+                    infolabels['episode'] = parsedTitle.get('episode')
                 elif parsedTitle.get('season') and type(parsedTitle.get('season')) == list:
                     longtitle += s + config.get_localized_string(30140) + " " +str(parsedTitle.get('season')[0]) + '-' + str(parsedTitle.get('season')[-1])
                 elif parsedTitle.get('season'):
                     longtitle += s + config.get_localized_string(60027) % str(parsedTitle.get('season'))
-                    item.contentSeason = parsedTitle.get('season')
+                    infolabels['season'] = parsedTitle.get('season')
                 if parsedTitle.get('episode_title'):
                     longtitle += s + parsedTitle.get('episode_title')
-                    item.contentEpisodeTitle = parsedTitle.get('episode_title')
+                    infolabels['episodeName'] = parsedTitle.get('episode_title')
             except:
                 import traceback
                 logger.error(traceback.format_exc())
