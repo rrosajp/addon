@@ -520,6 +520,7 @@ class SearchWindow(xbmcgui.WindowXML):
         elif action in [EXIT]:
             self.Close()
             close_action = True
+            xbmc.sleep(500)
 
     def onClick(self, control_id):
         global close_action
@@ -699,7 +700,7 @@ class SearchWindow(xbmcgui.WindowXML):
             else:
                 self.Focus(SEARCH)
                 self.setFocusId(RESULTS)
-                self.RESULTS.selectItem(self.eppos)
+                self.RESULTS.selectItem(self.epos)
         elif self.EPISODES.isVisible():
             self.episodes = []
             self.Focus(SEARCH)
@@ -717,6 +718,7 @@ class SearchWindow(xbmcgui.WindowXML):
             self.thread.join()
             busy(False)
         self.close()
+
 
     def context(self):
         focus = self.getFocusId()
