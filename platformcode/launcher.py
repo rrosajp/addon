@@ -455,8 +455,7 @@ def play_from_library(item):
     item.window = True
     logger.debug()
     # logger.debug("item: \n" + item.tostring('\n'))
-    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
-    xbmc.Player().stop()
+    platformtools.prevent_busy(item)
 
      # Modify the action (currently the video library needs "findvideos" since this is where the sources are searched
     item.action = "findvideos"
