@@ -446,7 +446,7 @@ def findvideos(item):
                     all_videolibrary = list_movies(Item()) + list_tvshows(Item())
                 for n, it in enumerate(all_videolibrary):
                     if nom_canal in it.library_urls:
-                        dead_item = Item(multichannel=len(item.library_urls) > 1,
+                        dead_item = Item(multichannel=len(it.library_urls) > 1,
                                          contentType=it.contentType,
                                          dead=nom_canal,
                                          path=filetools.split(it.nfo)[0],
