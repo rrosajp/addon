@@ -450,14 +450,16 @@ def play_from_library(item):
     import xbmcgui, xbmcplugin, xbmc
     from time import sleep
 
+    # logger.debug("item: \n" + item.tostring('\n'))
+    import setting
+    platformtools.prevent_busy(item)
+
     itemlist=[]
     item.fromLibrary = True
     item.window = True
     logger.debug()
-    # logger.debug("item: \n" + item.tostring('\n'))
-    platformtools.prevent_busy(item)
 
-     # Modify the action (currently the video library needs "findvideos" since this is where the sources are searched
+    # Modify the action (currently the video library needs "findvideos" since this is where the sources are searched
     item.action = "findvideos"
 
     window_type = config.get_setting("window_type", "videolibrary")
