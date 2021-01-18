@@ -451,7 +451,6 @@ def play_from_library(item):
     from time import sleep
 
     # logger.debug("item: \n" + item.tostring('\n'))
-    import setting
     platformtools.prevent_busy(item)
 
     itemlist=[]
