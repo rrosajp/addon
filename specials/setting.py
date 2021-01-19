@@ -241,7 +241,7 @@ def server_debrid_config(item):
 
 def servers_blacklist(item):
     server_list = servertools.get_servers_list()
-    black_list = config.get_setting("black_list", server='servers')
+    black_list = config.get_setting("black_list", server='servers', default=[])
     blacklisted = []
 
     list_controls = []
