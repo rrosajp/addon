@@ -320,16 +320,18 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
 
                     if type(parsedTitle.get('season')) == list:
                         longtitle += str(parsedTitle.get('season')[0]) + '-' + str(parsedTitle.get('season')[-1])
+                        infolabels['season'] = parsedTitle.get('season')[0]
                     else:
                         longtitle += str(parsedTitle.get('season'))
+                        infolabels['season'] = parsedTitle.get('season')
 
                     if type(parsedTitle.get('episode')) == list:
                         longtitle += 'x' + str(parsedTitle.get('episode')[0]).zfill(2) + '-' + str(parsedTitle.get('episode')[-1]).zfill(2)
+                        infolabels['episode'] = parsedTitle.get('episode')[0]
                     else:
                         longtitle += 'x' + str(parsedTitle.get('episode')).zfill(2)
+                        infolabels['episode'] = parsedTitle.get('episode')
 
-                    infolabels['season'] = parsedTitle.get('season')
-                    infolabels['episode'] = parsedTitle.get('episode')
                 elif parsedTitle.get('season') and type(parsedTitle.get('season')) == list:
                     longtitle += s + config.get_localized_string(30140) + " " +str(parsedTitle.get('season')[0]) + '-' + str(parsedTitle.get('season')[-1])
                 elif parsedTitle.get('season'):
