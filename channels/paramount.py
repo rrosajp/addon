@@ -6,8 +6,7 @@ import inspect
 from core import support, jsontools
 from platformcode import autorenumber, logger
 
-# host = support.config.get_channel_url()
-host = 'https://www.paramountnetwork.it'
+host = support.config.get_channel_url()
 headers = [['Referer', host]]
 
 

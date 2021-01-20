@@ -31,7 +31,7 @@ class UnshortenIt(object):
     _linkbucks_regex = r'linkbucks\.com|any\.gs|cash4links\.co|cash4files\.co|dyo\.gs|filesonthe\.net|goneviral\.com|megaline\.co|miniurls\.co|qqc\.co|seriousdeals\.net|theseblogs\.com|theseforums\.com|tinylinks\.co|tubeviral\.com|ultrafiles\.net|urlbeat\.net|whackyvidz\.com|yyv\.co'
     _adfocus_regex = r'adfoc\.us'
     _lnxlu_regex = r'lnx\.lu'
-    _shst_regex = r'sh\.st|festyy\.com|ceesty\.com'
+    _shst_regex = r'sh\.st|shorte\.st|sh\.st|clkmein\.com|viid\.me|xiw34\.com|corneey\.com|gestyy\.com|cllkme\.com|festyy\.com|destyy\.com|ceesty\.com'
     _hrefli_regex = r'href\.li'
     _anonymz_regex = r'anonymz\.com'
     _shrink_service_regex = r'shrink-service\.it'
@@ -381,41 +381,43 @@ class UnshortenIt(object):
 
     def _unshorten_shst(self, uri):
         try:
-            r = httptools.downloadpage(uri, timeout=self._timeout)
-            html = r.data
-            session_id = re.findall(r'sessionId\:(.*?)\"\,', html)
-            if len(session_id) > 0:
-                session_id = re.sub(r'\s\"', '', session_id[0])
-
-                http_header = dict()
-                http_header["Content-Type"] = "application/x-www-form-urlencoded"
-                http_header["Host"] = "sh.st"
-                http_header["Referer"] = uri
-                http_header["Origin"] = "http://sh.st"
-                http_header["X-Requested-With"] = "XMLHttpRequest"
-
-                if config.is_xbmc():
-                    import xbmc
-                    xbmc.sleep(5 * 1000)
-                else:
-                    time.sleep(5 * 1000)
-
-                payload = {'adSessionId': session_id, 'callback': 'c'}
-                r = httptools.downloadpage(
-                    'http://sh.st/shortest-url/end-adsession?' +
-                    urlencode(payload),
-                    headers=http_header,
-                    timeout=self._timeout)
-                response = r.data[6:-2].decode('utf-8')
-
-                if r.code == 200:
-                    resp_uri = json.loads(response)['destinationUrl']
-                    if resp_uri is not None:
-                        uri = resp_uri
-                    else:
-                        return uri, 'Error extracting url'
-                else:
-                    return uri, 'Error extracting url'
+            # act like a crawler
+            r = httptools.downloadpage(uri, timeout=self._timeout, headers=[['User-Agent', '']])
+            uri = r.url
+            # html = r.data
+            # session_id = re.findall(r'sessionId\:(.*?)\"\,', html)
+            # if len(session_id) > 0:
+            #     session_id = re.sub(r'\s\"', '', session_id[0])
+            #
+            #     http_header = dict()
+            #     http_header["Content-Type"] = "application/x-www-form-urlencoded"
+            #     http_header["Host"] = "sh.st"
+            #     http_header["Referer"] = uri
+            #     http_header["Origin"] = "http://sh.st"
+            #     http_header["X-Requested-With"] = "XMLHttpRequest"
+            #
+            #     if config.is_xbmc():
+            #         import xbmc
+            #         xbmc.sleep(5 * 1000)
+            #     else:
+            #         time.sleep(5 * 1000)
+            #
+            #     payload = {'adSessionId': session_id, 'callback': 'c'}
+            #     r = httptools.downloadpage(
+            #         'http://sh.st/shortest-url/end-adsession?' +
+            #         urlencode(payload),
+            #         headers=http_header,
+            #         timeout=self._timeout)
+            #     response = r.data[6:-2].decode('utf-8')
+            #
+            #     if r.code == 200:
+            #         resp_uri = json.loads(response)['destinationUrl']
+            #         if resp_uri is not None:
+            #             uri = resp_uri
+            #         else:
+            #             return uri, 'Error extracting url'
+            #     else:
+            #         return uri, 'Error extracting url'
 
             return uri, r.code
 
