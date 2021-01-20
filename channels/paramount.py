@@ -64,7 +64,7 @@ def live(item):
 def peliculas(item):
     logger.debug()
     def load_more(url):
-        second_url = host if url.startswith('/') else '' + url.replace('\u002F','/').replace('%5C','/')
+        second_url = host if url.startswith('/') else '' + url.replace('\u002F','/').replace('\\u002F','/').replace('%5C','/')
         new_data = support.match(host + second_url).data.replace('\x01','l').replace('\x02','a')
         return jsontools.load(new_data)['items']
 
