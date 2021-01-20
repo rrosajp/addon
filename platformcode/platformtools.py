@@ -51,7 +51,7 @@ def dialog_yesno(heading, message, nolabel=config.get_localized_string(70170), y
     dialog = xbmcgui.Dialog()
     # customlabel only work on kodi 19
     if PY3 and customlabel:
-        return dialog.yesno(heading, message, customlabel, nolabel=nolabel, yeslabel=yeslabel, autoclose=autoclose)
+        return dialog.yesno(heading, message, customlabel=customlabel, nolabel=nolabel, yeslabel=yeslabel, autoclose=autoclose)
     else:
         return dialog.yesno(heading, message, nolabel=nolabel, yeslabel=yeslabel, autoclose=autoclose)
 
