@@ -206,5 +206,5 @@ def findvideos(item):
             executor.submit(videourls, res) 
     if not video_urls: video_urls = [["m3u8 [StreamingCommunity]", url]]
     else: video_urls.sort(key=lambda url: int(support.match(url[0], patron=r'(\d+)p').match))
-    itemlist = [item.clone(title = 'StreamingCommunity', video_urls=video_urls, thumbnail=channeltools.get_channel_parameters(item.channel)["thumbnail"], forcethumb=True)]
+    itemlist = [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', video_urls=video_urls, thumbnail=channeltools.get_channel_parameters(item.channel)["thumbnail"], forcethumb=True)]
     return support.server(item, itemlist=itemlist)
