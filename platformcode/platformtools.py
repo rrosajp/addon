@@ -51,7 +51,7 @@ def dialog_yesno(heading, message, nolabel=config.get_localized_string(70170), y
     dialog = xbmcgui.Dialog()
     # customlabel only work on kodi 19
     if PY3 and customlabel:
-        return dialog.yesno(heading, message, customlabel, nolabel=nolabel, yeslabel=yeslabel, autoclose=autoclose)
+        return dialog.yesnocustom(heading, message, customlabel=customlabel, nolabel=nolabel, yeslabel=yeslabel, autoclose=autoclose)
     else:
         return dialog.yesno(heading, message, nolabel=nolabel, yeslabel=yeslabel, autoclose=autoclose)
 
@@ -1433,6 +1433,9 @@ def prevent_busy(item):
     if not item.autoplay and not item.window:
         if item.globalsearch: xbmc.Player().play(os.path.join(config.get_runtime_path(), "resources", "kod.mp4"))
         else: xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
-        xbmc.sleep(500)
+        xbmc.sleep(100)
         xbmc.Player().stop()
-        xbmc.sleep(500)
+        # xbmc.executebuiltin('Action(Stop)')
+        # xbmc.sleep(500)
+        # xbmc.Player().stop()
+        # xbmc.sleep(500)

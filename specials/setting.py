@@ -349,7 +349,7 @@ def cb_servers_favorites(server_names, dict_values):
             dict_favorites[dict_name[server_parameters['name']]] = server
             config.set_setting("favorites_servers_list", dict_name[server_parameters['name']], server=server)
         else:
-            config.set_setting("favorites_servers_list", 0, server=server)
+            config.set_setting("favorites_servers_list", 999, server=server)
         progreso.update(old_div((i * 100), n), config.get_localized_string(60559) % server_parameters['name'])
         i += 1
 
