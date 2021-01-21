@@ -34,6 +34,7 @@
         "italiaserie": "https://italiaserie.best", 
         "mediasetplay": "https://www.mediasetplay.mediaset.it", 
         "mondoserietv": "https://mondoserietv.fun", 
+        "paramount": "https://www.paramountnetwork.it", 
         "piratestreaming": "https://www.piratestreaming.camp", 
         "polpotv": "https://roma.polpo.tv", 
         "raiplay": "https://www.raiplay.it", 
@@ -43,8 +44,7 @@
         "streamingcommunity": "https://streamingcommunity.net", 
         "streamtime": "https://t.me/s/StreamTime", 
         "toonitalia": "https://toonitalia.pro", 
-        "vvvvid": "https://www.vvvvid.it",
-        "paramount": "https://www.paramountnetwork.it"
+        "vvvvid": "https://www.vvvvid.it"
     }, 
     "findhost": {
         "altadefinizione01": "https://altadefinizione01-nuovo.info", 
