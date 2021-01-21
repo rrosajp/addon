@@ -39,7 +39,7 @@ def peliculas(item):
 
     if item.args != 'newest':
         patronBlock = r'<ul class="posts">(?P<block>.*)<\/ul>'
-        patron = r'<li><a href="(?P<url>[^"]+)" data-thumbnail="(?P<thumb>[^"]+)">.*?<div class="title">(?P<title>.+?)(?:\[(?P<lang>Sub-ITA)\])?(?:[ ]\[?(?P<quality>[HD]+)?\])?(?:[ ]\((?P<year>\d+)\)?)?<\/div>'
+        patron = r'<li><a href="(?P<url>[^"]+)" data-thumbnail="(?P<thumb>[^"]+)">.*?<div class=("title"|"title lazyload")>(?P<title>.+?)(?:\[(?P<lang>Sub-ITA)\])?(?:[ ]\[?(?P<quality>[HD]+)?\])?(?:[ ]\((?P<year>\d+)\)?)?<\/div>'
         patronNext = r'<a href="([^"]+)" >Pagina'
 
     else:
