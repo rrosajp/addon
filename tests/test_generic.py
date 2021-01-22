@@ -62,7 +62,7 @@ validUrlRegex = re.compile(
     r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
 chBlackList = ['url', 'mediasetplay']
-srvBalcklist = ['mega', 'hdmario', 'torrent', 'youtube']
+srvBlacklist = ['mega', 'hdmario', 'torrent', 'youtube']
 chNumRis = {
     'altadefinizione01': {
         'Film': 20
@@ -222,7 +222,7 @@ print(channels)
 serverNames = []
 serversFinal = []
 for s in servers:
-    if not s['name'] in serverNames:
+    if s['name'] not in serverNames and s['name'] not in srvBlacklist:
         serverNames.append(s['name'])
         serversFinal.append(s)
 
