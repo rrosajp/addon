@@ -40,12 +40,12 @@ def peliculas(item):
 
     if item.args != 'newest':
         patronBlock = r'<ul class="posts">(?P<block>.*)<\/ul>'
-        patron = r'<li><a href="(?P<url>[^"]+)" data-thumbnail="(?P<thumb>[^"]+)">.*?<div class=("title"|"title lazyload")>(?P<title>.+?)(?:\[(?P<lang>Sub-ITA)\])?(?:[ ]\[?(?P<quality>[HD]+)?\])?(?:[ ]\((?P<year>\d+)\)?)?<\/div>'
+        patron = r'<li><a href="(?P<url>[^"]+)" data-thumbnail="(?P<thumb>[^"]+)">.*?<div class="title[^"]*">(?P<title>.+?)(?:\[(?P<lang>Sub-ITA)\])?(?:[ ]\[?(?P<quality>[HD]+)?\])?(?:[ ]\((?P<year>\d+)\)?)?<\/div>'
         patronNext = r'<a href="([^"]+)" >Pagina'
 
     else:
-        patronBlock = r'<ul class="posts">(?P<block>.*)<div class=("clear"|"clear lazyload")>'
-        patron = r'<li>\s?<a href="(?P<url>[^"]+)" data-thumbnail="(?P<thumb>[^"]+)">.*?<div class="title|"title lazyload">(?P<title>.+?)(?:\s\[(?P<quality>HD)\])?<\/div><div class="episode"[^>]+>(?P<episode>[^<(]+)(?:\((?P<lang>[a-zA-Z\-]+)\))?'
+        patronBlock = r'<ul class="posts">(?P<block>.*)<div class="clear[^"]*">'
+        patron = r'<li>\s?<a href="(?P<url>[^"]+)" data-thumbnail="(?P<thumb>[^"]+)">.*?<div class="title[^"]*">(?P<title>.+?)(?:\s\[(?P<quality>HD)\])?<\/div><div class="episode[^"]*"[^>]+>(?P<episode>[^<(]+)(?:\((?P<lang>[a-zA-Z\-]+)\))?'
         pagination = ''
 
     if item.args == 'search':
