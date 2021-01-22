@@ -3024,8 +3024,8 @@ msgid "Search by director"
 msgstr "Cerca per regista"
 
 msgctxt "#70048"
-msgid " My Account"
-msgstr " Il Mio Account"
+msgid "My Account"
+msgstr "Il Mio Account"
 
 msgctxt "#70049"
 msgid "Most Popular"
@@ -3053,11 +3053,11 @@ msgstr "Collega il tuo account trakt"
 
 msgctxt "#70055"
 msgid "Watchlists"
-msgstr "Lista Osservati"
+msgstr "Watchlist"
 
 msgctxt "#70056"
-msgid "Viewed"
-msgstr "Visti"
+msgid "Recently Watched"
+msgstr "Guardato di Recente"
 
 msgctxt "#70057"
 msgid "My lists"

@@ -32,18 +32,18 @@ def mainlist(item):
     itemlist = [
             # TMDB
             # item.clone(title=typo(config.get_localized_string(70021), 'bold'), action=""),
-            item.clone(title=typo(config.get_localized_string(70021) % (config.get_localized_string(30122), 'TMDB'), 'bold'), action="tmdb", args="movie", thumbnail=thumb('search_movie')),
-            item.clone(title=typo(config.get_localized_string(70021) % (config.get_localized_string(30123), 'TMDB'), 'bold'), action="tmdb", args="tv", thumbnail=thumb('search_tvshow')),
+            item.clone(title=config.get_localized_string(70021) % (config.get_localized_string(30122), 'TMDB'), action="tmdb", args="movie", thumbnail=thumb('search_movie')),
+            item.clone(title=config.get_localized_string(70021) % (config.get_localized_string(30123), 'TMDB'), action="tmdb", args="tv", thumbnail=thumb('search_tvshow')),
             # Filmaffinity
             # itemlist.append(item.clone(title=typo(config.get_localized_string(70024), 'bold'), action=""))
             # itemlist.append(item.clone(title=config.get_localized_string(70022), action="filmaf", args="movie", thumbnail=thumb('search_movie')))
             # itemlist.append(item.clone(title=config.get_localized_string(70023), action="filmaf", args="tv", thumbnail=thumb('search_tvshow')))
             # IMDB
             # item.clone(title=typo(config.get_localized_string(70025), 'bold'), action=""),
-            item.clone(title=typo(config.get_localized_string(70021) % (config.get_localized_string(30122), 'IMDB'), 'bold'), action="imdb", args="movie", url='&title_type=feature,tv_movie', thumbnail=thumb('search_movie')),
-            item.clone(title=typo(config.get_localized_string(70021) % (config.get_localized_string(30123), 'IMDB'), 'bold'), action="imdb", args="tv", url='&title_type=tv_series,tv_special,mini_series', thumbnail=thumb('search_tvshow')),
-            item.clone(title=typo(config.get_localized_string(70415), 'bold'), action="trakt", thumbnail="http://i.imgur.com/5sQjjuk.png"),
-            item.clone(title=typo(config.get_localized_string(70026), 'bold'), action="mal", thumbnail="http://i.imgur.com/RhsYWmd.png"),
+            item.clone(title=config.get_localized_string(70021) % (config.get_localized_string(30122), 'IMDB'), action="imdb", args="movie", url='&title_type=feature,tv_movie', thumbnail=thumb('search_movie')),
+            item.clone(title=config.get_localized_string(70021) % (config.get_localized_string(30123), 'IMDB'), action="imdb", args="tv", url='&title_type=tv_series,tv_special,mini_series', thumbnail=thumb('search_tvshow')),
+            item.clone(title=config.get_localized_string(70415), action="trakt", thumbnail="http://i.imgur.com/5sQjjuk.png"),
+            item.clone(title=config.get_localized_string(70026), action="mal", thumbnail="http://i.imgur.com/RhsYWmd.png"),
             item.clone(title=typo(config.get_localized_string(70027), 'color kod'), action="configuracion", folder=False)
         ]
     return itemlist
@@ -130,8 +130,8 @@ def tmdb(item):
         itemlist.append(item.clone(title=config.get_localized_string(70036), action="search_", search={'url': 'search/person', 'language': langt, 'page': 1}))
         if item.args == "movie": itemlist.append(item.clone(title=config.get_localized_string(70037), action="search_", search={'url': "search/person", 'language': langt, 'page': 1}, crew=True))
 
-    itemlist.append(item.clone(title=config.get_localized_string(70038), action="filter", ))
-    itemlist.append(item.clone(title=config.get_localized_string(70039), action="filter", ))
+    itemlist.append(item.clone(title=typo(config.get_localized_string(70038),'color kod'), action="filter", ))
+    itemlist.append(item.clone(title=typo(config.get_localized_string(70039),'color kod'), action="filter", ))
 
     return thumb(itemlist)
 
@@ -155,7 +155,7 @@ def imdb(item):
         itemlist.append(item.clone(title=config.get_localized_string(30980), action="search_", url="http://www.imdb.com/search/title?title={}" + item.url))
         itemlist.append(item.clone(title=config.get_localized_string(70036), action="search_", url="http://www.imdb.com/search/name?name={}"))
 
-    itemlist.append(item.clone(title=config.get_localized_string(70038), action="filter_imdb", ))
+    itemlist.append(item.clone(title=typo(config.get_localized_string(70038),'color kod'), action="filter_imdb", ))
 
     return thumb(itemlist)
 
@@ -199,20 +199,20 @@ def trakt(item):
     page = "?page=1&limit=20&extended=full"
     if not item.args:
         item.args = "movie"
-        itemlist.append(item.clone(title=typo(config.get_localized_string(70416), 'bold'), action=""))
-        itemlist.append(item.clone(title=config.get_localized_string(70049), action="acciones_trakt", url="movies/popular%s" % page))
-        itemlist.append(item.clone(title=config.get_localized_string(70050), action="acciones_trakt", url="movies/trending%s" % page))
-        itemlist.append(item.clone(title=config.get_localized_string(70053), action="acciones_trakt", url="movies/watched/all%s" % page))
-        itemlist.append(item.clone(title=config.get_localized_string(70051), action="acciones_trakt", url="movies/anticipated%s" % page))
-        if token_auth: itemlist.append(item.clone(title=config.get_localized_string(70052), action="acciones_trakt",url="recommendations/movies?limit=100&extended=full", pagina=0))
-        itemlist.append(item.clone(title=typo(config.get_localized_string(70417), 'bold'), action="",))
+        # itemlist.append(item.clone(title=typo(config.get_localized_string(70416), 'bold'), action=""))
+        itemlist.append(item.clone(title=typo(config.get_localized_string(30122), 'bold') + typo(config.get_localized_string(70049),'[] _'), action="acciones_trakt", url="movies/popular%s" % page))
+        itemlist.append(item.clone(title=typo(config.get_localized_string(30122), 'bold') + typo(config.get_localized_string(70050),'[] _'), action="acciones_trakt", url="movies/trending%s" % page))
+        itemlist.append(item.clone(title=typo(config.get_localized_string(30122), 'bold') + typo(config.get_localized_string(70053),'[] _'), action="acciones_trakt", url="movies/watched/all%s" % page))
+        itemlist.append(item.clone(title=typo(config.get_localized_string(30122), 'bold') + typo(config.get_localized_string(70051),'[] _'), action="acciones_trakt", url="movies/anticipated%s" % page))
+        if token_auth: itemlist.append(item.clone(title=typo(config.get_localized_string(30122), 'bold') + typo(config.get_localized_string(70052),'[] _'), action="acciones_trakt",url="recommendations/movies?limit=100&extended=full", pagina=0))
+        # itemlist.append(item.clone(title=typo(config.get_localized_string(70417), 'bold'), action="",))
         item.args = "show"
-        itemlist.append(item.clone(title=config.get_localized_string(70049), action="acciones_trakt", url="shows/popular%s" % page))
-        itemlist.append(item.clone(title=config.get_localized_string(70050), action="acciones_trakt", url="shows/trending%s" % page))
-        itemlist.append(item.clone(title=config.get_localized_string(70053), action="acciones_trakt", url="shows/watched/all%s" % page))
-        itemlist.append(item.clone(title=config.get_localized_string(70051), action="acciones_trakt", url="shows/anticipated%s" % page))
-        if token_auth: itemlist.append(item.clone(title=config.get_localized_string(70052), action="acciones_trakt", url="recommendations/shows?limit=100&extended=full", pagina=0))
-        itemlist.append(item.clone(title=typo(config.get_localized_string(70048), 'color kod bold'), args="cuenta"))
+        itemlist.append(item.clone(title=typo(config.get_localized_string(30123), 'bold') + typo(config.get_localized_string(70049),'[] _'), action="acciones_trakt", url="shows/popular%s" % page))
+        itemlist.append(item.clone(title=typo(config.get_localized_string(30123), 'bold') + typo(config.get_localized_string(70050),'[] _'), action="acciones_trakt", url="shows/trending%s" % page))
+        itemlist.append(item.clone(title=typo(config.get_localized_string(30123), 'bold') + typo(config.get_localized_string(70053),'[] _'), action="acciones_trakt", url="shows/watched/all%s" % page))
+        itemlist.append(item.clone(title=typo(config.get_localized_string(30123), 'bold') + typo(config.get_localized_string(70051),'[] _'), action="acciones_trakt", url="shows/anticipated%s" % page))
+        if token_auth: itemlist.append(item.clone(title=typo(config.get_localized_string(30123), 'bold') + typo(config.get_localized_string(70052),'[] _'), action="acciones_trakt", url="recommendations/shows?limit=100&extended=full", pagina=0))
+        itemlist.append(item.clone(title=typo(config.get_localized_string(70048), 'color kod'), args="cuenta"))
     else:
         item.args = "movie"
         # A saved token is checked and the authentication process is executed
@@ -220,16 +220,16 @@ def trakt(item):
             folder = (config.get_platform() == "plex")
             itemlist.append(item.clone(title=config.get_localized_string(70054), action="auth_trakt", folder=folder))
         else:
-            itemlist.append(item.clone(title=config.get_localized_string(70055), action="", ))
-            itemlist.append(item.clone(title=config.get_localized_string(60651), action="acciones_trakt", url="users/me/watchlist/movies%s" % page, order="added", how="desc"))
-            itemlist.append(item.clone(title=config.get_localized_string(60652), action="acciones_trakt", url="users/me/watchlist/shows%s" % page, args="show", order="added", how="desc"))
-            itemlist.append(item.clone(title=config.get_localized_string(70056), action="", ))
-            itemlist.append(item.clone(title=config.get_localized_string(60651), action="acciones_trakt", url="users/me/watched/movies%s" % page, order="added", how="desc"))
-            itemlist.append(item.clone(title=config.get_localized_string(60652), action="acciones_trakt", url="users/me/watched/shows%s" % page, args="show", order="added", how="desc"))
-            itemlist.append(item.clone(title=config.get_localized_string(70068), action="", ))
-            itemlist.append(item.clone(title=config.get_localized_string(60651), action="acciones_trakt", url="users/me/collection/movies%s" % page, order="added", how="desc"))
-            itemlist.append(item.clone(title=config.get_localized_string(60652), action="acciones_trakt", url="users/me/collection/shows%s" % page, args="show", order="added", how="desc"))
-            itemlist.append(item.clone(title=config.get_localized_string(70057), action="acciones_trakt", url="users/me/lists", ))
+
+            itemlist.append(item.clone(title=typo(config.get_localized_string(30122),'bold') + typo(config.get_localized_string(70055),'_ []'), action="acciones_trakt", url="users/me/watchlist/movies%s" % page, order="added", how="desc"))
+            itemlist.append(item.clone(title=typo(config.get_localized_string(30122),'bold') + typo(config.get_localized_string(70056),'_ []'), action="acciones_trakt", url="users/me/watched/movies%s" % page, order="added", how="desc"))
+            itemlist.append(item.clone(title=typo(config.get_localized_string(30122),'bold') + typo(config.get_localized_string(70068),'_ []'), action="acciones_trakt", url="users/me/collection/movies%s" % page, order="added", how="desc"))
+
+            itemlist.append(item.clone(title=typo(config.get_localized_string(30123),'bold') + typo(config.get_localized_string(70055),'_ []'), action="acciones_trakt", url="users/me/watchlist/shows%s" % page, args="show", order="added", how="desc"))
+            itemlist.append(item.clone(title=typo(config.get_localized_string(30123),'bold') + typo(config.get_localized_string(70056),'_ []'), action="acciones_trakt", url="users/me/watched/shows%s" % page, args="show", order="added", how="desc"))
+            itemlist.append(item.clone(title=typo(config.get_localized_string(30123),'bold') + typo(config.get_localized_string(70068),'_ []'), action="acciones_trakt", url="users/me/collection/shows%s" % page, args="show", order="added", how="desc"))
+
+            itemlist.append(item.clone(title=typo(config.get_localized_string(70057),'color kod bold'), action="acciones_trakt", url="users/me/lists", ))
 
     return itemlist
 
@@ -249,9 +249,9 @@ def mal(item):
     itemlist.append(item.clone(title=config.get_localized_string(70063), url="", action="indices_mal"))
     if config.get_platform() != "plex":
         itemlist.append(item.clone(title=config.get_localized_string(70064), url="https://myanimelist.net/anime.php?q=", action="search_"))
-    itemlist.append(item.clone(title=typo(config.get_localized_string(70038), 'bold submenu'), action="filter_mal"))
+    itemlist.append(item.clone(title=typo(config.get_localized_string(70038), 'color kod'), action="filter_mal"))
 
-    itemlist.append(item.clone(title=typo(config.get_localized_string(70057), 'bold submenu'), action="cuenta_mal"))
+    itemlist.append(item.clone(title=typo(config.get_localized_string(70057), 'color kod'), action="cuenta_mal"))
 
     return itemlist
 
@@ -858,11 +858,13 @@ def filter_imdb(item):
 
         data = match("http://www.imdb.com/search/title", cookies=False).data
         # bloque = scrapertools.find_single_match(data, '<h3>Genres</h3>(.*?)</table>')
-        matches = match(data, paronBlock=r'<h3>Genres</h3>(.*?)</table>', patron=r' value="([^"]+)"\s*>\s*<label.*?>([^<]+)<').matches
+        matches = match(data, patronBlock=r'<h3>Genres</h3>(.*?)</table>', patron=r' value="([^"]+)"\s*>\s*<label.*?>([^<]+)<').matches
         if matches:
+            list_controls.append({'id': 'espacio', 'label': '', 'enabled': False, 'type': 'label', 'default': None, 'visible': True})
             list_controls.append({'id': 'labelgenre', 'enabled': True, 'type': 'label', 'visible': True, 'label': config.get_localized_string(70451),})
             lista = []
             for value, title in matches:
+                logger.debug('TITOLO:',title, genres_translate.get(title, title))
                 title = genres_translate.get(title, title)
                 lista.append([value, title])
             lista.sort(key=lambda lista: lista[1])
@@ -1994,7 +1996,7 @@ def acciones_trakt(item):
         data = jsontools.load(data)
         for entry in data:
             new_item = item.clone()
-            new_item.title = entry["name"] + ' ' + str(entry["item_count"])
+            new_item.title = typo(entry["name"],'bold') + typo(str(entry["item_count"]),'color kod bold _ []')
             new_item.infoLabels["plot"] = entry.get("description")
             new_item.url = "users/me/lists/%s/items/?page=1&limit=20&extended=full" % entry["ids"]["trakt"]
             new_item.order = entry.get("sort_by")

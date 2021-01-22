@@ -3025,7 +3025,7 @@ msgid "Search by director"
 msgstr ""
 
 msgctxt "#70048"
-msgid " My Account"
+msgid "My Account"
 msgstr ""
 
 msgctxt "#70049"
@@ -3057,7 +3057,7 @@ msgid "Watchlists"
 msgstr ""
 
 msgctxt "#70056"
-msgid "Viewed"
+msgid "Recently Watched"
 msgstr ""
 
 msgctxt "#70057"
