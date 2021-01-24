@@ -217,7 +217,8 @@ logger.record = False
 
 from specials import news
 dictNewsChannels, any_active = news.get_channels_list()
-json.dump(channels, open(os.path.join(os.getcwd(), 'reports', 'result.json')))
+os.mkdir(os.path.join(os.getcwd(), 'reports'))
+json.dump(channels, open(os.path.join(os.getcwd(), 'reports', 'result.json'), 'w'))
 # only 1 server item for single server
 serverNames = []
 serversFinal = []
