@@ -7,6 +7,7 @@
 # export KOD_TST_CH=channel
 # python tests/test_generic.py
 import html
+import json
 import os
 import sys
 import unittest
@@ -216,7 +217,7 @@ logger.record = False
 
 from specials import news
 dictNewsChannels, any_active = news.get_channels_list()
-print(channels)
+json.dump(channels, open(os.path.join(os.getcwd(), 'reports', 'result.json')))
 # only 1 server item for single server
 serverNames = []
 serversFinal = []
