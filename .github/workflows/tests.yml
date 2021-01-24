@@ -14,10 +14,13 @@ jobs:
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
-        python-version: 2.7
+        python-version: 3.8
 
     - name: Run tests
-      run: ./tests/run.sh
+      run: |
+        export PYTHONPATH=$GITHUB_WORKSPACE
+        export KODI_INTERACTIVE=0
+        ./tests/run.sh
 
     - uses: actions/upload-artifact@v2
       with:
