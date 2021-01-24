@@ -6,7 +6,6 @@ python3 -m pip install --upgrade pip
 pip install sakee
 pip install html-testRunner
 pip install parameterized
-pip install html
 export PYTHONPATH=$PWD
 export KODI_INTERACTIVE=0
 export KODI_HOME=$PWD/tests/home
