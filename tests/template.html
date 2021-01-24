@@ -126,11 +126,11 @@
                         {%- endif %}
                         {%- endif %}
                         {%- endfor %}
-                        <tr>
-                            <td colspan="3">
-                                Total: {{ summaries[test_case_name].total }}, Pass: {{ summaries[test_case_name].success }}{% if summaries[test_case_name].failure %}, Fail: {{ summaries[test_case_name].failure }}{% endif %}{% if summaries[test_case_name].error %}, Error: {{ summaries[test_case_name].error }}{% endif %}{% if summaries[test_case_name].skip %}, Skip: {{ summaries[test_case_name].skip }}{% endif %} -- Duration: {{ summaries[test_case_name].duration }}
-                            </td>
-                        </tr>
+<!--                        <tr>-->
+<!--                            <td colspan="3">-->
+<!--                                Total: {{ summaries[test_case_name].total }}, Pass: {{ summaries[test_case_name].success }}{% if summaries[test_case_name].failure %}, Fail: {{ summaries[test_case_name].failure }}{% endif %}{% if summaries[test_case_name].error %}, Error: {{ summaries[test_case_name].error }}{% endif %}{% if summaries[test_case_name].skip %}, Skip: {{ summaries[test_case_name].skip }}{% endif %} &#45;&#45; Duration: {{ summaries[test_case_name].duration }}-->
+<!--                            </td>-->
+<!--                        </tr>-->
                     </tbody>
                 </table>
             </div>
@@ -171,30 +171,18 @@
             }
             $('#showPassed').on('click', function(){
                 $(".success").toggle(this.checked);
-                if (this.checked == false) {
-                    $(".success").next('tr').toggle(this.checked);
-                }
                 hideOrShow()
             });
             $('#showFailed').on('click', function(){
                 $(".danger").toggle(this.checked);
-                if (this.checked == false) {
-                    $(".danger").next('tr').toggle(this.checked);
-                }
                 hideOrShow()
             });
             $('#showErrors').on('click', function(){
                 $(".warning").toggle(this.checked);
-                if (this.checked == false) {
-                    $(".warning").next('tr').toggle(this.checked);
-                }
                 hideOrShow()
             });
             $('#showSkipped').on('click', function(){
                 $(".info").toggle(this.checked);
-                if (this.checked == false) {
-                    $(".info").next('tr').toggle(this.checked);
-                }
                 hideOrShow()
             });
         });
