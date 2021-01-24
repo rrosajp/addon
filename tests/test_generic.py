@@ -23,10 +23,9 @@ if 'KOD_TST_CH' not in os.environ:
             kodi_profile_path=os.path.join(os.getcwd(), 'tests', 'home', 'userdata')
         )
 
-
     # override
-    xbmc.__add_on_info = add_on_info
-
+    from sakee import addoninfo
+    addoninfo.get_add_on_info_from_calling_script = add_on_info
 
 # functions that on kodi 19 moved to xbmcvfs
 try:
