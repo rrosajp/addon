@@ -17,7 +17,7 @@ jobs:
         python-version: 2.7
 
     - name: Run tests
-      run: ./run.sh
+      run: ./tests/run.sh
 
     - uses: actions/upload-artifact@v2
       with:
