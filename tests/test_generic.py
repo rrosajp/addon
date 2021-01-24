@@ -25,7 +25,7 @@ if 'KOD_TST_CH' not in os.environ:
 
 
     # override
-    xbmc.get_add_on_info_from_calling_script = add_on_info
+    xbmc.__add_on_info = add_on_info
 
 
 # functions that on kodi 19 moved to xbmcvfs
