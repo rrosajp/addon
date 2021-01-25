@@ -49,6 +49,9 @@ def list_movies(item, silent=False):
                     local= True
                     break
 
+    # from core.support import dbg;dbg()
+    # for movie_path in movies_path:
+    #     get_results(movie_path, root, 'movie', local)
     with futures.ThreadPoolExecutor() as executor:
         itlist = [executor.submit(get_results, movie_path, root, 'movie', local) for movie_path in movies_path]
         for res in futures.as_completed(itlist):
@@ -123,7 +126,7 @@ def get_results(nfo_path, root, Type, local=False):
             if not filetools.exists(filetools.join(item.path, filetools.basename(strm_path))) and not local: return Item(), 0
 
             # Contextual menu: Mark as seen / not seen
-            visto = item.library_playcounts.get(item.path.split(sep)[0], 0)
+            visto = item.library_playcounts.get(strm_path.strip('/').split('/')[0], 0)
             item.infoLabels["playcount"] = visto
             if visto > 0:
                 seen_text = config.get_localized_string(60016)
