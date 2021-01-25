@@ -23,7 +23,7 @@ from platformcode import config
 
 def findhost(url):
     data = support.httptools.downloadpage(url).data
-    host = support.scrapertools.find_single_match(data, '<div class="elementor-button-wrapper"> <a href="([^"]+)"')
+    host = support.scrapertools.find_single_match(data, '<div class="elementor-button-wrapper">\s*<a href="([^"]+)"')
     return host
 
 host = config.get_channel_url(findhost)

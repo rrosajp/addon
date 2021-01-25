@@ -180,8 +180,6 @@ for chItem in channel_list:
 
                 itemlist = getattr(module, it.action)(it)
                 menuItemlist[it.title] = itemlist
-                logMenu[it.title] = logger.recordedLog
-                logger.recordedLog = ''
 
                 # some sites might have no link inside, but if all results are without servers, there's something wrong
                 for resIt in itemlist:
@@ -207,8 +205,9 @@ for chItem in channel_list:
             except:
                 import traceback
                 logger.error(traceback.format_exc())
-                logMenu[it.title] = logger.recordedLog
-                logger.recordedLog = ''
+
+            logMenu[it.title] = logger.recordedLog
+            logger.recordedLog = ''
 
         results.append(
             {'ch': ch, 'hasChannelConfig': hasChannelConfig, 'mainlist': [it.title for it in mainlist],
