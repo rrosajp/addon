@@ -22,12 +22,12 @@ jobs:
           ./tests/run.sh
 
       - name: Commit & Push changes
-        uses: cpina/github-action-push-to-another-repository@cp_instead_of_deleting
+        uses: dmnemec/copy_file_to_another_repo_action@v1.0.4
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source-directory: "reports"
-          destination-github-username: "kodiondemand"
-          destination-repository-name: "kodiondemand.github.io"
-          user-email: "tests@kod.bot"
-          commit-message: "Test suite"
+          source_file: 'reports'
+          destination_repo: 'kodiondemand/kodiondemand.github.io'
+          user_email: 'tests@kod.bot'
+          user_name: 'bot'
+          commit_message: 'Test suite'
