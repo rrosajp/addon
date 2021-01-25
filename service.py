@@ -24,7 +24,7 @@ sys.path.insert(0, librerias)
 
 from core import videolibrarytools, filetools, channeltools, httptools, scrapertools
 from lib import schedule
-from platformcode import logger, platformtools, updater
+from platformcode import logger, platformtools, updater, xbmc_videolibrary
 from specials import videolibrary
 from servers import torrent
 
@@ -397,6 +397,11 @@ class AddonMonitor(xbmc.Monitor):
             if self.settings_pre.get("shortcut_key", '') != settings_post.get("shortcut_key", ''):
                 xbmc.executebuiltin('Action(reloadkeymaps)')
             self.settings_pre = settings_post
+
+    def onNotification(self, sender, method, data):
+        if method == 'VideoLibrary.OnUpdate':
+            xbmc_videolibrary.set_watched_on_kod(data)
+            logger.debug('AGGIORNO')
 
     def onScreensaverActivated(self):
         logger.debug('screensaver activated, un-scheduling screen-on jobs')

@@ -351,6 +351,38 @@ def mark_season_as_watched_on_kodi(item, value=1):
 
     execute_sql_kodi(sql)
 
+def set_watched_on_kod(data):
+    from specials import videolibrary
+    from core import videolibrarytools
+    logger.debug('TYPE',type(data))
+    data = jsontools.load(data)
+    logger.debug('TYPE',type(data))
+    Type = data['item']['type']
+    ID = data['item']['id']
+    playcount = data['playcount']
+    for Type in ['movie', 'episode']:
+        sql = 'select strFileName, strPath, uniqueid_value from %s_view where (id%s like "%s")' % (Type, Type.capitalize(), ID)
+        n, records = execute_sql_kodi(sql)
+        if records:
+            for filename, path, uniqueid_value in records:
+                if Type in ['movie']:
+                    title = filename.replace('.strm', ' [' + uniqueid_value + ']')
+                    filename = title +'.nfo'
+                else:
+                    title = filename.replace('.strm', '')
+                    filename = 'tvshow.nfo'
+
+                path = filetools.join(path, filename)
+                head_nfo, item = videolibrarytools.read_nfo(path)
+                item.library_playcounts.update({title: playcount})
+                filetools.write(path, head_nfo + item.tojson())
+
+                if item.infoLabels['mediatype'] == "tvshow":
+                    for season in item.library_playcounts:
+                        if "season" in season:
+                            season_num = int(scrapertools.find_single_match(season, r'season (\d+)'))
+                            item = videolibrary.check_season_playcount(item, season_num)
+                            filetools.write(path, head_nfo + item.tojson())
 
 def mark_content_as_watched_on_kod(path):
     from specials import videolibrary
@@ -384,6 +416,7 @@ def mark_content_as_watched_on_kod(path):
     if "\\" in path:
         path = path.replace("/", "\\")
     head_nfo, item = videolibrarytools.read_nfo(path)                   # I read the content .nfo
+    old = item.clone()
     if not item:
         logger.error('.NFO not found: ' + path)
         return
@@ -437,8 +470,9 @@ def mark_content_as_watched_on_kod(path):
             if "season" in season:                                      # we look for the tags "season" inside playCounts
                 season_num = int(scrapertools.find_single_match(season, r'season (\d+)'))    # we save the season number
                 item = videolibrary.check_season_playcount(item, season_num)    # We call the method that updates Temps. and series
-
-    filetools.write(path, head_nfo + item.tojson())
+    if item.library_playcounts != old.library_playcounts:
+        logger.debug('scrivo')
+        filetools.write(path, head_nfo + item.tojson())
 
     #logger.debug(item)
 

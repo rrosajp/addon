@@ -67,6 +67,8 @@ def list_tvshows(item):
     lista = []
 
     root = videolibrarytools.TVSHOWS_PATH
+    from time import time
+    start = time()
     with futures.ThreadPoolExecutor() as executor:
         itlist = [executor.submit(get_results, filetools.join(root, folder, "tvshow.nfo"), root, 'tvshow') for folder in filetools.listdir(root)]
         for res in futures.as_completed(itlist):
@@ -75,7 +77,7 @@ def list_tvshows(item):
             if item_tvshow.library_urls and len(item_tvshow.library_urls) > 0:
                 itemlist += [item_tvshow]
                 lista += [{'title':item_tvshow.contentTitle,'thumbnail':item_tvshow.thumbnail,'fanart':item_tvshow.fanart, 'active': value, 'nfo':item_tvshow.nfo}]
-
+    logger.debug('load list',time() - start)
     if itemlist:
         itemlist = sorted(itemlist, key=lambda it: it.title.lower())
 
@@ -94,7 +96,10 @@ def get_results(nfo_path, root, Type, local=False):
     if filetools.exists(nfo_path):
         # We synchronize the episodes seen from the Kodi video library with that of KoD
         from platformcode import xbmc_videolibrary
-        xbmc_videolibrary.mark_content_as_watched_on_kod(nfo_path)
+        from time import time
+        start = time()
+        # xbmc_videolibrary.mark_content_as_watched_on_kod(nfo_path)
+        logger.debug('execution time =',time()-start)
         head_nfo, item = videolibrarytools.read_nfo(nfo_path)
 
         # If you have not read the .nfo well, we will proceed to the next
@@ -907,7 +912,9 @@ def mark_season_as_watched(item):
     # logger.debug("item:\n" + item.tostring('\n'))
 
     # Get dictionary of marked episodes
-    f = filetools.join(item.path, 'tvshow.nfo')
+    if not item.path: f = item.nfo
+    else: f = filetools.join(item.path, 'tvshow.nfo')
+
     head_nfo, it = videolibrarytools.read_nfo(f)
     if not hasattr(it, 'library_playcounts'):
         it.library_playcounts = {}
