@@ -53,6 +53,7 @@ from core import servertools
 import channelselector
 import re
 
+outDir = os.path.join(os.getcwd(), 'reports')
 validUrlRegex = re.compile(
     r'^(?:http|ftp)s?://'  # http:// or https://
     r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
@@ -144,7 +145,7 @@ channels = []
 
 channel_list = channelselector.filterchannels("all") if 'KOD_TST_CH' not in os.environ else [Item(channel=os.environ['KOD_TST_CH'], action="mainlist")]
 logger.info([c.channel for c in channel_list])
-ret = []
+results = []
 
 logger.record = True
 for chItem in channel_list:
@@ -209,6 +210,11 @@ for chItem in channel_list:
                 logMenu[it.title] = logger.recordedLog
                 logger.recordedLog = ''
 
+        results.append(
+            {'ch': ch, 'hasChannelConfig': hasChannelConfig, 'mainlist': [it.title for it in mainlist],
+             'menuItemlist': {k: [it.tojson() if type(it) == Item else it for it in menuItemlist[k]] for k in menuItemlist.keys()},
+             'serversFound': {k: [it.tojson() if type(it) == Item else it for it in menuItemlist[k]] for k in menuItemlist.keys()},
+             'module': str(module), 'logMenu': logMenu, 'error': error})
         channels.append(
             {'ch': ch, 'hasChannelConfig': hasChannelConfig, 'mainlist': mainlist, 'menuItemlist': menuItemlist,
              'serversFound': serversFound, 'module': module, 'logMenu': logMenu, 'error': error})
@@ -217,8 +223,9 @@ logger.record = False
 
 from specials import news
 dictNewsChannels, any_active = news.get_channels_list()
-os.mkdir(os.path.join(os.getcwd(), 'reports'))
-json.dump(channels, open(os.path.join(os.getcwd(), 'reports', 'result.json'), 'w'))
+if not os.path.isdir(outDir):
+    os.mkdir(outDir)
+json.dump(results, open(os.path.join(outDir, 'result.json'), 'w'))
 # only 1 server item for single server
 serverNames = []
 serversFinal = []
@@ -351,6 +358,6 @@ if __name__ == '__main__':
         unittest.main(testRunner=HtmlTestRunner.HTMLTestRunner(report_name='report', add_timestamp=False, combine_reports=True,
                      report_title='KoD Test Suite', template=os.path.join(config.get_runtime_path(), 'tests', 'template.html')), exit=False)
         import webbrowser
-        webbrowser.open(os.path.join(config.get_runtime_path(), 'reports', 'report.html'))
+        webbrowser.open(os.path.join(outDir, 'report.html'))
     else:
         unittest.main()
