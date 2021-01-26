@@ -21,9 +21,11 @@ HEADERS = {
 }
 
 MAX_CONECTION_THREAD = 10
+SL = 'en'
+TL = 'it'
 
 BASE_URL_PROXY = 'https://translate.googleusercontent.com'
-BASE_URL_TRANSLATE = 'https://translate.google.com/translate?hl=it&sl=en&tl=it&u=[TARGET_URL]&sandbox=0'  # noqa: E501
+BASE_URL_TRANSLATE = 'https://translate.google.com/translate?hl=it&sl=' + SL + '&tl=' + TL + '&u=[TARGET_URL]&sandbox=0'  # noqa: E501
 
 
 def checker_url(html, url):
@@ -52,7 +54,7 @@ def process_request_proxy(url):
 
         url_request = checker_url(
             return_html.text,
-            BASE_URL_PROXY + '/translate_p?hl=it&sl=en&tl=it&u='
+            BASE_URL_PROXY + '/translate_p?hl=it&sl=' + SL + '&tl=' + TL + '&u='
         )
 
         logger.debug(url_request)
@@ -85,7 +87,9 @@ def process_request_proxy(url):
         data = re.sub('\s(\w+)=(?!")([^<>\s]+)', r' \1="\2"', data)
         data = re.sub('https://translate\.googleusercontent\.com/.*?u=(.*?)&amp;usg=[A-Za-z0-9_-]+', '\\1', data)
         data = re.sub('https?://[a-zA-Z0-9]+--' + domain.replace('.', '-') + '\.translate\.goog(/[a-zA-Z0-9#/-]+)', 'https://' + domain + '\\1', data)
+        data = re.sub('\s+<', '<', data)
+        data = data.replace('&amp;', '&').replace('https://translate.google.com/website?sl=' + SL + '&tl=' + TL + '&u=', '')
 
-        return {'url': url.strip(), 'result': result, 'data': data.replace('&amp;', '&')}
+        return {'url': url.strip(), 'result': result, 'data': data}
     except Exception as e:
         logger.error(e)
