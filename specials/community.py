@@ -406,8 +406,8 @@ def findvideos(item):
         title = item.fulltitle + (' - '+option['title'] if 'title' in option else '')
         title = set_title(title, extra.language, extra.quality)
 
-        itemlist.append(Item(channel=item.channel, title=title, url=option['url'], action='play', quality=extra.quality,
-                             language=extra.language, infoLabels = item.infoLabels, contentTitle=item.fulltitle))
+        itemlist.append(item.clone(channel=item.channel, title=title, url=option['url'], action='play', quality=extra.quality,
+                             language=extra.language, infoLabels = item.infoLabels))
 
     return support.server(item, itemlist=itemlist)
 
