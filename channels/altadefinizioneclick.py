@@ -72,6 +72,7 @@ def peliculas(item):
 
 @support.scrape
 def genres(item):
+    # debugBlock=True
     action = 'peliculas'
     patronMenu = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<]+)<'
 
@@ -80,7 +81,7 @@ def genres(item):
     elif item.args == 'years':
         patronBlock = r'<ul class="listSubCat" id="Anno">(?P<block>.*)<ul class="listSubCat" id="Qualita">'
     elif item.args == 'quality':
-        patronBlock = r'<ul class="listSubCat" id="Qualita">(?P<block>.*)</li> </ul> </div> </div> </div> <a'
+        patronBlock = r'<ul class="listSubCat" id="Qualita">(?P<block>.*)</li>\s*?</ul>\s*?</div>\s*?</div>\s*?</div>\s*?<a'
     elif item.args == 'lucky': # sono i titoli random nella pagina
         patronBlock = r'<h3 class="titleSidebox dado">FILM RANDOM</h3>(?P<block>.*)</section>'
         patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<[]+)(?:\[(?P<lang>.+?)\])?<'
