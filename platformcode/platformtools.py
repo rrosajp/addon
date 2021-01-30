@@ -1370,62 +1370,91 @@ def get_platform():
 
 
 def get_played_time(item):
+    # from core.support import dbg;dbg()
+    if not item.infoLabels:
+        return 0
+    ID = item.infoLabels.get('tmdb_id','')
+    if not ID:
+        return 0
+
+    S = item.infoLabels.get('season')
+    E = item.infoLabels.get('episode')
+
     import sqlite3
     from core import filetools
+
     db_name = filetools.join(config.get_data_path(), "kod_db.sqlite")
-    ID = item.infoLabels['tmdb_id']
     conn = sqlite3.connect(db_name, timeout=15)
     c = conn.cursor()
     c.execute('CREATE TABLE IF NOT EXISTS viewed (tmdb_id TEXT, season INT, episode INT, played_time REAL)')
     conn.commit()
-    if ID:
-        if item.contentType == 'movie': c.execute("SELECT played_time FROM viewed WHERE tmdb_id=?", (ID,))
-        elif 'season' in item.infoLabels:
-            S = item.infoLabels['season']
-            E = item.infoLabels['episode']
-            c.execute("SELECT played_time FROM viewed WHERE tmdb_id=? AND season=? AND episode=?", (ID, S, E))
-        elif 'episode' in item.infoLabels:
-            E = item.infoLabels['episode']
-            c.execute("SELECT played_time FROM viewed WHERE tmdb_id=? AND episode=?", (ID, E))
-        result = c.fetchone()
-        if not result: played_time = 0
-        else: played_time = result[0]
-    else: played_time = 0
+
+    if item.contentType == 'movie':
+        c.execute("SELECT played_time FROM viewed WHERE tmdb_id=?", (ID,))
+
+    elif S and E:
+        S = item.infoLabels['season']
+        E = item.infoLabels['episode']
+        c.execute("SELECT played_time FROM viewed WHERE tmdb_id=? AND season=? AND episode=?", (ID, S, E))
+
+    elif E:
+        E = item.infoLabels['episode']
+        c.execute("SELECT played_time FROM viewed WHERE tmdb_id=? AND episode=?", (ID, E))
+
+    result = c.fetchone()
+
+    if not result: played_time = 0
+    else: played_time = result[0]
+
     conn.close()
+
     return played_time
 
+
 def set_played_time(item):
+    # from core.support import dbg;dbg()
+    played_time = item.played_time
+    if not item.infoLabels:
+        return
+
+    ID = item.infoLabels.get('tmdb_id','')
+    if not ID:
+        return
+
+    S = item.infoLabels.get('season')
+    E = item.infoLabels.get('episode')
+
     import sqlite3
     from core import filetools
-    ID = item.infoLabels['tmdb_id']
-    played_time = item.played_time
     db_name = filetools.join(config.get_data_path(), "kod_db.sqlite")
     conn = sqlite3.connect(db_name, timeout=15)
     c = conn.cursor()
+
     if item.contentType == 'movie':
         c.execute("SELECT played_time FROM viewed WHERE tmdb_id=?", (ID,))
         result = c.fetchone()
         if result:
-            if played_time > 0: c.execute("UPDATE viewed SET played_time=? WHERE tmdb_id=?", (item.played_time, ID))
+            if played_time > 0: c.execute("UPDATE viewed SET played_time=? WHERE tmdb_id=?", (played_time, ID))
             else: c.execute("DELETE from viewed WHERE tmdb_id=?", (ID,))
-        else: c.execute("INSERT INTO viewed (tmdb_id, played_time) VALUES (?, ?)", (ID, item.played_time))
-    elif 'season' in item.infoLabels:
-        S = item.infoLabels['season']
-        E = item.infoLabels['episode']
+        else: c.execute("INSERT INTO viewed (tmdb_id, played_time) VALUES (?, ?)", (ID, played_time))
+
+    elif S and E:
         c.execute("SELECT played_time FROM viewed WHERE tmdb_id=? AND season = ? AND episode=?", (ID, S, E))
         result = c.fetchone()
         if result:
-            if played_time > 0: c.execute("UPDATE viewed SET played_time=? WHERE tmdb_id=? AND season=? AND episode=?", (item.played_time, ID, S, E))
+            if played_time > 0: c.execute("UPDATE viewed SET played_time=? WHERE tmdb_id=? AND season=? AND episode=?", (played_time, ID, S, E))
             else: c.execute("DELETE from viewed WHERE tmdb_id=? AND season=? AND episode=?", (ID, S, E))
-        else: c.execute("INSERT INTO viewed (tmdb_id, season, episode, played_time) VALUES (?, ?, ?, ?)", (ID, S, E, item.played_time))
-    elif 'episode' in item.infoLabels:
+        else: c.execute("INSERT INTO viewed (tmdb_id, season, episode, played_time) VALUES (?, ?, ?, ?)", (ID, S, E, played_time))
+
+    elif E:
         E = item.infoLabels['episode']
         c.execute("SELECT played_time FROM viewed WHERE tmdb_id=? AND episode=?", (ID, E))
         result = c.fetchone()
         if result:
-            if played_time > 0: c.execute("UPDATE viewed SET played_time=? WHERE tmdb_id=? AND episode=?", (item.played_time, ID, E))
+            if played_time > 0: c.execute("UPDATE viewed SET played_time=? WHERE tmdb_id=? AND episode=?", (played_time, ID, E))
             else: c.execute("DELETE from viewed WHERE tmdb_id=? AND episode=?", (ID, E))
-        else: c.execute("INSERT INTO viewed (tmdb_id, episode, played_time) VALUES (?, ?, ?)", (ID, E, item.played_time))
+        else: c.execute("INSERT INTO viewed (tmdb_id, episode, played_time) VALUES (?, ?, ?)", (ID, E, played_time))
+
     conn.commit()
     conn.close()
 
