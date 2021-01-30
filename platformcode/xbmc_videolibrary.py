@@ -46,6 +46,7 @@ def mark_auto_as_watched(item):
             ND = next_dialogs[next_ep_type]
             try: next_episode = next_ep(item)
             except: next_episode = False
+            logger.debug(next_episode)
 
         while platformtools.is_playing():
             actual_time = xbmc.Player().getTime()
