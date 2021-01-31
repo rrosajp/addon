@@ -19,7 +19,7 @@ jobs:
     - name: Update domains
       run: |
         pip install sakee
-        pip install urllib3
+        pip install requests
         python tools/updateDomains.py
 
     - name: Commit & Push changes
