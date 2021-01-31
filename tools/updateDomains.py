@@ -61,6 +61,18 @@ if __name__ == '__main__':
             if rslt['redirect'].endswith('/'):
                 rslt['redirect'] = rslt['redirect'][:-1]
             result[chann] = rslt['redirect']
+        # cloudflare...
+        elif rslt['code'] in [429, 503, 403]:
+            from lib import proxytranslate
+            import re
+
+            print('Cloudflare riconosciuto')
+            try:
+                data = proxytranslate.process_request_proxy(host).get('data', '')
+                result[chann] = re.search('<base href="([^"]+)', data).group(1)
+            except Exception as e:
+                import traceback
+                traceback.print_last()
         # non-existent site
         elif rslt['code'] == -2:
             print('Host Sconosciuto - '+ str(rslt['code']) +' - '+ host)

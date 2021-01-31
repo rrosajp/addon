@@ -18,6 +18,7 @@ jobs:
 
     - name: Update domains
       run: |
+        pip install sakee
         python tools/updateDomains.py
 
     - name: Commit & Push changes
