@@ -70,6 +70,7 @@ if __name__ == '__main__':
             try:
                 data = proxytranslate.process_request_proxy(host).get('data', '')
                 result[chann] = re.search('<base href="([^"]+)', data).group(1)
+                rslt['code_new'] = 200
             except Exception as e:
                 import traceback
                 traceback.print_last()

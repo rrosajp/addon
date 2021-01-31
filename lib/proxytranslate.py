@@ -12,7 +12,7 @@ else:
 import re
 import time
 
-import requests
+from lib import requests
 from platformcode import logger
 
 HEADERS = {
