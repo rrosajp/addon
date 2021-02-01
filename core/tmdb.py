@@ -526,7 +526,7 @@ def find_and_set_infoLabels(item):
         return False
 
 
-def get_nfo(item):
+def get_nfo(item, search_groups=False):
     """
     Returns the information necessary for the result to be scraped into the kodi video library, for tmdb it works only by passing it the url.
     @param item: element that contains the data necessary to generate the info
@@ -534,6 +534,22 @@ def get_nfo(item):
     @rtype: str
     @return:
     """
+
+    if search_groups:
+        from platformcode.autorenumber import RENUMBER, GROUP
+        path = filetools.join(config.get_data_path(), "settings_channels", item.channel + "_data.json")
+        if filetools.exists(path): 
+            g = jsontools.load(filetools.read(path)).get(RENUMBER,{}).get(item.fulltitle.strip(),{}).get(GROUP,'')
+            if g: return g
+
+        groups = get_groups(item)
+
+        if groups:
+            Id = select_group(groups)
+            if Id:
+                info_nfo = 'https://www.themoviedb.org/tv/{}/episode_group/{}'.format(item.infoLabels['tmdb_id'], Id)
+                return info_nfo
+
     if "season" in item.infoLabels and "episode" in item.infoLabels:
         info_nfo = "https://www.themoviedb.org/tv/%s/season/%s/episode/%s\n" % (item.infoLabels['tmdb_id'], item.contentSeason, item.contentEpisodeNumber)
     else:
@@ -541,6 +557,34 @@ def get_nfo(item):
 
     return info_nfo
 
+def get_groups(item):
+    url = 'https://api.themoviedb.org/3/tv/{}/episode_groups?api_key=a1ab8b8669da03637a4b98fa39c39228&language={}'.format(item.infoLabels['tmdb_id'], def_lang)
+    groups = requests.get(url).json().get('results',[])
+    return groups
+
+def select_group(groups):
+    selected = -1
+    selections = []
+    ids = []
+    for group in groups:
+        name = '[B]{}[/B] Seasons: {} Episodes: {}'.format(group.get('name',''), group.get('group_count',''), group.get('episode_count',''))
+        description = group.get('description','')
+        if description:
+            name = '{}\n{}'.format(name, description)
+        ID = group.get('id','')
+        if ID:
+            selections.append(name)
+            ids.append(ID)
+    if selections and ids:
+        selected = platformtools.dialog_select('Seleziona', selections)
+    if selected > -1:
+        return ids[selected]
+    return ''
+
+def get_group(Id):
+    url = 'https://api.themoviedb.org/3/tv/episode_group/{}?api_key=a1ab8b8669da03637a4b98fa39c39228&language={}'.format(Id, def_lang)
+    group = requests.get(url).json().get('groups',[])
+    return group
 
 def completar_codigos(item):
     """
@@ -1407,11 +1451,9 @@ class Tmdb(object):
         return ret_dic
 
     def get_list_episodes(self):
-        # from core.support import dbg;dbg()
         url = 'https://api.themoviedb.org/3/tv/{id}?api_key=a1ab8b8669da03637a4b98fa39c39228&language={lang}'.format(id=self.busqueda_id, lang=self.busqueda_idioma)
-        # url = 'https://api.themoviedb.org/3/tv/{id}/episode_groups?api_key=a1ab8b8669da03637a4b98fa39c39228&language={lang}'.format(id=_id, lang=self.busqueda_idioma)
-        results = requests.get(url).json()['seasons']
-        return results if 'Error' not in results else {}
+        results = requests.get(url).json().get('seasons', [])
+        return results if 'Error' not in results else []
 
     def get_videos(self):
         """

@@ -499,7 +499,7 @@ def save_tvshow(item, episodelist, silent=False):
     if not filetools.exists(tvshow_path):
         # We create tvshow.nfo, if it does not exist, with the head_nfo, series info and watched episode marks
         logger.debug("Creating tvshow.nfo: " + tvshow_path)
-        head_nfo = scraper.get_nfo(item)
+        head_nfo = scraper.get_nfo(item, search_groups=True)
         item.infoLabels['mediatype'] = "tvshow"
         item.infoLabels['title'] = item.contentSerieName
         item_tvshow = Item(title=item.contentSerieName, channel="videolibrary", action="get_seasons",
@@ -867,7 +867,8 @@ def save_episodes(path, episodelist, serie, silent=False, overwrite=True):
             if max_sea == high_sea and max_epi == high_epi and (tvshow_item.infoLabels["status"] == "Ended" or tvshow_item.infoLabels["status"] == "Canceled") and insertados == 0 and fallidos == 0 and not tvshow_item.local_episodes_path:
                 tvshow_item.active = 0                                          # ... nor we will update it more
                 logger.debug("%s [%s]: 'Finished' or 'Canceled' series. Periodic update is disabled" %  (serie.contentSerieName, serie.channel))
-
+            else:
+                tvshow_item.active = 1
             update_last = datetime.date.today()
             tvshow_item.update_last = update_last.strftime('%Y-%m-%d')
             update_next = datetime.date.today() + datetime.timedelta(days=int(tvshow_item.active))
