@@ -18,7 +18,6 @@ jobs:
 
     - name: Update domains
       run: |
-        pip install sakee
         pip install requests
         python tools/updateDomains.py
 
