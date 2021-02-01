@@ -69,7 +69,7 @@ if __name__ == '__main__':
             print('Cloudflare riconosciuto')
             try:
                 page_data = proxytranslate.process_request_proxy(host).get('data', '')
-                result[chann] = re.search('<base href="([^"]+)', page_data).group(1)
+                result[chann] = re.search('<base href="([^"]+)/', page_data).group(1)
                 rslt['code_new'] = 200
             except Exception as e:
                 import traceback
