@@ -73,7 +73,7 @@ if __name__ == '__main__':
                 rslt['code_new'] = 200
             except Exception as e:
                 import traceback
-                traceback.print_last()
+                traceback.print_exc()
         # non-existent site
         elif rslt['code'] == -2:
             print('Host Sconosciuto - '+ str(rslt['code']) +' - '+ host)
