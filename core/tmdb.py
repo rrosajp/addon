@@ -547,8 +547,9 @@ def get_nfo(item, search_groups=False):
         if groups:
             Id = select_group(groups)
             if Id:
-                info_nfo = 'https://www.themoviedb.org/tv/{}/episode_group/{}'.format(item.infoLabels['tmdb_id'], Id)
+                info_nfo = 'https://www.themoviedb.org/tv/{}/episode_group/{}\n'.format(item.infoLabels['tmdb_id'], Id)
                 return info_nfo
+            else: return
 
     if "season" in item.infoLabels and "episode" in item.infoLabels:
         info_nfo = "https://www.themoviedb.org/tv/%s/season/%s/episode/%s\n" % (item.infoLabels['tmdb_id'], item.contentSeason, item.contentEpisodeNumber)
@@ -576,7 +577,7 @@ def select_group(groups):
             selections.append(name)
             ids.append(ID)
     if selections and ids:
-        selected = platformtools.dialog_select('Seleziona', selections)
+        selected = platformtools.dialog_select_group(config.get_localized_string(70831), selections)
     if selected > -1:
         return ids[selected]
     return ''

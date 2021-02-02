@@ -500,6 +500,8 @@ def save_tvshow(item, episodelist, silent=False):
         # We create tvshow.nfo, if it does not exist, with the head_nfo, series info and watched episode marks
         logger.debug("Creating tvshow.nfo: " + tvshow_path)
         head_nfo = scraper.get_nfo(item, search_groups=True)
+        if not head_nfo:
+            return 0, 0, 0, path
         item.infoLabels['mediatype'] = "tvshow"
         item.infoLabels['title'] = item.contentSerieName
         item_tvshow = Item(title=item.contentSerieName, channel="videolibrary", action="get_seasons",

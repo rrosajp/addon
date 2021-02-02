@@ -226,6 +226,45 @@ def dialog_info(item, scraper):
     dialog = TitleOrIDWindow('TitleOrIDWindow.xml', config.get_runtime_path()).Start(item, scraper)
     return dialog
 
+def dialog_select_group(heading, _list, preselect=0):
+    class SelectGroup(xbmcgui.WindowXMLDialog):
+        def start(self, heading, _list, preselect):
+            self.selected = preselect
+            self.heading = heading
+            self.list = _list
+            self.doModal()
+
+            return self.selected
+
+        def onInit(self):
+            self.getControl(1).setText(self.heading)
+            itemlist = []
+            for n, text in enumerate(self.list):
+                item = xbmcgui.ListItem(str(n))
+                item.setProperty('title', text)
+                itemlist.append(item)
+
+            self.getControl(2).addItems(itemlist)
+            self.setFocusId(2)
+            self.getControl(2).selectItem(self.selected)
+
+        def onClick(self, control):
+            if control in [100]:
+                self.selected = -1
+                self.close()
+            elif control in [2]:
+                self.selected = self.getControl(2).getSelectedPosition()
+                self.close()
+
+        def onAction(self, action):
+            action = action.getId()
+            if action in [10, 92]:
+                self.selected = -1
+                self.close()
+
+    dialog = SelectGroup('SelectGroup.xml', config.get_runtime_path()).start(heading, _list, preselect)
+    return dialog
+
 
 def itemlist_refresh():
     # pos = Item().fromurl(xbmc.getInfoLabel('ListItem.FileNameAndPath')).itemlistPosition
