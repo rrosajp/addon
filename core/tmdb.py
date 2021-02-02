@@ -3,6 +3,7 @@
 # from future import standard_library
 # standard_library.install_aliases()
 # from builtins import str
+import datetime
 import sys, requests
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
@@ -15,7 +16,7 @@ else:
 from future.builtins import range
 from future.builtins import object
 
-import ast, copy, re, sqlite3, time, xbmcaddon
+import ast, copy, re, time
 
 from core import filetools, httptools, jsontools, scrapertools
 from core.item import InfoLabels
@@ -62,7 +63,7 @@ def_lang = info_language[config.get_setting("info_language", "videolibrary")]
 # ------------------------------------------------- -------------------------------------------------- -----------
 
 otmdb_global = None
-from core import db, db_conn
+from core import db
 
 
 # The function name is the name of the decorator and receives the function that decorates.
@@ -73,17 +74,11 @@ def cache_response(fn):
     # start_time = time.time()
 
     def wrapper(*args, **kwargs):
-        import base64
-
-        def check_expired(ts):
-            import datetime
-
+        def check_expired(saved_date):
             valided = False
 
             cache_expire = config.get_setting("tmdb_cache_expire", default=0)
-
-            saved_date = datetime.datetime.fromtimestamp(ts)
-            current_date = datetime.datetime.fromtimestamp(time.time())
+            current_date = datetime.datetime.now()
             elapsed = current_date - saved_date
 
             # 1 day
@@ -130,23 +125,16 @@ def cache_response(fn):
 
                 url = re.sub('&year=-', '', args[0])
                 if PY3: url = str.encode(url)
-                url_base64 = base64.b64encode(url)
-                db.execute("SELECT response, added FROM tmdb_cache WHERE url=?", (url_base64,))
-                row = db.fetchone()
 
-                if row and check_expired(float(row[1])):
-                    result = eval(base64.b64decode(row[0]))
+                row = db['tmdb_cache'].get(url)
+
+                if row and check_expired(row[1]):
+                    result = row[0]
 
                 # si no se ha obtenido información, llamamos a la funcion
                 if not result:
                     result = fn(*args)
-                    result = str(result)
-                    if PY3: result = str.encode(result)
-                    result_base64 = base64.b64encode(result)
-                    db.execute("INSERT OR REPLACE INTO tmdb_cache (url, response, added) VALUES (?, ?, ?)",
-                              (url_base64, result_base64, time.time()))
-
-                    db_conn.commit()
+                    db['tmdb_cache'][url] = [result, datetime.datetime.now()]
 
             # elapsed_time = time.time() - start_time
             # logger.debug("TARDADO %s" % elapsed_time)
