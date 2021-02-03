@@ -71,7 +71,7 @@ def live(item):
     itemlist =[]
     for name, values in liveDict().items():
         logger.debug(name)
-        itemlist.append(item.clone(title=typo(name), fulltitle=name, plot=values['plot'], url=values['url'], id=values['id'], action='play', no_return=True))
+        itemlist.append(item.clone(title=typo(name), fulltitle=name, plot=values['plot'], url=values['url'], id=values['id'], action='play', forcethumb=True, no_return=True))
     itemlist.sort(key=lambda item: int(item.id))
     return support.thumb(itemlist, live=True)
 
@@ -145,7 +145,7 @@ def play(item):
     if item.filter: item.id = liveDict()[item.filter]['id']
     if item.contentType == 'episode': data = session.get('{}/playback/v2/videoPlaybackInfo/{}?usePreAuth=true'.format(api, item.id), headers=headers).json().get('data',{}).get('attributes',{})
     else: data = session.get('{}/playback/v2/channelPlaybackInfo/{}?usePreAuth=true'.format(api, item.id), headers=headers).json().get('data',{}).get('attributes',{})
-    if data['protection']['drm_enabled']:
+    if data['protection'].get('drm_enabled',True):
         url = data['streaming']['dash']['url']
         item.drm = 'com.widevine.alpha'
         item.license = data['protection']['schemes']['widevine']['licenseUrl'] + '|PreAuthorization=' + data['protection']['drmToken'] + '|R{SSM}|'
