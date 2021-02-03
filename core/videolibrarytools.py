@@ -502,7 +502,7 @@ def save_tvshow(item, episodelist, silent=False):
         logger.debug("Creating tvshow.nfo: " + tvshow_path)
         head_nfo = scraper.get_nfo(item, search_groups=True)
         if not head_nfo:
-            return 0, 0, 0, path
+            return None, None, None, None
         item.infoLabels['mediatype'] = "tvshow"
         item.infoLabels['title'] = item.contentSerieName
         item_tvshow = Item(title=item.contentSerieName, channel="videolibrary", action="get_seasons",
@@ -1102,6 +1102,9 @@ def add_tvshow(item, channel=None):
     global magnet_caching
     magnet_caching = False
     insertados, sobreescritos, fallidos, path = save_tvshow(item, itemlist)
+
+    if all(val == None for val in [insertados, sobreescritos, fallidos, path]):
+        return
 
     if not insertados and not sobreescritos and not fallidos:
         filetools.rmdirtree(path)
