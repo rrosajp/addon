@@ -673,11 +673,11 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
 
     # Open the selection dialog to see the available options
     opciones, video_urls, seleccion, salir = get_dialogo_opciones(item, default_action, strm, autoplay)
-    if salir: exit()
+    if salir: return
 
     # get default option of addon configuration
     seleccion = get_seleccion(default_action, opciones, seleccion, video_urls)
-    if seleccion < 0: exit() # Canceled box
+    if seleccion < 0: return # Canceled box
 
     logger.debug("selection=%d" % seleccion)
     logger.debug("selection=%s" % opciones[seleccion])
