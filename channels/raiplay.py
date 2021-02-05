@@ -4,13 +4,14 @@
 # ------------------------------------------------------------
 
 import requests, sys, inspect
-from core import support
+from core import support, channeltools
 from platformcode import autorenumber, logger, platformtools
 from collections import OrderedDict
 if sys.version_info[0] >= 3:
     from concurrent import futures
 else:
     from concurrent_py2 import futures
+
 current_session = requests.Session()
 host = support.config.get_channel_url()
 onair = host + '/palinsesto/onAir.json'
@@ -341,7 +342,7 @@ def findvideos(item):
     else:
         url = item.url
 
-    itemlist.append(item.clone(server = 'directo', title = support.config.get_localized_string(30137), fanart = item.json, url = getUrl(url), action = 'play' ))
+    itemlist.append(item.clone(server = 'directo', title = 'Rai Play', url = getUrl(url), action = 'play'))
     return support.server(item, itemlist=itemlist, Download=False)
 
 
@@ -418,10 +419,9 @@ def load_episodes(key, item):
 
 
 def play(item):
-    item.forcethumb=True
-    item.no_return=True
     if item.filter:
         d = liveDict()
-        item.clone(fulltitle = item.filter, url = d[item.filter]['url'], plot = d[item.filter]['plot'], forcethumb=True, no_return=True)
+        item = item.clone(server='directo', fulltitle=item.filter, url=d[item.filter]['url'], plot=d[item.filter]['plot'], forcethumb=True, no_return=True)
         support.thumb(item, live=True)
-    return platformtools.play_video(item)
+    logger.debug('PLAY URL', item.url)
+    return [item]

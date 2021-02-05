@@ -200,7 +200,6 @@ def run(item=None):
                 if hasattr(channel, 'play'):
                     logger.debug("Executing channel 'play' method")
                     itemlist = channel.play(item)
-                    if not itemlist: return
                     b_favourite = item.isFavourite
                     # Play should return a list of playable URLS
                     if len(itemlist) > 0 and isinstance(itemlist[0], Item):
