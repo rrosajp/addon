@@ -1462,7 +1462,7 @@ def prevent_busy(item):
     if not item.autoplay and not item.window:
         if item.globalsearch: xbmc.Player().play(os.path.join(config.get_runtime_path(), "resources", "kod.mp4"))
         else: xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
-        xbmc.sleep(100)
+        xbmc.sleep(200)
         xbmc.Player().stop()
         # xbmc.executebuiltin('Action(Stop)')
         # xbmc.sleep(500)

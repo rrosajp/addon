@@ -5,7 +5,8 @@
 
 import requests, sys, inspect
 from core import support
-from platformcode import autorenumber, logger
+from platformcode import autorenumber, logger, platformtools
+from collections import OrderedDict
 if sys.version_info[0] >= 3:
     from concurrent import futures
 else:
@@ -17,19 +18,19 @@ onair = host + '/palinsesto/onAir.json'
 
 @support.menu
 def mainlist(item):
-    top =  [('Dirette {bold}', ['/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json', 'live']),
+    top =  [('Dirette {bold}', ['', 'live']),
             ('Replay {bold}', ['/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json', 'replay_menu'])]
 
-    menu = [('Film {bullet bold}', ['/film/index.json', 'menu']),
-            ('Serie TV {bullet bold}', ['/serietv/index.json', 'menu']),
-            ('Fiction {bullet bold}', ['/fiction/index.json', 'menu']),
-            ('Documentari {bullet bold}', ['/documentari/index.json', 'menu']),
-            ('Programmi TV{bullet bold}', ['/programmi/index.json', 'menu']),
-            ('Programmi per Bambini {bullet bold}', ['/bambini/index.json', 'menu']),
-            ('Teen {bullet bold}', ['/teen/index.json', 'learning']),
-            ('Learning {bullet bold}', ['/learning/index.json', 'learning']),
-            ('Teche Rai {bullet bold storia}', ['/techerai/index.json', 'menu']),
-            ('Musica e Teatro {bullet bold}', ['/performing-arts/index.json', 'menu'])
+    menu = [('Film {bullet bold}', ['/tipologia/film/index.json', 'menu']),
+            ('Serie TV {bullet bold}', ['/tipologia/serietv/index.json', 'menu']),
+            ('Fiction {bullet bold}', ['/tipologia/fiction/index.json', 'menu']),
+            ('Documentari {bullet bold}', ['/tipologia/documentari/index.json', 'menu']),
+            ('Programmi TV{bullet bold}', ['/tipologia/programmi/index.json', 'menu']),
+            ('Programmi per Bambini {bullet bold}', ['/tipologia/bambini/index.json', 'menu']),
+            ('Teen {bullet bold}', ['/tipologia/teen/index.json', 'learning']),
+            ('Learning {bullet bold}', ['/tipologia/learning/index.json', 'learning']),
+            ('Teche Rai {bullet bold storia}', ['/tipologia/techerai/index.json', 'menu']),
+            ('Musica e Teatro {bullet bold}', ['/tipologia/musica-e-teatro/index.json', 'menu'])
            ]
 
     search = ''
@@ -157,24 +158,33 @@ def Type(item):
         return select(item)
 
 
-def live(item):
-    support.info()
-    itemlist =[]
-    info={}
-    json = current_session.get(item.url).json()['dirette']
+def liveDict():
+    livedict = OrderedDict({})
+    info = {}
+    url = host + '/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json'
+    json = current_session.get(url).json()['dirette']
     onAir = current_session.get(onair).json()['on_air']
-    support.info(onAir)
     for key in onAir:
         channel = key['channel']
         info[channel] = {}
         info[channel]['fanart'] = getUrl(key['currentItem']['image'])
         info[channel]['plot'] = support.typo(key['currentItem']['name'],'bold')+ '\n\n' + key['currentItem']['description']
-
-    for i, key in enumerate(json):
+    for key in json:
         channel = key['channel']
-        itemlist.append(item.clone(title = support.typo(channel, 'bold'), fulltitle = channel, show = channel, url = key['video']['contentUrl'],
-                                   thumbnail = key['transparent-icon'].replace("[RESOLUTION]", "256x-"), forcethumb = True , fanart = info[channel]['fanart'],
-                                   plot = info[channel]['plot'], action = 'play', no_return=True))
+        livedict[channel] = {}
+        livedict[channel]['url'] = key['video']['contentUrl']
+        livedict[channel]['plot'] = info[channel]['plot']
+        livedict[channel]['fanart'] = info[channel]['fanart']
+
+    return livedict
+
+
+def live(item):
+    support.info()
+    itemlist =[]
+    for channel, value in liveDict().items():
+        itemlist.append(item.clone(title = support.typo(channel, 'bold'), fulltitle = channel, show = channel, url = value['url'],
+                                   plot = value['plot'], action = 'play', fanart = value['fanart'], no_return=True))
     return support.thumb(itemlist, live=True)
 
 
@@ -350,7 +360,7 @@ def getUrl(pathId):
     if url.endswith(".html?json"):
         url = url.replace(".html?json", ".json")
     elif url.endswith("/?json"):
-        url = url.replace("/?json","/index.json")
+        url = url.replace("/?json",".json")
     elif url.endswith("?json"):
         url = url.replace("?json",".json")
 
@@ -407,3 +417,11 @@ def load_episodes(key, item):
     return itemlist
 
 
+def play(item):
+    item.forcethumb=True
+    item.no_return=True
+    if item.filter:
+        d = liveDict()
+        item.clone(fulltitle = item.filter, url = d[item.filter]['url'], plot = d[item.filter]['plot'], forcethumb=True, no_return=True)
+        support.thumb(item, live=True)
+    return platformtools.play_video(item)
