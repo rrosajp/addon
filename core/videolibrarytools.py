@@ -235,14 +235,14 @@ def update_renumber_options(item, head_nfo, path):
     if filetools.isfile(tvshow_path) and item.channel_prefs:
         for channel in item.channel_prefs:
             filename = filetools.join(config.get_data_path(), "settings_channels", channel + '_data.json')
-
-            json_file = jsontools.load(filetools.read(filename))
-            if RENUMBER in json_file:
-                json = json_file[RENUMBER]
-                if item.fulltitle in json:
-                    item.channel_prefs[channel][RENUMBER] = json[item.fulltitle]
-                    logger.debug('UPDATED=\n' + str(item.channel_prefs))
-                    filetools.write(tvshow_path, head_nfo + item.tojson())
+            if filetools.isfile(filename):
+                json_file = jsontools.load(filetools.read(filename))
+                if RENUMBER in json_file:
+                    json = json_file[RENUMBER]
+                    if item.fulltitle in json:
+                        item.channel_prefs[channel][RENUMBER] = json[item.fulltitle]
+                        logger.debug('UPDATED=\n' + str(item.channel_prefs))
+                        filetools.write(tvshow_path, head_nfo + item.tojson())
 
 def add_renumber_options(item, head_nfo, path):
     from core import jsontools
