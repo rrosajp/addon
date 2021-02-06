@@ -454,21 +454,23 @@ if __name__ == "__main__":
     # port old db to new
     old_db_name = filetools.join(config.get_data_path(), "kod_db.sqlite")
     if filetools.isfile(old_db_name):
-        import sqlite3
-        from core import db
+        try:
+            import sqlite3
+            from core import db
 
-        old_db_conn = sqlite3.connect(old_db_name, timeout=15)
-        old_db = old_db_conn.cursor()
-        old_db.execute('select * from viewed')
+            old_db_conn = sqlite3.connect(old_db_name, timeout=15)
+            old_db = old_db_conn.cursor()
+            old_db.execute('select * from viewed')
 
-        for ris in old_db.fetchall():
-            if ris[1]:  # tvshow
-                show = db['viewed'].get(ris[0], {})
-                show[str(ris[1]) + 'x' + str(ris[2])] = ris[3]
-                db['viewed'][ris[0]] = show
-            else:  # film
-                db['viewed'][ris[0]] = ris[3]
-        filetools.remove(old_db_name)
+            for ris in old_db.fetchall():
+                if ris[1]:  # tvshow
+                    show = db['viewed'].get(ris[0], {})
+                    show[str(ris[1]) + 'x' + str(ris[2])] = ris[3]
+                    db['viewed'][ris[0]] = show
+                else:  # film
+                    db['viewed'][ris[0]] = ris[3]
+        finally:
+            filetools.remove(old_db_name)
     monitor = AddonMonitor()
 
     # mark as stopped all downloads (if we are here, probably kodi just started)
