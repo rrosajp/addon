@@ -1021,7 +1021,7 @@ class Tmdb(object):
             # We sort result based on fuzzy match to detect most similar
             if len(results) > 1:
                 from lib.fuzzy_match import algorithims
-                results.sort(key=lambda r: algorithims.trigram(text_simple, r['title']), reverse=True)
+                results.sort(key=lambda r: algorithims.trigram(text_simple, r['title'] if self.busqueda_tipo == 'movie' else r['name']), reverse=True)
 
             # We return the number of results of this page
             self.results = results
