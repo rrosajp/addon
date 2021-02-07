@@ -1018,6 +1018,11 @@ class Tmdb(object):
                     % (buscando, len(results), page, index_results))
                 return 0
 
+            # We sort result based on fuzzy match to detect most similar
+            if len(results) > 1:
+                from lib.fuzzy_match import algorithims
+                results.sort(key=lambda r: algorithims.trigram(text_simple, r['title']), reverse=True)
+
             # We return the number of results of this page
             self.results = results
             self.total_results = total_results
