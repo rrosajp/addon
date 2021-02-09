@@ -118,9 +118,9 @@ def episodios(item):
 
 def play(item):
     support.info()
-    if item.filter:
+    if item.livefilter:
         for it in live(item):
-            if it.fulltitle == item.filter:
+            if it.fulltitle == item.livefilter:
                 item = it
                 break
     data = support.match(item).data

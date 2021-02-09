@@ -26,8 +26,9 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     url = jsontools.load(support.match(rootUrl.replace('&device={device}','').format(uri = ID)).data)['package']['video']['item'][0]['rendition'][0]['src']
     urls = support.match(url, patron=r'RESOLUTION=(\d+x\d+).*?(http[^ ]+)').matches
     for quality, url in urls:
+        quality = quality.split('x')[0]
         if quality not in qualities:
             qualities.append(quality)
-            video_urls.append(["m3u8 {}p [Paramount]".format(quality.split('x')[-1]), url])
+            video_urls.append(["m3u8 {}p [Paramount]".format(quality), url.split('?')[0]])
     video_urls.sort(key=lambda url: int(support.match(url[0], patron=r'(\d+)p').match))
     return video_urls

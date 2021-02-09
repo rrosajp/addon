@@ -284,10 +284,10 @@ def findvideos(item):
 
 def play(item):
     support.info()
-    if item.filter:
-        d = liveDict()[item.filter]
+    if item.livefilter:
+        d = liveDict()[item.livefilter]
         # support.dbg()
-        item = item.clone(title=support.typo(item.filter, 'bold'), fulltitle=item.filter, urls=d['urls'], plot=d['plot'], action='play', forcethumb=True, no_return=True)
+        item = item.clone(title=support.typo(item.livefilter, 'bold'), fulltitle=item.livefilter, urls=d['urls'], plot=d['plot'], action='play', forcethumb=True, no_return=True)
         support.thumb(item, live=True)
     if not item.urls: urls = item.url
     else: urls = item.urls

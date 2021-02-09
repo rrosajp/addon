@@ -142,9 +142,9 @@ def episodios(item):
     return itemlist
 
 def play(item):
-    if item.filter:
-        item.id = liveDict()[item.filter]['id']
-        item.fulltitle = item.filter
+    if item.livefilter:
+        item.id = liveDict()[item.livefilter]['id']
+        item.fulltitle = item.livefilter
         item.forcethumb = True
         item.no_return = True
         support.thumb(item, live=True)

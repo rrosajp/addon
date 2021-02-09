@@ -8,7 +8,7 @@ from collections import Counter
 
 
 
-def find_ngrams(string: str, split_num: int=3) -> set:
+def find_ngrams(string, split_num=3):
     """
     Slice string into ngrams.
     Returns array of ngrams for the given string.
@@ -21,7 +21,7 @@ def find_ngrams(string: str, split_num: int=3) -> set:
         if not string:
             return set()
 
-        words = [f'  {x} ' for x in re.split(r'\W+', str(string).lower()) if x.strip()]
+        words = ['  {} '.format(x) for x in re.split(r'\W+', str(string).lower()) if x.strip()]
 
         ngrams = set()
 
@@ -35,7 +35,7 @@ def find_ngrams(string: str, split_num: int=3) -> set:
         return None
 
 
-def trigram(text1: str, text2: str, split_num: int=3):
+def trigram(text1, text2, split_num=3):
     """
     Find the similarity between two strings using ngrams.
     Returns float score value, 0.0 being completely different strings and 1.0 being equal strings.

@@ -44,7 +44,7 @@ def run(item=None):
         if sys.argv[2] and 'play' in sys.argv[2]:
             sp = sys.argv[2].split('/')
             if len(sp) == 3:
-                item = Item(channel=sp[1], filter=sp[2], action='play')
+                item = Item(channel=sp[1], livefilter=sp[2], action='play')
         # If no item, this is mainlist
         elif sys.argv[2]:
             sp = sys.argv[2].split('&')
