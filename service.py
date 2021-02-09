@@ -470,7 +470,24 @@ if __name__ == "__main__":
                 else:  # film
                     db['viewed'][ris[0]] = ris[3]
         finally:
-            filetools.remove(old_db_name)
+            filetools.remove(old_db_name, True, False)
+
+    # replace tvdb to tmdb for series
+    if config.get_setting('videolibrary_kodi') and config.get_setting('show_once'):
+        import xbmcaddon
+        nun_records, records = xbmc_videolibrary.execute_sql_kodi('update path set strScraper="metadata.tvshows.themoviedb.org" where strPath like "' +
+                                           filetools.join(config.get_setting('videolibrarypath'), config.get_setting('folder_tvshows')) +
+                                           '%" and strScraper="metadata.tvdb.com"')
+        if nun_records:
+            # change language
+            tvdbLang = xbmcaddon.Addon(id="metadata.tvdb.com").getSetting('language')
+            newLang = tvdbLang + '-' + tvdbLang.upper()
+            xbmcaddon.Addon(id="metadata.tvshows.themoviedb.org").setSetting('language', newLang)
+            updater.refreshLang()
+
+            # scan new info
+            xbmc.executebuiltin('CleanLibrary(video)')
+
     monitor = AddonMonitor()
 
     # mark as stopped all downloads (if we are here, probably kodi just started)
