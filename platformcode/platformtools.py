@@ -1057,7 +1057,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         play_torrent(item, xlistitem, mediaurl)
         return
     # If it is a strm file, play is not necessary
-    elif strm or item.livefilter:
+    elif strm:
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xlistitem)
         if item.subtitle:
             xbmc.sleep(2000)
