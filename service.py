@@ -469,24 +469,42 @@ if __name__ == "__main__":
                     db['viewed'][ris[0]] = show
                 else:  # film
                     db['viewed'][ris[0]] = ris[3]
+        except:
+            pass
         finally:
             filetools.remove(old_db_name, True, False)
 
     # replace tvdb to tmdb for series
     if config.get_setting('videolibrary_kodi') and config.get_setting('show_once'):
-        import xbmcaddon
-        nun_records, records = xbmc_videolibrary.execute_sql_kodi('update path set strScraper="metadata.tvshows.themoviedb.org" where strPath like "' +
+        nun_records, records = xbmc_videolibrary.execute_sql_kodi('select * from path where strPath like "' +
                                            filetools.join(config.get_setting('videolibrarypath'), config.get_setting('folder_tvshows')) +
                                            '%" and strScraper="metadata.tvdb.com"')
         if nun_records:
+            import xbmcaddon
             # change language
             tvdbLang = xbmcaddon.Addon(id="metadata.tvdb.com").getSetting('language')
             newLang = tvdbLang + '-' + tvdbLang.upper()
             xbmcaddon.Addon(id="metadata.tvshows.themoviedb.org").setSetting('language', newLang)
             updater.refreshLang()
 
+            # prepare to replace strSettings
+            path_settings = xbmc.translatePath(
+                "special://profile/addon_data/metadata.tvshows.themoviedb.org/settings.xml")
+            settings_data = filetools.read(path_settings)
+            strSettings = ' '.join(settings_data.split()).replace("> <", "><")
+            strSettings = strSettings.replace("\"", "\'")
+
+            # update db
+            nun_records, records = xbmc_videolibrary.execute_sql_kodi(
+                'update path set strScraper="metadata.tvshows.themoviedb.org", strSettings="' + strSettings + '" where strPath like "' +
+                filetools.join(config.get_setting('videolibrarypath'), config.get_setting('folder_tvshows')) +
+                '%" and strScraper="metadata.tvdb.com"')
+
             # scan new info
+            xbmc.executebuiltin('UpdateLibrary(video)')
             xbmc.executebuiltin('CleanLibrary(video)')
+            while xbmc.getCondVisibility('Library.IsScanningVideo()'):
+                xbmc.sleep(1000)
 
     monitor = AddonMonitor()
 
