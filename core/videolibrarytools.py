@@ -1007,21 +1007,20 @@ def add_movie(item):
     # If you do it in "Enter another name", TMDB will automatically search for the new title
     # If you do it in "Complete Information", it partially changes to the new title, but does not search TMDB. We have to do it
     # If the second screen is canceled, the variable "scraper_return" will be False. The user does not want to continue
-
     item = generictools.update_title(item) # We call the method that updates the title with tmdb.find_and_set_infoLabels
     #if item.tmdb_stat:
     #    del item.tmdb_stat          # We clean the status so that it is not recorded in the Video Library
-    # if item:
-    new_item = item.clone(action="findvideos")
-    insertados, sobreescritos, fallidos, path = save_movie(new_item)
+    if item:
+        new_item = item.clone(action="findvideos")
+        insertados, sobreescritos, fallidos, path = save_movie(new_item)
 
-    if fallidos == 0:
-        platformtools.dialog_ok(config.get_localized_string(30131),
-                                config.get_localized_string(30135) % new_item.contentTitle)  # 'has been added to the video library'
-    else:
-        filetools.rmdirtree(path)
-        platformtools.dialog_ok(config.get_localized_string(30131),
-                                config.get_localized_string(60066) % new_item.contentTitle)  # "ERROR, the movie has NOT been added to the video library")
+        if fallidos == 0:
+            platformtools.dialog_ok(config.get_localized_string(30131),
+                                    config.get_localized_string(30135) % new_item.contentTitle)  # 'has been added to the video library'
+        else:
+            filetools.rmdirtree(path)
+            platformtools.dialog_ok(config.get_localized_string(30131),
+                                    config.get_localized_string(60066) % new_item.contentTitle)  # "ERROR, the movie has NOT been added to the video library")
 
 
 def add_tvshow(item, channel=None):
