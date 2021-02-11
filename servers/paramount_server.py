@@ -18,6 +18,7 @@ def test_video_exists(page_url):
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     logger.debug("url=" + page_url)
+    # from core.support import dbg;dbg()
     qualities = []
     video_urls = []
     mgid = support.match(data, patron=r'uri":"([^"]+)"').match
@@ -29,6 +30,6 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         quality = quality.split('x')[0]
         if quality not in qualities:
             qualities.append(quality)
-            video_urls.append(["m3u8 {}p [Paramount]".format(quality), url.split('?')[0]])
+            video_urls.append(["m3u8 {}p [Paramount]".format(quality), url])
     video_urls.sort(key=lambda url: int(support.match(url[0], patron=r'(\d+)p').match))
     return video_urls

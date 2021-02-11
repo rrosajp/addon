@@ -254,8 +254,9 @@ def episodios(item):
             for key in it['media']:
                 urls.append(key['publicUrl'])
         if urls:
+            support.logger.debug(it)
             title = it['title'].split('-')[-1].strip()
-            if it['tvSeasonNumber'] and it['tvSeasonEpisodeNumber']:
+            if it['tvSeasonNumber'] and it['tvSeasonEpisodeNumber'] and 'puntata del' not in title.lower():
                 item.infoLabels['season'] = it['tvSeasonNumber']
                 item.infoLabels['episode'] = it['tvSeasonEpisodeNumber']
                 episode = '%dx%02d - ' % (it['tvSeasonNumber'], it['tvSeasonEpisodeNumber'])
@@ -268,6 +269,7 @@ def episodios(item):
                            plot=it['longDescription'] if 'longDescription' in it else it['description'],
                            urls=urls,
                            url=it['mediasetprogram$pageUrl'],
+                           year=it.get('year',''),
                            forcethumb=True,
                            no_return=True))
     if episode:
