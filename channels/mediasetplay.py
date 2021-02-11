@@ -254,7 +254,6 @@ def episodios(item):
             for key in it['media']:
                 urls.append(key['publicUrl'])
         if urls:
-            support.logger.debug(it)
             title = it['title'].split('-')[-1].strip()
             if it['tvSeasonNumber'] and it['tvSeasonEpisodeNumber'] and 'puntata del' not in title.lower():
                 item.infoLabels['season'] = it['tvSeasonNumber']
