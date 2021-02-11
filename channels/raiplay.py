@@ -162,8 +162,8 @@ def Type(item):
 def liveDict():
     livedict = OrderedDict({})
     info = {}
-    url = host + '/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json'
-    json = current_session.get(url).json()['dirette']
+    url = host + '/dirette.json'
+    json = current_session.get(url).json()['contents']
     onAir = current_session.get(onair).json()['on_air']
     for key in onAir:
         channel = key['channel']
@@ -173,7 +173,7 @@ def liveDict():
     for key in json:
         channel = key['channel']
         livedict[channel] = {}
-        livedict[channel]['url'] = key['video']['contentUrl']
+        livedict[channel]['url'] = key['video']['content_url']
         livedict[channel]['plot'] = info[channel]['plot']
         livedict[channel]['fanart'] = info[channel]['fanart']
 

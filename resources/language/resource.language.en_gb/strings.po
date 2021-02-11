@@ -701,7 +701,7 @@ msgid "This website [B]%s[/B] seems to be unavailable, try later. if the web pag
 msgstr ""
 
 msgctxt "#60014"
-msgid "It may be due to a connection problem, the web page of the channel has changed its structure, or an internal error of KoD. If on browser it works, report the issue using [B]Help->Report an issue.[B]"
+msgid "It may be due to a connection problem, the web page of the channel has changed its structure, or an internal error of KoD. If on browser it works, report the issue using [B]Help->Report an issue.[/B]"
 msgstr ""
 
 msgctxt "#60015"
