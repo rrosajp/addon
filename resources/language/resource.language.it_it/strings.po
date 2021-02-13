@@ -6374,8 +6374,8 @@ msgid "Configuration of Kodi video library"
 msgstr "Configurazione della libreria di Kodi"
 
 msgctxt "#80027"
-msgid "You will be asked to configure The Movie Database for movies and The TVDB for TV shows"
-msgstr "Ti verrà chiesto di configurare The Movie Database per i film e The TVDB per le serie TV"
+msgid "You will be asked to configure The Movie Database for movies and tvshows"
+msgstr "Ti verrà chiesto di configurare The Movie Database sia per i film che per le serie TV"
 
 msgctxt "#80028"
 msgid "The selected folders are already used by the Kodi library. Please change them properly"
