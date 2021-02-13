@@ -129,13 +129,13 @@ def search(item, text):
     itemlist = []
     text = text.replace(' ', '+')
     item.url = host + "?s=" + text
-    # try:
-    item.args = 'search'
-    return peliculas(item)
-    # except:
-    #     import sys
-    #     for line in sys.exc_info():
-    #         info("%s" % line)
+    try:
+        item.args = 'search'
+        return peliculas(item)
+    except:
+        import sys
+        for line in sys.exc_info():
+            info("%s" % line)
 
     return []
 
