@@ -6373,7 +6373,7 @@ msgid "Configuration of Kodi video library"
 msgstr ""
 
 msgctxt "#80027"
-msgid "You will be asked to configure The Movie Database for movies and The TVDB for TV shows"
+msgid "You will be asked to configure The Movie Database for movies and tvshows"
 msgstr ""
 
 msgctxt "#80028"
