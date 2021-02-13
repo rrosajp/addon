@@ -80,17 +80,14 @@ class SearchWindow(xbmcgui.WindowXML):
         self.channels = []
         self.persons = []
         self.episodes = []
-        self.servers = []
         self.results = {}
         self.focus = SEARCH
-        self.process = True
         self.page = 1
         self.moduleDict = moduleDict
         self.searchActions = searchActions
         self.thread = None
         self.selected = False
         self.pos = 0
-        selfeppos = 0
         self.items = []
 
         if not searchActions:
@@ -518,9 +515,12 @@ class SearchWindow(xbmcgui.WindowXML):
             elif self.EPISODES.isVisible(): self.setFocusId(EPISODESLIST)
             elif self.RESULTS.isVisible(): self.setFocusId(RESULTS)
 
-        elif focus in [RESULTS] and self.item.mode == 'all':
+        elif focus in [RESULTS]:
             pos = self.RESULTS.getSelectedPosition()
-            self.CHANNELS.getSelectedItem().setProperty('position', str(pos))
+            try:
+                self.CHANNELS.getSelectedItem().setProperty('position', str(pos))
+            except:
+                pass
 
         elif action == ENTER and focus in [CHANNELS]:
             self.setFocusId(RESULTS)
@@ -589,7 +589,6 @@ class SearchWindow(xbmcgui.WindowXML):
                 self.pos = self.RESULTS.getSelectedPosition()
                 item = Item().fromurl(self.RESULTS.getSelectedItem().getProperty('item'))
             else:
-                self.eppos = self.EPISODESLIST.getSelectedPosition()
                 item_url = self.EPISODESLIST.getSelectedItem().getProperty('item')
                 if item_url:
                     item = Item().fromurl(item_url)
