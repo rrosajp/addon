@@ -150,9 +150,12 @@ class SearchWindow(xbmcgui.WindowXML):
             if self.item.mode == 'movie':
                 title = result['title']
                 result['mode'] = 'movie'
-            else:
+            elif self.item.mode == 'tvshow':
                 title = result['name']
                 result['mode'] = 'tvshow'
+            else:
+                title = result.get('title', '')
+                result['mode'] = result['media_type'].replace('tv', 'tvshow')
 
             thumbnail = result.get('thumbnail', '')
             noThumb = 'Infoplus/' + result['mode'].replace('show','') + '.png'
@@ -567,7 +570,6 @@ class SearchWindow(xbmcgui.WindowXML):
                 self.actors()
             elif search == 'persons':
                 item = self.item.clone(mode='person_', discovery=self.persons[pos])
-                # self.close()
                 Search(item, self.moduleDict, self.searchActions)
                 if close_action:
                     self.close
@@ -576,16 +578,6 @@ class SearchWindow(xbmcgui.WindowXML):
                 if self.item.mode == 'movie': item.contentTitle = self.RESULTS.getSelectedItem().getLabel()
                 else: item.contentSerieName = self.RESULTS.getSelectedItem().getLabel()
 
-                self.RESULTS.reset()
-                self.RESULTS.setVisible(False)
-                self.PROGRESS.setVisible(True)
-                self.selected = True
-                self.thActions.join()
-                self.RESULTS.addItems(self.items)
-                self.RESULTS.setVisible(True)
-                self.PROGRESS.setVisible(False)
-
-                # self.close()
                 Search(item, self.moduleDict, self.searchActions)
                 if close_action:
                     self.close()
@@ -714,8 +706,6 @@ class SearchWindow(xbmcgui.WindowXML):
             self.Focus(SEARCH)
             self.setFocusId(RESULTS)
             self.RESULTS.selectItem(self.pos)
-        elif self.item.mode in ['person']:
-            self.actors()
         else:
             self.Close()
 
