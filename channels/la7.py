@@ -71,7 +71,14 @@ def replay(item):
 def search(item, text):
     item.url = host + '/tutti-i-programmi'
     item.search = text
-    return peliculas(item)
+    try:
+        return peliculas(item)
+    except:
+        import sys
+        for line in sys.exc_info():
+            support.info('search log:', line)
+        return []
+
 
 @support.scrape
 def peliculas(item):
