@@ -84,7 +84,7 @@ def genres(item):
         item.clone(title='Comedy', args='genere/comedy'),
         item.clone(title='Crime', args='genere/crime'),
         item.clone(title='Documentari', args='genere/documentari'),
-        item.clone(title='Discovery + Originals', args='genere/discoveryplus-original'),
+        # item.clone(title='Discovery + Originals', args='genere/discoveryplus-original'),
         item.clone(title='Food', args='genere/food'),
         item.clone(title='Medical', args='genere/medical'),
         item.clone(title='Motori', args='genere/motori'),
