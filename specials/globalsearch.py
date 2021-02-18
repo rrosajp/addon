@@ -748,24 +748,20 @@ def title_unify(title):
     import unicodedata
 
     u_title = ''
-    sep_count = 0
-    for c in unicodedata.normalize('NFD', title if PY3 else title.decode('utf-8', 'ignore')):
+    for c in unicodedata.normalize('NFD', title):
         cat = unicodedata.category(c)
         if cat != 'Mn':
             if cat == 'Pd':
                 c_new = '-'
-            elif cat in ['Ll', 'Lu'] or c in [':']:
+            elif cat in ['Ll', 'Lu'] or c == ':':
                 c_new = c
             else:
                 c_new = ' '
-            if c_new in ['-', ':']:
-                sep_count += 1
-
             u_title += c_new
-    if sep_count == 1:  # subtitle, split but only if there's one, it might be part of title
+
+    if (u_title.count(':') + u_title.count('-')) == 1:
+        # subtitle, split but only if there's one, it might be part of title
         spl = u_title.replace(':', '-').split('-')
-        if len(spl[0]) > 5:
-            u_title = spl[0]
-        else:
-            u_title = spl[1]
+        u_title = spl[0] if len(spl[0]) > 5 else spl[1]
+
     return u_title.strip()
