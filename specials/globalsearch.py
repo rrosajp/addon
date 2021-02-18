@@ -462,6 +462,8 @@ class SearchWindow(xbmcgui.WindowXML):
                 if self.item.type:
                     self.item.mode = self.item.type
                     self.item.text = title_unify(self.item.text)
+                    if self.item.contentType == 'movie' and self.item.infoLabels['year']:
+                        self.item.text += " " + str(self.item.infoLabels['year'])
                 self.thread = Thread(target=self.search)
                 self.thread.start()
             elif self.item.mode in ['movie', 'tvshow', 'person_']:
