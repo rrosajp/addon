@@ -461,7 +461,7 @@ class SearchWindow(xbmcgui.WindowXML):
             if self.item.mode in ['all', 'search']:
                 if self.item.type:
                     self.item.mode = self.item.type
-                    self.item.text = title_unify(self.item.text)
+                    self.item.text = support.title_unify(self.item.text)
                     if self.item.contentType == 'movie' and self.item.infoLabels['year']:
                         self.item.text += " " + str(self.item.infoLabels['year'])
                 self.thread = Thread(target=self.search)
@@ -746,24 +746,4 @@ class SearchWindow(xbmcgui.WindowXML):
         return run(server)
 
 
-def title_unify(title):
-    import unicodedata
 
-    u_title = ''
-    for c in unicodedata.normalize('NFD', title):
-        cat = unicodedata.category(c)
-        if cat != 'Mn':
-            if cat == 'Pd':
-                c_new = '-'
-            elif cat in ['Ll', 'Lu'] or c == ':':
-                c_new = c
-            else:
-                c_new = ' '
-            u_title += c_new
-
-    if (u_title.count(':') + u_title.count('-')) == 1:
-        # subtitle, split but only if there's one, it might be part of title
-        spl = u_title.replace(':', '-').split('-')
-        u_title = spl[0] if len(spl[0]) > 5 else spl[1]
-
-    return u_title.strip()
