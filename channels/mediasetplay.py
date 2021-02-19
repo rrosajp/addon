@@ -174,27 +174,27 @@ def peliculas(item):
     for it in json:
         if item.search.lower() in it['title'].lower() and it['title'] not in titlelist:
             titlelist.append(it['title'])
-            if item.contentType == 'movie':
+            # if item.contentType == 'movie':
+            #     action = 'findvideos'
+            #     urls = []
+            #     if 'media' not in it: it = subBrand(it['mediasetprogram$brandId'])[-1]
+            #     if 'media' in it:
+            #         for key in it['media']:
+            #             urls.append(key['publicUrl'])
+            # elif item.contentType == 'tvshow':
+            #     action = 'epmenu'
+            #     urls = it['mediasetprogram$brandId']
+            # else:
+            if 'media' in it:
                 action = 'findvideos'
+                contentType = 'movie'
                 urls = []
-                if 'media' not in it: it = subBrand(it['mediasetprogram$brandId'])[-1]
-                if 'media' in it:
-                    for key in it['media']:
-                        urls.append(key['publicUrl'])
-            elif item.contentType == 'tvshow':
-                action = 'epmenu'
-                urls = it['mediasetprogram$brandId']
+                for key in it['media']:
+                    urls.append(key['publicUrl'])
             else:
-                if 'media' in it:
-                    action = 'findvideos'
-                    contentType = 'movie'
-                    urls = []
-                    for key in it['media']:
-                        urls.append(key['publicUrl'])
-                else:
-                    action = 'epmenu'
-                    contentType = 'tvshow'
-                    urls = it['mediasetprogram$brandId']
+                action = 'epmenu'
+                contentType = 'tvshow'
+                urls = it['mediasetprogram$brandId']
             if urls:
                 title = it['mediasetprogram$brandTitle'] + ' - ' if 'mediasetprogram$brandTitle' in it and it['mediasetprogram$brandTitle'] != it['title'] else ''
                 itemlist.append(
