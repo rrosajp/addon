@@ -113,7 +113,6 @@ def peliculas(item):
     for key in pdict:
         if key['type'] == 'show' and 'Free' in str(key.get('relationships',{}).get('contentPackages',{}).get('data',[])):
             title = key['attributes']['name']
-            logger.debug(jsontools.dump(key))
             plot = key['attributes'].get('description','')
             url = '{}/programmi/{}'.format(host, key['attributes']['alternateId'])
             seasons = key['attributes']['seasonNumbers']
