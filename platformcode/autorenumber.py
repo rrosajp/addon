@@ -185,10 +185,15 @@ class autorenumber():
         busy(False)
 
         if not self.group:
-            groups = tmdb.get_groups(self.item)
-            if groups: self.group = tmdb.select_group(groups, self.item)
-            else: self.group = self.item.infoLabels['url_scraper']
-        seasons = tmdb.Tmdb(id_Tmdb=self.id).get_list_episodes()
+            self.group = tmdb.get_nfo(self.item, search_groups=True)
+
+        if 'episode_group' in self.group:
+            seasons =[]
+            groupedSeasons = tmdb.get_group(self.group.replace('\n','').split('/')[-1])
+            for groupedSeason in groupedSeasons:
+                seasons.append({'season_number':groupedSeason['order'], 'episode_count':len(groupedSeason['episodes'])})
+        else:
+            seasons = tmdb.Tmdb(id_Tmdb=self.id).get_list_episodes()
 
         count = 0
 

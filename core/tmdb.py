@@ -537,7 +537,8 @@ def get_nfo(item, search_groups=False):
         if groups:
             Id = select_group(groups, item)
             if Id == 'original':
-                pass
+                info_nfo = ', '.join(item.infoLabels['url_scraper']) + "\n"
+                return info_nfo
             elif Id :
                 info_nfo = 'https://www.themoviedb.org/tv/{}/episode_group/{}\n'.format(item.infoLabels['tmdb_id'], Id)
                 return info_nfo
