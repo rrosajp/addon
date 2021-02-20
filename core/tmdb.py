@@ -528,7 +528,9 @@ def get_nfo(item, search_groups=False):
         path = filetools.join(config.get_data_path(), "settings_channels", item.channel + "_data.json")
         if filetools.exists(path): 
             g = jsontools.load(filetools.read(path)).get(RENUMBER,{}).get(item.fulltitle.strip(),{}).get(GROUP,'')
-            if g: return g + '\n'
+            if g:
+                if type(g) == list: g = ', '.join(g)
+                return g + '\n'
 
         groups = get_groups(item)
 

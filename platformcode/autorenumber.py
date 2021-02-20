@@ -166,7 +166,6 @@ class autorenumber():
 
 
     def renumber(self):
-        
         if not self.item.renumber and self.itemlist:
             for item in self.itemlist:
                 if not match(item.title, patron=r'[Ss]?(\d+)(?:x|_|\s+)[Ee]?[Pp]?(\d+)').match:
@@ -187,7 +186,8 @@ class autorenumber():
 
         if not self.group:
             groups = tmdb.get_groups(self.item)
-            self.group = tmdb.select_group(groups, self.item)
+            if groups: self.group = tmdb.select_group(groups, self.item)
+            else: self.group = self.item.infoLabels['url_scraper']
         seasons = tmdb.Tmdb(id_Tmdb=self.id).get_list_episodes()
 
         count = 0
