@@ -1629,7 +1629,7 @@ class Tmdb(object):
             elif k == 'credits_cast' or k == 'temporada_cast' or k == 'episodio_guest_stars':
                 dic_aux = dict((name, character) for (name, character) in l_castandrole)
                 l_castandrole.extend([(p['name'], p.get('character', '') or p.get('character_name', '')) \
-                                      for p in v if p['name'] not in list(dic_aux.keys())])
+                                      for p in v if 'name' in p and p['name'] not in list(dic_aux.keys())])
 
             elif k == 'videos':
                 if not isinstance(v, list):
