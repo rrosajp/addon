@@ -66,6 +66,10 @@ otmdb_global = None
 from core import db
 
 
+def clean_cache():
+    db['tmdb_cache'].clear()
+
+
 # The function name is the name of the decorator and receives the function that decorates.
 def cache_response(fn):
     logger.debug()
@@ -180,7 +184,8 @@ def set_infoLabels_itemlist(item_list, seekTmdb=False, idioma_busqueda=def_lang,
     """
     Concurrently, it gets the data of the items included in the item_list.
 
-    The API has a limit of 40 requests per IP every 10 '' and that is why the list should not have more than 30 items to ensure the proper functioning of this function.
+    The API in the past had a limit of 40 requests per IP every 10 '', now there's no limit (https://developers.themoviedb.org/3/getting-started/request-rate-limiting)
+    If a limit will be re-added uncomment "tmdb_threads" and related code
 
     @param item_list: list of Item objects that represent movies, series or chapters. The infoLabels attribute of each Item object will be modified including the extra localized data.
     @type item_list: list
@@ -197,18 +202,18 @@ def set_infoLabels_itemlist(item_list, seekTmdb=False, idioma_busqueda=def_lang,
         return
     import threading
 
-    threads_num = config.get_setting("tmdb_threads", default=20)
-    semaforo = threading.Semaphore(threads_num)
+    # threads_num = config.get_setting("tmdb_threads", default=20)
+    # semaforo = threading.Semaphore(threads_num)
     lock = threading.Lock()
     r_list = list()
     i = 0
     l_hilo = list()
 
     def sub_thread(_item, _i, _seekTmdb):
-        semaforo.acquire()
+        # semaforo.acquire()
         ret = set_infoLabels_item(_item, _seekTmdb, idioma_busqueda, lock)
         # logger.debug(str(ret) + "item: " + _item.tostring())
-        semaforo.release()
+        # semaforo.release()
         r_list.append((_i, _item, ret))
 
     for item in item_list:
