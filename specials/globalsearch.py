@@ -311,9 +311,11 @@ class SearchWindow(xbmcgui.WindowXML):
 
     def get_channel_results(self, searchAction):
         def search(text):
+            valid = []
+            other = []
             results = self.moduleDict[channel].search(searchAction, text)
             if len(results) == 1:
-                if not results[0].action or config.get_localized_string(70006).lower() in results[0].title.lower():
+                if not results[0].action or results[0].nextPage:
                     results = []
 
             if self.item.mode != 'all':
@@ -324,6 +326,7 @@ class SearchWindow(xbmcgui.WindowXML):
                         valid.append(elem)
                     else:
                         other.append(elem)
+            return results, valid, other
 
         logger.debug()
         channel = searchAction.channel
@@ -332,10 +335,14 @@ class SearchWindow(xbmcgui.WindowXML):
         other = []
 
         try:
-            search(self.item.text)
+            results, valid, other = search(self.item.text)
 
-            if self.item.contentType == 'movie' and not valid and self.item.infoLabels['year']:
-                search(self.item.text + " " + str(self.item.infoLabels['year']))
+            # if we are on movie search but no valid results is found, and there's a lot of results (more pages), try
+            # to add year to search text for better filtering
+            if self.item.contentType == 'movie' and not valid and other and other[-1].nextPage \
+                    and self.item.infoLabels['year']:
+                logger.debug('retring adding year on channel ' + channel)
+                dummy, valid, dummy = search(self.item.text + " " + str(self.item.infoLabels['year']))
         except:
             pass
 
