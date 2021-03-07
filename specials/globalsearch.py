@@ -310,14 +310,8 @@ class SearchWindow(xbmcgui.WindowXML):
                 logger.debug('end search for:', searchAction.channel)
 
     def get_channel_results(self, searchAction):
-        logger.debug()
-        channel = searchAction.channel
-        results = []
-        valid = []
-        other = []
-
-        try:
-            results = self.moduleDict[channel].search(searchAction, self.item.text)
+        def search(text):
+            results = self.moduleDict[channel].search(searchAction, text)
             if len(results) == 1:
                 if not results[0].action or config.get_localized_string(70006).lower() in results[0].title.lower():
                     results = []
@@ -330,6 +324,18 @@ class SearchWindow(xbmcgui.WindowXML):
                         valid.append(elem)
                     else:
                         other.append(elem)
+
+        logger.debug()
+        channel = searchAction.channel
+        results = []
+        valid = []
+        other = []
+
+        try:
+            search(self.item.text)
+
+            if self.item.contentType == 'movie' and not valid and self.item.infoLabels['year']:
+                search(self.item.text + " " + str(self.item.infoLabels['year']))
         except:
             pass
 
@@ -430,9 +436,15 @@ class SearchWindow(xbmcgui.WindowXML):
             self.channels = []
             self.moduleDict = {}
             self.searchActions = []
-        if percent == 100 and not self.results:
-            self.PROGRESS.setVisible(False)
-            self.NORESULTS.setVisible(True)
+
+            # if no results
+            total = 0
+            for num in self.results.values():
+                total += num
+            if not total:
+                self.PROGRESS.setVisible(False)
+                self.NORESULTS.setVisible(True)
+                self.setFocusId(CLOSE)
 
     def onInit(self):
         self.time = time.time()
@@ -462,8 +474,6 @@ class SearchWindow(xbmcgui.WindowXML):
                 if self.item.type:
                     self.item.mode = self.item.type
                     self.item.text = title_unify(self.item.text)
-                    if self.item.contentType == 'movie' and self.item.infoLabels['year']:
-                        self.item.text += " " + str(self.item.infoLabels['year'])
                 self.thread = Thread(target=self.search)
                 self.thread.start()
             elif self.item.mode in ['movie', 'tvshow', 'person_']:
@@ -574,7 +584,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 item = self.item.clone(mode='person_', discovery=self.persons[pos])
                 Search(item, self.moduleDict, self.searchActions)
                 if close_action:
-                    self.close
+                    self.close()
             else:
                 item = Item().fromurl(self.RESULTS.getSelectedItem().getProperty('item'))
                 if self.item.mode == 'movie': item.contentTitle = self.RESULTS.getSelectedItem().getLabel()
