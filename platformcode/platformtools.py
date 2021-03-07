@@ -239,9 +239,14 @@ def dialog_select_group(heading, _list, preselect=0):
         def onInit(self):
             self.getControl(1).setText(self.heading)
             itemlist = []
-            for n, text in enumerate(self.list):
+            for n, it in enumerate(self.list):
+                logger.debug(it)
                 item = xbmcgui.ListItem(str(n))
-                item.setProperty('title', text)
+                item.setProperty('title', it[0])
+                item.setProperty('seasons', str(it[1]))
+                item.setProperty('episodes', str(it[2]))
+                item.setProperty('description', '\n' + it[3])
+                item.setProperty('thumb', it[4])
                 itemlist.append(item)
 
             self.getControl(2).addItems(itemlist)
@@ -495,7 +500,6 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
 
         2. Adding options according to criteria
             Options can be added to the context menu to items that meet certain conditions.
-
 
         3. Adding options to all items
             Options can be added to the context menu for all items

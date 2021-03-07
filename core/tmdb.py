@@ -565,16 +565,14 @@ def select_group(groups, item):
     selected = -1
     url = 'https://api.themoviedb.org/3/tv/{}?api_key=a1ab8b8669da03637a4b98fa39c39228&language={}'.format(item.infoLabels['tmdb_id'], def_lang)
     res = requests.get(url).json()
-    selections = ['[B]Original[/B] Seasons: {} Episodes: {}'.format(res.get('number_of_seasons',0), res.get('number_of_episodes',0))]
+    selections = [['Original',res.get('number_of_seasons',0), res.get('number_of_episodes',0), '', item.thumbnail]]
     ids = ['original']
     for group in groups:
-        name = '[B]{}[/B] Seasons: {} Episodes: {}'.format(group.get('name',''), group.get('group_count',0), group.get('episode_count',0))
-        description = group.get('description','')
-        if description:
-            name = '{}\n{}'.format(name, description)
+        # name = '{} Seasons: {} Episodes: {}'.format(group.get('name',''), group.get('group_count',0), group.get('episode_count',0))
+        # description = group.get('description','')
         ID = group.get('id','')
         if ID:
-            selections.append(name)
+            selections.append([group.get('name',''), group.get('group_count',0), group.get('episode_count',0), group.get('description',''), item.thumbnail])
             ids.append(ID)
     if selections and ids:
         selected = platformtools.dialog_select_group(config.get_localized_string(70831), selections)
