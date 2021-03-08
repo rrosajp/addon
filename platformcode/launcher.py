@@ -332,7 +332,7 @@ def run(item=None):
                 platformtools.dialog_ok(config.get_localized_string(60087) % Channel, config.get_localized_string(60014))
         else:
             if platformtools.dialog_yesno(config.get_localized_string(60038), config.get_localized_string(60015)):
-                run(Item(channel="setting", action="report_menu"))
+                platformtools.itemlist_update(Item(channel="setting", action="report_menu"), True)
     finally:
         # db need to be closed when not used, it will cause freezes
         from core import db

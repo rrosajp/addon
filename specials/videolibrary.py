@@ -201,14 +201,14 @@ def configure_update_videolibrary(item):
 
     # Select Dialog
     ret = platformtools.dialog_multiselect(config.get_localized_string(60601), lista, preselect=preselect, useDetails=True)
-    if ret < 0:
+    if ret is None:
         return False  # order cancel
-    seleccionados = [ids[i] for i in ret]
+    selection = [ids[i] for i in ret]
 
     for tvshow in ids:
-        if tvshow not in seleccionados:
+        if tvshow not in selection:
             tvshow.active = 0
-        elif tvshow in seleccionados:
+        elif tvshow in selection:
             tvshow.active = 1
         mark_tvshow_as_updatable(tvshow, silent=True)
 
