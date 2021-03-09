@@ -10,14 +10,7 @@ typo = support.typo
 session = requests.Session()
 host = support.config.get_channel_url()
 
-def getToken():
-    token = config.get_setting('token', 'discoveryplus', None)
-    if not token:
-        token = session.get('https://disco-api.discoveryplus.it/token?realm=dplayit').json()['data']['attributes']['token']
-        config.set_setting('token', token, 'discoveryplus')
-    return token
-
-token = getToken()
+token = session.get('https://disco-api.discoveryplus.it/token?realm=dplayit').json()['data']['attributes']['token']
 
 api = "https://disco-api.discoveryplus.it"
 headers = {'User-Agent': 'Mozilla/50.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0',
