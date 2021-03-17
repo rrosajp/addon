@@ -65,7 +65,8 @@ def peliculas(item):
 
     if item.args == 'search':
         patronBlock = r'>Lista Serie Tv</a></li></ul></div><div id="box_movies">(?P<block>.*?)<div id="paginador">'
-        patron = r'<div class="movie">[^>]+[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt="(?P<title>.+?)(?:(?P<year>\d{4})|")[^>]*>\s*<a href="([^"]+)'
+        # patron = r'<div class="movie">[^>]+[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt="(?P<title>.+?)(?:(?P<year>\d{4})|")[^>]*>\s*<a href="([^"]+)'
+        patron = r'<div class="movie">[^>]+[^>]+>\s*<img src="(?P<thumb>[^"]+)" alt="(?P<title>.+?)(?:(?P<year>\d{4})|")[^>]*>\s*<a href="(?P<url>[^"]+)'
     elif item.contentType == 'episode':
         pagination = 35
         action = 'findvideos'
@@ -108,8 +109,7 @@ def episodios(item):
     support.info()
     action = 'findvideos'
     patronBlock = r'<table>(?P<block>.*)<\/table>'
-    # patron = r'<tr><td>(?P<title>.*?)?[ ](?:Parte)?(?P<episode>\d+x\d+|\d+)(?:|[ ]?(?P<title2>.+?)?(?:avi)?)<(?P<url>.*?)</td><tr>'
-    patron = r'<tr><td>(?P<title>.*?)?\s(?P<episode>\d+x\d+|\d+)(?:\s?(?P<title2>.+?)?(?:Parte\s*\d)?(?:avi)?)<\/td><td>[^<]*<.*?href="(?P<url>[^"]+)"'
+    patron = r'<tr><td>(?P<title>.*?)?[ ](?:Parte)?(?P<episode>\d+x\d+|\d+)(?:|[ ]?(?P<title2>.+?)?(?:avi)?)<(?P<data>.*?)<\/td><tr>'
     def itemlistHook(itemlist):
         for i, item in enumerate(itemlist):
             ep = support.match(item.title, patron=r'\d+x(\d+)').match
@@ -171,7 +171,7 @@ def findvideos(item):
             itemlist = []
             item.infoLabels['mediatype'] = 'episode'
 
-            data = httptools.downloadpage(item.url, headers=headers).data
+            data = httptools.downloadpage(item.data, headers=headers).data
             data = re.sub('\n|\t', ' ', data)
             data = re.sub(r'>\s+<', '> <', data)
             #support.info("DATA - HTML:\n", data)
