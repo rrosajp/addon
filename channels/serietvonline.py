@@ -107,8 +107,9 @@ def peliculas(item):
 def episodios(item):
     support.info()
     action = 'findvideos'
-    patronBlock = r'<table>(?P<block>.*?)<\/table>'
-    patron = r'<tr><td>(?P<title>.*?)?[ ](?:Parte)?(?P<episode>\d+x\d+|\d+)(?:|[ ]?(?P<title2>.+?)?(?:avi)?)<(?P<url>.*?)</td><tr>'
+    patronBlock = r'<table>(?P<block>.*)<\/table>'
+    # patron = r'<tr><td>(?P<title>.*?)?[ ](?:Parte)?(?P<episode>\d+x\d+|\d+)(?:|[ ]?(?P<title2>.+?)?(?:avi)?)<(?P<url>.*?)</td><tr>'
+    patron = r'<tr><td>(?P<title>.*?)?\s(?P<episode>\d+x\d+|\d+)(?:\s?(?P<title2>.+?)?(?:Parte\s*\d)?(?:avi)?)<\/td><td>[^<]*<.*?href="(?P<url>[^"]+)"'
     def itemlistHook(itemlist):
         for i, item in enumerate(itemlist):
             ep = support.match(item.title, patron=r'\d+x(\d+)').match
