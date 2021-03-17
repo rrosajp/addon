@@ -138,7 +138,7 @@ def scrapeLang(scraped, lang, longtitle):
     # e credo sia utile per filtertools
     language = ''
 
-    if scraped['lang']:
+    if scraped.get('lang'):
         if 'ita' in scraped['lang'].lower(): language = 'ITA'
         if 'sub' in scraped['lang'].lower(): language = 'Sub-' + language
 
