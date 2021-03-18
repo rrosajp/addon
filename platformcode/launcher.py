@@ -461,7 +461,8 @@ def play_from_library(item):
     # Modify the action (currently the video library needs "findvideos" since this is where the sources are searched
     item.action = "findvideos"
 
-    window_type = config.get_setting("window_type", "videolibrary")
+    window_type = config.get_setting("window_type", "videolibrary") if config.get_setting('next_ep') < 3 else 1
+
     # and launch kodi again
     if xbmc.getCondVisibility('Window.IsMedia') and not window_type == 1:
         xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")

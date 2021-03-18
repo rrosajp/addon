@@ -6129,11 +6129,15 @@ msgstr ""
 
 msgctxt "#70832"
 msgid "Disabled"
-msgstr "Disabilitato"
+msgstr ""
 
 msgctxt "#70833"
 msgid "Automatic"
-msgstr "Automatico"
+msgstr ""
+
+msgctxt "#70834"
+msgid "Playlist"
+msgstr ""
 
 # DNS start [ settings and declaration ]
 msgctxt "#707401"

@@ -6136,6 +6136,10 @@ msgctxt "#70833"
 msgid "Automatic"
 msgstr "Automatico"
 
+msgctxt "#70834"
+msgid "Playlist"
+msgstr "Playlist"
+
 # DNS start [ settings and declaration ]
 msgctxt "#707401"
 msgid "Enable DNS check alert"

@@ -1088,6 +1088,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
             playlist.add(mediaurl, xlistitem)
             # Reproduce
             xbmc_player.play(playlist, xlistitem)
+            add_next_to_playlist(item)
 
             if config.get_setting('trakt_sync'):
                 from core import trakt_tools
@@ -1121,6 +1122,29 @@ def set_player(item, xlistitem, mediaurl, view, strm):
             continue
         xbmc.sleep(500)
         xbmcgui.Window(12005).show()
+
+
+def add_next_to_playlist(item):
+    import threading
+    from core import filetools, videolibrarytools
+    from platformcode import xbmc_videolibrary
+    def add_to_playlist(item):
+        if item.contentType != 'movie' and item.strm_path:
+            next= xbmc_videolibrary.next_ep(item)
+            if next:
+                next.back = True
+                nfo_path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"), next.strm_path.replace('strm','nfo'))
+                if nfo_path and filetools.isfile(nfo_path):
+                    head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
+                nextItem = xbmcgui.ListItem(path=item_nfo.url)
+                nextItem.setArt({"thumb": item_nfo.contentThumbnail if item_nfo.contentThumbnail else item_nfo.thumbnail})
+                set_infolabels(nextItem, item_nfo, True)
+                nexturl = "plugin://plugin.video.kod/?" + next.tourl()
+                playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+                playlist.add(nexturl, nextItem)
+                add_to_playlist(next)
+    if item.contentType != 'movie' and config.get_setting('next_ep') == 3:
+        threading.Thread(target=add_to_playlist, args=[item]).start()
 
 
 def torrent_client_installed(show_tuple=False):
