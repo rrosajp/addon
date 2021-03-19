@@ -25,8 +25,6 @@ def mark_auto_as_watched(item):
         logger.debug()
         actual_time = 0
         total_time = 0
-        # logger.debug("item:\n" + item.tostring('\n'))
-        # if item.options['continue']: item.played_time = platformtools.resume_playback(platformtools.get_played_time(item))
 
         time_limit = time.time() + 30
         while not platformtools.is_playing() and time.time() < time_limit:
@@ -49,9 +47,10 @@ def mark_auto_as_watched(item):
             logger.debug(next_episode)
 
         while platformtools.is_playing():
-            xbmc.sleep(1000)
-            actual_time = xbmc.Player().getTime()
-            total_time = xbmc.Player().getTotalTime()
+            try: actual_time = xbmc.Player().getTime()
+            except: pass
+            try: total_time = xbmc.Player().getTotalTime()
+            except: pass
             if item.played_time and xbmcgui.getCurrentWindowId() == 12005:
                 xbmc.Player().seekTime(item.played_time)
                 item.played_time = 0 # Fix for Slow Devices
@@ -86,7 +85,7 @@ def mark_auto_as_watched(item):
                 break
 
         # if item.options['continue']:
-        if 10 < actual_time < mark_time:
+        if actual_time < mark_time:
             item.played_time = actual_time
         else: item.played_time = 0
         platformtools.set_played_time(item)

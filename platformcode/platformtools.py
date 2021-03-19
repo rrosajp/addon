@@ -1234,7 +1234,8 @@ def resume_playback(played_time):
             if action in self.action_exitkeys_id:
                 self.set_values(False)
                 self.close()
-    if played_time:
+
+    if played_time and played_time > 30:
         Dialog = ResumePlayback('ResumePlayback.xml', config.get_runtime_path(), played_time=played_time)
         Dialog.show()
         t = 0
