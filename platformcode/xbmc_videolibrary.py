@@ -75,7 +75,6 @@ def mark_auto_as_watched(item):
             # check for next Episode
             if next_episode and sync and time_from_end >= difference:
                 nextdialog = NextDialog(ND, config.get_runtime_path())
-                nextdialog.show()
                 while platformtools.is_playing() and not nextdialog.is_exit():
                     xbmc.sleep(100)
                 if nextdialog.continuewatching:
@@ -1394,6 +1393,7 @@ class NextDialog(xbmcgui.WindowXMLDialog):
         self.setProperty("next_img", img)
         self.setProperty("title", info["tvshowtitle"])
         self.setProperty("ep_title", "%dx%02d - %s" % (info["season"], info["episode"], info["title"]))
+        self.doModal()
 
     def set_exit(self, EXIT):
         self.EXIT = EXIT
