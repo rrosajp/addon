@@ -19,7 +19,6 @@ def mainlist(item):
     patron = r'listOptionBrand">\s*<a href="(?P<url>[^"]+)"(?:[^>]+>){2}(?P<title>[^<]+)'
 
     def itemHook(item):
-        item.url = host + item.url
         item.thumbnail = support.thumb('music')
         return item
 
