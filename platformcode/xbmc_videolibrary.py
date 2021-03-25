@@ -28,7 +28,7 @@ def mark_auto_as_watched(item):
 
         time_limit = time.time() + 30
         while not platformtools.is_playing() and time.time() < time_limit:
-            time.sleep(1)
+            pass
 
 
         marked = False
@@ -39,9 +39,6 @@ def mark_auto_as_watched(item):
         percentage = float(config.get_setting("watched_setting")) / 100
         time_from_end = config.get_setting('next_ep_seconds')
         if item.contentType != 'movie' and config.get_setting('next_ep') < 3:
-            next_dialogs = ['NextDialog.xml', 'NextDialogExtended.xml', 'NextDialogCompact.xml']
-            next_ep_type = config.get_setting('next_ep_type')
-            ND = next_dialogs[next_ep_type]
             try: next_episode = next_ep(item)
             except: next_episode = False
             logger.debug(next_episode)
@@ -69,28 +66,30 @@ def mark_auto_as_watched(item):
                 show_server = False
                 from specials import videolibrary
                 videolibrary.mark_content_as_watched2(item)
-                if not next_episode:
-                    break
-
-            # check for next Episode
-            if next_episode and sync and time_from_end >= difference:
-                nextdialog = NextDialog(ND, config.get_runtime_path())
-                while platformtools.is_playing() and not nextdialog.is_exit():
-                    xbmc.sleep(100)
-                if nextdialog.continuewatching:
-                    next_episode.next_ep = True
-                    xbmc.Player().stop()
-                nextdialog.close()
                 break
+
+        # Silent sync with Trakt
+        if sync and config.get_setting("trakt_sync"): sync_trakt_kodi()
+
+        # check for next Episode
+        if next_episode and sync:
+            next_dialogs = ['NextDialog.xml', 'NextDialogExtended.xml', 'NextDialogCompact.xml']
+            next_ep_type = config.get_setting('next_ep_type')
+            ND = next_dialogs[next_ep_type]
+            nextdialog = NextDialog(ND, config.get_runtime_path())
+            while platformtools.is_playing() and not nextdialog.is_exit():
+                xbmc.sleep(100)
+            if nextdialog.continuewatching:
+                next_episode.next_ep = True
+                xbmc.Player().stop()
+            nextdialog.close()
+            # break
 
         # if item.options['continue']:
         if actual_time < mark_time:
             item.played_time = actual_time
         else: item.played_time = 0
         platformtools.set_played_time(item)
-
-        # Silent sync with Trakt
-        if sync and config.get_setting("trakt_sync"): sync_trakt_kodi()
 
         while platformtools.is_playing():
             xbmc.sleep(100)
