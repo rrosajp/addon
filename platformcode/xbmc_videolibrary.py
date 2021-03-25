@@ -37,7 +37,7 @@ def mark_auto_as_watched(item):
         show_server = True
 
         percentage = float(config.get_setting("watched_setting")) / 100
-        time_from_end = config.get_setting('next_ep_seconds')
+
         if item.contentType != 'movie' and config.get_setting('next_ep') < 3:
             try: next_episode = next_ep(item)
             except: next_episode = False
@@ -53,7 +53,6 @@ def mark_auto_as_watched(item):
                 item.played_time = 0 # Fix for Slow Devices
 
             mark_time = total_time * percentage
-            difference = total_time - actual_time
 
             # Mark as Watched
             if actual_time > mark_time and not marked:
@@ -73,6 +72,13 @@ def mark_auto_as_watched(item):
 
         # check for next Episode
         if next_episode and sync:
+            while platformtools.is_playing():
+                actual_time = xbmc.Player().getTime()
+                total_time = xbmc.Player().getTotalTime()
+                time_from_end = config.get_setting('next_ep_seconds')
+                difference = total_time - actual_time
+                if time_from_end >= difference:
+                    break
             next_dialogs = ['NextDialog.xml', 'NextDialogExtended.xml', 'NextDialogCompact.xml']
             next_ep_type = config.get_setting('next_ep_type')
             ND = next_dialogs[next_ep_type]
