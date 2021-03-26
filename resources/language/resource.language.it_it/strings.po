@@ -1424,8 +1424,8 @@ msgid "The unzipped %s file already exists, or you want to overwrite it.?"
 msgstr "il file %s da decomprimere esiste già, vuoi sovrascriverlo?"
 
 msgctxt "#60305"
-msgid ""
-msgstr ""
+msgid "[COLOR red]Do not open this link[/COLOR]"
+msgstr "[COLOR red]NON aprire questo link[/COLOR]"
 
 msgctxt "#60306"
 msgid "The fields 'New password' and 'Confirm new password' do not match"
@@ -1436,8 +1436,8 @@ msgid "Use 'Preferences' to change your password"
 msgstr "Entra in 'Preferenze' per cambiare la password"
 
 msgctxt "#60308"
-msgid ""
-msgstr ""
+msgid "[COLOR red]It's one use, so write it[/COLOR]"
+msgstr "[COLOR red]Funziona una volta sola, quindi scrivilo[/COLOR]"
 
 msgctxt "#60309"
 msgid "The password is not correct."
@@ -1540,8 +1540,8 @@ msgid "Configuration"
 msgstr "Configurazione"
 
 msgctxt "#60334"
-msgid ""
-msgstr ""
+msgid "Log file too large. Restart Kodi and retry"
+msgstr "File di log troppo pesante. Riapri kodi e riprova"
 
 msgctxt "#60335"
 msgid "Watch in..."

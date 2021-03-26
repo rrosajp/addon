@@ -1425,7 +1425,7 @@ msgid "The unzipped %s file already exists, or you want to overwrite it.?"
 msgstr ""
 
 msgctxt "#60305"
-msgid ""
+msgid "[COLOR red]Do not open this link[/COLOR]"
 msgstr ""
 
 msgctxt "#60306"
@@ -1437,7 +1437,7 @@ msgid "Use 'Preferences' to change your password"
 msgstr ""
 
 msgctxt "#60308"
-msgid ""
+msgid "[COLOR red]It's one use, so write it[/COLOR]"
 msgstr ""
 
 msgctxt "#60309"
@@ -1541,7 +1541,7 @@ msgid "Configuration"
 msgstr ""
 
 msgctxt "#60334"
-msgid ""
+msgid "Log file too large. Restart Kodi and retry"
 msgstr ""
 
 msgctxt "#60335"
