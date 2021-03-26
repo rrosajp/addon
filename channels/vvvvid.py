@@ -23,8 +23,7 @@ except:
     conn_id = ''
 
 
-main_host = host
-host += '/vvvvid/ondemand/'
+main_host = host + '/vvvvid/ondemand/'
 
 
 @support.menu
@@ -89,13 +88,13 @@ def newest(categoria):
     item.args = 'channel/10007/last/'
     if categoria == 'peliculas':
         item.contentType = 'movie'
-        item.url = host + 'film/'
+        item.url = main_host + 'film/'
     if categoria == 'series':
         item.contentType = 'tvshow'
-        item.url = host + 'series/'
+        item.url = main_host + 'series/'
     if categoria == 'anime':
         item.contentType = 'tvshow'
-        item.url = host + 'anime/'
+        item.url = main_host + 'anime/'
     return peliculas(item)
 
 
@@ -159,7 +158,7 @@ def episodios(item):
         if type(title) == tuple: title = title[0]
         itemlist.append(
             item.clone(title = support.typo(title, 'bold'),
-                    url=  host + show_id + '/season/' + str(season_id),
+                    url=  main_host + show_id + '/season/' + str(season_id),
                     action= 'findvideos',
                     video_id= episode['video_id']))
 
@@ -174,7 +173,7 @@ def findvideos(item):
     itemlist = []
     if item.contentType == 'movie':
         json_file = current_session.get(item.url, headers=headers, params=payload).json()
-        item.url = host + str(json_file['data'][0]['show_id']) + '/season/' + str(json_file['data'][0]['episodes'][0]['season_id']) + '/'
+        item.url = main_host + str(json_file['data'][0]['show_id']) + '/season/' + str(json_file['data'][0]['episodes'][0]['season_id']) + '/'
         item.video_id = json_file['data'][0]['episodes'][0]['video_id']
     logger.info('url=',item.url)
     json_file = current_session.get(item.url, headers=headers, params=payload).json()
@@ -220,7 +219,7 @@ def make_itemlist(itemlist, item, data):
                 item.clone(title = support.typo(title, 'bold'),
                            fulltitle= fulltitle,
                            show= fulltitle,
-                           url= host + str(key['show_id']) + '/seasons/',
+                           url= main_host + str(key['show_id']) + '/seasons/',
                            action= 'findvideos' if item.contentType == 'movie' else 'episodios',
                            contentType = item.contentType,
                            contentSerieName= fulltitle if item.contentType != 'movie' else '',
