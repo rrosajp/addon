@@ -4,30 +4,33 @@
 # ------------------------------------------------------------
 
 import random
-from core import httptools,support
+from core import httptools, support
 from platformcode import logger
 
 host = 'https://www.accuradio.com'
+api_url = host + '/c/m/json/{}/'
 headers = [['Referer', host]]
 
-@support.scrape
+
+
 def mainlist(item):
-    if item.data: data = item.data
-    else: item.url = host
-    action = 'peliculas'
-    patronBlock = r'Genres(?P<block>.*?)</ul'
-    patron = r'listOptionBrand">\s*<a href="(?P<url>[^"]+)"(?:[^>]+>){2}(?P<title>[^<]+)'
-
-    def itemHook(item):
-        item.thumbnail = support.thumb('music')
-        return item
-
-    def itemlistHook(itemlist):
+    itemlist = []
+    item.action = 'peliculas'
+    js = httptools.downloadpage(api_url.format('brands')).json
+    for it in js.get('features',[]):
         itemlist.append(
-            item.clone(title=support.typo('Cerca...', 'bold color kod'), action='search', thumbnail=support.thumb('search')))
-        support.channel_config(item, itemlist)
-        return itemlist
-    return locals()
+            item.clone(url= '{}/{}'.format(host,it.get('canonical_url','')),
+                       title=support.typo(it['name'],'italic') + support.typo(it.get('channels',''),'_ [] color kod')
+            ))
+    for it in js.get('brands',[]):
+        itemlist.append(
+            item.clone(url= '{}/{}'.format(host,it.get('canonical_url','')),
+                       title=support.typo(it['name'],'bullet bold') + support.typo(it.get('channels',''),'_ [] color kod')
+            ))
+
+    itemlist.append(item.clone(title=support.typo('Cerca...', 'bold color kod'), action='search', thumbnail=support.thumb('search')))
+    support.channel_config(item, itemlist)
+    return itemlist
 
 
 @support.scrape
@@ -50,7 +53,7 @@ def playradio(item):
             album = i['album']['title']
             year = i['album']['year']
             thumb = 'https://www.accuradio.com/static/images/covers300' + i['album']['cdcover']
-            duration = i['duration']
+            duration = i.get('duration',0)
             info = {'duration':duration,
                     'album':album,
                     'artist':artist,

@@ -150,7 +150,6 @@ def episodios(item):
             show_id = str(json_file[0]['show_id'])
             season_id = str(json_file[0]['season_id'])
 
- 
     for episode in episodes:
         try:
             title = 'Episodio ' + episode['number'] + ' - ' + episode['title'].encode('utf8')
@@ -166,9 +165,8 @@ def episodios(item):
 
     if inspect.stack()[1][3] not in ['find_episodes']:
         autorenumber.start(itemlist, item)
-    if autorenumber.check(item) == True \
-        or support.match(itemlist[0].title, patron=r"(\d+x\d+)").match:
-        support.videolibrary(itemlist,item)
+
+    support.videolibrary(itemlist,item)
     return itemlist
 
 def findvideos(item):
@@ -213,20 +211,22 @@ def make_itemlist(itemlist, item, data):
     infoLabels = {}
     for key in data['data']:
         if search.lower() in encode(key['title']).lower():
-            infoLabels['year'] = key['date_published']
-            infoLabels['title'] = key['title']
-            if item.contentType != 'movie': infoLabels['tvshowtitle'] = key['title']
             title = encode(key['title'])
+            fulltitle=title.split('-')[0].strip()
+            infoLabels['year'] = key['date_published']
+            infoLabels['title'] = fulltitle
+            if item.contentType != 'movie': infoLabels['tvshowtitle'] = fulltitle
             itemlist.append(
                 item.clone(title = support.typo(title, 'bold'),
-                           fulltitle= title,
-                           show= title,
+                           fulltitle= fulltitle,
+                           show= fulltitle,
                            url= host + str(key['show_id']) + '/seasons/',
                            action= 'findvideos' if item.contentType == 'movie' else 'episodios',
                            contentType = item.contentType,
-                           contentSerieName= key['title'] if item.contentType != 'movie' else '',
-                           contentTitle= title if item.contentType == 'movie' else '',
-                           infoLabels=infoLabels))
+                           contentSerieName= fulltitle if item.contentType != 'movie' else '',
+                           contentTitle= fulltitle if item.contentType == 'movie' else '',
+                           infoLabels=infoLabels,
+                           videolibrary=False))
     return itemlist
 
 def loadjs(url):
