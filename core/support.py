@@ -709,10 +709,12 @@ def menu(func):
         item = args['item']
         logger.debug(item.channel + ' menu start')
         host = func.__globals__['host']
+        menuHost = args.get('host','')
+        if menuHost: host = menuHost
         filename = func.__module__.split('.')[1]
         single_search = False
         # listUrls = ['film', 'filmSub', 'tvshow', 'tvshowSub', 'anime', 'animeSub', 'search', 'top', 'topSub']
-        listUrls = ['top', 'film', 'tvshow', 'anime', 'search']
+        listUrls = ['top', 'film', 'tvshow', 'anime', 'search', 'host']
         listUrls_extra = []
         dictUrl = {}
 
