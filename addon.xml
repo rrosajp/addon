@@ -24,9 +24,9 @@
     <assets>
       <icon>resources/media/logo.png</icon>
       <fanart>resources/media/fanart.jpg</fanart>
-      <screenshot>resources/media/themes/ss/1.png</screenshot>
-      <screenshot>resources/media/themes/ss/2.png</screenshot>
-      <screenshot>resources/media/themes/ss/3.png</screenshot>
+      <screenshot>resources/media/screenshot-1.png</screenshot>
+      <screenshot>resources/media/screenshot-2.png</screenshot>
+      <screenshot>resources/media/screenshot-3.png</screenshot>
     </assets>
       <news>-Migliorata l'efficacia del riconoscimento dei contenuti in ricerca film/serie
           - corretti alcuni bug e fatti alcuni fix per i soliti cambi di struttura</news>
