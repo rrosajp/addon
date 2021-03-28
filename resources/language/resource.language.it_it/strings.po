@@ -4808,8 +4808,8 @@ msgid "Notification(Update Kodi to its latest version, for best info,8000, 'http
 msgstr "Notification(Aggiorna Kodi alla sua ultima versione, per migliori info,8000, 'http://i.imgur.com/mHgwcn3.png')"
 
 msgctxt "#70501"
-msgid "Search did not match (%s)"
-msgstr "La ricerca non ha dato risultati (%s)"
+msgid "Search did not match"
+msgstr "La ricerca non ha dato risultati"
 
 msgctxt "#70502"
 msgid ">> Next"
@@ -4840,24 +4840,24 @@ msgid "Search in Mymovies"
 msgstr "Ricerca in Mymovies"
 
 msgctxt "#70510"
-msgid "Manual Search in Youtube"
-msgstr "Ricerca Manuale in Youtube"
+msgid "Manual Search"
+msgstr "Ricerca Manuale"
 
 msgctxt "#70511"
-msgid "Manual Search in Mymovies"
-msgstr "Ricerca Manuale in Mymovies"
+msgid ""
+msgstr ""
 
 msgctxt "#70512"
 msgid "Searching in Mymovies"
 msgstr "Ricerca in Mymovies"
 
 msgctxt "#70513"
-msgid "Manual Searching in Filmaffinity"
-msgstr "Ricerca Manuale in Filmaffinity"
+msgid ""
+msgstr ""
 
 msgctxt "#70514"
-msgid "Manual Search in Jayhap"
-msgstr "Ricerca Manuale in Jayhap"
+msgid ""
+msgstr ""
 
 msgctxt "#70515"
 msgid "Completed %s"

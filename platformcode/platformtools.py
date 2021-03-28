@@ -642,7 +642,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
 
         # Search trailer...
         if (item.contentTitle and item.contentType in ['movie', 'tvshow']) or "buscar_trailer" in context:
-            context_commands.append((config.get_localized_string(60359), "RunPlugin(%s?%s)" % (sys.argv[0], urllib.urlencode({ 'channel': "trailertools", 'action': "buscartrailer", 'search_title': item.contentTitle if item.contentTitle else item.fulltitle, 'contextual': True}))))
+            context_commands.append((config.get_localized_string(60359), "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, urllib.urlencode({ 'channel': "trailertools", 'action': "buscartrailer", 'search_title': item.contentTitle if item.contentTitle else item.fulltitle, 'contextual': True}))))
 
         if kwargs.get('superfavourites'):
             context_commands.append((config.get_localized_string(60361), "RunScript(special://home/addons/plugin.program.super.favourites/LaunchSFMenu.py)"))

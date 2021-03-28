@@ -4809,7 +4809,7 @@ msgid "Notification(Update Kodi to its latest version, for best info,8000, 'http
 msgstr ""
 
 msgctxt "#70501"
-msgid "Search did not match (%s)"
+msgid "Search did not match"
 msgstr ""
 
 msgctxt "#70502"
@@ -4841,11 +4841,11 @@ msgid "Search in Mymovies"
 msgstr ""
 
 msgctxt "#70510"
-msgid "Manual Search in Youtube"
+msgid "Manual Search"
 msgstr ""
 
 msgctxt "#70511"
-msgid "Manual Search in Mymovies"
+msgid ""
 msgstr ""
 
 msgctxt "#70512"
@@ -4853,11 +4853,11 @@ msgid "Searching in Mymovies"
 msgstr ""
 
 msgctxt "#70513"
-msgid "Manual Searching in Filmaffinity"
+msgid ""
 msgstr ""
 
 msgctxt "#70514"
-msgid "Manual Search in Jayhap"
+msgid ""
 msgstr ""
 
 msgctxt "#70515"
