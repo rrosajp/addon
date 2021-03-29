@@ -936,8 +936,8 @@ def get_dialogo_opciones(item, default_action, strm, autoplay):
         if default_action == 3:
             seleccion = len(opciones) - 1
 
-        # Search for trailers on youtube
-        if item.channel not in ["Trailer", "ecarteleratrailers"]:
+        # Search for trailers
+        if item.channel not in ["trailertools"]:
             # "Search Trailer"
             opciones.append(config.get_localized_string(30162))
 

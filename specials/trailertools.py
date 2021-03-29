@@ -48,8 +48,7 @@ else:
 
 def buscartrailer(item, trailers=[]):
     logger.debug()
-
-    if item.show or item.infoLabels['tvshowtitle'] or item.contentType != "movie":
+    if item.contentType != "movie":
         tipo = "tv"
     else:
         tipo = "movie"
@@ -113,7 +112,7 @@ def buscartrailer(item, trailers=[]):
                                    action="", thumbnail=get_thumb('nofolder.png'), text_color=""))
 
     from lib.fuzzy_match import algorithims
-    itemlist.sort(key=lambda r: algorithims.trigram(item.contentTitle, r.title), reverse=True)
+    itemlist.sort(key=lambda r: algorithims.trigram(item.contentTitle + ' trailer', r.title), reverse=True)
 
     if item.contextual:
         global window_select, result
@@ -162,8 +161,8 @@ def tmdb_trailers(item, tipo="movie"):
         for vid in tmdb_search.get_videos():
             found = False
             if vid['type'].lower() == 'trailer':
-                title = vid['name'] + " [" + vid['size'] + "p]"
-                it = item.clone(action="play", title=title, title2="TMDB(youtube) - LANG:" + vid['language'].replace("en", "ING").replace("it", "ITA"), url=vid['url'], server="youtube")
+                title = vid['name']
+                it = item.clone(action="play", title=title, title2="TMDB(youtube) - " + vid['language'].replace("en", "ING").replace("it", "ITA") + " [" + vid['size'] + "p]", url=vid['url'], server="youtube")
                 itemlist.append(it)
 
                 if vid['language'] == def_lang and not found:  # play now because lang is correct and TMDB is trusted
@@ -215,7 +214,10 @@ def mymovies_search(item):
 
     title = item.contentTitle
     url = 'https://www.mymovies.it/ricerca/ricerca.php?limit=true&q=' + title
-    js = json.loads(httptools.downloadpage(url).data)['risultati']['film']['elenco']
+    try:
+        js = json.loads(httptools.downloadpage(url).data)['risultati']['film']['elenco']
+    except:
+        return []
 
     itemlist = []
     with futures.ThreadPoolExecutor() as executor:
@@ -230,9 +232,11 @@ def mymovies_search(item):
 def search_links_mymovies(item):
     global result
     logger.debug()
-    trailer_url = match(item, patron=r'<li class="bottone_playlist"[^>]+><a href="([^"]+)"').match
+    trailer_url = match(item, patron=r'<source src="([^"]+)').match
     if trailer_url:
-        return item.clone(url=trailer_url, server='directo', action="play")
+        it = item.clone(url=trailer_url, server='directo', action="play")
+        del it.infoLabels['tmdb_id']  # for not saving watch time
+        return it
 
 
 try:
