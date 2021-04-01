@@ -235,7 +235,8 @@ def search_links_mymovies(item):
     trailer_url = match(item, patron=r'<source src="([^"]+)').match
     if trailer_url:
         it = item.clone(url=trailer_url, server='directo', action="play")
-        del it.infoLabels['tmdb_id']  # for not saving watch time
+        if 'tmdb_id' in it.infoLabels:
+            del it.infoLabels['tmdb_id']  # for not saving watch time
         return it
 
 
