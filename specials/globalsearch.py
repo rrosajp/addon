@@ -345,7 +345,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 dummy, valid, dummy = search(self.item.text + " " + str(self.item.infoLabels['year']))
 
             # some channels may use original title
-            if self.item.mode != 'all' and not valid:
+            if self.item.mode != 'all' and not valid and self.item.infoLabels['originaltitle']:
                 logger.debug('retring with original title on channel ' + channel)
                 dummy, valid, dummy = search(self.item.infoLabels['originaltitle'])
         except:
