@@ -294,6 +294,10 @@ def render_items(itemlist, parent_item):
     """
     Function used to render itemlist on kodi
     """
+    # if it's not a list, do nothing
+    if not isinstance(itemlist, list):
+        return
+
     logger.debug('START render_items')
     thumb_type = config.get_setting('video_thumbnail_type')
     from platformcode import shortcuts
@@ -309,9 +313,6 @@ def render_items(itemlist, parent_item):
     check_sf = os.path.exists(sf_file_path)
     superfavourites = check_sf and xbmc.getCondVisibility('System.HasAddon("plugin.program.super.favourites")')
 
-    # if it's not a list, do nothing
-    if not isinstance(itemlist, list):
-        return
     # if there's no item, add "no elements" item
     if not len(itemlist):
         itemlist.append(Item(title=config.get_localized_string(60347), thumbnail=get_thumb('nofolder.png')))
@@ -583,7 +584,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
             if item.infoLabels['tmdb_id'] or item.infoLabels['imdb_id'] or item.infoLabels['tvdb_id']:
                 context_commands.append(("InfoPlus", "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'channel=infoplus&action=Main&from_channel=' + item.channel)))
 
-        # Go to the Main Menu (channel.mainlist)
+        # Open in browser and previous menu
         if parent_item.channel not in ["news", "channelselector", "downloads", "search"] and item.action != "mainlist" and not parent_item.noMainMenu:
             if parent_item.action != "mainlist":
                 context_commands.insert(0, (config.get_localized_string(60349), "Container.Refresh (%s?%s)" % (sys.argv[0], Item(channel=item.channel, action="mainlist").tourl())))
@@ -609,8 +610,10 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
             else:
                 mediatype = item.contentType
 
-            context_commands.append((config.get_localized_string(60350), "Container.Update (%s?%s&%s)" % (sys.argv[0], item_url, urllib.urlencode({'channel': 'search', 'action': "from_context", 'from_channel': item.channel, 'contextual': True, 'text': item.wanted}))))
-
+            if config.get_setting('new_search'):
+                context_commands.append((config.get_localized_string(60350), "RunPlugin (%s?%s&%s)" % (sys.argv[0], item_url, urllib.urlencode({'channel': 'search', 'action': "from_context", 'from_channel': item.channel, 'contextual': True}))))
+            else:
+                context_commands.append((config.get_localized_string(60350), "Container.Refresh (%s?%s&%s)" % (sys.argv[0], item_url, urllib.urlencode({'channel': 'search', 'action': "from_context", 'from_channel': item.channel, 'contextual': True, 'text': item.wanted}))))
             context_commands.append( (config.get_localized_string(70561), "Container.Update (%s?%s&%s)" % (sys.argv[0], item_url, 'channel=search&action=from_context&search_type=list&page=1&list_type=%s/%s/similar' % (mediatype, item.infoLabels['tmdb_id']))))
 
         if item.channel != "videolibrary" and item.videolibrary != False:
