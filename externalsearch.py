@@ -6,6 +6,7 @@ librerias = xbmc.translatePath(os.path.join(config.get_runtime_path(), 'lib'))
 sys.path.insert(0, librerias)
 
 
+from core import tmdb
 from core.item import Item
 
 
@@ -21,29 +22,33 @@ def execute_search():
   # These following lines are commented and keep in the code just as reminder.
   # In future, they could be used to filter the search outcome
 
-  # IMDB: the imdb of the selected ListItem
-  # this field is the Kodi's core field (not TMDB)
-  #
-  # imdb = xbmc.getInfoLabel('ListItem.IMDBNumber')
-
   # ADDON: maybe can we know if the current windows is related to a specific addon?
   # we could skip the ContextMenu if we already are in KOD's window
   #
   # addon = xbmc.getInfoLabel('ListItem.Property(Addon.ID)')
 
-  # YEAR: the year of the selected ListItem
-  # this field is the Kodi's core field
-  #
-  # year = xbmc.getInfoLabel('ListItem.Year')
 
-
-  tmdb = xbmc.getInfoLabel('ListItem.Property(tmdb_id)')
+  tmdbid = xbmc.getInfoLabel('ListItem.Property(tmdb_id)')
   mediatype = xbmc.getInfoLabel('ListItem.DBTYPE')
   title = xbmc.getInfoLabel('ListItem.Title')
+  year = xbmc.getInfoLabel('ListItem.Year')
+  imdb = xbmc.getInfoLabel('ListItem.IMDBNumber')
 
-
-  logstr = "Selected ListItem is: 'TMDB: {}' - 'Title: {}' - 'Type: {}'".format(tmdb, title, mediatype)
+  logstr = "Selected ListItem is: 'IMDB: {}' - TMDB: {}' - 'Title: {}' - 'Year: {}'' - 'Type: {}'".format(imdb, tmdbid, title, year, mediatype)
   logger.info(logstr)
+
+  if not tmdbid and imdb:
+    logger.info('No TMDBid found. Try to get by IMDB')
+    it = Item(contentType= mediatype, infoLabels={'imdb_id' : imdb})
+    tmdb.set_infoLabels(it)
+    tmdbid = it.infoLabels.get('tmdb_id', '')
+
+  if not tmdbid:
+    logger.info('No TMDBid found. Try to get by Title/Year')
+    it = Item(contentTitle= title, contentType= mediatype, infoLabels={'year' : year})
+    tmdb.set_infoLabels(it)
+    tmdbid = it.infoLabels.get('tmdb_id', '')
+
 
   item = Item(
     action="Search",
@@ -53,7 +58,8 @@ def execute_search():
     text= title,
     type= mediatype,
     infoLabels= {
-      'tmdb_id': tmdb
+      'tmdb_id': tmdbid,
+      'year': year
     },
     folder= False
   )

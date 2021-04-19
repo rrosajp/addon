@@ -18,7 +18,7 @@
       </item>
       <item library="externalsearch.py">
         <label>90001</label>
-        <visible>!String.IsEmpty(ListItem.Property(tmdb_id))</visible>
+        <visible>String.IsEqual(ListItem.dbtype,tvshow) | String.IsEqual(ListItem.dbtype,movie)</visible>
       </item>
     </menu>
   </extension>
