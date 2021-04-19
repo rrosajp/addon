@@ -9,6 +9,8 @@ sys.path.insert(0, librerias)
 from core import tmdb
 from core.item import Item
 
+__addon__ = config.get_addon_core()
+addon_name = __addon__.getAddonInfo('name')
 
 def execute_search():
   """
@@ -25,14 +27,13 @@ def execute_search():
   # ADDON: maybe can we know if the current windows is related to a specific addon?
   # we could skip the ContextMenu if we already are in KOD's window
   #
-  # addon = xbmc.getInfoLabel('ListItem.Property(Addon.ID)')
-
 
   tmdbid = xbmc.getInfoLabel('ListItem.Property(tmdb_id)')
   mediatype = xbmc.getInfoLabel('ListItem.DBTYPE')
   title = xbmc.getInfoLabel('ListItem.Title')
   year = xbmc.getInfoLabel('ListItem.Year')
   imdb = xbmc.getInfoLabel('ListItem.IMDBNumber')
+
 
   logstr = "Selected ListItem is: 'IMDB: {}' - TMDB: {}' - 'Title: {}' - 'Year: {}'' - 'Type: {}'".format(imdb, tmdbid, title, year, mediatype)
   logger.info(logstr)
