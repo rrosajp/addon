@@ -29,6 +29,18 @@ def execute_search():
   title = xbmc.getInfoLabel('ListItem.Title')
   year = xbmc.getInfoLabel('ListItem.Year')
   imdb = xbmc.getInfoLabel('ListItem.IMDBNumber')
+  # folderPath = xbmc.getInfoLabel('Container.FolderPath')
+  # filePath = xbmc.getInfoLabel('ListItem.FileNameAndPath')
+
+
+  # logger.info("****")
+  # logger.info( xbmc.getCondVisibility("String.Contains(Container.FolderPath, 'plugin.video.kod')") )
+  # logger.info( xbmc.getCondVisibility("String.Contains(ListItem.FileNameAndPath, 'plugin.video.kod')") )
+  # logger.info( xbmc.getCondVisibility("String.IsEqual(ListItem.dbtype,tvshow)") )
+  # logger.info( xbmc.getCondVisibility("String.IsEqual(ListItem.dbtype,movie)") )
+  # logger.info("****")
+
+  # visible = xbmc.getCondVisibility("!String.StartsWith(ListItem.FileNameAndPath, 'plugin://plugin.video.kod/') + [String.IsEqual(ListItem.dbtype,tvshow) | String.IsEqual(ListItem.dbtype,movie)]")
 
   logstr = "Selected ListItem is: 'IMDB: {}' - TMDB: {}' - 'Title: {}' - 'Year: {}'' - 'Type: {}'".format(imdb, tmdbid, title, year, mediatype)
   logger.info(logstr)
