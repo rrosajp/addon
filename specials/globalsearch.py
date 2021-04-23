@@ -348,11 +348,12 @@ class SearchWindow(xbmcgui.WindowXML):
             if self.item.mode != 'all' and not valid and self.item.infoLabels.get('originaltitle'):
                 logger.debug('retring with original title on channel ' + channel)
                 dummy, valid, dummy = search(self.item.infoLabels.get('originaltitle'))
-        except:
-            pass
 
-        self.count += 1
-        return self.update(channel, valid, other if other else results)
+            self.count += 1
+            return self.update(channel, valid, other if other else results)
+        except:
+            import traceback
+            logger.error(traceback.format_exc())
 
     def makeItem(self, url):
         item = Item().fromurl(url)
