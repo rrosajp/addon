@@ -128,7 +128,7 @@ def cache_response(fn):
             else:
 
                 url = re.sub('&year=-', '', args[0])
-                if PY3: url = str.encode(url)
+                # if PY3: url = str.encode(url)
 
                 row = db['tmdb_cache'].get(url)
 
@@ -411,24 +411,51 @@ def set_infoLabels_item(item, seekTmdb=True, idioma_busqueda=def_lang, lock=None
                     __leer_datos(otmdb)
                     return len(item.infoLabels)
 
-        def unify():
-            new_title = scrapertools.title_unify(item.fulltitle)
-            if new_title != item.fulltitle:
-                item.infoLabels['tvshowtitle'] = scrapertools.title_unify(item.infoLabels['tvshowtitle'])
-                item.infoLabels['title'] = scrapertools.title_unify(item.infoLabels['title'])
-                item.fulltitle = new_title
-                return True
+        # title might contain - or : --> try to search only second title
+        def splitTitle():
+            if '-' in item.fulltitle:
+                item.infoLabels['tvshowtitle'] = item.fulltitle.split('-')[1]
+                item.infoLabels['title'] = item.infoLabels['tvshowtitle']
+            elif ':' in item.fulltitle:
+                item.infoLabels['tvshowtitle'] = item.fulltitle.split(':')[1]
+                item.infoLabels['title'] = item.infoLabels['tvshowtitle']
+            else:
+                return False
+            return True
         # We check what type of content it is...
         if item.contentType == 'movie':
             tipo_busqueda = 'movie'
         elif item.contentType == 'undefined':  # don't know
-            tipo_busqueda = 'multi'
+            def detect():
+                # try movie first
+                results = search(otmdb_global, 'movie')
+                if results:
+                    item.contentType = 'movie'
+                infoMovie = item.infoLabels
+                if infoMovie['title'] == item.fulltitle:  # exact match -> it's probably correct
+                    return results
+
+                # try tvshow then
+                item.infoLabels = {'tvshowtitle': item.infoLabels['tvshowtitle']}  # reset infolabels
+                results = search(otmdb_global, 'tv')
+                if results:
+                    item.contentType = 'tvshow'
+                else:
+                    item.infoLabels = infoMovie
+
+                return results
+
+            results = detect()
+            if not results:
+                if splitTitle():
+                    results = detect()
+            return results
         else:
             tipo_busqueda = 'tv'
 
         ret = search(otmdb_global, tipo_busqueda)
-        if not ret:  # try with unified title
-            if unify():
+        if not ret:
+            if splitTitle():
                 ret = search(otmdb_global, tipo_busqueda)
         return ret
     # Search in tmdb is deactivated or has not given result
@@ -871,6 +898,7 @@ class Tmdb(object):
     @staticmethod
     @cache_response
     def get_json(url, cache=True):
+        # from core.support import dbg;dbg()
         try:
             result = httptools.downloadpage(url, cookies=False, ignore_response_code=True)
 
@@ -927,6 +955,7 @@ class Tmdb(object):
                 logger.error(traceback.format_exc())
 
     def __by_id(self, source='tmdb'):
+        # from core.support import dbg;dbg()
 
         if self.busqueda_id:
             if source == "tmdb":
@@ -1021,7 +1050,7 @@ class Tmdb(object):
             # We sort result based on fuzzy match to detect most similar
             if len(results) > 1:
                 from lib.fuzzy_match import algorithims
-                results.sort(key=lambda r: algorithims.trigram(text_simple, r.get('name', '') if self.busqueda_tipo == 'tv' else r.get('title', '')), reverse=True)
+                results.sort(key=lambda r: algorithims.trigram(text_simple, r['title'] if self.busqueda_tipo == 'movie' else r['name']), reverse=True)
 
             # We return the number of results of this page
             self.results = results
@@ -1035,6 +1064,7 @@ class Tmdb(object):
             msg = "The search for '%s' gave no results for page %s" % (buscando, page)
             logger.error(msg)
             return 0
+
 
     def __discover(self, index_results=0):
         self.result = ResultDictDefault()
@@ -1134,16 +1164,15 @@ class Tmdb(object):
                 try:
                     if self.load_resultado(r, p):
                         result = self.result.copy()
-                        if result['first_air_date']:
 
-                            result['thumbnail'] = self.get_poster(size="w300")
-                            result['fanart'] = self.get_backdrop()
+                        result['thumbnail'] = self.get_poster(size="w300")
+                        result['fanart'] = self.get_backdrop()
 
-                            res.append(result)
-                            cr += 1
+                        res.append(result)
+                        cr += 1
 
-                            if cr >= num_result:
-                                return res
+                        if cr >= num_result:
+                            return res
                 except:
                     continue
 
@@ -1200,6 +1229,7 @@ class Tmdb(object):
         :rtype: str
         """
         ret = ""
+        # from core.support import dbg;dbg()
 
         if 'id' in self.result:
             ret = self.result.get('overview')
