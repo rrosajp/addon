@@ -538,7 +538,8 @@ class SearchWindow(xbmcgui.WindowXML):
         elif (action in [DOWN] and focus in [BACK, CLOSE, MENU]) or focus not in [BACK, CLOSE, MENU, SERVERLIST, EPISODESLIST, RESULTS, CHANNELS]:
             if self.SERVERS.isVisible(): self.setFocusId(SERVERLIST)
             elif self.EPISODES.isVisible(): self.setFocusId(EPISODESLIST)
-            elif self.RESULTS.isVisible(): self.setFocusId(RESULTS)
+            elif self.RESULTS.isVisible() and self.RESULTS.size() > 0: self.setFocusId(RESULTS)
+            elif self.CHANNELS.isVisible(): self.setFocusId(CHANNELS)
 
         elif focus in [RESULTS]:
             pos = self.RESULTS.getSelectedPosition()
