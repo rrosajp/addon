@@ -390,7 +390,7 @@ class SearchWindow(xbmcgui.WindowXML):
             self.CHANNELS.addItems(self.channels)
             self.CHANNELS.selectItem(pos)
             self.setFocusId(CHANNELS)
-        if valid:
+        if valid and self.CHANNELS.size():
             item = self.CHANNELS.getListItem(0)
             resultsList = item.getProperty('items')
             for result in valid:
