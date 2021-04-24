@@ -4,6 +4,7 @@
 # --------------------------------------------------------------------------------
 
 
+from core import support
 import xbmc, xbmcgui, re, base64, inspect, sys
 from core import jsontools, tmdb, scrapertools, filetools
 from core.item import Item
@@ -144,9 +145,12 @@ class autorenumber():
             self.item.contentSerieName = self.title.rstrip('123456789 ')
 
         while not self.item.exit:
+            self.item.infoLabels['imdb_id'] = ''
+            self.item.infoLabels['tvdb_id'] = ''
             self.item.infoLabels['tmdb_id'] = ''
             self.item.infoLabels['year'] = '-'
-            self.item.contentType ='tvshow'
+            self.item.contentType = 'tvshow'
+
             tmdb.find_and_set_infoLabels(self.item)
             if self.item.infoLabels['tmdb_id']: self.item.exit = True
             else: self.item = platformtools.dialog_info(self.item, 'tmdb')
