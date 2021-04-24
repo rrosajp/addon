@@ -1425,12 +1425,11 @@ class Tmdb(object):
         if not temporada:
             # An error has occurred
             return {}
-        # if capitulo == 9: from core.support import dbg;dbg()
+
         if len(temporada["episodes"]) == 0:
             # An error has occurred
             logger.error("Episode %d of the season %d not found." % (capitulo, numtemporada))
             return {}
-
 
         elif len(temporada["episodes"]) < capitulo and temporada["episodes"][-1]['episode_number'] >= capitulo:
             n = None
@@ -1443,9 +1442,10 @@ class Tmdb(object):
             else:
                 logger.error("Episode %d of the season %d not found." % (capitulo, numtemporada))
                 return {}
-        # else:
-        #     logger.error("Episode %d of the season %d not found." % (capitulo, numtemporada))
-        #     return {}
+
+        elif len(temporada["episodes"]) < capitulo:
+            logger.error("Episode %d of the season %d not found." % (capitulo, numtemporada))
+            return {}
 
         ret_dic = dict()
         # Get data for this season
@@ -1465,7 +1465,7 @@ class Tmdb(object):
         dic_aux = temporada.get('credits', {})
         ret_dic["temporada_cast"] = dic_aux.get('cast', [])
         ret_dic["temporada_crew"] = dic_aux.get('crew', [])
-        if capitulo == -1:
+        if capitulo == 0:
             # If we only look for season data, include the technical team that has intervened in any chapter
             dic_aux = dict((i['id'], i) for i in ret_dic["temporada_crew"])
             for e in temporada["episodes"]:
@@ -1475,8 +1475,7 @@ class Tmdb(object):
             ret_dic["temporada_crew"] = list(dic_aux.values())
 
         # Obtain chapter data if applicable
-
-        if capitulo != -1:
+        if capitulo > 0:
             episodio = temporada["episodes"][capitulo - 1]
             ret_dic["episodio_titulo"] = episodio.get("name", )
             ret_dic["episodio_sinopsis"] = episodio["overview"]
