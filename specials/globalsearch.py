@@ -349,7 +349,8 @@ class SearchWindow(xbmcgui.WindowXML):
                 logger.debug('retring with original title on channel ' + channel)
                 dummy, valid, dummy = search(self.item.infoLabels.get('originaltitle'))
         except:
-            pass
+            import traceback
+            logger.error(traceback.format_exc())
 
         self.count += 1
         return self.update(channel, valid, other if other else results)
