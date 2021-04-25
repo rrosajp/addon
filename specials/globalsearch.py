@@ -89,6 +89,7 @@ class SearchWindow(xbmcgui.WindowXML):
         self.selected = False
         self.pos = 0
         self.items = []
+        self.search_threads = []
 
         if not searchActions:
             self.thActions = Thread(target=self.getActions)
@@ -306,8 +307,13 @@ class SearchWindow(xbmcgui.WindowXML):
         with futures.ThreadPoolExecutor(max_workers=set_workers()) as executor:
             for searchAction in self.searchActions:
                 if self.exit: return
-                executor.submit(self.get_channel_results, searchAction)
-                logger.debug('end search for:', searchAction.channel)
+                self.search_threads.append(executor.submit(self.get_channel_results, searchAction))
+            for ch in futures.as_completed(self.search_threads):
+                if self.exit: return
+                if ch.result():
+                    self.count += 1
+                    channel, valid, other = ch.result()
+                    self.update(channel, valid, other)
 
     def get_channel_results(self, searchAction):
         def search(text):
@@ -352,8 +358,7 @@ class SearchWindow(xbmcgui.WindowXML):
             import traceback
             logger.error(traceback.format_exc())
 
-        self.count += 1
-        return self.update(channel, valid, other if other else results)
+        return channel, valid, other if other else results
 
     def makeItem(self, url):
         item = Item().fromurl(url)
@@ -738,6 +743,8 @@ class SearchWindow(xbmcgui.WindowXML):
         self.exit = True
         if self.thread:
             busy(True)
+            for th in self.search_threads:
+                th.cancel()
             self.thread.join()
             busy(False)
         self.close()
