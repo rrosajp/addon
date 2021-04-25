@@ -72,7 +72,7 @@ EPISODESLIST = 200
 SERVERLIST = 300
 
 class SearchWindow(xbmcgui.WindowXML):
-    def start(self, item, moduleDict={}, searchActions=[]):
+    def start(self, item, moduleDict={}, searchActions=[], thActions=None):
         logger.debug()
         self.exit = False
         self.item = item
@@ -95,7 +95,7 @@ class SearchWindow(xbmcgui.WindowXML):
             self.thActions = Thread(target=self.getActions)
             self.thActions.start()
         else:
-            self.thActions = None
+            self.thActions = thActions
 
         self.lastSearch()
         if not self.item.text: return
@@ -293,7 +293,23 @@ class SearchWindow(xbmcgui.WindowXML):
 
     def timer(self):
         while self.searchActions:
-            self.COUNT.setText('%s/%s [%s"]' % (self.count, len(self.searchActions), int(time.time() - self.time) ))
+            percent = (float(self.count) / len(self.searchActions)) * 100
+            self.LOADING.setVisible(False)
+            self.PROGRESS.setPercent(percent)
+            self.COUNT.setText('%s/%s [%s"]' % (self.count, len(self.searchActions), int(time.time() - self.time)))
+            if percent == 100:
+                self.channels = []
+                self.moduleDict = {}
+                self.searchActions = []
+
+                # if no results
+                total = 0
+                for num in self.results.values():
+                    total += num
+                if not total:
+                    self.PROGRESS.setVisible(False)
+                    self.NORESULTS.setVisible(True)
+                    self.setFocusId(CLOSE)
             time.sleep(1)
 
     def search(self):
@@ -304,16 +320,21 @@ class SearchWindow(xbmcgui.WindowXML):
             self.thActions.join()
         Thread(target=self.timer).start()
 
-        with futures.ThreadPoolExecutor(max_workers=set_workers()) as executor:
-            for searchAction in self.searchActions:
-                if self.exit: return
-                self.search_threads.append(executor.submit(self.get_channel_results, searchAction))
-            for ch in futures.as_completed(self.search_threads):
-                if self.exit: return
-                if ch.result():
-                    self.count += 1
-                    channel, valid, other = ch.result()
-                    self.update(channel, valid, other)
+        try:
+            with futures.ThreadPoolExecutor(max_workers=set_workers()) as executor:
+                for searchAction in self.searchActions:
+                    if self.exit: return
+                    self.search_threads.append(executor.submit(self.get_channel_results, searchAction))
+                for ch in futures.as_completed(self.search_threads):
+                    if self.exit: return
+                    if ch.result():
+                        self.count += 1
+                        channel, valid, other = ch.result()
+                        self.update(channel, valid, other)
+        except:
+            import traceback
+            logger.error(traceback.format_exc())
+            self.count = len(self.searchActions)
 
     def get_channel_results(self, searchAction):
         def search(text):
@@ -445,24 +466,6 @@ class SearchWindow(xbmcgui.WindowXML):
                     if result: items.append(self.makeItem(result))
                 self.RESULTS.reset()
                 self.RESULTS.addItems(items)
-
-        percent = (float(self.count) / len(self.searchActions)) * 100
-        self.LOADING.setVisible(False)
-        self.PROGRESS.setPercent(percent)
-        self.COUNT.setText('%s/%s [%s"]' % (self.count, len(self.searchActions), int(time.time() - self.time) ))
-        if percent == 100:
-            self.channels = []
-            self.moduleDict = {}
-            self.searchActions = []
-
-            # if no results
-            total = 0
-            for num in self.results.values():
-                total += num
-            if not total:
-                self.PROGRESS.setVisible(False)
-                self.NORESULTS.setVisible(True)
-                self.setFocusId(CLOSE)
 
     def onInit(self):
         self.time = time.time()
@@ -601,7 +604,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 self.actors()
             elif search == 'persons':
                 item = self.item.clone(mode='person_', discovery=self.persons[pos])
-                Search(item, self.moduleDict, self.searchActions)
+                Search(item, self.moduleDict, self.searchActions, self.thActions)
                 if close_action:
                     self.close()
             else:
@@ -609,7 +612,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 if self.item.mode == 'movie': item.contentTitle = self.RESULTS.getSelectedItem().getLabel()
                 else: item.contentSerieName = self.RESULTS.getSelectedItem().getLabel()
 
-                Search(item, self.moduleDict, self.searchActions)
+                Search(item, self.moduleDict, self.searchActions, self.thActions)
                 if close_action:
                     self.close()
 
