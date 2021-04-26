@@ -141,19 +141,19 @@ class autorenumber():
         # Pulizia del Titolo
         if any( word in self.title.lower() for word in ['specials', 'speciali']):
             self.title = re.sub(r'\s*specials|\s*speciali', '', self.title.lower())
-        elif not self.item.infoLabels['tvdb_id']:
+        elif not self.item.infoLabels['tmdb_id']:
             self.item.contentSerieName = self.title.rstrip('123456789 ')
 
-        while not self.item.exit:
-            self.item.infoLabels['imdb_id'] = ''
-            self.item.infoLabels['tvdb_id'] = ''
-            self.item.infoLabels['tmdb_id'] = ''
-            self.item.infoLabels['year'] = '-'
-            self.item.contentType = 'tvshow'
+        self.item.infoLabels['imdb_id'] = ''
+        self.item.infoLabels['tvdb_id'] = ''
+        self.item.infoLabels['tmdb_id'] = ''
+        self.item.infoLabels['year'] = '-'
+        self.item.contentType = 'tvshow'
 
+        while not self.item.exit:
             tmdb.find_and_set_infoLabels(self.item)
             if self.item.infoLabels['tmdb_id']: self.item.exit = True
-            else: self.item = platformtools.dialog_info(self.item, 'tmdb')
+            else:self.item = platformtools.dialog_info(self.item, 'tmdb')
 
         # Rinumerazione Automatica
         if (not self.id and self.auto) or self.item.renumber:
