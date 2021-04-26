@@ -298,16 +298,18 @@ def set_infoLabels_item(item, seekTmdb=True, idioma_busqueda=def_lang, lock=None
                     if episodio:
                         # Update data
                         __leer_datos(otmdb_global)
-                        item.infoLabels['title'] = episodio['episodio_titulo']
-                        if episodio['episodio_sinopsis']:
+                        if episodio.get('episodio_titulo'):
+                            item.infoLabels['title'] = episodio['episodio_titulo']
+                        if episodio.get('episodio_sinopsis'):
                             item.infoLabels['plot'] = episodio['episodio_sinopsis']
-                        if episodio['episodio_imagen']:
+                        if episodio.get('episodio_imagen'):
                             item.infoLabels['poster_path'] = episodio['episodio_imagen']
                             item.thumbnail = item.infoLabels['poster_path']
-                        if episodio['episodio_air_date']:
+                        if episodio.get('episodio_air_date'):
                             item.infoLabels['aired'] = episodio['episodio_air_date']
-                        if episodio['episodio_vote_average']:
+                        if episodio.get('episodio_vote_average'):
                             item.infoLabels['rating'] = episodio['episodio_vote_average']
+                        if episodio.get('episodio_vote_count'):
                             item.infoLabels['votes'] = episodio['episodio_vote_count']
 
                         # 4l3x87 - fix for overlap infoLabels if there is episode or season
