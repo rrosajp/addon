@@ -296,6 +296,8 @@ def set_infoLabels_item(item, seekTmdb=True, idioma_busqueda=def_lang, lock=None
                     episodio = otmdb_global.get_episodio(numtemporada, episode)
 
                     if episodio:
+                        if episode == 89:
+                            logger.debug('EPISODIO', jsontools.dump(episodio))
                         # Update data
                         __leer_datos(otmdb_global)
                         if episodio.get('episodio_titulo'):
@@ -858,6 +860,9 @@ class Tmdb(object):
 
         self.temporada = {}
         self.texto_buscado = kwargs.get('texto_buscado', '')
+        if type(self.texto_buscado) == list:
+            logger.debug('TESTO CERCATO', self.texto_buscado)
+            self.texto_buscado = self.texto_buscado[0]
 
         self.busqueda_id = kwargs.get('id_Tmdb', '')
         self.busqueda_texto = re.sub('\[\\\?(B|I|COLOR)\s?[^\]]*\]', '', self.texto_buscado).strip()
@@ -1437,7 +1442,7 @@ class Tmdb(object):
             n = None
             for i, chapters in enumerate(temporada["episodes"]):
                 if chapters['episode_number'] == capitulo:
-                    n = i
+                    n = i + 1
                     break
             if n != None:
                 capitulo = n
