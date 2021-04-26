@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import xbmc, xbmcgui, sys, channelselector, time, os
-from core import support
 from core.support import dbg, tmdb
 from core.item import Item
 from core import channeltools, servertools, scrapertools
@@ -347,7 +346,7 @@ class SearchWindow(xbmcgui.WindowXML):
 
             if self.item.mode != 'all':
                 for elem in results:
-                    if elem.infoLabels['tmdb_id'] == self.item.infoLabels['tmdb_id']:
+                    if elem.infoLabels.get('tmdb_id') == self.item.infoLabels.get('tmdb_id'):
                         elem.from_channel = channel
                         elem.verified = 1
                         valid.append(elem)

@@ -211,7 +211,12 @@ def set_infoLabels_itemlist(item_list, seekTmdb=False, idioma_busqueda=def_lang,
 
     def sub_thread(_item, _i, _seekTmdb):
         # semaforo.acquire()
-        ret = set_infoLabels_item(_item, _seekTmdb, idioma_busqueda, lock)
+        ret = 0
+        try:
+            ret = set_infoLabels_item(_item, _seekTmdb, idioma_busqueda, lock)
+        except:
+            import traceback
+            logger.error(traceback.format_exc(1))
         # logger.debug(str(ret) + "item: " + _item.tostring())
         # semaforo.release()
         r_list.append((_i, _item, ret))
