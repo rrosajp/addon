@@ -292,6 +292,7 @@ class SearchWindow(xbmcgui.WindowXML):
 
     def timer(self):
         while self.searchActions:
+            if self.exit: return
             percent = (float(self.count) / len(self.searchActions)) * 100
             self.LOADING.setVisible(False)
             self.PROGRESS.setPercent(percent)
@@ -325,15 +326,15 @@ class SearchWindow(xbmcgui.WindowXML):
                     if self.exit: return
                     self.search_threads.append(executor.submit(self.get_channel_results, searchAction))
                 for ch in futures.as_completed(self.search_threads):
+                    self.count += 1
                     if self.exit: return
                     if ch.result():
-                        self.count += 1
                         channel, valid, other = ch.result()
                         self.update(channel, valid, other)
         except:
             import traceback
             logger.error(traceback.format_exc())
-            self.count = len(self.searchActions)
+        self.count = len(self.searchActions)
 
     def get_channel_results(self, searchAction):
         def search(text):

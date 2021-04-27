@@ -21,9 +21,11 @@ import ast, copy, re, time
 from core import filetools, httptools, jsontools, scrapertools
 from core.item import InfoLabels
 from platformcode import config, logger, platformtools
+import threading
 
 info_language = ["de", "en", "es", "fr", "it", "pt"] # from videolibrary.json
 def_lang = info_language[config.get_setting("info_language", "videolibrary")]
+lock = threading.Lock()
 
 # ------------------------------------------------- -------------------------------------------------- --------
 # Set of functions related to infoLabels.
@@ -200,11 +202,8 @@ def set_infoLabels_itemlist(item_list, seekTmdb=False, idioma_busqueda=def_lang,
 
     if not config.get_setting('tmdb_active') and not forced:
         return
-    import threading
-
     # threads_num = config.get_setting("tmdb_threads", default=20)
     # semaforo = threading.Semaphore(threads_num)
-    lock = threading.Lock()
     r_list = list()
     i = 0
     l_hilo = list()
@@ -217,6 +216,8 @@ def set_infoLabels_itemlist(item_list, seekTmdb=False, idioma_busqueda=def_lang,
         except:
             import traceback
             logger.error(traceback.format_exc(1))
+        if lock and lock.locked():
+            lock.release()
         # logger.debug(str(ret) + "item: " + _item.tostring())
         # semaforo.release()
         r_list.append((_i, _item, ret))
