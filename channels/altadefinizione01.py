@@ -73,7 +73,6 @@ def peliculas(item):
 @support.scrape
 def genres(item):
     support.info('genres',item)
-    debug=True
     action = "peliculas"
 
     blacklist = ['Altadefinizione01']
