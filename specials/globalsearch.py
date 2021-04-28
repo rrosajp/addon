@@ -415,21 +415,27 @@ class SearchWindow(xbmcgui.WindowXML):
             pos = self.CHANNELS.getSelectedPosition()
             self.CHANNELS.addItems(self.channels)
             self.CHANNELS.selectItem(pos)
-            self.setFocusId(CHANNELS)
+            self.setFocusId(RESULTS)
+
         if valid and self.CHANNELS.size():
             item = self.CHANNELS.getListItem(0)
             resultsList = item.getProperty('items')
             for result in valid:
                 resultsList += result.tourl() + '|'
             item.setProperty('items', resultsList)
-            self.channels[0].setProperty('results', str(len(resultsList.split('|'))))
+            self.channels[0].setProperty('results', str(len(resultsList.split('|')) - 1 ))
+
             if self.CHANNELS.getSelectedPosition() == 0:
                 items = []
                 for result in valid:
                     if result: items.append(self.makeItem(result.tourl()))
                 pos = self.RESULTS.getSelectedPosition()
                 self.RESULTS.addItems(items)
+                if pos < 0:
+                    self.setFocusId(RESULTS)
+                    pos = 0
                 self.RESULTS.selectItem(pos)
+
         if results:
             resultsList = ''
             channelParams = channeltools.get_channel_parameters(channel)
