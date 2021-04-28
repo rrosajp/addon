@@ -220,8 +220,8 @@ def make_itemlist(itemlist, item, data):
             if item.contentType != 'movie': infoLabels['tvshowtitle'] = fulltitle
             itemlist.append(
                 item.clone(title = support.typo(title, 'bold'),
-                           fulltitle= fulltitle,
-                           show= fulltitle,
+                           fulltitle= title,
+                           show= title,
                            url= main_host + str(key['show_id']) + '/seasons/',
                            action= 'findvideos' if item.contentType == 'movie' else 'episodios',
                            contentType = item.contentType,
