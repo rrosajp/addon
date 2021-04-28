@@ -558,7 +558,7 @@ def scrape(func):
 
         if anime and inspect.stack()[1][3] not in ['find_episodes']:
             from platformcode import autorenumber
-            if (function == 'episodios' or item.action == 'episodios'): autorenumber.start(itemlist, item)
+            if function == 'episodios': autorenumber.start(itemlist, item)
             else: autorenumber.start(itemlist)
         # if anime and autorenumber.check(item) == False and len(itemlist)>0 and not scrapertools.find_single_match(itemlist[0].title, r'(\d+.\d+)'):
         #     pass

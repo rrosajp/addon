@@ -100,11 +100,11 @@ class autorenumber():
     def __init__(self, itemlist, item=None):
         self.item = item
         self.itemlist = itemlist
-        self.renumberdict = load(self.itemlist[0]) if self.itemlist else load(item) if item else {}
         self.selectspecials = False
         self.manual = False
         self.auto = False
         if self.item:
+            self.renumberdict = load(item)
             self.auto = config.get_setting('autorenumber', item.channel)
             self.title = self.item.fulltitle.strip()
             if match(self.itemlist[0].title, patron=r'[Ss]?(\d+)(?:x|_|\s+)[Ee]?[Pp]?(\d+)').match:
@@ -130,6 +130,7 @@ class autorenumber():
                 self.episodes = {}
                 self.config()
         else:
+            self.renumberdict = {}
             for item in self.itemlist:
                 item.context = [{"title": typo(config.get_localized_string(70585), 'bold'),
                                  "action": "start",
