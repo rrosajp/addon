@@ -325,12 +325,12 @@ class SearchWindow(xbmcgui.WindowXML):
                 for searchAction in self.searchActions:
                     if self.exit: return
                     self.search_threads.append(executor.submit(self.get_channel_results, searchAction))
-                # for ch in futures.as_completed(self.search_threads):
-                #     self.count += 1
-                #     if self.exit: return
-                #     if ch.result():
-                #         channel, valid, other = ch.result()
-                #         self.update(channel, valid, other)
+                for ch in futures.as_completed(self.search_threads):
+                    self.count += 1
+                    if self.exit: return
+                    if ch.result():
+                        channel, valid, other = ch.result()
+                        self.update(channel, valid, other)
         except:
             import traceback
             logger.error(traceback.format_exc())
@@ -379,8 +379,7 @@ class SearchWindow(xbmcgui.WindowXML):
             import traceback
             logger.error(traceback.format_exc())
 
-        self.count += 1
-        return self.update(channel, valid, other if other else results)
+        return channel, valid, other if other else results
 
     def makeItem(self, url):
         item = Item().fromurl(url)
