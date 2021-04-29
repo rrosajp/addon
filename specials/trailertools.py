@@ -165,9 +165,9 @@ def tmdb_trailers(item, dialog, tipo="movie"):
     itemlist = []
     tmdb_search = None
     if item.infoLabels['tmdb_id']:
-        tmdb_search = Tmdb(id_Tmdb=item.infoLabels['tmdb_id'], tipo=tipo, idioma_busqueda=def_lang)
+        tmdb_search = Tmdb(id_Tmdb=item.infoLabels['tmdb_id'], tipo=tipo, search_language=def_lang)
     elif item.infoLabels['year']:
-        tmdb_search = Tmdb(texto_buscado=item.contentTitle, tipo=tipo, year=item.infoLabels['year'])
+        tmdb_search = Tmdb(searched_text=item.contentTitle, tipo=tipo, year=item.infoLabels['year'])
 
     if tmdb_search:
         found = False

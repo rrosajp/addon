@@ -385,7 +385,8 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 contentSerieName= title if 'movie' not in [contentType] and function != 'episodios' else item.contentSerieName,
                 contentTitle= title if 'movie' in [contentType] and function == 'peliculas' else item.contentTitle,
                 contentLanguage = lang1,
-                contentEpisodeNumber=episode if episode else '',
+                contentSeasonNumber= infolabels.get('season', ''),
+                contentEpisodeNumber=infolabels.get('episode', ''),
                 news= item.news if item.news else '',
                 other = scraped['other'] if scraped['other'] else '',
                 grouped=group
@@ -530,15 +531,25 @@ def scrape(func):
                 itemlist = newFunc()
             itemlist = [i for i in itemlist if i.action not in ['add_pelicula_to_library', 'add_serie_to_library']]
 
-        if action != 'play' and function != 'episodios' and 'patronMenu' not in args and item.contentType in ['movie', 'tvshow', 'episode', 'undefined'] and not disabletmdb:
+        if anime and inspect.stack()[1][3] not in ['find_episodes']:
+            from platformcode import autorenumber
+            if function == 'episodios': autorenumber.start(itemlist, item)
+            else: autorenumber.start(itemlist)
+
+        if action != 'play' and 'patronMenu' not in args and not disabletmdb: # and function != 'episodios' and item.contentType in ['movie', 'tvshow', 'episode', 'undefined']
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
         if not group and not args.get('groupExplode') and ((pagination and len(matches) <= pag * pagination) or not pagination):  # next page with pagination
             if patronNext and inspect.stack()[1][3] not in ['newest'] and len(inspect.stack()) > 2 and inspect.stack()[2][3] not in ['get_channel_results']:
                 nextPage(itemlist, item, data, patronNext, function)
 
-        # if function == 'episodios':
-        #     scraper.sort_episode_list(itemlist)
+        for it in itemlist:
+            if it.contentEpisodeNumber and it.contentSeason:
+                it.title = '[B]{:d}x{:02d} - {}[/B]'.format(it.contentSeason, it.contentEpisodeNumber, it.infoLabels['title'] if it.infoLabels['title'] else it.fulltitle)
+                if it.contentLanguage:
+                    it.title += typo(it.contentLanguage, '_ [] color kod')
+                if it.quality:
+                    it.title += typo(it.quality, '_ [] color kod')
 
         # next page for pagination
         if pagination and len(matches) > pag * pagination and not search:
@@ -556,13 +567,7 @@ def scrape(func):
                          thumbnail=thumb(),
                          prevthumb=item.prevthumb if item.prevthumb else item.thumbnail))
 
-        if anime and inspect.stack()[1][3] not in ['find_episodes']:
-            from platformcode import autorenumber
-            if function == 'episodios': autorenumber.start(itemlist, item)
-            else: autorenumber.start(itemlist)
-        # if anime and autorenumber.check(item) == False and len(itemlist)>0 and not scrapertools.find_single_match(itemlist[0].title, r'(\d+.\d+)'):
-        #     pass
-        # else:
+
         if inspect.stack()[1][3] not in ['find_episodes']:
             if addVideolibrary and (item.infoLabels["title"] or item.fulltitle):
                 # item.fulltitle = item.infoLabels["title"]

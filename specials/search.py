@@ -135,7 +135,7 @@ def new_search(item):
         return actor_list(item)
 
     if item.mode != 'all':
-        tmdb_info = tmdb.Tmdb(texto_buscado=searched_text, tipo=item.mode.replace('show', ''))
+        tmdb_info = tmdb.Tmdb(searched_text=searched_text, search_type=item.mode.replace('show', ''))
         results = tmdb_info.results
         for result in results:
             result = tmdb_info.get_infoLabels(result, origen=result)
@@ -563,7 +563,7 @@ def genres_menu(item):
     itemlist = []
     mode = item.mode.replace('show', '')
 
-    genres = tmdb.get_genres(mode)
+    genres = tmdb.get_dic_genres(mode)
     for key, value in list(genres[mode].items()):
         discovery = {'url': 'discover/%s' % mode, 'with_genres': key,
                      'language': def_lang, 'page': '1'}
