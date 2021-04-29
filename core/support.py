@@ -385,7 +385,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 contentSerieName= title if 'movie' not in [contentType] and function != 'episodios' else item.contentSerieName,
                 contentTitle= title if 'movie' in [contentType] and function == 'peliculas' else item.contentTitle,
                 contentLanguage = lang1,
-                contentSeasonNumber= infolabels.get('season', ''),
+                contentSeason= infolabels.get('season', ''),
                 contentEpisodeNumber=infolabels.get('episode', ''),
                 news= item.news if item.news else '',
                 other = scraped['other'] if scraped['other'] else '',
