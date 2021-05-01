@@ -91,7 +91,7 @@ class SearchWindow(xbmcgui.WindowXML):
         self.search_threads = []
 
         if not thActions:
-            self.thActions = Thread(target=self.getActionsThread())
+            self.thActions = Thread(target=self.getActionsThread)
             self.thActions.start()
         else:
             self.thActions = thActions
