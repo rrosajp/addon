@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import threading
 
 import xbmc, xbmcgui, sys, channelselector, time, os
 from core.support import dbg, tmdb
@@ -18,6 +19,7 @@ else:
 info_language = ["de", "en", "es", "fr", "it", "pt"] # from videolibrary.json
 def_lang = info_language[config.get_setting("info_language", "videolibrary")]
 close_action = False
+update_lock = threading.Lock()
 
 
 def busy(state):
@@ -330,12 +332,6 @@ class SearchWindow(xbmcgui.WindowXML):
                 for searchAction in self.getActions():
                     if self.exit: return
                     self.search_threads.append(executor.submit(self.get_channel_results, searchAction))
-                for ch in futures.as_completed(self.search_threads):
-                    self.count += 1
-                    if self.exit: return
-                    if ch.result():
-                        channel, valid, other = ch.result()
-                        self.update(channel, valid, other)
         except:
             import traceback
             logger.error(traceback.format_exc())
@@ -384,7 +380,12 @@ class SearchWindow(xbmcgui.WindowXML):
             import traceback
             logger.error(traceback.format_exc())
 
-        return channel, valid, other if other else results
+        if self.exit:
+            return
+        update_lock.acquire()
+        self.count += 1
+        self.update(channel, valid, other if other else results)
+        update_lock.release()
 
     def makeItem(self, url):
         item = Item().fromurl(url)
