@@ -631,9 +631,10 @@ def discovery(item, dict_=False, cast=False):
 
     return listado
 
-def get_dic_genres(type):
+def get_dic_genres(search_type):
     lang = def_lang
-    genres = Tmdb(type=type)
+    # from core.support import dbg;dbg()
+    genres = Tmdb(search_type=search_type)
 
     return genres.dic_genres[lang]
 
@@ -935,7 +936,7 @@ class Tmdb(object):
             cls.dic_genres[language] = {}
 
         if search_type not in cls.dic_genres[language]:
-            cls.dic_genres[language][type] = {}
+            cls.dic_genres[language][search_type] = {}
             url = ('{}/genre/{}/list?api_key={}&language={}'.format(host, search_type, api, language))
             try:
                 logger.debug("[Tmdb.py] Filling in dictionary of genres")
@@ -946,7 +947,7 @@ class Tmdb(object):
                 list_genres = result["genres"]
 
                 for i in list_genres:
-                    cls.dic_genres[language][type][str(i["id"])] = i["name"]
+                    cls.dic_genres[language][search_type][str(i["id"])] = i["name"]
             except:
                 logger.error("Error generating dictionaries")
                 import traceback
