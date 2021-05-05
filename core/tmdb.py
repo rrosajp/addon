@@ -543,12 +543,12 @@ def get_nfo(item, search_groups=False):
                 info_nfo = ', '.join(item.infoLabels['url_scraper'])
                 return info_nfo + '\n'
             elif Id :
-                info_nfo = '{}/tv/{}/episode_group/{}'.format(host, item.infoLabels['tmdb_id'], Id)
+                info_nfo = 'https://www.themoviedb.org/tv/{}/episode_group/{}'.format(item.infoLabels['tmdb_id'], Id)
                 return info_nfo + '\n'
             else: return
 
     if "season" in item.infoLabels and "episode" in item.infoLabels:
-        info_nfo = "{}/tv/{}/season/{}/episode/{}" .format(host, item.infoLabels['tmdb_id'], item.contentSeason, item.contentEpisodeNumber)
+        info_nfo = "https://www.themoviedb.org/tv/{}/season/{}/episode/{}" .format(item.infoLabels['tmdb_id'], item.contentSeason, item.contentEpisodeNumber)
     else:
         info_nfo = ', '.join(item.infoLabels['url_scraper'])
 
