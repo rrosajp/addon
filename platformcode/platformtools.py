@@ -388,6 +388,26 @@ def render_items(itemlist, parent_item):
     logger.debug('END render_items')
 
 
+def viewmodeMonitor():
+    try:
+        currentModeName = xbmc.getInfoLabel('Container.Viewmode')
+        win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+        currentMode = int(win.getFocusId())
+        if currentModeName and 'plugin.video.kod' in xbmc.getInfoLabel('Container.FolderPath') and currentMode < 1000 and currentMode >= 50:  # inside addon and in itemlist view
+            content, Type = getCurrentView()
+            if content:
+                defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
+                if currentMode != defaultMode:
+                    logger.debug('viewmode changed: ' + currentModeName + '-' + str(currentMode) + ' - content: ' + content)
+                    config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
+                    dialog_notification(config.get_localized_string(70153),
+                                                      config.get_localized_string(70187) % (content, currentModeName),
+                                                      sound=False)
+    except:
+        import traceback
+        logger.error(traceback.print_exc())
+
+
 def getCurrentView(item=None, parent_item=None):
     if not parent_item:
         info = xbmc.getInfoLabel('Container.FolderPath')
@@ -395,7 +415,7 @@ def getCurrentView(item=None, parent_item=None):
             return None, None
         parent_item = Item().fromurl(info)
     if not item:
-        info = xbmc.getInfoLabel('Container.ListItem(1).FileNameAndPath')
+        info = xbmc.getInfoLabel('Container.ListItemPosition(2).FileNameAndPath')  # first addon listitem (consider "..")
         if not info:
             return None, None
         item = Item().fromurl(info) if info else Item()
@@ -424,12 +444,12 @@ def getCurrentView(item=None, parent_item=None):
         return 'episode', 'tvshows'
 
     else:
-        return 'addon', 'addons' if config.get_setting('touch_view') else ''
+        return 'menu', 'addons' if config.get_setting('touch_view') else ''
 
 
 def set_view_mode(item, parent_item):
     def reset_view_mode():
-        for mode in ['addon','channel','movie','tvshow','season','episode','server']:
+        for mode in ['menu','channel','movie','tvshow','season','episode','server']:
             config.set_setting('skin_name', xbmc.getSkinDir())
             config.set_setting('view_mode_%s' % mode, config.get_localized_string(70003) + ' , 0')
 

@@ -286,22 +286,6 @@ def check_for_update(overwrite=True):
         trakt_tools.update_all()
 
 
-def viewmodeMonitor():
-    try:
-        currentModeName = xbmc.getInfoLabel('Container.Viewmode')
-        win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
-        currentMode = int(win.getFocusId())
-        if currentModeName and 'plugin.video.kod' in xbmc.getInfoLabel('Container.FolderPath') and currentMode < 1000 and currentMode >= 50:  # inside addon and in itemlist view
-            content, Type = platformtools.getCurrentView()
-            if content:
-                defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
-                if currentMode != defaultMode:
-                    logger.debug('viewmode changed: ' + currentModeName + '-' + str(currentMode) + ' - content: ' + content)
-                    config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
-    except:
-        logger.error(traceback.print_exc())
-
-
 def updaterCheck():
     # updater check
     updated, needsReload = updater.check(background=True)
@@ -441,7 +425,7 @@ class AddonMonitor(xbmc.Monitor):
             logger.debug('scheduled videolibrary at ' + str(self.update_hour).zfill(2) + ':00')
 
     def scheduleScreenOnJobs(self):
-        schedule.every().second.do(viewmodeMonitor).tag('screenOn')
+        schedule.every().second.do(platformtools.viewmodeMonitor).tag('screenOn')
         schedule.every().second.do(torrent.elementum_monitor).tag('screenOn')
 
     def onDPMSActivated(self):

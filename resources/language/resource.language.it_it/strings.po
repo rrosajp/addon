@@ -3432,8 +3432,8 @@ msgid "Show ExtendedInfo"
 msgstr "Mostra ExtendedInfo"
 
 msgctxt "#70153"
-msgid ""
-msgstr ""
+msgid "View mode saved"
+msgstr "Tipo di vista salvato"
 
 msgctxt "#70154"
 msgid "TMDB search"
@@ -3568,8 +3568,8 @@ msgid "Getting episodes..."
 msgstr "Ottenimento episodi..."
 
 msgctxt "#70187"
-msgid ""
-msgstr ""
+msgid "For content %s -> %s"
+msgstr "Per contenuto %s -> %s"
 
 msgctxt "#70188"
 msgid "Obtaining data for the TV show"

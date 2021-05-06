@@ -3433,7 +3433,7 @@ msgid "Show ExtendedInfo"
 msgstr ""
 
 msgctxt "#70153"
-msgid ""
+msgid "View mode saved"
 msgstr ""
 
 msgctxt "#70154"
@@ -3569,7 +3569,7 @@ msgid "Getting episodes..."
 msgstr ""
 
 msgctxt "#70187"
-msgid ""
+msgid "For content %s -> %s"
 msgstr ""
 
 msgctxt "#70188"
