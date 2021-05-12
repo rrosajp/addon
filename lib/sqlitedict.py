@@ -109,7 +109,7 @@ class SqliteDict(DictClass):
     VALID_FLAGS = ['c', 'r', 'w', 'n']
 
     def __init__(self, filename=None, tablename='unnamed', flag='c',
-                 autocommit=False, journal_mode="DELETE", encode=encode, decode=decode, timeout=5):
+                 autocommit=False, journal_mode="DELETE", encode=encode, decode=decode, timeout=5, conn=None):
         """
         Initialize a thread-safe sqlite-backed dictionary. The dictionary will
         be a table `tablename` in database file `filename`. A single file (=database)
@@ -174,7 +174,7 @@ class SqliteDict(DictClass):
         self.timeout = timeout
 
         logger.info("opening Sqlite table %r in %r" % (tablename, filename))
-        self.conn = self._new_conn()
+        self.conn = self._new_conn() if not conn else conn
         if self.flag == 'r':
             if self.tablename not in SqliteDict.get_tablenames(self.filename):
                 msg = 'Refusing to create a new table "%s" in read-only DB mode' % tablename
@@ -593,7 +593,7 @@ class SqliteMultithread(Thread):
         while time.time() - start_time < self.timeout:
             if self._sqlitedict_thread_initialized or self.exception:
                 return
-            time.sleep(0.1)
+            time.sleep(0.01)
         raise TimeoutError("SqliteMultithread failed to flag initialization withing %0.0f seconds." % self.timeout)
 
 

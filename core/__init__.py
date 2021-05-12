@@ -14,7 +14,7 @@ except:
 from . import filetools
 from platformcode import config
 from collections import defaultdict
-from lib.sqlitedict import SqliteDict
+from lib.sqlitedict import SqliteDict, SqliteMultithread
 
 
 class nested_dict_sqlite(defaultdict):
@@ -25,10 +25,12 @@ class nested_dict_sqlite(defaultdict):
         return value
 
     def close(self):
-        for key in self.keys():
-            self[key].close()
+        sqliteTH.close()
+        # for key in self.keys():
+        #     self[key].close()
         self.clear()
 
 
 db_name = filetools.join(config.get_data_path(), "db.sqlite")
-db = nested_dict_sqlite(lambda table: SqliteDict(db_name, table, 'c', True))
+sqliteTH = SqliteMultithread(db_name, autocommit=True, journal_mode="DELETE", timeout=5)
+db = nested_dict_sqlite(lambda table: SqliteDict(db_name, table, 'c', True, conn=sqliteTH))
