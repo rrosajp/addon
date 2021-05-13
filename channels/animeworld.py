@@ -20,7 +20,7 @@ def get_cookie():
 
 
 def get_data(item):
-    support.dbg()
+    # support.dbg()
     url = httptools.downloadpage(item.url, headers=headers, follow_redirects=True, only_headers=True).url
     data = support.match(url, headers=headers, follow_redirects=True).data
     if 'AWCookieVerify' in data:

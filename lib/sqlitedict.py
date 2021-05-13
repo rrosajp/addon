@@ -109,7 +109,7 @@ class SqliteDict(DictClass):
     VALID_FLAGS = ['c', 'r', 'w', 'n']
 
     def __init__(self, filename=None, tablename='unnamed', flag='c',
-                 autocommit=False, journal_mode="DELETE", encode=encode, decode=decode, timeout=5, conn=None):
+                 autocommit=False, journal_mode="DELETE", encode=encode, decode=decode, timeout=5):
         """
         Initialize a thread-safe sqlite-backed dictionary. The dictionary will
         be a table `tablename` in database file `filename`. A single file (=database)
@@ -174,7 +174,7 @@ class SqliteDict(DictClass):
         self.timeout = timeout
 
         logger.info("opening Sqlite table %r in %r" % (tablename, filename))
-        self.conn = self._new_conn() if not conn else conn
+        self.conn = self._new_conn()
         if self.flag == 'r':
             if self.tablename not in SqliteDict.get_tablenames(self.filename):
                 msg = 'Refusing to create a new table "%s" in read-only DB mode' % tablename
