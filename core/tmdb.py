@@ -128,7 +128,7 @@ def cache_response(fn):
                 result = fn(*args)
             else:
 
-                url = re.sub('&year=-', '', args[0])
+                url = args[0].replace('&year=-', '')
                 # if PY3: url = str.encode(url)
 
                 row = db['tmdb_cache'].get(url)
@@ -137,7 +137,7 @@ def cache_response(fn):
                     result = row[0]
 
                 # si no se ha obtenido información, llamamos a la funcion
-                if not result:
+                if not result.get('results'):
                     result = fn(*args)
                     db['tmdb_cache'][url] = [result, datetime.datetime.now()]
 
