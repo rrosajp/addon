@@ -512,13 +512,13 @@ def set_infolabels(listitem, item, player=False):
                        'top250': 'top250', 'tracknumber': 'tracknumber', 'trailer': 'trailer', 'thumbnail': 'None',
                        'tvdb_id': 'None', 'tvshowtitle': 'tvshowtitle', 'type': 'None', 'userrating': 'userrating',
                        'url_scraper': 'None', 'votes': 'votes', 'writer': 'writer', 'year': 'year'}
-    if item.infoLabels:
-        try:
-            infoLabels_kodi = {infoLabels_dict[label_tag]: item.infoLabels[label_tag] for label_tag, label_value in list(item.infoLabels.items()) if infoLabels_dict[label_tag] != 'None'}
-            listitem.setInfo("video", infoLabels_kodi)
-        except:
-            listitem.setInfo("video", item.infoLabels)
-            # logger.error(item.infoLabels)
+    # if item.infoLabels:
+    try:
+        infoLabels_kodi = {infoLabels_dict[label_tag]: item.infoLabels[label_tag] for label_tag, label_value in list(item.infoLabels.items()) if infoLabels_dict[label_tag] != 'None'}
+        listitem.setInfo("video", infoLabels_kodi)
+    except:
+        listitem.setInfo("video", item.infoLabels)
+        # logger.error(item.infoLabels)
 
 
 def set_context_commands(item, item_url, parent_item, **kwargs):
