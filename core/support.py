@@ -151,6 +151,7 @@ def cleantitle(title):
     cleantitle = ''
     if title:
         if type(title) != str: title.decode('UTF-8')
+        title = scrapertools.unescape(title)
         title = scrapertools.decodeHtmlentities(title)
         cleantitle = title.replace('"', "'").replace('×', 'x').replace('–', '-').strip()
     return cleantitle
