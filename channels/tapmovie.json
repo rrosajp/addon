@@ -1,0 +1,11 @@
+{
+    "id": "tapmovie",
+    "name": "Tap Movie",
+    "language": ["ita", "sub-ita"],
+    "active": true,
+    "thumbnail": "",
+    "banner": "",
+    "categories": ["movie", "tvshow", "anime"],
+    "not_active": ["include_in_newest"],
+    "settings": []
+}

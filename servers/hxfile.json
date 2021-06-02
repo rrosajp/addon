@@ -4,14 +4,14 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "https://youdbox.(?:com|net)/embed-([A-z0-9-]+.html)",
-        "url": "https://youdbox.net/embed-\\1"
+        "pattern": "https?://hxfile.co/(?!api)(?:embed-)?([A-z0-9]+)",
+        "url": "https://hxfile.co/embed-\\1.html"
       }
     ]
   },
   "free": true,
-  "id": "youdbox",
-  "name": "YouDbox",
+  "id": "hxfile",
+  "name": "HxFile",
   "settings": [
     {
       "default": false,
