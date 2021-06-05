@@ -15,7 +15,7 @@ def test_video_exists(page_url):
     global data
     data = httptools.downloadpage(page_url)
     if data.code == 404 or "File is no longer available" in data.data:
-        return False, "[playtube] El archivo no existe o ha sido borrado"
+        return False, config.get_localized_string(70449) % 'PlayTube'
     return True, ""
 
 
@@ -25,5 +25,5 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     pack = scrapertools.find_single_match(data.data, 'p,a,c,k,e,d.*?</script>')
     unpacked = jsunpack.unpack(pack)
     url = scrapertools.find_single_match(unpacked, 'file:"([^"]+)') + "|referer=%s" %(page_url)
-    video_urls.append(['m3u8 [playtube]', url] )
+    video_urls.append(['m3u8 [PlayTube]', url] )
     return video_urls
