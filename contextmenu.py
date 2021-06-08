@@ -1,4 +1,3 @@
-import os
 from platformcode import config, logger
 import xbmc, sys, xbmcgui, os
 
@@ -11,17 +10,11 @@ addon_id = config.get_addon_core().getAddonInfo('id')
 
 LOCAL_FILE = os.path.join(config.get_runtime_path(), "platformcode/contextmenu/contextmenu.json")
 f = open(LOCAL_FILE)
-try:
-    contextmenu_settings = jsontools.load( f.read() )
-except:
-    contextmenu_settings = []
+contextmenu_settings = jsontools.load(open(LOCAL_FILE).read())
 f.close()
 
 
-
-
 def build_menu():
-
     tmdbid = xbmc.getInfoLabel('ListItem.Property(tmdb_id)')
     mediatype = xbmc.getInfoLabel('ListItem.DBTYPE')
     title = xbmc.getInfoLabel('ListItem.Title')
@@ -35,41 +28,28 @@ def build_menu():
     logger.info(filePath)
     logger.info(containerPath)
 
-    contextmenumodules = []
-    contextmenu = []
-
-    for itemmodule in contextmenu_settings:
-        logger.debug('check contextmenu', itemmodule )
-        module = __import__(itemmodule, None, None, [ itemmodule] )
-
-        # if module.check_condition():
-        logger.info('Add contextmenu item ->',itemmodule )
-        contextmenumodules.append( module )
-
-
     contextmenuitems = []
     contextmenuactions = []
-    empty = False
-    if len(contextmenumodules) == 0:
+
+    for itemmodule in contextmenu_settings:
+        logger.debug('check contextmenu', itemmodule)
+        module = __import__(itemmodule, None, None, [itemmodule])
+
+        logger.info('Add contextmenu item ->', itemmodule)
+        module_item_actions = module.get_menu_items()
+        contextmenuitems.extend([item for item, fn in module_item_actions])
+        contextmenuactions.extend([fn for item, fn in module_item_actions])
+
+    if len(contextmenuitems) == 0:
         logger.info('No contextmodule found, build an empty one')
-        contextmenucontextmenuitems.append( empty_item() )
-        empty = True
-    else:
-        support.dbg()
-        for itemmodule in contextmenumodules:
-            module_item_actions = itemmodule.get_menu_items()
-            contextmenuitems = contextmenuitems + [item for item, fn in module_item_actions ]
-            contextmenuactions = contextmenuactions + [fn for item, fn in module_item_actions ]
+        contextmenuitems.append(empty_item())
+        contextmenuactions.append(lambda: None)
 
-    ret = xbmcgui.Dialog().contextmenu( contextmenuitems )
+    ret = xbmcgui.Dialog().contextmenu(contextmenuitems)
 
-    if not empty and ret > -1:
-        module_function = contextmenuactions[ ret ]
-        logger.info( 'Contextmenu module index', ret,  'for -> {}', itemmodule )
-        if module_function:
-            module_function()
-        else:
-            logger.warn('No function for menu item: {}'.format(contextmenuitems[ret]) )
+    if ret > -1:
+        logger.info('Contextmenu module index', ret, ', label=' + contextmenuitems[ret])
+        contextmenuactions[ret]()
 
 
 def empty_item():

@@ -10,9 +10,11 @@ from core import tmdb
 from core.item import Item
 
 addon_id = config.get_addon_core().getAddonInfo('id')
+global item_is_coming_from_kod
 
 
 def check_condition():
+    global item_is_coming_from_kod
     logger.debug('check item condition')
     mediatype = xbmc.getInfoLabel('ListItem.DBTYPE')
 
@@ -33,17 +35,15 @@ def check_condition():
             item_is_coming_from_kod = pattern.search(filePath)
 
     if item_is_coming_from_kod:
-        logger.debug("item IS already managed by KOD", item_is_coming_from_kod)
+        logger.debug("item IS already managed by KOD")
 
-    # logger.info('container is KOD? {}'.format(we_are_in_kod) )
-
-    return mediatype and item_is_coming_from_kod # and not we_are_in_kod
+    return mediatype
 
 
 def get_menu_items():
     logger.debug('get menu item')
     if check_condition():
-        return config.get_localized_string(90003) , execute
+        return [(config.get_localized_string(90003 if item_is_coming_from_kod else 90005), execute)]
     else:
         return []
 
@@ -69,6 +69,10 @@ def execute():
     year = xbmc.getInfoLabel('ListItem.Year')
     imdb = xbmc.getInfoLabel('ListItem.IMDBNumber')
 
+    if mediatype in ('episode', 'season'):
+        mediatype = 'tvshow'
+        title = xbmc.getInfoLabel('ListItem.TVShowTitle')
+
     logstr = "Selected ListItem is: 'IMDB: {}' - TMDB: {}' - 'Title: {}' - 'Year: {}'' - 'Type: {}'".format(imdb, tmdbid, title, year, mediatype)
     logger.info(logstr)
 
@@ -90,12 +94,9 @@ def execute():
         except:
             logger.info("Cannot find TMDB via title/year")
 
-
     if not tmdbid:
         # We can continue searching by 'title (year)'
         logger.info( "No TMDB found, proceed with title/year:",  title , "(" , year, ")" )
-
-
 
     # User wants to search on other channels
     logger.info("Search on other channels")

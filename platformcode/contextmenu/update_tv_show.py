@@ -107,8 +107,8 @@ def execute_sql(sql):
 
 def check_condition():
     # support.dbg()
-    dbid = xbmc.getInfoLabel('ListItem.DBID')
-    path = search_paths( dbid )
+    dbid = xbmc.getInfoLabel('ListItem.TvShowDBID')
+    path = search_paths(dbid)
     if path:
         return True
     return False
@@ -117,15 +117,15 @@ def check_condition():
 def get_menu_items():
     logger.debug('get menu item')
     if check_condition():
-        return config.get_localized_string(70269) , execute
+        return [(config.get_localized_string(70269), execute)]
     else:
         return []
 
 
 
 def execute():
-    dbid = xbmc.getInfoLabel('ListItem.DBID')
-    path = search_paths( dbid )
+    dbid = xbmc.getInfoLabel('ListItem.TvShowDBID')
+    path = search_paths(dbid)
     if path:
         item = Item(action="update_tvshow", channel="videolibrary", path=path)
         # Why? I think it is not necessary, just commented
