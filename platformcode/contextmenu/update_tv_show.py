@@ -9,6 +9,9 @@ from core.item import Item
 from lib.sambatools import libsmb as samba
 from core import scrapertools, support
 
+path = ''
+mediatype = ''
+
 
 def exists(path, silent=False, vfs=True):
     path = xbmc.translatePath(path)
@@ -105,26 +108,75 @@ def execute_sql(sql):
     return records
 
 
+def get_id():
+    global mediatype
+
+    mediatype = xbmc.getInfoLabel('ListItem.DBTYPE')
+    if mediatype == 'tvshow':
+        dbid = xbmc.getInfoLabel('ListItem.DBID')
+    elif mediatype in ('season', 'episode'):
+        dbid = xbmc.getInfoLabel('ListItem.TvShowDBID')
+    else:
+        dbid = ''
+    return dbid
+
 def check_condition():
     # support.dbg()
-    dbid = xbmc.getInfoLabel('ListItem.TvShowDBID')
-    path = search_paths(dbid)
-    if path:
-        return True
-    return False
+    global path
+    path = search_paths(get_id())
+    return path
 
 
 def get_menu_items():
     logger.debug('get menu item')
     if check_condition():
-        return [(config.get_localized_string(70269), execute)]
+        items = [(config.get_localized_string(70269), update)]
+        # if config.get_setting('downloadenabled'):
+        #     from core import videolibrarytools
+        #     from core import filetools
+        #     if xbmc.getInfoLabel('ListItem.FilenameAndPath'):
+        #         item = Item().fromurl(filetools.read(xbmc.getInfoLabel('ListItem.FilenameAndPath')))
+        #     else:
+        #         item = videolibrarytools.read_nfo(path + 'tvshow.nfo')[1]
+        #     if item:
+        #         item_url = item.tourl()
+        #
+        #         Download movie
+                # if mediatype == "movie":
+                #     items.append((config.get_localized_string(60354), lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?%s&%s)" % (item_url,
+                #                                                                                                                                    'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' + item.action))))
+                #
+                # elif item.contentSerieName:
+                #     Download series
+                    # if mediatype == "tvshow" and item.action not in ['findvideos']:
+                    #     if item.channel == 'videolibrary':
+                    #         items.append((config.get_localized_string(60003), lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?%s&%s)" % (
+                    #             item_url,
+                    #             'channel=downloads&action=save_download&unseen=true&from_channel=' + item.channel + '&from_action=' + item.action))))
+                    #     items.append((config.get_localized_string(60355), lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?%s&%s)" % (
+                    #         item_url,
+                    #         'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' + item.action))))
+                    #     items.append((config.get_localized_string(60357), lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?%s&%s)" % (
+                    #         item_url,
+                    #         'channel=downloads&action=save_download&download=season&from_channel=' + item.channel + '&from_action=' + item.action))))
+                    # Download episode
+                    # elif mediatype == "episode" and item.action in ['findvideos']:
+                    #     items.append((config.get_localized_string(60356), lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?%s&%s)" % (
+                    #         item_url,
+                    #         'channel=downloads&action=save_download&from_channel=' + item.channel + '&from_action=' + item.action))))
+                    # Download season
+                    # elif mediatype == "season":
+                    #     items.append((config.get_localized_string(60357), lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?%s&%s)" % (
+                    #         item_url,
+                    #         'channel=downloads&action=save_download&download=season&from_channel=' + item.channel + '&from_action=' + item.action))))
+
+        return items
     else:
         return []
 
 
-
-def execute():
-    dbid = xbmc.getInfoLabel('ListItem.TvShowDBID')
+def update():
+    dbid = get_id()
     path = search_paths(dbid)
     if path:
         item = Item(action="update_tvshow", channel="videolibrary", path=path)

@@ -107,7 +107,7 @@ def execute():
     contentType= mediatype,
     mode="search",
     contextual= True,
-    text= title,
+    text=title,
     type= mediatype,
     infoLabels= {
         'tmdb_id': tmdbid,
