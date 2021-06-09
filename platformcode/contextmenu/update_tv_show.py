@@ -131,6 +131,27 @@ def get_menu_items():
     logger.debug('get menu item')
     if check_condition():
         items = [(config.get_localized_string(70269), update)]
+        from core import videolibrarytools
+        nfo = path + 'tvshow.nfo'
+        item = videolibrarytools.read_nfo(nfo)[1]
+        if item:
+            item.nfo = nfo
+            item_url = item.tourl()
+            # Context menu: Automatically search for new episodes or not
+            if item.active and int(item.active) > 0:
+                update_text = config.get_localized_string(60022)
+                value = 0
+            else:
+                update_text = config.get_localized_string(60023)
+                value = 1
+            items.append((update_text,
+                          lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?%s&%s)" % (item_url,
+            "title=" + update_text + "&action=mark_tvshow_as_updatable&channel=videolibrary&active=" + str(value)))))
+            if item.local_episodes_path == "":
+                items.append((config.get_localized_string(80048),
+                              lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?%s&%s)" %
+                                                          (item_url, "action=add_local_episodes&channel=videolibrary"))))
+
         # if config.get_setting('downloadenabled'):
         #     from core import videolibrarytools
         #     from core import filetools
