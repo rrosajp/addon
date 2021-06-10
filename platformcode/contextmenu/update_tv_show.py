@@ -145,12 +145,9 @@ def get_menu_items():
                 update_text = config.get_localized_string(60023)
                 value = 1
             items.append((update_text,
-                          lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?%s&%s)" % (item_url,
-            "title=" + update_text + "&action=mark_tvshow_as_updatable&channel=videolibrary&active=" + str(value)))))
+                          lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?{}&title={}&action=mark_tvshow_as_updatable&channel=videolibrary&active={})".format(item_url, update_text, str(value)))))
             if item.local_episodes_path == "":
-                items.append((config.get_localized_string(80048),
-                              lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?%s&%s)" %
-                                                          (item_url, "action=add_local_episodes&channel=videolibrary"))))
+                items.append((config.get_localized_string(80048), lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?{}&action=add_local_episodes&channel=videolibrary&path={})".format(item_url, path))))
 
         # if config.get_setting('downloadenabled'):
         #     from core import videolibrarytools
