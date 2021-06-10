@@ -148,7 +148,18 @@ def get_menu_items():
                           lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?{}&title={}&action=mark_tvshow_as_updatable&channel=videolibrary&active={})".format(item_url, update_text, str(value)))))
             if item.local_episodes_path == "":
                 items.append((config.get_localized_string(80048), lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?{}&action=add_local_episodes&channel=videolibrary&path={})".format(item_url, path))))
+            else:
+                items.append((config.get_localized_string(80049), lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?{}&action=remove_local_episodes&channel=videolibrary&path={})".format(item_url, path))))
 
+            # Context menu: Delete series / channel
+            channels_num = len(item.library_urls)
+            if channels_num > 1:
+                delete_text = config.get_localized_string(60024)
+                multichannel = True
+            else:
+                delete_text = config.get_localized_string(60025)
+                multichannel = False
+            items.append((delete_text, lambda: xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?{}&action=delete&channel=videolibrary&multichannel={}&path={})".format(item_url, str(multichannel), path))))
         # if config.get_setting('downloadenabled'):
         #     from core import videolibrarytools
         #     from core import filetools
