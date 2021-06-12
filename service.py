@@ -6,7 +6,6 @@ import sys
 import threading
 import traceback
 import xbmc
-import xbmcgui
 from platformcode import config
 
 try:
