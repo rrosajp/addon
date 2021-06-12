@@ -28,6 +28,9 @@ from platformcode import logger, platformtools, updater, xbmc_videolibrary
 from specials import videolibrary
 from servers import torrent
 
+# if this service need to be reloaded because an update changed it
+needsReload = False
+
 
 def update(path, p_dialog, i, t, serie, overwrite):
     logger.debug("Updating " + path)
@@ -284,11 +287,9 @@ def check_for_update(overwrite=True):
 
 
 def updaterCheck():
+    global needsReload
     # updater check
     updated, needsReload = updater.check(background=True)
-    if needsReload:
-        xbmc.executescript(__file__)
-        exit(0)
 
 
 def get_ua_list():
@@ -515,6 +516,12 @@ if __name__ == "__main__":
             schedule.run_pending()
         except:
             logger.error(traceback.format_exc())
+
+        if needsReload:
+            db.close()
+            logger.info('Relaunching service.py')
+            xbmc.executescript(__file__)
+            break
 
         if monitor.waitForAbort(1):  # every second
             # db need to be closed when not used, it will cause freezes
