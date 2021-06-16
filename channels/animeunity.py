@@ -275,14 +275,11 @@ def findvideos(item):
                 item.url = episode["link"]
                 directLink = True
 
-
-
-
     if directLink:
         logger.info('try direct link')
         return support.server(item, itemlist=[item.clone(title=support.config.get_localized_string(30137), url=item.url, server='directo', action='play')])
     else:
-        return support.server(item, itemlist=[item.clone(title=support.config.get_localized_string(30137), url=str(item.video_url), manifest = 'hls', server='streamingcommunityws', action='play')])
+        return support.server(item, itemlist=[item.clone(title="StreamingCommunityWS", url=str(item.video_url), manifest = 'hls', server='streamingcommunityws', action='play')])
 
 
 
