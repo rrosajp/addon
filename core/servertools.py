@@ -701,9 +701,9 @@ def sort_servers(servers_list):
     """
     if servers_list:
         if isinstance(servers_list[0], Item):
-            servers_list = sorted(servers_list, key=lambda x: config.get_setting("favorites_servers_list", server=x.server))
+            servers_list = sorted(servers_list, key=lambda x: config.get_setting("favorites_servers_list", server=x.server, default=999))
         else:
-            servers_list = sorted(servers_list, key=lambda x: config.get_setting("favorites_servers_list", server=x))
+            servers_list = sorted(servers_list, key=lambda x: config.get_setting("favorites_servers_list", server=x, default=999))
 
     return servers_list
 
