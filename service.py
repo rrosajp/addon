@@ -519,7 +519,10 @@ if __name__ == "__main__":
         if needsReload:
             db.close()
             logger.info('Relaunching service.py')
-            xbmc.executescript(__file__)
+            xbmc.executeJSONRPC(
+                '{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "plugin.video.kod", "enabled": false }}')
+            xbmc.executeJSONRPC(
+                '{"jsonrpc": "2.0", "id":1, "method": "Addons.SetAddonEnabled", "params": { "addonid": "plugin.video.kod", "enabled": true }}')
             break
 
         if monitor.waitForAbort(1):  # every second
