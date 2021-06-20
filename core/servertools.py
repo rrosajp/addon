@@ -673,6 +673,12 @@ def sort_servers(servers_list):
     :param servers_list: List of servers to order. The items in the servers_list can be strings or Item objects. In which case it is necessary that they have an item.server attribute of type str.
     :return: List of the same type of objects as servers_list ordered according to the favorite servers.
     """
+    def index(lst, value):
+        if value in lst:
+            return lst.index(value)
+        else:
+            logger.debug('Index not found: ' + value)
+            return 999
     if not servers_list:
         return []
 
@@ -686,8 +692,7 @@ def sort_servers(servers_list):
     quality_list = ['4k', '2160p', '2160', '4k2160p', '4k2160', '4k 2160p', '4k 2160', '2k',
                     'fullhd', 'fullhd 1080', 'fullhd 1080p', 'full hd', 'full hd 1080', 'full hd 1080p', 'hd1080', 'hd1080p', 'hd 1080', 'hd 1080p', '1080', '1080p',
                     'hd', 'hd720', 'hd720p', 'hd 720', 'hd 720p', '720', '720p', 'hdtv',
-                    'sd', '480p', '480', '360p', '360', '240p', '240',
-                    '']
+                    'sd', '480p', '480', '360p', '360', '240p', '240']
 
     sorted_list = []
     url_list_valid = []
@@ -723,14 +728,14 @@ def sort_servers(servers_list):
 
 
         if priority < 2:  # 0: Servers and qualities or 1: Qualities and servers
-            element["indice_server"] = favorite_servers.index(item.server.lower()) if item.server.lower() in favorite_servers else 999
-            element["indice_quality"] = favorite_quality.index(item.quality.lower())
+            element["indice_server"] = index(favorite_servers, item.server.lower())
+            element["indice_quality"] = index(favorite_quality, item.quality.lower())
 
         elif priority == 2:  # Servers only
-            element["indice_server"] = favorite_servers.index(item.server.lower())
+            element["indice_server"] = index(favorite_servers, item.server.lower())
 
         elif priority == 3:  # Only qualities
-            element["indice_quality"] = favorite_quality.index(item.quality.lower())
+            element["indice_quality"] = index(favorite_quality, item.quality.lower())
 
         else:  # Do not order
             if item.url in url_list_valid:
@@ -755,9 +760,9 @@ def sort_servers(servers_list):
             if not item.server or item.server.lower() in blacklisted_servers:
                 continue
 
-            if favorite_quality.index(item.quality.lower()) < max_quality:
+            if index(favorite_quality, item.quality.lower()) < max_quality:
                 element["indice_server"] = n
-                element["indice_quality"] = favorite_quality.index(item.quality.lower())
+                element["indice_quality"] = index(favorite_quality, item.quality.lower())
                 element['videoitem'] = item
                 sorted_list.append(element)
 
