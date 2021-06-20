@@ -49,7 +49,6 @@ def update(path, p_dialog, i, t, serie, overwrite):
         url = module.host + urlsplit(url).path
         serie.url = url
 
-        ###### Redirection to the NewPct1.py channel if it is a clone, or to another channel and url if there has been judicial intervention
         try:
             head_nfo, it = videolibrarytools.read_nfo(nfo_file)         # Refresh the .nfo to collect updates
             if it.emergency_urls:
