@@ -93,12 +93,10 @@ def update(path, p_dialog, i, t, serie, overwrite):
                     insertados_total += insertados
 
                 except:
-                    import traceback
                     logger.error("Error when saving the chapters of the series")
                     logger.error(traceback.format_exc())
 
             except:
-                import traceback
                 logger.error("Error in obtaining the episodes of: %s" % serie.show)
                 logger.error(traceback.format_exc())
 
