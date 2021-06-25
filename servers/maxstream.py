@@ -1,8 +1,11 @@
-from core import httptools
-from core import scrapertools, support
-from lib import jsunpack
+# -*- coding: utf-8 -*-
+# --------------------------------------------------------
+# Conector MaxStream
+# --------------------------------------------------------
+
+from core import httptools, scrapertools
 from platformcode import logger, config
-import re, ast, requests, sys
+import ast, sys
 
 if sys.version_info[0] >= 3:
     import urllib.parse as urlparse
