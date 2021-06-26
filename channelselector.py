@@ -62,7 +62,7 @@ def getchanneltypes(view="thumb_"):
     logger.debug()
 
     # Category List
-    channel_types = ["movie", "tvshow", "anime", "documentary", "vos", "torrent",  "music"] # , "live", "direct"
+    channel_types = ["movie", "tvshow", "anime", "documentary", "vos", "live", "torrent",  "music"] #, "direct"
 
     # Channel Language
     channel_language = auto_filter()

@@ -1,7 +1,7 @@
 {
     "id": "la7",
     "name": "La7",
-    "active": false,
+    "active": true,
     "language": ["ita"],
     "thumbnail": "la7.png",
     "banner": "la7.png",
