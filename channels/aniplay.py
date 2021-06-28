@@ -38,7 +38,7 @@ def mainlist(item):
         ('Top del mese',['/api/home/monthly-top', 'toplist', ''])
     ]
 
-    stagionali = ['' , get_seasonal_menu()]
+    # stagionali = ['' , get_seasonal_menu()]
 
     search = ''
 
@@ -78,7 +78,37 @@ def get_seasonal_menu():
     return seasonal
 
 def toplist(item):
-    pass
+    
+    url = item.url
+    jsonDataStr = httptools.downloadpage(url, CF=False ).data
+    json = jsontools.load( jsonDataStr )
+    itemlist = []
+    for it in json:
+
+        title = it['animeTitle'].split('(')[0].strip()
+        scrapedlang = scrapertools.find_single_match(it['animeTitle'], r'\(([^\)]+)')
+        lang = scrapedlang.upper() if scrapedlang else 'Sub-ITA'
+        long_title = support.typo(title, 'bold') + support.typo(lang, '_ [] color kod')
+
+
+        itemlist.append( 
+            item.clone(
+                id= it['animeId'],
+                url = 'api/anime/{}'.format(it['animeId']),
+                title = long_title,
+                show = title,
+                contentLanguage = lang,
+                contentType = 'tvshow',
+                contentTitle = title,
+                contentSerieName = title,
+                action = 'episodios' ,
+                videolibrary= True,
+                thumbnail= get_thumbnail(it, prop ='animeHorizontalImages' )
+            )
+        )
+    tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+    return itemlist
+
 
 
 def seasonal(item):
@@ -121,6 +151,7 @@ def alphabetical_strip(item):
                     action= 'alphabetical_letter',
                     videolibrary= False)
         )
+    
     return itemlist
 
 
@@ -144,6 +175,7 @@ def alphabetical_letter(item):
 
         itemlist.append(item.clone(title = long_title,
                                     id= it['id'],
+                                    url = 'api/anime/{}'.format(it['id']),
                                    fulltitle = title,
                                    show = title,
                                    contentLanguage = lang,
@@ -162,7 +194,7 @@ def alphabetical_letter(item):
 
 
 
-def get_thumbnail(data, key):
+def get_thumbnail(data, key = 'medium', prop = 'verticalImages'):
     """
     " Returns the vertical image as per given key
     " possibile values are:
@@ -172,7 +204,7 @@ def get_thumbnail(data, key):
     " - medium
     """
     value = None
-    verticalImages = data['verticalImages']
+    verticalImages = data[prop]
     if verticalImages:
         first = verticalImages[0]
         if first:
@@ -180,45 +212,64 @@ def get_thumbnail(data, key):
     return value
 
 
-
-
-def calendar(item):
-    pass
-
 def episodios(item):
     support.info(item)
 
     support.dbg()
 
-    itemId = item.id
-    url = '{}/api/anime/{}'.format(host, itemId)
+    url = '{}/{}'.format(host, item.url)
 
     jsonDataStr = httptools.downloadpage(url, CF=False ).data
     json = jsontools.load( jsonDataStr )
 
     itemlist = []
 
-    episodes = json['episodes']
+    if 'seasons' in json and len(json['seasons']) > 0:
+        seasons = json['seasons']
 
-    for it in episodes:
-        title = it['title'] # .split('(')[0].strip()
-        # scrapedlang = scrapertools.find_single_match(json['title'], r'\(([^\)]+)')
-        # lang = scrapedlang.upper() if scrapedlang else 'Sub-ITA'
-        # long_title = support.typo(title, 'bold') + support.typo(lang, '_ [] color kod')
+        seasons.sort(key=lambda s: s['episodeStart'])
+        
+        for it in seasons:
+            title = it['name'] # .split('(')[0].strip()
 
-        itemlist.append(item.clone(title = title,
-                                    id= it['id'],
-                                   fulltitle = title,
-                                   show = json['title'],
-                                #    contentLanguage = lang,
-                                   contentType = 'episode',
-                                   contentTitle = title,
-                                   contentSerieName = json['title'],
-                                   action = 'findvideos',
-                                   plot = json['storyline'],
-                                   year = it['airingDate'].split('-')[0]
-                                   ))
+            itemlist.append(
+                item.clone(title = title,
+                    id= it['id'],
+                    url= 'api/anime/{}/season/{}'.format(it['animeId'], it['id']),
+                    fulltitle = it['name'],
+                    show = json['title'],
+                    contentType = 'season',
+                    contentTitle = title,
+                    contentSerieName = json['title'],
+                    action = 'episodios',
+                    plot = json['storyline'],
+                    year = it['yearStart']
+                )
+            )
+
+    elif ('episodes' in json and len(json['episodes']) > 0) or len(json) > 0:
+        episodes = json['episodes'] if 'episodes' in json else json
+
+        episodes.sort(key=lambda ep: int(ep['episodeNumber']))
+        
+        for it in episodes:
+            title = it['title'] # .split('(')[0].strip()
+
+            itemlist.append(
+                item.clone(title = title,
+                    id= it['id'],
+                    url= 'api/episode/{}'.format(it['id']),
+                    fulltitle = title,
+                    #    contentLanguage = lang,
+                    contentType = 'episode',
+                    contentTitle = title,
+                    action = 'findvideos',
+                    year = it['airingDate'].split('-')[0]
+                )
+            )
+
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
+    
     return itemlist
 
 # Questa def è utilizzata per generare i menu del canale
@@ -314,10 +365,10 @@ def newest(categoria):
 def findvideos(item):
     support.info('findvideos ->', item)
     support.dbg()
-    urlpath = item.contentType
-    itemId = item.id
 
-    url = '{}/api/{}/{}'.format(host, urlpath, itemId)
+    urlpath = item.url
+
+    url = '{}/{}'.format(host, urlpath)
 
     jsonDataStr = httptools.downloadpage(url, CF=False ).data
     json = jsontools.load( jsonDataStr )
