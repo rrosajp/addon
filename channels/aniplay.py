@@ -252,25 +252,34 @@ def episodios(item):
 
         episodes.sort(key=lambda ep: int(ep['episodeNumber']))
         
-        for it in episodes:
-            title = it['title'] # .split('(')[0].strip()
-
-            itemlist.append(
-                item.clone(title = title,
-                    id= it['id'],
-                    url= 'api/episode/{}'.format(it['id']),
-                    fulltitle = title,
-                    #    contentLanguage = lang,
-                    contentType = 'episode',
-                    contentTitle = title,
-                    action = 'findvideos',
-                    year = it['airingDate'].split('-')[0]
-                )
-            )
+        itemlist = build_itemlist_by_episodes(episodes, item)
 
     tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
     
     return itemlist
+
+
+
+def build_itemlist_by_episodes(episodes, item):
+    itemlist = []
+    for it in episodes:
+        title = it['title'] # .split('(')[0].strip()
+
+        itemlist.append(
+            item.clone(title = title,
+                id= it['id'],
+                url= 'api/episode/{}'.format(it['id']),
+                fulltitle = title,
+                #    contentLanguage = lang,
+                contentType = 'episode',
+                contentTitle = title,
+                action = 'findvideos',
+                year = it['airingDate'].split('-')[0]
+            )
+        )
+    return itemlist
+
+
 
 # Questa def è utilizzata per generare i menu del canale
 # per genere, per anno, per lettera, per qualità ecc ecc
@@ -319,19 +328,29 @@ def select(item):
 def search(item, text):
     support.info('search', item)
     itemlist = []
-    text = text.replace(' ', '+')
-    item.url = host + '/index.php?do=search&story=%s&subaction=search' % (text)
-    # bisogna inserire item.contentType per la ricerca globale
-    # se il canale è solo film, si può omettere, altrimenti bisgona aggiungerlo e discriminare.
-    item.contentType = item.contentType
-    try:
-        return peliculas(item)
-    # Se captura la excepcion, para no interrumpir al buscador global si un canal falla
-    except:
-        import sys
-        for line in sys.exc_info():
-            info('search log:', line)
-        return []
+    # text = text.replace(' ', '%20')
+    # item.url = host + '/index.php?do=search&story=%s&subaction=search' % (text)
+    # # bisogna inserire item.contentType per la ricerca globale
+    # # se il canale è solo film, si può omettere, altrimenti bisgona aggiungerlo e discriminare.
+    # item.contentType = item.contentType
+    # try:
+    #     return peliculas(item)
+    # # Se captura la excepcion, para no interrumpir al buscador global si un canal falla
+    # except:
+    #     import sys
+    #     for line in sys.exc_info():
+    #         info('search log:', line)
+    #     return []
+
+    # https://aniplay.it/api/anime/search?query=lupin
+    support.dbg()
+    url = '{}/api/anime/search?query={}'.format(host, text)
+
+    jsonDataStr = httptools.downloadpage(url, CF=False ).data
+    json = jsontools.load( jsonDataStr )
+
+    return build_itemlist_by_episodes(json, item)
+
 
 
 # da adattare al canale
