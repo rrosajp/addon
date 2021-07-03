@@ -197,7 +197,7 @@ def episodios(item):
     url = '{}/api/anime/{}'.format(host, item.id)
     json = httptools.downloadpage(url, CF=False ).json
 
-    if 'seasons' in json and len(json['seasons']) > 0:
+    if json.get('seasons'):
         seasons = json['seasons']
         seasons.sort(key=lambda s: s['episodeStart'])
 
@@ -224,21 +224,25 @@ def episodios(item):
                     if res.result():
                         itlist.extend(res.result())
             itemlist = itlist
+    elif json.get('episodes'):
+        itemlist = list_episodes(item, json)
 
-        # add renumber option
-        if stack()[1][3] not in ['find_episodes'] and itemlist and itemlist[0].contentType == 'episode':
-            autorenumber.start(itemlist, item)
+    # add renumber option
+    if stack()[1][3] not in ['find_episodes'] and itemlist and itemlist[0].contentType == 'episode':
+        autorenumber.start(itemlist, item)
 
-        # add add to videolibrary menu
-        if stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']:
-            support.videolibrary(itemlist, item)
-        return itemlist
+    # add add to videolibrary menu
+    if stack()[1][3] not in ['add_tvshow', 'get_episodes', 'update', 'find_episodes']:
+        support.videolibrary(itemlist, item)
+    
+    return itemlist
+    
 
-def list_episodes(item):
+def list_episodes(item, json=None):
     itemlist = []
-
-    url = '{}/api/anime/{}'.format(host, item.id)
-    json = httptools.downloadpage(url, CF=False ).json
+    if not json:
+        url = '{}/api/anime/{}'.format(host, item.id)
+        json = httptools.downloadpage(url, CF=False ).json
 
     episodes = json['episodes'] if 'episodes' in json else json
     episodes.sort(key=lambda ep: int(ep['episodeNumber'].split('.')[0]))
