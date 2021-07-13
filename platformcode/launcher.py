@@ -2,7 +2,6 @@
 # ------------------------------------------------------------
 # XBMC Launcher (xbmc / kodi)
 # ------------------------------------------------------------
-
 import sys, os
 PY3 = False
 if sys.version_info[0] >= 3:PY3 = True; unicode = str; unichr = chr; long = int
@@ -151,6 +150,17 @@ def run(item=None):
                         import urllib
                     short = urllib.urlopen('https://u.nu/api.php?action=shorturl&format=simple&url=' + item.url).read().decode('utf-8')
                     platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(70740) % short)
+        elif item.action == "gotopage":
+            page = platformtools.dialog_numeric(0, config.get_localized_string(70513))
+            if page:
+                import xbmc
+                item.action = item.real_action
+                if item.page:
+                    item.page = page
+                else:
+                    import re
+                    item.url = re.sub('([=/])[0-9]+(/?)$', '\g<1>' + page + '\g<2>', item.url)
+                xbmc.executebuiltin("Container.Update(%s?%s)" % (sys.argv[0], item.tourl()))
         else:
             # Checks if channel exists
             if os.path.isfile(os.path.join(config.get_runtime_path(), 'channels', item.channel + ".py")):

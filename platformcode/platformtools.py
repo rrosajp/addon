@@ -648,6 +648,8 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
         if (item.contentTitle and item.contentType in ['movie', 'tvshow']) or "buscar_trailer" in context:
             context_commands.append((config.get_localized_string(60359), "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, urllib.urlencode({ 'channel': "trailertools", 'action': "buscartrailer", 'search_title': item.contentTitle if item.contentTitle else item.fulltitle, 'contextual': True}))))
 
+        if item.nextPage:
+            context_commands.append((config.get_localized_string(70511), "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'action=gotopage&real_action='+item.action)))
     if config.dev_mode():
         context_commands.insert(0, ("item info", "Container.Update (%s?%s)" % (sys.argv[0], Item(action="itemInfo", parent=item.tojson()).tourl())))
     return context_commands

@@ -622,6 +622,8 @@ def discovery(item, dict_=False, cast=False):
     from core.item import Item
 
     if dict_:
+        if item.page:
+            item.discovery['page'] = item.page
         listado = Tmdb(discover = dict_, cast=cast)
 
     elif item.search_type == 'discover':
