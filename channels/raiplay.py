@@ -185,8 +185,9 @@ def live(item):
     itemlist =[]
     for channel, value in liveDict().items():
         itemlist.append(item.clone(title = support.typo(channel, 'bold'), fulltitle = channel, show = channel, url = value['url'],
-                                   plot = value['plot'], action = 'play', fanart = value['fanart'], manifest='hls', no_return=True))
-    return support.thumb(itemlist, live=True)
+                                   plot = value['plot'], action = 'play', fanart = value['fanart'], manifest='hls', forcethumb=True, no_return=True))
+    support.thumb(itemlist, live=True)
+    return itemlist
 
 
 def peliculas(item):
