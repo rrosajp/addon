@@ -6,24 +6,26 @@ from lib.fakeMail import Gmailnator
 from platformcode import config, platformtools, logger
 from core import scrapertools, httptools
 
-host = config.get_channel_url()
+
+def findhost(url):
+    return support.match(url, patron=r'<a href="([^"]+)/\w+">Accedi').match
+
+
+host = config.get_channel_url(findhost)
 register_url = 'https://altaregistrazione.com'
-headers = [['Referer', host]]
+headers = [['Referer', host], ['x-requested-with', 'XMLHttpRequest']]
 
 
 @support.menu
 def mainlist(item):
     support.info(item)
 
-    # Ordine delle voci
-    # Voce FILM, puoi solo impostare l'url
-    film = ['/type/movie', # url per la voce FILM, se possibile la pagina principale con le ultime novità
+    film = ['/load-more-film?anno=&order=&support_webp=1&type=movie&page=1',
         #Voce Menu,['url','action','args',contentType]
         ('Generi', ['', 'genres', 'genres']),
         ]
 
-    # Voce SERIE, puoi solo impostare l'url
-    tvshow = ['', # url per la voce Serie, se possibile la pagina con titoli di serie
+    tvshow = ['/load-more-film?type=tvshow&anno=&order=&support_webp=1&page=1',
         #Voce Menu,['url','action','args',contentType]
         ('Generi', ['', 'genres', 'genres']),
         ]
@@ -66,7 +68,7 @@ def registerOrLogin():
         from core.item import Item
         user_pre = config.get_setting('username', channel='altadefinizionecommunity')
         password_pre = config.get_setting('password', channel='altadefinizionecommunity')
-        setting.server_config(Item(config='altadefinizionecommunity'))
+        setting.channel_config(Item(config='altadefinizionecommunity'))
         user_post = config.get_setting('username', channel='altadefinizionecommunity')
         password_post = config.get_setting('password', channel='altadefinizionecommunity')
 
@@ -121,12 +123,24 @@ def registerOrLogin():
 
 @support.scrape
 def peliculas(item):
-    support.info(item)
-
-    patron = r'wrapFilm">\s*<a href="(?P<url>[^"]+)">\s*<span class="year">(?P<year>[0-9]{4})</span>\s*<span[^>]+>[^<]+</span>\s*<span class="qual">(?P<quality>[^<]+).*?<img src="(?P<thumbnail>[^"]+)[^>]+>\s*<h3>(?P<title>[^<]+)'
-    patronNext = ''
-
     # debug = True
+    support.info(item)
+    if '/load-more-film' not in item.url and '/search' not in item.url:  # generi o altri menu, converto
+        import ast
+        ajax = support.match(item.url, patron="ajax_data\s*=\s*([^;]+)").match
+        item.url = host + '/load-more-film?' + support.urlencode(ast.literal_eval(ajax)) + '&page=1'
+    json = support.httptools.downloadpage(item.url, headers=headers).json
+    data = "\n".join(json['data'])
+    patron = r'wrapFilm">\s*<a href="(?P<url>[^"]+)">\s*<span class="year">(?P<year>[0-9]{4})</span>\s*<span[^>]+>[^<]+</span>\s*<span class="qual">(?P<quality>[^<]+).*?<img src="(?P<thumbnail>[^"]+)[^>]+>\s*<h3>(?P<title>[^<[]+)(?:\[(?P<lang>[sSuUbBiItTaA-]+))?'
+
+    # paginazione
+    if json.get('have_next'):
+        def fullItemlistHook(itemlist):
+            spl = item.url.split('=')
+            url = '='.join(spl[:-1])
+            page = str(int(spl[-1])+1)
+            support.nextPage(itemlist, item, next_page='='.join((url, page)), function_or_level='peliculas')
+            return itemlist
     return locals()
 
 
@@ -134,7 +148,7 @@ def search(item, texto):
     support.info("search ", texto)
 
     item.args = 'search'
-    item.url = host + "/search?s=" + texto
+    item.url = host + "/search?s={0}&page=1".format(texto)
     try:
         return peliculas(item)
     # Continua la ricerca in caso di errore
@@ -171,6 +185,7 @@ def episodios(item):
         spl = it.url.split('/')[-2:]
         it.contentSeason = int(spl[0])+1
         it.contentEpisodeNumber = int(spl[1])+1
+        it.title = str(it.contentSeason) + 'x' + str(it.contentEpisodeNumber)
         return it
     return locals()
 
@@ -178,7 +193,7 @@ def episodios(item):
 def findvideos(item):
     itemlist = []
     video_url = item.url
-    if not '/watch-unsubscribed' in video_url:
+    if '/watch-unsubscribed' not in video_url:
         playWindow = support.match(item.url, patron='playWindow" href="([^"]+)')
         video_url = playWindow.match
         if '/tvshow' in video_url:
