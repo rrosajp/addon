@@ -43,7 +43,8 @@ session.headers.update({'x-session': sessionKey})
 def mainlist(item):
     top =  [('Dirette {bold}', ['', 'live'])]
 
-    menu = [('Fiction / Serie TV {bullet bold}', ['/fiction', 'menu', '5acfcb3c23eec6000d64a6a4', 'tvshow']),
+    menu = [('Film {bullet bold}', ['/cinema', 'peliculas', {'uxReference':'filmUltimiArrivi'}, 'movie']),
+            ('Fiction / Serie TV {bullet bold}', ['/fiction', 'menu', '5acfcb3c23eec6000d64a6a4', 'tvshow']),
             ('Programmi TV{ bullet bold}', ['/programmitv', 'menu', '5acfc8011de1c4000b6ec953', 'tvshow']),
             ('Documentari {bullet bold}', ['/documentari', 'menu', '5bfd17c423eec6001aec49f9', 'undefined']),
             ('Kids {bullet bold}', ['/kids', 'menu', '5acfcb8323eec6000d64a6b3', 'undefined'])]
@@ -59,10 +60,7 @@ def menu(item):
         if 'uxReference' in it:
             itemlist.append(item.clone(title=support.typo(it['title'], 'bullet bold'),
                             url= it['landingUrl'],
-                            feed = it.get('feedurlV2',''),
-                            ref=it.get('uxReferenceV2', ''),
-                            params=it.get('uxReferenceV2Params', ''),
-                            args='',
+                            args={'uxReference':it.get('uxReferenceV2', ''), 'params':it.get('uxReferenceV2Params', ''), 'feed':it.get('feedurlV2','')},
                             action='peliculas'))
     return itemlist
 
@@ -95,9 +93,7 @@ def live(item):
 
 
 def search(item, text):
-    item.ref = 'main'
-    item.query = text
-    item.params = 'channel≈'
+    item.args = {'uxReference':'main', 'params':'channel≈', 'query':text}
 
     try:
         return peliculas(item)
@@ -154,6 +150,7 @@ def peliculas(item):
                                    url=url,
                                    video_id=video_id,
                                    seriesid = it.get('seriesTvSeasons', it.get('id','')),
+                                   disable_videolibrary = True,
                                    forcethumb=True))
     if res['next']:
         item.page = res['next']
@@ -288,25 +285,24 @@ def get_from_id(item):
         return res['entries']
     return {}
 
-def get_programs(item, ret={}, args={}):
+def get_programs(item):
     url = ''
     pag = item.page if item.page else 1
+    ret = {}
 
-    if item.feed:
+    if item.args.get('feed'):
         pag = item.page if item.page else 1
-        url='{}&range={}-{}'.format(item.feed, pag, pag + 20 - 1)
+        url='{}&range={}-{}'.format(item.args.get('feed'), pag, pag + 20 - 1)
         ret['next'] = pag + 20
         res = requests.get(url).json()
 
     else:
-        args['uxReference'] = item.ref
-        args['params'] = item.params
-        args['query'] = item.query
+        args = {key:value for key, value in item.args.items()}
         args['context'] = 'platform≈web'
         args['sid'] = sid
         args['sessionId'] = sid
         args['hitsPerPage'] = 20
-        args['property'] = 'search' if item.query else 'play'
+        args['property'] = 'search' if args.get('query') else 'play'
         args['tenant'] = 'play-prod-v2'
         args['page'] = pag
         args['deviceId'] = '017ac511182d008322c989f3aac803083002507b00bd0'
