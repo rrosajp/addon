@@ -2,19 +2,16 @@
 # ------------------------------------------------------------
 # Canale per Mediaset Play
 # ------------------------------------------------------------
-from time import time
+
 from platformcode import logger, config
 import uuid, datetime, xbmc
 
 import requests, sys
-from core import support, jsontools, tmdb
+from core import support
 if sys.version_info[0] >= 3:
     from urllib.parse import urlencode, quote
-    from concurrent import futures
 else:
     from urllib import urlencode, quote
-    from concurrent_py2 import futures
-from collections import OrderedDict
 
 host = 'https://www.mediasetplay.mediaset.it'
 loginUrl = 'https://api-ott-prod-fe.mediaset.net/PROD/play/idm/anonymous/login/v2.0'
@@ -32,7 +29,6 @@ entry = 'https://api.one.accedo.tv/content/entry/{id}?locale=it'
 entries = 'https://api.one.accedo.tv/content/entries?id={id}&locale=it'
 
 # login anonimo
-# support.dbg()
 res = session.post(loginUrl, json=loginData, verify=False)
 Token = res.json()['response']['beToken']
 sid = res.json()['response']['sid']
@@ -60,7 +56,6 @@ def menu(item):
     itemlist = []
     res = get_from_id(item)
     for it in res:
-        logger.debug(jsontools.dump(it))
         if 'uxReference' in it:
             itemlist.append(item.clone(title=support.typo(it['title'], 'bullet bold'),
                             url= it['landingUrl'],
@@ -85,14 +80,14 @@ def live(item):
         url = 'https:' + it['mediasetstation$pageUrl']
         if 'plus' in title.lower() or 'premium' in title.lower(): continue
         if it['callSign'] in allguide:
-            urls = []
+
             guide = allguide[it['callSign']]
             plot = '[B]{}[/B]\n{}\n\nA Seguire:\n[B]{}[/B]\n{}'.format(guide['currentListing']['mediasetlisting$epgTitle'],
                                                                         guide['currentListing']['description'],
                                                                         guide['nextListing']['mediasetlisting$epgTitle'],
                                                                         guide['nextListing']['description'],)
 
-            itemlist.append(item.clone(title=support.typo(title, 'bold'), fulltitle=title, urls=guide['tuningInstruction']['urn:theplatform:tv:location:any'], plot=plot, url=url, action='play', forcethumb=True))
+            itemlist.append(item.clone(title=support.typo(title, 'bold'), fulltitle=title, callSign=it['callSign'], urls=guide['tuningInstruction']['urn:theplatform:tv:location:any'], plot=plot, url=url, action='play', forcethumb=True))
 
     itemlist.sort(key=lambda it: support.channels_order.get(it.fulltitle, 999))
     support.thumb(itemlist, live=True)
@@ -118,7 +113,9 @@ def peliculas(item):
     itemlist = []
     res = get_programs(item)
     video_id= ''
+
     for it in res['items']:
+        if not 'MediasetPlay_ANY' in it.get('mediasetprogram$channelsRights',['MediasetPlay_ANY']): continue
         thumb = ''
         fanart = ''
         contentSerieName = ''
@@ -129,8 +126,8 @@ def peliculas(item):
             title = '{} - {}'.format(title, title2)
         plot = it.get('longDescription', it.get('description', it.get('mediasettvseason$brandDescription', '')))
 
-        if it.get('seriesTitle'):
-            contentSerieName = it['seriesTitle']
+        if it.get('seriesTitle') or it.get('seriesTvSeasons'):
+            contentSerieName = it.get('seriesTitle', it.get('title'))
             contentType = 'tvshow'
             action = 'epmenu'
         else:
@@ -156,7 +153,7 @@ def peliculas(item):
                                    plot=plot,
                                    url=url,
                                    video_id=video_id,
-                                   seriesid = it.get('id',''),
+                                   seriesid = it.get('seriesTvSeasons', it.get('id','')),
                                    forcethumb=True))
     if res['next']:
         item.page = res['next']
@@ -168,36 +165,47 @@ def epmenu(item):
     logger.debug()
     itemlist = []
 
+    epUrl = 'https://feed.entertainment.tv.theplatform.eu/f/PR1GhC/mediaset-prod-all-subbrands-v2?byTvSeasonId={}&sort=mediasetprogram$order'
+
     if item.seriesid:
-        res = requests.get('https://feed.entertainment.tv.theplatform.eu/f/PR1GhC/mediaset-prod-all-subbrands-v2?byTvSeasonId={}&sort=mediasetprogram$order'.format(item.seriesid)).json()['entries']
-        for it in res:
-            itemlist.append(
-                item.clone(seriesid = '',
-                            title=support.typo(it['description'], 'bold'),
-                            subbrand=it['mediasetprogram$subBrandId'],
-                            action='episodios'))
-        itemlist = sorted(itemlist, key=lambda it: it.title, reverse=True)
-        if len(itemlist) == 1: return episodios(itemlist[0])
+        if type(item.seriesid) == list:
+            res = []
+            for s in item.seriesid:
+                itemlist.append(
+                    item.clone(seriesid = s['id'],
+                               title=support.typo(s['title'], 'bold')))
+            if len(itemlist) == 1: return epmenu(itemlist[0])
+        else:
+            res = requests.get(epUrl.format(item.seriesid)).json()['entries']
+            for it in res:
+                itemlist.append(
+                    item.clone(seriesid = '',
+                               title=support.typo(it['description'], 'bold'),
+                               subbrand=it['mediasetprogram$subBrandId'],
+                               action='episodios'))
+            itemlist = sorted(itemlist, key=lambda it: it.title, reverse=True)
+            if len(itemlist) == 1: return episodios(itemlist[0])
 
     return itemlist
 
 def episodios(item):
+    # create month list
+    months = []
+    try:
+        for month in range(21, 33): months.append(xbmc.getLocalizedString(month))
+    except:  # per i test, xbmc.getLocalizedString non è supportato
+        for month in range(21, 33): months.append('dummy')
+
     itemlist = []
     res = requests.get('https://feed.entertainment.tv.theplatform.eu/f/PR1GhC/mediaset-prod-all-programs-v2?byCustomValue={subBrandId}{' + item.subbrand +'}&sort=:publishInfo_lastPublished|asc,tvSeasonEpisodeNumber').json()['entries']
 
     for it in res:
         thumb = ''
-        title = ''
-        season = it.get('tvSeasonNumber','')
-        episode = it.get('tvSeasonEpisodeNumber','')
-
-        ep_title = it['title']
-        if season and episode:
-            title = '{}x{:02d} - {}'.format(season, episode, ep_title)
-        elif episode:
-            title = '{:02d} - {}'.format(episode, ep_title)
-        else:
-            title = ep_title
+        titleDate = ''
+        if 'mediasetprogram$publishInfo_lastPublished' in it:
+            date = datetime.date.fromtimestamp(it['mediasetprogram$publishInfo_lastPublished'] / 1000)
+            titleDate ='  [{} {}]'.format(date.day, months[date.month])
+        title = '[B]{}[/B]{}'.format(it['title'], titleDate)
         for k, v in it['thumbnails'].items():
             if 'image_keyframe' in k and not thumb:
                 thumb = v['url'].replace('.jpg', '@3.jpg')
@@ -205,15 +213,11 @@ def episodios(item):
         if not thumb: thumb = item.thumbnail
 
         itemlist.append(item.clone(title=title,
-                                   contentSeason = season,
-                                   contentEpisodeNumber = episode,
                                    thumbnail=thumb,
                                    forcethumb=True,
                                    contentType='episode',
                                    action='play',
                                    video_id=it['guid']))
-
-    itemlist.sort(key=lambda it: (it.contentSeson, it.contentEpisodeNumber))
 
     return itemlist
 
@@ -222,37 +226,43 @@ def play(item):
     logger.debug()
     item.no_return=True
     mpd = config.get_setting('mpd', item.channel)
-    post = {format}
+
 
     lic_url = 'https://widevine.entitlement.theplatform.eu/wv/web/ModularDrm/getRawWidevineLicense?releasePid={pid}&account=http://access.auth.theplatform.com/data/Account/2702976343&schema=1.0&token={token}|Accept=*/*&Content-Type=&User-Agent={ua}|R{{SSM}}|'
     url = ''
 
-    if item.video_id:
+    if item.urls:
+        url = ''
+        pid = ''
+        Format = 'dash+xml' if mpd else 'x-mpegURL'
+        for it in item.urls:
+            if Format in it['format']:
+                item.url = requests.head(it['publicUrls'][0]).headers['Location']
+                pid = it['releasePids'][0]
+
+        if mpd:
+            item.manifest = 'mpd'
+            item.drm = 'com.widevine.alpha'
+            item.license = lic_url.format(pid=pid, token=Token, ua=support.httptools.get_user_agent())
+
+        else:
+            item.manifest = 'hls'
+        return[item]
+
+    elif item.video_id:
         payload = '{"contentId":"' + item.video_id + ' ","streamType":"VOD","delivery":"Streaming","createDevice":true}'
         res = session.post('https://api-ott-prod-fe.mediaset.net/PROD/play/playback/check/v2.0?sid=' + sid, data=payload).json()['response']['mediaSelector']
-        url = res['url']
-        Formats = res['formats']
-        Format = res['format']
-        mpd = True if 'dash' in Formats else False
+
     else:
-        for it in item.urls:
-            if (mpd and it['format'] == 'application/dash+xml') or (not mpd and it['format'] == 'application/x-mpegURL'):
-                try:
-                    url = it['publicUrls'][0]
-                    break
-                except:
-                    logger.debug('No url find for', 'mpd' if mpd else 'hls')
-                    pass
+        payload = '{"channelCode":"' + item.callSign + '","streamType":"LIVE","delivery":"Streaming","createDevice":true}'
+        res = session.post('https://api-ott-prod-fe.mediaset.net/PROD/play/playback/check/v2.0?sid=' + sid, data=payload).json()['response']['mediaSelector']
+
+    url = res['url']
+    mpd = True if 'dash' in res['formats'].lower() else False
 
     if url:
-        post = {}
-        post['format'] = Format
-        post['assetTypes'] = 'HD,browser,widevine,geoIT|geoNo:HD,browser,geoIT|geoNo:HD,geoIT|geoNo:SD,browser,widevine,geoIT|geoNo:SD,browser,geoIT|geoNo:SD,geoIT|geoNo'
-        if Format == 'SMIL':
-            post['auth'] = Token
-            post['formats'] = Formats
 
-        sec_data = support.match(url + '?' + urlencode(post)).data
+        sec_data = support.match(url + '?' + urlencode(res)).data
         item.url = support.match(sec_data, patron=r'<video src="([^"]+)').match
         pid = support.match(sec_data, patron=r'pid=([^|]+)').match
 
@@ -303,7 +313,6 @@ def get_programs(item, ret={}, args={}):
         url="https://api-ott-prod-fe.mediaset.net/PROD/play/reco/anonymous/v2.0?" + urlencode(args)
 
         res = session.get(url).json()
-
 
     if res:
         res = res.get('response', res)
