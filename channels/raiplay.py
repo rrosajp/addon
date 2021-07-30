@@ -47,20 +47,28 @@ def menu(item):
 
     if item.data:
         for it in item.data:
-            if 'sets' in it:
-                action = 'episodios'
-            itemlist.append(item.clone(title=support.typo(it['name'], 'bold'), data=[it], action=action))
+            url = getUrl(it['path_id'])
+            action = 'genres'
+            itemlist.append(item.clone(title=support.typo(it['name'], 'bold'), url=url.replace('.json','.html'), genre_url=url, data='', action=action))
         support.thumb(itemlist, genre=True)
     else:
         items = item.data if item.data else requests.get(host + item.args).json()['contents']
         for it in items:
-            if 'RaiPlay Slider Block' in it['type']:
+            if 'RaiPlay Slider Block' in it['type'] or 'RaiPlay Slider Generi Block' in it['type']:
                 thumb = item.thumbnail
-                if 'Generi' in it['name']:
+                if 'RaiPlay Slider Generi Block' in it['type']:
                     action = 'menu'
                     thumb = support.thumb('genres')
                 itemlist.append(item.clone(title=support.typo(it['name'], 'bold'), data=it.get('contents', item.data), thumbnail=thumb, action=action))
 
+    return itemlist
+
+
+def genres(item):
+    itemlist = []
+    items = requests.get(getUrl(item.genre_url)).json()['contents']
+    for title, it in items.items():
+        if it: itemlist.append(item.clone(title=support.typo(title, 'bold'), data=it, action='peliculas', thumbnail=support.thumb('az')))
     return itemlist
 
 
