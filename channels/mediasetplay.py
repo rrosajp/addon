@@ -38,6 +38,8 @@ session.headers.update({'authorization': 'Bearer ' + Token})
 sessionKey = session.get(sessionUrl.format(uuid=str(uuid.uuid4())), verify=False).json()['sessionKey']
 session.headers.update({'x-session': sessionKey})
 
+pagination = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100][config.get_setting('pagination', 'mediasetplay')]
+
 
 @support.menu
 def mainlist(item):
@@ -292,8 +294,8 @@ def get_programs(item):
 
     if item.args.get('feed'):
         pag = item.page if item.page else 1
-        url='{}&range={}-{}'.format(item.args.get('feed'), pag, pag + 20 - 1)
-        ret['next'] = pag + 20
+        url='{}&range={}-{}'.format(item.args.get('feed'), pag, pag + pagination - 1)
+        ret['next'] = pag + pagination
         res = requests.get(url).json()
 
     else:
@@ -301,7 +303,7 @@ def get_programs(item):
         args['context'] = 'platform≈web'
         args['sid'] = sid
         args['sessionId'] = sid
-        args['hitsPerPage'] = 20
+        args['hitsPerPage'] = pagination
         args['property'] = 'search' if args.get('query') else 'play'
         args['tenant'] = 'play-prod-v2'
         args['page'] = pag
