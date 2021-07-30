@@ -449,7 +449,7 @@ def scrapeBlock(item, args, block, patron, headers, action, pagination, debug, t
                 news= item.news if item.news else '',
                 other = scraped['other'] if scraped['other'] else '',
                 grouped=group,
-                disable_videolibrary = True if not args.get('addVideolibrary') else False
+                disable_videolibrary = not args.get('addVideolibrary', True)
             )
             if scraped['episode'] and group and not item.grouped:  # some adjustment for grouping feature
                 it.action = function
