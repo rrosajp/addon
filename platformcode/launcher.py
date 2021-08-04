@@ -149,7 +149,7 @@ def run(item=None):
                 if xbmc.getCondVisibility('system.platform.linux') and xbmc.getCondVisibility('system.platform.android'):  # android
                     xbmc.executebuiltin('StartAndroidActivity("", "android.intent.action.VIEW", "", "%s")' % item.url)
                 else:
-                    platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(70740) % "\n".join((item.url[j:j+57] for j in range(0, len(item.url), 57))))
+                    platformtools.dialog_ok(config.get_localized_string(20000), config.get_localized_string(70740) % "\n".join([item.url[j:j+57] for j in range(0, len(item.url), 57)]))
         elif item.action == "gotopage":
             page = platformtools.dialog_numeric(0, config.get_localized_string(70513))
             if page:
@@ -175,10 +175,10 @@ def run(item=None):
             channel = None
 
             if os.path.exists(channel_file):
-                # try:
-                channel = __import__('%s.%s' % (CHANNELS, item.channel), None, None, ['%s.%s' % (CHANNELS, item.channel)])
-                # except ImportError:
-                #     exec("import " + CHANNELS + "." + item.channel + " as channel")
+                try:
+                    channel = __import__('%s.%s' % (CHANNELS, item.channel), None, None, ['%s.%s' % (CHANNELS, item.channel)])
+                except ImportError:
+                    exec("import " + CHANNELS + "." + item.channel + " as channel")
 
             logger.info("Running channel %s | %s" % (channel.__name__, channel.__file__))
 
