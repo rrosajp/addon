@@ -17,7 +17,7 @@ from past.utils import old_div
 
 import re
 
-from core import filetools, httptools, jsontools, support
+from core import filetools, httptools, jsontools
 from core.item import Item
 from platformcode import config, logger, platformtools
 from lib import unshortenit
@@ -705,9 +705,9 @@ def sort_servers(servers_list):
     #       3: Only qualities
     #       4: Do not order
 
-    if config.get_setting('favorites_servers') and favorite_servers and config.get_setting('default_action') and not config.get_setting('quality_priority', 'servers'):
+    if config.get_setting('favorites_servers') and favorite_servers and config.get_setting('default_action') and not config.get_setting('quality_priority'):
         priority = 0  # 0: Servers and Qualities
-    elif config.get_setting('favorites_servers') and favorite_servers and config.get_setting('default_action') and config.get_setting('quality_priority', 'servers'):
+    elif config.get_setting('favorites_servers') and favorite_servers and config.get_setting('default_action') and config.get_setting('quality_priority'):
         priority = 1  # 0: Qualities and Servers
     elif config.get_setting('favorites_servers') and favorite_servers:
         priority = 2  # Servers only
