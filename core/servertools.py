@@ -17,7 +17,7 @@ from past.utils import old_div
 
 import re
 
-from core import filetools, httptools, jsontools
+from core import filetools, httptools, jsontools, support
 from core.item import Item
 from platformcode import config, logger, platformtools
 from lib import unshortenit
@@ -696,7 +696,7 @@ def sort_servers(servers_list):
 
     sorted_list = []
     url_list_valid = []
-    favorite_quality = [quality_list.reverse() if config.get_setting('default_action') == 1 else quality_list]
+    favorite_quality = quality_list.reverse() if config.get_setting('default_action') == 1 else quality_list
 
     # Priorities when ordering itemlist:
     #       0: Servers and Qualities
@@ -705,9 +705,9 @@ def sort_servers(servers_list):
     #       3: Only qualities
     #       4: Do not order
 
-    if config.get_setting('favorites_servers') and favorite_servers and config.get_setting('default_action') and not config.get_setting('quality_priority'):
+    if config.get_setting('favorites_servers') and favorite_servers and config.get_setting('default_action') and not config.get_setting('quality_priority', 'servers'):
         priority = 0  # 0: Servers and Qualities
-    elif config.get_setting('favorites_servers') and favorite_servers and config.get_setting('default_action') and config.get_setting('quality_priority'):
+    elif config.get_setting('favorites_servers') and favorite_servers and config.get_setting('default_action') and config.get_setting('quality_priority', 'servers'):
         priority = 1  # 0: Qualities and Servers
     elif config.get_setting('favorites_servers') and favorite_servers:
         priority = 2  # Servers only
@@ -758,7 +758,7 @@ def sort_servers(servers_list):
     elif priority == 1: sorted_list.sort(key=lambda row: (row['indice_language'], row['indice_quality'], row['indice_server'])) # Qualities and Servers
     elif priority == 2: sorted_list.sort(key=lambda row: (row['indice_language'], row['indice_server'])) # Servers only
     elif priority == 3: sorted_list.sort(key=lambda row: (row['indice_language'], row['indice_quality'])) # Only qualities
-    else: sorted_list.sort(key=lambda row: row['indice_language'])
+    else: sorted_list.sort(key=lambda row: (row['indice_language'], row['indice_quality']))
 
     return [v['videoitem'] for v in sorted_list if v]
 
