@@ -1348,7 +1348,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         logger.info("mediaurl=" + mediaurl)
 
         if player_mode in [0,1]:
-            # prevent_busy(item)
+            prevent_busy(item)
             if player_mode in [1]:
                 item.played_time = resume_playback(get_played_time(item))
 
@@ -1449,7 +1449,7 @@ def play_torrent(item, xlistitem, mediaurl):
         selection = 0
 
     if selection >= 0:
-        # prevent_busy(item)
+        prevent_busy(item)
 
         mediaurl = urllib.quote_plus(item.url)
         torr_client = torrent_options[selection][0]
@@ -1777,15 +1777,12 @@ def set_played_time(item):
 
 def prevent_busy(item):
     logger.debug()
-    # from core.support import dbg;dbg()
-    if not item.autoplay and not item.window and item.action == 'play_from_library':
-        xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
-        # else: xbmc.Player().play(os.path.join(config.get_runtime_path(), "resources", "kod.mp4"))
-        # first wait the fake video to start
-        # while not is_playing():
-        #     logger.debug('wait for play')
-        #     pass
-        # then wait a little more
+    if not item.autoplay and not item.window:
+        if item.globalsearch: xbmc.Player().play(os.path.join(config.get_runtime_path(), "resources", "kod.mp4"))
+        else: xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
         xbmc.sleep(200)
-        # and then stop it
         xbmc.Player().stop()
+        # xbmc.executebuiltin('Action(Stop)')
+        # xbmc.sleep(500)
+        # xbmc.Player().stop()
+        # xbmc.sleep(500)
