@@ -1765,7 +1765,7 @@ def set_played_time(item):
             newDict = db['viewed'].get(ID, {})
             newDict['{}x{}'.format(s, e)] = played_time
             db['viewed'][ID] = newDict
-        if item.contentType == 'movie':
+        else:
             db['viewed'][ID] = played_time
     except:
         import traceback
