@@ -416,7 +416,7 @@ def set_infoLabels_item(item, seekTmdb=True, search_language=def_lang, lock=None
                         # Movie search by title ...
                         # if item.infoLabels['year'] or item.infoLabels['filtro']:
                         # ...and year or filter
-                        searched_title = scrapertools.unescape(item.contentTitle if item.contentTitle else item.fulltitle)
+                        searched_title = scrapertools.unescape(item.infoLabels['title'])
                         searched_title = searched_title.split('-')[0].strip()
                         otmdb = Tmdb(searched_text=searched_title, search_type=search_type, search_language=search_language,
                                      filtro=item.infoLabels.get('filtro', {}), year=item.infoLabels['year'])
@@ -442,7 +442,7 @@ def set_infoLabels_item(item, seekTmdb=True, search_language=def_lang, lock=None
             if new_title != item.fulltitle:
                 item.infoLabels['tvshowtitle'] = scrapertools.title_unify(item.infoLabels['tvshowtitle'])
                 item.infoLabels['title'] = scrapertools.title_unify(item.infoLabels['title'])
-                item.fulltitle = new_title
+                # item.fulltitle = new_title
                 return True
         # We check what type of content it is...
         if item.contentType == 'movie':
