@@ -408,7 +408,7 @@ def set_infoLabels_item(item, seekTmdb=True, search_language=def_lang, lock=None
                     if search_type == 'tv':
                         # Serial search by title and filtering your results if necessary
                         searched_title = scrapertools.unescape(item.infoLabels['tvshowtitle'])
-                        searched_title = searched_title.split('-')[0].strip()
+                        searched_title = searched_title.split(' - ')[0].strip()
                         otmdb = Tmdb(searched_text=searched_title, search_type=search_type,
                                      search_language=search_language, filtro=item.infoLabels.get('filtro', {}),
                                      year=item.infoLabels['year'])
@@ -417,7 +417,7 @@ def set_infoLabels_item(item, seekTmdb=True, search_language=def_lang, lock=None
                         # if item.infoLabels['year'] or item.infoLabels['filtro']:
                         # ...and year or filter
                         searched_title = scrapertools.unescape(item.infoLabels['title'])
-                        searched_title = searched_title.split('-')[0].strip()
+                        searched_title = searched_title.split(' - ')[0].strip()
                         otmdb = Tmdb(searched_text=searched_title, search_type=search_type, search_language=search_language,
                                      filtro=item.infoLabels.get('filtro', {}), year=item.infoLabels['year'])
                     if otmdb is not None:
