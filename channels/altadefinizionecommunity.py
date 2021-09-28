@@ -186,7 +186,7 @@ def search(item, texto):
 def genres(item):
     logger.debug(item)
     data = support.httptools.downloadpage(item.url, cloudscraper=True).data
-    debugBlock=True
+    # debugBlock=True
     patronMenu = r'<a href="(?P<url>[^"]+)">(?P<title>[^<]+)'
 
     if item.args == 'year':

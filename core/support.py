@@ -650,7 +650,7 @@ def scrape(func):
         if config.get_setting('trakt_sync'):
             from core import trakt_tools
             trakt_tools.trakt_check(itemlist)
-        logger.debug('scraping time: ', time()-scrapingTime)
+        logger.debug(item.channel + ' scraping time ' + ':', time()-scrapingTime)
         return itemlist
 
     return wrapper
