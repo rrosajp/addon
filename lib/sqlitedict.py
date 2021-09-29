@@ -39,6 +39,7 @@ from threading import Thread
 __version__ = '1.7.0.dev0'
 
 import xbmc
+kodi_monitor = xbmc.Monitor()
 
 major_version = sys.version_info[0]
 if major_version < 3:  # py <= 2.x
@@ -416,7 +417,6 @@ class SqliteMultithread(Thread):
         self.log = logging.getLogger('sqlitedict.SqliteMultithread')
         self.start()
 
-        self.kodi_monitor = xbmc.Monitor()
 
     def run(self):
         try:
@@ -443,7 +443,7 @@ class SqliteMultithread(Thread):
         self._sqlitedict_thread_initialized = True
 
         res = None
-        while not self.kodi_monitor.abortRequested():
+        while not kodi_monitor.abortRequested():
             req, arg, res, outer_stack = self.reqs.get()
             if req == '--close--':
                 assert res, ('--close-- without return queue', res)

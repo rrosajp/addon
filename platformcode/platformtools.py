@@ -383,23 +383,24 @@ def render_items(itemlist, parent_item):
 
 
 def viewmodeMonitor():
-    try:
-        currentModeName = xbmc.getInfoLabel('Container.Viewmode')
-        win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
-        currentMode = int(win.getFocusId())
-        if currentModeName and 'plugin.video.kod' in xbmc.getInfoLabel('Container.FolderPath') and currentMode < 1000 and currentMode >= 50:  # inside addon and in itemlist view
-            content, Type = getCurrentView()
-            if content:
-                defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
-                if currentMode != defaultMode:
-                    logger.debug('viewmode changed: ' + currentModeName + '-' + str(currentMode) + ' - content: ' + content)
-                    config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
-                    dialog_notification(config.get_localized_string(70153),
-                                                      config.get_localized_string(70187) % (content, currentModeName),
-                                                      sound=False)
-    except:
-        import traceback
-        logger.error(traceback.print_exc())
+    if get_window() == 'WINDOW_VIDEO_NAV':
+        try:
+            currentModeName = xbmc.getInfoLabel('Container.Viewmode')
+            win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+            currentMode = int(win.getFocusId())
+            if currentModeName and 'plugin.video.kod' in xbmc.getInfoLabel('Container.FolderPath') and currentMode < 1000 and currentMode >= 50:  # inside addon and in itemlist view
+                content, Type = getCurrentView()
+                if content:
+                    defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
+                    if currentMode != defaultMode:
+                        logger.debug('viewmode changed: ' + currentModeName + '-' + str(currentMode) + ' - content: ' + content)
+                        config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
+                        dialog_notification(config.get_localized_string(70153),
+                                                        config.get_localized_string(70187) % (content, currentModeName),
+                                                        sound=False)
+        except:
+            import traceback
+            logger.error(traceback.print_exc())
 
 
 def getCurrentView(item=None, parent_item=None):
