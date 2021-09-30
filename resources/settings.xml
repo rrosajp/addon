@@ -138,7 +138,9 @@
         <setting id="touch_view" label='30002' type="bool" default="false"/>
         <!-- View Mode (hidden)-->
         <setting id="skin_name" label='Skin Name' type="text" default="skin.estuary" visible="false"/>
+        <setting id="view_mode_home" type="action" label="70009" default= "Default, 0" visible="false"/>
         <setting id="view_mode_menu" type="action" label="70009" default= "Default, 0" visible="false"/>
+        <setting id="view_mode_channels" type="action" label="30118" default= "Default, 0" visible="false"/>
         <setting id="view_mode_channel" type="action" label="30118" default= "Default, 0" visible="false"/>
         <setting id="view_mode_movie" type="action" label="30122" default= "Default, 0" visible="false"/>
         <setting id="view_mode_tvshow" type="action" label="30123" default= "Default, 0" visible="false"/>
