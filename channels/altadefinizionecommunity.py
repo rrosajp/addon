@@ -9,6 +9,7 @@ from core import scrapertools, httptools
 
 
 def findhost(url):
+    global register_url
     register_url = url
     return support.match(url, patron=r'<a href="([^"]+)/\w+">Accedi').match
 
