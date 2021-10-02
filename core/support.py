@@ -592,6 +592,7 @@ def scrape(func):
                 nextArgs['item'] = item
                 itemlist = newFunc()
             itemlist = [i for i in itemlist if i.action not in ['add_pelicula_to_library', 'add_serie_to_library']]
+        logger.debug(item.channel + ' scraping time ' + ':', time()-scrapingTime)
 
         if anime and inspect.stack()[1][3] not in ['find_episodes']:
             from platformcode import autorenumber
@@ -650,7 +651,6 @@ def scrape(func):
         if config.get_setting('trakt_sync'):
             from core import trakt_tools
             trakt_tools.trakt_check(itemlist)
-        logger.debug(item.channel + ' scraping time ' + ':', time()-scrapingTime)
         return itemlist
 
     return wrapper
