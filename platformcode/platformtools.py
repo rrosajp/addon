@@ -389,13 +389,16 @@ def render_items(itemlist, parent_item):
 
 
 def viewmodeMonitor():
+    # logger.debug('WINDOW:',get_window())
     if get_window() == 'WINDOW_VIDEO_NAV':
         try:
             currentModeName = xbmc.getInfoLabel('Container.Viewmode')
             win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
             currentMode = int(win.getFocusId())
-            if currentModeName and 'plugin.video.kod' in xbmc.getInfoLabel('Container.FolderPath') and currentMode < 1000 and currentMode >= 50:  # inside addon and in itemlist view
+            # logger.debug('CM', currentMode, 'CN',currentModeName, 'label',xbmc.getInfoLabel('Container.FolderPath'))
+            if currentModeName and 'plugin.video.kod' in xbmc.getInfoLabel('Container.FolderPath') and 50 <= currentMode < 1000:# and currentMode >= 50:  # inside addon and in itemlist view
                 content, Type = getCurrentView()
+                # logger.debug(content, Type)
                 if content:
                     defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
                     if currentMode != defaultMode:
@@ -418,8 +421,9 @@ def getCurrentView(item=None, parent_item=None):
     if not item:
         info = xbmc.getInfoLabel('Container.ListItemPosition(2).FileNameAndPath')  # first addon listitem (consider "..")
         if not info:
-            return None, None
-        item = Item().fromurl(info) if info else Item()
+            item = Item()
+        else:
+            item = Item().fromurl(info) if info else Item()
     parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'newest', 'discover_list', 'new_search', 'channel_search']
 
     addons = 'addons' if config.get_setting('touch_view') else ''
