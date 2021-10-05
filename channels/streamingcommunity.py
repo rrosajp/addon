@@ -104,23 +104,28 @@ def newest(category):
 def peliculas(item):
     # getHeaders()
     logger.debug()
+    global host
     itemlist = []
     recordlist = []
     videoType = 'movie' if item.contentType == 'movie' else 'tv'
 
     page = item.page if item.page else 0
     offset = page * 60
-    if item.records:
-        records = item.records
-    elif type(item.args) == int:
-        data = support.scrapertools.decodeHtmlentities(support.match(item).data)
-        records = json.loads(support.match(data, patron=r'slider-title titles-json="(.*?)" slider-name="').matches[item.args])
-    elif not item.search:
-        payload = json.dumps({'type': videoType, 'offset':offset, 'genre':item.args})
-        records = session.post(host + '/api/browse', headers=headers, data=payload).json()['records']
-    else:
-        payload = json.dumps({'q': item.search})
-        records = session.post(host + '/api/search', headers=headers, data=payload).json()['records']
+    try:
+        if item.records:
+            records = item.records
+        elif type(item.args) == int:
+            data = support.scrapertools.decodeHtmlentities(support.match(item).data)
+            records = json.loads(support.match(data, patron=r'slider-title titles-json="(.*?)" slider-name="').matches[item.args])
+        elif not item.search:
+            payload = json.dumps({'type': videoType, 'offset':offset, 'genre':item.args})
+            records = session.post(host + '/api/browse', headers=headers, data=payload).json()['records']
+        else:
+            payload = json.dumps({'q': item.search})
+            records = session.post(host + '/api/search', headers=headers, data=payload).json()['records']
+    except:
+        host = support.config.get_channel_url(findhost, forceFindhost=True)
+        return peliculas(item)
 
     if records and type(records[0]) == list:
         js = []
@@ -134,7 +139,7 @@ def peliculas(item):
             itemlist.append(makeItem(i, it, item))
         else:
             recordlist.append(it)
-    
+
     itemlist.sort(key=lambda item: item.n)
     if recordlist:
         itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), thumbnail=support.thumb(), page=page, records=recordlist))
