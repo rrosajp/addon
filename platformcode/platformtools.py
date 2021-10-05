@@ -361,6 +361,8 @@ def render_items(itemlist, parent_item):
         listitem.addContextMenuItems(context_commands)
 
         dirItems.append(('%s?%s' % (sys.argv[0], item_url), listitem, item.folder))
+
+    set_view_mode(itemlist[0], parent_item)
     xbmcplugin.addDirectoryItems(_handle, dirItems)
 
     if parent_item.list_type == '':
@@ -376,13 +378,13 @@ def render_items(itemlist, parent_item):
 
     xbmcplugin.setPluginCategory(handle=_handle, category=breadcrumb)
 
-    set_view_mode(itemlist[0], parent_item)
 
-    cacheToDisc = False
-    if (parent_item.action == 'findvideos' and config.get_setting('autoplay')) or parent_item.action == 'search':
-        cacheToDisc = True
 
-    xbmcplugin.endOfDirectory(_handle, succeeded=True, updateListing=False, cacheToDisc=cacheToDisc)
+    # cacheToDisc = False
+    # if (parent_item.action == 'findvideos' and config.get_setting('autoplay')) or parent_item.action == 'search':
+    #     cacheToDisc = True
+
+    xbmcplugin.endOfDirectory(_handle, succeeded=True, updateListing=False, cacheToDisc=True)
     logger.debug('END render_items')
 
 
