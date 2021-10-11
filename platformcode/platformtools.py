@@ -393,16 +393,21 @@ def viewmodeMonitor():
     if get_window() == 'WINDOW_VIDEO_NAV':
         try:
             currentModeName = xbmc.getInfoLabel('Container.Viewmode')
-            win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
+            parent_info = xbmc.getInfoLabel('Container.FolderPath')
+            item_info = xbmc.getInfoLabel('Container.ListItemPosition(2).FileNameAndPath')
+            parent_item = Item().fromurl(parent_info)
+            win = xbmcgui.Window(10025)
             currentMode = int(win.getFocusId())
             # logger.debug('CM', currentMode, 'CN',currentModeName, 'label',xbmc.getInfoLabel('Container.FolderPath'))
-            if currentModeName and 'plugin.video.kod' in xbmc.getInfoLabel('Container.FolderPath') and 50 <= currentMode < 1000:# and currentMode >= 50:  # inside addon and in itemlist view
-                content, Type = getCurrentView()
-                # logger.debug(content, Type)
+            # if not parent_info:
+            # from core.support import dbg;dbg()
+            if currentModeName and 'plugin.video.kod' in parent_info and 50 <= currentMode < 1000:# and currentMode >= 50:  # inside addon and in itemlist view
+                # logger.debug('CAMBIO VISUALE')
+                content, Type = getCurrentView(Item().fromurl(item_info) if item_info else Item(), Item().fromurl(parent_info))
                 if content:
                     defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
                     if currentMode != defaultMode:
-                        logger.debug('viewmode changed: ' + currentModeName + '-' + str(currentMode) + ' - content: ' + content)
+                        # logger.debug('viewmode changed: ' + currentModeName + '-' + str(currentMode) + ' - content: ' + content)
                         config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
                         dialog_notification(config.get_localized_string(70153),
                                                         config.get_localized_string(70187) % (content, currentModeName),
@@ -413,17 +418,24 @@ def viewmodeMonitor():
 
 
 def getCurrentView(item=None, parent_item=None):
-    if not parent_item:
-        info = xbmc.getInfoLabel('Container.FolderPath')
-        if not info:
-            return None, None
-        parent_item = Item().fromurl(info)
+
     if not item:
-        info = xbmc.getInfoLabel('Container.ListItemPosition(2).FileNameAndPath')  # first addon listitem (consider "..")
-        if not info:
-            item = Item()
-        else:
-            item = Item().fromurl(info) if info else Item()
+        item = Item()
+    if not parent_item:
+        logger.debug('ESCO')
+        return None, None
+    
+    # if not parent_item:
+    #     info = xbmc.getInfoLabel('Container.FolderPath')
+    #     if not info:
+    #         return None, None
+    #     parent_item = Item().fromurl(info)
+    # if not item:
+    #     info = xbmc.getInfoLabel('Container.ListItemPosition(2).FileNameAndPath')  # first addon listitem (consider "..")
+    #     if not info:
+    #         item = Item()
+    #     else:
+    #         item = Item().fromurl(info) if info else Item()
     parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'newest', 'discover_list', 'new_search', 'channel_search']
 
     addons = 'addons' if config.get_setting('touch_view') else ''
@@ -444,20 +456,25 @@ def getCurrentView(item=None, parent_item=None):
             or (item.channel in ['videolibrary'] and parent_item.action in ['list_tvshows']):
         return 'tvshow', 'tvshows'
 
-    elif parent_item.action in ['get_seasons']:
-        return 'season', 'tvshows'
-
     elif parent_item.action in ['episodios', 'get_episodes'] or item.contentType == 'episode':
         return 'episode', 'tvshows'
 
-    elif parent_item.action in ['getmainlist', '']:
+    elif parent_item.action in ['get_seasons']:
+        logger.debug('CONTENTTYPE:',item.contentType)
+        return 'season', 'tvshows'
+
+    elif parent_item.action in ['getmainlist', '', 'getchanneltypes']:
         return 'home', addons
 
     elif parent_item.action in ['filterchannels']:
         return 'channels', addons
 
-    else:
+    elif item.action:
         return 'menu', addons
+
+    else:
+        return None, None
+
 
 
 def set_view_mode(item, parent_item):
