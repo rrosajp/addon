@@ -41,7 +41,7 @@ def read_nfo(path_nfo, item=None):
     @rtype: tuple (str, Item)
     """
     head_nfo = ""
-    it = None
+    it = Item()
 
     data = filetools.read(path_nfo)
 
