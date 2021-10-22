@@ -4,7 +4,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "((?:vidspeeds|liivideo|anavids|allviids)).com(?:\\:\\d+)?/((?:embed-)?[0-9a-zA-Z]+)",
+        "pattern": "((?:anavids|vidspeeds|liivideo|liiivideo|allviids|vidbm|vidroba|vidbom|anafasts)).com(?:\\:\\d+)?/((?:embed-)?[0-9a-zA-Z]+)",
         "url": "https://\\1.com/\\2.html"
       }
     ]
