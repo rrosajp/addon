@@ -145,6 +145,7 @@ class SearchWindow(xbmcgui.WindowXML):
 
         # wait and return as getActionsThread load
         lastLen = len(self.searchActions)
+        logger.debug('LAST LEN:', lastLen, len(self.searchActions))
         while self.thActions.is_alive():
             while len(self.searchActions) == lastLen:
                 if not self.thActions.is_alive():
