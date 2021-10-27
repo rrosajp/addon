@@ -1267,6 +1267,8 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
                         findS = servertools.get_server_from_url(videoitem.url)
                         if not findS:
                             info(videoitem, 'Non supportato')
+                            if logger.testMode:
+                                raise Exception('Server missing: ' + videoitem.url)
                             return
                 videoitem.server = findS[2]
                 videoitem.title = findS[0]

@@ -182,19 +182,19 @@ for chItem in channel_list:
                     # no title to search
                     if not firstContent:
                         continue
-                    itemlist = module.search(it, firstContent.fulltitle)
+                    itemlist = module.search(it, firstContent)
                 else:
                     itemlist = getattr(module, it.action)(it)
 
                     if itemlist and itemlist[0].action in ('findvideos', 'episodios'):
-                        firstContent = itemlist[0]
+                        firstContent = re.match('[ \w]*', itemlist[0].fulltitle).group(0)
 
                     # some sites might have no link inside, but if all results are without servers, there's something wrong
                     for resIt in itemlist:
                         if resIt.action == 'findvideos' or resIt.action == 'episodios':
                             if hasattr(module, resIt.action):
                                 serversFound[it.title] = getattr(module, resIt.action)(resIt)
-                                if resIt.action == 'episodios':
+                                if serversFound[it.title] and resIt.action == 'episodios':
                                     getattr(module, serversFound[it.title][0].action)(serversFound[it.title][0])
                             else:
                                 serversFound[it.title] = [resIt]
