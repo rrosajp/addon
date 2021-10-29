@@ -1508,7 +1508,7 @@ def play_torrent(item, xlistitem, mediaurl):
         if torr_client in ['elementum'] and item.downloadFilename:
             torrent.elementum_download(item)
         else:
-            # time.sleep(3)
+            time.sleep(3)
             # xbmc.Player().play(torrent_options[selection][1] % mediaurl)
             xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
 
