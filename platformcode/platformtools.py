@@ -1478,6 +1478,7 @@ def play_torrent(item, xlistitem, mediaurl):
     from servers import torrent
 
     torrent_options = torrent_client_installed(show_tuple=True)
+    # from core.support import dbg;dbg()
     if len(torrent_options) == 0:
         from platformcode import elementum_download
         install = elementum_download.download()
@@ -1491,7 +1492,9 @@ def play_torrent(item, xlistitem, mediaurl):
         selection = 0
 
     if selection >= 0:
-        prevent_busy(item)
+        xbmc.Player().play(os.path.join(config.get_runtime_path(), "resources", "kod.mp4"))
+        xbmc.sleep(200)
+        xbmc.Player().stop()
 
         mediaurl = urllib.quote_plus(item.url)
         torr_client = torrent_options[selection][0]
@@ -1505,14 +1508,15 @@ def play_torrent(item, xlistitem, mediaurl):
         if torr_client in ['elementum'] and item.downloadFilename:
             torrent.elementum_download(item)
         else:
-            time.sleep(3)
+            # time.sleep(3)
+            # xbmc.Player().play(torrent_options[selection][1] % mediaurl)
             xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
 
-            torrent.mark_auto_as_watched(item)
+            # torrent.mark_auto_as_watched(item)
 
-            if not item.globalsearch:
-                while is_playing() and not xbmc.Monitor().abortRequested():
-                    time.sleep(3)
+            # if not item.globalsearch:
+            #     while is_playing() and not xbmc.Monitor().abortRequested():
+            #         time.sleep(3)
 
 
 def resume_playback(played_time):
@@ -1823,7 +1827,3 @@ def prevent_busy(item):
         else: xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
         xbmc.sleep(200)
         xbmc.Player().stop()
-        # xbmc.executebuiltin('Action(Stop)')
-        # xbmc.sleep(500)
-        # xbmc.Player().stop()
-        # xbmc.sleep(500)
