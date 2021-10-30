@@ -103,7 +103,7 @@ def start(itemlist, item):
                         pass
                     # sleep(3)
                     try:
-                        if platformtools.is_playing() or autoplay_elem.server == 'torrent':
+                        if platformtools.is_playing():
                             PLAYED = True
                             break
                     except:
@@ -119,7 +119,7 @@ def start(itemlist, item):
                             max_intents_servers[videoitem.server.lower()] = max_intents
 
                     # If there are no items in the list, it is reported
-                    if autoplay_elem == autoplay_list[-1]:
+                    if autoplay_elem == autoplay_list[-1] and autoplay_elem.server != 'torrent':
                         platformtools.dialog_notification('AutoPlay', config.get_localized_string(60072) % name)
 
         else:
