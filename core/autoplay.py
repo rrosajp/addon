@@ -40,9 +40,8 @@ def start(itemlist, item):
         return itemlist
 
     import xbmc
-    xbmc.sleep(100)
-    control_item = Item().fromurl(xbmc.getInfoLabel('ListItem.FileNameAndPath'))
-    if control_item.action == 'play':
+    control_item = Item().fromurl(xbmc.getInfoLabel('Container.FolderPath'))
+    if control_item.url == item.url:
         return itemlist
 
     if config.get_setting('autoplay') or item.autoplay:
