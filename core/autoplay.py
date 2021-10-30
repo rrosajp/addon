@@ -39,6 +39,12 @@ def start(itemlist, item):
     if not config.is_xbmc():
         return itemlist
 
+    import xbmc
+    xbmc.sleep(100)
+    control_item = Item().fromurl(xbmc.getInfoLabel('ListItem.FileNameAndPath'))
+    if control_item.action == 'play':
+        return itemlist
+
     if config.get_setting('autoplay') or item.autoplay:
         # Save the current value of "Action and Player Mode" in preferences
         user_config_setting_action = config.get_setting("default_action")
