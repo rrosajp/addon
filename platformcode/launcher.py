@@ -459,7 +459,13 @@ def play_from_library(item):
     from time import sleep
 
     # logger.debug("item: \n" + item.tostring('\n'))
+    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True,
+                              xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
+    while not platformtools.is_playing():
+        xbmc.sleep(10)
+    xbmc.Player().stop()
     platformtools.prevent_busy()
+
 
     itemlist=[]
     item.fromLibrary = True
@@ -531,7 +537,7 @@ def play_from_library(item):
                     if selection == -1:
                         return
                     else:
-                        item = videolibrary.play(itemlist[selection  + selection_implementation])[0]
+                        item = videolibrary.play(itemlist[selection + selection_implementation])[0]
                         platformtools.play_video(item)
                         reopen = True
                 # if (platformtools.is_playing() and item.action) or item.server == 'torrent' or config.get_setting('autoplay'): break

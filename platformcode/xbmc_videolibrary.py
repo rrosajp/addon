@@ -377,8 +377,6 @@ def set_watched_on_kod(data):
 
                 path = filetools.join(path, filename)
                 head_nfo, item = videolibrarytools.read_nfo(path)
-                from core.support import dbg
-                dbg()
                 if item.library_playcounts:
                     item.library_playcounts.update({title: playcount})
                 else:
