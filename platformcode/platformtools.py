@@ -1387,7 +1387,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         logger.info("mediaurl=" + mediaurl)
 
         if player_mode in [0,1]:
-            prevent_busy(item)
+            prevent_busy()
             if player_mode in [1]:
                 item.played_time = resume_playback(get_played_time(item))
 
@@ -1491,11 +1491,7 @@ def play_torrent(item, xlistitem, mediaurl):
         selection = 0
 
     if selection >= 0:
-        # if item.autoplay: xbmc.Player().play(os.path.join(config.get_runtime_path(), "resources", "kod.mp4"))
-        # else: xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
-        # xbmc.sleep(200)
-        # xbmc.Player().stop()
-        prevent_busy(item)
+        prevent_busy()
 
         mediaurl = urllib.quote_plus(item.url)
         torr_client = torrent_options[selection][0]
@@ -1509,8 +1505,12 @@ def play_torrent(item, xlistitem, mediaurl):
         if torr_client in ['elementum'] and item.downloadFilename:
             torrent.elementum_download(item)
         else:
-            time.sleep(3)
-            xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
+            # time.sleep(3)
+            if item.fromLibrary:
+                xlistitem.setPath(torrent_options[selection][1] % mediaurl)
+                xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xlistitem)
+            else:
+                xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
 
             # torrent.mark_auto_as_watched(item)
 
@@ -1819,6 +1819,5 @@ def set_played_time(item):
         del db['viewed'][ID]
 
 
-
-def prevent_busy(item):
+def prevent_busy():
     xbmc.executebuiltin('Dialog.Close(all,true)')

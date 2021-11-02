@@ -377,7 +377,12 @@ def set_watched_on_kod(data):
 
                 path = filetools.join(path, filename)
                 head_nfo, item = videolibrarytools.read_nfo(path)
-                item.library_playcounts.update({title: playcount})
+                from core.support import dbg
+                dbg()
+                if item.library_playcounts:
+                    item.library_playcounts.update({title: playcount})
+                else:
+                    item.library_playcounts = {title: playcount}
                 filetools.write(path, head_nfo + item.tojson())
 
                 if item.infoLabels['mediatype'] == "tvshow":

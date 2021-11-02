@@ -459,7 +459,7 @@ def play_from_library(item):
     from time import sleep
 
     # logger.debug("item: \n" + item.tostring('\n'))
-    platformtools.prevent_busy(item)
+    platformtools.prevent_busy()
 
     itemlist=[]
     item.fromLibrary = True

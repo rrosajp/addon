@@ -41,7 +41,7 @@ def start(itemlist, item):
 
     import xbmc
     control_item = Item().fromurl(xbmc.getInfoLabel('Container.FolderPath'))
-    if control_item.url == item.url:
+    if control_item == item:
         return itemlist
 
     if config.get_setting('autoplay') or item.autoplay:
