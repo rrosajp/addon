@@ -261,7 +261,6 @@ def run(item=None):
 
             # Special action for searching, first asks for the words then call the "search" function
             elif item.action == "search":
-                # from core.support import dbg;dbg()
                 if filetools.isfile(temp_search_file) and config.get_setting('videolibrary_kodi'):
                     itemlist = []
                     f = filetools.read(temp_search_file)
@@ -486,7 +485,7 @@ def play_from_library(item):
 
     # Modify the action (currently the video library needs "findvideos" since this is where the sources are searched
     item.action = item.next_action if item.next_action else "findvideos"
-    # from core.support import dbg;dbg()
+
     if item.contentType == 'movie' or item.contentType != 'movie' and config.get_setting('next_ep') < 3:
         window_type = config.get_setting("window_type", "videolibrary")
     else: window_type = 1

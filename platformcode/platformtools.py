@@ -400,7 +400,7 @@ def viewmodeMonitor():
             currentMode = int(win.getFocusId())
             # logger.debug('CM', currentMode, 'CN',currentModeName, 'label',xbmc.getInfoLabel('Container.FolderPath'))
             # if not parent_info:
-            # from core.support import dbg;dbg()
+
             if currentModeName and 'plugin.video.kod' in parent_info and 50 <= currentMode < 1000:# and currentMode >= 50:  # inside addon and in itemlist view
                 # logger.debug('CAMBIO VISUALE')
                 content, Type = getCurrentView(Item().fromurl(item_info) if item_info else Item(), Item().fromurl(parent_info))
@@ -424,7 +424,7 @@ def getCurrentView(item=None, parent_item=None):
     if not parent_item:
         logger.debug('ESCO')
         return None, None
-    
+
     # if not parent_item:
     #     info = xbmc.getInfoLabel('Container.FolderPath')
     #     if not info:
@@ -1001,7 +1001,6 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
         set_infolabels(xlistitem, item, True)
 
         # if it is a video in mpd format, the listitem is configured to play it ith the inpustreamaddon addon implemented in Kodi 17
-        # from core.support import dbg;dbg()
         if mpd or item.manifest =='mpd':
             if not install_inputstream():
                 return
@@ -1505,8 +1504,6 @@ def play_torrent(item, xlistitem, mediaurl):
         if torr_client in ['elementum'] and item.downloadFilename:
             torrent.elementum_download(item)
         else:
-            # time.sleep(3)
-            # from core.support import dbg;dbg()
             if item.fromLibrary and item.play_from == 'window':
                 xlistitem.setPath(torrent_options[selection][1] % mediaurl)
                 playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
