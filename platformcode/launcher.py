@@ -13,7 +13,7 @@ if sys.version_info[0] >= 3:PY3 = True; unicode = str; unichr = chr; long = int
 
 from core.item import Item
 from core import filetools, jsontools
-from platformcode import config, logger, platformtools
+from platformcode import config, logger, platformtools, xbmc_videolibrary
 from platformcode.logger import WebErrorException
 temp_search_file = config.get_temp_file('temp-search')
 
@@ -445,25 +445,37 @@ def play_from_library(item):
     """
 
     def get_played_time(item):
-        if item.contentType == 'movie': nfo_path = item.nfo
-        else: nfo_path = item.strm_path.replace('strm','nfo')
+        from core import videolibrarytools
+
+        if item.contentType == 'movie':
+            nfo_path = item.nfo
+            if nfo_path.startswith('\\') or nfo_path.startswith('/'):
+                nfo_path = filetools.join(videolibrarytools.MOVIES_PATH, nfo_path)
+
+        else:
+            nfo_path =item.strm_path.replace('strm','nfo')
+            if nfo_path.startswith('\\') or nfo_path.startswith('/'):
+                nfo_path = filetools.join(videolibrarytools.TVSHOWS_PATH, nfo_path)
+
         if nfo_path and filetools.isfile(nfo_path):
-            from core import videolibrarytools
             head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
             sleep(1)
             played_time = platformtools.get_played_time(item_nfo)
+
         else: played_time = 0
+
         return played_time
 
     import xbmcgui, xbmcplugin, xbmc
     from time import sleep
 
     # logger.debug("item: \n" + item.tostring('\n'))
-    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True,
-                              xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
-    while not platformtools.is_playing():
-        xbmc.sleep(10)
-    xbmc.Player().stop()
+    # xbmc.Player().play(os.path.join(config.get_runtime_path(), "resources", "kod.mp4"))
+    if not item.autoplay:
+        xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
+        while not platformtools.is_playing():
+            xbmc.sleep(10)
+        xbmc.Player().stop()
     platformtools.prevent_busy()
 
 
@@ -474,8 +486,10 @@ def play_from_library(item):
 
     # Modify the action (currently the video library needs "findvideos" since this is where the sources are searched
     item.action = item.next_action if item.next_action else "findvideos"
-
-    window_type = config.get_setting("window_type", "videolibrary") if config.get_setting('next_ep') < 3 and item.contentType != 'movie' else 1
+    # from core.support import dbg;dbg()
+    if item.contentType == 'movie' or item.contentType != 'movie' and config.get_setting('next_ep') < 3:
+        window_type = config.get_setting("window_type", "videolibrary")
+    else: window_type = 1
 
     # and launch kodi again
     if (xbmc.getCondVisibility('Window.IsMedia') and not window_type == 1) or item.action != 'findvideos':
@@ -496,10 +510,10 @@ def play_from_library(item):
         if config.get_setting("max_links", "videolibrary") != 0: itemlist = limit_itemlist(itemlist)
         # The list of links is slightly "cleaned"
         if config.get_setting("replace_VD", "videolibrary") == 1: itemlist = reorder_itemlist(itemlist)
-        # from core.support import dbg;dbg()
+
         if len(itemlist) > 0:
             reopen = False
-            # from core.support import dbg;dbg()
+
             while not xbmc.Monitor().abortRequested():
                 played = True
                 # if config.get_setting('next_ep') == 3 and xbmc.Player().playnext:

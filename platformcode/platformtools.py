@@ -1506,9 +1506,13 @@ def play_torrent(item, xlistitem, mediaurl):
             torrent.elementum_download(item)
         else:
             # time.sleep(3)
-            if item.fromLibrary:
+            # from core.support import dbg;dbg()
+            if item.fromLibrary and item.play_from == 'window':
                 xlistitem.setPath(torrent_options[selection][1] % mediaurl)
-                xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xlistitem)
+                playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+                playlist.clear()
+                playlist.add(torrent_options[selection][1] % mediaurl, xlistitem)
+                xbmc_player.play(playlist, xlistitem)
             else:
                 xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
 
