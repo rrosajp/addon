@@ -395,7 +395,6 @@ def viewmodeMonitor():
             currentModeName = xbmc.getInfoLabel('Container.Viewmode')
             parent_info = xbmc.getInfoLabel('Container.FolderPath')
             item_info = xbmc.getInfoLabel('Container.ListItemPosition(2).FileNameAndPath')
-            parent_item = Item().fromurl(parent_info)
             win = xbmcgui.Window(10025)
             currentMode = int(win.getFocusId())
             # logger.debug('CM', currentMode, 'CN',currentModeName, 'label',xbmc.getInfoLabel('Container.FolderPath'))
