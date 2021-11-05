@@ -1505,7 +1505,7 @@ def play_torrent(item, xlistitem, mediaurl):
             torrent.elementum_download(item)
 
         else:
-            if item.fromLibrary and item.play_from == 'window':
+            if (item.fromLibrary and item.play_from == 'window') or item.window:
                 xlistitem.setPath(torrent_options[selection][1] % mediaurl)
                 playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
                 playlist.clear()
