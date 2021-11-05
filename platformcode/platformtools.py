@@ -1482,7 +1482,7 @@ def play_torrent(item, xlistitem, mediaurl):
         install = elementum_download.download()
         if install:
             return play_torrent(item, xlistitem, mediaurl)
-        else: 
+        else:
             selection = -1
     elif len(torrent_options) > 1:
         selection = dialog_select(config.get_localized_string(70193), [opcion[0] for opcion in torrent_options])
@@ -1511,6 +1511,7 @@ def play_torrent(item, xlistitem, mediaurl):
                 playlist.add(torrent_options[selection][1] % mediaurl, xlistitem)
                 xbmc_player.play(playlist, xlistitem)
             else:
+                if not item.autoplay: fakeVideo()
                 xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
 
             # torrent.mark_auto_as_watched(item)
@@ -1822,3 +1823,10 @@ def set_played_time(item):
 
 def prevent_busy():
     xbmc.executebuiltin('Dialog.Close(all,true)')
+
+
+def fakeVideo():
+    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
+    while not is_playing():
+        xbmc.sleep(10)
+    xbmc.Player().stop()

@@ -471,10 +471,7 @@ def play_from_library(item):
     # logger.debug("item: \n" + item.tostring('\n'))
     # xbmc.Player().play(os.path.join(config.get_runtime_path(), "resources", "kod.mp4"))
     if not item.autoplay:
-        xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
-        while not platformtools.is_playing():
-            xbmc.sleep(10)
-        xbmc.Player().stop()
+        platformtools.fakeVideo()
     platformtools.prevent_busy()
 
 
