@@ -1503,6 +1503,7 @@ def play_torrent(item, xlistitem, mediaurl):
 
         if torr_client in ['elementum'] and item.downloadFilename:
             torrent.elementum_download(item)
+
         else:
             if item.fromLibrary and item.play_from == 'window':
                 xlistitem.setPath(torrent_options[selection][1] % mediaurl)
@@ -1511,7 +1512,7 @@ def play_torrent(item, xlistitem, mediaurl):
                 playlist.add(torrent_options[selection][1] % mediaurl, xlistitem)
                 xbmc_player.play(playlist, xlistitem)
             else:
-                if not item.autoplay: fakeVideo()
+                if not item.autoplay and item.channel != 'videolibrary': fakeVideo()
                 xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
 
             # torrent.mark_auto_as_watched(item)
