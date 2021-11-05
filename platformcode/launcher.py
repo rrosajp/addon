@@ -551,5 +551,6 @@ def play_from_library(item):
                         item = videolibrary.play(itemlist[selection + selection_implementation])[0]
                         platformtools.play_video(item)
                         reopen = True
+                        if item.server == 'torrent': return
                 # if (platformtools.is_playing() and item.action) or item.server == 'torrent' or config.get_setting('autoplay'): break
 
