@@ -364,14 +364,15 @@ class Item(object):
         if "?" in url:
             url = url.split("?")[1]
         decoded = False
-        try:
-            str_item = base64.b64decode(urllib.unquote(url))
-            json_item = json.load(str_item, object_hook=self.toutf8)
-            if json_item is not None and len(json_item) > 0:
-                self.__dict__.update(json_item)
-                decoded = True
-        except:
-            pass
+        if url:
+            try:
+                str_item = base64.b64decode(urllib.unquote(url))
+                json_item = json.load(str_item, object_hook=self.toutf8)
+                if json_item is not None and len(json_item) > 0:
+                    self.__dict__.update(json_item)
+                    decoded = True
+            except:
+                pass
 
         if not decoded:
             url = urllib.unquote_plus(url)
