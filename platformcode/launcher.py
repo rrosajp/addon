@@ -470,9 +470,10 @@ def play_from_library(item):
 
     # logger.debug("item: \n" + item.tostring('\n'))
     # xbmc.Player().play(os.path.join(config.get_runtime_path(), "resources", "kod.mp4"))
-    if not item.autoplay:
-        platformtools.fakeVideo()
-    platformtools.prevent_busy()
+    # if not item.autoplay:
+    #     platformtools.fakeVideo()
+
+    platformtools.prevent_busy(item)
 
 
     itemlist=[]

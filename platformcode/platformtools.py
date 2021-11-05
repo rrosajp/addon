@@ -1386,7 +1386,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         logger.info("mediaurl=" + mediaurl)
 
         if player_mode in [0,1]:
-            prevent_busy()
+            prevent_busy(item)
             if player_mode in [1]:
                 item.played_time = resume_playback(get_played_time(item))
 
@@ -1473,7 +1473,6 @@ def torrent_client_installed(show_tuple=False):
 
 def play_torrent(item, xlistitem, mediaurl):
     logger.debug()
-    import time
     from servers import torrent
 
     torrent_options = torrent_client_installed(show_tuple=True)
@@ -1505,6 +1504,7 @@ def play_torrent(item, xlistitem, mediaurl):
             torrent.elementum_download(item)
 
         else:
+            # xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
             if (item.fromLibrary and item.play_from == 'window') or item.window:
                 xlistitem.setPath(torrent_options[selection][1] % mediaurl)
                 playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
@@ -1822,8 +1822,11 @@ def set_played_time(item):
         del db['viewed'][ID]
 
 
-def prevent_busy():
-    xbmc.executebuiltin('Dialog.Close(all,true)')
+def prevent_busy(item=None):
+    if item and (not item.autoplay and item.channel != 'videolibrary' and not item.window):
+        fakeVideo()
+    else:
+        xbmc.executebuiltin('Dialog.Close(all,true)')
 
 
 def fakeVideo():
