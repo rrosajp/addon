@@ -1421,8 +1421,9 @@ def set_player(item, xlistitem, mediaurl, view, strm):
     # if it is a video library file send to mark as seen
     if strm or item.strm_path: item.options['strm'] = True
     # if player_mode == 1: item.options['continue'] = True
-    from platformcode import xbmc_videolibrary
-    xbmc_videolibrary.mark_auto_as_watched(item)
+    if not mediaurl.startswith('plugin'):
+        from platformcode import xbmc_videolibrary
+        xbmc_videolibrary.mark_auto_as_watched(item)
 
     # for cases where the audio playback window appears in place of the video one
     if item.focusOnVideoPlayer:
