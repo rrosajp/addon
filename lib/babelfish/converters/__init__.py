@@ -10,7 +10,7 @@ try:
     from collections.abc import Mapping, MutableMapping
 except ImportError:
     from collections import Mapping, MutableMapping
-
+from importlib import import_module
 
 # from https://github.com/kennethreitz/requests/blob/master/requests/structures.py
 class CaseInsensitiveDict(MutableMapping):
@@ -240,21 +240,20 @@ class ConverterManager(object):
         """Get a converter, lazy loading it if necessary"""
         if name in self.converters:
             return self.converters[name]
-        for ep in iter_entry_points(self.entry_point):
-            if ep.name == name:
-                self.converters[ep.name] = ep.load()()
-                return self.converters[ep.name]
-        for ep in (EntryPoint.parse(c) for c in self.registered_converters + self.internal_converters):
-            if ep.name == name:
-                # `require` argument of ep.load() is deprecated in newer versions of setuptools
-                if hasattr(ep, 'resolve'):
-                    plugin = ep.resolve()
-                elif hasattr(ep, '_load'):
-                    plugin = ep._load()
-                else:
-                    plugin = ep.load(require=False)
-                self.converters[ep.name] = plugin()
-                return self.converters[ep.name]
+        # for ep in iter_entry_points(self.entry_point):
+        #     if ep.name == name:
+        #         self.converters[ep.name] = ep.load()()
+        #         return self.converters[ep.name]
+
+        def parse(str):
+            import re
+            match = re.match('(?P<name>\w+) = (?P<module>[a-z0-9.]+):(?P<class>\w+)', str)
+            return match.groupdict()
+        for ep in (parse(c) for c in self.registered_converters + self.internal_converters):
+            if ep.get('name') == name:
+                cl = getattr(import_module(ep.get('module')), ep.get('class'))
+                self.converters[ep.get('name')] = cl()
+                return self.converters[ep.get('name')]
         raise KeyError(name)
 
     def __setitem__(self, name, converter):
