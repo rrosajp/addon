@@ -216,7 +216,7 @@ def youtube_search(item):
             scrapedtitle = "%s" % scrapedtitle
         url = urlparse.urljoin('https://www.youtube.com/', scrapedurl)
         itemlist.append(del_id(item.clone(title=scrapedtitle, title2='Youtube - ' + scrapedduration, action="play", server="youtube",
-                                   url=url, thumbnail=scrapedthumbnail)))
+                                   url=url, thumbnail=scrapedthumbnail, window=True)))
     # next_page = scrapertools.find_single_match(data, '<a href="([^"]+)"[^>]+><span class="yt-uix-button-content">')
     # if next_page != "":
     #     next_page = urlparse.urljoin("https://www.youtube.com", next_page)
@@ -252,7 +252,7 @@ def search_links_mymovies(item):
     logger.debug()
     trailer_url = match(item, patron=r'<source src="([^"]+)').match
     if trailer_url:
-        it = del_id(item.clone(url=trailer_url, server='directo', action="play"))
+        it = del_id(item.clone(url=trailer_url, server='directo', action="play", window=True))
         return it
 
 
@@ -276,7 +276,8 @@ try:
         def onInit(self):
             try:
                 self.control_list = self.getControl(6)
-                self.getControl(5).setNavigation(self.control_list, self.control_list, self.control_list, self.control_list)
+                self.getControl(5).setNavigation(self.getControl(7), self.getControl(7), self.control_list, self.control_list)
+                self.getControl(7).setNavigation(self.getControl(5), self.getControl(5), self.control_list, self.control_list)
                 self.getControl(8).setEnabled(0)
                 self.getControl(8).setVisible(0)
             except:
@@ -337,10 +338,12 @@ try:
                             window.close()
                         retorna = platformtools.play_video(item, force_direct=True)
                         if not retorna:
-                            while True:
-                                xbmc.sleep(1000)
-                                if not xbmc.Player().isPlaying():
-                                    break
+                            while not xbmc.Player().isPlaying():
+                                xbmc.sleep(10)
+                            while xbmc.Player().isPlaying():
+                                xbmc.sleep(100)
+                                # if not xbmc.Player().isPlaying():
+                                #     break
                         window_select[-1].doModal()
                     else:
                         self.close()
