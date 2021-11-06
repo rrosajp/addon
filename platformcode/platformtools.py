@@ -1512,6 +1512,7 @@ def play_torrent(item, xlistitem, mediaurl):
                 xbmc_player.play(playlist, xlistitem)
             else:
                 if not item.autoplay and item.channel != 'videolibrary': fakeVideo()
+                if xbmc.getCondVisibility("system.platform.android"): xbmc.sleep(3000)
                 xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
 
             # torrent.mark_auto_as_watched(item)
