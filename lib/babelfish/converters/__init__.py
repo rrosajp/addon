@@ -2,20 +2,22 @@
 # Use of this source code is governed by the 3-clause BSD license
 # that can be found in the LICENSE file.
 #
-import collections
-import functools
-from importlib import import_module
-
-# from pkg_resources import iter_entry_points, EntryPoint
+from pkg_resources import iter_entry_points, EntryPoint
 from ..exceptions import LanguageConvertError, LanguageReverseError
+
+try:
+    # Python 3.3+
+    from collections.abc import Mapping, MutableMapping
+except ImportError:
+    from collections import Mapping, MutableMapping
 
 
 # from https://github.com/kennethreitz/requests/blob/master/requests/structures.py
-class CaseInsensitiveDict(collections.MutableMapping):
+class CaseInsensitiveDict(MutableMapping):
     """A case-insensitive ``dict``-like object.
 
     Implements all methods and operations of
-    ``collections.MutableMapping`` as well as dict's ``copy``. Also
+    ``collections.abc.MutableMapping`` as well as dict's ``copy``. Also
     provides ``lower_items``.
 
     All keys are expected to be strings. The structure remembers the
@@ -66,7 +68,7 @@ class CaseInsensitiveDict(collections.MutableMapping):
         )
 
     def __eq__(self, other):
-        if isinstance(other, collections.Mapping):
+        if isinstance(other, Mapping):
             other = CaseInsensitiveDict(other)
         else:
             return NotImplemented
@@ -238,19 +240,21 @@ class ConverterManager(object):
         """Get a converter, lazy loading it if necessary"""
         if name in self.converters:
             return self.converters[name]
-        # for ep in iter_entry_points(self.entry_point):
-        #     if ep.name == name:
-        #         self.converters[ep.name] = ep.load()()
-        #         return self.converters[ep.name]
-        def parse(str):
-            import re
-            match = re.match('(?P<name>\w+) = (?P<module>[a-z0-9.]+):(?P<class>\w+)', str)
-            return match.groupdict()
-        for ep in (parse(c) for c in self.registered_converters + self.internal_converters):
-            if ep.get('name') == name:
-                cl = getattr(import_module(ep.get('module')), ep.get('class'))
-                self.converters[ep.get('name')] = cl()
-                return self.converters[ep.get('name')]
+        for ep in iter_entry_points(self.entry_point):
+            if ep.name == name:
+                self.converters[ep.name] = ep.load()()
+                return self.converters[ep.name]
+        for ep in (EntryPoint.parse(c) for c in self.registered_converters + self.internal_converters):
+            if ep.name == name:
+                # `require` argument of ep.load() is deprecated in newer versions of setuptools
+                if hasattr(ep, 'resolve'):
+                    plugin = ep.resolve()
+                elif hasattr(ep, '_load'):
+                    plugin = ep._load()
+                else:
+                    plugin = ep.load(require=False)
+                self.converters[ep.name] = plugin()
+                return self.converters[ep.name]
         raise KeyError(name)
 
     def __setitem__(self, name, converter):
