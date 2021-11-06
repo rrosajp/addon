@@ -42,7 +42,7 @@ def start(itemlist, item):
     import xbmc
     control_info = xbmc.getInfoLabel('Container.FolderPath')
     if control_info:
-        control_item = Item().fromurl()
+        control_item = Item().fromurl(control_info)
         if control_item.action == item.action:
             return itemlist
 
