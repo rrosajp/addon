@@ -5,10 +5,8 @@
 # that can be found in the LICENSE file.
 #
 from __future__ import unicode_literals
-
-import os, io
 from collections import namedtuple
-# from pkg_resources import resource_stream  # @UnresolvedImport
+from pkg_resources import resource_stream  # @UnresolvedImport
 from . import basestr
 
 #: Script code to script name mapping
@@ -20,10 +18,10 @@ SCRIPT_MATRIX = []
 #: The namedtuple used in the :data:`SCRIPT_MATRIX`
 IsoScript = namedtuple('IsoScript', ['code', 'number', 'name', 'french_name', 'pva', 'date'])
 
-f = io.open(os.path.join(os.path.dirname(__file__), 'data/iso15924-utf8-20131012.txt'), encoding='utf-8')
+f = resource_stream('babelfish', 'data/iso15924-utf8-20131012.txt')
 f.readline()
 for l in f:
-    l = l.strip()
+    l = l.decode('utf-8').strip()
     if not l or l.startswith('#'):
         continue
     script = IsoScript._make(l.split(';'))
