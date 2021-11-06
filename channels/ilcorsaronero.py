@@ -56,7 +56,7 @@ def peliculas(item):
     def itemHook(item):
         if not sceneTitle:
             item.title = item.title.replace('_', ' ')
-        item.title = support.urlparse.unquote(item.title)
+        item.title = support.scrapertools.decodeHtmlentities(support.urlparse.unquote(item.title))
         return item
 
     if 'search' not in item.args:

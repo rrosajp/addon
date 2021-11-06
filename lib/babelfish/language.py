@@ -7,12 +7,13 @@
 from __future__ import unicode_literals
 from collections import namedtuple
 from functools import partial
-from pkg_resources import resource_stream  # @UnresolvedImport
+# from pkg_resources import resource_stream  # @UnresolvedImport
 from .converters import ConverterManager
 from .country import Country
 from .exceptions import LanguageConvertError
 from .script import Script
 from . import basestr
+import os, io
 
 
 LANGUAGES = set()
@@ -21,10 +22,10 @@ LANGUAGE_MATRIX = []
 #: The namedtuple used in the :data:`LANGUAGE_MATRIX`
 IsoLanguage = namedtuple('IsoLanguage', ['alpha3', 'alpha3b', 'alpha3t', 'alpha2', 'scope', 'type', 'name', 'comment'])
 
-f = resource_stream('babelfish', 'data/iso-639-3.tab')
+f = io.open(os.path.join(os.path.dirname(__file__), 'data/iso-639-3.tab'), encoding='utf-8')
 f.readline()
 for l in f:
-    iso_language = IsoLanguage(*l.decode('utf-8').split('\t'))
+    iso_language = IsoLanguage(*l.split('\t'))
     LANGUAGES.add(iso_language.alpha3)
     LANGUAGE_MATRIX.append(iso_language)
 f.close()
