@@ -276,7 +276,8 @@ try:
         def onInit(self):
             try:
                 self.control_list = self.getControl(6)
-                self.getControl(5).setNavigation(self.control_list, self.control_list, self.control_list, self.control_list)
+                self.getControl(5).setNavigation(self.getControl(7), self.getControl(7), self.control_list, self.control_list)
+                self.getControl(7).setNavigation(self.getControl(5), self.getControl(5), self.control_list, self.control_list)
                 self.getControl(8).setEnabled(0)
                 self.getControl(8).setVisible(0)
             except:
