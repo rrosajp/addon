@@ -1504,7 +1504,8 @@ def play_torrent(item, xlistitem, mediaurl):
             torrent.elementum_download(item)
 
         else:
-            # xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
+            import xbmcaddon
+            xbmcaddon.Addon(id='plugin.video.elementum').setSetting('download_storage', '1')
             if (item.fromLibrary and item.play_from == 'window') or item.window:
                 xlistitem.setPath(torrent_options[selection][1] % mediaurl)
                 playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
@@ -1834,4 +1835,6 @@ def fakeVideo():
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
     while not is_playing():
         xbmc.sleep(10)
+    if xbmc.getCondVisibility("system.platform.android"):
+        xbmc.sleep(300)
     xbmc.Player().stop()
