@@ -538,7 +538,7 @@ if __name__ == "__main__":
             break
 
         if monitor.waitForAbort(1):  # every second
-            join_threads()
             # db need to be closed when not used, it will cause freezes
             db.close()
+            join_threads()
             break

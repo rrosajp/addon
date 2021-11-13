@@ -113,7 +113,7 @@ def elementum_monitor():
 
         if len(Monitor) > 0:
             try:
-                data = requests.get(elementum_host + '/list').json()
+                data = requests.get(elementum_host + '/list', timeout=2).json()
             except:
                 data = ''
             if data:
