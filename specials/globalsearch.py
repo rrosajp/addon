@@ -125,7 +125,8 @@ class SearchWindow(xbmcgui.WindowXML):
                     if self.item.mode == 'all':
                         save_search(self.item.text)
         else:
-            del self.item.context  # needed for preventing same content twice in saved search
+            if self.item.context:
+                del self.item.context  # needed for preventing same content twice in saved search
             save_search(self.item.__dict__)
 
     def getActionsThread(self):
