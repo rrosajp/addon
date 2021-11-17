@@ -1385,8 +1385,8 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         logger.info("mediaurl=" + mediaurl)
 
         if player_mode in [0,1]:
+            prevent_busy()
             if player_mode in [1]:
-                prevent_busy(item)
                 item.played_time = resume_playback(get_played_time(item))
 
             logger.info('Player Mode:',['Direct', 'Bookmark'][player_mode])
