@@ -1495,6 +1495,11 @@ def play_torrent(item, xlistitem, mediaurl):
         torr_client = torrent_options[selection][0]
 
         if torr_client in ['elementum'] and item.infoLabels['tmdb_id']:
+            import xbmcaddon
+            addon = xbmcaddon.Addon(id='plugin.video.elementum')
+            if addon.getSetting('download_storage') != '1':
+                addon.setSetting('download_storage', '1')
+                xbmc.sleep(2000)
             if item.contentType == 'episode' and "elementum" not in torr_client:
                 mediaurl += "&episode=%s&library=&season=%s&show=%s&tmdb=%s&type=episode" % (item.infoLabels['episode'], item.infoLabels['season'], item.infoLabels['tmdb_id'], item.infoLabels['tmdb_id'])
             elif item.contentType == 'movie':
@@ -1504,8 +1509,6 @@ def play_torrent(item, xlistitem, mediaurl):
             torrent.elementum_download(item)
 
         else:
-            import xbmcaddon
-            xbmcaddon.Addon(id='plugin.video.elementum').setSetting('download_storage', '1')
             if (item.fromLibrary and item.play_from == 'window') or item.window:
                 xlistitem.setPath(torrent_options[selection][1] % mediaurl)
                 playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
@@ -1514,7 +1517,7 @@ def play_torrent(item, xlistitem, mediaurl):
                 xbmc_player.play(playlist, xlistitem)
             else:
                 if not item.autoplay and item.channel != 'videolibrary': fakeVideo()
-                if xbmc.getCondVisibility("system.platform.android"): xbmc.sleep(3000)
+                if xbmc.getCondVisibility("system.platform.android"): xbmc.sleep(300)
                 xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
 
             # torrent.mark_auto_as_watched(item)
@@ -1824,15 +1827,13 @@ def set_played_time(item):
         del db['viewed'][ID]
 
 
-def prevent_busy(item=None):
-    if item and (not item.autoplay and item.channel != 'videolibrary' and not item.window):
-        fakeVideo()
-    else:
-        xbmc.executebuiltin('Dialog.Close(all,true)')
+def prevent_busy():
+    xbmc.executebuiltin('Dialog.Close(all,true)')
 
 
 def fakeVideo():
-    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
+    xbmc_player.play(os.path.join(config.get_runtime_path(), "resources", "kod.mp4"))
+    # xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
     while not is_playing():
         xbmc.sleep(10)
     if xbmc.getCondVisibility("system.platform.android"):
