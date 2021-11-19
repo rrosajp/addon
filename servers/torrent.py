@@ -165,7 +165,7 @@ def monitor_update(TorrentPath, value, remove=False):
         jsontools.dump(json)
         filetools.write(monitor, jsontools.dump(json), silent=True)
 
-    if len(Monitor) == 0: set_elementum()
+    set_elementum()
 
 
 def set_elementum(SET=False):
@@ -174,12 +174,14 @@ def set_elementum(SET=False):
     backup_setting = json['settings']
     write = False
     if SET:
+        elementum_setting.setSetting('logger_silent', 'true')
+        elementum_setting.setSetting('download_storage', '0') 
         if elementum_setting.getSetting('logger_silent') == False or not 'logger_silent' in backup_setting:
             elementum_setting.setSetting('logger_silent', 'true')
             backup_setting['logger_silent'] = 'false'
 
         if elementum_setting.getSetting('download_storage') != 0 or not 'download_storage' in backup_setting:
-            backup_setting['download_storage'] = elementum_setting.getSetting('download_storage')           # Backup Setting
+            # backup_setting['download_storage'] = elementum_setting.getSetting('download_storage')           # Backup Setting
             elementum_setting.setSetting('download_storage', '0')                                    # Set Setting
 
         if elementum_setting.getSetting('download_path') != config.get_setting('downloadpath') or not 'download_path' in backup_setting:
@@ -188,8 +190,9 @@ def set_elementum(SET=False):
         write = True
 
     elif backup_setting:
+        elementum_setting.setSetting('download_storage', '1')
         elementum_setting.setSetting('logger_silent', backup_setting['logger_silent'])
-        elementum_setting.setSetting('download_storage', backup_setting['download_storage'])
+        # elementum_setting.setSetting('download_storage', backup_setting['download_storage'])
         elementum_setting.setSetting('download_path', backup_setting['download_path'])
         json['settings'] = {}
         write = True
