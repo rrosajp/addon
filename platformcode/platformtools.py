@@ -1504,18 +1504,25 @@ def play_torrent(item, xlistitem, mediaurl):
             torrent.elementum_download(item)
 
         else:
+            import xbmcaddon
+            addon = xbmcaddon.Addon(id='plugin.video.elementum')
+            # from core.support import dbg;dbg()
+            if addon.getSetting('download_storage') == '0':
+                addon.setSetting('download_storage', '1')
+                xbmc.sleep(3000)
+            xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
             # import xbmcaddon
             # xbmcaddon.Addon(id='plugin.video.elementum').setSetting('download_storage', '1')
-            if (item.fromLibrary and item.play_from == 'window') or item.window:
-                xlistitem.setPath(torrent_options[selection][1] % mediaurl)
-                playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-                playlist.clear()
-                playlist.add(torrent_options[selection][1] % mediaurl, xlistitem)
-                xbmc_player.play(playlist, xlistitem)
-            else:
-                if not item.autoplay and item.channel != 'videolibrary': fakeVideo()
-                if xbmc.getCondVisibility("system.platform.android"): xbmc.sleep(3000)
-                xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
+            # if (item.fromLibrary and item.play_from == 'window') or item.window:
+            #     xlistitem.setPath(torrent_options[selection][1] % mediaurl)
+            #     playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+            #     playlist.clear()
+            #     playlist.add(torrent_options[selection][1] % mediaurl, xlistitem)
+            #     xbmc_player.play(playlist, xlistitem)
+            # else:
+            #     if not item.autoplay and item.channel != 'videolibrary': fakeVideo()
+            #     if xbmc.getCondVisibility("system.platform.android"): xbmc.sleep(3000)
+            #     xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
 
             # torrent.mark_auto_as_watched(item)
 
