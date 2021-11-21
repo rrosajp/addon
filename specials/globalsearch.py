@@ -657,6 +657,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 else: item.contentSerieName = self.RESULTS.getSelectedItem().getLabel()
                 item.folder = False
 
+                logger.debug(item)
                 Search(item, self.thActions)
                 if close_action:
                     self.close()

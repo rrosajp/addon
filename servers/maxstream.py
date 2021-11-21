@@ -9,22 +9,15 @@ import requests
 from core import httptools, scrapertools, support
 from lib import jsunpack
 from platformcode import logger, config, platformtools
-if sys.version_info[0] >= 3:
-    import urllib.parse as urlparse
-else:
-    import urlparse
 
 
 def test_video_exists(page_url):
     logger.debug("(page_url='%s')" % page_url)
 
-    global data
-    if 'uprot/' in page_url:
-        id = httptools.downloadpage(page_url, follow_redirects=False, cloudscraper=True).headers.get('location').split('/')[-1]
-    else:
-        id = page_url.split('/')[-1]
-    page_url = requests.head('http://lozioangie.altervista.org/max_anticaptcha.php?id=' + id).headers.get('location')
-    data = httptools.downloadpage(page_url, cloudscraper=True).data
+    global data, new_url
+    new_url = httptools.downloadpage(page_url, follow_redirects=False, cloudscraper=True).headers.get('location', page_url)
+    # page_url = requests.head('http://lozioangie.altervista.org/max_anticaptcha.php?id=' + id).headers.get('location')
+    data = httptools.downloadpage(new_url, cloudscraper=True).data
 
     if scrapertools.find_single_match(data, '(?<!none);[^>]*>file was deleted'):
         return False, config.get_localized_string(70449) % "MaxStream"
@@ -35,14 +28,14 @@ def test_video_exists(page_url):
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     logger.debug("url=" + page_url)
     video_urls = []
-    global data
-    if 'captcha' in data:
-        httptools.set_cookies(requests.get('http://lozioangie.altervista.org/maxcookie.php').json())
-        data = httptools.downloadpage(page_url, cloudscraper=True).data
+    global data, new_url
+    # if 'captcha' in data:
+    #     httptools.set_cookies(requests.get('http://lozioangie.altervista.org/maxcookie.php').json())
+    #     data = httptools.downloadpage(page_url, cloudscraper=True).data
 
-    # sitekey = scrapertools.find_multiple_matches(data, """data-sitekey=['"] *([^"']+)""")
-    # if sitekey: sitekey = sitekey[-1]
-    # captcha = platformtools.show_recaptcha(sitekey, page_url) if sitekey else ''
+    sitekey = scrapertools.find_multiple_matches(data, """data-sitekey=['"] *([^"']+)""")
+    if sitekey: sitekey = sitekey[-1]
+    captcha = platformtools.show_recaptcha(sitekey, new_url) if sitekey else ''
     #
     # possibleParam = scrapertools.find_multiple_matches(data,
     #                                                    r"""<input.*?(?:name=["']([^'"]+).*?value=["']([^'"]*)['"]>|>)""")

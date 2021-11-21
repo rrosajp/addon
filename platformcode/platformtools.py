@@ -1138,8 +1138,8 @@ def show_video_info(*args, **kwargs):
 
 
 def show_recaptcha(key, referer):
-    from platformcode.recaptcha import Recaptcha
-    return Recaptcha("Recaptcha.xml", config.get_runtime_path()).Start(key, referer)
+    from platformcode.recaptcha import Kodi
+    return Kodi(key, referer).run()
 
 
 def alert_no_disponible_server(server):
