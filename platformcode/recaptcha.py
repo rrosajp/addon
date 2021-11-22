@@ -153,12 +153,6 @@ class DynamicKodi(SolverKodi):
             return False
         return self.result
 
-    def changeTile(self, path, index, delay):
-        time.sleep(delay)
-        self.getControl(PANEL).getListItem(index).setArt({'image', path})
-        # tile = self.getControl(10005 + index)
-        # self.addControl(xbmcgui.ControlImage(tile.getX(), tile.getY(), tile.getWidth(), tile.getHeigh(), path))
-
     def onClick(self, control):
         if control == CLOSE:
             self.closed = True
@@ -174,11 +168,7 @@ class DynamicKodi(SolverKodi):
         else:
             item = self.getControl(PANEL)
             index = item.getSelectedPosition()
-            selected = True if item.getSelectedItem().getProperty('selected') == 'false' else False
-            item.getSelectedItem().setProperty('selected', str(selected).lower())
-            self.indices[index] = selected
-
             tile = self.solver.select_tile(index)
             path = config.get_temp_file(str(random.randint(1, 1000)) + '.png')
             filetools.write(path, tile.image)
-            Thread(target=self.changeTile, args=(path, index, tile.delay)).start()
+            item.getSelectedItem().setArt({'image': path})
