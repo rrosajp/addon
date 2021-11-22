@@ -2,8 +2,8 @@
 import random
 import time
 from threading import Thread
-from specials.globalsearch import CLOSE
 
+import channelselector
 import xbmcgui
 from core import httptools
 from core import filetools
@@ -13,10 +13,12 @@ from lib.librecaptcha.recaptcha import ReCaptcha, Solver, DynamicSolver, MultiCa
     ImageGridChallenge
 
 lang = 'it'
+temp_dir = config.get_temp_file('reCAPTCHA/')
 tiles_pos = (75+390, 90+40)
 grid_width = 450
 tiles_texture_focus = 'white.png'
 tiles_texture_checked = 'Controls/check_mark.png'
+empty_image = 'https://upload.wikimedia.org/wikipedia/commons/4/49/A_black_image.jpg'
 
 TITLE = 10
 PANEL = 11
@@ -28,33 +30,40 @@ CANCEL = 22
 RELOAD = 23
 
 
+def get_temp():
+    if not filetools.isdir(temp_dir):
+        filetools.mkdir(temp_dir)
+    return temp_dir + str(random.randint(1, 1000)) + '.png'
+
+
 class Kodi:
     def __init__(self, key, referer):
+        filetools.rmdirtree(temp_dir)
         self.rc = ReCaptcha(
             api_key=key,
             site_url=referer,
             user_agent=httptools.get_user_agent(),
         )
 
-    def run(self) -> str:
+    def run(self):
         result = self.rc.first_solver()
         while not isinstance(result, str) and result is not False:
             solution = self.run_solver(result)
             if solution:
                 result = self.rc.send_solution(solution)
-        logger.debug(result)
+                logger.debug(result)
+            else:
+                return False
         platformtools.dialog_notification("Captcha corretto", "Verifica conclusa")
         return result
 
     def run_solver(self, solver: Solver) -> Solution:
-        a = {
+        selected_solver = {
             DynamicSolver: DynamicKodi,
             MultiCaptchaSolver: MultiCaptchaKodi,
-        }
-        b = a[type(solver)]
-        c = b("Recaptcha.xml", config.get_runtime_path())
-        c.solver = solver
-        return c.run()
+        }[type(solver)]("Recaptcha.xml", config.get_runtime_path())
+        selected_solver.solver = solver
+        return selected_solver.run()
 
 
 class SolverKodi(xbmcgui.WindowXMLDialog):
@@ -64,10 +73,13 @@ class SolverKodi(xbmcgui.WindowXMLDialog):
         self.result = None
         self.image_path = ''
         self.indices = {}
+        self.num_rows = 3
+        self.num_columns = 3
+        self.num_tiles = 9
         logger.debug()
 
     def show_image(self, image, goal):
-        self.image_path = config.get_temp_file(str(random.randint(1, 1000)) + '.png')
+        self.image_path = get_temp()
         filetools.write(self.image_path, image)
         self.goal = goal.replace('<strong>', '[B]').replace('</strong>', '[/B]')
         self.doModal()
@@ -85,18 +97,21 @@ class SolverKodi(xbmcgui.WindowXMLDialog):
         self.getControl(PANEL).reset()
         self.getControl(PANEL).addItems(items)
 
+
 class MultiCaptchaKodi(SolverKodi):
     """
     multicaptcha challenges present you with one large image split into a grid of tiles and ask you to select the tiles that contain a given object.
     Occasionally, the image will not contain the object, but rather something that looks similar.
     It is possible to select no tiles in this case, but reCAPTCHA may have been fooled by the similar-looking object and would reject a selection of no tiles.
     """
-    def run(self) -> Solution:
+    def run(self):
         result = self.solver.first_challenge()
         while not isinstance(result, Solution):
             if not isinstance(result, ImageGridChallenge):
                 raise TypeError("Unexpected type: {}".format(type(result)))
             indices = self.handle_challenge(result)
+            if self.closed:
+                return False
             result = self.solver.select_indices(indices)
         return result
 
@@ -119,11 +134,11 @@ class MultiCaptchaKodi(SolverKodi):
             self.close()
 
         elif control == RELOAD:
-            self.result = None
+            self.closed = True
             self.close()
 
         elif control == OK:
-            self.result = [int(k) for k in range(9) if self.indices.get(k, False)]
+            self.result = [int(k) for k in range(self.num_tiles) if self.indices.get(k, False)]
             self.close()
         else:
             item = self.getControl(PANEL)
@@ -153,8 +168,17 @@ class DynamicKodi(SolverKodi):
             return False
         return self.result
 
+    def changeTile(self, item, path, delay):
+        cur_delay = delay
+        while cur_delay > 0:
+            # todo: show time
+            item.setLabel(str(cur_delay))
+            time.sleep(0.1)
+            cur_delay -= 0.1
+        item.setArt({'image': path})
+
     def onClick(self, control):
-        if control == CLOSE:
+        if control == CANCEL:
             self.closed = True
             self.close()
 
@@ -166,9 +190,12 @@ class DynamicKodi(SolverKodi):
             self.result = self.solver.finish()
             self.close()
         else:
-            item = self.getControl(PANEL)
-            index = item.getSelectedPosition()
-            tile = self.solver.select_tile(index)
-            path = config.get_temp_file(str(random.randint(1, 1000)) + '.png')
-            filetools.write(path, tile.image)
-            item.getSelectedItem().setArt({'image': path})
+            panel = self.getControl(PANEL)
+            item = panel.getSelectedItem()
+            if item.getArt('image') != empty_image:
+                item.setArt({'image': empty_image})
+                index = panel.getSelectedPosition()
+                tile = self.solver.select_tile(index)
+                path = get_temp()
+                filetools.write(path, tile.image)
+                Thread(target=self.changeTile, args=(item, path, tile.delay)).start()

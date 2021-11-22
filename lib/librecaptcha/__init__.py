@@ -16,8 +16,8 @@
 # along with librecaptcha.  If not, see <https://www.gnu.org/licenses/>.
 
 # flake8: noqa
-from . import librecaptcha, extract_strings, user_agents
-from .recaptcha import ReCaptcha
-from .librecaptcha import __version__, get_token, has_gui
-from .user_agents import USER_AGENTS, random_user_agent
-from .__main__ import main
+# from . import librecaptcha, extract_strings, user_agents
+# from .recaptcha import ReCaptcha
+# from .librecaptcha import __version__, get_token, has_gui
+# from .user_agents import USER_AGENTS, random_user_agent
+# from .__main__ import main
