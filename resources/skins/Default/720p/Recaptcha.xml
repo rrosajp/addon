@@ -1,97 +1,190 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <window>
     <allowoverlays>false</allowoverlays>
-    <animation type="WindowOpen" reversible="false">
-      <effect type="zoom" start="80" end="100" center="640,225" delay="160" tween="back" time="240" />
-      <effect type="fade" delay="160" end="100" time="240" />
+    <defaultcontrol>11</defaultcontrol>
+    <animation type='WindowOpen' reversible='false'>
+        <effect type='zoom' start='80' end='100' center='640,225' delay='160' tween='back' time='240' />
+        <effect type='fade' delay='160' end='100' time='240' />
     </animation>
-    <animation type="WindowClose" reversible="false">
-      <effect type="zoom" start="100" end="80" center="640,225" easing="in" tween="back" time="240" />
-      <effect type="fade" start="100" end="0" time="240" />
+    <animation type='WindowClose' reversible='false'>
+        <effect type='zoom' start='100' end='80' center='640,225' easing='in' tween='back' time='240' />
+        <effect type='fade' start='100' end='0' time='240' />
     </animation>
     <controls>
-      <control type="group" id="10001">
-        <top>40</top>
-        <left>390</left>
-        <width>600</width>
-        <height>640</height>
-        <control type="image">
-			<width>510</width>
-			<height>640</height>
-            <left>45</left>
-			<texture>Controls/dialog-bg-solid.png</texture>
+        <control type='group'>
+            <top>40</top>
+            <left>398</left>
+            <width>484</width>
+            <height>640</height>
+            <control type='image'>
+                <width>100%</width>
+                <height>100%</height>
+                <texture colordiffuse='FF232323'>white.png</texture>
+            </control>
+            <control type='image' id='12'>
+                <description>Main Captcha Image</description>
+                <top>90</top>
+                <left>20</left>
+                <width>444</width>
+                <height>444</height>
+            </control>
+            <control type='label' id='10'>
+                <top>20</top>
+                <left>20</left>
+                <height>60</height>
+                <width>444</width>
+                <font>font13</font>
+                <textcolor>FFFFFFFF</textcolor>
+                <wrapmultiline>true</wrapmultiline>
+                <align>center</align>
+                <aligny>center</aligny>
+                <label></label>
+            </control>
+            <control type='panel' id='11'>
+                <left>20</left>
+                <top>90</top>
+                <ondown>21</ondown>
+                <itemlayout height='148' width='148' condition='Integer.IsEqual(Container(11).NumItems, 9)'>
+                    <control type='image'>
+                        <description>Override Image</description>
+                        <width>100%</width>
+                        <height>100%</height>
+                        <texture>$INFO[ListItem.Art(image)]</texture>
+                    </control>
+                    <control type='image'>
+                        <description>Focused</description>
+                        <width>100%</width>
+                        <height>100%</height>
+                        <texture colordiffuse='FFFFFFFF' border='2'>selection.png</texture>
+                    </control>
+                    <control type='image'>
+                        <visible>String.IsEqual(ListItem.Property(selected), true)</visible>
+                        <description>Selected Image</description>
+                        <width>100%</width>
+                        <height>100%</height>
+                        <texture>Controls/check_mark.png</texture>
+                    </control>
+                </itemlayout>
+                <itemlayout height='111' width='111'>
+                    <control type='image'>
+                        <description>Override Image</description>
+                        <width>100%</width>
+                        <height>100%</height>
+                        <texture>$INFO[ListItem.Art(image)]</texture>
+                    </control>
+                    <control type='image'>
+                        <description>Focused</description>
+                        <width>100%</width>
+                        <height>100%</height>
+                        <texture colordiffuse='FFFFFFFF' border='2'>selection.png</texture>
+                    </control>
+                    <control type='image'>
+                        <visible>String.IsEqual(ListItem.Property(selected), true)</visible>
+                        <description>Selected Image</description>
+                        <width>100%</width>
+                        <height>100%</height>
+                        <texture>Controls/check_mark.png</texture>
+                    </control>
+                </itemlayout>
+                <focusedlayout height='148' width='148' condition='Integer.IsEqual(Container(11).NumItems, 9)'>
+                    <control type='image'>
+                        <description>Override Image</description>
+                        <width>100%</width>
+                        <height>100%</height>
+                        <texture>$INFO[ListItem.Art(image)]</texture>
+                    </control>
+                    <control type='image'>
+                        <description>Focused</description>
+                        <width>100%</width>
+                        <height>100%</height>
+                        <texture colordiffuse='FF0082C2' border='2'>selection.png</texture>
+                    </control>
+                    <control type='image'>
+                        <description>Focused</description>
+                        <width>100%</width>
+                        <height>100%</height>
+                        <texture colordiffuse='550082C2'>white.png</texture>
+                    </control>
+                    <control type='image'>
+                        <visible>String.IsEqual(ListItem.Property(selected), true)</visible>
+                        <description>Selected Image</description>
+                        <width>100%</width>
+                        <height>100%</height>
+                        <texture>Controls/check_mark.png</texture>
+                    </control>
+                </focusedlayout>
+                <focusedlayout height='111' width='111'>
+                    <control type='image'>
+                        <description>Override Image</description>
+                        <width>100%</width>
+                        <height>100%</height>
+                        <texture>$INFO[ListItem.Art(image)]</texture>
+                    </control>
+                    <control type='image'>
+                        <description>Focused</description>
+                        <width>100%</width>
+                        <height>100%</height>
+                        <texture colordiffuse='880082C2' border='2'>selection.png</texture>
+                    </control>
+                    <control type='image'>
+                        <description>Focused</description>
+                        <width>100%</width>
+                        <height>100%</height>
+                        <texture colordiffuse='550082C2'>white.png</texture>
+                    </control>
+                    <control type='image'>
+                        <visible>String.IsEqual(ListItem.Property(selected), true)</visible>
+                        <description>Selected Image</description>
+                        <width>100%</width>
+                        <height>100%</height>
+                        <texture>Controls/check_mark.png</texture>
+                    </control>
+                </focusedlayout>
+            </control>
+            <control type='grouplist'>
+                <top>565</top>
+                <left>20</left>
+                <orientation>horizontal</orientation>
+                <control type='button' id='21'>
+                    <width>150</width>
+                    <height>50</height>
+                    <onup>11</onup>
+                    <textwidth>110</textwidth>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <focusedcolor>FFFFFFFF</focusedcolor>
+                    <texturefocus colordiffuse='FF0082C2'>white.png</texturefocus>
+                    <texturenofocus colordiffuse='000082C2'>white.png</texturenofocus>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$ADDON[plugin.video.kod 70007]</label>
+                </control>
+                <control type='button' id='22'>
+                    <width>150</width>
+                    <height>50</height>
+                    <onup>11</onup>
+                    <textwidth>110</textwidth>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <focusedcolor>FFFFFFFF</focusedcolor>
+                    <texturefocus colordiffuse='FF0082C2'>white.png</texturefocus>
+                    <texturenofocus colordiffuse='000082C2'>white.png</texturenofocus>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$ADDON[plugin.video.kod 707433]</label>
+                </control>
+                <control type='button' id='23'>
+                    <width>150</width>
+                    <height>50</height>
+                    <onup>11</onup>
+                    <textwidth>110</textwidth>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <focusedcolor>FFFFFFFF</focusedcolor>
+                    <texturefocus colordiffuse='FF0082C2'>white.png</texturefocus>
+                    <texturenofocus colordiffuse='000082C2'>white.png</texturenofocus>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$ADDON[plugin.video.kod 70008]</label>
+                </control>
+            </control>
         </control>
-		<control type="textbox" id="10000">
-          <top>30</top>
-          <left>20</left>
-          <height>60</height>
-          <width>560</width>
-          <font>font13</font>
-          <textcolor>FFFFFFFF</textcolor>
-          <wrapmultiline>true</wrapmultiline>
-          <align>center</align>
-          <label></label>
-        </control>
-        <control type="button" id="10002">
-            <top>565</top>
-            <left>75</left>
-            <width>150</width>
-            <height>50</height>
-            <textwidth>110</textwidth>
-            <textcolor>FFFFFFFF</textcolor>
-            <focusedcolor>FFFFFFFF</focusedcolor>
-            <texturefocus colordiffuse="FF0082C2">white.png</texturefocus>
-            <texturenofocus colordiffuse="000082C2">white.png</texturenofocus>
-            <align>center</align>
-            <aligny>center</aligny>
-            <label>$ADDON[plugin.video.kod 70007]</label>
-            <onup>10011</onup>
-			<ondown>10005</ondown>
-			<onleft>10004</onleft>
-			<onright>10003</onright>
-        </control>
-        <control type="button" id="10003">
-            <top>565</top>
-            <left>225</left>
-            <width>150</width>
-            <height>50</height>
-            <textwidth>110</textwidth>
-            <textcolor>FFFFFFFF</textcolor>
-            <focusedcolor>FFFFFFFF</focusedcolor>
-            <texturefocus colordiffuse="FF0082C2">white.png</texturefocus>
-            <texturenofocus colordiffuse="000082C2">white.png</texturenofocus>
-            <align>center</align>
-            <aligny>center</aligny>
-            <label>$ADDON[plugin.video.kod 707433]</label>
-            <onup>10012</onup>
-			<ondown>10006</ondown>
-			<onleft>10002</onleft>
-			<onright>10004</onright>
-        </control>
-        <control type="button" id="10004">
-            <top>565</top>
-            <left>375</left>
-            <width>150</width>
-            <height>50</height>
-            <textwidth>110</textwidth>
-            <textcolor>FFFFFFFF</textcolor>
-            <focusedcolor>FFFFFFFF</focusedcolor>
-            <texturefocus colordiffuse="FF0082C2">white.png</texturefocus>
-            <texturenofocus colordiffuse="000082C2">white.png</texturenofocus>
-            <align>center</align>
-            <aligny>center</aligny>
-            <label>$ADDON[plugin.video.kod 70008]</label>
-            <onup>10013</onup>
-			<ondown>10007</ondown>
-			<onleft>10003</onleft>
-			<onright>10002</onright>
-        </control>
-        <control type="image" id="10020">
-            <top>90</top>
-            <left>75</left>
-            <width>450</width>
-            <height>450</height>
-        </control>
-      </control>
     </controls>
 </window>

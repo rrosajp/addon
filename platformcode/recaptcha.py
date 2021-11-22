@@ -2,6 +2,7 @@
 import random
 import time
 from threading import Thread
+from specials.globalsearch import CLOSE
 
 import xbmcgui
 from core import httptools
@@ -16,6 +17,15 @@ tiles_pos = (75+390, 90+40)
 grid_width = 450
 tiles_texture_focus = 'white.png'
 tiles_texture_checked = 'Controls/check_mark.png'
+
+TITLE = 10
+PANEL = 11
+IMAGE = 12
+CONTROL = 1
+
+OK = 21
+CANCEL = 22
+RELOAD = 23
 
 
 class Kodi:
@@ -64,15 +74,16 @@ class SolverKodi(xbmcgui.WindowXMLDialog):
 
     def onInit(self):
         logger.debug(self.image_path)
-        self.getControl(10020).setImage(self.image_path, False)
-        self.getControl(10000).setText(self.goal)
-        self.setFocusId(10005)
-        for x in range(self.num_columns):
-            for y in range(self.num_rows):
-                self.addControl(xbmcgui.ControlRadioButton(int(tiles_pos[0] + x*grid_width/self.num_rows), int(tiles_pos[1] + y*grid_width/self.num_columns),
-                                                            int(grid_width/self.num_rows), int(grid_width/self.num_columns), '', tiles_texture_focus, tiles_texture_focus,
-                                                           focusTexture=tiles_texture_checked, noFocusTexture=tiles_texture_checked))
+        items=[]
+        self.getControl(IMAGE).setImage(self.image_path, False)
+        self.getControl(TITLE).setLabel(self.goal)
 
+        for x in range(self.num_tiles):
+            item = xbmcgui.ListItem(str(x))
+            item.setProperty('selected', 'false')
+            items.append(item)
+        self.getControl(PANEL).reset()
+        self.getControl(PANEL).addItems(items)
 
 class MultiCaptchaKodi(SolverKodi):
     """
@@ -88,34 +99,38 @@ class MultiCaptchaKodi(SolverKodi):
             indices = self.handle_challenge(result)
             result = self.solver.select_indices(indices)
         return result
-    
+
     def handle_challenge(self, challenge: ImageGridChallenge):
         goal = challenge.goal.plain
         self.num_rows = challenge.dimensions.rows
         self.num_columns = challenge.dimensions.columns
+        logger.debug('RIGHE',self.num_rows, 'COLONNE',self.num_columns)
 
-        num_tiles = challenge.dimensions.count
+        self.num_tiles = challenge.dimensions.count
         image = challenge.image
         self.show_image(image, goal)
         if self.closed:
             return False
         return self.result
-    
+
     def onClick(self, control):
-        if control == 10003:
+        if control == CANCEL:
             self.closed = True
             self.close()
 
-        elif control == 10004:
+        elif control == RELOAD:
             self.result = None
             self.close()
 
-        elif control == 10002:
+        elif control == OK:
             self.result = [int(k) for k in range(9) if self.indices.get(k, False)]
             self.close()
         else:
-            index = control - 10005
-            self.indices[control - 10005] = not self.indices.get(index, False)
+            item = self.getControl(PANEL)
+            index = item.getSelectedPosition()
+            selected = True if item.getSelectedItem().getProperty('selected') == 'false' else False
+            item.getSelectedItem().setProperty('selected', str(selected).lower())
+            self.indices[index] = selected
 
 
 class DynamicKodi(SolverKodi):
@@ -130,7 +145,8 @@ class DynamicKodi(SolverKodi):
         goal = challenge.goal.raw
         self.num_rows = challenge.dimensions.rows
         self.num_columns = challenge.dimensions.columns
-        num_tiles = challenge.dimensions.count
+        self.num_tiles = challenge.dimensions.count
+        logger.debug('RIGHE',self.num_rows, 'COLONNE',self.num_columns)
 
         self.show_image(image, goal)
         if self.closed:
@@ -138,26 +154,30 @@ class DynamicKodi(SolverKodi):
         return self.result
 
     def changeTile(self, path, index, delay):
-        from core.support import dbg
-        dbg()
         time.sleep(delay)
-        tile = self.getControl(10005 + index)
-        self.addControl(xbmcgui.ControlImage(tile.getX(), tile.getY(), tile.getWidth(), tile.getHeigh(), path))
+        self.getControl(PANEL).getListItem(index).setArt({'image', path})
+        # tile = self.getControl(10005 + index)
+        # self.addControl(xbmcgui.ControlImage(tile.getX(), tile.getY(), tile.getWidth(), tile.getHeigh(), path))
 
     def onClick(self, control):
-        if control == 10003:
+        if control == CLOSE:
             self.closed = True
             self.close()
 
-        elif control == 10004:
+        elif control == RELOAD:
             self.result = None
             self.close()
 
-        elif control == 10002:
+        elif control == OK:
             self.result = self.solver.finish()
             self.close()
         else:
-            index = control - 10005
+            item = self.getControl(PANEL)
+            index = item.getSelectedPosition()
+            selected = True if item.getSelectedItem().getProperty('selected') == 'false' else False
+            item.getSelectedItem().setProperty('selected', str(selected).lower())
+            self.indices[index] = selected
+
             tile = self.solver.select_tile(index)
             path = config.get_temp_file(str(random.randint(1, 1000)) + '.png')
             filetools.write(path, tile.image)
