@@ -91,7 +91,7 @@ class SolverKodi(xbmcgui.WindowXMLDialog):
         self.getControl(TITLE).setLabel(self.goal)
 
         for x in range(self.num_tiles):
-            item = xbmcgui.ListItem(str(x))
+            item = xbmcgui.ListItem('')
             item.setProperty('selected', 'false')
             items.append(item)
         self.getControl(PANEL).reset()
@@ -172,9 +172,10 @@ class DynamicKodi(SolverKodi):
         cur_delay = delay
         while cur_delay > 0:
             # todo: show time
-            item.setLabel(str(cur_delay))
+            item.setLabel('{:.1f}'.format(cur_delay))
             time.sleep(0.1)
             cur_delay -= 0.1
+        item.setLabel('')
         item.setArt({'image': path})
 
     def onClick(self, control):
@@ -192,8 +193,7 @@ class DynamicKodi(SolverKodi):
         else:
             panel = self.getControl(PANEL)
             item = panel.getSelectedItem()
-            if item.getArt('image') != empty_image:
-                item.setArt({'image': empty_image})
+            if not item.getLabel():
                 index = panel.getSelectedPosition()
                 tile = self.solver.select_tile(index)
                 path = get_temp()
