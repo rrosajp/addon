@@ -1385,7 +1385,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         logger.info("mediaurl=" + mediaurl)
 
         if player_mode in [0,1]:
-            prevent_busy()
+            prevent_busy(item)
             if player_mode in [1]:
                 item.played_time = resume_playback(get_played_time(item))
 
@@ -1489,7 +1489,7 @@ def play_torrent(item, xlistitem, mediaurl):
         selection = 0
 
     if selection >= 0:
-        prevent_busy()
+        prevent_busy(item)
 
         mediaurl = urllib.quote_plus(item.url)
         torr_client = torrent_options[selection][0]
@@ -1506,30 +1506,10 @@ def play_torrent(item, xlistitem, mediaurl):
         else:
             import xbmcaddon
             addon = xbmcaddon.Addon(id='plugin.video.elementum')
-            # from core.support import dbg;dbg()
             if addon.getSetting('download_storage') == '0':
                 addon.setSetting('download_storage', '1')
                 xbmc.sleep(3000)
             xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
-            # import xbmcaddon
-            # xbmcaddon.Addon(id='plugin.video.elementum').setSetting('download_storage', '1')
-            # if (item.fromLibrary and item.play_from == 'window') or item.window:
-            #     xlistitem.setPath(torrent_options[selection][1] % mediaurl)
-            #     playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-            #     playlist.clear()
-            #     playlist.add(torrent_options[selection][1] % mediaurl, xlistitem)
-            #     xbmc_player.play(playlist, xlistitem)
-            # else:
-            #     if not item.autoplay and item.channel != 'videolibrary': fakeVideo()
-            #     if xbmc.getCondVisibility("system.platform.android"): xbmc.sleep(3000)
-            #     xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
-
-            # torrent.mark_auto_as_watched(item)
-
-            # if not item.globalsearch:
-            #     while is_playing() and not xbmc.Monitor().abortRequested():
-            #         time.sleep(3)
-
 
 def resume_playback(played_time):
     class ResumePlayback(xbmcgui.WindowXMLDialog):
