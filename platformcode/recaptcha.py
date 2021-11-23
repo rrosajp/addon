@@ -27,7 +27,7 @@ CONTROL = 1
 
 OK = 21
 CANCEL = 22
-RELOAD = 23
+# RELOAD = 23
 
 
 def get_temp():
@@ -133,9 +133,9 @@ class MultiCaptchaKodi(SolverKodi):
             self.closed = True
             self.close()
 
-        elif control == RELOAD:
-            self.closed = True
-            self.close()
+        # elif control == RELOAD:
+        #     self.closed = True
+        #     self.close()
 
         elif control == OK:
             self.result = [int(k) for k in range(self.num_tiles) if self.indices.get(k, False)]
@@ -183,9 +183,9 @@ class DynamicKodi(SolverKodi):
             self.closed = True
             self.close()
 
-        elif control == RELOAD:
-            self.result = None
-            self.close()
+        # elif control == RELOAD:
+        #     self.result = None
+        #     self.close()
 
         elif control == OK:
             self.result = self.solver.finish()

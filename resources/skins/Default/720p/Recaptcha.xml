@@ -214,7 +214,7 @@
                 <left>20</left>
                 <orientation>horizontal</orientation>
                 <control type='button' id='21'>
-                    <width>150</width>
+                    <width>222</width>
                     <height>50</height>
                     <onup>11</onup>
                     <textwidth>110</textwidth>
@@ -227,7 +227,7 @@
                     <label>$ADDON[plugin.video.kod 70007]</label>
                 </control>
                 <control type='button' id='22'>
-                    <width>150</width>
+                    <width>222</width>
                     <height>50</height>
                     <onup>11</onup>
                     <textwidth>110</textwidth>
@@ -238,19 +238,6 @@
                     <align>center</align>
                     <aligny>center</aligny>
                     <label>$ADDON[plugin.video.kod 707433]</label>
-                </control>
-                <control type='button' id='23'>
-                    <width>150</width>
-                    <height>50</height>
-                    <onup>11</onup>
-                    <textwidth>110</textwidth>
-                    <textcolor>FFFFFFFF</textcolor>
-                    <focusedcolor>FFFFFFFF</focusedcolor>
-                    <texturefocus colordiffuse='FF0082C2'>white.png</texturefocus>
-                    <texturenofocus colordiffuse='000082C2'>white.png</texturenofocus>
-                    <align>center</align>
-                    <aligny>center</aligny>
-                    <label>$ADDON[plugin.video.kod 70008]</label>
                 </control>
             </control>
         </control>
