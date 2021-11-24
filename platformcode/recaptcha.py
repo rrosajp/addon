@@ -43,7 +43,7 @@ class Kodi:
             api_key=key,
             site_url=referer,
             user_agent=httptools.get_user_agent(),
-            lang = 'en'
+            lang = lang
         )
 
     def run(self):

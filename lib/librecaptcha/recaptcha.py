@@ -128,7 +128,7 @@ def get_rresp(uvresp):
 
 def get_js_strings(user_agent: str, rc_version: str, lang : str = 'en') -> List[str]:
     def get_json():
-        with open(STRINGS_PATH) as f:
+        with open(STRINGS_PATH + '-' + lang) as f:
             version, text = f.read().split("\n", 1)
             if version != "{}/{}".format(STRINGS_VERSION, rc_version):
                 raise OSError("Incorrect version: {}".format(version))
@@ -141,7 +141,7 @@ def get_js_strings(user_agent: str, rc_version: str, lang : str = 'en') -> List[
 
     result = extract_and_save(
         url=JS_URL_TEMPLATE.format(rc_version, lang),
-        path=STRINGS_PATH,
+        path=STRINGS_PATH + '-' + lang,
         version=STRINGS_VERSION,
         rc_version=rc_version,
         user_agent=user_agent,
