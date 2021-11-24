@@ -300,7 +300,17 @@ def run(item=None):
 
             # For all other actions
             else:
-                # import web_pdb; web_pdb.set_trace()
+                reload = False
+                from core import db
+                if db['OnPlay'].get('addon', False):
+                    reload = True
+                db['OnPlay']['addon'] = False
+                db.close()
+                if reload:
+                    import xbmc
+                    xbmc.Player().play()
+                    return xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")
+
                 logger.debug("Executing channel '%s' method" % item.action)
                 itemlist = getattr(channel, item.action)(item)
                 if config.get_setting('trakt_sync'):
