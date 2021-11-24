@@ -222,6 +222,12 @@ def run(item=None):
             # Special action for findvideos, where the plugin looks for known urls
             elif item.action == "findvideos":
                 from core import servertools
+                from core import db
+                if db['OnPlay'].get('addon', False):
+                    item.autoplay = True
+                    platformtools.fakeVideo()
+                db.close()
+
 
                 # First checks if channel has a "findvideos" function
                 if hasattr(channel, 'findvideos'):

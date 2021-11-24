@@ -400,7 +400,16 @@ class AddonMonitor(xbmc.Monitor):
             self.settings_pre = config.get_all_settings_addon()
 
     def onNotification(self, sender, method, data):
-        if method == 'VideoLibrary.OnUpdate':
+        # logger.debug('METHOD', method, sender, data)
+        if method == 'Playlist.OnAdd':
+            from core import db
+            db['OnPlay']['addon'] = True
+            db.close()
+        elif method == 'Player.OnStop':
+            from core import db
+            db['OnPlay']['addon'] = False
+            db.close()
+        elif method == 'VideoLibrary.OnUpdate':
             xbmc_videolibrary.set_watched_on_kod(data)
             logger.debug('AGGIORNO')
 
