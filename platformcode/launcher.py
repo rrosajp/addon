@@ -307,8 +307,8 @@ def run(item=None):
                 db['OnPlay']['addon'] = False
                 db.close()
                 if reload:
+                    platformtools.fakeVideo()
                     import xbmc
-                    xbmc.Player().play()
                     return xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")
 
                 logger.debug("Executing channel '%s' method" % item.action)
