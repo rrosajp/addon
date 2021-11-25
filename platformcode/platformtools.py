@@ -408,7 +408,8 @@ def viewmodeMonitor():
                     if currentMode != defaultMode:
                         # logger.debug('viewmode changed: ' + currentModeName + '-' + str(currentMode) + ' - content: ' + content)
                         config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
-                        dialog_notification(config.get_localized_string(70153),
+                        if config.get_setting('viewchange_notify'):
+                            dialog_notification(config.get_localized_string(70153),
                                                         config.get_localized_string(70187) % (content, currentModeName),
                                                         sound=False)
         except:
