@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-import random
+import sys
 import time
 from threading import Thread
 
-import channelselector
 import xbmcgui
-from core import httptools, support
+from core import httptools
 from core import filetools
 from platformcode import config, platformtools
 from platformcode import logger
@@ -18,7 +17,7 @@ tiles_pos = (75+390, 90+40)
 grid_width = 450
 tiles_texture_focus = 'white.png'
 tiles_texture_checked = 'Controls/check_mark.png'
-empty_image = 'https://upload.wikimedia.org/wikipedia/commons/4/49/A_black_image.jpg'
+cur_tmp = 0
 
 TITLE = 10
 PANEL = 11
@@ -31,22 +30,32 @@ CANCEL = 22
 
 
 def get_temp():
+    global cur_tmp
+    cur_tmp += 1
     if not filetools.isdir(temp_dir):
         filetools.mkdir(temp_dir)
-    return temp_dir + str(random.randint(1, 1000)) + '.png'
+    return temp_dir + str(cur_tmp) + '.png'
 
 
 class Kodi:
     def __init__(self, key, referer):
-        filetools.rmdirtree(temp_dir)
-        self.rc = ReCaptcha(
-            api_key=key,
-            site_url=referer,
-            user_agent=httptools.get_user_agent(),
-            lang = lang
-        )
+        if sys.version_info[0] < 3:
+            self.rc = None
+            platformtools.dialog_ok('reCAPTCHA', 'Il sito sta mostrando la schermata "Non sono un robot".\nQuesta schermata tuttavia è superabile solo da kodi 19')
+        else:
+            prog = platformtools.dialog_progress('Caricamento reCAPTCHA', 'Il sito sta mostrando la schermata "Non sono un robot"')
+            filetools.rmdirtree(temp_dir)
+            self.rc = ReCaptcha(
+                api_key=key,
+                site_url=referer,
+                user_agent=httptools.get_user_agent(),
+                lang=lang
+            )
+            prog.close()
 
     def run(self):
+        if not self.rc:
+            return None
         result = self.rc.first_solver()
         while not isinstance(result, str) and result is not False:
             solution = self.run_solver(result)
