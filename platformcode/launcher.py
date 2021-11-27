@@ -225,6 +225,7 @@ def run(item=None):
                 from core import db
                 if db['OnPlay'].get('addon', False):
                     item.autoplay = True
+                    db['OnPlay']['addon'] = False
                     platformtools.fakeVideo()
                 db.close()
 
@@ -298,18 +299,19 @@ def run(item=None):
 
                 platformtools.render_items(itemlist, item)
 
-            # For all other actions
+                # For all other actions
             else:
-                reload = False
-                from core import db
-                if db['OnPlay'].get('addon', False):
-                    reload = True
-                db['OnPlay']['addon'] = False
-                db.close()
-                if reload:
-                    platformtools.fakeVideo()
-                    import xbmc
-                    return xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")
+                if item.channel == 'filmontv':
+                    reload = False
+                    from core import db
+                    if db['OnPlay'].get('addon', False):
+                        reload = True
+                    db['OnPlay']['addon'] = False
+                    db.close()
+                    if reload:
+                        platformtools.fakeVideo()
+                        import xbmc
+                        return xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")
 
                 logger.debug("Executing channel '%s' method" % item.action)
                 itemlist = getattr(channel, item.action)(item)

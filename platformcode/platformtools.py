@@ -1686,6 +1686,7 @@ def prevent_busy(item=None):
 
 def fakeVideo():
     xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
+    sleep = 200 if xbmc.getCondVisibility("system.platform.android") else 100
     while not is_playing():
-        xbmc.sleep(100)
+        xbmc.sleep(sleep)
     xbmc.Player().stop()
