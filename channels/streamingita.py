@@ -3,7 +3,7 @@
 # Canale per streamingITA
 # ------------------------------------------------------------
 
-from core import support
+from core import httptools, support
 from platformcode import logger, config
 
 host = config.get_channel_url()
@@ -33,7 +33,8 @@ def search(item, text):
 
 
 def peliculas(item):
-    return support.dooplay_peliculas(item, False)
+    mixed = True if item.contentType == 'undefined' else False
+    return support.dooplay_peliculas(item, mixed)
 
 
 def episodios(item):
@@ -42,29 +43,17 @@ def episodios(item):
 
 
 def findvideos(item):
-    itemlist = []
+    data = []
     for link in support.dooplay_get_links(item, host):
-        itemlist.append(
-            item.clone(action="play", url=link['url']))
-    # if item.contentType == 'episode':
-    #     linkHead = support.httptools.downloadpage(item.url, only_headers=True).headers['link']
-    #     epId = support.scrapertools.find_single_match(linkHead, r'\?p=([0-9]+)>')
-    #     for link in support.dooplay_get_links(item, host, paramList=[['tv', epId, 1, 'title', 'server']]):
-    #         itemlist.append(
-    #             item.clone(action="play", url=link['url']))
-    # else:
-    #     for link, quality in support.match(item.url, patron="(" + host + """links/[^"]+).*?class="quality">([^<]+)""").matches:
-    #         srv = support.servertools.find_video_items(data=support.httptools.downloadpage(link).data)
-    #         for s in srv:
-    #             s.quality = quality
-    #         itemlist.extend(srv)
-    return support.server(item, itemlist=itemlist)
+        url = httptools.downloadpage(link['url'], only_headers=True).url
+        data.append(url)
+    return support.server(item, data)
 
 
 @support.scrape
 def menu(item):
     action = 'peliculas'
-    # debug = True
+    item.contentType = 'undefined'
     if item.args in ['genres', 'releases']:
         patronBlock = r'<nav class="' + item.args + r'">(?P<block>.*?)</nav'
         patronMenu= r'<a href="(?P<url>[^"]+)"[^>]*>(?P<title>[^<]+)<'
