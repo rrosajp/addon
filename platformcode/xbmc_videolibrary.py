@@ -97,10 +97,10 @@ def mark_auto_as_watched(item):
         while platformtools.is_playing():
             xbmc.sleep(100)
 
-        if not show_server and item.play_from != 'window' and not item.no_return:
-            xbmc.sleep(700)
-            xbmc.executebuiltin('Action(ParentDir)')
-            xbmc.sleep(500)
+        # if not show_server and item.play_from != 'window' and not item.no_return:
+        #     xbmc.sleep(200)
+        #     xbmc.executebuiltin('Action(close)')
+        #     xbmc.sleep(500)
 
         if next_episode and next_episode.next_ep and config.get_setting('next_ep') < 3:
             from platformcode.launcher import run
@@ -109,6 +109,7 @@ def mark_auto_as_watched(item):
         # db need to be closed when not used, it will cause freezes
         from core import db
         db.close()
+        # from core.support import dbg;dbg()
 
     # If it is configured to mark as seen
     if config.get_setting("mark_as_watched", "videolibrary"):

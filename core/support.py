@@ -1278,26 +1278,22 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
                 videoitem.server = videoitem.server.lower()
 
         if videoitem.video_urls or srv_param.get('active', False):
-            title = typo(item.contentTitle.strip(), 'bold') if item.contentType == 'movie' or (config.get_localized_string(30161) in item.title) else item.title
+            vi = item.clone(server=videoitem.server,
+                            serverName=videoitem.serverName,
+                            url=videoitem.url,
+                            videoUrls= videoitem.videoUrlsn,
+                            ch_name=channeltools.get_channel_parameters(item.channel)['title'],
+                            action = "play")
 
-            quality = videoitem.quality if videoitem.quality else item.quality if item.quality else ''
-            videoitem.title = (title if item.channel not in ['url'] else '')\
-                + (typo(videoitem.title, '_ color kod [] bold') if videoitem.title else "")\
-                + (typo(videoitem.quality, '_ color kod []') if videoitem.quality else "")\
-                + (typo(videoitem.contentLanguage, '_ color kod []') if videoitem.contentLanguage else "")\
-                + (typo(videoitem.extraInfo, '_ color kod []') if videoitem.extraInfo else "")
-            videoitem.plot = typo(videoitem.title, 'bold') + (typo(quality, '_ [] bold') if quality else '')
-            videoitem.channel = item.channel
-            videoitem.fulltitle = item.fulltitle
-            videoitem.show = item.show
-            if not videoitem.video_urls:  videoitem.thumbnail = item.thumbnail
-            videoitem.contentType = item.contentType
-            videoitem.infoLabels = item.infoLabels
-            videoitem.quality = quality
-            videoitem.referer = item.referer if item.referer else item.url
-            videoitem.action = "play"
-            # videoitem.nfo = item.nfo
-            # videoitem.strm_path = item.strm_path
+            if videoitem.title: vi.serverName = videoitem.title
+            if videoitem.quality: vi.quality = videoitem.quality
+            if not vi.referer: vi.referer = item.url
+            vi.contentFanart = item.infoLabels['fanart']
+            vi.contentThumb = item.infoLabels['fanart']
+            if videoitem.forcethumb:
+                vi.thumbnail = videoitem.thumbnail
+                vi.forcethumb = True
+            videoitem = vi
             return videoitem
 
     # non threaded for webpdb

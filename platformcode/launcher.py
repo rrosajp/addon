@@ -233,24 +233,8 @@ def run(item=None):
 
             # Special action for findvideos, where the plugin looks for known urls
             elif item.action == "findvideos":
-                from core import servertools
-                if reload:
-                    item.autoplay = True
-                    platformtools.fakeVideo()
-
-                # First checks if channel has a "findvideos" function
-                if hasattr(channel, 'findvideos'):
-                    itemlist = getattr(channel, item.action)(item)
-
-                # If not, uses the generic findvideos function
-                else:
-                    logger.debug("No channel 'findvideos' method, " "executing core method")
-                    itemlist = servertools.find_video_items(item)
-
-                if config.get_setting("max_links", "videolibrary") != 0:
-                    itemlist = limit_itemlist(itemlist)
-
-                platformtools.render_items(itemlist, item)
+                findvideos(item)
+                # platformtools.render_items(itemlist, item)
 
             # Special action for adding a movie to the library
             elif item.action == "add_pelicula_to_library":
@@ -446,6 +430,37 @@ def limit_itemlist(itemlist):
         return itemlist
 
 
+def findvideos(item):
+    logger.debug('Executing channel', item.channel, 'method', item.action)
+    channel = platformtools.channelImport(item.channel)
+    if not channel:
+        logger.debug('Channel', item.channel, 'not exist!')
+        return
+    from core import servertools
+
+    p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(60683))
+    p_dialog.update(0)
+
+    # First checks if channel has a "findvideos" function
+    if hasattr(channel, 'findvideos'):
+        itemlist = getattr(channel, item.action)(item)
+
+    # If not, uses the generic findvideos function
+    else:
+        logger.debug('No channel "findvideos" method, executing core method')
+        itemlist = servertools.find_video_items(item)
+
+    itemlist = limit_itemlist(itemlist)
+
+    p_dialog.update(100)
+    p_dialog.close()
+
+    # If there is only one server play it immediately
+    # if len(itemlist) == 1 or len(itemlist) > 1 and not itemlist[1].server:
+    #     play(itemlist[0].clone(no_return=True))
+    # else:
+    platformtools.serverWindow(item, itemlist)
+
 def play_from_library(item):
     """
         The .strm files when played from kodi, this expects it to be a "playable" file so it cannot contain
@@ -458,110 +473,10 @@ def play_from_library(item):
         @param item: item with information
     """
 
-    def get_played_time(item):
-        from core import videolibrarytools
+    item.action = item.next_action if item.next_action else 'findvideos'
+    logger.debug('Executing channel', item.channel, 'method', item.action)
+    if item.action == 'findvideos':
+        item.fakevideo = True
+    return run(item)
 
-        if item.contentType == 'movie':
-            nfo_path = item.nfo
-            if nfo_path.startswith('\\') or nfo_path.startswith('/'):
-                nfo_path = filetools.join(videolibrarytools.MOVIES_PATH, nfo_path)
-
-        else:
-            nfo_path =item.strm_path.replace('strm','nfo')
-            if nfo_path.startswith('\\') or nfo_path.startswith('/'):
-                nfo_path = filetools.join(videolibrarytools.TVSHOWS_PATH, nfo_path)
-
-        if nfo_path and filetools.isfile(nfo_path):
-            head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
-            sleep(1)
-            played_time = platformtools.get_played_time(item_nfo)
-
-        else: played_time = 0
-
-        return played_time
-
-    import xbmcgui, xbmcplugin, xbmc
-    from time import sleep
-
-    if not item.autoplay and not item.next_ep:
-        platformtools.fakeVideo()
-
-
-    itemlist=[]
-    item.fromLibrary = True
-    item.window = True
-    logger.debug()
-
-    # Modify the action (currently the video library needs "findvideos" since this is where the sources are searched
-    item.action = item.next_action if item.next_action else "findvideos"
-
-    if item.contentType == 'movie' or item.contentType != 'movie' and config.get_setting('next_ep') < 3:
-        window_type = config.get_setting("window_type", "videolibrary")
-    else: window_type = 1
-
-    # and launch kodi again
-    if (xbmc.getCondVisibility('Window.IsMedia') and not window_type == 1) or item.action != 'findvideos':
-        xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")
-
-    else:
-        # Pop-up window
-        from specials import videolibrary
-        from core.channeltools import get_channel_parameters
-        p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(60683))
-        p_dialog.update(0, '')
-        item.play_from = 'window'
-        itemlist = videolibrary.findvideos(item)
-        p_dialog.update(100, ''); sleep(0.5); p_dialog.close()
-        played = False
-
-        # The number of links to show is limited
-        if config.get_setting("max_links", "videolibrary") != 0: itemlist = limit_itemlist(itemlist)
-        # The list of links is slightly "cleaned"
-        if config.get_setting("replace_VD", "videolibrary") == 1: itemlist = reorder_itemlist(itemlist)
-
-        if len(itemlist) > 0:
-            reopen = False
-
-            while not xbmc.Monitor().abortRequested():
-                played = True
-                # if config.get_setting('next_ep') == 3 and xbmc.Player().playnext:
-                #     return
-                # The user chooses the mirror
-                if not platformtools.is_playing():
-                    if config.get_setting('next_ep') == 3:
-                        xbmc.sleep(500)
-                        if platformtools.is_playing():
-                            return
-                    if config.get_setting('autoplay') or reopen:
-                        played_time = get_played_time(item)
-                        if not played_time and played:
-                            return
-
-                    options = []
-                    selection_implementation = 0
-                    for item in itemlist:
-                        item.thumbnail = config.get_online_server_thumb(item.server)
-                        quality = '[B][' + item.quality + '][/B]' if item.quality else ''
-                        if item.server:
-                            path = filetools.join(config.get_runtime_path(), 'servers', item.server.lower() + '.json')
-                            name = jsontools.load(open(path, "rb").read())['name']
-                            if name.startswith('@'): name = config.get_localized_string(int(name.replace('@','')))
-                            logger.debug(item)
-                            it = xbmcgui.ListItem('\n[B]%s[/B] %s - %s [%s]' % (name, quality, item.contentTitle, get_channel_parameters(item.contentChannel)['title']))
-                            it.setArt({'thumb':item.thumbnail})
-                            options.append(it)
-                        else:
-                            selection_implementation += 1
-                    # The selection window opens
-                    if (item.contentSerieName and item.contentSeason and item.contentEpisodeNumber): head = ("%s - %sx%s | %s" % (item.contentSerieName, item.contentSeason, item.contentEpisodeNumber, config.get_localized_string(30163)))
-                    else: head = config.get_localized_string(30163)
-                    selection = platformtools.dialog_select(head, options, preselect= -1, useDetails=True)
-                    if selection == -1:
-                        return
-                    else:
-                        item = videolibrary.play(itemlist[selection + selection_implementation])[0]
-                        platformtools.play_video(item)
-                        reopen = True
-                        if item.server == 'torrent': return
-                # if (platformtools.is_playing() and item.action) or item.server == 'torrent' or config.get_setting('autoplay'): break
 

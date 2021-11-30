@@ -627,7 +627,7 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
         # Add to kodfavoritos (My links)
         if item.channel not in ["favorites", "videolibrary", "help", ""] and parent_item.channel != "favorites":
             context_commands.append( (config.get_localized_string(70557), "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, urllib.urlencode({'channel': "kodfavorites", 'action': "addFavourite", 'from_channel': item.channel, 'from_action': item.action}))))
-        # Add to kodfavoritos 
+        # Add to kodfavoritos
         if parent_item.channel == 'globalsearch':
             context_commands.append( (config.get_localized_string(30155), "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, urllib.urlencode({'channel': "favorites", 'action': "addFavourite", 'from_channel': item.channel, 'from_action': item.action}))))
         # Search in other channels
@@ -1386,7 +1386,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         logger.info("mediaurl=" + mediaurl)
 
         if player_mode in [0,1]:
-            prevent_busy(item)
+            prevent_busy()
             if player_mode in [1]:
                 item.played_time = resume_playback(get_played_time(item))
 
@@ -1490,7 +1490,7 @@ def play_torrent(item, xlistitem, mediaurl):
         selection = 0
 
     if selection >= 0:
-        prevent_busy(item)
+        prevent_busy()
 
         mediaurl = urllib.quote_plus(item.url)
         torr_client = torrent_options[selection][0]
@@ -1684,10 +1684,137 @@ def prevent_busy(item=None):
         xbmc.executebuiltin('Dialog.Close(all,true)')
 
 
-def fakeVideo():
-    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True,
-                              xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), "resources", "kod.mp4")))
-    sleep = 200
-    while not is_playing():
-        xbmc.sleep(sleep)
-    xbmc.Player().stop()
+def fakeVideo(sleep = False):
+    mediaurl = os.path.join(config.get_runtime_path(), "resources", "kod.mp4")
+    xbmc.executebuiltin("PlayMedia(" + mediaurl + ")")
+    if sleep:
+        while is_playing():
+            xbmc.sleep(sleep)
+        xbmc.Player().stop()
+
+
+def channelImport(channelId):
+    from core import filetools
+    ch = ''
+    path = filetools.join(config.get_runtime_path(), '{}', channelId + ".py")
+    if filetools.exists(path.format('channels')): ch = 'channels.{}'.format(channelId)
+    elif filetools.exists(path.format('specials')): ch = 'specials.{}'.format(channelId)
+    elif filetools.exists(path.format('platformcode')): ch = 'platformcode.{}'.format(channelId)
+    elif filetools.exists(path.format('core')): ch = 'core.{}'.format(channelId)
+    if ch:
+        channel = __import__(ch, None, None, [ch])
+    else:
+        logger.info('Channel {} not Exist'.format(channelId))
+        channel = None
+    return channel
+
+def serverWindow(item, itemlist):
+    LEFT = 1
+    RIGHT = 2
+    UP = 3
+    DOWN = 4
+    ENTER = 7
+    EXIT = 10
+    BACKSPACE = 92
+
+    class ServerWindow(xbmcgui.WindowXMLDialog):
+        def start(self, item, itemlist):
+            self.itemlist = itemlist
+            self.item = item
+            self.servers = []
+            items = []
+            self.selection = -1
+            self.actions = {}
+            for videoitem in self.itemlist:
+                videoitem.thumbnail = config.get_online_server_thumb(videoitem.server)
+                quality = ' [' + videoitem.quality + ']' if videoitem.quality else ''
+                if videoitem.server:
+                    color = scrapertools.find_single_match(videoitem.alive, r'(FF[^\]]+)')
+                    it = xbmcgui.ListItem('{}{}'.format(videoitem.serverName, quality))
+
+                    # format Title
+                    if videoitem.contentSeason and videoitem.contentEpisodeNumber:
+                        title = '{}x{:02d}. {}'.format(videoitem.contentSeason, videoitem.contentEpisodeNumber, videoitem.contentTitle)
+                    elif videoitem.contentEpisodeNumber:
+                        title = '{:02d}. {}'.format(videoitem.contentEpisodeNumber, videoitem.contentTitle)
+                    else:
+                        title = videoitem.title
+
+                    it.setProperties({'name': title, 'channel': videoitem.ch_name, 'color': color if color else 'FF0082C2'})
+                    it.setArt({'poster':videoitem.contentThumbnail, 'thumb':videoitem.thumbnail, 'fanart':videoitem.contentFanart})
+                    self.servers.append(it)
+                    items.append(videoitem)
+                else:
+                    it = xbmcgui.ListItem(videoitem.title)
+                    if 'library' in videoitem.action:
+                        self.actions['videolibrary'] = videoitem
+                    if 'download' in videoitem.action:
+                        self.actions['download'] = videoitem
+
+            self.itemlist = items
+            self.doModal()
+            return self.selection
+
+        def onInit(self):
+            self.SERVERS = self.getControl(100)
+            self.VIDEOLIBRARY = self.getControl(102)
+            self.DOWNLOAD = self.getControl(103)
+            if 'videolibrary' not in self.actions.keys():
+                self.VIDEOLIBRARY.setVisible(False)
+            if 'download' not in self.actions.keys():
+                self.DOWNLOAD.setVisible(False)
+            self.SERVERS.reset()
+            self.SERVERS.addItems(self.servers)
+            self.setFocusId(100)
+            # from core.support import dbg;dbg()
+
+        def onAction(self, action):
+            action = action.getId()
+            focus = self.getFocusId()
+            if action in [UP, DOWN, LEFT, RIGHT] and focus not in [100, 101, 102, 103]:
+                self.setFocusId(100)
+            elif action in [EXIT, BACKSPACE]:
+                self.close()
+
+        def onClick(self, control):
+            if control == 100:
+                self.selection = self.itemlist[self.SERVERS.getSelectedPosition()].clone(window=True)
+                self.close()
+            elif control in [101]:
+                self.close()
+            elif control in [102]:
+                self.run(self.actions['videolibrary'])
+            elif control in [103]:
+                self.run(self.actions['download'])
+
+        def run(self, action):
+            from platformcode.launcher import run
+            run(action)
+
+
+
+    if itemlist:
+        reopen = False
+        while not xbmc.Monitor().abortRequested():
+            played = True
+            if not is_playing():
+                if config.get_setting('next_ep') == 3:
+                    xbmc.sleep(500)
+                    if is_playing():
+                        return
+                if config.get_setting('autoplay') or reopen:
+                    played_time = get_played_time(item)
+                    if not played_time and played:
+                        return
+
+                selection = ServerWindow('Servers.xml', config.get_runtime_path()).start(item, itemlist)
+
+                if selection == -1:
+                    if item.fakevideo:
+                        return fakeVideo()
+                    else: return
+
+                else:
+                    from platformcode.launcher import run
+                    run(selection)
+                    reopen = True
