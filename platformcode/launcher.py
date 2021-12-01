@@ -454,12 +454,14 @@ def findvideos(item):
         itemlist = limit_itemlist(itemlist)
     except:
         itemlist = []
-        platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60347))
 
     p_dialog.update(100)
     p_dialog.close()
 
-    platformtools.serverWindow(item, itemlist)
+    if not itemlist:
+        platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60347))
+    else:
+        platformtools.serverWindow(item, itemlist)
 
 def play_from_library(item):
     """
@@ -475,8 +477,11 @@ def play_from_library(item):
 
     item.action = item.next_action if item.next_action else 'findvideos'
     logger.debug('Executing channel', item.channel, 'method', item.action)
-    if item.action == 'findvideos':
+    if item.action == 'findvideos': 
         item.fakevideo = True
-    return run(item)
+        return run(item)
+    else:
+        platformtools.fakeVideo()
+        return run(item)
 
 
