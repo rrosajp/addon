@@ -7,6 +7,7 @@ from core import httptools, support
 from platformcode import logger, config
 
 host = config.get_channel_url()
+headers = [['Referer', host]]
 
 
 @support.menu
@@ -45,7 +46,7 @@ def episodios(item):
 def findvideos(item):
     data = []
     for link in support.dooplay_get_links(item, host):
-        url = httptools.downloadpage(link['url'], only_headers=True).url
+        url = httptools.downloadpage(link['url'], only_headers=True, headers=headers).url
         data.append(url)
     return support.server(item, data)
 
