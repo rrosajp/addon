@@ -401,8 +401,7 @@ def set_infoLabels_item(item, seekTmdb=True, search_language=def_lang):
                     # from core.support import dbg;dbg()
                     otmdb = Tmdb(searched_text=searched_title, search_type=search_type, search_language=search_language,
                                     filtro=item.infoLabels.get('filtro', {}), year=item.infoLabels['year'])
-                    if not item.infoLabels['tmdb_id'] and not item.infoLabels['imdb_id'] and not item.infoLabels['tvdb_id']\
-                        and not item.infoLabels['freebase_mid'] and not item.infoLabels['freebase_id'] and not item.infoLabels['tvrage_id']:
+                    if otmdb is not None and not otmdb.get_id():
                         otmdb = Tmdb(searched_text=searched_title, search_type=search_type, search_language=search_language,
                                     filtro=item.infoLabels.get('filtro', {}))
                     if otmdb is not None:
