@@ -1677,20 +1677,16 @@ def set_played_time(item):
         del db['viewed'][ID]
 
 
-def prevent_busy(item=None):
-    if item and (not item.autoplay and item.channel != 'videolibrary' and not item.window):
-        fakeVideo()
-    else:
-        xbmc.executebuiltin('Dialog.Close(all,true)')
+def prevent_busy():
+    xbmc.executebuiltin('Dialog.Close(all,true)')
 
 
 def fakeVideo(sleep = False):
     mediaurl = os.path.join(config.get_runtime_path(), "resources", "kod.mp4")
-    xbmc.executebuiltin("PlayMedia(" + mediaurl + ")")
-    if sleep:
-        while is_playing():
-            xbmc.sleep(sleep)
-        xbmc.Player().stop()
+    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xbmcgui.ListItem(path=mediaurl))
+    while not is_playing():
+        xbmc.sleep(200)
+    xbmc.Player().stop()
 
 
 def channelImport(channelId):
@@ -1716,7 +1712,7 @@ def serverWindow(item, itemlist):
     ENTER = 7
     EXIT = 10
     BACKSPACE = 92
-    xbmc.executebuiltin('Dialog.Close(all,true)')
+    prevent_busy()
 
     class ServerWindow(xbmcgui.WindowXMLDialog):
         def start(self, item, itemlist):

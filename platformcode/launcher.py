@@ -170,8 +170,8 @@ def run(item=None):
                 xbmc.executebuiltin("Container.Update(%s?%s)" % (sys.argv[0], item.tourl()))
 
         elif reload and item.channel == 'filmontv' and item.action == 'new_search':
-            platformtools.fakeVideo()
             import xbmc
+            platformtools.fakeVideo()
             return xbmc.executebuiltin("Container.Update(" + sys.argv[0] + "?" + item.tourl() + ")")
         else:
             # Checks if channel exists
