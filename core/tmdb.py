@@ -393,18 +393,18 @@ def set_infoLabels_item(item, seekTmdb=True, search_language=def_lang):
                     if search_type == 'tv':
                         # Serial search by title and filtering your results if necessary
                         searched_title = scrapertools.unescape(item.infoLabels['tvshowtitle'])
-                        # searched_title = searched_title.split('-')[0].strip()
-                        otmdb = Tmdb(searched_text=searched_title, search_type=search_type,
-                                     search_language=search_language, filtro=item.infoLabels.get('filtro', {}),
-                                     year=item.infoLabels['year'])
                     else:
                         # Movie search by title ...
                         # if item.infoLabels['year'] or item.infoLabels['filtro']:
                         # ...and year or filter
                         searched_title = scrapertools.unescape(item.infoLabels['title'])
-                        # searched_title = searched_title.split('-')[0].strip()
+                    # from core.support import dbg;dbg()
+                    otmdb = Tmdb(searched_text=searched_title, search_type=search_type, search_language=search_language,
+                                    filtro=item.infoLabels.get('filtro', {}), year=item.infoLabels['year'])
+                    if not item.infoLabels['tmdb_id'] and not item.infoLabels['imdb_id'] and not item.infoLabels['tvdb_id']\
+                        and not item.infoLabels['freebase_mid'] and not item.infoLabels['freebase_id'] and not item.infoLabels['tvrage_id']:
                         otmdb = Tmdb(searched_text=searched_title, search_type=search_type, search_language=search_language,
-                                     filtro=item.infoLabels.get('filtro', {}), year=item.infoLabels['year'])
+                                    filtro=item.infoLabels.get('filtro', {}))
                     if otmdb is not None:
                         if otmdb.get_id() and config.get_setting("tmdb_plus_info", default=False):
                             # If the search has been successful and you are not looking for a list of items,

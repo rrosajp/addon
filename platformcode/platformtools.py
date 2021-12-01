@@ -336,7 +336,7 @@ def render_items(itemlist, parent_item):
         if not item.title:
             item.title = ''
         # If there is no action or it is findvideos / play, folder = False because no listing will be returned
-        if item.action in ['play', '']:
+        if item.action in ['play', 'findvideos', '']:
             item.folder = False
         if item.fanart == "":
             item.fanart = parent_item.fanart
@@ -1716,6 +1716,7 @@ def serverWindow(item, itemlist):
     ENTER = 7
     EXIT = 10
     BACKSPACE = 92
+    xbmc.executebuiltin('Dialog.Close(all,true)')
 
     class ServerWindow(xbmcgui.WindowXMLDialog):
         def start(self, item, itemlist):
@@ -1795,6 +1796,7 @@ def serverWindow(item, itemlist):
 
     if itemlist:
         reopen = False
+        from core import db
         while not xbmc.Monitor().abortRequested():
             played = True
             if not is_playing():
@@ -1803,8 +1805,8 @@ def serverWindow(item, itemlist):
                     if is_playing():
                         return
                 if config.get_setting('autoplay') or reopen:
-                    played_time = get_played_time(item)
-                    if not played_time and played:
+                    xbmc.sleep(200)
+                    if not db['controls'].get('reopen', False):
                         return
 
                 selection = ServerWindow('Servers.xml', config.get_runtime_path()).start(item, itemlist)
@@ -1818,3 +1820,4 @@ def serverWindow(item, itemlist):
                     from platformcode.launcher import run
                     run(selection)
                     reopen = True
+        db.close()

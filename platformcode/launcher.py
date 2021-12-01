@@ -441,24 +441,24 @@ def findvideos(item):
     p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(60683))
     p_dialog.update(0)
 
-    # First checks if channel has a "findvideos" function
-    if hasattr(channel, 'findvideos'):
-        itemlist = getattr(channel, item.action)(item)
+    try:
+        # First checks if channel has a "findvideos" function
+        if hasattr(channel, 'findvideos'):
+            itemlist = getattr(channel, item.action)(item)
 
-    # If not, uses the generic findvideos function
-    else:
-        logger.debug('No channel "findvideos" method, executing core method')
-        itemlist = servertools.find_video_items(item)
+        # If not, uses the generic findvideos function
+        else:
+            logger.debug('No channel "findvideos" method, executing core method')
+            itemlist = servertools.find_video_items(item)
 
-    itemlist = limit_itemlist(itemlist)
+        itemlist = limit_itemlist(itemlist)
+    except:
+        itemlist = []
+        platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60347))
 
     p_dialog.update(100)
     p_dialog.close()
 
-    # If there is only one server play it immediately
-    # if len(itemlist) == 1 or len(itemlist) > 1 and not itemlist[1].server:
-    #     play(itemlist[0].clone(no_return=True))
-    # else:
     platformtools.serverWindow(item, itemlist)
 
 def play_from_library(item):

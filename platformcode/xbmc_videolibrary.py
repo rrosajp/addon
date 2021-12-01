@@ -86,9 +86,13 @@ def mark_auto_as_watched(item):
                 break
 
         # if item.options['continue']:
+        from core import db
         if actual_time < mark_time and mark_time:
             item.played_time = actual_time
-        else: item.played_time = 0
+            db['controls']['reopen'] = True
+        else:
+            item.played_time = 0
+            db['controls']['reopen'] = False
         platformtools.set_played_time(item)
 
         # Silent sync with Trakt
@@ -107,14 +111,13 @@ def mark_auto_as_watched(item):
             run(next_episode)
 
         # db need to be closed when not used, it will cause freezes
-        from core import db
         db.close()
         # from core.support import dbg;dbg()
 
     # If it is configured to mark as seen
     if config.get_setting("mark_as_watched", "videolibrary"):
         threading.Thread(target=mark_as_watched_subThread, args=[item]).start()
-
+        logger.debug('EXIT MONITOR')
 
 def sync_trakt_addon(path_folder):
     """
