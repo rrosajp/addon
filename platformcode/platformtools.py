@@ -1876,31 +1876,34 @@ def serverWindow(item, itemlist):
 
 
     if itemlist:
-        reopen = False
-        from core import db
-        while not xbmc.Monitor().abortRequested():
-            played = True
-            if not is_playing():
-                if config.get_setting('next_ep') == 3:
-                    xbmc.sleep(500)
-                    if is_playing():
-                        return
-                if config.get_setting('autoplay') or reopen:
-                    xbmc.sleep(200)
-                    if not db['controls'].get('reopen', False):
-                        return
-                if config.get_setting('window_type') == 0:
-                    selection = ServerSkinWindow("DialogSelect.xml", config.get_runtime_path()).start(item, itemlist)
-                else:
-                    selection = ServerWindow('Servers.xml', config.get_runtime_path()).start(item, itemlist)
+        def monitor(itemlist):
+            reopen = False
+            from core import db
+            while not xbmc.Monitor().abortRequested():
+                played = True
+                if not is_playing():
+                    if config.get_setting('next_ep') == 3:
+                        xbmc.sleep(500)
+                        if is_playing():
+                            return
+                    if config.get_setting('autoplay') or reopen:
+                        xbmc.sleep(200)
+                        if not db['controls'].get('reopen', False):
+                            return
+                    if config.get_setting('window_type') == 0:
+                        selection = ServerSkinWindow("DialogSelect.xml", config.get_runtime_path()).start(item, itemlist)
+                    else:
+                        selection = ServerWindow('Servers.xml', config.get_runtime_path()).start(item, itemlist)
 
-                if selection == -1:
-                    if item.fakevideo:
-                        return fakeVideo()
-                    else: return
+                    if selection == -1:
+                        if item.fakevideo:
+                            return fakeVideo()
+                        else: return
 
-                else:
-                    from platformcode.launcher import run
-                    run(selection)
-                    reopen = True
-        db.close()
+                    else:
+                        from platformcode.launcher import run
+                        run(selection)
+                        reopen = True
+            db.close()
+        import threading
+        threading.Thread(target=monitor, args=[itemlist]).start()
