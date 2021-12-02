@@ -193,18 +193,19 @@ def episodios(item):
     for episodes in js:
         for it in episodes['episodes']:
             itemlist.append(
-                support.Item(channel=item.channel,
-                             title=support.typo(str(episodes['number']) + 'x' + str(it['number']).zfill(2) + ' - ' + support.cleantitle(it['name']), 'bold'),
-                             episode = it['number'],
-                             season=episodes['number'],
-                             thumbnail=it['images'][0]['original_url'] if 'images' in it and 'original_url' in it['images'][0] else item.thumbnail,
-                             fanart=item.fanart,
-                             plot=it['plot'],
-                             action='findvideos',
-                             contentType='episode',
-                             contentSerieName=item.fulltitle,
-                             url=host + '/watch/' + str(episodes['title_id']),
-                             episodeid= '?e=' + str(it['id'])))
+                item.clone(title=support.typo(str(episodes['number']) + 'x' + str(it['number']).zfill(2) + ' - ' + support.cleantitle(it['name']), 'bold'),
+                           episode=it['number'],
+                           season=episodes['number'],
+                           thumbnail=it['images'][0]['original_url'] if 'images' in it and 'original_url' in it['images'][0] else item.thumbnail,
+                           contentThumbnail=item.thumbnail,
+                           fanart=item.fanart,
+                           contentFanart=item.fanart,
+                           plot=it['plot'],
+                           action='findvideos',
+                           contentType='episode',
+                           contentSerieName=item.fulltitle,
+                           url=host + '/watch/' + str(episodes['title_id']),
+                           episodeid= '?e=' + str(it['id'])))
 
     support.videolibrary(itemlist, item)
     support.download(itemlist, item)
