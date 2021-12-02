@@ -1788,6 +1788,91 @@ def serverWindow(item, itemlist):
             from platformcode.launcher import run
             run(action)
 
+    class ServerSkinWindow(xbmcgui.WindowXMLDialog):
+        def start(self, item, itemlist):
+            self.item = item
+            self.itemlist = itemlist
+            self.selection = -1
+            self.actions = []
+            self.doModal()
+            return self.selection
+
+        def onInit(self):
+            try:
+                self.list = self.getControl(6)
+                self.exit = self.getControl(5)
+                self.first = self.getControl(8)
+                self.second = self.getControl(7)
+                self.first.setVisible(False)
+                self.second.setVisible(False)
+                self.exit.setNavigation(self.exit, self.exit, self.list, self.list)
+            except:
+                pass
+
+            self.exit.setLabel(config.get_localized_string(60396))
+
+            for item in itemlist:
+                if item.server: break
+            if item.contentSeason and item.contentEpisodeNumber:
+                title = '{}x{:02d}. {}'.format(item.contentSeason, item.contentEpisodeNumber, item.contentTitle)
+            elif item.contentEpisodeNumber:
+                title = '{:02d}. {}'.format(item.contentEpisodeNumber, item.contentTitle)
+            else:
+                title = item.fulltitle
+
+            self.getControl(1).setLabel(title)
+
+            items = []
+
+            from core.support import typo
+            for videoitem in self.itemlist:
+                videoitem.thumbnail = config.get_online_server_thumb(videoitem.server)
+                quality = ' [' + videoitem.quality + ']' if videoitem.quality else ''
+                if videoitem.server:
+                    color = scrapertools.find_single_match(videoitem.alive, r'(FF[^\]]+)')
+                    color = typo(' •', 'bold color 0x{}'.format(color)) if color else ''
+                    it = xbmcgui.ListItem('{}{}{}'.format(videoitem.serverName, quality, color))
+                    logger.debug('{}{}{}'.format(videoitem.serverName, quality, color))
+
+                    it.setLabel2(videoitem.ch_name)
+                    it.setArt({'thumb': videoitem.thumbnail})
+                    items.append(it)
+                    self.list.reset()
+                    self.list.addItems(items)
+                    self.setFocus(self.list)
+                else:
+                    self.actions.append(videoitem)
+
+            for n, action in enumerate(self.actions):
+                label = ''
+                if 'library' in action.action:
+                    label = config.get_localized_string(30131)
+                elif 'download' in action.action:
+                    label = config.get_localized_string(30153)
+                if n == 0:
+                    self.first.setLabel(label)
+                    self.exit.setNavigation(self.first, self.first, self.list, self.list)
+                    self.first.setNavigation(self.exit, self.exit, self.list, self.list)
+                    self.first.setVisible(True)
+                elif n == 1:
+                    self.second.setLabel(label)
+                    self.first.setNavigation(self.exit, self.second, self.list, self.list)
+                    self.second.setNavigation(self.first, self.exit, self.list, self.list)
+                    self.second.setVisible(True)
+
+
+        def onClick(self, control):
+            if control == 6:
+                self.selection = self.itemlist[self.list.getSelectedPosition()]
+                self.close()
+            if control == 5:
+                self.close()
+            elif control == 7:
+                from platformcode.launcher import run
+                run(self.actions[1])
+            elif control == 8:
+                from platformcode.launcher import run
+                run(self.actions[0])
 
 
     if itemlist:
@@ -1804,8 +1889,10 @@ def serverWindow(item, itemlist):
                     xbmc.sleep(200)
                     if not db['controls'].get('reopen', False):
                         return
-
-                selection = ServerWindow('Servers.xml', config.get_runtime_path()).start(item, itemlist)
+                if config.get_setting('window_type') == 0:
+                    selection = ServerSkinWindow("DialogSelect.xml", config.get_runtime_path()).start(item, itemlist)
+                else:
+                    selection = ServerWindow('Servers.xml', config.get_runtime_path()).start(item, itemlist)
 
                 if selection == -1:
                     if item.fakevideo:
