@@ -33,7 +33,6 @@ def mark_auto_as_watched(item):
         marked = False
         sync = False
         next_episode = None
-        show_server = True
         mark_time = 0
 
         percentage = float(config.get_setting("watched_setting")) / 100
@@ -68,7 +67,6 @@ def mark_auto_as_watched(item):
                 item.played_time = 0
                 platformtools.set_played_time(item)
                 if item.options['strm'] : sync = True
-                show_server = False
                 from specials import videolibrary
                 videolibrary.mark_content_as_watched2(item)
                 if not next_episode:
@@ -93,6 +91,7 @@ def mark_auto_as_watched(item):
         else:
             item.played_time = 0
             db['controls']['reopen'] = False
+        db.close()
         platformtools.set_played_time(item)
 
         # Silent sync with Trakt
@@ -101,18 +100,9 @@ def mark_auto_as_watched(item):
         while platformtools.is_playing():
             xbmc.sleep(100)
 
-        # if not show_server and item.play_from != 'window' and not item.no_return:
-        #     xbmc.sleep(200)
-        #     xbmc.executebuiltin('Action(close)')
-        #     xbmc.sleep(500)
-
         if next_episode and next_episode.next_ep and config.get_setting('next_ep') < 3:
             from platformcode.launcher import run
             run(next_episode)
-
-        # db need to be closed when not used, it will cause freezes
-        db.close()
-        # from core.support import dbg;dbg()
 
     # If it is configured to mark as seen
     if config.get_setting("mark_as_watched", "videolibrary"):

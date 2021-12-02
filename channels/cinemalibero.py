@@ -53,11 +53,13 @@ def peliculas(item):
         patron = r'<div class="col-lg-3">[^>]+>[^>]+>\s<a href="(?P<url>[^"]+)".+?url\((?P<thumb>[^\)]+)\)">[^>]+>(?P<title>[^<]+)<[^>]+>[^>]+>(?:[^>]+>)?\s?(?P<rating>[\d\.]+)?[^>]+>.+?(?:[ ]\((?P<year>\d{4})\))?<[^>]+>[^>]+>(.?[\d\-x]+\s\(?(?P<lang>[sSuUbBiItTaA\-]+)?\)?\s?(?P<quality>[\w]+)?[|]?\s?(?:[fFiInNeE]+)?\s?\(?(?P<lang2>[sSuUbBiItTaA\-]+)?\)?)?'
         pagination = 25
     elif item.contentType == 'movie':
+        action = 'findvideos'
         patron = r'<a href="(?P<url>[^"]+)" title="(?P<title>.+?)(?:[ ]\[(?P<lang>[sSuUbB\-iItTaA]+)\])?(?:[ ]\((?P<year>\d{4})\))?"\s*alt="[^"]+"\s*class="[^"]+"(?: style="background-image: url\((?P<thumb>.+?)\)">)?\s*<div class="voto">[^>]+>[^>]+>.(?P<rating>[\d\.a-zA-Z\/]+)?[^>]+>[^>]+>[^>]+>(?:<div class="genere">(?P<quality>[^<]+)</div>)?'
         if item.args == 'update':
             patronBlock = r'<section id="slider">(?P<block>.*?)</section>'
             patron = r'<a href="(?P<url>(?:https:\/\/.+?\/(?P<title>[^\/]+[a-zA-Z0-9\-]+)(?P<year>\d{4})))/".+?url\((?P<thumb>[^\)]+)\)">'
     elif item.contentType == 'tvshow':
+        action = 'episodios'
         if item.args == 'update':
             patron = r'<a href="(?P<url>[^"]+)"[^<]+?url\((?P<thumb>.+?)\)">\s*?<div class="titolo">(?P<title>.+?)(?: &#8211; Serie TV)?(?:\([sSuUbBiItTaA\-]+\))?[ ]?(?P<year>\d{4})?</div>\s*?(?:<div class="genere">)?(?:[\w]+?\.?\s?[\s|S]?[\dx\-S]+?\s\(?(?P<lang>[iItTaA]+|[sSuUbBiItTaA\-]+)\)?\s?(?P<quality>[HD]+)?|.+?\(?(?P<lang2>[sSuUbBiItTaA\-]+)?\)?</div>)'
             pagination = 25
@@ -159,6 +161,8 @@ def newest(categoria):
 
 def check(item):
     support.info()
+    # support.dbg()
+    from platformcode.launcher import run
     data = support.match(item.url, headers=headers).data
     if data:
         ck = support.match(data, patron=r'Supportaci condividendo quest[oa] ([^:]+)').match.lower()
@@ -178,7 +182,8 @@ def check(item):
         elif ck == 'film':
             item.contentType = 'movie'
             item.data = data
-            return findvideos(item)
+            item.action = 'findvideos'
+            return run(item)
 
         else:
             item.contentType = 'tvshow'
@@ -187,8 +192,9 @@ def check(item):
             if not itemlist:
                 item.contentType = 'movie'
                 item.data = data
-                return findvideos(item)
-            return itemlist
+                item.action = 'findvideos'
+                return run(item)
+
 
 
 def findvideos(item):

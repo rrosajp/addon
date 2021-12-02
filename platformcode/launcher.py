@@ -196,6 +196,7 @@ def run(item=None):
 
             # Special play action
             if item.action == "play":
+                # from core.support import dbg;dbg()
                 # define la info para trakt
                 try:
                     from core import trakt_tools
@@ -460,6 +461,8 @@ def findvideos(item):
 
     if not itemlist:
         platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60347))
+    elif len(itemlist) == 1 or len(itemlist) > 1 and not itemlist[1].server:
+        run(itemlist[0].clone(no_return=True))
     else:
         platformtools.serverWindow(item, itemlist)
 

@@ -1384,9 +1384,8 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         if (player_mode == 3 and mediaurl.startswith("rtmp")): player_mode = 0
         elif "megacrypter.com" in mediaurl: player_mode = 3
         logger.info("mediaurl=" + mediaurl)
-
+        prevent_busy()
         if player_mode in [0,1]:
-            prevent_busy()
             if player_mode in [1]:
                 item.played_time = resume_playback(get_played_time(item))
 
@@ -1421,13 +1420,14 @@ def set_player(item, xlistitem, mediaurl, view, strm):
 
     # if it is a video library file send to mark as seen
     if strm or item.strm_path: item.options['strm'] = True
-    # if player_mode == 1: item.options['continue'] = True
+
     if not mediaurl.startswith('plugin'):
         from platformcode import xbmc_videolibrary
         xbmc_videolibrary.mark_auto_as_watched(item)
 
     # for cases where the audio playback window appears in place of the video one
     if item.focusOnVideoPlayer:
+        from core.support import dbg;dbg()
         while is_playing() and xbmcgui.getCurrentWindowId() != 12006:
             continue
         xbmc.sleep(500)
@@ -1882,10 +1882,10 @@ def serverWindow(item, itemlist):
             while not xbmc.Monitor().abortRequested():
                 played = True
                 if not is_playing():
-                    if config.get_setting('next_ep') == 3:
-                        xbmc.sleep(500)
-                        if is_playing():
-                            return
+                    # if config.get_setting('next_ep') == 3:
+                    #     xbmc.sleep(500)
+                    #     if is_playing():
+                    #         return
                     if config.get_setting('autoplay') or reopen:
                         xbmc.sleep(200)
                         if not db['controls'].get('reopen', False):
