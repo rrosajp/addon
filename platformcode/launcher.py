@@ -480,9 +480,22 @@ def play_from_library(item):
 
     item.action = item.next_action if item.next_action else 'findvideos'
     logger.debug('Executing channel', item.channel, 'method', item.action)
-    if item.action == 'findvideos': 
+    if item.action == 'findvideos':
+        from specials import videolibrary
+        p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(60683))
+        p_dialog.update(0)
         item.fakevideo = True
-        return run(item)
+        itemlist = videolibrary.findvideos(item)
+        p_dialog.update(100)
+        p_dialog.close()
+
+        if not itemlist:
+            platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60347))
+        elif len(itemlist) == 1 or len(itemlist) > 1 and not itemlist[1].server:
+            run(itemlist[0].clone(no_return=True))
+        else:
+            platformtools.serverWindow(item, itemlist)
+
     else:
         platformtools.fakeVideo()
         return run(item)
