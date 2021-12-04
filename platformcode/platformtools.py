@@ -1801,13 +1801,14 @@ def serverWindow(item, itemlist):
             try:
                 self.list = self.getControl(6)
                 self.exit = self.getControl(5)
-                self.first = self.getControl(8)
-                self.second = self.getControl(7)
-                self.first.setVisible(False)
-                self.second.setVisible(False)
                 self.exit.setNavigation(self.exit, self.exit, self.list, self.list)
             except:
                 pass
+
+            try: self.getControl(7).setVisible(False)
+            except: pass
+            try: self.getControl(8).setVisible(False)
+            except: pass
 
             self.exit.setLabel(config.get_localized_string(60396))
 
@@ -1826,40 +1827,23 @@ def serverWindow(item, itemlist):
 
             from core.support import typo
             for videoitem in self.itemlist:
-                videoitem.thumbnail = config.get_online_server_thumb(videoitem.server)
-                quality = ' [' + videoitem.quality + ']' if videoitem.quality else ''
                 if videoitem.server:
+                    videoitem.thumbnail = config.get_online_server_thumb(videoitem.server)
+                    quality = ' [' + videoitem.quality + ']' if videoitem.quality else ''
                     color = scrapertools.find_single_match(videoitem.alive, r'(FF[^\]]+)')
                     color = typo(' •', 'bold color 0x{}'.format(color)) if color else ''
-                    it = xbmcgui.ListItem('{}{}{}'.format(videoitem.serverName, quality, color))
-                    logger.debug('{}{}{}'.format(videoitem.serverName, quality, color))
-
-                    it.setLabel2(videoitem.ch_name)
-                    it.setArt({'thumb': videoitem.thumbnail})
-                    items.append(it)
-                    self.list.reset()
-                    self.list.addItems(items)
-                    self.setFocus(self.list)
+                    title = '{}{}{}'.format(videoitem.serverName, quality, color)
                 else:
-                    self.actions.append(videoitem)
-
-            for n, action in enumerate(self.actions):
-                label = ''
-                if 'library' in action.action:
-                    label = config.get_localized_string(30131)
-                elif 'download' in action.action:
-                    label = config.get_localized_string(30153)
-                if n == 0:
-                    self.first.setLabel(label)
-                    self.exit.setNavigation(self.first, self.first, self.list, self.list)
-                    self.first.setNavigation(self.exit, self.exit, self.list, self.list)
-                    self.first.setVisible(True)
-                elif n == 1:
-                    self.second.setLabel(label)
-                    self.first.setNavigation(self.exit, self.second, self.list, self.list)
-                    self.second.setNavigation(self.first, self.exit, self.list, self.list)
-                    self.second.setVisible(True)
-
+                    logger.debug(videoitem)
+                    title = videoitem.title
+                it = xbmcgui.ListItem(title)
+                if videoitem.ch_name:
+                    it.setLabel2(videoitem.ch_name)
+                it.setArt({'thumb': videoitem.thumbnail})
+                items.append(it)
+                self.list.reset()
+                self.list.addItems(items)
+                self.setFocus(self.list)
 
         def onClick(self, control):
             if control == 6:
@@ -1881,11 +1865,11 @@ def serverWindow(item, itemlist):
             from core import db
             while not xbmc.Monitor().abortRequested():
                 played = True
+                if config.get_setting('next_ep') == 3:
+                    # xbmc.sleep(500)
+                    if is_playing():
+                        return
                 if not is_playing():
-                    # if config.get_setting('next_ep') == 3:
-                    #     xbmc.sleep(500)
-                    #     if is_playing():
-                    #         return
                     if config.get_setting('autoplay') or reopen:
                         xbmc.sleep(200)
                         if not db['controls'].get('reopen', False):
@@ -1896,14 +1880,13 @@ def serverWindow(item, itemlist):
                         selection = ServerWindow('Servers.xml', config.get_runtime_path()).start(item, itemlist)
 
                     if selection == -1:
-                        if item.fakevideo:
-                            return fakeVideo()
-                        else: return
+                        return
 
                     else:
                         from platformcode.launcher import run
                         run(selection)
                         reopen = True
+                        if not selection.server: return
             db.close()
         import threading
         threading.Thread(target=monitor, args=[itemlist]).start()
