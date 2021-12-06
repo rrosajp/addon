@@ -996,7 +996,7 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
         if not mediaurl: return
 
         # video information is obtained.
-        xlistitem = xbmcgui.ListItem(path=item.url)
+        xlistitem = xbmcgui.ListItem(item.title, path=item.url)
         xlistitem.setArt({"thumb": item.contentThumbnail if item.contentThumbnail else item.thumbnail})
         set_infolabels(xlistitem, item, True)
 
@@ -1387,7 +1387,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         prevent_busy()
         if player_mode in [0,1]:
             if player_mode in [1]:
-                item.played_time = resume_playback(get_played_time(item))
+                xlistitem.setProperty('StartOffset','{}'.format(resume_playback(get_played_time(item))))
 
             logger.info('Player Mode:',['Direct', 'Bookmark'][player_mode])
             # Add the listitem to a playlist
@@ -1446,7 +1446,7 @@ def add_next_to_playlist(item):
                 nfo_path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"), next.strm_path.replace('strm','nfo'))
                 if nfo_path and filetools.isfile(nfo_path):
                     head_nfo, item_nfo = videolibrarytools.read_nfo(nfo_path)
-                nextItem = xbmcgui.ListItem(path=item_nfo.url)
+                nextItem = xbmcgui.ListItem(item_nfo.fulltitle, path=item_nfo.url)
                 nextItem.setArt({"thumb": item_nfo.contentThumbnail if item_nfo.contentThumbnail else item_nfo.thumbnail})
                 set_infolabels(nextItem, item_nfo, True)
                 nexturl = "plugin://plugin.video.kod/?" + next.tourl()

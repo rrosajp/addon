@@ -52,9 +52,6 @@ def mark_auto_as_watched(item):
             except: pass
             try: total_time = xbmc.Player().getTotalTime()
             except: pass
-            if item.played_time and xbmcgui.getCurrentWindowId() == 12005:
-                xbmc.Player().seekTime(item.played_time)
-                item.played_time = 0 # Fix for Slow Devices
 
             mark_time = total_time * percentage
             difference = total_time - actual_time
