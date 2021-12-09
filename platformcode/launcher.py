@@ -432,6 +432,9 @@ def limit_itemlist(itemlist):
 
 
 def findvideos(item):
+    from core import db
+    db['controls']['reopen'] = False
+    db.close()
     logger.debug('Executing channel', item.channel, 'method', item.action)
     channel = platformtools.channelImport(item.channel)
     if not channel:

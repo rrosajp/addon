@@ -82,12 +82,14 @@ def mark_auto_as_watched(item):
 
         # if item.options['continue']:
         from core import db
-        if actual_time < mark_time and mark_time:
-            item.played_time = actual_time
-            db['controls']['reopen'] = True
-        else:
+        if marked:
+            logger.debug('CLOSE')
             item.played_time = 0
             db['controls']['reopen'] = False
+        else:
+            logger.debug('REOPEN')
+            item.played_time = actual_time
+            db['controls']['reopen'] = True
         db.close()
         platformtools.set_played_time(item)
 

@@ -1363,7 +1363,6 @@ def get_video_seleccionado(item, seleccion, video_urls, autoplay=False):
 def set_player(item, xlistitem, mediaurl, view, strm):
     logger.debug()
     item.options = {'strm':False}
-    # logger.debug("item:\n" + item.tostring('\n'))
 
     # Moved del conector "torrent" here
     if item.server == "torrent":
@@ -1864,13 +1863,8 @@ def serverWindow(item, itemlist):
             reopen = False
             from core import db
             while not xbmc.Monitor().abortRequested():
-                played = True
-                if config.get_setting('next_ep') == 3:
-                    # xbmc.sleep(500)
-                    if is_playing():
-                        return
                 if not is_playing():
-                    if config.get_setting('autoplay') or reopen:
+                    if reopen:
                         xbmc.sleep(200)
                         if not db['controls'].get('reopen', False):
                             return
