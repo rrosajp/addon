@@ -1403,7 +1403,7 @@ def addQualityTag(item, itemlist, data, patron):
             "DTS": "audio ricavato dai dischi DTS2, quindi la qualità audio è elevata.",
             "LD": "l’audio è stato registrato tramite jack collegato alla macchina da presa, pertanto di discreta qualità.",
             "DD": "audio ricavato dai dischi DTS cinema. L’audio è di buona qualità, ma potreste riscontrare il fatto che non potrebbe essere più riproducibile.",
-            "AC3": "audio in Dolby Digital puo' variare da 2.0 a 5.1 canali in alta qualità.",
+            "AC3": "audio in Dolby Digital può variare da 2.0 a 5.1 canali in alta qualità.",
             "MP3": "codec per compressione audio utilizzato MP3.",
             "RESYNC": "il film è stato lavorato e re sincronizzato con una traccia audio. A volte potresti riscontrare una mancata sincronizzazione tra audio e video.",
         }
@@ -1430,7 +1430,7 @@ def addQualityTag(item, itemlist, data, patron):
                 descr = ''
             itemlist.insert(0,Item(channel=item.channel,
                                    action="",
-                                   title=typo(qualityStr, '[] color kod bold'),
+                                   title=typo(qualityStr, 'bold'),
                                    fulltitle=qualityStr,
                                    plot=descr,
                                    folder=False,

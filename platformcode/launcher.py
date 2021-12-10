@@ -462,10 +462,12 @@ def findvideos(item):
     p_dialog.update(100)
     p_dialog.close()
 
-    if not itemlist:
+    serverlist = [s for s in itemlist if s.server]
+
+    if not serverlist:
         platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60347))
-    elif len(itemlist) == 1 or len(itemlist) > 1 and not itemlist[1].server:
-        run(itemlist[0].clone(no_return=True))
+    elif len(serverlist) == 1:
+        run(serverlist[0].clone(no_return=True))
     else:
         platformtools.serverWindow(item, itemlist)
 

@@ -1838,6 +1838,8 @@ def serverWindow(item, itemlist):
                 it = xbmcgui.ListItem(title)
                 if videoitem.ch_name:
                     it.setLabel2(videoitem.ch_name)
+                else:
+                    it.setLabel2(videoitem.plot)
                 it.setArt({'thumb': videoitem.thumbnail})
                 items.append(it)
                 self.list.reset()
@@ -1847,7 +1849,12 @@ def serverWindow(item, itemlist):
         def onClick(self, control):
             if control == 6:
                 self.selection = self.itemlist[self.list.getSelectedPosition()]
-                self.close()
+                if not self.selection.action:
+                    it = self.selection
+                    self.selection = -1
+                    dialog_textviewer(it.title, it.plot)
+                else:
+                    self.close()
             if control == 5:
                 self.close()
             elif control == 7:
