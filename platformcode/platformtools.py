@@ -1711,10 +1711,10 @@ def serverWindow(item, itemlist):
     ENTER = 7
     EXIT = 10
     BACKSPACE = 92
-    prevent_busy()
 
     class ServerWindow(xbmcgui.WindowXMLDialog):
         def start(self, item, itemlist):
+            prevent_busy()
             self.itemlist = itemlist
             self.item = item
             self.servers = []
@@ -1789,6 +1789,7 @@ def serverWindow(item, itemlist):
 
     class ServerSkinWindow(xbmcgui.WindowXMLDialog):
         def start(self, item, itemlist):
+            prevent_busy()
             self.item = item
             self.itemlist = itemlist
             self.selection = -1
@@ -1833,13 +1834,14 @@ def serverWindow(item, itemlist):
                     color = typo(' •', 'bold color 0x{}'.format(color)) if color else ''
                     title = '{}{}{}'.format(videoitem.serverName, quality, color)
                 else:
-                    logger.debug(videoitem)
                     title = videoitem.title
                 it = xbmcgui.ListItem(title)
                 if videoitem.ch_name:
                     it.setLabel2(videoitem.ch_name)
-                else:
+                elif not videoitem.action:
                     it.setLabel2(videoitem.plot)
+                else:
+                    it.setLabel2(videoitem.fulltitle)
                 it.setArt({'thumb': videoitem.thumbnail})
                 items.append(it)
                 self.list.reset()
