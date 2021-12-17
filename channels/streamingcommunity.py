@@ -220,7 +220,6 @@ def play(item):
     from time import time
     from base64 import b64encode
     from hashlib import md5
-    video_urls = []
 
     data = support.httptools.downloadpage(item.url + item.episodeid, headers=headers).data.replace('&quot;','"').replace('\\','')
     scws_id = support.match(data, patron=r'scws_id"\s*:\s*(\d+)').match
@@ -233,9 +232,6 @@ def play(item):
     expires = int(time() + 172800)
     token = b64encode(md5('{}{} Yc8U6r8KjAKAepEA'.format(expires, client_ip).encode('utf-8')).digest()).decode('utf-8').replace('=', '').replace('+', '-').replace('/', '_')
 
-    sub = 'https://scws.xyz/master/{}?token={}&expires={}&n=1'.format(scws_id, token, expires)
-    urls = support.match(sub, patron=r'RESOLUTION=\d+x(\d+)(?:\s*,\s*SUBTITLES="[^"]+")\s*([^\s\n]+)').matches
-    for quality, url in urls:
-        video_urls.append(['hls [{}p]'.format(quality),url])
+    url = 'https://scws.xyz/master/{}?token={}&expires={}&n=1'.format(scws_id, token, expires)
 
-    return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', video_urls=video_urls, manifest='hls', subtitle=sub)]
+    return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', url=url)]
