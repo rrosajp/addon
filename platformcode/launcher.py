@@ -297,16 +297,21 @@ def findvideos(item, itemlist=[]):
         p_dialog = platformtools.dialog_progress_bg(config.get_localized_string(20000), config.get_localized_string(60683))
         p_dialog.update(0)
 
-        # First checks if channel has a "findvideos" function
-        if hasattr(channel, 'findvideos'):
-            itemlist = getattr(channel, item.action)(item)
+        try:
+            # First checks if channel has a "findvideos" function
+            if hasattr(channel, 'findvideos'):
+                itemlist = getattr(channel, item.action)(item)
 
-        # If not, uses the generic findvideos function
-        else:
-            logger.debug('No channel "findvideos" method, executing core method')
-            itemlist = servertools.find_video_items(item)
+            # If not, uses the generic findvideos function
+            else:
+                logger.debug('No channel "findvideos" method, executing core method')
+                itemlist = servertools.find_video_items(item)
 
-        itemlist = limitItemlist(itemlist)
+            itemlist = limitItemlist(itemlist)
+        except Exception as ex:
+            template = "An exception of type %s occured. Arguments:\n%r"
+            message = template % (type(ex).__name__, ex.args)
+            logger.error(" %s" % message)
 
         p_dialog.update(100)
         p_dialog.close()

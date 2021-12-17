@@ -41,7 +41,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(http[s]?:\\/\\/(?:[a-zA-Z0-9]+)\\.torrent)",
+        "pattern": "(https?:\/\/\\S+.torrent)",
         "url": "\\1"
       },
       {

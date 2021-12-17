@@ -1892,7 +1892,8 @@ def serverWindow(item, itemlist):
                         from platformcode.launcher import run
                         run(selection)
                         reopen = True
-                        if not selection.server: return
+                        if not selection.server or selection.server == 'torrent': return
+
             db.close()
         import threading
         threading.Thread(target=monitor, args=[itemlist]).start()
