@@ -1724,9 +1724,10 @@ def serverWindow(item, itemlist):
             for videoitem in self.itemlist:
                 videoitem.thumbnail = config.get_online_server_thumb(videoitem.server)
                 quality = ' [' + videoitem.quality + ']' if videoitem.quality else ''
+                info = ' [' + videoitem.extraInfo + ']' if videoitem.extraInfo else ''
                 if videoitem.server:
                     color = scrapertools.find_single_match(videoitem.alive, r'(FF[^\]]+)')
-                    it = xbmcgui.ListItem('{}{}'.format(videoitem.serverName, quality))
+                    it = xbmcgui.ListItem('{}{}{}'.format(videoitem.serverName, quality, info))
 
                     # format Title
                     if videoitem.contentSeason and videoitem.contentEpisodeNumber:
@@ -1828,11 +1829,13 @@ def serverWindow(item, itemlist):
             from core.support import typo
             for videoitem in self.itemlist:
                 if videoitem.server:
+                    logger.debug(videoitem)
                     videoitem.thumbnail = config.get_online_server_thumb(videoitem.server)
                     quality = ' [' + videoitem.quality + ']' if videoitem.quality else ''
                     color = scrapertools.find_single_match(videoitem.alive, r'(FF[^\]]+)')
                     color = typo(' •', 'bold color 0x{}'.format(color)) if color else ''
-                    title = '{}{}{}'.format(videoitem.serverName, quality, color)
+                    info = ' [' + videoitem.extraInfo + ']' if videoitem.extraInfo else ''
+                    title = '{}{}{}{}'.format(videoitem.serverName, quality, info, color)
                 else:
                     title = videoitem.title
                 it = xbmcgui.ListItem(title)

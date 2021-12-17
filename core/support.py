@@ -1279,6 +1279,7 @@ def server(item, data='', itemlist=[], headers='', AutoPlay=True, CheckLinks=Tru
 
         if videoitem.video_urls or srv_param.get('active', False):
             vi = item.clone(server=videoitem.server,
+                            extraInfo=videoitem.extraInfo,
                             serverName=videoitem.serverName,
                             url=videoitem.url,
                             videoUrls= videoitem.videoUrlsn,
