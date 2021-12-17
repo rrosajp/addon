@@ -57,7 +57,7 @@ def mark_auto_as_watched(item):
             difference = total_time - actual_time
 
             # Mark as Watched
-            if actual_time > mark_time and not marked:
+            if mark_time and total_time > actual_time > mark_time and not marked:
                 logger.info("Marked as Watched")
                 item.playcount = 1
                 marked = True
