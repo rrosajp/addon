@@ -237,14 +237,17 @@ def play(item):
     url = 'https://scws.xyz/master/{}?token={}&expires={}&n=1'.format(scws_id, token, expires)
     subs = []
     urls = []
+
     info = support.match(url, patron='(?:NAME="([^"]+)".*?URI="([^"]+)|RESOLUTION=\d+x(\d+).*?(http[^"\s]+))').matches
+    if info:
+        for lang, sub, res, url in info:
+            if sub:
+                s = config.get_temp_file(lang +'.srt')
+                subs.append(s)
+                filetools.write(s, support.vttToSrt(httptools.downloadpage(support.match(sub, patron=r'(http[^\s\n]+)').match).data))
+            elif url:
+                urls.append(['hls [{}]'.format(res), url])
 
-    for lang, sub, res, url in info:
-        if sub:
-            s = config.get_temp_file(lang +'.srt')
-            subs.append(s)
-            filetools.write(s, support.vttToSrt(httptools.downloadpage(support.match(sub, patron=r'(http[^\s\n]+)').match).data))
-        elif url:
-            urls.append(['hls [{}]'.format(res), url])
-
-    return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', video_urls=urls, subtitle=subs, manifest='hls')]
+        return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', video_urls=urls, subtitle=subs, manifest='hls')]
+    else:
+        return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', url=url, manifest='hls')]
