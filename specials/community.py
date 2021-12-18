@@ -238,7 +238,7 @@ def peliculas(item, json='', key='', itemlist=[]):
     itemlist += itlist
 
     if item.sort:
-        itemlist.sort(key=lambda x: x.title, reverse=False)
+        itemlist.sort(key=lambda x: x.title.lower(), reverse=False)
     if Pagination and len(itemlist) >= Pagination:
         if inspect.stack()[1][3] != 'get_newest':
             item.title = support.typo(config.get_localized_string(30992), 'color kod bold')
