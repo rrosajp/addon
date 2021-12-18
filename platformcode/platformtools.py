@@ -1386,7 +1386,8 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         logger.info("mediaurl=" + mediaurl)
         prevent_busy()
         if player_mode in [0,1]:
-            xlistitem.addStreamInfo('video', {'duration':240})
+            if player_mode in [1]:
+                xlistitem.setProperty('StartOffset','{}'.format(resume_playback(get_played_time(item))))
 
             logger.info('Player Mode:',['Direct', 'Bookmark'][player_mode])
             # Add the listitem to a playlist
@@ -1419,11 +1420,11 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         xbmc_videolibrary.mark_auto_as_watched(item)
 
     # for cases where the audio playback window appears in place of the video one
-    if item.focusOnVideoPlayer:
-        while is_playing() and xbmcgui.getCurrentWindowId() != 12006:
-            continue
-        xbmc.sleep(500)
-        xbmcgui.Window(12005).show()
+    # if item.focusOnVideoPlayer:
+    #     while is_playing() and xbmcgui.getCurrentWindowId() != 12006:
+    #         continue
+    #     xbmc.sleep(500)
+    #     xbmcgui.Window(12005).show()
 
 
 
@@ -1639,7 +1640,7 @@ def get_played_time(item):
         import traceback
         logger.error(traceback.format_exc())
         del db['viewed'][ID]
-
+    db.close()
     return played_time
 
 
@@ -1669,7 +1670,7 @@ def set_played_time(item):
         import traceback
         logger.error(traceback.format_exc())
         del db['viewed'][ID]
-
+    db.close()
 
 def prevent_busy():
     xbmc.executebuiltin('Dialog.Close(all,true)')
@@ -1874,21 +1875,22 @@ def serverWindow(item, itemlist):
                     if reopen:
                         xbmc.sleep(200)
                         if not db['controls'].get('reopen', False):
-                            return
+                            break
                     if config.get_setting('window_type') == 0:
                         selection = ServerSkinWindow("DialogSelect.xml", config.get_runtime_path()).start(item, itemlist)
                     else:
                         selection = ServerWindow('Servers.xml', config.get_runtime_path()).start(item, itemlist)
 
                     if selection == -1:
-                        return
+                        break
 
                     else:
                         from platformcode.launcher import run
                         run(selection)
                         reopen = True
-                        if not selection.server or selection.server == 'torrent': return
+                        if not selection.server or selection.server == 'torrent': break
 
             db.close()
+            logger.debug('Server Window EXIT')
         import threading
         threading.Thread(target=monitor, args=[itemlist]).start()
