@@ -653,9 +653,7 @@ def scrape(func):
 
         # itemlist = filterLang(item, itemlist)   # causa problemi a newest
 
-        if config.get_setting('trakt_sync'):
-            from core import trakt_tools
-            trakt_tools.trakt_check(itemlist)
+        check_trakt(itemlist)
         return itemlist
 
     return wrapper
@@ -1621,3 +1619,9 @@ def vttToSrt(data):
             ret += line + os.linesep
 
     return ret
+
+def check_trakt(itemlist):
+    if config.get_setting('trakt_sync'):
+        from core import trakt_tools
+        trakt_tools.trakt_check(itemlist)
+    return itemlist
