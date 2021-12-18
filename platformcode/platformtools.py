@@ -1363,6 +1363,10 @@ def get_video_seleccionado(item, seleccion, video_urls, autoplay=False):
 def set_player(item, xlistitem, mediaurl, view, strm):
     logger.debug()
     item.options = {'strm':False}
+    if item.subtitle:
+        if type(item.subtitle) != list: item.subtitle = [item.subtitle]
+        item.subtitle.reverse()
+        xlistitem.setSubtitles(item.subtitle)
 
     # Moved del conector "torrent" here
     if item.server == "torrent":
@@ -1371,9 +1375,6 @@ def set_player(item, xlistitem, mediaurl, view, strm):
     # If it is a strm file, play is not necessary
     elif strm:
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xlistitem)
-        if item.subtitle:
-            xbmc.sleep(2000)
-            xbmc_player.setSubtitles(item.subtitle)
 
     else:
         if type(item.player_mode) == int:
@@ -1385,8 +1386,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
         logger.info("mediaurl=" + mediaurl)
         prevent_busy()
         if player_mode in [0,1]:
-            if player_mode in [1]:
-                xlistitem.setProperty('StartOffset','{}'.format(resume_playback(get_played_time(item))))
+            xlistitem.addStreamInfo('video', {'duration':240})
 
             logger.info('Player Mode:',['Direct', 'Bookmark'][player_mode])
             # Add the listitem to a playlist
@@ -1411,12 +1411,6 @@ def set_player(item, xlistitem, mediaurl, view, strm):
             download_and_play.download_and_play(mediaurl, "download_and_play.tmp", config.get_setting("downloadpath"))
             return
 
-    # ALL LOOKING TO REMOVE VIEW
-    if item.subtitle and view:
-        logger.info("External subtitles: " + item.subtitle)
-        xbmc.sleep(2000)
-        xbmc_player.setSubtitles(item.subtitle)
-
     # if it is a video library file send to mark as seen
     if strm or item.strm_path: item.options['strm'] = True
 
@@ -1426,11 +1420,12 @@ def set_player(item, xlistitem, mediaurl, view, strm):
 
     # for cases where the audio playback window appears in place of the video one
     if item.focusOnVideoPlayer:
-        from core.support import dbg;dbg()
         while is_playing() and xbmcgui.getCurrentWindowId() != 12006:
             continue
         xbmc.sleep(500)
         xbmcgui.Window(12005).show()
+
+
 
 
 def add_next_to_playlist(item):

@@ -5,8 +5,8 @@
 import functools
 import json, requests, sys
 from channels.mediasetplay import Token
-from core import support, channeltools, httptools
-from platformcode import logger
+from core import support, channeltools, httptools, jsontools, filetools
+from platformcode import logger, config, platformtools
 
 
 # def findhost(url):
@@ -191,7 +191,9 @@ def episodios(item):
     js = json.loads(support.match(item.url, patron=r'seasons="([^"]+)').match.replace('&quot;','"'))
 
     for episodes in js:
+        logger.debug(jsontools.dump(js))
         for it in episodes['episodes']:
+            
             itemlist.append(
                 item.clone(title=support.typo(str(episodes['number']) + 'x' + str(it['number']).zfill(2) + ' - ' + support.cleantitle(it['name']), 'bold'),
                            episode=it['number'],
@@ -233,5 +235,16 @@ def play(item):
     token = b64encode(md5('{}{} Yc8U6r8KjAKAepEA'.format(expires, client_ip).encode('utf-8')).digest()).decode('utf-8').replace('=', '').replace('+', '-').replace('/', '_')
 
     url = 'https://scws.xyz/master/{}?token={}&expires={}&n=1'.format(scws_id, token, expires)
+    subs = []
+    urls = []
+    info = support.match(url, patron='(?:NAME="([^"]+)".*?URI="([^"]+)|RESOLUTION=\d+x(\d+).*?(http[^"\s]+))').matches
 
-    return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', url=url)]
+    for lang, sub, res, url in info:
+        if sub:
+            s = config.get_temp_file(lang +'.srt')
+            subs.append(s)
+            filetools.write(s, support.vttToSrt(httptools.downloadpage(support.match(sub, patron=r'(http[^\s\n]+)').match).data))
+        elif url:
+            urls.append(['hls [{}]'.format(res), url])
+
+    return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', video_urls=urls, subtitle=subs, manifest='hls')]

@@ -1594,3 +1594,30 @@ def thumb(item_itemlist_string=None, genre=False, live=False):
 
     else:
         return get_thumb('next.png')
+
+
+def vttToSrt(data):
+    # Code adapted by VTT_TO_SRT.PY (c) Jansen A. Simanullang
+    ret = ''
+
+    data = re.sub(r'(\d\d:\d\d:\d\d).(\d\d\d) --> (\d\d:\d\d:\d\d).(\d\d\d)(?:[ \-\w]+:[\w\%\d:]+)*\n', r'\1,\2 --> \3,\4\n', data)
+    data = re.sub(r'(\d\d:\d\d).(\d\d\d) --> (\d\d:\d\d).(\d\d\d)(?:[ \-\w]+:[\w\%\d:]+)*\n', r'00:\1,\2 --> 00:\3,\4\n', data)
+    data = re.sub(r'(\d\d).(\d\d\d) --> (\d\d).(\d\d\d)(?:[ \-\w]+:[\w\%\d:]+)*\n', r'00:00:\1,\2 --> 00:00:\3,\4\n', data)
+    data = re.sub(r'WEBVTT\n', '', data)
+    data = re.sub(r'Kind:[ \-\w]+\n', '', data)
+    data = re.sub(r'Language:[ \-\w]+\n', '', data)
+    data = re.sub(r'<c[.\w\d]*>', '', data)
+    data = re.sub(r'</c>', '', data)
+    data = re.sub(r'<\d\d:\d\d:\d\d.\d\d\d>', '', data)
+    data = re.sub(r'::[\-\w]+\([\-.\w\d]+\)[ ]*{[.,:;\(\) \-\w\d]+\n }\n', '', data)
+    data = re.sub(r'Style:\n##\n', '', data)
+
+    lines = data.split(os.linesep)
+
+    for n, line in enumerate(lines):
+        if re.match(r"((\d\d:){2}\d\d),(\d{3}) --> ((\d\d:){2}\d\d),(\d{3})", line):
+            ret += str(n + 1) + os.linesep + line + os.linesep
+        else:
+            ret += line + os.linesep
+
+    return ret
