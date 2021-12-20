@@ -727,6 +727,7 @@ def dooplay_search(item, blacklist=""):
 
 
 def dooplay_search_vars(item, blacklist):
+    actLike = 'peliculas'
     if item.contentType == 'undefined':  # ricerca globale
         type = '(?P<type>movies|tvshows)'
         typeActionDict = {'findvideos': ['movies'], 'episodios': ['tvshows']}
@@ -1625,3 +1626,4 @@ def check_trakt(itemlist):
         from core import trakt_tools
         trakt_tools.trakt_check(itemlist)
     return itemlist
+
