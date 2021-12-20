@@ -286,9 +286,9 @@ def get_seasons(item):
                                          'get_newest'] and defp and not item.disable_pagination:
             itemlist = pagination(item, itemlist)
 
-    if show_seasons:
-        support.videolibrary(itemlist, item)
-        support.download(itemlist, item)
+    # if show_seasons:
+    support.videolibrary(itemlist, item)
+    support.download(itemlist, item)
     return itemlist
 
 
@@ -393,6 +393,9 @@ def episodios(item, json='', key='', itemlist=[]):
                                      filterseason=str(season),
                                      path=item.path))
 
+            support.videolibrary(itemlist, item)
+            support.download(itemlist, item)
+
         elif defp and inspect.stack()[1][3] not in ['get_seasons'] and not item.disable_pagination:
             if Pagination and len(itemlist) >= Pagination:
                 if inspect.stack()[1][3] != 'get_newest':
@@ -400,9 +403,10 @@ def episodios(item, json='', key='', itemlist=[]):
                     item.page = pag + 1
                     item.thumbnail = support.thumb()
                     itemlist.append(item)
-        if not show_seasons:
+
+        if inspect.stack()[1][3] not in ['get_seasons'] and not show_seasons:
             support.videolibrary(itemlist, item)
-        support.download(itemlist, item)
+            support.download(itemlist, item)
     return itemlist
 
 
