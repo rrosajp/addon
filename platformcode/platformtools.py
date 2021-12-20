@@ -472,8 +472,8 @@ def getCurrentView(item=None, parent_item=None):
     elif item.action:
         return 'menu', addons
 
-    else:
-        return None, None
+    # else:
+    #     return None, None
 
 
 
