@@ -695,8 +695,8 @@ class UnshortenIt(object):
             return httptools.downloadpage(uri, only_headers=True, follow_redirects=False).headers.get('location', uri), 200
 
     def _unshorten_uprot(self, uri):
-        from core.support import dbg
-        dbg()
+        # from core.support import dbg
+        # dbg()
         for link in scrapertools.find_multiple_matches(httptools.downloadpage(uri, cloudscraper=True).data, '<a[^>]+href="([^"]+)'):
             if link.startswith('https://maxstream.video') or link.startswith('https://uprot.net') and link != uri:
                 return link, 200
