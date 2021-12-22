@@ -87,6 +87,7 @@ def newest(category):
     itemlist = []
     item = support.Item()
     item.args = 1
+    item.newest = True
     if category == 'peliculas':
         item.url = host + '/film'
     else:
@@ -147,10 +148,11 @@ def peliculas(item):
             recordlist.append(it)
 
     itemlist.sort(key=lambda item: item.n)
-    if recordlist:
-        itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), thumbnail=support.thumb(), page=page, records=recordlist))
-    elif len(itemlist) >= 20:
-        itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), thumbnail=support.thumb(), records=[], page=page + 1))
+    if not item.newest:
+        if recordlist:
+            itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), thumbnail=support.thumb(), page=page, records=recordlist))
+        elif len(itemlist) >= 20:
+            itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), thumbnail=support.thumb(), records=[], page=page + 1))
 
     support.tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
     support.check_trakt(itemlist)
