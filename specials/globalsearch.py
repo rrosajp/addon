@@ -343,11 +343,11 @@ class SearchWindow(xbmcgui.WindowXML):
                 for searchAction in self.getActions():
                     if self.exit: break
                     self.search_threads.append(executor.submit(self.get_channel_results, searchAction))
-                # for res in futures.as_completed(self.search_threads):
-                #     if self.exit: break
-                #     if res.result():
-                #         channel, valid, results = res.result()
-                #         self.update(channel, valid, results)
+                for res in futures.as_completed(self.search_threads):
+                    if self.exit: break
+                    if res.result():
+                        channel, valid, results = res.result()
+                        self.update(channel, valid, results)
 
                         # if results:
                         #     name = results[0].channel
@@ -363,7 +363,7 @@ class SearchWindow(xbmcgui.WindowXML):
         self.count = len(self.searchActions)
 
     def get_channel_results(self, searchAction):
-        def search(text):
+        def channel_search(text):
             valid = []
             other = []
             results = self.moduleDict[channel].search(searchAction, text)
@@ -388,7 +388,7 @@ class SearchWindow(xbmcgui.WindowXML):
         other = []
 
         try:
-            results, valid, other = search(self.item.text)
+            results, valid, other = channel_search(self.item.text)
             if self.exit: return
 
             # if we are on movie search but no valid results is found, and there's a lot of results (more pages), try
@@ -396,7 +396,7 @@ class SearchWindow(xbmcgui.WindowXML):
             if self.item.contentType == 'movie' and not valid and other and other[-1].nextPage \
                     and self.item.infoLabels['year']:
                 logger.debug('retring adding year on channel ' + channel)
-                dummy, valid, dummy = search(self.item.text + " " + str(self.item.infoLabels['year']))
+                dummy, valid, dummy = channel_search(self.item.text + " " + str(self.item.infoLabels['year']))
 
             if self.exit: return
             # some channels may use original title
@@ -404,17 +404,18 @@ class SearchWindow(xbmcgui.WindowXML):
                 original = scrapertools.title_unify(self.item.infoLabels.get('originaltitle'))
                 if self.item.text != original:
                     logger.debug('retring with original title on channel ' + channel)
-                    dummy, valid, dummy = search(original)
+                    dummy, valid, dummy = channel_search(original)
         except:
             import traceback
             logger.error(traceback.format_exc())
 
         if self.exit: return
-        update_lock.acquire()
+        # update_lock.acquire()
         self.count += 1
-        # return channel, valid, other if other else results
+
+        return channel, valid, other if other else results
         self.update(channel, valid, other if other else results)
-        update_lock.release()
+        # update_lock.release()
 
     def makeItem(self, url):
         item = Item().fromurl(url)
