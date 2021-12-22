@@ -362,7 +362,7 @@ def render_items(itemlist, parent_item):
 
         dirItems.append(('%s?%s' % (sys.argv[0], item_url), listitem, item.folder))
 
-    set_view_mode(itemlist[0], parent_item)
+
     xbmcplugin.addDirectoryItems(_handle, dirItems)
 
     if parent_item.list_type == '':
@@ -383,8 +383,9 @@ def render_items(itemlist, parent_item):
     # cacheToDisc = False
     # if (parent_item.action == 'findvideos' and config.get_setting('autoplay')) or parent_item.action == 'search':
     #     cacheToDisc = True
-
+    set_view_mode(itemlist[0], parent_item)
     xbmcplugin.endOfDirectory(_handle, succeeded=True, updateListing=False, cacheToDisc=True)
+
     logger.debug('END render_items')
 
 
@@ -439,7 +440,7 @@ def getCurrentView(item=None, parent_item=None):
     parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'newest', 'discover_list', 'new_search', 'channel_search']
 
     addons = 'addons' if config.get_setting('touch_view') else ''
-
+    # from core.support import dbg;dbg()
     if parent_item.action == 'findvideos' or (parent_item.action in ['channel_search', 'new_search'] and parent_item.infoLabels['tmdb_id']):
         return 'server', addons
 
@@ -472,8 +473,8 @@ def getCurrentView(item=None, parent_item=None):
     elif item.action:
         return 'menu', addons
 
-    # else:
-    #     return None, None
+    else:
+        return None, None
 
 
 
@@ -487,7 +488,7 @@ def set_view_mode(item, parent_item):
         reset_view_mode()
         xbmcplugin.setContent(handle=int(sys.argv[1]), content='')
         xbmc.executebuiltin('Container.SetViewMode(%s)' % 55)
-
+    # from core.support import dbg;dbg()
     content, Type = getCurrentView(item, parent_item)
     if content:
         mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
