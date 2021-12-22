@@ -361,7 +361,7 @@ def render_items(itemlist, parent_item):
         listitem.addContextMenuItems(context_commands)
 
         dirItems.append(('%s?%s' % (sys.argv[0], item_url), listitem, item.folder))
-
+    # from core.support import dbg;dbg()
 
     xbmcplugin.addDirectoryItems(_handle, dirItems)
 
@@ -390,29 +390,24 @@ def render_items(itemlist, parent_item):
 
 
 def viewmodeMonitor():
-    # logger.debug('WINDOW:',get_window())
+    logger.debug('WINDOW:',get_window(), xbmcgui.getCurrentWindowId())
     if get_window() == 'WINDOW_VIDEO_NAV':
         try:
-            currentModeName = xbmc.getInfoLabel('Container.Viewmode')
-            parent_info = xbmc.getInfoLabel('Container.FolderPath')
-            item_info = xbmc.getInfoLabel('Container.ListItemPosition(2).FileNameAndPath')
-            win = xbmcgui.Window(10025)
-            currentMode = int(win.getFocusId())
-            # logger.debug('CM', currentMode, 'CN',currentModeName, 'label',xbmc.getInfoLabel('Container.FolderPath'))
-            # if not parent_info:
-
-            if currentModeName and 'plugin.video.kod' in parent_info and 50 <= currentMode < 1000:# and currentMode >= 50:  # inside addon and in itemlist view
-                # logger.debug('CAMBIO VISUALE')
-                content, Type = getCurrentView(Item().fromurl(item_info) if item_info else Item(), Item().fromurl(parent_info))
-                if content:
+            currentMode = int(xbmcgui.Window(10025).getFocusId())
+            if 50 <= currentMode < 600:
+                currentModeName = xbmc.getInfoLabel('Container.Viewmode')
+                parent_info = xbmc.getInfoLabel('Container.FolderPath')
+                item_info = xbmc.getInfoLabel('Container.ListItemPosition(1).FileNameAndPath')
+                if currentModeName and 'plugin.video.kod' in parent_info:
+                    content, Type = getCurrentView(Item().fromurl(item_info) if item_info else Item(), Item().fromurl(parent_info))
                     defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
-                    if currentMode != defaultMode:
-                        # logger.debug('viewmode changed: ' + currentModeName + '-' + str(currentMode) + ' - content: ' + content)
+                    if content and currentMode != defaultMode and int(xbmcgui.Window(10025).getFocusId()) == currentMode:
                         config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
                         if config.get_setting('viewchange_notify'):
                             dialog_notification(config.get_localized_string(70153),
                                                         config.get_localized_string(70187) % (content, currentModeName),
                                                         sound=False)
+
         except:
             import traceback
             logger.error(traceback.print_exc())
@@ -447,6 +442,9 @@ def getCurrentView(item=None, parent_item=None):
     elif parent_item.action == 'mainlist':
         return 'channel', addons
 
+    elif item.contentType == 'music':
+        return 'musicvideo', 'musicvideos'
+
     elif (item.contentType in ['movie'] and parent_item.action in parent_actions) \
             or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']) \
             or (parent_item.channel in ['favorites'] and parent_item.action in ['mainlist']) \
@@ -461,7 +459,6 @@ def getCurrentView(item=None, parent_item=None):
         return 'episode', 'tvshows'
 
     elif parent_item.action in ['get_seasons']:
-        logger.debug('CONTENTTYPE:',item.contentType)
         return 'season', 'tvshows'
 
     elif parent_item.action in ['getmainlist', '', 'getchanneltypes']:

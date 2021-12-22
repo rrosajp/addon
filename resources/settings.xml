@@ -148,6 +148,7 @@
         <setting id="view_mode_season" type="action" label="30140" default= "Default, 0" visible="false"/>
         <setting id="view_mode_episode" type="action" label="70362" default= "Default, 0" visible="false"/>
         <setting id="view_mode_server" type="action" label="70145" default= "Default, 0" visible="false"/>
+        <setting id="view_mode_musicvideo" type="action" label="70145" default= "Default, 0" visible="false"/>
         <!-- Contextual -->
         <setting label="30024" type="lsep"/>
         <setting id="quick_menu" type="bool" label="60360" default="true"/>
