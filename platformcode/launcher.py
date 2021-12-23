@@ -31,7 +31,6 @@ def start():
 
 def run(item=None):
     logger.debug()
-    platformtools.save_view_mode()
     # Extract item from sys.argv
     if not item: item = makeItem()
 
