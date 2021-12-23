@@ -315,7 +315,7 @@ def render_items(itemlist, parent_item):
         return
 
     logger.debug('START render_items')
-    save_view_mode()
+    # save_view_mode()
     thumb_type = config.get_setting('video_thumbnail_type')
     from platformcode import shortcuts
     # from core import httptools
