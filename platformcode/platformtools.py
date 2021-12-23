@@ -315,6 +315,7 @@ def render_items(itemlist, parent_item):
         return
 
     logger.debug('START render_items')
+    save_view_mode()
     thumb_type = config.get_setting('video_thumbnail_type')
     from platformcode import shortcuts
     # from core import httptools
@@ -389,28 +390,28 @@ def render_items(itemlist, parent_item):
     logger.debug('END render_items')
 
 
-def viewmodeMonitor():
-    logger.debug('WINDOW:',get_window(), xbmcgui.getCurrentWindowId())
-    if get_window() == 'WINDOW_VIDEO_NAV':
-        try:
-            currentMode = int(xbmcgui.Window(10025).getFocusId())
-            if 50 <= currentMode < 600:
-                currentModeName = xbmc.getInfoLabel('Container.Viewmode')
-                parent_info = xbmc.getInfoLabel('Container.FolderPath')
-                item_info = xbmc.getInfoLabel('Container.ListItemPosition(1).FileNameAndPath')
-                if currentModeName and 'plugin.video.kod' in parent_info:
-                    content, Type = getCurrentView(Item().fromurl(item_info) if item_info else Item(), Item().fromurl(parent_info))
-                    defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
-                    if content and currentMode != defaultMode and int(xbmcgui.Window(10025).getFocusId()) == currentMode:
-                        config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
-                        if config.get_setting('viewchange_notify'):
-                            dialog_notification(config.get_localized_string(70153),
-                                                        config.get_localized_string(70187) % (content, currentModeName),
-                                                        sound=False)
+# def viewmodeMonitor():
+#     logger.debug('WINDOW:',get_window(), xbmcgui.getCurrentWindowId())
+#     if get_window() == 'WINDOW_VIDEO_NAV':
+#         try:
+#             currentMode = int(xbmcgui.Window(10025).getFocusId())
+#             if 50 <= currentMode < 600:
+#                 currentModeName = xbmc.getInfoLabel('Container.Viewmode')
+#                 parent_info = xbmc.getInfoLabel('Container.FolderPath')
+#                 item_info = xbmc.getInfoLabel('Container.ListItemPosition(1).FileNameAndPath')
+#                 if currentModeName and 'plugin.video.kod' in parent_info:
+#                     content, Type = getCurrentView(Item().fromurl(item_info) if item_info else Item(), Item().fromurl(parent_info))
+#                     defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
+#                     if content and currentMode != defaultMode and int(xbmcgui.Window(10025).getFocusId()) == currentMode:
+#                         config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
+#                         if config.get_setting('viewchange_notify'):
+#                             dialog_notification(config.get_localized_string(70153),
+#                                                         config.get_localized_string(70187) % (content, currentModeName),
+#                                                         sound=False)
 
-        except:
-            import traceback
-            logger.error(traceback.print_exc())
+#         except:
+#             import traceback
+#             logger.error(traceback.print_exc())
 
 
 def getCurrentView(item=None, parent_item=None):
@@ -421,21 +422,10 @@ def getCurrentView(item=None, parent_item=None):
         logger.debug('ESCO')
         return None, None
 
-    # if not parent_item:
-    #     info = xbmc.getInfoLabel('Container.FolderPath')
-    #     if not info:
-    #         return None, None
-    #     parent_item = Item().fromurl(info)
-    # if not item:
-    #     info = xbmc.getInfoLabel('Container.ListItemPosition(2).FileNameAndPath')  # first addon listitem (consider "..")
-    #     if not info:
-    #         item = Item()
-    #     else:
-    #         item = Item().fromurl(info) if info else Item()
     parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'newest', 'discover_list', 'new_search', 'channel_search']
 
     addons = 'addons' if config.get_setting('touch_view') else ''
-    # from core.support import dbg;dbg()
+
     if parent_item.action == 'findvideos' or (parent_item.action in ['channel_search', 'new_search'] and parent_item.infoLabels['tmdb_id']):
         return 'server', addons
 
@@ -462,7 +452,7 @@ def getCurrentView(item=None, parent_item=None):
         return 'season', 'tvshows'
 
     elif parent_item.action in ['getmainlist', '', 'getchanneltypes']:
-        return 'home', addons
+        return None, None
 
     elif parent_item.action in ['filterchannels']:
         return 'channels', addons
@@ -473,6 +463,23 @@ def getCurrentView(item=None, parent_item=None):
     else:
         return None, None
 
+
+def save_view_mode():
+    if get_window() == 'WINDOW_VIDEO_NAV':
+        currentModeName = xbmc.getInfoLabel('Container.Viewmode')
+        currentMode = int(xbmcgui.Window(10025).getFocusId())
+        parent_info = xbmc.getInfoLabel('Container.FolderPath')
+        item_info = xbmc.getInfoLabel('ListItem.FileNameAndPath')
+        content, Type = getCurrentView(Item().fromurl(item_info) if item_info else Item(), Item().fromurl(parent_info))
+
+        if content:
+            defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
+            if currentMode != defaultMode:
+                config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
+                if config.get_setting('viewchange_notify'):
+                    dialog_notification(config.get_localized_string(70153),
+                                        config.get_localized_string(70187) % (content, currentModeName),
+                                        sound=False)
 
 
 def set_view_mode(item, parent_item):
