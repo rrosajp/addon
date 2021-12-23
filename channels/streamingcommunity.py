@@ -214,7 +214,8 @@ def episodios(item):
                            url=host + '/watch/' + str(episodes['title_id']),
                            episodeid= '?e=' + str(it['id'])))
 
-
+    if config.get_setting('episode_info') and not support.stackCheck(['add_tvshow', 'get_newest']):
+        support.tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
     support.check_trakt(itemlist)
     support.videolibrary(itemlist, item)
     support.download(itemlist, item)

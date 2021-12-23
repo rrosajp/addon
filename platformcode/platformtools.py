@@ -10,9 +10,12 @@ import sys
 if sys.version_info[0] >= 3:
     PY3 = True
     import urllib.parse as urllib
+    from concurrent import futures
 else:
     PY3 = False
     import urllib
+    from concurrent_py2 import futures
+
 
 import os, xbmc, xbmcgui, xbmcplugin
 from past.utils import old_div
@@ -310,33 +313,31 @@ def render_items(itemlist, parent_item):
     """
     Function used to render itemlist on kodi
     """
+
     # if it's not a list, do nothing
     if not isinstance(itemlist, list):
         return
 
-    logger.debug('START render_items')
-    # save_view_mode()
+    logger.debug('START renderItems')
     thumb_type = config.get_setting('video_thumbnail_type')
     from platformcode import shortcuts
-    # from core import httptools
     _handle = int(sys.argv[1])
     default_fanart = config.get_fanart()
     def_context_commands = shortcuts.context()
 
     # if there's no item, add "no elements" item
     if not len(itemlist):
-        itemlist.append(Item(title=config.get_localized_string(60347), thumbnail=get_thumb('nofolder.png')))
+        from core.support import thumb
+        itemlist.append(Item(title=config.get_localized_string(60347), thumbnail=thumb('nofolder')))
 
     dirItems = []
 
-    for n, item in enumerate(itemlist):
-        # item.itemlistPosition = n + 1
+    def setItem(n, item, parent_item):
+        item.itemlistPosition = n
         item_url = item.tourl()
 
         if item.category == "":
             item.category = parent_item.category
-        if not item.title:
-            item.title = ''
         # If there is no action or it is findvideos / play, folder = False because no listing will be returned
         if item.action in ['play', 'findvideos', '']:
             item.folder = False
@@ -346,12 +347,32 @@ def render_items(itemlist, parent_item):
             item.thumbnail = config.get_online_server_thumb(item.server)
 
         icon_image = "DefaultFolder.png" if item.folder else "DefaultVideo.png"
-        listitem = xbmcgui.ListItem(item.title)
-        listitem.setArt({'icon': icon_image, 'thumb': item.thumbnail, 'poster': item.thumbnail,
-                         'fanart': item.fanart if item.fanart else default_fanart})
+
+        title = item.title
+
+
+        listitem = xbmcgui.ListItem(title)
+        art = {'icon': icon_image, 'thumb': item.thumbnail, 'poster': item.thumbnail, 'fanart': item.fanart if item.fanart else default_fanart}
+        if item.infoLabels.get('landscape'): art['landscape'] = item.infoLabels['landscape']
+        if item.infoLabels.get('clearlogo'): art['clearlogo'] = item.infoLabels['clearlogo']
+        if item.infoLabels.get('clearart'): art['clearart'] = item.infoLabels['clearart']
+        if item.infoLabels.get('banner'): art['banner'] = item.infoLabels['banner']
+        if item.infoLabels.get('disc'): art['disc'] = item.infoLabels['disc']
+        listitem.setProperty('ResumeTime', str(get_played_time(item)))
+
+        listitem.setArt(art)
 
         if config.get_setting("player_mode") == 1 and item.action == "play" and not item.nfo:
             listitem.setProperty('IsPlayable', 'true')
+
+        if item.infoLabels.get('castandrole'):
+            try:
+                cast = [{'name':c[0], 'role':c[1], 'thumbnail':c[2], 'order':c[3]} for c in item.infoLabels.get("castandrole", [])]
+                cast.sort(key=lambda c: c['order'])
+                listitem.setCast(cast)
+                del item.infoLabels['castandrole']
+            except:
+                pass
 
         set_infolabels(listitem, item)
 
@@ -361,11 +382,29 @@ def render_items(itemlist, parent_item):
         else:
             context_commands = def_context_commands
         listitem.addContextMenuItems(context_commands)
+        return item, item_url, listitem
 
-        dirItems.append(('%s?%s' % (sys.argv[0], item_url), listitem, item.folder))
+    # For Debug
+    # from core.support import dbg;dbg()
+    # r_list = [setItem(i, item, parent_item) for i, item in enumerate(itemlist)]
 
-    set_view_mode(itemlist[0], parent_item)
+    r_list = []
+
+    with futures.ThreadPoolExecutor() as executor:
+        searchList = [executor.submit(setItem, i, item, parent_item) for i, item in enumerate(itemlist)]
+        for res in futures.as_completed(searchList):
+            r_list.append(res.result())
+    r_list.sort(key=lambda it: it[0].itemlistPosition)
+
+
+    # from core.support import dbg;dbg()
+    for item, item_url, listitem in r_list:
+        dirItems.append(('{}?{}'.format(sys.argv[0], item_url), listitem, item.folder, len(r_list)))
     xbmcplugin.addDirectoryItems(_handle, dirItems)
+
+    if parent_item.sorted:
+        if parent_item.sorted == 'year': xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_DATE)
+        elif parent_item.sorted == 'name':xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_TITLE_IGNORE_THE)
 
     if parent_item.list_type == '':
         breadcrumb = parent_item.category #.capitalize()
@@ -379,11 +418,11 @@ def render_items(itemlist, parent_item):
             breadcrumb = config.get_localized_string(70693)
 
     xbmcplugin.setPluginCategory(handle=_handle, category=breadcrumb)
-
+    set_view_mode(itemlist[0], parent_item)
 
     xbmcplugin.endOfDirectory(_handle, succeeded=True, updateListing=False, cacheToDisc=True)
-
-    logger.debug('END render_items')
+    from core import db; db.close()
+    logger.debug('END renderItems')
 
 
 def viewmodeMonitor():
@@ -498,33 +537,23 @@ def set_infolabels(listitem, item, player=False):
     @type item: item
     """
 
-    infoLabels_dict = {'aired': 'aired', 'album': 'album', 'artist': 'artist', 'cast': 'cast',
-                       'castandrole': 'castandrole', 'tmdb_id': 'code', 'code': 'code', 'country': 'country',
-                       'credits': 'credits', 'release_date': 'dateadded', 'dateadded': 'dateadded', 'dbid': 'dbid',
-                       'director': 'director', 'duration': 'duration', 'episode': 'episode',
-                       'episodio_sinopsis': 'episodeguide', 'episodio_air_date': 'None', 'episodio_imagen': 'None',
-                       'episodio_titulo': 'title', 'episodio_vote_average': 'rating', 'episodio_vote_count': 'votes',
-                       'fanart': 'None', 'genre': 'genre', 'homepage': 'None', 'imdb_id': 'imdbnumber',
-                       'imdbnumber': 'imdbnumber', 'in_production': 'None', 'last_air_date': 'lastplayed',
-                       'mediatype': 'mediatype', 'mpaa': 'mpaa', 'number_of_episodes': 'None',
-                       'number_of_seasons': 'None', 'original_language': 'None', 'originaltitle': 'originaltitle',
-                       'overlay': 'overlay', 'poster_path': 'path', 'popularity': 'None', 'playcount': 'playcount',
-                       'plot': 'plot', 'plotoutline': 'plotoutline', 'premiered': 'premiered', 'quality': 'None',
-                       'rating': 'rating', 'season': 'season', 'set': 'set', 'setid': 'setid',
-                       'setoverview': 'setoverview', 'showlink': 'showlink', 'sortepisode': 'sortepisode',
-                       'sortseason': 'sortseason', 'sorttitle': 'sorttitle', 'status': 'status', 'studio': 'studio',
-                       'tag': 'tag', 'tagline': 'tagline', 'temporada_air_date': 'None', 'temporada_nombre': 'None',
-                       'temporada_num_episodios': 'None', 'temporada_poster': 'None', 'title': 'title',
-                       'top250': 'top250', 'tracknumber': 'tracknumber', 'trailer': 'trailer', 'thumbnail': 'None',
-                       'tvdb_id': 'None', 'tvshowtitle': 'tvshowtitle', 'type': 'None', 'userrating': 'userrating',
-                       'url_scraper': 'None', 'votes': 'votes', 'writer': 'writer', 'year': 'year'}
+    infoLabels_dict = {'aired': 'aired', 'album': 'album', 'artist': 'artist', 'cast': 'cast', 'castandrole': 'castandrole',
+                       'tmdb_id': 'code', 'code': 'code', 'country': 'country', 'credits': 'credits', 'release_date': 'dateadded',
+                       'dateadded': 'dateadded', 'dbid': 'dbid', 'director': 'director', 'duration': 'duration', 'episode': 'episode',
+                       'episode_plot': 'episodeguide', 'episode_title': 'title', 'episode_vote_average': 'rating', 'episode_vote_count': 'votes',
+                       'genre': 'genre', 'imdb_id': 'imdbnumber', 'imdbnumber': 'imdbnumber', 'last_air_date': 'lastplayed', 'mediatype': 'mediatype',
+                       'mpaa': 'mpaa', 'originaltitle': 'originaltitle', 'overlay': 'overlay', 'poster_path': 'path', 'playcount': 'playcount',
+                       'plot': 'plot', 'plotoutline': 'plotoutline', 'premiered': 'premiered', 'rating': 'rating', 'season': 'season', 'set': 'set',
+                       'setid': 'setid', 'setoverview': 'setoverview', 'showlink': 'showlink', 'sortepisode': 'sortepisode', 'sortseason': 'sortseason',
+                       'sorttitle': 'sorttitle', 'status': 'status', 'studio': 'studio', 'tag': 'tag', 'tagline': 'tagline', 'title': 'title',
+                       'top250': 'top250', 'tracknumber': 'tracknumber', 'trailer': 'trailer', 'tvshowtitle': 'tvshowtitle', 'userrating': 'userrating',
+                       'votes': 'votes', 'writer': 'writer', 'year': 'year'}
     # if item.infoLabels:
     try:
-        infoLabels_kodi = {infoLabels_dict[label_tag]: item.infoLabels[label_tag] for label_tag, label_value in list(item.infoLabels.items()) if infoLabels_dict[label_tag] != 'None'}
+        infoLabels_kodi = {infoLabels_dict[label_tag]: label_value for label_tag, label_value in list(item.infoLabels.items()) if label_tag in infoLabels_dict}
         listitem.setInfo("video", infoLabels_kodi)
     except:
         listitem.setInfo("video", item.infoLabels)
-        # logger.error(item.infoLabels)
 
 
 def set_context_commands(item, item_url, parent_item, **kwargs):
@@ -1480,7 +1509,7 @@ def play_torrent(item, xlistitem, mediaurl):
         else:
             import xbmcaddon
             addon = xbmcaddon.Addon(id='plugin.video.elementum')
-            if addon.getSetting('download_storage') == '0':
+            if addon.get_setting('download_storage') == '0':
                 addon.setSetting('download_storage', '1')
                 xbmc.sleep(3000)
             xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
@@ -1618,7 +1647,7 @@ def get_played_time(item):
         import traceback
         logger.error(traceback.format_exc())
         del db['viewed'][ID]
-    db.close()
+    # db.close()
     return played_time
 
 

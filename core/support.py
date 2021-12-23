@@ -604,7 +604,9 @@ def scrape(func):
             if function == 'episodios': autorenumber.start(itemlist, item)
             else: autorenumber.start(itemlist)
 
-        if action != 'play' and 'patronMenu' not in args and not disabletmdb and function != 'episodios' and item.contentType in ['movie', 'tvshow', 'episode', 'undefined']:
+        if action != 'play' and 'patronMenu' not in args and 'patronGenreMenu' not in args \
+            and not stackCheck(['add_tvshow', 'get_newest']) and (function not in ['episodes', 'mainlist'] \
+            or (function in ['episodes'] and config.getSetting('episode_info'))):
             tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
 
         if not group and not args.get('groupExplode') and ((pagination and len(matches) <= pag * pagination) or not pagination):  # next page with pagination
@@ -1627,3 +1629,11 @@ def check_trakt(itemlist):
         trakt_tools.trakt_check(itemlist)
     return itemlist
 
+
+def stackCheck(values):
+    stacks = [s[3] for s in inspect.stack()]
+    logger.debug('STAKS', stacks)
+    if type(values) == str:
+        return values in stacks
+    else:
+        return any(v in values for v in stacks)

@@ -470,10 +470,9 @@ def find_and_set_infoLabels(item):
         item.infoLabels['year'] = year[1:-1]
 
     if not item.infoLabels.get("tmdb_id") or not item.infoLabels.get("tmdb_id")[0].isdigit():
-        if not item.infoLabels.get("imdb_id"):
-            otmdb_global = Tmdb(searched_text=scrapertools.unescape(title), search_type=search_type, year=item.infoLabels['year'])
-        else:
-            otmdb_global = Tmdb(external_id=item.infoLabels.get("imdb_id"), external_source="imdb_id", search_type=search_type)
+        if item.infoLabels.get("imdb_id"): otmdb_global = Tmdb(external_id=item.infoLabels.get("imdb_id"), external_source="imdb_id", search_type=search_type)
+        else: otmdb_global = Tmdb(searched_text=scrapertools.unescape(title), search_type=search_type, year=item.infoLabels['year'])
+
     elif not otmdb_global or str(otmdb_global.result.get("id")) != item.infoLabels['tmdb_id']:
         otmdb_global = Tmdb(id_Tmdb=item.infoLabels['tmdb_id'], search_type=search_type, search_language=def_lang)
 
@@ -536,10 +535,7 @@ def get_nfo(item, search_groups=False):
                 info_nfo = 'https://www.themoviedb.org/tv/{}/episode_group/{}'.format(item.infoLabels['tmdb_id'], Id)
                 return info_nfo + '\n'
             else: return
-    # from core.support import dbg;dbg()
-    # if "season" in item.infoLabels and "episode" in item.infoLabels:
-    #     info_nfo = "https://www.themoviedb.org/tv/{}/season/{}/episode/{}" .format(item.infoLabels['tmdb_id'], item.contentSeason, item.contentEpisodeNumber)
-    # else:
+
     info_nfo = ', '.join(item.infoLabels['url_scraper'])
 
     return info_nfo + '\n'
@@ -643,10 +639,11 @@ class ResultDictDefault(dict):
 
     def __missing__(self, key):
         """
-        default values ​​in case the requested key does not exist
+        default values in case the requested key does not exist
         """
         if key in ['genre_ids', 'genre', 'genres']:
             return list()
+
         elif key == 'images_posters':
             posters = dict()
             if 'images' in list(super(ResultDictDefault, self).keys()) and 'posters' in super(ResultDictDefault, self).__getitem__('images'):
