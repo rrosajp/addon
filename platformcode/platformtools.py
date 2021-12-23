@@ -364,8 +364,8 @@ def render_items(itemlist, parent_item):
 
         dirItems.append(('%s?%s' % (sys.argv[0], item_url), listitem, item.folder))
 
-    xbmcplugin.addDirectoryItems(_handle, dirItems)
     set_view_mode(itemlist[0], parent_item)
+    xbmcplugin.addDirectoryItems(_handle, dirItems)
 
     if parent_item.list_type == '':
         breadcrumb = parent_item.category #.capitalize()
@@ -393,16 +393,16 @@ def viewmodeMonitor():
             parent_info = xbmc.getInfoLabel('Container.FolderPath')
             parent = Item().fromurl(parent_info)
             if 'plugin.video.kod' in parent_info:
-                item = Item().fromurl(xbmc.getInfoLabel('Container.ListItemPosition(2).FileNameAndPath'))
+                item = Item().fromurl(xbmc.getInfoLabel('ListItem.FileNameAndPath'))
                 currentModeName = xbmc.getInfoLabel('Container.Viewmode')
                 currentMode = int(xbmcgui.Window(10025).getFocusId())
-                logger.debug('SAVE VIEW 1', currentMode, parent.action, item.action)
+                # logger.debug('SAVE VIEW 1', currentMode, parent.action, item.action)
                 if 50 <= currentMode < 600 and parent.action != item.action:
                     content, Type = getCurrentView(item, parent)
                     defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
                     if content and currentMode != defaultMode:
                         config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
-                        logger.debug('SAVE VIEW 2', defaultMode, '->', currentMode)
+                        # logger.debug('SAVE VIEW 2', defaultMode, '->', currentMode)
                         if config.get_setting('viewchange_notify'):
                             dialog_notification(config.get_localized_string(70153),
                                                         config.get_localized_string(70187) % (content, currentModeName),
