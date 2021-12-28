@@ -432,20 +432,22 @@ def viewmodeMonitor():
             parent_info = xbmc.getInfoLabel('Container.FolderPath')
             parent = Item().fromurl(parent_info)
             if 'plugin.video.kod' in parent_info:
-                item = Item().fromurl(xbmc.getInfoLabel('Container.ListItemPosition(2).FileNameAndPath'))
-                currentModeName = xbmc.getInfoLabel('Container.Viewmode')
-                currentMode = int(xbmcgui.Window(10025).getFocusId())
-                # logger.debug('SAVE VIEW 1', currentMode, parent.action, item.action)
-                if 50 <= currentMode < 600 and parent.action != item.action:
-                    content, Type = getCurrentView(item, parent)
-                    defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
-                    if content and currentMode != defaultMode:
-                        config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
-                        # logger.debug('SAVE VIEW 2', defaultMode, '->', currentMode)
-                        if config.get_setting('viewchange_notify'):
-                            dialog_notification(config.get_localized_string(70153),
-                                                        config.get_localized_string(70187) % (content, currentModeName),
-                                                        sound=False)
+                first_item_url = xbmc.getInfoLabel('Container.ListItemAbsolute(1).FileNameAndPath')
+                if first_item_url:
+                    item = Item().fromurl(first_item_url)
+                    currentModeName = xbmc.getInfoLabel('Container.Viewmode')
+                    currentMode = int(xbmcgui.Window(10025).getFocusId())
+                    # logger.debug('SAVE VIEW 1', currentMode, parent.action, item.action)
+                    if 50 <= currentMode < 600 and parent.action != item.action:
+                        content, Type = getCurrentView(item, parent)
+                        defaultMode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
+                        if content and currentMode != defaultMode:
+                            config.set_setting('view_mode_%s' % content, currentModeName + ', ' + str(currentMode))
+                            # logger.debug('SAVE VIEW 2', defaultMode, '->', currentMode)
+                            if config.get_setting('viewchange_notify'):
+                                dialog_notification(config.get_localized_string(70153),
+                                                            config.get_localized_string(70187) % (content, currentModeName),
+                                                            sound=False)
 
         except:
             import traceback
@@ -453,12 +455,11 @@ def viewmodeMonitor():
 
 
 def getCurrentView(item=None, parent_item=None):
-
     if not item:
         item = Item()
-    if not parent_item:
-        logger.debug('ESCO')
-        return None, None
+    # if not parent_item:
+    #     logger.debug('ESCO')
+    #     return None, None
 
     parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'newest', 'discover_list', 'new_search', 'channel_search']
 
@@ -490,7 +491,7 @@ def getCurrentView(item=None, parent_item=None):
         return 'season', 'tvshows'
 
     elif parent_item.action in ['getmainlist', '', 'getchanneltypes']:
-        return None, None
+        return 'home', addons
 
     elif parent_item.action in ['filterchannels']:
         return 'channels', addons
