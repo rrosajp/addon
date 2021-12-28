@@ -432,7 +432,7 @@ def viewmodeMonitor():
             parent_info = xbmc.getInfoLabel('Container.FolderPath')
             parent = Item().fromurl(parent_info)
             if 'plugin.video.kod' in parent_info:
-                item = Item().fromurl(xbmc.getInfoLabel('ListItem.FileNameAndPath'))
+                item = Item().fromurl(xbmc.getInfoLabel('Container.ListItemPosition(2).FileNameAndPath'))
                 currentModeName = xbmc.getInfoLabel('Container.Viewmode')
                 currentMode = int(xbmcgui.Window(10025).getFocusId())
                 # logger.debug('SAVE VIEW 1', currentMode, parent.action, item.action)
