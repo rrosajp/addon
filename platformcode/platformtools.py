@@ -1515,7 +1515,7 @@ def play_torrent(item, xlistitem, mediaurl):
         else:
             import xbmcaddon
             addon = xbmcaddon.Addon(id='plugin.video.elementum')
-            if addon.get_setting('download_storage') == '0':
+            if addon.getSetting('download_storage') == '0':
                 addon.setSetting('download_storage', '1')
                 xbmc.sleep(3000)
             xbmc.executebuiltin("PlayMedia(" + torrent_options[selection][1] % mediaurl + ")")
