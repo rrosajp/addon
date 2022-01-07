@@ -977,6 +977,8 @@ def get_window():
 
 
 def play_video(item, strm=False, force_direct=False, autoplay=False):
+    from core import httptools
+
     logger.debug()
     logger.debug(item.tostring('\n'))
 
@@ -994,7 +996,6 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
 
         # pass referer
         if item.referer:
-            from core import httptools
             httptools.default_headers['Referer'] = item.referer
 
         # Open the selection dialog to see the available options
@@ -1016,6 +1017,28 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
         # we get the selected video
         mediaurl, view, mpd, hls = get_video_seleccionado(item, seleccion, video_urls, autoplay)
         if not mediaurl: return
+        headers = {'User-Agent': httptools.get_user_agent(), 'Referer': item.referer}
+        # Kodi does not seems to allow this, leaving there as may work in the future
+        # if config.get_setting('resolver_dns'):
+        #     try:
+        #         import urllib.parse as urlparse
+        #     except ImportError:
+        #         import urlparse
+        #     from lib import doh
+        #     try:
+        #         parse = urlparse.urlparse(mediaurl)
+        #         if parse.netloc:
+        #             domain = parse.netloc
+        #             if not scrapertools.find_single_match(domain, '\d+\.\d+\.\d+\.\d+'):
+        #                 ip = doh.query(domain)[0]
+        #                 logger.info('Query DoH: ' + domain + ' = ' + str(ip))
+        #                 parse = list(parse)
+        #                 parse[1] = ip
+        #                 mediaurl = urlparse.urlunparse(parse)
+        #                 headers['Host'] = domain
+        #     except:
+        #         logger.error('Failed to resolve hostname, fallback to normal dns')
+        mediaurl = mediaurl + '|' + urllib.urlencode(headers)
 
         # video information is obtained.
         xlistitem = xbmcgui.ListItem(item.title, path=item.url)

@@ -235,6 +235,9 @@ def play(item):
     scws_id = support.match(data, patron=r'scws_id"\s*:\s*(\d+)').match
 
     if not scws_id:
+        if '<strong>Prossimamente' in data:
+            platformtools.dialog_ok('StreamingCommunity', 'Il sito notifica che il contenuto sarà disponibile prossimamente')
+            platformtools.play_canceled = True
         return []
 
     # Calculate Token
