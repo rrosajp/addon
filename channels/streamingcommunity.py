@@ -241,7 +241,8 @@ def play(item):
         return []
 
     # Calculate Token
-    client_ip = support.httptools.downloadpage('https://scws.xyz/videos/' + scws_id, headers=headers).json.get('client_ip')
+    support.dbg()
+    client_ip = support.httptools.downloadpage('https://scws.xyz/videos/' + scws_id).json.get('client_ip')
     expires = int(time() + 172800)
     token = b64encode(md5('{}{} Yc8U6r8KjAKAepEA'.format(expires, client_ip).encode('utf-8')).digest()).decode('utf-8').replace('=', '').replace('+', '-').replace('/', '_')
 
@@ -249,7 +250,7 @@ def play(item):
     subs = []
     urls = []
 
-    info = support.match(url, patron='(?:NAME="([^"]+)".*?URI="([^"]+)|RESOLUTION=\d+x(\d+).*?(http[^"\s]+))').matches
+    info = support.scrapertools.find_multiple_matches(httptools.downloadpage(url).data, 'NAME="([^"]+)".*?URI="([^"]+)|RESOLUTION=\d+x(\d+).*?(http[^"\s]+)')
     if info:
         for lang, sub, res, url in info:
             if sub:
