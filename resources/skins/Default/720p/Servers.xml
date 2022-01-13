@@ -202,7 +202,7 @@
                     <!-- <onclick>Action(close)</onclick> -->
                 </control>
                 <control type="button" id="102">
-                    <description>videolibrary</description>
+                    <description>Menu</description>
                     <top>0</top>
                     <right>40</right>
                     <height>40</height>
@@ -210,23 +210,38 @@
                     <onup>100</onup>
                     <ondown>100</ondown>
                     <onleft condition="Control.IsVisible(103)">103</onleft>
-                    <onleft condition="Control.IsVisible(103)">100</onleft>
+                    <onleft condition="!Control.IsVisible(103) + Control.IsVisible(104)">104</onleft>
+                    <onleft>100</onleft>
                     <onright>101</onright>
+                    <texturefocus colordiffuse="FFFFFFFF">menu.png</texturefocus>
+                    <texturenofocus colordiffuse="80FFFFFF">menu.png</texturenofocus>
+                </control>
+                <control type="button" id="103">
+                    <description>videolibrary</description>
+                    <top>0</top>
+                    <right>80</right>
+                    <height>40</height>
+                    <width>40</width>
+                    <onup>100</onup>
+                    <ondown>100</ondown>
+                    <onleft condition="Control.IsVisible(104)">104</onleft>
+                    <onleft condition="!Control.IsVisible(104)">100</onleft>
+                    <onright>102</onright>
                     <texturefocus colordiffuse="FFFFFFFF">add.png</texturefocus>
                     <texturenofocus colordiffuse="80FFFFFF">add.png</texturenofocus>
                 </control>
-                <control type="button" id="103">
+                <control type="button" id="104">
                     <description>Download</description>
                     <top>0</top>
-                    <right>40</right>
-                    <animation effect="slide" end="-40,0" condition="Control.IsVisible(102)">Conditional</animation>
+                    <right>80</right>
+                    <animation effect="slide" end="-40,0" condition="Control.IsVisible(103)">Conditional</animation>
                     <height>40</height>
                     <width>40</width>
                     <onup>100</onup>
                     <ondown>100</ondown>
                     <onleft>100</onleft>
-                    <onright condition="Control.IsVisible(102)">102</onright>
-                    <onright>101</onright>
+                    <onright condition="Control.IsVisible(103)">102</onright>
+                    <onright>102</onright>
                     <texturefocus colordiffuse="FFFFFFFF">down.png</texturefocus>
                     <texturenofocus colordiffuse="80FFFFFF">down.png</texturenofocus>
                 </control>

@@ -1785,8 +1785,8 @@ def serverWindow(item, itemlist):
 
         def onInit(self):
             self.SERVERS = self.getControl(100)
-            self.VIDEOLIBRARY = self.getControl(102)
-            self.DOWNLOAD = self.getControl(103)
+            self.VIDEOLIBRARY = self.getControl(103)
+            self.DOWNLOAD = self.getControl(104)
             if 'videolibrary' not in self.actions.keys():
                 self.VIDEOLIBRARY.setVisible(False)
             if 'download' not in self.actions.keys():
@@ -1804,7 +1804,7 @@ def serverWindow(item, itemlist):
         def onAction(self, action):
             action = action.getId()
             focus = self.getFocusId()
-            if action in [UP, DOWN, LEFT, RIGHT] and focus not in [100, 101, 102, 103]:
+            if action in [UP, DOWN, LEFT, RIGHT] and focus not in [100, 101, 102, 103, 104]:
                 self.setFocusId(100)
             elif action in [EXIT, BACKSPACE]:
                 self.close()
@@ -1818,8 +1818,10 @@ def serverWindow(item, itemlist):
             elif control in [101]:
                 self.close()
             elif control in [102]:
-                self.run(self.actions['videolibrary'])
+                context(self)
             elif control in [103]:
+                self.run(self.actions['videolibrary'])
+            elif control in [104]:
                 self.run(self.actions['download'])
 
         def run(self, action):
@@ -1838,9 +1840,9 @@ def serverWindow(item, itemlist):
 
         def onInit(self):
             try:
-                self.list = self.getControl(6)
+                self.SERVERS = self.getControl(6)
                 self.exit = self.getControl(5)
-                self.exit.setNavigation(self.exit, self.exit, self.list, self.list)
+                self.exit.setNavigation(self.exit, self.exit, self.SERVERS, self.SERVERS)
             except:
                 pass
 
@@ -1886,9 +1888,9 @@ def serverWindow(item, itemlist):
                 it.setArt({'thumb': videoitem.thumbnail})
 
                 items.append(it)
-                self.list.reset()
-                self.list.addItems(items)
-                self.setFocus(self.list)
+            self.SERVERS.reset()
+            self.SERVERS.addItems(items)
+            self.setFocus(self.SERVERS)
 
         def onFocus(self, control):
             if is_playing() and db['controls'].get('reopen', False):
@@ -1922,7 +1924,7 @@ def serverWindow(item, itemlist):
 
 
     def context(self):
-        pos = self.list.getSelectedPosition()
+        pos = self.SERVERS.getSelectedPosition()
         parent = self.item
         item = self.itemlist[pos]
         commands = set_context_commands(item, item.tourl(), parent)
