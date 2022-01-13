@@ -381,7 +381,7 @@ def actions(item):
         else:
             config.set_setting('install_trakt', True)
 
-        if len([s for s in itemlist if s.server]) > 0:
+        if len([s for s in itemlist if s.server]) > 0 and item.action in ['findvideos']:
             findvideos(item, itemlist)
         else:
             platformtools.render_items(itemlist, item)

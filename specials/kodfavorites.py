@@ -224,6 +224,7 @@ def mostrar_perfil(item):
     for i_enlace, enlace in enumerate(alfav.user_favorites[i_perfil]['items']):
 
         it = Item().fromurl(enlace)
+        it.from_channel = 'kodfavorites'
         it.context = [ {'title': config.get_localized_string(70617), 'channel': item.channel, 'action': 'acciones_enlace',
                         'i_enlace': i_enlace, 'i_perfil': i_perfil} ]
 
@@ -231,6 +232,10 @@ def mostrar_perfil(item):
         if it.extra != '': it.plot += ' Extra: ' + it.extra
         it.plot += '[CR]Url: ' + it.url if isinstance(it.url, str) else '...'
         if it.date_added != '': it.plot += '[CR]' + config.get_localized_string(70469) + ': ' + it.date_added
+
+        if it.server:
+            it.thumbnail = it.contentThumbnail
+            it.title += ' [{}]'.format(it.serverName)
 
         # If it is not a url, nor does it have the system path, convert the path since it will have been copied from another device.
         # It would be more optimal if the conversion was done with an import menu, but at the moment it is controlled in run-time.
