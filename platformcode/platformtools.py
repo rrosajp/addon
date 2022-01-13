@@ -423,7 +423,7 @@ def render_items(itemlist, parent_item):
 
 
 def viewmodeMonitor():
-    logger.debug('WINDOW:',get_window(), xbmcgui.getCurrentWindowId())
+    # logger.debug('WINDOW:',get_window(), xbmcgui.getCurrentWindowId())
     if get_window() == 'WINDOW_VIDEO_NAV':
         try:
             parent_info = xbmc.getInfoLabel('Container.FolderPath')
@@ -456,7 +456,7 @@ def getCurrentView(item=None, parent_item=None):
     if not item:
         item = Item()
     if not parent_item:
-        logger.debug('ESCO')
+        # logger.debug('ESCO')
         return None, None
 
     parent_actions = ['peliculas', 'novedades', 'search', 'get_from_temp', 'newest', 'discover_list', 'new_search', 'channel_search']
@@ -1906,7 +1906,7 @@ def serverWindow(item, itemlist):
 
         def onClick(self, control):
             if control == 6:
-                self.selection = self.itemlist[self.list.getSelectedPosition()]
+                self.selection = self.itemlist[self.SERVERS.getSelectedPosition()]
                 if not self.selection.action:
                     it = self.selection
                     self.selection = -1
@@ -1927,6 +1927,8 @@ def serverWindow(item, itemlist):
         pos = self.SERVERS.getSelectedPosition()
         parent = self.item
         item = self.itemlist[pos]
+        if not item.server:
+            return
         commands = set_context_commands(item, item.tourl(), parent)
         context = [c[0] for c in commands]
         context_commands = [c[1].replace('Container.Refresh', 'RunPlugin').replace('Container.Update', 'RunPlugin') for c in commands]
