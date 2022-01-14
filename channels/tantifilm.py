@@ -79,7 +79,7 @@ def newest(categoria):
 @support.scrape
 def peliculas(item):
     action = 'check'
-    item.contentType == 'undefined'
+    item.contentType = 'undefined'
     if item.args == 'search':
         patron = r'<a href="(?P<url>[^"]+)" title="Permalink to\s*(?P<title>[^"]+) \((?P<year>[0-9]+)[^<]*\)[^"]*"[^>]+>\s*<img[^s]+src="(?P<thumb>[^"]+)".*?<div class="calitate">\s*<p>(?P<quality>[^<]+)<\/p>'
     else:
@@ -119,11 +119,12 @@ def episodios(item):
     with futures.ThreadPoolExecutor() as executor:
         thL = []
         for i, season in enumerate(seasons.matches):
-            thL.append(executor.submit(get_season, seasons.data if i == 0 else '', season[0], season[1]))
+            thL.append(executor.submit(get_season, '', season[0], season[1]))
         for res in futures.as_completed(thL):
             if res.result():
                 data += res.result()
     patron = r'(?P<season>\d+)x(?P<episode>\d+)\s*-\s*(?P<title>[^\|]+)\|(?P<url>[^ ]+)'
+    # debug = True
     action = 'findvideos'
 
     def itemlistHook(itemlist):
