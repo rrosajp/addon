@@ -330,6 +330,8 @@ def render_items(itemlist, parent_item):
         from core.support import thumb
         itemlist.append(Item(title=config.get_localized_string(60347), thumbnail=thumb('nofolder')))
 
+    mode, Type = get_view_mode(itemlist[0], parent_item)
+
     dirItems = []
 
     def setItem(n, item, parent_item):
@@ -415,9 +417,13 @@ def render_items(itemlist, parent_item):
             breadcrumb = config.get_localized_string(70693)
 
     xbmcplugin.setPluginCategory(handle=_handle, category=breadcrumb)
-    set_view_mode(itemlist[0], parent_item)
+
+    if Type: xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
+    if mode: xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
 
     xbmcplugin.endOfDirectory(_handle, succeeded=True, updateListing=False, cacheToDisc=True)
+
+
     from core import db; db.close()
     logger.debug('END renderItems')
 
@@ -501,27 +507,26 @@ def getCurrentView(item=None, parent_item=None):
         return None, None
 
 
-def set_view_mode(item, parent_item):
+def get_view_mode(item, parent_item):
     def reset_view_mode():
         for mode in ['home','menu','channels','channel','movie','tvshow','season','episode','server']:
             config.set_setting('skin_name', xbmc.getSkinDir())
             config.set_setting('view_mode_%s' % mode, config.get_localized_string(70003) + ' , 0')
 
+    content, Type = getCurrentView(item, parent_item)
+
     if xbmc.getSkinDir() != config.get_setting('skin_name') or not config.get_setting('skin_name'):
         reset_view_mode()
-        xbmc.executebuiltin('Container.SetViewMode(%s)' % 55)
-        xbmcplugin.setContent(handle=int(sys.argv[1]), content='')
-
-    content, Type = getCurrentView(item, parent_item)
+        return 55, Type
 
     if content:
         mode = int(config.get_setting('view_mode_%s' % content).split(',')[-1])
         if mode == 0:
             logger.debug('default mode')
             mode = 55
-        xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
-        xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
-        # logger.debug('TYPE: ' + Type + ' - ' + 'CONTENT: ' + content)
+        return mode, Type
+
+    return None, None
 
 
 def set_infolabels(listitem, item, player=False):
