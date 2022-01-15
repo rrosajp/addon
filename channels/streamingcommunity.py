@@ -125,7 +125,7 @@ def peliculas(item):
         records = item.records
     elif type(item.args) == int:
         data = support.scrapertools.decodeHtmlentities(support.match(item).data)
-        records = json.loads(support.match(data, patron=r'slider-title titles-json="(.*?)" slider-name="').matches[item.args])
+        records = json.loads(support.match(data, patron=r'slider-title titles-json="(.*?)"\s*slider-name="').matches[item.args])
     elif not item.search:
         payload = json.dumps({'type': videoType, 'offset':offset, 'genre':item.args})
         records = session.post(host + '/api/browse', headers=headers, data=payload).json()['records']
