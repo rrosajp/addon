@@ -421,7 +421,7 @@ def render_items(itemlist, parent_item):
     if Type: xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
     if mode: xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
 
-    xbmcplugin.endOfDirectory(_handle, succeeded=True, updateListing=False, cacheToDisc=False)
+    xbmcplugin.endOfDirectory(_handle, succeeded=True, updateListing=False, cacheToDisc= True if parent_item.action in ['news', 'search'] else False)
 
 
     from core import db; db.close()
