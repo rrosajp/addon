@@ -320,7 +320,7 @@ def get_programs(item):
         args['sid'] = sid
         args['sessionId'] = sid
         args['hitsPerPage'] = pagination
-        args['property'] = 'search' if args.get('query') else 'findvideos'
+        args['property'] = 'search' if args.get('query') else 'play'
         args['tenant'] = 'play-prod-v2'
         args['page'] = pag
         args['deviceId'] = '017ac511182d008322c989f3aac803083002507b00bd0'
