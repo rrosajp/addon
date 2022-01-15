@@ -3,11 +3,14 @@
 # Canale per StreamingCommunity
 # ------------------------------------------------------------
 import functools
-import json, requests, sys
-from channels.mediasetplay import Token
+import json, requests, re, sys
 from core import support, channeltools, httptools, jsontools, filetools
 from platformcode import logger, config, platformtools
 
+if sys.version_info[0] >= 3:
+    from concurrent import futures
+else:
+    from concurrent_py2 import futures
 
 # def findhost(url):
 #     return 'https://' + support.match(url, patron='var domain\s*=\s*"([^"]+)').match
@@ -115,6 +118,7 @@ def peliculas(item):
 
     global host
     itemlist = []
+    items = []
     recordlist = []
     videoType = 'movie' if item.contentType == 'movie' else 'tv'
 
@@ -143,9 +147,15 @@ def peliculas(item):
 
     for i, it in enumerate(js):
         if i < 20:
-            itemlist.append(makeItem(i, it, item))
+            items.append(it)
         else:
             recordlist.append(it)
+
+    with futures.ThreadPoolExecutor() as executor:
+        itlist = [executor.submit(makeItem, i, it, item) for i, it in enumerate(items)]
+        for res in futures.as_completed(itlist):
+            if res.result():
+                itemlist.append(res.result())
 
     itemlist.sort(key=lambda item: item.n)
     if not item.newest:
@@ -160,10 +170,9 @@ def peliculas(item):
 
 def makeItem(n, it, item):
     info = session.post(host + '/api/titles/preview/{}'.format(it['id']), headers=headers).json()
-    title, lang = support.match(info['name'], patron=r'([^\[|$]+)(?:\[([^\]]+)\])?').match
-    title = support.cleantitle(title)
-    if not lang:
-        lang = 'ITA'
+    title = info['name']
+    lang = 'Sub-ITA' if 'sub-ita' in title.lower() else 'ITA'
+    title = support.cleantitle(re.sub('\[|\]|[Ss][Uu]Bb]-[Ii][Tt][Aa]', '', title))
     itm = item.clone(title=support.typo(title,'bold') + support.typo(lang,'_ [] color kod bold'))
     itm.contentType = info['type'].replace('tv', 'tvshow')
     itm.language = lang
