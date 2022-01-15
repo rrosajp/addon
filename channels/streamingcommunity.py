@@ -172,7 +172,7 @@ def makeItem(n, it, item):
     info = session.post(host + '/api/titles/preview/{}'.format(it['id']), headers=headers).json()
     title = info['name']
     lang = 'Sub-ITA' if 'sub-ita' in title.lower() else 'ITA'
-    title = support.cleantitle(re.sub('\[|\]|[Ss][Uu]Bb]-[Ii][Tt][Aa]', '', title))
+    title = support.cleantitle(re.sub('\[|\]|[Ss][Uu][Bb]-[Ii][Tt][Aa]', '', title))
     itm = item.clone(title=support.typo(title,'bold') + support.typo(lang,'_ [] color kod bold'))
     itm.contentType = info['type'].replace('tv', 'tvshow')
     itm.language = lang
