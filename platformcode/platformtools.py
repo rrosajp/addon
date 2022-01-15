@@ -979,6 +979,7 @@ def get_window():
 
 
 def play_video(item, strm=False, force_direct=False, autoplay=False):
+    from core import httptools
     logger.debug()
     logger.debug(item.tostring('\n'))
 
@@ -996,7 +997,6 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
 
         # pass referer
         if item.referer:
-            from core import httptools
             httptools.default_headers['Referer'] = item.referer
 
         # Open the selection dialog to see the available options
@@ -1039,7 +1039,7 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
         #                 headers['Host'] = domain
         #     except:
         #         logger.error('Failed to resolve hostname, fallback to normal dns')
-        if not '|' in mediaurl:
+        if '|' not in mediaurl:
             mediaurl = mediaurl + '|' + urllib.urlencode(headers)
 
         # video information is obtained.
