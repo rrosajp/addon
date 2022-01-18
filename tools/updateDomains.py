@@ -20,7 +20,7 @@ def http_Resp(lst_urls):
                             (code.status, code.reason, code.previous['status'],
                              code.previous['-x-permanent-redirect-url']))
                 rslt['code'] = code.previous['status']
-                rslt['redirect'] = code.previous['-x-permanent-redirect-url']
+                rslt['redirect'] = code.previous.get('-x-permanent-redirect-url', code.previous.get('content-location', sito))
                 rslt['status'] = code.status
             else:
                 rslt['code'] = code.status
