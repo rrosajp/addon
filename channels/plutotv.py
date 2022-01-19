@@ -31,7 +31,7 @@ def live(item):
 
     now = datetime.datetime.now()
     start = (now.strftime('%Y-%m-%dT%H:00:00Z'))
-    stop  = (now + datetime.timedelta(hours=2)).strftime('%Y-%m-%dT%H:00:00Z')
+    stop  = (now + datetime.timedelta(hours=4)).strftime('%Y-%m-%dT%H:00:00Z')
 
 
     live_url = '{}/v2/channels.json?{}'.format(api, UUID)
