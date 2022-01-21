@@ -55,9 +55,10 @@ def search(item, text):
 
 @support.scrape
 def peliculas(item):
+    n = '22' if '/?s=' in item.url else '8'
     item.contentType = "undefined"
     action = 'check'
-    patron = r'src="(?P<thumb>http[^"]+)(?:[^>]+>){6,12}\s*<a href="(?P<url>[^"]+)[^>]+>\s*(?P<title>[^\[\(\<]+)(?:\[(?P<quality>[^\]]+)\])?\s*(?:\((?P<lang>[a-zA-z-]+)\))?\s*(?:\((?P<year>\d+)\))?\s*</a>\s*</h2>'
+    patron = r'data-src="(?P<thumb>http[^"]+)(?:[^>]+>){' + n + r'}\s*<a href="(?P<url>[^"]+)[^>]+>\s*(?P<title>[^\[\(\<]+)(?:\[(?P<quality>[^\]]+)\])?\s*(?:\((?P<lang>[a-zA-z-]+)\))?\s*(?:\((?P<year>\d+)\))?\s*</a>\s*</h2>'
     patronNext = r'href="([^"]+)[^>]+>»'
     return locals()
 
