@@ -10,7 +10,6 @@
         "aniplay": "https://aniplay.it",
         "casacinema": "https://www.casacinema.page",
         "cb01anime": "https://www.cineblog01.red",
-        "cineblog01": "https://cb01.cfd",
         "cinemalibero": "https://cinemalibero.rest",
         "cinetecadibologna": "http://cinestore.cinetecadibologna.it",
         "discoveryplus": "https://www.discoveryplus.com",
@@ -39,6 +38,7 @@
         "vvvvid": "https://www.vvvvid.it"
     },
     "findhost": {
+        "cineblog01": "https://cb01.uno",
         "altadefinizione": "https://altadefinizione.nuovo.live",
         "altadefinizionecommunity": "https://altaregistrazione.net",
         "animealtadefinizione": "https://www.animealtadefinizione.it",
