@@ -50,6 +50,8 @@ if __name__ == '__main__':
                 print(chann + ' not exists anymore')
                 del data[k][chann]
                 continue
+            if k == 'findhost':
+                continue
             # to get an idea of the timing
             # useful only if you control all channels
             # for channels with error 522 about 40 seconds are lost ...
