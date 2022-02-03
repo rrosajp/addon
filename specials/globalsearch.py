@@ -677,7 +677,7 @@ class SearchWindow(xbmcgui.WindowXML):
                     busy(False)
                     return
 
-                if item.action in ['add_pelicula_to_library', 'add_serie_to_library','save_download']:  # special items (add to videolibrary, download ecc.)
+                if item.action:
                     xbmc.executebuiltin("RunPlugin(plugin://plugin.video.kod/?" + item_url + ")")
                     busy(False)
                     return
@@ -691,79 +691,22 @@ class SearchWindow(xbmcgui.WindowXML):
                 logger.error(traceback.format_exc())
                 self.itemsResult = []
 
-            if self.itemsResult and self.itemsResult[0].action in ['play', '']:
+            self.episodes = self.itemsResult if self.itemsResult else []
+            self.itemsResult = []
+            ep = []
+            for item in self.episodes:
+                it = xbmcgui.ListItem(item.title)
+                it.setProperty('item', item.tourl())
+                ep.append(it)
 
-                if config.get_setting('checklinks') and not config.get_setting('autoplay'):
-                    self.itemsResult = servertools.check_list_links(self.itemsResult, config.get_setting('checklinks_number'))
-                servers = self.itemsResult if self.itemsResult else []
-                self.itemsResult = []
-                uhd = []
-                fhd = []
-                hd = []
-                sd = []
-                unknown = []
-                other = []
-                for i, item in enumerate(servers):
-                    if item.server:
-                        it = self.makeItem(item.tourl())
-                        it.setProperty('index', str(i))
-                        if item.quality.lower() in ['4k', '2160p', '2160', '4k2160p', '4k2160', '4k 2160p', '4k 2160', '2k']:
-                            it.setProperty('quality', 'uhd.png')
-                            uhd.append(it)
-                        elif item.quality.lower() in ['fullhd', 'fullhd 1080', 'fullhd 1080p', 'full hd', 'full hd 1080', 'full hd 1080p', 'hd1080', 'hd1080p', 'hd 1080', 'hd 1080p', '1080', '1080p']:
-                            it.setProperty('quality', 'Fhd.png')
-                            fhd.append(it)
-                        elif item.quality.lower() in ['hd', 'hd720', 'hd720p', 'hd 720', 'hd 720p', '720', '720p', 'hdtv']:
-                            it.setProperty('quality', 'hd.png')
-                            hd.append(it)
-                        elif item.quality.lower() in ['sd', '480p', '480', '360p', '360', '240p', '240']:
-                            it.setProperty('quality', 'sd.png')
-                            sd.append(it)
-                        else:
-                            it.setProperty('quality', '')
-                            unknown.append(it)
-                    elif not item.action:
-                        self.getControl(QUALITYTAG).setText(item.fulltitle)
-                    else:
-                        it = self.makeItem(item.tourl())
-                        other.append(it)
+            if not ep:
+                ep = [xbmcgui.ListItem(config.get_localized_string(60347))]
+                ep[0].setProperty('thumb', channelselector.get_thumb('nofolder.png'))
 
-                uhd.sort(key=lambda it: it.getProperty('index'))
-                fhd.sort(key=lambda it: it.getProperty('index'))
-                hd.sort(key=lambda it: it.getProperty('index'))
-                sd.sort(key=lambda it: it.getProperty('index'))
-                unknown.sort(key=lambda it: it.getProperty('index'))
-
-                serverlist = uhd + fhd + hd + sd + unknown + other
-                if not serverlist:
-                    serverlist = [xbmcgui.ListItem(config.get_localized_string(60347))]
-                    serverlist[0].setProperty('thumb', channelselector.get_thumb('nofolder.png'))
-
-                self.Focus(SERVERS)
-                self.SERVERLIST.reset()
-                self.SERVERLIST.addItems(serverlist)
-                self.setFocusId(SERVERLIST)
-
-                if config.get_setting('autoplay'):
-                    busy(False)
-
-            else:
-                self.episodes = self.itemsResult if self.itemsResult else []
-                self.itemsResult = []
-                ep = []
-                for item in self.episodes:
-                    it = xbmcgui.ListItem(item.title)
-                    it.setProperty('item', item.tourl())
-                    ep.append(it)
-
-                if not ep:
-                    ep = [xbmcgui.ListItem(config.get_localized_string(60347))]
-                    ep[0].setProperty('thumb', channelselector.get_thumb('nofolder.png'))
-
-                self.Focus(EPISODES)
-                self.EPISODESLIST.reset()
-                self.EPISODESLIST.addItems(ep)
-                self.setFocusId(EPISODESLIST)
+            self.Focus(EPISODES)
+            self.EPISODESLIST.reset()
+            self.EPISODESLIST.addItems(ep)
+            self.setFocusId(EPISODESLIST)
 
             busy(False)
 
