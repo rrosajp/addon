@@ -1018,7 +1018,8 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
         # we get the selected video
         mediaurl, view, mpd, hls = get_video_seleccionado(item, seleccion, video_urls, autoplay)
         if not mediaurl: return
-        headers = {'User-Agent': httptools.get_user_agent(), 'Referer': item.url}
+        # to better disguise KoD as a browser
+        headers = {'User-Agent': httptools.get_user_agent(), 'Referer': item.referer if item.server == 'directo' else item.url}
         # Kodi does not seems to allow this, leaving there as may work in the future
         # if config.get_setting('resolver_dns'):
         #     try:
