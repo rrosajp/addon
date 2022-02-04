@@ -685,6 +685,10 @@ class SearchWindow(xbmcgui.WindowXML):
             try:
                 self.channel = __import__('channels.%s' % item.channel, fromlist=["channels.%s" % item.channel])
                 self.itemsResult = getattr(self.channel, item.action)(item)
+                if self.itemsResult and self.itemsResult[0].server:
+                    from platformcode.launcher import findvideos
+                    findvideos(self.item, self.itemsResult)
+                    return
             except:
                 import traceback
                 logger.error('error importing/getting search items of ' + item.channel)
