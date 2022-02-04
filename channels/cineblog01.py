@@ -223,7 +223,7 @@ def findvideos(item):
     patronvideos = r'([\w.]+)</strong></div></td>'
     support.addQualityTag(item, itemlist, data, patronvideos)
 
-    return itemlist
+    return support.server(item, itemlist=itemlist)
 
     # Estrae i contenuti - Download
     # load_links(itemlist, '<strong>Download:</strong>(.*?)<tableclass=cbtable height=30>', "aqua", "Download")
