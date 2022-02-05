@@ -419,10 +419,12 @@ def render_items(itemlist, parent_item):
     xbmcplugin.setPluginCategory(handle=_handle, category=breadcrumb)
 
     if Type: xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
-    if mode: xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
 
-    xbmcplugin.endOfDirectory(_handle, succeeded=True, updateListing=False, cacheToDisc= True if parent_item.action in ['news', 'search', 'new_search', 'now_on_tv'] else False)
 
+    xbmcplugin.endOfDirectory(_handle, succeeded=True, updateListing=False, cacheToDisc= True) # if parent_item.action in ['news', 'search', 'new_search', 'now_on_tv'] else False)
+    if mode:
+        # xbmc.sleep(100)
+        xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
 
     from core import db; db.close()
     logger.debug('END renderItems')
@@ -435,7 +437,7 @@ def viewmodeMonitor():
             parent_info = xbmc.getInfoLabel('Container.FolderPath')
             if 'plugin.video.kod' in parent_info:
                 parent = Item().fromurl(parent_info, silent=True)
-                item = Item().fromurl(xbmc.getInfoLabel('ListItem.FileNameAndPath'), silent=True)
+                item = Item().fromurl(xbmc.getInfoLabel('Container.ListItemPosition(2).FileNameAndPath'), silent=True)
                 currentModeName = xbmc.getInfoLabel('Container.Viewmode')
                 currentMode = int(xbmcgui.Window(10025).getFocusId())
                 # logger.debug('SAVE VIEW 1', currentMode, parent.action, item.action)
