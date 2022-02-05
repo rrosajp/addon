@@ -138,7 +138,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 module = __import__('channels.%s' % channel, fromlist=["channels.%s" % channel])
                 mainlist = getattr(module, 'mainlist')(Item(channel=channel, global_search=True))
                 action = [elem for elem in mainlist if elem.action == "search" and (
-                            self.item.mode in ['all', 'person'] or elem.contentType in [self.item.mode, 'undefined'])]
+                            self.item.mode in ['all', 'person'] or elem.contentType in [self.item.type, 'undefined'])]
                 self.moduleDict[channel] = module
                 self.searchActions += action
             except:
