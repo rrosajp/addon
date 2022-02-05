@@ -401,6 +401,9 @@ def render_items(itemlist, parent_item):
         dirItems.append(('{}?{}'.format(sys.argv[0], item_url), listitem, item.folder, len(r_list)))
     xbmcplugin.addDirectoryItems(_handle, dirItems)
 
+    if Type: xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
+    if mode: xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
+
     if parent_item.sorted:
         if parent_item.sorted == 'year': xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_DATE)
         elif parent_item.sorted == 'name':xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_TITLE_IGNORE_THE)
@@ -418,12 +421,10 @@ def render_items(itemlist, parent_item):
 
     xbmcplugin.setPluginCategory(handle=_handle, category=breadcrumb)
 
-    if Type: xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
-
-
     xbmcplugin.endOfDirectory(_handle, succeeded=True, updateListing=False, cacheToDisc= True) # if parent_item.action in ['news', 'search', 'new_search', 'now_on_tv'] else False)
+
     if mode:
-        # xbmc.sleep(100)
+        xbmc.sleep(50)
         xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
 
     from core import db; db.close()
