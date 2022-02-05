@@ -441,7 +441,7 @@ class AddonMonitor(xbmc.Monitor):
             logger.debug('scheduled videolibrary at ' + str(self.update_hour).zfill(2) + ':00')
 
     def scheduleScreenOnJobs(self):
-        schedule.every(0.5).seconds.do(platformtools.viewmodeMonitor).tag('screenOn')
+        schedule.every().second.do(platformtools.viewmodeMonitor).tag('screenOn')
         schedule.every().second.do(torrent.elementum_monitor).tag('screenOn')
 
     def onDPMSActivated(self):
