@@ -442,9 +442,10 @@ def viewmodeMonitor():
                 currentModeName = xbmc.getInfoLabel('Container.Viewmode')
                 currentMode = int(xbmcgui.Window(10025).getFocusId())
                 # logger.debug('SAVE VIEW 1', currentMode, parent.action, item.action)
-                if 50 <= currentMode < 600 and parent and parent.action != item.action:
+                if 50 <= currentMode < 520 and parent and parent.action != item.action:
                     content, Type = getCurrentView(item, parent)
                     view_mode_type = config.get_setting('view_mode_%s' % content)
+                    # logger.debug('VIEW MODE TYPE')
                     if view_mode_type:
                         defaultMode = int(view_mode_type.split(',')[-1])
                         if content and currentMode != defaultMode:
@@ -1418,7 +1419,7 @@ def set_player(item, xlistitem, mediaurl, view, strm):
     item.options = {'strm':False}
     if item.subtitle:
         if type(item.subtitle) != list: item.subtitle = [item.subtitle]
-        item.subtitle.reverse()
+        # item.subtitle.reverse()
         xlistitem.setSubtitles(item.subtitle)
 
     # Moved del conector "torrent" here

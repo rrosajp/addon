@@ -259,10 +259,11 @@ def play(item):
     subs = []
     urls = []
 
-    info = support.scrapertools.find_multiple_matches(httptools.downloadpage(url).data, 'NAME="([^"]+)".*?URI="([^"]+)|RESOLUTION=\d+x(\d+).*?(http[^"\s]+)')
+    info = support.match(url, patron=r'LANGUAGE="([^"]+)",\s*URI="([^"]+)|RESOLUTION=\d+x(\d+).*?(http[^"\s]+)').matches
     if info:
         for lang, sub, res, url in info:
             if sub:
+                if lang == 'auto': lang = 'ita-forced'
                 s = config.get_temp_file(lang +'.srt')
                 subs.append(s)
                 filetools.write(s, support.vttToSrt(httptools.downloadpage(support.match(sub, patron=r'(http[^\s\n]+)').match).data))
