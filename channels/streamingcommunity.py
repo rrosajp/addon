@@ -113,9 +113,8 @@ def newest(category):
 
 
 def peliculas(item):
-    # getHeaders()
     logger.debug()
-
+    if item.mainThumb: item.thumbnail = item.mainThumb
     global host
     itemlist = []
     items = []
@@ -159,6 +158,7 @@ def peliculas(item):
 
     itemlist.sort(key=lambda item: item.n)
     if not item.newest:
+        item.mainThumb = item.thumbnail
         if recordlist:
             itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), thumbnail=support.thumb(), page=page, records=recordlist))
         elif len(itemlist) >= 20:
@@ -170,6 +170,7 @@ def peliculas(item):
 
 def makeItem(n, it, item):
     info = session.post(host + '/api/titles/preview/{}'.format(it['id']), headers=headers).json()
+    logger.debug(jsontools.dump(it))
     title = info['name']
     lang = 'Sub-ITA' if 'sub-ita' in title.lower() else 'ITA'
     title = support.cleantitle(re.sub('\[|\]|[Ss][Uu][Bb]-[Ii][Tt][Aa]', '', title))
@@ -203,7 +204,7 @@ def episodios(item):
     js = json.loads(support.match(item.url, patron=r'seasons="([^"]+)').match.replace('&quot;','"'))
 
     for episodes in js:
-        logger.debug(jsontools.dump(js))
+        # logger.debug(jsontools.dump(js))
         for it in episodes['episodes']:
 
             itemlist.append(
