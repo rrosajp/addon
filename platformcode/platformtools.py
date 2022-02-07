@@ -331,6 +331,9 @@ def render_items(itemlist, parent_item):
         itemlist.append(Item(title=config.get_localized_string(60347), thumbnail=thumb('nofolder')))
 
     mode, Type = get_view_mode(itemlist[0], parent_item)
+    # from core.support import dbg;dbg()
+    if mode:
+        set_view_mode(parent_item.tourl(), mode)
 
     dirItems = []
 
@@ -402,7 +405,6 @@ def render_items(itemlist, parent_item):
     xbmcplugin.addDirectoryItems(_handle, dirItems)
 
     if Type: xbmcplugin.setContent(handle=int(sys.argv[1]), content=Type)
-    if mode: xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
 
     if parent_item.sorted:
         if parent_item.sorted == 'year': xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_DATE)
@@ -423,9 +425,9 @@ def render_items(itemlist, parent_item):
 
     xbmcplugin.endOfDirectory(_handle, succeeded=True, updateListing=False, cacheToDisc= True) # if parent_item.action in ['news', 'search', 'new_search', 'now_on_tv'] else False)
 
-    if mode:
-        xbmc.sleep(50)
-        xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
+    # if mode:
+    #     xbmc.sleep(50)
+    #     xbmc.executebuiltin('Container.SetViewMode(%s)' % mode)
 
     from core import db; db.close()
     logger.debug('END renderItems')
@@ -531,6 +533,64 @@ def get_view_mode(item, parent_item):
         return mode, Type
 
     return None, None
+
+
+def set_view_mode(url, mode):
+    import re
+    find = re.findall('(%\d\w)', url, flags=re.DOTALL)
+    for f in find:
+        url = url.replace(f, f.lower())
+
+    def get_connection():
+        from core import filetools
+
+        file_db = ""
+
+        # We look for the archive of the video database according to the version of kodi
+        view_db = config.get_platform(True)['view_db']
+        if view_db:
+            file_db = filetools.join(xbmc.translatePath("special://userdata/Database"), view_db)
+
+        # alternative method to locate the database
+        if not file_db or not filetools.exists(file_db):
+            file_db = ""
+            for f in filetools.listdir(xbmc.translatePath("special://userdata/Database")):
+                path_f = filetools.join(xbmc.translatePath("special://userdata/Database"), f)
+
+                if filetools.isfile(path_f) and f.lower().startswith('viewmodes') and f.lower().endswith('.db'):
+                    file_db = path_f
+                    break
+        try:
+            import sqlite3
+            return sqlite3.connect(file_db)
+        except:
+            return None
+
+    def execute_sql(conn, sql):
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        conn.commit()
+
+        return cursor.fetchall()
+
+    conn = get_connection()
+    if conn:
+        skin_name = config.get_skin()
+        try:
+            sql = 'select idView from view where (path="{}?{}" and skin="{}")'.format(sys.argv[0], url, skin_name)
+            records = execute_sql(conn, sql)
+            if records:
+                # from core.support import dbg;dbg()
+                sql = 'update view set viewMode={} where idView={}'.format(mode, records[0][0])
+                records = execute_sql(conn, sql)
+            else:
+                # from core.support import dbg;dbg()
+                sql = 'INSERT INTO view (window, path, viewMode, sortMethod, sortOrder, sortAttributes, skin) VALUES ' \
+                    '(10025, "{}?{}", {}, 0, 1, 0, "{}")'.format(sys.argv[0], url, mode, skin_name)
+                records = execute_sql(conn, sql)
+        except:
+            pass
+        conn.close()
 
 
 def set_infolabels(listitem, item, player=False):

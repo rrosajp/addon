@@ -79,11 +79,16 @@ def get_platform(full_version=False):
                '13': 'MyVideos78.db', '14': 'MyVideos90.db', '15': 'MyVideos93.db',
                '16': 'MyVideos99.db', '17': 'MyVideos107.db', '18': 'MyVideos116.db', 
                '19': 'MyVideos119.db', '20': 'MyVideos120.db'}
+    view_db = {'10': 'ViewModes1.db', '11': 'ViewModes4.db', '12': 'ViewModes4.db',
+               '13': 'ViewModes6.db', '14': 'ViewModes6.db', '15': 'ViewModes6.db',
+               '16': 'ViewModes6.db', '17': 'ViewModes6.db', '18': 'ViewModes6.db', 
+               '19': 'ViewModes6.db', '20': 'ViewModes6.db'}
 
     num_version = xbmc.getInfoLabel('System.BuildVersion')
     num_version = re.match("\d+\.\d+", num_version).group(0)
     ret['name_version'] = codename.get(num_version.split('.')[0], num_version)
     ret['video_db'] = video_db.get(num_version.split('.')[0], "")
+    ret['view_db'] = view_db.get(num_version.split('.')[0], "")
     ret['num_version'] = float(num_version)
     if ret['num_version'] < 14:
         ret['platform'] = "xbmc-" + ret['name_version']
@@ -443,3 +448,9 @@ def get_online_server_thumb(server):
 
 def get_language():
     return get_localized_string(20001)
+
+def get_skin():
+    import xbmc
+    from core import jsontools
+    js = '{"jsonrpc": "2.0", "method": "Settings.GetSettingValue", "params": {"setting": "lookandfeel.skin"}, "id": 1 }'
+    return jsontools.load(xbmc.executeJSONRPC(js)).get('result', {}).get('value')
