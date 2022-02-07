@@ -333,7 +333,7 @@ def render_items(itemlist, parent_item):
     mode, Type = get_view_mode(itemlist[0], parent_item)
     # from core.support import dbg;dbg()
     if mode:
-        set_view_mode(parent_item.tourl(), mode)
+        set_view_mode(sys.argv[2], mode)
 
     dirItems = []
 
@@ -577,7 +577,7 @@ def set_view_mode(url, mode):
     if conn:
         skin_name = config.get_skin()
         try:
-            sql = 'select idView from view where (path="{}?{}" and skin="{}")'.format(sys.argv[0], url, skin_name)
+            sql = 'select idView from view where (path="{}{}" and skin="{}")'.format(sys.argv[0], url, skin_name)
             records = execute_sql(conn, sql)
             if records:
                 # from core.support import dbg;dbg()
@@ -586,7 +586,7 @@ def set_view_mode(url, mode):
             else:
                 # from core.support import dbg;dbg()
                 sql = 'INSERT INTO view (window, path, viewMode, sortMethod, sortOrder, sortAttributes, skin) VALUES ' \
-                    '(10025, "{}?{}", {}, 0, 1, 0, "{}")'.format(sys.argv[0], url, mode, skin_name)
+                    '(10025, "{}{}", {}, 0, 1, 0, "{}")'.format(sys.argv[0], url, mode, skin_name)
                 records = execute_sql(conn, sql)
         except:
             pass
