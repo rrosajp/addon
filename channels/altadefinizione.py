@@ -68,7 +68,7 @@ def episodios(item):
     item.quality = ''
     data = item.data
     action='findvideos'
-    patronBlock = r'Stagione[^;]+;\s(?P<lang>(?:Sub-)?ITA)(?: in )?(?P<quality>[^<]*)?(?:[^>]+>){4}(?P<block>.*?)/p>'
+    patronBlock = r'[Ss]tagione.*?\s(?P<lang>(?:[Ss][Uu][Bb][-]?)?[Ii][Tt][Aa])(?: in )?(?P<quality>[^<]*)?(?:[^>]+>){4}(?P<block>.*?)/p>'
     patron = r'(?P<season>\d+)&[^:]+;(?P<episode>\d+)(?P<data>.*?)(?:<br|$)'
     return locals()
 
