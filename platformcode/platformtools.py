@@ -2009,9 +2009,10 @@ def serverWindow(item, itemlist):
         if index > 0: xbmc.executebuiltin(context_commands[index])
 
 
+
     if itemlist:
         def monitor(itemlist):
-            reopen = False
+            reopen = True
             while not xbmc.Monitor().abortRequested():
                 if not is_playing():
                     if reopen:
@@ -2028,8 +2029,10 @@ def serverWindow(item, itemlist):
 
                     else:
                         from platformcode.launcher import run
-                        run(selection)
-                        reopen = True
+                        try:
+                            run(selection)
+                        except:
+                            reopen = False
                         if not selection.server or selection.server == 'torrent': break
 
             db.close()
