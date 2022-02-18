@@ -2012,7 +2012,7 @@ def serverWindow(item, itemlist):
 
     if itemlist:
         def monitor(itemlist):
-            reopen = True
+            reopen = False
             while not xbmc.Monitor().abortRequested():
                 if not is_playing():
                     if reopen:
@@ -2021,8 +2021,10 @@ def serverWindow(item, itemlist):
                             break
                     if config.get_setting('window_type') == 0:
                         selection = ServerSkinWindow("DialogSelect.xml", config.get_runtime_path()).start(item, itemlist)
+                        reopen = True
                     else:
                         selection = ServerWindow('Servers.xml', config.get_runtime_path()).start(item, itemlist)
+                        reopen = True
 
                     if selection == -1:
                         break
