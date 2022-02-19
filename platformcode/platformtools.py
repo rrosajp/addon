@@ -2009,10 +2009,14 @@ def serverWindow(item, itemlist):
         if index > 0: xbmc.executebuiltin(context_commands[index])
 
 
-
     if itemlist:
-        def monitor(itemlist):
-            reopen = False
+        reopen = False
+        if config.get_setting('autoplay'):
+            reopen = True
+            from core import autoplay
+            autoplay.start(itemlist, item)
+
+        def monitor(itemlist, reopen):
             while not xbmc.Monitor().abortRequested():
                 if not is_playing():
                     if reopen:
@@ -2037,7 +2041,5 @@ def serverWindow(item, itemlist):
                             reopen = False
                         if not selection.server or selection.server == 'torrent': break
 
-            db.close()
-            logger.debug('Server Window EXIT')
         import threading
-        threading.Thread(target=monitor, args=[itemlist]).start()
+        threading.Thread(target=monitor, args=[itemlist, reopen]).start()
