@@ -1249,6 +1249,7 @@ def show_video_info(*args, **kwargs):
     """
 
     from platformcode.xbmc_info_window import InfoWindow
+    xbmc.executebuiltin('Dialog.Close(all)')
     return InfoWindow("InfoWindow.xml", config.get_runtime_path()).start(*args, **kwargs)
 
 
@@ -1869,10 +1870,10 @@ def serverWindow(item, itemlist):
             self.setFocusId(100)
             # from core.support import dbg;dbg()
 
-        def onFocus(self, control):
-            if is_playing() and db['controls'].get('reopen', False):
-                self.close()
-                serverWindow(self.item, self.itemlist)
+        # def onFocus(self, control):
+        #     if is_playing() and db['controls'].get('reopen', False):
+        #         self.close()
+        #         serverWindow(self.item, self.itemlist)
 
         def onAction(self, action):
             action = action.getId()
@@ -1965,10 +1966,10 @@ def serverWindow(item, itemlist):
             self.SERVERS.addItems(items)
             self.setFocus(self.SERVERS)
 
-        def onFocus(self, control):
-            if is_playing() and db['controls'].get('reopen', False):
-                self.close()
-                serverWindow(self.item, self.itemlist)
+        # def onFocus(self, control):
+        #     if is_playing() and db['controls'].get('reopen', False):
+        #         self.close()
+        #         serverWindow(self.item, self.itemlist)
 
         def onAction(self, action):
             action = action.getId()
