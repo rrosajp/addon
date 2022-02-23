@@ -259,7 +259,8 @@ def servers_blacklist(item):
                 blacklisted.append(i)
         list_servers.append(server)
     ris = platformtools.dialog_multiselect(config.get_localized_string(60550), list_controls, preselect=blacklisted)
-    config.set_setting("black_list", [l for n, l in enumerate(list_servers) if n in ris], server='servers')
+    if ris is not None:
+        config.set_setting("black_list", [l for n, l in enumerate(list_servers) if n in ris], server='servers')
     # if ris is not None:
     #     cb_servers_blacklist({list_servers[n]: True if n in ris else False for n, it in enumerate(list_controls)})
     # return platformtools.show_channel_settings(list_controls=list_controls, dict_values=dict_values, caption=config.get_localized_string(60550), callback="cb_servers_blacklist")
