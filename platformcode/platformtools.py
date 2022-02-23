@@ -1249,7 +1249,6 @@ def show_video_info(*args, **kwargs):
     """
 
     from platformcode.xbmc_info_window import InfoWindow
-    xbmc.executebuiltin('Dialog.Close(all)')
     return InfoWindow("InfoWindow.xml", config.get_runtime_path()).start(*args, **kwargs)
 
 
