@@ -320,7 +320,7 @@ def findvideos(item, itemlist=[]):
         platformtools.render_items(itemlist, item)
     if not serverlist:
         platformtools.dialog_notification(config.get_localized_string(20000), config.get_localized_string(60347))
-    elif len(serverlist) == 1 and serverlist[0].server != 'torrent':
+    elif len(serverlist) == 1:
         # If there is only one server play it immediately
         play(itemlist[0].clone(no_return=True))
     else:

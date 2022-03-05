@@ -1,95 +1,183 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# Canale per 133x
+# Canale per 1337x
 # ------------------------------------------------------------
 
-from core import httptools, support, jsontools
-from platformcode import logger
-import requests
+import inspect
+from core import support
+from platformcode import logger, config
 
 # host = support.config.get_channel_url()
 host = 'https://www.1337x.to'
-# headers = {
-# 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-# 'accept-encoding': 'gzip, deflate, br',
-# 'accept-language': 'it,en;q=0.9,it-IT;q=0.8,en-GB;q=0.7,en-US;q=0.6',
-# 'cache-control': 'no-cache',
-# 'pragma': 'no-cache',
-# 'referer': 'https://www.1337x.to/',
-# 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36 Edg/98.0.1108.62'}
-
-# def getData(item):
-#     support.dbg()
-#     json = jsontools.load(base64.b64decode(support.match(item, patron=r'window.park\s*=\s*"([^"]+)').match))
-#     data = support.match(json['page_url'], headers=json['page_headers']).data
-#     return data
 
 @support.menu
 def mainlist(item):
-    
-    film = ['/movie-lib-sort/all/it/release/desc/all/1/']
-    
-    tvshow = ['/popular-movies',
-              ('Popolari', ['/popular-movies', 'popular'])]
 
-    # menu = [
-    #     ('BDRiP {film}', ['/categoria.php?active=0&category=1&order=data&by=DESC&page=', 'peliculas', [0, 'movie', True], 'undefined']),
-    #     ('Cerca BDRiP... {submenu} {film}', ['/torrent-ita/1/', 'search', ['search', 'movie', True], 'movie']),
-    #     ('DVD {film}', ['/categoria.php?active=0&category=20&order=data&by=DESC&page=', 'peliculas', [0, 'movie', True], 'undefined']),
-    #     ('Cerca DVD... {submenu} {film}', ['/torrent-ita/20/', 'search', ['search', 'movie', True], 'movie']),
-    #     ('Screener {film}', ['/categoria.php?active=0&category=19&order=data&by=DESC&page=', 'peliculas', [0, 'movie', True], 'undefined']),
-    #     ('Cerca Screener.. {submenu} {film}', ['/torrent-ita/19/', 'search', ['search', 'movie', True], 'movie']),
-    #     ('Serie TV', ['/categoria.php?active=0&category=15&order=data&by=DES&page=', 'peliculas', [0 , 'tvshow', True], 'tvshow']),
-    #     ('Cerca Serie TV.. {submenu}', ['/torrent-ita/15/', 'search', ['search', 'tvshow',True], 'tvshow']),
-    #     ('Anime', ['/categoria.php?active=0&category=5&order=data&by=DESC&page=', 'peliculas', [0, 'anime', True], 'tvshow']),
-    #     ('Cerca Anime.. {submenu}', ['/torrent-ita/5/', 'search', ['search', 'anime', True], 'tvshow']),
-    #     ('Musica', ['/categoria.php?active=0&category=2&order=data&by=DESC&page=', 'peliculas', [0, 'music', False], 'music']),
-    #     ('Cerca Musica.. {submenu}', ['/torrent-ita/2/', 'search', ['search', 'music', False], 'music']),
-    #     ('Audiolibri {musica}', ['/categoria.php?active=0&category=18&order=data&by=DESC&page=', 'peliculas', [0, 'music', False], 'music']),
-    #     ('Cerca Audiolibri.. {submenu}', ['/torrent-ita/18/', 'search', ['search', 'music', False], 'music']),
-    #     # mostrerebbe anche risultati non "multimediali" e allungherebbero inutilmente la ricerca globale
-    #     # ('Altro {film}', ['/categoria.php?active=0&category=4&order=data&by=DESC&page=', 'peliculas', [0, 'other', False]]),
-    #     # ('Cerca altro.. {submenu}', ['/torrent-ita/4/', 'search', ['search', 'other', False]]),
-    #     # ('Cerca Tutto... {color kod bold}', ['/argh.php?search=', 'search', ['search', 'all', False]])
-    # ]
+    menu = [('Film ITA {bullet bold}',['/movie-lib-sort/all/it/popularity/desc/all/1/', 'peliculas', '', 'movie']),
+            ('Film {submenu}',['/movie-library/1/', 'peliculas', 'filter', 'movie']),
+            ('Serie TV {bullet bold}',['/series-library/', 'az', '', 'tvshow'])]
+
+    search = ''
 
     return locals()
 
 
-@support.scrape
-def peliculas(item):
-    patron = r'<img alt="[^"]*" data-original="(?P<thumb>[^"]+)(?:[^>]+>){15}(?P<title>[^<]+)(?:[^>]+>){18,23}\s*<a href="(?P<url>[^"]+)'
-    patronNext = r'"([^"]+)">&gt;&gt;'
-    return locals()
+def moviefilter(item):
+    from platformcode import platformtools
+
+    item.args = ''
+    controls = []
+    data = support.match(item).data
+
+    patronBlock = r'<select name="{}"[^>]+>(.+?)</select>'
+    patron = r'value="([^"]+)">([^<]+)'
+
+    genres = support.match(data, patronBlock=patronBlock.format('genre'), patron=patron).matches
+    years = support.match(data, patronBlock=patronBlock.format('year'), patron=patron).matches
+    langs = support.match(data, patronBlock=patronBlock.format('lang'), patron=patron).matches
+    sorts = support.match(data, patronBlock=patronBlock.format('sortby'), patron=patron).matches
+    orders = support.match(data, patronBlock=patronBlock.format('sort'), patron=patron).matches
+
+    item.genreValues = [x[0] for x in genres]
+    item.yearValues = [x[0] for x in years]
+    item.langValues = [x[0] for x in langs]
+    item.sortValues = [x[0] for x in sorts]
+    item.orderValues = [x[0] for x in orders]
+
+    genres = [g[1] for g in genres]
+    years = [g[1] for g in years]
+    langs = [g[1] for g in langs]
+    sorts = [g[1] for g in sorts]
+    orders = [g[1] for g in orders]
+
+    controls.append({'id': 'lang', 'label': 'Lingua', 'type': 'list', 'enabled':True, 'visible':True, 'lvalues':langs, 'default': 0})
+    controls.append({'id': 'genre', 'label': 'Genere', 'type': 'list', 'enabled':True, 'visible':True, 'lvalues':genres, 'default': 0})
+    controls.append({'id': 'year', 'label': 'Anno', 'type': 'list', 'enabled':True, 'visible':True, 'lvalues':years, 'default': 0})
+    controls.append({'id': 'sort', 'label': 'Anno', 'type': 'list', 'enabled':True, 'visible':True, 'lvalues':sorts, 'default': 0})
+    controls.append({'id': 'order', 'label': 'Anno', 'type': 'list', 'enabled':True, 'visible':True, 'lvalues':orders, 'default': 0})
+    return platformtools.show_channel_settings(list_controls=controls, item=item, caption='Filtro', callback='filtered')
+
+
+def filtered(item, values):
+
+    genre = item.genreValues[values['genre']]
+    lang = item.langValues[values['lang']]
+    sortby = item.sortValues[values['sort']]
+    order = item.orderValues[values['order']]
+    year = item.yearValues[values['year']]
+
+    return f'{host}/movie-lib-sort/{genre}/{lang}/{sortby}/{order}/{year}/1/'
+
+
+def az(item):
+    import string
+    itemlist = [item.clone(title='1-9', url=f'{item.url}num/1/', action='peliculas', thumbnail=support.thumb('az'))]
+    for letter in list(string.ascii_lowercase):
+        itemlist.append(item.clone(title=letter.upper(), url=f'{item.url}{letter}/1/', action='peliculas', thumbnail=support.thumb('az')))
+    return itemlist
 
 
 def search(item, text):
-    support.info(item, text)
-    if 'all' in item.args:
-        item.url += text
-    else:
-        item.url += text + '.html'
+    support.info('search', text)
+    item.args = 'search'
+    if config.get_setting('itaSearch', channel=item.channel, default=False):
+        text += ' ita'
+    text = text.replace(' ', '+')
+    item.url = f'{host}/search/{text}/1/'
     try:
         return peliculas(item)
     # Cattura la eccezione così non interrompe la ricerca globle se il canale si rompe!
     except:
         import sys
         for line in sys.exc_info():
-            support.logger.error("search except: %s" % line)
+            support.logger.error("search except: ", line)
         return []
+
+@support.scrape
+def peliculas(item):
+    if item.args == 'filter':
+        item.url = moviefilter(item)
+
+    data = support.match(item).data
+    if item.args == 'search':
+        sceneTitle = 'undefined'
+        patron = r'<a href="(?P<url>[^"]+)">(?P<title>[^<]+)<(?:[^>]+>){3,7}(?P<seed>[^<]+)<(?:[^>]+>){6}(?P<size>[^<]+)<span'
+        patronNext = r'"([^"]+)">&gt;&gt;'
+    elif item.contentType == 'movie':
+        patron = r'<img alt="[^"]*" data-original="(?P<thumb>[^"]+)(?:[^>]+>){15}(?P<title>[^<]+)(?:[^>]+>){18,23}\s*<a href="(?P<url>[^"]+)'
+        patronNext = r'"([^"]+)">&gt;&gt;'
+    else:
+        action = 'seasons'
+        patron = r'<img src="(?P<thumb>[^"]+)(?:[^>]+>){4}\s*<a href="(?P<url>[^"]+)[^>]+>(?P<title>[^<]+)'
+
+    if (item.args == 'search' or item.contentType != 'movie') and inspect.stack()[4][3] not in ['get_channel_results']:
+        def itemlistHook(itemlist):
+            lastUrl = support.match(data, patron=r'href="([^"]+)">Last').match
+            if lastUrl:
+                currentPage = support.match(item.url, string=True, patron=r'/(\d+)/').match
+                nextPage = int(currentPage) + 1
+                support.nextPage(itemlist, item, next_page=item.url.replace(f'/{currentPage}', f'/{nextPage}'), function_or_level='peliculas')
+            return itemlist
+    return locals()
+
+
+@support.scrape
+def seasons(item):
+    item.contentType == 'season'
+    action = 'episodios'
+    patron = r'<li>\s*<a href="(?P<url>[^"]+)[^>]+>\s*<img alt="[^"]*"\ssrc="(?P<thumb>[^"]+)(?:([^>]+)>){2}\s*(?P<title>\w+ (?P<season>\d+))'
+    return locals()
+
+@support.scrape
+def episodios(item):
+    patron = r'<img src="(?P<thumb>[^"]+)(?:[^>]+>){13}\s*(?P<season>\d+)x(?P<episode>\d+)\s*<span class="seperator">(?:[^>]+>){2}\s*<a href="(?P<url>[^"]+)">(?P<title>[^<]+)'
+    def itemlistHook(itemlist):
+        itemlist.reverse()
+        return itemlist
+    return locals()
 
 
 def findvideos(item):
-    from lib.guessit import guessit
     itemlist = []
-    items = support.match(item.url, patron=r'<a href="([^"]+)">([^<]+)<(?:[^>]+>){3}([^<]+)<(?:[^>]+>){6}([^<]+)<span').matches
+    item.disableAutoplay = True
+    if item.args == 'search':
+        itemlist.append(item.clone(server='torrent', action='play'))
+    else:
+        from lib.guessit import guessit
 
-    for url, title, seed, size in items:
-        title = guessit(title).get('title', '')
-        itemlist.append(item.clone(title = f'{title} [Seed={seed}] [{size}]', url=host + url, server='torrent', action='play'))
+        items = support.match(item.url, patron=r'<a href="([^"]+)">([^<]+)<(?:[^>]+>){3}([^<]+)<(?:[^>]+>){6}([^<]+)<span').matches
+
+        for url, title, seed, size in items:
+            parsedTitle = guessit(title)
+
+            title = support.scrapertools.unescape(parsedTitle.get('title', ''))
+
+            lang = ''
+            if parsedTitle.get('language'):
+                langs = parsedTitle.get('language')
+                if isinstance(langs, list):
+                    lang = 'MULTI'
+                else:
+                    lang = vars(langs).get('alpha3').upper()
+                if not (lang.startswith('MUL') or lang.startswith('ITA')):
+                    subs = parsedTitle.get('subtitle_language')
+                    if isinstance(subs, list):
+                        lang = 'Multi-Sub'
+                    else:
+                        lang = vars(subs).get('alpha3').upper()
+            if lang:
+                title = f'{title} [{lang}]'
+
+            sizematch = support.match(size, patron='(\d+(?:\.\d+)?)\s* (\w+)').match
+            sizenumber = float(sizematch[0])
+            if sizematch[1].lower() == 'gb':
+                sizenumber = sizenumber * 1024
+
+            itemlist.append(item.clone(title = f'{title} [{seed} SEEDS] [{size}]', seed=int(seed), size=sizenumber, url=host + url, server='torrent', action='play'))
+        itemlist.sort(key=lambda it: (it.seed, it.size), reverse=True)
 
     Videolibrary = True if 'movie' in item.args else False
-    return support.server(item, itemlist=itemlist, Videolibrary=Videolibrary)
+    return support.server(item, itemlist=itemlist, Videolibrary=Videolibrary, Sorted=False)
 
 
 def play(item):

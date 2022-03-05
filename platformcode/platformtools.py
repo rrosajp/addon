@@ -2011,7 +2011,7 @@ def serverWindow(item, itemlist):
 
     if itemlist:
         reopen = False
-        if config.get_setting('autoplay'):
+        if config.get_setting('autoplay') and not item.disableAutoplay:
             reopen = True
             from core import autoplay
             autoplay.start(itemlist, item)

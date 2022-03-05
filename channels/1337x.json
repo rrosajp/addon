@@ -6,5 +6,14 @@
     "thumbnail": "1337x.png",
     "banner": "1337x.png",
     "categories": ["movie", "tvshow", "torrent"],
-    "settings": []
+    "settings": [
+        {
+            "id": "itaSearch",
+            "type": "bool",
+            "label": "Cerca contenuti in italiano",
+            "default": false,
+            "enabled": true,
+            "visible": true
+        }
+    ]
 }
