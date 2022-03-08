@@ -84,8 +84,8 @@ def genres(item):
 
 def findvideos(item):
     data = support.match(item.url).data
-    urls = support.match(data, patron=r'<span data-link="([^"]+)').matches
-    if urls:
+    urls = support.match(data, patron=r'<span data-link="([^"]+)',).matches
+    if len(urls) > 1:
         data = urls
     else:
         url = support.match(item.url, patron='<iframe.*?src="([^"]+)').match

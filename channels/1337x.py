@@ -58,8 +58,8 @@ def moviefilter(item):
     return platformtools.show_channel_settings(list_controls=controls, item=item, caption='Filtro', callback='filtered')
 
 
-def filtered(item, values):
 
+def filtered(item, values):
     genre = item.genreValues[values['genre']]
     lang = item.langValues[values['lang']]
     sortby = item.sortValues[values['sort']]
@@ -97,8 +97,11 @@ def search(item, text):
 def peliculas(item):
     if item.args == 'filter':
         item.url = moviefilter(item)
+    if not item.url:
+        data = ' '
+    else:
+        data = support.match(item).data
 
-    data = support.match(item).data
     if item.args == 'search':
         sceneTitle = 'undefined'
         patron = r'<a href="(?P<url>[^"]+)">(?P<title>[^<]+)<(?:[^>]+>){3,7}(?P<seed>[^<]+)<(?:[^>]+>){6}(?P<size>[^<]+)<span'
@@ -118,6 +121,7 @@ def peliculas(item):
                 nextPage = int(currentPage) + 1
                 support.nextPage(itemlist, item, next_page=item.url.replace(f'/{currentPage}', f'/{nextPage}'), function_or_level='peliculas')
             return itemlist
+
     return locals()
 
 
