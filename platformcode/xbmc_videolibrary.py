@@ -100,7 +100,7 @@ def mark_auto_as_watched(item):
         if sync and config.get_setting("trakt_sync"): sync_trakt_kodi()
 
         while platformtools.is_playing():
-            xbmc.sleep(100)
+            xbmc.sleep(300)
 
         if next_episode and next_episode.next_ep and config.get_setting('next_ep') < 3:
             from platformcode.launcher import run
