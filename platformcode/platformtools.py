@@ -771,7 +771,8 @@ def set_context_commands(item, item_url, parent_item, **kwargs):
                 # Download season
                 elif item.contentType == "season":
                     context_commands.append((config.get_localized_string(60357), "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'channel=downloads&action=save_download&download=season&from_channel=' + item.channel + '&from_action=' + item.action)))
-
+        if item.contentType in ['movie', 'episode'] and config.get_setting('autoplay'):
+            context_commands.append((config.get_localized_string(70192), "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'disableAutoplay=true')))
         if item.nextPage:
             context_commands.append((config.get_localized_string(70511), "RunPlugin(%s?%s&%s)" % (sys.argv[0], item_url, 'action=gotopage&real_action='+item.action)))
     if config.dev_mode():
