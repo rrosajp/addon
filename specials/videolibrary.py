@@ -1087,6 +1087,7 @@ def delete(item):
             if item_nfo.emergency_urls and item_nfo.emergency_urls.get(canal, False):
                 del item_nfo.emergency_urls[canal]
             filetools.write(item.nfo, head_nfo + item_nfo.tojson())
+            platformtools.itemlist_refresh()
         return num_enlaces
     else:
         if platformtools.dialog_yesno(heading, config.get_localized_string(70088) % item.infoLabels['title']):
