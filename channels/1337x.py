@@ -114,6 +114,7 @@ def peliculas(item):
         patron = r'<img src="(?P<thumb>[^"]+)(?:[^>]+>){4}\s*<a href="(?P<url>[^"]+)[^>]+>(?P<title>[^<]+)'
 
     if (item.args == 'search' or item.contentType != 'movie') and inspect.stack()[4][3] not in ['get_channel_results']:
+        patronNext = None
         def itemlistHook(itemlist):
             lastUrl = support.match(data, patron=r'href="([^"]+)">Last').match
             if lastUrl:
@@ -127,7 +128,7 @@ def peliculas(item):
 
 @support.scrape
 def seasons(item):
-    item.contentType == 'season'
+    item.contentType = 'season'
     action = 'episodios'
     patron = r'<li>\s*<a href="(?P<url>[^"]+)[^>]+>\s*<img alt="[^"]*"\ssrc="(?P<thumb>[^"]+)(?:([^>]+)>){2}\s*(?P<title>\w+ (?P<season>\d+))'
     return locals()
