@@ -93,7 +93,7 @@ def mark_auto_as_watched(item):
             logger.debug('REOPEN')
             item.played_time = actual_time
             db['controls']['reopen'] = True
-        db.close()
+
         platformtools.set_played_time(item)
 
         # Silent sync with Trakt
@@ -104,7 +104,10 @@ def mark_auto_as_watched(item):
 
         if next_episode and next_episode.next_ep and config.get_setting('next_ep') < 3:
             from platformcode.launcher import run
+            xbmc.sleep(1000)
             run(next_episode)
+
+        db.close()
 
     # If it is configured to mark as seen
     if config.get_setting("mark_as_watched", "videolibrary"):
