@@ -270,7 +270,7 @@ def get_seasons(item):
             itemlist = sorted(itemlist, key=lambda it: int(it.contentSeason))
 
         if config.get_setting("show_all_seasons", "videolibrary"):
-            new_item = item.clone(action="get_episodes", title=config.get_localized_string(60030))
+            new_item = item.clone(action="get_episodes", channel='videolibrary', title=config.get_localized_string(60030))
             new_item.infoLabels["playcount"] = 0
             itemlist.insert(0, new_item)
 
