@@ -61,7 +61,7 @@ class UnshortenIt(object):
 
     def unshorten(self, uri, type=None):
         code = 0
-        originalUri = uri
+        originalUri = uri.replace('%0A', '\n')
         while True:
             uri = uri.strip()
             oldUri = uri

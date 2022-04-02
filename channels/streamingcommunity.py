@@ -92,8 +92,10 @@ def newest(category):
     item.args = 1
     item.newest = True
     if category == 'peliculas':
+        item.contentType == 'movie'
         item.url = host + '/film'
     else:
+        item.contentType == 'tvshow'
         item.url = host + '/serie-tv'
 
     try:
@@ -213,7 +215,7 @@ def episodios(item):
                            season=episodes['number'],
                            contentSeason=episodes['number'],
                            contentEpisodeNumber=it['number'],
-                           thumbnail=it['images'][0]['original_url'] if 'images' in it and 'original_url' in it['images'][0] else item.thumbnail,
+                           thumbnail=it['images'][0].get('original_url', item.thumbnail) if it['images'] else item.thumbnail,
                            contentThumbnail=item.thumbnail,
                            fanart=item.fanart,
                            contentFanart=item.fanart,
