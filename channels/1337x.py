@@ -23,6 +23,8 @@ def mainlist(item):
 
 
 def moviefilter(item):
+    if logger.testMode:
+        return f'{host}/movie-lib-sort/all/all/score/desc/all/1/'
     from platformcode import platformtools
 
     item.args = ''
