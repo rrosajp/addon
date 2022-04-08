@@ -444,7 +444,7 @@ def viewmodeMonitor():
                 currentModeName = xbmc.getInfoLabel('Container.Viewmode')
                 currentMode = int(xbmcgui.Window(10025).getFocusId())
                 # logger.debug('SAVE VIEW 1', currentMode, parent.action, item.action)
-                if 50 <= currentMode < 520 and parent and parent.action != item.action:
+                if 50 <= currentMode < 599 and parent and parent.action != item.action:
                     content, Type = getCurrentView(item, parent)
                     view_mode_type = config.get_setting('view_mode_%s' % content)
                     # logger.debug('VIEW MODE TYPE')
