@@ -130,7 +130,6 @@ def get_channel_url(findhostMethod=None, name=None, forceFindhost=False):
         return url
     else:
         url = httptools.downloadpage(channels_data['direct'][name], follow_redirects=True, only_headers=True).url
-        if url.endswith('/'): url = url[:-1]
         return url
 
 
