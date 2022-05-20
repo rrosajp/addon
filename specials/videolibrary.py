@@ -363,12 +363,17 @@ def findvideos(item):
         content_title = str(item.contentSeason) + 'x' + (str(item.contentEpisodeNumber) if item.contentEpisodeNumber > 9 else '0' + str(item.contentEpisodeNumber))
     else:
         content_title = item.contentTitle.strip().lower()
+
+    # Fix in case item.streampath is a full path
+    import re
+    paths = re.split('\\\|/', item.strm_path)
+    strm_path = filetools.join(paths[-2],paths[-1])
     if item.contentType == 'movie':
-        strm_path = filetools.join(videolibrarytools.MOVIES_PATH, item.strm_path)
+        strm_path = filetools.join(videolibrarytools.MOVIES_PATH, strm_path)
         path_dir = filetools.dirname(strm_path)
         item.nfo = filetools.join(path_dir, filetools.basename(path_dir) + ".nfo")
     else:
-        strm_path = filetools.join(videolibrarytools.TVSHOWS_PATH, item.strm_path)
+        strm_path = filetools.join(videolibrarytools.TVSHOWS_PATH, strm_path)
         path_dir = filetools.dirname(strm_path)
         item.nfo = filetools.join(path_dir, 'tvshow.nfo')
 
