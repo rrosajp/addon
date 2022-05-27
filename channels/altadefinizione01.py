@@ -144,7 +144,7 @@ def newest(categoria):
 def findvideos(item):
     support.info('findvideos', item)
     data = httptools.downloadpage(item.url).data
-    iframe = support.match(data, patron='player-container[^>]+>\s*<iframe[^>]+src="([^"]+)').match
+    iframe = support.match(data, patron='src="(http[^"]+)" frameborder').match
     if iframe:
         item.url = iframe
         return support.server(item)
