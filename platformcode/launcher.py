@@ -22,7 +22,7 @@ def start():
         try:
             with open(config.changelogFile, 'r') as fileC:
                 changelog = fileC.read()
-                if changelog.strip():
+                if changelog.strip() and config.get_setting("addon_update_message"):
                     platformtools.dialog_ok('Kodi on Demand', 'Aggiornamenti applicati:\n' + changelog)
             filetools.remove(config.changelogFile)
         except:
