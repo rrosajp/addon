@@ -319,8 +319,9 @@ def novedades(item):
         result_mode = config.get_setting("result_mode", "news")
         if mode != 'normal':
             result_mode=0
-
-        tmdb.set_infoLabels_itemlist(list_newest, seekTmdb=True)
+        if config.get_setting("tmdb", "news"):
+            progreso.update(100, config.get_localized_string(70835))
+            tmdb.set_infoLabels_itemlist(list_newest, seekTmdb=True)
 
         if result_mode == 0:  # Grouped by content
             ret = group_by_content(list_newest)
