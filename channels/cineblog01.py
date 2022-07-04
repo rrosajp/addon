@@ -45,8 +45,9 @@ def mainlist(item):
 
 @support.scrape
 def menu(item):
+    # debug=True
     patronBlock = item.args + r'<span.*?><\/span>.*?<ul.*?>(?P<block>.*?)<\/ul>'
-    patronMenu = r'href="?(?P<url>[^">]+)"?>(?P<title>.*?)<\/a>'
+    patronMenu = r'href="?(?P<url>[^">]+)"?>(?P<title>[^<Â]+)'
     action = 'peliculas'
 
     return locals()
