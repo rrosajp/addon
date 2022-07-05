@@ -3,7 +3,7 @@
 # XBMC Launcher (xbmc / kodi)
 # ------------------------------------------------------------
 
-import sys
+import sys, xbmc
 from core.item import Item
 from core import filetools
 from platformcode import config, logger, platformtools
@@ -86,7 +86,6 @@ def run(item=None):
         elif item.action == "open_browser":
             import webbrowser
             if not webbrowser.open(item.url):
-                import xbmc
                 if xbmc.getCondVisibility('system.platform.linux') and xbmc.getCondVisibility('system.platform.android'):  # android
                     xbmc.executebuiltin('StartAndroidActivity("", "android.intent.action.VIEW", "", "%s")' % item.url)
                 else:
@@ -96,7 +95,6 @@ def run(item=None):
         elif item.action == "gotopage":
             page = platformtools.dialog_numeric(0, config.get_localized_string(70513))
             if page:
-                import xbmc
                 item.action = item.real_action
                 if item.page:
                     item.page = int(page)
@@ -184,6 +182,7 @@ def run(item=None):
     finally:
         # db need to be closed when not used, it will cause freezes
         from core import db
+        xbmc.sleep(100)
         db.close()
         import threading
         logger.debug(threading.enumerate())
@@ -374,7 +373,6 @@ def actions(item):
             if not token_auth:
                 trakt_tools.auth_trakt()
             else:
-                import xbmc
                 if not xbmc.getCondVisibility('System.HasAddon(script.trakt)') and config.get_setting('install_trakt'):
                     trakt_tools.ask_install_script()
             itemlist = trakt_tools.trakt_check(itemlist)

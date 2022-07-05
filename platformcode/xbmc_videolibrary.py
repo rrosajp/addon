@@ -42,8 +42,10 @@ def mark_auto_as_watched(item):
             next_dialogs = ['NextDialog.xml', 'NextDialogExtended.xml', 'NextDialogCompact.xml']
             next_ep_type = config.get_setting('next_ep_type')
             ND = next_dialogs[next_ep_type]
-            try: next_episode = next_ep(item)
-            except: next_episode = False
+            try:
+                next_episode = next_ep(item)
+            except:
+                next_episode = False
             logger.debug(next_episode)
 
         while not xbmc.Monitor().abortRequested():
@@ -1333,39 +1335,39 @@ def next_ep(item):
     item.next_ep = False
 
     # check if next file exist
-    current_filename = filetools.basename(item.strm_path)
+    current_filename = filetools.basename(item.strm_path).replace('.strm', '')
     base_path = filetools.basename(filetools.dirname(item.strm_path))
     path = filetools.join(config.get_videolibrary_path(), config.get_setting("folder_tvshows"),base_path)
     fileList = []
     for file in filetools.listdir(path):
         if file.endswith('.strm'):
-            fileList.append(file)
-    fileList.sort()
+            fileList.append(file.replace('.strm', ''))
+
+    fileList.sort(key=lambda ep: (int(ep.split('x')[0]), int(ep.split('x')[1])))
 
     nextIndex = fileList.index(current_filename) + 1
     if nextIndex == 0 or nextIndex == len(fileList): next_file = None
-    else: next_file = fileList[nextIndex]
+    else: next_file = fileList[nextIndex] 
     logger.debug('Next File:' + str(next_file))
 
     # start next episode window afther x time
     if next_file:
-        season_ep = next_file.split('.')[0]
-        season = season_ep.split('x')[0]
-        episode = season_ep.split('x')[1]
-        next_ep = '%sx%s' % (season, episode)
+        season = int(next_file.split('x')[0])
+        episode = int(next_file.split('x')[1])
+        # next_ep = '%sx%s' % (season, episode)
         item = Item(
             action= 'play_from_library',
             channel= 'videolibrary',
             contentEpisodeNumber= episode,
             contentSeason= season,
-            contentTitle= next_ep,
+            contentTitle= next_file,
             contentType= 'episode',
-            infoLabels= {'episode': episode, 'mediatype': 'episode', 'season': season, 'title': next_ep},
-            strm_path= filetools.join(base_path, next_file),
+            infoLabels= {'episode': episode, 'mediatype': 'episode', 'season': season, 'title': next_file},
+            strm_path= filetools.join(base_path, next_file + '.strm'),
             play_from = item.play_from)
 
         global INFO
-        INFO = filetools.join(path, next_file.replace("strm", "nfo"))
+        INFO = filetools.join(path, next_file + '.nfo')
     else:
         item=None
 
@@ -1394,7 +1396,10 @@ class NextDialog(xbmcgui.WindowXMLDialog):
         else: img = filetools.join(config.get_runtime_path(), "resources", "noimage.png")
         self.setProperty("next_img", img)
         self.setProperty("title", info["tvshowtitle"])
-        self.setProperty("ep_title", "%dx%02d - %s" % (info["season"], info["episode"], info.get("title",'')))
+        ep_title = f'{info["season"]}x{info["episode"]:02d}'
+        if info.get("title",''):
+            ep_title += f' - {info["title"]}'
+        self.setProperty("ep_title", ep_title)
         self.show()
 
     def set_exit(self, EXIT):
