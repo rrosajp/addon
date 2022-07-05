@@ -178,6 +178,9 @@ def peliculas(item, json='', key='', itemlist=[]):
 
     # logger.debug('DEBUG:', json)
 
+    if item.sort:
+        json.sort(key=lambda x: x.get('title', ''), reverse=False)
+
     infoLabels = item.infoLabels if item.infoLabels else {}
     contentType = 'tvshow' if 'tvshow' in key else 'movie'
     itlist = filterkey = []
@@ -237,8 +240,8 @@ def peliculas(item, json='', key='', itemlist=[]):
         tmdb.set_infoLabels(itlist, seekTmdb=True)
     itemlist += itlist
 
-    if item.sort:
-        itemlist.sort(key=lambda x: x.title.lower(), reverse=False)
+    # if item.sort:
+    #     itemlist.sort(key=lambda x: x.title.lower(), reverse=False)
     if Pagination and len(itemlist) >= Pagination:
         if inspect.stack()[1][3] != 'get_newest':
             item.title = support.typo(config.get_localized_string(30992), 'color kod bold')
