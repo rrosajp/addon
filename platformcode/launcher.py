@@ -182,7 +182,6 @@ def run(item=None):
     finally:
         # db need to be closed when not used, it will cause freezes
         from core import db
-        xbmc.sleep(100)
         db.close()
         import threading
         logger.debug(threading.enumerate())
