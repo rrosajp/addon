@@ -728,6 +728,7 @@ def load_and_check(item):
 # set extra values
 def set_extra_values(item, json, path):
     logger.debug()
+    # support.dbg()
     ret = Item()
     for key in json:
         if key == 'quality':
@@ -743,7 +744,7 @@ def set_extra_values(item, json, path):
         elif key == 'fanart':
             ret.fanart = json[key] if ':/' in json[key] else filetools.join(path, json[key])
         elif key in ['url', 'link']:
-            ret.url = json[key] if ':/' in json[key] or type(json[key]) == dict else filetools.join(path, json[key])
+            ret.url = json[key] if ':/' in json[key] or type(json[key]) in (dict, OrderedDict) else filetools.join(path, json[key])
         elif key == 'seasons_list':
             ret.url = {}
             ret.url['seasons_list'] = json['seasons_list']
