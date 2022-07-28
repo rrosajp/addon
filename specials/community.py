@@ -228,6 +228,7 @@ def peliculas(item, json='', key='', itemlist=[]):
                       contentType=contentType,
                       infoLabels=infoLabels,
                       url=extra.url,
+                      subtitle=extra.subtitle,
                       path=item.path,
                       thumbnail=extra.thumb,
                       fanart=extra.fanart,
@@ -365,6 +366,7 @@ def episodios(item, json='', key='', itemlist=[]):
                                  url=option,
                                  action='findvideos',
                                  plot=extra.plot,
+                                 subtitle=extra.subtitle,
                                  thumbnail=extra.thumb if extra.thumb else item.thumbnail,
                                  fanart=extra.fanart,
                                  contentSeason=season_number,
@@ -764,6 +766,8 @@ def set_extra_values(item, json, path):
             ret.description = json[key]
         elif key == 'info':
             ret.info = json[key]
+        elif key == 'subtitle':
+            ret.subtitle = json[key]
 
     if not ret.thumb:
         if 'get_search_menu' in inspect.stack()[1][3]:
