@@ -228,7 +228,6 @@ def peliculas(item, json='', key='', itemlist=[]):
                       contentType=contentType,
                       infoLabels=infoLabels,
                       url=extra.url,
-                      subtitle=extra.subtitle,
                       path=item.path,
                       thumbnail=extra.thumb,
                       fanart=extra.fanart,
@@ -366,7 +365,6 @@ def episodios(item, json='', key='', itemlist=[]):
                                  url=option,
                                  action='findvideos',
                                  plot=extra.plot,
-                                 subtitle=extra.subtitle,
                                  thumbnail=extra.thumb if extra.thumb else item.thumbnail,
                                  fanart=extra.fanart,
                                  contentSeason=season_number,
@@ -461,6 +459,7 @@ def findvideos(item):
             item.clone(url=option['url'],
                        action='play',
                        quality=extra.quality,
+                       subtitle=extra.subtitle,
                        contentLanguage=extra.language,
                        extraInfo=extra.info))
 
