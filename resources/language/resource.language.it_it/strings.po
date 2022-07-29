@@ -2548,8 +2548,8 @@ msgid "      Update waiting time"
 msgstr "      Tempo di attesa aggiornamento"
 
 msgctxt "#60607"
-msgid "When Kodi starts"
-msgstr "All'avvio di Kodi"
+msgid "Each time you start Kodi"
+msgstr "Ad ogni avvio di Kodi"
 
 msgctxt "#60609"
 msgid "10 sec"

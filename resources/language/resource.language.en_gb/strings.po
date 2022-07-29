@@ -2549,7 +2549,7 @@ msgid "      Update waiting time"
 msgstr ""
 
 msgctxt "#60607"
-msgid "When Kodi starts"
+msgid "Each time you start Kodi"
 msgstr ""
 
 msgctxt "#60609"
