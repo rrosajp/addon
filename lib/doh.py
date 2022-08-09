@@ -24,7 +24,8 @@ else:
     _urlopen = urllib2.urlopen
     _Request = urllib2.Request
 
-ipv6 = ':' in _urlopen('https://api64.ipify.org/').read().decode()
+# ipv6 = ':' in _urlopen('https://api64.ipify.org/').read().decode()
+ipv6 = False
 
 
 def query(name, type='AAAA' if ipv6 else 'A', server=DOH_SERVER, path="/dns-query", fallback=True):
