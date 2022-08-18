@@ -80,14 +80,15 @@ def episodios(item):
     item.quality = ''
     data = item.data
     action='findvideos'
+    # debug=True
     patronBlock = r'<span>\s*\w+\s*[Ss]tagione.*?(?P<lang>(?:[Ss][Uu][Bb][-]?)?[Ii][Tt][Aa])(?: in )?(?P<quality>[^<]*)?(?:[^>]+>){4}(?P<block>.*?)/p>'
-    patron = r'(?P<season>\d+)x(?P<episode>\d+)</li>(?P<data>.*?)(?:</table)'
+    patron = r'(?P<season>\d+)x(?P<episode>\d+)[^>]+>(?P<data>.*?)(?:</table)'
     return locals()
 
 
 def check(item):
     item.data = httptools.downloadpage(item.url).data
-    if 'episode_no"' in item.data:
+    if 'Stagione' in item.data:
         item.contentType = 'tvshow'
         return episodios(item)
     else:
