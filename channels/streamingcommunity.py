@@ -252,7 +252,7 @@ def play(item):
         return []
 
     # Calculate Token
-    client_ip = httptools.downloadpage('https://api64.ipify.org/', use_requests=True).data
+    client_ip = support.httptools.downloadpage('https://scws.xyz/videos/{}'.format(scws_id), headers=headers).json.get('client_ip')
     logger.debug(client_ip)
     expires = int(time() + 172800)
     token = b64encode(md5('{}{} Yc8U6r8KjAKAepEA'.format(expires, client_ip).encode('utf-8')).digest()).decode('utf-8').replace('=', '').replace('+', '-').replace('/', '_')
