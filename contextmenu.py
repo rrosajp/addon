@@ -15,6 +15,7 @@ f.close()
 
 
 def build_menu():
+    # from core.support import dbg;dbg()
     tmdbid = xbmc.getInfoLabel('ListItem.Property(tmdb_id)')
     mediatype = xbmc.getInfoLabel('ListItem.DBTYPE')
     title = xbmc.getInfoLabel('ListItem.Title')
@@ -24,9 +25,9 @@ def build_menu():
     containerPath = xbmc.getInfoLabel('Container.FolderPath')
 
     logstr = "Selected ListItem is: 'IMDB: {}' - TMDB: {}' - 'Title: {}' - 'Year: {}'' - 'Type: {}'".format(imdb, tmdbid, title, year, mediatype)
-    logger.info(logstr)
-    logger.info(filePath)
-    logger.info(containerPath)
+    logger.debug(logstr)
+    logger.debug(filePath)
+    logger.debug(containerPath)
 
     contextmenuitems = []
     contextmenuactions = []
@@ -35,21 +36,34 @@ def build_menu():
         logger.debug('check contextmenu', itemmodule)
         module = __import__(itemmodule, None, None, [itemmodule])
 
-        logger.info('Add contextmenu item ->', itemmodule)
+        logger.debug('Add contextmenu item ->', itemmodule)
         module_item_actions = module.get_menu_items()
         contextmenuitems.extend([item for item, fn in module_item_actions])
         contextmenuactions.extend([fn for item, fn in module_item_actions])
 
+    if 'kod' in filePath and mediatype in ['movie', 'episode'] and config.get_setting('autoplay'):
+        logger.debug('Add Select server menu item')
+        contextmenuitems.append(config.get_localized_string(70192))
+        from core import filetools
+        from core.item import Item
+        item = Item().fromurl(filetools.read(filePath))
+        item.disableAutoplay = True
+        contextmenuactions.append(item)
+
     if len(contextmenuitems) == 0:
-        logger.info('No contextmodule found, build an empty one')
+        logger.debug('No contextmodule found, build an empty one')
         contextmenuitems.append(empty_item())
         contextmenuactions.append(lambda: None)
 
     ret = xbmcgui.Dialog().contextmenu(contextmenuitems)
 
     if ret > -1:
-        logger.info('Contextmenu module index', ret, ', label=' + contextmenuitems[ret])
-        contextmenuactions[ret]()
+        logger.debug('Contextmenu module index', ret, ', label=' + contextmenuitems[ret])
+        if isinstance(contextmenuactions[ret], Item):
+            from platformcode.launcher import run
+            run(contextmenuactions[ret])
+        else:
+            contextmenuactions[ret]()
 
 
 def empty_item():
