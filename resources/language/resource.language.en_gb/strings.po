@@ -2552,6 +2552,10 @@ msgctxt "#60607"
 msgid "Each time you start Kodi"
 msgstr ""
 
+msgctxt "#60608"
+msgid "Each time you start Kodi and daily"
+msgstr ""
+
 msgctxt "#60609"
 msgid "10 sec"
 msgstr ""
