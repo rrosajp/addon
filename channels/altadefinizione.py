@@ -70,7 +70,7 @@ def peliculas(item):
     action = 'check'
     patron = r'src="(?P<poster>http[^"]+)(?:[^>]+>){4}\s*<a href="(?P<url>[^"]+)[^>]+>\s*(?P<title>[^\[\(\<]+)(?:\[(?P<quality>[^\]]+)\])?\s*(?:\((?P<lang>[a-zA-z-]+)\))?\s*(?:\((?P<year>\d+)\))?\s*</a>\s*</h2>'
     if item.args == 'search':
-        patron = '<title>(?P<title>[^\[\(\<]+)(?:\[(?P<quality>[^\]]+)\])?\s*(?:\((?P<lang>[a-zA-z-]+)\))?[^>]+>\s*<link>(?P<url>[^<]+)'
+        patron = r'<title>(?P<title>[^\[\(\<]+)(?:\[(?P<quality>[^\]]+)\])?\s*(?:\((?P<lang>[a-zA-z-]+)\))?\s*(?:\((?P<year>\d+)\))?\s*[^>]+>\s*<link>(?P<url>[^<]+)'
     patronNext = r'href="([^"]+)[^>]+>Successivo'
     return locals()
 
