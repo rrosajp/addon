@@ -1,10 +1,12 @@
 from platformcode import config, logger
 import xbmc, sys, xbmcgui, os
 
+
 librerias = xbmc.translatePath(os.path.join(config.get_runtime_path(), 'lib'))
 sys.path.insert(0, librerias)
 
 from core import jsontools, support
+from core.item import Item
 
 addon_id = config.get_addon_core().getAddonInfo('id')
 
@@ -41,15 +43,6 @@ def build_menu():
         contextmenuitems.extend([item for item, fn in module_item_actions])
         contextmenuactions.extend([fn for item, fn in module_item_actions])
 
-    if 'kod' in filePath and mediatype in ['movie', 'episode'] and config.get_setting('autoplay'):
-        logger.debug('Add Select server menu item')
-        contextmenuitems.append(config.get_localized_string(70192))
-        from core import filetools
-        from core.item import Item
-        item = Item().fromurl(filetools.read(filePath))
-        item.disableAutoplay = True
-        contextmenuactions.append(item)
-
     if len(contextmenuitems) == 0:
         logger.debug('No contextmodule found, build an empty one')
         contextmenuitems.append(empty_item())
@@ -59,11 +52,7 @@ def build_menu():
 
     if ret > -1:
         logger.debug('Contextmenu module index', ret, ', label=' + contextmenuitems[ret])
-        if isinstance(contextmenuactions[ret], Item):
-            from platformcode.launcher import run
-            run(contextmenuactions[ret])
-        else:
-            contextmenuactions[ret]()
+        contextmenuactions[ret]()
 
 
 def empty_item():
