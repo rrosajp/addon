@@ -414,7 +414,6 @@ class SearchWindow(xbmcgui.WindowXML):
         self.count += 1
 
         return channel, valid, other if other else results
-        self.update(channel, valid, other if other else results)
         # update_lock.release()
 
     def makeItem(self, url):
@@ -438,6 +437,7 @@ class SearchWindow(xbmcgui.WindowXML):
         return it
 
     def update(self, channel, valid, results):
+        update_lock.acquire()
         self.LOADING.setVisible(False)
         if self.exit:
             return
@@ -485,7 +485,7 @@ class SearchWindow(xbmcgui.WindowXML):
                                     })
                 for result in results:
                     resultsList += result.tourl() + '|'
-                item.setProperty('items',resultsList)
+                item.setProperty('items', resultsList)
                 self.results[name] = len(self.results)
                 self.channels.append(item)
             else:
@@ -509,6 +509,7 @@ class SearchWindow(xbmcgui.WindowXML):
                     if result: items.append(self.makeItem(result))
                 self.RESULTS.reset()
                 self.RESULTS.addItems(items)
+        update_lock.release()
 
     def onInit(self):
         self.time = time.time()
