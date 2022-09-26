@@ -252,7 +252,8 @@ def play(item):
         return []
 
     # Calculate Token
-    client_ip = support.httptools.downloadpage('https://scws.work/videos/{}'.format(scws_id)).json.get('client_ip')
+    # client_ip = support.httptools.downloadpage('https://scws.work/videos/{}'.format(scws_id)).json.get('client_ip')
+    client_ip = support.httptools.downloadpage('http://ip-api.com/json/').json.get('query')
 
     expires = int(time() + 172800)
     token = b64encode(md5('{}{} Yc8U6r8KjAKAepEA'.format(expires, client_ip).encode('utf-8')).digest()).decode('utf-8').replace('=', '').replace('+', '-').replace('/', '_')
@@ -261,7 +262,7 @@ def play(item):
     subs = []
     urls = []
 
-    info = support.match(url, patron=r'LANGUAGE="([^"]+)",\s*URI="([^"]+)|RESOLUTION=\d+x(\d+).*?(http[^"\s]+)').matches
+    info = support.match(url, patron=r'LANGUAGE="([^"]+)",\s*URI="([^"]+)|RESOLUTION=\d+x(\d+).*?(http[^"\s]+)', headers=headers).matches
     if info:
         for lang, sub, res, url in info:
             if sub and not logger.testMode: # ai test non piace questa parte
@@ -272,6 +273,6 @@ def play(item):
             elif url:
                 urls.append(['hls [{}]'.format(res), url])
 
-        return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', video_urls=urls, subtitle=subs, manifest='hls')]
+        return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', video_urls=urls, subtitle=subs, manifest='hls', referer=False)]
     else:
-        return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', url=url, manifest='hls')]
+        return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', url=url, manifest='hls', referer=False)]
