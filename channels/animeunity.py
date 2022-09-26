@@ -222,16 +222,18 @@ def findvideos(item):
         from time import time
         from base64 import b64encode
         from hashlib import md5
+        # support.dbg()
 
         # Calculate Token
-        client_ip = support.httptools.downloadpage('https://scws.work/videos/{}'.format(item.scws_id)).json.get('client_ip')
+        # client_ip = support.httptools.downloadpage('https://scws.work/videos/{}'.format(item.scws_id)).json.get('client_ip')
+        client_ip = support.httptools.downloadpage('http://ip-api.com/json/').json.get('query')
         logger.debug(client_ip)
         expires = int(time() + 172800)
         token = b64encode(md5('{}{} Yc8U6r8KjAKAepEA'.format(expires, client_ip).encode('utf-8')).digest()).decode('utf-8').replace('=', '').replace('+', '-').replace('/', '_')
 
         url = 'https://scws.work/master/{}?token={}&expires={}&n=1'.format(item.scws_id, token, expires)
-        itemlist = [item.clone(title=support.config.get_localized_string(30137), url=url, server='directo', action='play', manifest='hls')]
+        itemlist = [item.clone(title=support.config.get_localized_string(30137), url=url, server='directo', action='play', manifest='hls',referer=False)]
     else:
-        itemlist = [item.clone(title=support.config.get_localized_string(30137), url=item.video_url, server='directo', action='play')]
-    return support.server(item, itemlist=itemlist)
+        itemlist = [item.clone(title=support.config.get_localized_string(30137), url=item.video_url, server='directo', action='play',referer=False)]
+    return support.server(item, itemlist=itemlist, referer=False)
 
