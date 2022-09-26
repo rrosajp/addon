@@ -273,6 +273,6 @@ def play(item):
             elif url:
                 urls.append(['hls [{}]'.format(res), url])
 
-        return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', video_urls=urls, subtitle=subs, manifest='hls')]
+        return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', video_urls=urls, subtitle=subs, manifest='hls', referer=False)]
     else:
-        return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', url=url, manifest='hls')]
+        return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', url=url, manifest='hls', referer=False)]
