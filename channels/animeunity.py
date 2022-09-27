@@ -195,6 +195,7 @@ def episodios(item):
     support.info()
     itemlist = []
     title = 'Parte ' if item.type.lower() == 'movie' else 'Episodio '
+
     for it in item.episodes:
         itemlist.append(
             item.clone(title=support.typo(title + it['number'], 'bold'),
@@ -218,6 +219,6 @@ def episodios(item):
 
 
 def findvideos(item):
-    itemlist = [item.clone(title=support.config.get_localized_string(30137), server='streamingcommunityws')]
+    itemlist = [item.clone(title=support.config.get_localized_string(30137), server='streamingcommunityws', url=str(item.scws_id))]
     return support.server(item, itemlist=itemlist, referer=False)
 
