@@ -233,46 +233,46 @@ def episodios(item):
 
 
 def findvideos(item):
-    itemlist = [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo')]
-    return support.server(item, itemlist=itemlist)
+    itemlist = [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='streamingcommunityws')]
+    return support.server(item, itemlist=itemlist, referer=False)
 
-def play(item):
-    from time import time
-    from base64 import b64encode
-    from hashlib import md5
+# def play(item):
+#     from time import time
+#     from base64 import b64encode
+#     from hashlib import md5
 
-    data = support.httptools.downloadpage(item.url + item.episodeid, headers=headers).data.replace('&quot;','"').replace('\\','')
-    scws_id = support.match(data, patron=r'scws_id"\s*:\s*(\d+)').match
-    # support.dbg()
+#     data = support.httptools.downloadpage(item.url + item.episodeid, headers=headers).data.replace('&quot;','"').replace('\\','')
+#     scws_id = support.match(data, patron=r'scws_id"\s*:\s*(\d+)').match
+#     # support.dbg()
 
-    if not scws_id:
-        if '<strong>Prossimamente' in data:
-            platformtools.dialog_ok('StreamingCommunity', 'Il sito notifica che il contenuto sarà disponibile prossimamente')
-            platformtools.play_canceled = True
-        return []
+#     if not scws_id:
+#         if '<strong>Prossimamente' in data:
+#             platformtools.dialog_ok('StreamingCommunity', 'Il sito notifica che il contenuto sarà disponibile prossimamente')
+#             platformtools.play_canceled = True
+#         return []
 
-    # Calculate Token
-    # client_ip = support.httptools.downloadpage('https://scws.work/videos/{}'.format(scws_id)).json.get('client_ip')
-    client_ip = support.httptools.downloadpage('http://ip-api.com/json/').json.get('query')
+#     # Calculate Token
+#     # client_ip = support.httptools.downloadpage('https://scws.work/videos/{}'.format(scws_id)).json.get('client_ip')
+#     client_ip = support.httptools.downloadpage('http://ip-api.com/json/').json.get('query')
 
-    expires = int(time() + 172800)
-    token = b64encode(md5('{}{} Yc8U6r8KjAKAepEA'.format(expires, client_ip).encode('utf-8')).digest()).decode('utf-8').replace('=', '').replace('+', '-').replace('/', '_')
+#     expires = int(time() + 172800)
+#     token = b64encode(md5('{}{} Yc8U6r8KjAKAepEA'.format(expires, client_ip).encode('utf-8')).digest()).decode('utf-8').replace('=', '').replace('+', '-').replace('/', '_')
 
-    url = 'https://scws.work/master/{}?token={}&expires={}&n=1'.format(scws_id, token, expires)
-    subs = []
-    urls = []
+#     url = 'https://scws.work/master/{}?token={}&expires={}&n=1'.format(scws_id, token, expires)
+#     subs = []
+#     urls = []
 
-    info = support.match(url, patron=r'LANGUAGE="([^"]+)",\s*URI="([^"]+)|RESOLUTION=\d+x(\d+).*?(http[^"\s]+)', headers=headers).matches
-    if info:
-        for lang, sub, res, url in info:
-            if sub and not logger.testMode: # ai test non piace questa parte
-                if lang == 'auto': lang = 'ita-forced'
-                s = config.get_temp_file(lang +'.srt')
-                subs.append(s)
-                filetools.write(s, support.vttToSrt(httptools.downloadpage(support.match(sub, patron=r'(http[^\s\n]+)').match).data))
-            elif url:
-                urls.append(['hls [{}]'.format(res), url])
+#     info = support.match(url, patron=r'LANGUAGE="([^"]+)",\s*URI="([^"]+)|RESOLUTION=\d+x(\d+).*?(http[^"\s]+)', headers=headers).matches
+#     if info:
+#         for lang, sub, res, url in info:
+#             if sub and not logger.testMode: # ai test non piace questa parte
+#                 if lang == 'auto': lang = 'ita-forced'
+#                 s = config.get_temp_file(lang +'.srt')
+#                 subs.append(s)
+#                 filetools.write(s, support.vttToSrt(httptools.downloadpage(support.match(sub, patron=r'(http[^\s\n]+)').match).data))
+#             elif url:
+#                 urls.append(['hls [{}]'.format(res), url])
 
-        return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', video_urls=urls, subtitle=subs, manifest='hls', referer=False)]
-    else:
-        return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', url=url, manifest='hls', referer=False)]
+#         return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='stt', video_urls=urls, subtitle=subs, manifest='hls', referer=False)]
+#     else:
+#         return [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='directo', url=url, manifest='hls', referer=False)]
