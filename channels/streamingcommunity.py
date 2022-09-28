@@ -221,8 +221,7 @@ def episodios(item):
                            action='findvideos',
                            contentType='episode',
                            contentSerieName=item.fulltitle,
-                           url=host + '/watch/' + str(episodes['title_id']),
-                           episodeid= '?e=' + str(it['id'])))
+                           url=host + '/watch/' + str(episodes['title_id']) + '?e=' + str(it['id'])))
 
     if config.get_setting('episode_info') and not support.stackCheck(['add_tvshow', 'get_newest']):
         support.tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
@@ -233,7 +232,7 @@ def episodios(item):
 
 
 def findvideos(item):
-    itemlist = [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], server='streamingcommunityws')]
+    itemlist = [item.clone(title = channeltools.get_channel_parameters(item.channel)['title'], url=item.url, server='streamingcommunityws')]
     return support.server(item, itemlist=itemlist, referer=False)
 
 # def play(item):
