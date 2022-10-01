@@ -18,7 +18,7 @@ else:
 
 host = support.config.get_channel_url()
 headers = {}
-
+headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.53'}
 
 def getHeaders(forced=False):
     global headers
@@ -31,7 +31,7 @@ def getHeaders(forced=False):
         #     host = support.config.get_channel_url(findhost, forceFindhost=True)
         csrf_token = support.match(response.data, patron='name="csrf-token" content="([^"]+)"').match
         headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14',
-                    'content-type': 'application/json;charset=UTF-8',
+                    # 'content-type': 'application/json;charset=UTF-8',
                     'Referer': host,
                     'x-csrf-token': csrf_token,
                     'Cookie': '; '.join([x.name + '=' + x.value for x in response.cookies])}
@@ -39,7 +39,7 @@ def getHeaders(forced=False):
         #     host = support.config.get_channel_url(findhost, forceFindhost=True)
         #     if not forced: getHeaders(True)
 
-getHeaders()
+# getHeaders()
 
 @support.menu
 def mainlist(item):
@@ -59,7 +59,7 @@ def mainlist(item):
 
 def genres(item):
     # getHeaders()
-    logger.debug()
+    # logger.debug()
     itemlist = []
     data = support.scrapertools.decodeHtmlentities(support.match(item).data)
     args = support.match(data, patronBlock=r'genre-options-json="([^\]]+)\]', patron=r'name"\s*:\s*"([^"]+)').matches
@@ -130,11 +130,16 @@ def peliculas(item):
         data = support.scrapertools.decodeHtmlentities(support.match(item).data)
         records = json.loads(support.match(data, patron=r'slider-title titles-json="(.*?)"\s*slider-name="').matches[item.args])
     elif not item.search:
-        payload = json.dumps({'type': videoType, 'offset':offset, 'genre':item.args})
-        records = httptools.downloadpage(host + '/api/browse', headers=headers, post=payload).json['records']
+        payload = {'type': videoType, 'offset':offset, 'genre':item.args}
+        headers['referer'] = host + '/browse'
+        # support.dbg()
+        # records = httptools.downloadpage(host + '/api/browse', headers=headers, post=payload).json['records']
+        records = requests.post(host + '/api/browse', headers=headers, json=payload).json()['records']
     else:
-        payload = json.dumps({'q': item.search})
-        records = httptools.downloadpage(host + '/api/search', headers=headers, post=payload).json['records']
+        payload = {'q': item.search}
+        headers['referer'] = host + '/search'
+        # records = httptools.downloadpage(host + '/api/search', headers=headers, post=payload).json['records']
+        records = requests.post(host + '/api/search', headers=headers, json=payload).json()['records']
 
 
     if records and type(records[0]) == list:
