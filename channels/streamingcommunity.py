@@ -18,7 +18,8 @@ else:
 
 host = support.config.get_channel_url()
 headers = {}
-headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.53'}
+headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.53',
+           'referer': host + '/browse'}
 
 def getHeaders(forced=False):
     global headers
@@ -131,14 +132,10 @@ def peliculas(item):
         records = json.loads(support.match(data, patron=r'slider-title titles-json="(.*?)"\s*slider-name="').matches[item.args])
     elif not item.search:
         payload = {'type': videoType, 'offset':offset, 'genre':item.args}
-        headers['referer'] = host + '/browse'
-        # support.dbg()
-        # records = httptools.downloadpage(host + '/api/browse', headers=headers, post=payload).json['records']
         records = requests.post(host + '/api/browse', headers=headers, json=payload).json()['records']
     else:
         payload = {'q': item.search}
         headers['referer'] = host + '/search'
-        # records = httptools.downloadpage(host + '/api/search', headers=headers, post=payload).json['records']
         records = requests.post(host + '/api/search', headers=headers, json=payload).json()['records']
 
 
@@ -154,6 +151,8 @@ def peliculas(item):
             items.append(it)
         else:
             recordlist.append(it)
+
+    itlist = [makeItem(i, it, item) for i, it in enumerate(items)]
 
     with futures.ThreadPoolExecutor() as executor:
         itlist = [executor.submit(makeItem, i, it, item) for i, it in enumerate(items)]
@@ -175,7 +174,7 @@ def peliculas(item):
 
 def makeItem(n, it, item):
     info = httptools.downloadpage(host + '/api/titles/preview/{}'.format(it['id']), headers=headers, post={}).json
-    logger.debug(it)
+    logger.debug(jsontools.dump(info))
     title = info['name']
     lang = 'Sub-ITA' if 'sub-ita' in title.lower() else 'ITA'
     title = support.cleantitle(re.sub('\[|\]|[Ss][Uu][Bb]-[Ii][Tt][Aa]', '', title))
