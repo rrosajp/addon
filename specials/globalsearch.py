@@ -744,7 +744,11 @@ class SearchWindow(xbmcgui.WindowXML):
             busy(True)
             for th in self.search_threads:
                 th.cancel()
-            self.thread.join()
+            try:
+                self.thread.join()
+            except:
+                import traceback
+                logger.error(traceback.format_exc())
             busy(False)
         self.close()
 
