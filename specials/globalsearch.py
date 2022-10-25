@@ -740,7 +740,7 @@ class SearchWindow(xbmcgui.WindowXML):
 
     def Close(self):
         self.exit = True
-        if self.thread:
+        if self.thread and self.thread.is_alive():
             busy(True)
             for th in self.search_threads:
                 th.cancel()
