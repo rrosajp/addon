@@ -688,8 +688,8 @@ class SearchWindow(xbmcgui.WindowXML):
                 self.itemsResult = getattr(self.channel, item.action)(item)
                 if self.itemsResult and self.itemsResult[0].server:
                     from platformcode.launcher import findvideos
-                    findvideos(self.item, self.itemsResult)
                     busy(False)
+                    findvideos(self.item, self.itemsResult)
                     return
             except:
                 import traceback
