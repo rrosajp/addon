@@ -23,6 +23,7 @@ close_action = False
 update_lock = threading.Lock()
 moduleDict = {}
 searchActions = []
+thread = None
 
 
 def busy(state):
@@ -78,6 +79,7 @@ EPISODESLIST = 200
 SERVERLIST = 300
 
 class SearchWindow(xbmcgui.WindowXML):
+    global thread
     def start(self, item, thActions=None):
         logger.debug()
         self.exit = False
@@ -539,8 +541,8 @@ class SearchWindow(xbmcgui.WindowXML):
                 if self.item.type:
                     self.item.mode = self.item.type
                     self.item.text = scrapertools.title_unify(self.item.text)
-                self.thread = Thread(target=self.search)
-                self.thread.start()
+                thread = Thread(target=self.search)
+                thread.start()
             elif self.item.mode in ['movie', 'tvshow', 'person_']:
                 self.select()
             elif self.item.mode in ['person']:
@@ -740,15 +742,11 @@ class SearchWindow(xbmcgui.WindowXML):
 
     def Close(self):
         self.exit = True
-        if self.thread and self.thread.is_alive():
+        if thread and thread.is_alive():
             busy(True)
             for th in self.search_threads:
                 th.cancel()
-            try:
-                self.thread.join()
-            except:
-                import traceback
-                logger.error(traceback.format_exc())
+            thread.join()
             busy(False)
         self.close()
 
