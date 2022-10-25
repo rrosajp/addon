@@ -689,6 +689,7 @@ class SearchWindow(xbmcgui.WindowXML):
                 if self.itemsResult and self.itemsResult[0].server:
                     from platformcode.launcher import findvideos
                     findvideos(self.item, self.itemsResult)
+                    busy(False)
                     return
             except:
                 import traceback
