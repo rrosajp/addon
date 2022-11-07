@@ -197,7 +197,12 @@ for chItem in channel_list:
 
                     # if more search action (ex: movie, tvshow), firstcontent need to be changed in every menu
                     if itemlist and itemlist[0].action in ('findvideos', 'episodios'):
-                        firstContent = re.match('[ \w]*', itemlist[0].fulltitle).group(0)
+                        for it2 in itemlist:
+                            # some sites refuse to search if the search term is too short
+                            title = it2.fulltitle if it2.contentType == 'movie' else it2.contentSerieName
+                            if title > 5:
+                                firstContent = re.match('[ \w]*', title).group(0)
+                                break
 
                     # some sites might have no link inside, but if all results are without servers, there's something wrong
                     for resIt in itemlist:
