@@ -12,7 +12,7 @@ import random
 import sys
 import time
 import unittest
-
+import datetime
 import xbmc
 
 if 'KOD_TST_CH' not in os.environ:
@@ -66,7 +66,7 @@ validUrlRegex = re.compile(
     r'(?::\d+)?'  # optional port
     r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
-chBlackList = ['url', 'mediasetplay', 'metalvideo', 'accuradio']
+chBlackList = ['url', 'mediasetplay', 'metalvideo', 'accuradio', 'cinetecadibologna', 'tunein']
 srvBlacklist = ['mega', 'hdmario', 'torrent', 'youtube']
 chNumRis = {
     'altadefinizione01': {
@@ -181,7 +181,9 @@ for chItem in channel_list:
         for it in mainlist:
             wait()
             try:
-                print('preparing ' + ch + ' -> ' + it.title)
+                now = datetime.datetime.now()
+                current_time = now.strftime("%H:%M:%S")
+                print(current_time + 'preparing ' + ch + ' -> ' + it.title)
 
                 if it.action == 'channel_config':
                     hasChannelConfig = True
