@@ -54,7 +54,7 @@ from core import servertools, httptools
 import channelselector
 import re
 
-
+logger.DEBUG_ENABLED = False
 httptools.HTTPTOOLS_DEFAULT_DOWNLOAD_TIMEOUT = 10
 
 outDir = os.path.join(os.getcwd(), 'reports')
@@ -151,8 +151,8 @@ def wait():
 
 servers = []
 channels = []
-
 channel_list = channelselector.filterchannels("all") if 'KOD_TST_CH' not in os.environ else [Item(channel=os.environ['KOD_TST_CH'], action="mainlist")]
+logger.DEBUG_ENABLED = True
 logger.info([c.channel for c in channel_list])
 results = []
 
