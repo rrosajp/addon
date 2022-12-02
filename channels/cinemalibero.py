@@ -207,10 +207,9 @@ def newest(categoria):
 
 def check(item):
     data = support.match(item.url, headers=headers).data
-    # support.dbg()
+
     if data:
         ck = str(support.match(data, patronBlock=r'Genere:(.*?)</span>', patron=r'tag">([^<]+)').matches).lower()
-        support.dbg()
 
         if 'serie tv' in ck or 'anime' in ck or 'wrestling wwe' in ck :# in ['serie tv', 'wrestling wwe', 'anime']:
             if 'anime' in ck:
