@@ -146,7 +146,8 @@ chNumRis = {
 
 
 def wait():
-    time.sleep(random.randint(1, 3))
+    pass
+    # time.sleep(random.randint(1, 3))
 
 
 servers = []
@@ -202,7 +203,7 @@ for chItem in channel_list:
                         for it2 in itemlist:
                             # some sites refuse to search if the search term is too short
                             title = it2.fulltitle if it2.contentType == 'movie' else it2.contentSerieName
-                            if title > 5:
+                            if len(title) > 5:
                                 firstContent = re.match('[ \w]*', title).group(0)
                                 break
 
