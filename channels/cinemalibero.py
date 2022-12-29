@@ -252,7 +252,7 @@ def findvideos(item):
         return support.server(item, itemlist=[Item().fromurl(s) for s in item.servers])
     if not item.data:
         item.data = httptools.downloadpage(item.url)
-    data = scrapertools.find_single_match(item.data, '<div class="at-above-post addthis_tool"(.*?)<div class="at-below-post')
+    data = scrapertools.find_single_match(item.data, '<div class="at-above-post addthis_tool"(.*?)(?:<div class="at-below-post|[dD][oO][wW][nN][lL][oO][aA][dD])')
     if data:
         item.data = data
 
