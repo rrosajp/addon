@@ -20,6 +20,19 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     if source:
         media_url = base64.b64decode(source).decode()
         video_urls.append(["mp4", media_url])
+    else:  # download only
+        post = {
+            "op": "download2",
+            "id": page_url.split('/')[-1],
+            "method_free": "Free + Download",
+            "method_premium": "",
+            "adblock_detected": "0"
+        }
+        data = httptools.downloadpage(page_url, post=post).data
+        media_url, filename = scrapertools.find_single_match(data, "ldl\.ld\('([^']+)','([^']+)")
+        media_url = base64.b64decode(media_url).decode()
+        filename = base64.b64decode(filename).decode()
+        video_urls.append([filename.split('.')[-1], media_url])
     return video_urls
 
 

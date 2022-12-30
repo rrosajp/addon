@@ -130,8 +130,8 @@ def episodios(item):
         for it in itl:
             ep = scrapertools.find_single_match(it.title, r'(\d+x\d+)')
             if not ep and 'http' in it.data:  # stagione intera
-                from lib import unshortenit
-                data = unshortenit.findlinks(it.data)
+                # from lib import unshortenit
+                # data = unshortenit.findlinks(it.data)
                 episodes = {}
 
                 def get_ep(s):
@@ -147,7 +147,7 @@ def episodios(item):
                                 episodes[ep] = []
                             episodes[ep].append(s)
 
-                servers = support.server(item, data, CheckLinks=False, Download=False, Videolibrary=False)
+                servers = support.server(item, it.data, CheckLinks=False, Download=False, Videolibrary=False)
                 # for s in servers:
                 #     get_ep(s)
                 # ottengo l'episodio dal nome del file

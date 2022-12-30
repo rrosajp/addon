@@ -45,9 +45,9 @@ class UnshortenIt(object):
     _protectlink_regex = r'(?:s\.)?protectlink\.stream'
     _uprot_regex = r'uprot\.net'
     # for services that only include real link inside iframe
-    _simple_iframe_regex = r'cryptmango|xshield\.net|vcrypt\.club|isecure\.link|icu'
+    _simple_iframe_regex = r'cryptmango|xshield\.net|vcrypt\.club|isecure\.link|isecure\.icu'
     # for services that only do redirects
-    _simple_redirect = r'streamcrypt\.net/[^/]+|is\.gd|www\.vedere\.stream|isecure\.link|icu'
+    _simple_redirect = r'streamcrypt\.net/[^/]+|is\.gd|www\.vedere\.stream|isecure\.link|isecure\.icu'
     _filecrypt_regex = r'filecrypt\.cc'
 
     listRegex = [_adfly_regex, _linkbucks_regex, _adfocus_regex, _lnxlu_regex, _shst_regex, _hrefli_regex, _anonymz_regex,
@@ -785,6 +785,7 @@ def findlinks(text):
         unshList = [executor.submit(unshortener.expand_folder, match) for match in matches]
         for ret in futures.as_completed(unshList):
             text += '\n'.join(ret.result())
+            text += '\n'
 
     # unshorten
     matches = []
@@ -817,7 +818,8 @@ def findlinks(text):
 
 
 class FileCrypt:
-    toFilter = ('https://nitroflare.com',)
+    hostToFilter = ('https://nitroflare.com', 'http://easybytez.com', 'http://drop.download', 'https://rapidgator.net')
+    extensionToFilter = ('rar',)
 
     def __init__(self, uri=None):
         self.uri = uri
@@ -833,7 +835,7 @@ class FileCrypt:
             from lib import proxytranslate
             data = proxytranslate.process_request_proxy(self.uri).get('data', '')
         ret = scrapertools.find_multiple_matches(data, reg)
-        return [r for r in ret if r[1] not in self.toFilter]
+        return [r for r in ret if r[1] not in self.hostToFilter and r[0].split('.')[-1] not in self.extensionToFilter]
 
     def unshorten(self, link):
         link_data = httptools.downloadpage('https://filecrypt.cc/Link/' + link + '.html').data
