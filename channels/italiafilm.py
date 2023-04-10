@@ -12,7 +12,7 @@ headers = [['Referer', host]]
 
 @support.menu
 def mainlist(item):
-      menu = [   
+    menu = [   
         ('Film', ['/film/', 'list', 'film']),
         ('Per Genere', ['', 'list', 'genere']),
         ('Al Cinema', ['/cinema/', 'list', 'film']),
