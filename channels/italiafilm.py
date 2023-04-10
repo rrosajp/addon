@@ -12,10 +12,13 @@ headers = [['Referer', host]]
 
 @support.menu
 def mainlist(item):
-    menu = [('Per Genere', ['', 'list', 'genere']),
-               ('Al Cinema', ['/cinema/', 'list', 'film']),
-               ('Top del Mese', ['/top-del-mese.html', 'list', 'film']),
-               ('Sottotitolati', ['/sub-ita/', 'list', 'film'])
+      menu = [   
+        ('Film', ['/film/', 'list', 'film']),
+        ('Per Genere', ['', 'list', 'genere']),
+        ('Al Cinema', ['/cinema/', 'list', 'film']),
+        ('Sottotitolati', ['/sub-ita/', 'list', 'film']),
+        ('Top del Mese', ['/top-del-mese.html', 'list', 'film'])
+        
            ]
     search = ''
 
