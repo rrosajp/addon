@@ -31,6 +31,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     logger.debug("url=" + page_url)
     video_urls = []
     find_url = match(data, patron=r'innerHTML = ([^;]+)').matches[-1]
+    find_url.replace('"', "'")
     logger.debug(find_url)
     possible_url = js2py.eval_js(find_url)
     url = "https:" + possible_url
