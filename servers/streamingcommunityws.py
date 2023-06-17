@@ -55,6 +55,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             local_subs = [s[1] for s in sorted(composed_subs, key=lambda n: n[0])]
 
             video_urls = [['m3u [{}]'.format(res), url, 0, local_subs] for res, url in urls]
+    else:
+        video_urls = [['hls', url]]
 
     return video_urls
 
