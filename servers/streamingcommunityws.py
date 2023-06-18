@@ -35,43 +35,44 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     masterPlaylistParams = ast.literal_eval(iframeParams)
     url = 'https://scws.work/v2/playlist/{}?{}&n=1'.format(scws_id, urllib.parse.urlencode(masterPlaylistParams))
 
-    info = support.match(url, patron=r'LANGUAGE="([^"]+)",\s*URI="([^"]+)|RESOLUTION=\d+x(\d+).*?(http[^"\s]+)').matches
+    info = support.match(url, patron=r'LANGUAGE="([^"]+)",\s*URI="([^"]+)|(?:RESOLUTION=\d+x|BANDWIDTH=)?(\d+).*?(http[^"\s]+)').matches
 
     if info:
         for lang, sub, res, url in info:
             if sub:
                 if lang == 'auto': lang = 'ita-forced'
                 subs.append([lang, sub])
-            elif res != '1080':
+            elif not 'token=&' in url:
                 urls.append([res, url])
 
         if subs:
-            with futures.ThreadPoolExecutor() as executor:
-                itlist = [executor.submit(subs_downloader, n, s) for n, s in enumerate(subs)]
-                for res in futures.as_completed(itlist):
-                    if res.result():
-                        composed_subs.append(res.result())
-
-            local_subs = [s[1] for s in sorted(composed_subs, key=lambda n: n[0])]
-
-            video_urls = [['m3u [{}]'.format(res), url, 0, local_subs] for res, url in urls]
+            local_subs = subs_downloader(subs)
+            video_urls = [['m3u8 [{}]'.format(res), url, 0, local_subs] for res, url in urls]
+        else:
+            video_urls = [['m3u8 [{}]'.format(res), url] for res, url in urls]
     else:
         video_urls = [['hls', url]]
 
     return video_urls
 
 
-def subs_downloader(n, s):
-    lang, url = s
+def subs_downloader(subs):
+    def subs_downloader_thread(n, s):
+        lang, url = s
+        match = support.match(url, patron=r'(http[^\s\n]+)').match
+        if match:
+            data = httptools.downloadpage(match).data
+            if lang == 'auto': lang = 'ita-forced'
+            sub = config.get_temp_file('{}.{}'.format(lang, 'vtt' if vttsupport else 'str'))
+            filetools.write(sub, data if vttsupport else support.vttToSrt(data))
+            return n, sub
 
-    match = support.match(url, patron=r'(http[^\s\n]+)').match
+    local_subs = list()
 
-    if match:
-        data = httptools.downloadpage(match).data
+    with futures.ThreadPoolExecutor() as executor:
+        itlist = [executor.submit(subs_downloader_thread, n, s) for n, s in enumerate(subs)]
+        for res in futures.as_completed(itlist):
+            if res.result():
+                local_subs.append(res.result())
 
-        if lang == 'auto': lang = 'ita-forced'
-
-        sub = config.get_temp_file('{}.{}'.format(lang, 'vtt' if vttsupport else 'str'))
-
-        filetools.write(sub, data if vttsupport else support.vttToSrt(data))
-        return n, sub
+    return [s[1] for s in sorted(local_subs, key=lambda n: n[0])]
