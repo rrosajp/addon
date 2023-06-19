@@ -34,15 +34,15 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     masterPlaylistParams = ast.literal_eval(iframeParams)
     url = 'https://scws.work/v2/playlist/{}?{}&n=1'.format(scws_id, urllib.parse.urlencode(masterPlaylistParams))
 
-    info = support.match(url, patron=r'LANGUAGE="([^"]+)",\s*URI="([^"]+)|BANDWIDTH=(\d+).+?(?:RESOLUTION=\d+x(\d+))?[^ ]+ (http[^"\s]+)').matches
+    info = support.match(url, patron=r'LANGUAGE="([^"]+)",\s*URI="([^"]+)|(http.*?rendition=(\d+)[^\s]+)').matches
 
     if info:
-        for lang, sub, band, res, url in info:
+        for lang, sub, url, res in info:
             if sub:
                 if lang == 'auto': lang = 'ita-forced'
                 subs.append([lang, sub])
             elif not 'token=&' in url:
-                urls.append([res if res else band, url])
+                urls.append([res, url])
 
         if subs:
             local_subs = subs_downloader(subs)
