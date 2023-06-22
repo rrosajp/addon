@@ -1107,7 +1107,7 @@ def play_video(item, strm=False, force_direct=False, autoplay=False):
         #         logger.error('Failed to resolve hostname, fallback to normal dns')
         from core import support
         # support.dbg()
-        if '|' not in mediaurl and item.referer != False:
+        if '|' not in mediaurl and item.referer != False and 'youtube' not in mediaurl:
             mediaurl = mediaurl + '|' + urllib.urlencode(headers)
 
         # video information is obtained.
