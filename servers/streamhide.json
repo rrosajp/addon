@@ -5,7 +5,7 @@
 
     "patterns": [
       {
-        "pattern": "ahvsh.com/[ed]/([\\d\\w]+)",
+        "pattern": "ahvsh.com/[a-z]/([\\d\\w]+)",
         "url": "https://ahvsh.com/e/\\1"
       }
     ]
