@@ -4,7 +4,7 @@
 # thanks to fatshotty
 # ----------------------------------------------------------
 
-from core import httptools, support, config
+from core import httptools, support, config, jsontools
 
 host = support.config.get_channel_url()
 __channel__ = 'animeworld'
@@ -186,8 +186,9 @@ def findvideos(item):
                 title = support.match(url, patron=r'http[s]?://(?:www.)?([^.]+)', string=True).match
                 itemlist.append(item.clone(action="play", title=title, url=url, server='directo'))
             else:
-                json = support.match(host + '/api/episode/info?id=' + epID + '&alt=0', headers=headers).json
-                # json = jsontools.load(dataJson)
+                dataJson = support.match(host + '/api/episode/info?id=' + epID + '&alt=0', headers=headers).data
+                json = jsontools.load(dataJson)
+
                 title = support.match(json['grabber'], patron=r'server\d+.([^.]+)', string=True).match
                 if title: itemlist.append(item.clone(action="play", title=title, url=json['grabber'].split('=')[-1], server='directo'))
                 else: urls.append(json['grabber'])
