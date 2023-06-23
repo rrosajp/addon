@@ -429,8 +429,9 @@ def downloadpage(url, **opt):
         else:
             logger.debug("CF retry with proxy for domain: %s" % domain)
             if not opt.get('headers'):
-                opt['headers'] = []
-            opt['headers'].extend([['Px-Host', domain], ['Px-Token', cf_proxy['token']]])
+                opt['headers'] = {}
+            opt['headers']['Px-Host'] = domain
+            opt['headers']['Px-Token'] = cf_proxy['token']
             opt['real-url'] = url
             ret = downloadpage(urlparse.urlunparse((parse.scheme, cf_proxy['url'], parse.path, parse.params, parse.query, parse.fragment)), **opt)
             ret.url = url
