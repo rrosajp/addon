@@ -287,10 +287,11 @@ def downloadpage(url, **opt):
 
     # Headers passed as parameters
     if opt.get('headers', None) is not None:
+        opt['headers'] = dict(opt['headers'])
         if not opt.get('replace_headers', False):
-            req_headers.update(dict(opt['headers']))
+            req_headers.update(opt['headers'])
         else:
-            req_headers = dict(opt['headers'])
+            req_headers = opt['headers']
 
     if domain in directIP.keys() and not opt.get('disable_directIP', False):
         req_headers['Host'] = domain
