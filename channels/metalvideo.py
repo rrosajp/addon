@@ -45,7 +45,8 @@ def peliculas(item):
 
 
 def findvideos(item):
-    return support.server(item, Videolibrary=False)
+    data = support.match(item, patron=r'<source src="[^"]+').match
+    return support.server(item, Videolibrary=False, data=data)
 
 
 def search(item, text):
