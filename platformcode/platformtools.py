@@ -1655,7 +1655,7 @@ def resume_playback(played_time):
 
 
     if played_time and played_time > 30:
-        if config.get_setting('resume_menu') == 0:
+        if config.get_setting('resume_menu') == 0:  # Resume Menu matches Custom Theme
             Dialog = ResumePlayback('ResumePlayback.xml', config.get_runtime_path(), played_time=played_time)
             Dialog.show()
             t = 0
@@ -1663,7 +1663,7 @@ def resume_playback(played_time):
                 t += 1
                 xbmc.sleep(100)
             if not Dialog.Resume: played_time = 0
-        else:
+        else:  # Resume Menu matches Skin Theme
             m, s = divmod(played_time, 60)
             h, m = divmod(m, 60)
             idx = xbmcgui.Dialog().contextmenu(
@@ -1671,7 +1671,10 @@ def resume_playback(played_time):
                 xbmc.getLocalizedString(12022).format('%02d:%02d:%02d' % (h, m, s)),
                 xbmc.getLocalizedString(12021)
             ])
-            if idx in [-1, 0]: played_time = 0
+            # if the dialog is skipped (idx == -1)
+            # or the second item is selected (idx == 1)
+            # resume from the beginning
+            if idx in [-1, 1]: played_time = 0
 
     else: played_time = 0
     xbmc.sleep(300)
