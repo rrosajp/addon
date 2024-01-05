@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
-import urllib.parse
+import sys
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+if PY3: import urllib.parse as urllib
+else: import urllib
 import ast
 import xbmc
 
 from core import httptools, support, filetools
 from platformcode import logger, config
-from concurrent import futures
+if PY3: from concurrent import futures
+else: from concurrent_py2 import futures
 
 vttsupport = False if int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0]) < 20 else True
 
@@ -35,7 +41,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
     # scws_id = urlparse(server_url).path.split('/')[-1]
     masterPlaylistParams = ast.literal_eval(iframeParams[0])
-    url = iframeParams[1] + '?{}&n=1'.format(urllib.parse.urlencode(masterPlaylistParams))
+    url = iframeParams[1] + '?{}&n=1'.format(urllib.urlencode(masterPlaylistParams))
 
     # info = support.match(url, patron=r'LANGUAGE="([^"]+)",\s*URI="([^"]+)|(http.*?rendition=(\d+)[^\s]+)').matches
     #
