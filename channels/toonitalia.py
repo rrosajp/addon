@@ -14,18 +14,18 @@ headers = [['Referer', host]]
 def mainlist(item):
 
     anime =['/category/anime',
-            ('ITA',['/lista-anime-ita','peliculas',]),
-            ('Sub-ITA',['/lista-anime-sub-ita', 'peliculas'])]
+            ('ITA',['/anime-ita','peliculas','list']),
+            ('Sub-ITA',['/contatti', 'peliculas', 'list']),
+	    ('Film Animazione',['/film-animazione', 'peliculas','list'])]
                # ('Film Animati',['/lista-anime-ita','peliculas', '', 'movie'])]
     search = ''
     return locals()
 
 
-def search(item, text):
-    support.info(text)
-    # item.args='search'
-    item.text = text
-    item.url = item.url + '/?a=b&s=' + text.replace(' ', '+')
+def search(item, text):    
+    item.args='search'
+    item.url = "{}/?{}".format(host, support.urlencode({"s": text}))
+    support.info(item.url)
 
     try:
         return peliculas(item)
@@ -44,13 +44,16 @@ def peliculas(item):
     action = 'check'
 
     deflang = 'ITA' if 'sub' not in item.url else 'Sub-ITA'
-    if 'lista' in item.url:
+    if item.args == 'list':
         pagination = 20
         patron = r'<li><a href="(?P<url>[^"]+)">(?P<title>[^<]+)'
 
     else:
         patronBlock = '<main[^>]+>(?P<block>.*)</main>'
-        patron = r'(?i)<a href="(?P<url>[^"]+)" rel="bookmark">(?P<title>[^<]+)</a>(:?[^>]+>){3}(?:<img.*?src="(?P<thumb>[^"]+)")?.*?<p>(?P<plot>[^<]+)</p>.*?tag">.*?(?P<type>(?:film|serie|anime))(?P<cat>.*?)</span>'
+        patron = r'<article.*?<h2 class="entry-title.*?<a href="(?P<url>.*?)">(?P<title>.*?)</a>.*?<img.*?src="(?P<thumb>.*?)".*?<p>(?P<plot>.*?)</p>.*?</article>'
+        if item.args == 'search':
+            patron = r'<article.*?<h2 class="entry-title.*?<a href="(?P<url>.*?)">(?P<title>.*?)</a>.*?<p>(?P<plot>.*?)</p>.*?</article>'
+
         typeContentDict={'movie':['film']}
         typeActionDict={'findvideos':['film']}
         patronNext = '<a class="next page-numbers" href="([^"]+)">'
