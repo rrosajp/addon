@@ -16,7 +16,8 @@ def mainlist(item):
     anime =['/category/anime',
             ('ITA',['/anime-ita','peliculas','list']),
             ('Sub-ITA',['/contatti', 'peliculas', 'list']),
-	    ('Film Animazione',['/film-animazione', 'peliculas','list'])]
+	    ('Film Animazione',['/film-animazione', 'peliculas','list']),
+	    ('Serie TV',['/serie-tv/', 'peliculas','list']),]
                # ('Film Animati',['/lista-anime-ita','peliculas', '', 'movie'])]
     search = ''
     return locals()
