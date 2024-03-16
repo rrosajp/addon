@@ -12,19 +12,18 @@ headers = [['Referer', host]]
 
 @support.menu
 def mainlist(item):
-
-    anime =['/category/anime',
-            ('ITA',['/anime-ita','peliculas','list']),
-            ('Sub-ITA',['/contatti', 'peliculas', 'list']),
-	    ('Film Animazione',['/film-animazione', 'peliculas','list']),
-	    ('Serie TV',['/serie-tv/', 'peliculas','list']),]
-               # ('Film Animati',['/lista-anime-ita','peliculas', '', 'movie'])]
+    top = [('Anime',['/category/anime', 'peliculas']),
+           ('Anime ITA',['/anime-ita','peliculas','list', 'anime']),
+	   ('Anime Sub-ITA',['/contatti', 'peliculas', 'list']),
+	   ('Film Animazione',['/film-animazione', 'peliculas','list']),
+           ('Serie TV',['/serie-tv/', 'peliculas','list'])]
     search = ''
     return locals()
 
 
 def search(item, text):    
     item.args='search'
+    item.thumbnail = 'anime'
     item.url = "{}/?{}".format(host, support.urlencode({"s": text}))
     support.info(item.url)
 
@@ -43,7 +42,7 @@ def search(item, text):
 def peliculas(item):
     anime = True
     action = 'check'
-
+    
     deflang = 'ITA' if 'sub' not in item.url else 'Sub-ITA'
     if item.args == 'list':
         pagination = 20

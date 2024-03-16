@@ -31,9 +31,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     ext = '.mp4'
 
     global data
-    logger.info(data)
+
     packed = scrapertools.find_single_match(data, r'(eval.*?)</script>')
-    logger.info(packed)
     unpacked = jsunpack.unpack(packed)
     
     # mixdrop like to change var name very often, hoping that will catch every
