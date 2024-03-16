@@ -12,11 +12,11 @@ headers = [['Referer', host]]
 
 @support.menu
 def mainlist(item):
-    top = [('Anime',['/category/anime', 'peliculas']),
-           ('Anime ITA',['/anime-ita','peliculas','list', 'anime']),
-	   ('Anime Sub-ITA',['/contatti', 'peliculas', 'list']),
-	   ('Film Animazione',['/film-animazione', 'peliculas','list']),
-           ('Serie TV',['/serie-tv/', 'peliculas','list'])]
+    menu = [('Anime',['/category/anime', 'peliculas', '', 'tvshow']),
+           ('Anime ITA {submenu}',['/anime-ita', 'peliculas', 'list', 'tvshow']),
+	   ('Anime Sub-ITA {submenu}',['/contatti', 'peliculas', 'list', 'tvshow']),
+	   ('Film Animazione',['/film-animazione', 'peliculas', 'list', 'movie']),
+           ('Serie TV',['/serie-tv/', 'peliculas', 'list', 'tvshow'])]
     search = ''
     return locals()
 
