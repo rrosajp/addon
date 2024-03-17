@@ -340,7 +340,11 @@ def render_items(itemlist, parent_item):
     def setItem(n, item, parent_item):
         item.itemlistPosition = n
         item_url = item.tourl()
-
+        if item.thumbnail == parent_item.thumbnail and parent_item.action in ['peliculas', 'search']:
+            if item.contentType in ['movie', 'undefined']:
+                item.thumbnail = 'https://raw.githubusercontent.com/kodiondemand/media/master/null/movie.png'
+            else:
+                item.thumbnail = 'https://raw.githubusercontent.com/kodiondemand/media/master/null/tv.png'
         if item.category == "":
             item.category = parent_item.category
         # If there is no action or it is findvideos / play, folder = False because no listing will be returned
@@ -484,7 +488,7 @@ def getCurrentView(item=None, parent_item=None):
     elif item.contentType == 'music':
         return 'musicvideo', 'musicvideos'
 
-    elif (item.contentType in ['movie'] and parent_item.action in parent_actions) \
+    elif (item.contentType in ['movie', 'undefined'] and parent_item.action in parent_actions) \
             or (item.channel in ['videolibrary'] and parent_item.action in ['list_movies']) \
             or (parent_item.channel in ['favorites'] and parent_item.action in ['mainlist']) \
             or parent_item.action in ['now_on_tv', 'now_on_misc', 'now_on_misc_film', 'mostrar_perfil', 'live', 'replay', 'news']:
