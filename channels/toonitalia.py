@@ -12,18 +12,19 @@ headers = [['Referer', host]]
 
 @support.menu
 def mainlist(item):
-    menu = [('Anime',['/category/anime', 'peliculas', '', 'tvshow']),
-           ('Anime ITA {submenu}',['/anime-ita', 'peliculas', 'list', 'tvshow']),
-	   ('Anime Sub-ITA {submenu}',['/contatti', 'peliculas', 'list', 'tvshow']),
-	   ('Film Animazione',['/film-animazione', 'peliculas', 'list', 'movie']),
+    menu = [('Anime',['/category/anime', 'peliculas', '', 'undefined']),
+           ('Anime ITA {submenu}',['/anime-ita', 'peliculas', 'list', 'undefined']),
+           ('Anime Sub-ITA {submenu}',['/contatti', 'peliculas', 'list', 'undefined']),
+           ('Film Animazione',['/film-animazione', 'peliculas', 'list', 'undefined']),
            ('Serie TV',['/serie-tv/', 'peliculas', 'list', 'tvshow'])]
     search = ''
     return locals()
 
 
-def search(item, text):    
+def search(item, text):
     item.args='search'
     item.thumbnail = 'anime'
+    item.contentType = 'undefined'
     item.url = "{}/?{}".format(host, support.urlencode({"s": text}))
     support.info(item.url)
 
@@ -42,7 +43,7 @@ def search(item, text):
 def peliculas(item):
     anime = True
     action = 'check'
-    
+
     deflang = 'ITA' if 'sub' not in item.url else 'Sub-ITA'
     if item.args == 'list':
         pagination = 20
@@ -77,6 +78,7 @@ def check(item):
 @support.scrape
 def episodios(item):
     anime = True
+    item.contentType = 'tvshow'
     patron = r'>\s*(?:(?P<season>\d+)(?:&#215;|x|×))?(?P<episode>\d+)(?:\s+&#8211;\s+)?[ –]+(?P<title2>[^<]+)[ –]+<a (?P<data>.*?)(?:<br|</p)'
     return locals()
 
