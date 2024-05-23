@@ -162,9 +162,9 @@ def peliculas(item):
     if not item.newest:
         item.mainThumb = item.thumbnail
         if recordlist:
-            itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), thumbnail=support.thumb(), page=page, records=recordlist))
+            itemlist.append(item.clone(action='peliculas',title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), thumbnail=support.thumb(), page=page, records=recordlist))
         elif len(itemlist) >= 20:
-            itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), thumbnail=support.thumb(), records=[], page=page + 1))
+            itemlist.append(item.clone(action='peliculas',title=support.typo(support.config.get_localized_string(30992), 'color kod bold'), thumbnail=support.thumb(), records=[], page=page + 1))
 
     support.tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
     support.check_trakt(itemlist)
