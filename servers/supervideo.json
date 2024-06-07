@@ -4,7 +4,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "supervideo.tv/embed-([a-z0-9]{12}).html",
+        "pattern": "supervideo\\.[a-z0-9]+?/embed-([a-z0-9]{12}).html",
         "url": "https://supervideo.cc/e/\\1"
       },
       {
