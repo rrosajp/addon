@@ -17,7 +17,8 @@ def test_video_exists(page_url):
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     global data
-    packed = support.match(data, patron=r'(eval\(function\(p.*?)</').match
+    packed = support.match(data, patron=r'<script data-cfasync=\"false\" type=\"text/javascript\">(eval\(function\(p,a,c,k,e,d\).*?)\s*</script>').match
+
     if packed:
         data = jsunpack.unpack(packed).replace("\\", "")
     video_urls = support.get_jwplayer_mediaurl(data, 'filemoon', hls=True)
