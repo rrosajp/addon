@@ -56,7 +56,9 @@ def mainlist(item):
     generi = [('Generi', ['','genres'])]
     menu = [
         ('Archivio', ['/archivio', 'peliculas', -1]),
-	('Archivio per data aggiornamento {submenu}', ['/archivio?sort=last_air_date', 'peliculas', -1]),
+	('Archivio Film {submenu}', ['/archivio?type=movie', 'peliculas', -1]),
+    ('Archivio Serie TV {submenu}', ['/archivio?type=tv', 'peliculas', -1]),
+    ('Archivio per data aggiornamento {submenu}', ['/archivio?sort=last_air_date', 'peliculas', -1]),
 	('Archivio per data aggiunta {submenu}', ['/archivio?sort=created_at', 'peliculas', -1]),
 	('Archivio per valutazione {submenu}', ['/archivio?sort=score', 'peliculas', -1]),
 	('Archivio per numero visioni {submenu}', ['/archivio?sort=views', 'peliculas', -1]),
