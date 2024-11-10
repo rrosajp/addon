@@ -54,6 +54,14 @@ def mainlist(item):
             ('Aggiunti di recente', ['/serie-tv', 'peliculas', 1]),
             ('Top 10 serie TV di oggi', ['/serie-tv', 'peliculas', 2])]
     generi = [('Generi', ['','genres'])]
+    menu = [
+        ('Archivio', ['/archivio', 'peliculas', -1]),
+	('Archivio per data aggiornamento {submenu}', ['/archivio?sort=last_air_date', 'peliculas', -1]),
+	('Archivio per data aggiunta {submenu}', ['/archivio?sort=created_at', 'peliculas', -1]),
+	('Archivio per valutazione {submenu}', ['/archivio?sort=score', 'peliculas', -1]),
+	('Archivio per numero visioni {submenu}', ['/archivio?sort=views', 'peliculas', -1]),
+	('Archivio per nome {submenu}', ['/archivio?sort=name', 'peliculas', -1])
+    ]
     search=''
     return locals()
 
@@ -130,7 +138,7 @@ def peliculas(item):
 
     if item.records:
         records = item.records
-    elif item.genre or item.search:
+    elif item.genre or item.search or (item.args and item.args == -1):
         records = data_page['props']['titles']
     else:
         if not item.args:
@@ -233,7 +241,7 @@ def episodios(item):
         support.tmdb.set_infoLabels_itemlist(itemlist, seekTmdb=True)
     support.check_trakt(itemlist)
     support.videolibrary(itemlist, item)
-    support.download(itemlist, item)
+    #support.download(itemlist, item)
     return itemlist
 
 
