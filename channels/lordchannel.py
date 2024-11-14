@@ -44,6 +44,7 @@ def genres(item):
 def peliculas(item):
     #if item.args == 'search':
     action = 'check'
+    pagination = 100 #come il portale
     patron= r'<div class="col-6.*?<img\s.*?src="(?P<thumb>[^"]+).*?<h3.*?<a\shref="(?P<url>[^"]+).*?>(?P<title>.*?)</a'
     patronNext = r'<li class="paginator__item paginator__item--next">.*?href="(?P<url>[^"]+)'
     return locals()
@@ -78,13 +79,14 @@ def search(item, text):
             logger.error("search except: %s" % line)
         return []
 
+
 def findvideos(item):
     video_url = item.url
 
     if item.contentType == 'movie':
         video_url = support.match(video_url, patron=r'<a\shref="(?P<url>[^"]+)"\sclass="btn-streaming streaming_btn">').match
     
-    video_url = support.match(video_url, patron=r'<video-js.*?src="(?P<url>[^"]+)').match
+    video_url = support.match(video_url, patron=r'<video-js.*?src="?(?P<url>.*?)"?\s.*?</video-js>').match
 
     if (video_url == ''):
        return []
