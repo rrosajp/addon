@@ -1565,7 +1565,7 @@ def thumb(item_itemlist_string=None, genre=False, live=False):
                  'az':['lettera','lista','alfabetico','a-z', 'alphabetical'],
                  'year':['anno', 'anni', 'year'],
                  'update':['replay', 'update'],
-                 'videolibrary':['teche'],
+                 'videolibrary':['teche', 'archivio'],
                  'info':['info','information','informazioni'],
                  'star':['star', 'personaggi', 'interpreti', 'stars', 'characters', 'performers', 'staff', 'actors', 'attori'],
                  'winter':['inverno', 'winter'],
