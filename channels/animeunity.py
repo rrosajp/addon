@@ -4,7 +4,7 @@
 # ------------------------------------------------------------
 
 import cloudscraper, json, copy, inspect
-from core import jsontools, support, httptools
+from core import jsontools, support, httptools, scrapertools
 from platformcode import autorenumber
 
 # support.dbg()
@@ -53,7 +53,7 @@ def genres(item):
     # support.dbg()
     itemlist = []
 
-    genres = json.loads(support.match(response.text, patron='genres="([^"]+)').match.replace('&quot;','"'))
+    genres = json.loads(support.match(response.data, patron='genres="([^"]+)').match.replace('&quot;','"'))
 
     for genre in genres:
         item.args['genres'] = [genre]
@@ -65,10 +65,10 @@ def years(item):
     itemlist = []
 
     from datetime import datetime
-    current_year = datetime.today().year
-    oldest_year = int(support.match(response.text, patron='anime_oldest_date="([^"]+)').match)
+    next_year = datetime.today().year + 1
+    oldest_year = int(support.match(response.data, patron='anime_oldest_date="([^"]+)').match)
 
-    for year in list(reversed(range(oldest_year, current_year + 1))):
+    for year in list(reversed(range(oldest_year, next_year + 1))):
         item.args['year']=year
         itemlist.append(item.clone(title=support.typo(year,'bold'), action='peliculas'))
     return itemlist
@@ -123,16 +123,28 @@ def news(item):
     js = fullJs['data']
 
     for it in js:
-        if it.get('anime', {}).get('title'):
+        if it.get('anime', {}).get('title') or it.get('anime', {}).get('title_eng'):
+            title_name = it['anime']['title'] if it.get('anime', {}).get('title') else it['anime']['title_eng']
+            pattern = r'[sS](?P<season>\d+)[eE](?P<episode>\d+)'
+            match = scrapertools.find_single_match(it['file_name'], pattern)
+            full_episode = ''
+            if match:
+                season, episode = match
+                full_episode = ' - S' + season + ' E' + episode
+            else:
+                pattern = r'[._\s]Ep[._\s]*(?P<episode>\d+)'
+                episode = scrapertools.find_single_match(it['file_name'], pattern)
+                if episode:
+                    full_episode = ' - E' + episode                             
             itemlist.append(
-                item.clone(title= support.typo(it['anime']['title'] + ' - EP. ' + it['number'], 'bold'),
-                           fulltitle=it['anime']['title'],
-                           thumbnail=it['anime']['imageurl'],
+                item.clone(title = support.typo(title_name + full_episode, 'bold'),
+                           fulltitle = it['anime']['title'],
+                           thumbnail = it['anime']['imageurl'],
                            forcethumb = True,
-                           scws_id=it.get('scws_id', ''),
+                           scws_id = it.get('scws_id', ''),
                         #    video_url=it.get('link', ''),
-                           plot=it['anime']['plot'],
-                           action='findvideos')
+                           plot = it['anime']['plot'],
+                           action = 'findvideos')
             )
     if 'next_page_url' in fullJs:
         itemlist.append(item.clone(title=support.typo(support.config.get_localized_string(30992), 'color kod bold'),thumbnail=support.thumb(), url=fullJs['next_page_url']))
