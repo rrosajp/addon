@@ -1,0 +1,11 @@
+{
+    "id": "bt4g",
+    "name": "BT4G",
+    "active": true,
+    "language": ["ita"],
+    "thumbnail": "bt4g.png",
+    "banner": "bt4g.png",
+    "categories": ["movie", "tvshow", "torrent"],
+    "not_active": ["include_in_newest"],
+    "settings": []
+}
