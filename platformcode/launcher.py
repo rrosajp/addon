@@ -8,7 +8,7 @@ from core.item import Item
 from core import filetools
 from platformcode import config, logger, platformtools
 from platformcode.logger import WebErrorException
-
+from six.moves import urllib
 
 def start():
     '''
@@ -226,7 +226,7 @@ def makeItem():
                 key, val = e.split('=')
                 if val.lower() == 'false': val = False
                 elif val.lower() == 'true': val = True
-                item.__setattr__(key, val)
+                item.__setattr__(key, urllib.parse.unquote(val))
     # If no item, this is mainlist
     else:
         item = Item(channel='channelselector', action='getmainlist', viewmode='movie')
