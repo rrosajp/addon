@@ -183,7 +183,7 @@ def findvideos(item):
     main_url = support.match(item, patron=r'<a href="([^"]+)">[^>]+>[^>]+>G',  headers=headers).match
     urls = support.match(support.match(main_url, headers=headers).data, patron=r'<a class="dropdown-item"\s*href="([^"]+)', headers=headers).matches
     itemlist.append(item.clone(action="play", title='Primario', url=main_url, server='directo'))
-    itemlist.append(item.clone(action="play", title='Secondario', url=main_url + '&s=alt', server='directo'))
+    #itemlist.append(item.clone(action="play", title='Secondario', url=main_url + '&s=alt', server='directo'))
     for url in urls:
         link = support.match(url, patron=r'<a href="([^"]+)"[^>]+><button', headers=headers).match
         if link:
