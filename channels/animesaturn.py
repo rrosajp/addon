@@ -5,6 +5,7 @@
 
 from core import support
 from platformcode import logger
+import pyaes
 
 host = support.config.get_channel_url()
 __channel__ = 'animesaturn'
@@ -17,10 +18,10 @@ def get_cookie(data):
     a = support.match(data, patron=r'a=toNumbers\("([^"]+?)"\)').match 
     b = support.match(data, patron=r'b=toNumbers\("([^"]+?)"\)').match 
     c = support.match(data, patron=r'c=toNumbers\("([^"]+?)"\)').match
-    from Crypto.Cipher import AES
-    cipher = AES.new(bytes.fromhex(a), AES.MODE_CBC, bytes.fromhex(b))
     
-    cookie = "ASNew-9v=" + cipher.decrypt(bytes.fromhex(c)).hex()
+    aes = pyaes.AESModeOfOperationCBC(bytes.fromhex(a), iv = bytes.fromhex(b))
+    
+    cookie = "ASNew-9v=" + aes.decrypt(bytes.fromhex(c)).hex()
     logger.debug("cookie = " + cookie)
     support.config.set_setting('cookie', cookie, __channel__)
     headers = [['Cookie', cookie]]
