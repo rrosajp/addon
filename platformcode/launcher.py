@@ -226,7 +226,7 @@ def makeItem():
                 key, val = e.split('=')
                 if val.lower() == 'false': val = False
                 elif val.lower() == 'true': val = True
-                item.__setattr__(key, urllib.parse.unquote(val))
+                item.__setattr__(key, urllib.parse.unquote(val) if isinstance(val,str) else val)
     # If no item, this is mainlist
     else:
         item = Item(channel='channelselector', action='getmainlist', viewmode='movie')

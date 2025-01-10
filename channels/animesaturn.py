@@ -4,6 +4,7 @@
 # ----------------------------------------------------------
 
 from core import support
+from platformcode import logger
 
 host = support.config.get_channel_url()
 __channel__ = 'animesaturn'
@@ -13,25 +14,30 @@ headers = {'X-Requested-With': 'XMLHttpRequest', 'Cookie': cookie}
 
 def get_cookie(data):
     global cookie, headers
-    cookie = support.match(data, patron=r'document.cookie="([^\s]+)').match
+    a = support.match(data, patron=r'a=toNumbers\("([^"]+?)"\)').match 
+    b = support.match(data, patron=r'b=toNumbers\("([^"]+?)"\)').match 
+    c = support.match(data, patron=r'c=toNumbers\("([^"]+?)"\)').match
+    from Crypto.Cipher import AES
+    cipher = AES.new(bytes.fromhex(a), AES.MODE_CBC, bytes.fromhex(b))
+    
+    cookie = "ASNew-9v=" + cipher.decrypt(bytes.fromhex(c)).hex()
+    logger.debug("cookie = " + cookie)
     support.config.set_setting('cookie', cookie, __channel__)
     headers = [['Cookie', cookie]]
 
 
-def get_data(item):
-    # support.dbg()
-    # url = support.match(item.url, headers=headers, follow_redirects=True, only_headers=True).url
-    data = support.match(item.url, headers=headers, follow_redirects=True).data
-    if 'ASCookie' in data:
+def get_data(url):
+    data = support.match(url, headers=headers, follow_redirects=True).data
+    if 'ASNew-9v' in data:
         get_cookie(data)
-        data = get_data(item)
+        data = get_data(url)
     return data
 
 
 @support.menu
 def mainlist(item):
 
-    anime = ['/animelist?load_all=1&d=1',
+    anime = ['/animelist',
              ('ITA',['', 'submenu', '/filter?language%5B0%5D=1']),
              ('SUB-ITA',['', 'submenu', '/filter?language%5B0%5D=0']),
              ('Più Votati',['/toplist','menu', 'top']),
@@ -76,7 +82,7 @@ def newest(categoria):
 
 @support.scrape
 def submenu(item):
-    data = support.match(item.url + item.args).data
+    data = get_data(item.url + item.args) #support.match(item.url + item.args).data
     action = 'filter'
     patronMenu = r'<h5 class="[^"]+">(?P<title>[^<]+)[^>]+>[^>]+>\s*<select id="(?P<parameter>[^"]+)"[^>]+>(?P<data>.*?)</select>'
     def itemlistHook(itemlist):
@@ -87,7 +93,8 @@ def submenu(item):
 
 def filter(item):
     itemlist = []
-    matches = support.match(item.data if item.data else item.url, patron=r'<option value="(?P<value>[^"]+)"[^>]*>(?P<title>[^<]+)').matches
+    data = item.data if item.data else get_data(item.url)
+    matches = support.match(data, patron=r'<option value="(?P<value>[^"]+)"[^>]*>(?P<title>[^<]+)',  headers=headers).matches
     for value, title in matches:
         itemlist.append(item.clone(title= support.typo(title,'bold'), url='{}{}&{}%5B0%5D={}'.format(host, item.args, item.parameter, value), action='peliculas', args='filter'))
     support.thumb(itemlist, genre=True)
@@ -96,12 +103,9 @@ def filter(item):
 
 @support.scrape
 def menu(item):
-    patronMenu = r'<div class="col-md-13 bg-dark-as-box-shadow p-2 text-white text-center">(?P<title>[^"<]+)<(?P<other>.*?)(?:"lista-top"|"clearfix")'
-    action = 'peliculas'
-    item.args = 'top'
-    def itemHook(item2):
-        item2.url = item.url
-        return item2
+    data = item.data if item.data else get_data(item.url)
+    patronMenu = r'<div class="col-md-9 pl-0 mobile-padding margin-top-anime-page float-left pr-0">.*?href="(?P<url>[^"]+)".*?</div>(?P<title>.*?)<'
+    action = 'check'
 
     return locals()
 
@@ -114,9 +118,7 @@ def peliculas(item):
     action = 'check'
     page = None
     post = "page=" + str(item.page if item.page else 1) if item.page and int(item.page) > 1 else None
-    data = get_data(item)
-
-    # debug = True
+    data = get_data(item.url)
 
     if item.args == 'top':
         data = item.other
@@ -154,7 +156,7 @@ def peliculas(item):
 
 
 def check(item):
-    movie = support.match(item, patron=r'Episodi:</b> (\d*) Movie')
+    movie = support.match(item, patron=r'Episodi:</b> (\d*) Movie',  headers=headers)
     if movie.match:
         episodes = episodios(item)
         if len(episodes) > 0:
@@ -177,7 +179,7 @@ def findvideos(item):
     itemlist = []
     links = []
 
-    main_url = support.match(item, patron=r'<a href="([^"]+)">[^>]+>[^>]+>G').match
+    main_url = support.match(item, patron=r'<a href="([^"]+)">[^>]+>[^>]+>G',  headers=headers).match
     urls = support.match(support.match(main_url, headers=headers).data, patron=r'<a class="dropdown-item"\s*href="([^"]+)', headers=headers).matches
     itemlist.append(item.clone(action="play", title='Primario', url=main_url, server='directo'))
     itemlist.append(item.clone(action="play", title='Secondario', url=main_url + '&s=alt', server='directo'))
@@ -190,5 +192,5 @@ def findvideos(item):
 
 def play(item):
     if item.server == 'directo':
-        item.url = support.match(item.url, patron=r'(?:source type="[^"]+"\s*src=|file:[^"]+)"([^"]+)').match
+        item.url = support.match(item.url, patron=r'(?:source type="[^"]+"\s*src=|file:[^"]+)"([^"]+)',  headers=headers).match
     return[item]
