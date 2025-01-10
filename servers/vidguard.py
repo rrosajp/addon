@@ -16,7 +16,7 @@ def test_video_exists(page_url):
     logger.debug("(page_url='%s')" % page_url)
     data = httptools.downloadpage(page_url)
     if data.code == 404:
-        return False,  config.get_localized_string(70449) % "Vivo"
+        return False,  config.get_localized_string(70449) % "VidGuard"
     return True, ""
 
 
@@ -35,7 +35,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         enc_data = enc_data.replace('\\"', '"')
         enc_data = aadecode.decode(enc_data, alt = True)
         stream_url = json.loads(enc_data[11:]).get('stream')
-        video_urls.append(['vivo', sig_decode(stream_url)])
+        video_urls.append(['VidGuard', sig_decode(stream_url)])
 
     return video_urls
 
